@@ -1,5 +1,730 @@
 [
   {
+    "release": "2026-10-21.3",
+    "ar": [
+      "شاهد أوقات الصلاة بأرقام أكبر داخل البطاقات نفسها، مع الحفاظ على حجم العرض المطوي ومسافات واضحة حول النص.",
+      "اقرأ العدّ التنازلي بسهولة أكبر، مع حلقة بسيطة تزداد امتلاءً كلما اقترب موعد الصلاة.",
+      "تفاعل مع أدوات الرئيسية والمشاركة والتحديث باستجابة أوضح، أو اختر تقليل الحركة لعرض أهدأ.",
+      "تعرّف إلى الصلاة الحالية من مؤشر «الآن» المتناسق مع لون الزر الرئيسي، بلمعة خفيفة وبدائل واضحة لتسهيل الاستخدام."
+    ],
+    "en": [
+      "See larger prayer times in the same cards, with familiar collapsed sizing and clear space around the text.",
+      "Read the countdown more easily, with a simple ring that fills as the next prayer gets closer.",
+      "Enjoy clearer feedback from Home tools, sharing and refresh, or choose Reduce Motion for a calmer view.",
+      "Recognize the current prayer with a Now pill that matches the main button, with a soft gloss and clear accessibility alternatives."
+    ]
+  },
+  {
+    "release": "2026-10-21.2",
+    "ar": [
+      "اقرأ أوقات الصلاة بحجم أكبر داخل البطاقات الحالية، مع بقاء البطاقات المطوية بحجمها المعتاد.",
+      "تابع الوقت المتبقي للصلاة بأرقام أوضح وحلقة أنقى تمتلئ تدريجيًا مع اقتراب موعدها.",
+      "استمتع باستجابة أوضح لأزرار المشاركة والتحديث وأدوات الرئيسية، مع بديل هادئ عند تفعيل تقليل الحركة.",
+      "ميّز الصلاة الحالية بمؤشر «الآن» بلون أزرار التطبيق ولمعة هادئة، مع الحفاظ على وضوحه في أوضاع تسهيل الاستخدام."
+    ],
+    "en": [
+      "Read larger prayer times within the existing cards, while collapsed cards keep their familiar size.",
+      "Follow the remaining prayer time with clearer digits and a cleaner ring that fills as prayer time approaches.",
+      "Get clearer feedback from Home sharing, refresh and everyday actions, with a calmer alternative when Reduce Motion is enabled.",
+      "Spot the current prayer with a Now indicator that matches the app's buttons and adds a soft gloss, with clear accessibility alternatives."
+    ]
+  },
+  {
+    "release": "2026-10-21.1",
+    "ar": [
+      "تظهر أزرار المسبحة والصلاة على النبي بانتظام، مع إخفاء نص الفائدة عند اختيار الأيقونات فقط.",
+      "اقرأ معاينات أطول للأذكار داخل القائمة، مع ترتيب أوضح للأعداد المحفوظة وبقاء النص الكامل متاحًا.",
+      "استخدم قوائم الاختيار وأزرار العد مع النص المكبّر، دون تداخل الحقول أو فقدان الوصول إلى أدوات أسفل الصفحة."
+    ],
+    "en": [
+      "Masbaha and Salawat tools now match consistently, with the Benefit label hidden when you choose icons only.",
+      "Read longer dhikr previews in the picker, with clearer saved counts and the complete text still available.",
+      "Use pickers and counting controls with enlarged text, without overlapping fields or losing access to footer actions."
+    ]
+  },
+  {
+    "release": "2026-10-21",
+    "ar": [
+      "أظهر أدوات المصحف بضغطة واحدة وأغلق شرح الكلمة بلمسه أو بلمس الكلمة، مع أسهم رجوع تتجه نحو حافة الشاشة.",
+      "اختر ألوان المصحف أو تنقّل بينها بالسحب لأعلى ولأسفل، مع إمكانية إيقاف الإيماءة ودليل موجز في إعدادات القراءة.",
+      "اقرأ الصفحة دون انتظار شروح الكلمات، مع تحميل الخطوط والصفحات معًا وانتقال سلس يحافظ على ثبات الأدوات.",
+      "استخدم تاريخًا موحدًا لأقسام التقدم مع سجل أوضح وقوائم تناسب النص المكبّر، وتحكّم بالأزرار ولوحة المفاتيح بثبات أكبر."
+    ],
+    "en": [
+      "Reveal Mushaf tools with one tap and dismiss meanings by tapping them or the same word, with Back arrows pointing towards the screen edge.",
+      "Choose Mushaf colours or swipe up and down between them, with an optional gesture switch and a short guide in Reading Settings.",
+      "Read without waiting for word meanings, with fonts and pages loading together and smooth page turns that keep tools stationary.",
+      "Use one date scope across Progress, with clearer records, menus that fit enlarged text, and more reliable button and keyboard feedback."
+    ]
+  },
+  {
+    "release": "2026-10-20.4",
+    "ar": [
+      "المشاركة تملأ شاشة الهاتف مع معاينة أكبر، ويمكنك الانتقال من ذكر واحد إلى المجموعة كاملة دون فقد تصميمك.",
+      "اختر مقاييس التقدم واعرض السجلات الدقيقة، مع مرشحات فترة قابلة للطي ورسوم تتبع اتجاه لغتك.",
+      "اطوِ البحث والتصفية في مكتبة الأذكار لتوفير مساحة للقراءة، مع بقاء اختيارك وكلمات البحث واضحة.",
+      "تابع تقدم الضغط لفتح قفل الاستماع، مع حماية التنقل داخل التطبيق ومساعدة تثبيته على شاشة جهازك."
+    ],
+    "en": [
+      "Sharing fills your phone screen with larger previews; switch from one zikr to its whole collection while keeping your design.",
+      "Choose your Progress metrics and inspect exact records, with collapsible date filters and charts that follow your language direction.",
+      "Collapse Library search and filters to give azkar more room, while keeping your selected category and search words visible.",
+      "See your hold-to-unlock progress, with protected in-app navigation and help keeping the app pinned on your device."
+    ]
+  },
+  {
+    "release": "2026-10-20.3",
+    "ar": [
+      "صفحة التقدم أصبحت بمعايير مختارة وخرائط تتجه من اليمين إلى اليسار بالعربية، مع تصدير السجلات الدقيقة.",
+      "عداد الثواني للصلاة القادمة مع دائرة متحركة خفيفة، ومنظومة حركة هادئة وفق تفضيل تقليل الحركة.",
+      "قوائم الاختيار محمية بسطح معتم يغطي النص الخلفي في جميع الوضعيات والألوان.",
+      "تحسينات في الموثوقية: استعادة الإعدادات، وإلغاء التصدير، وحسابات الحديقة الفعّالة عند التمرير."
+    ],
+    "en": [
+      "Progress shows your chosen metrics and charts that run right to left in Arabic and left to right in English, with exact record exports.",
+      "A seconds countdown with a small animated ring appears on the next prayer card, with purposeful motion that respects Reduce Motion.",
+      "Dropdowns and pickers use a protected opaque surface that covers underlying text in every theme and material mode.",
+      "Reliability improvements: preference recovery, cancelled export cleanup, and efficient garden calculations while scrolling."
+    ]
+  },
+  {
+    "release": "2026-10-20.2",
+    "ar": [
+      "شارك بطاقتك مع نص اختياري، وانسخ القراءة أو رابطها من خطوة المشاركة.",
+      "تنقّل بين خطوات مترابطة ومعاينة متجاوبة، وتخطَّ التصميم للاحتفاظ ببطاقتك الحالية.",
+      "اختر خطة ورد القرآن بقوائم أبسط وأهداف لمس أوسع، مع عرض أوضح للخطة والسجل الأسبوعي.",
+      "تصفّح سجل التقدم بعمل حسابي أقل أثناء التمرير، مع خلفية تحمي أدوات الصفحة عند تعذّر التمويه الزجاجي."
+    ],
+    "en": [
+      "Share your card with optional text, and copy the reading or its link from the Share step.",
+      "Move through connected steps and a responsive preview, or skip design to keep your current card.",
+      "Choose your Quran reading plan with simpler menus and larger touch targets, with clearer plan and weekly records.",
+      "Browse Progress with less recalculation while scrolling, and protected page controls when glass blur is unavailable."
+    ]
+  },
+  {
+    "release": "2026-10-20",
+    "ar": [
+      "أضف نصًا اختياريًا إلى الصورة التي تشاركها، وانسخ نص القراءة أو رابطها المباشر.",
+      "تنقّل بين خطوات المشاركة الواضحة، واختر المحتوى واللغة بقوائم تملأ عرض الهاتف.",
+      "راجع بطاقتك بجوار إعداداتها على الشاشات الواسعة، وتخطَّ التصميم عندما تكون جاهزًا للمشاركة.",
+      "اضبط ورد القرآن بقوائم مختصرة، وتابع خطتك وسجل أسبوعك بعرض أوضح على الأجهزة اللوحية والحاسوب."
+    ],
+    "en": [
+      "Add optional text to the image you share, and copy the reading text or its direct link.",
+      "Move through clear sharing steps and choose content and language with full-width phone menus.",
+      "Review your card beside its settings on wide screens, and skip design when you are ready to share.",
+      "Set your Quran reading plan with compact menus, and see your plan and weekly history more clearly on tablets and computers."
+    ]
+  },
+  {
+    "release": "2026-10-19.5",
+    "ar": [
+      "تظل معاينة البطاقة الحالية ظاهرة أثناء تغيير تصميمها، حتى عند اختيار بطاقات متأخرة.",
+      "يبقى رقم البطاقة ظاهرًا ومتسقًا أثناء تجهيز البطاقات الجديدة، حتى عندما يقل عددها.",
+      "تبقى أزرار السابق والتالي في مكانها، مع تعطيلها بوضوح إلى أن تصبح البطاقة الجديدة جاهزة."
+    ],
+    "en": [
+      "Keep the current preview visible while changing its design, including when viewing later cards.",
+      "Keep a consistent card number while new cards are prepared, even when there are fewer cards.",
+      "Previous and Next stay in place and are clearly disabled until the updated card is ready."
+    ]
+  },
+  {
+    "release": "2026-10-19.4",
+    "ar": [
+      "جهّز بطاقات المشاركة عبر خطوات المحتوى والتصميم والمشاركة، مع معاينة مباشرة وحفظ اختياراتك بين الخطوات.",
+      "أضف الترجمات الإنجليزية المتاحة إلى مشاركات نصوص الرئيسية والفضائل والورد، مع خيارات تطابق المحتوى.",
+      "استخدم قوائم أوضح وتمريرًا أقل على الهاتف، وتنقّل بين البطاقات بأسهم قريبة وواضحة الاتجاه."
+    ],
+    "en": [
+      "Prepare shared cards in clear Content, Design and Share steps, with a live preview and choices kept between steps.",
+      "Include available English meanings in Home, Benefits and Wird shares, with accurate options for each reading.",
+      "Use clearer dropdowns with less phone scrolling, and move between cards using nearby arrows that point the right way."
+    ]
+  },
+  {
+    "release": "2026-10-19.3",
+    "ar": [
+      "استمتع بزجاج ضبابي أخف يُظهر ألوان خلفية الصفحة الرئيسية أثناء التمرير.",
+      "يظهر رأس الصفحة وبطاقات الصلاة فوق سطح متصل، دون شريط داكن إضافي خلف الرأس.",
+      "تتقلّص بطاقات الصلاة وتتمدد بسلاسة، مع تلاشي التفاصيل وظهور العد التنازلي بتناغم مع حركتها."
+    ],
+    "en": [
+      "Enjoy softer frosted glass that lets Home's background colors show through while scrolling.",
+      "See the header and prayer cards on one continuous surface, without an extra dark header band.",
+      "Prayer cards shrink and expand smoothly, with details and the countdown fading in step with their movement."
+    ]
+  },
+  {
+    "release": "2026-10-19.2",
+    "ar": [
+      "تصفّح الصفحة الرئيسية ببطاقات صلاة أكثر ثباتًا، مع بقاء العد التنازلي للصلاة التالية ظاهرًا عند التمرير.",
+      "اقرأ أسماء الصلوات وأوقاتها بوضوح مع تباعد مريح حتى عند تكبير النص.",
+      "اقرأ الروايات الكاملة للأحاديث في صفحة فوائد الذكر بالعربية والإنجليزية، وشارك نصها مع مصادرها.",
+      "احتفظ باختيارك للمظهر الزجاجي أو المعتم للصفحة الرئيسية أثناء التمرير، بشكل مستقل عن مظهر بقية التطبيق."
+    ],
+    "en": [
+      "Browse Home with steadier prayer cards and keep the next-prayer countdown visible while scrolling.",
+      "Read prayer names and times clearly with comfortable spacing, including enlarged text.",
+      "Read complete hadith narrations in Benefits in Arabic and English, and share their text with sources.",
+      "Keep your chosen Glass or Opaque Home appearance while scrolling, independently of the rest of the app."
+    ]
+  },
+  {
+    "release": "2026-10-19",
+    "ar": [
+      "تصفّح الصفحة الرئيسية ببطاقات صلاة أكثر ثباتًا، مع بقاء العد التنازلي للصلاة التالية ظاهرًا عند التمرير.",
+      "اقرأ أسماء الصلوات وأوقاتها بوضوح مع تباعد مريح حتى عند تكبير النص.",
+      "اقرأ الروايات الكاملة للأحاديث في صفحة فوائد الذكر بالعربية والإنجليزية، وشارك نصها مع مصادرها.",
+      "احتفظ بالمظهر الزجاجي الذي اخترته للصفحة الرئيسية أثناء التمرير، حتى مع تفعيل تقليل الشفافية لبقية التطبيق."
+    ],
+    "en": [
+      "Browse Home with steadier prayer cards and keep the next-prayer countdown visible while scrolling.",
+      "Read prayer names and times clearly with comfortable spacing, including enlarged text.",
+      "Read complete hadith narrations in Benefits in Arabic and English, and share their text with sources.",
+      "Keep your chosen Home Glass appearance while scrolling, including when reduced transparency is enabled for the rest of the app."
+    ]
+  },
+  {
+    "release": "2026-10-18.11",
+    "ar": [
+      "تصفّح الصفحة الرئيسية ببطاقات صلاة أكثر ثباتًا، مع بقاء العد التنازلي للصلاة التالية ظاهرًا عند التمرير.",
+      "اقرأ أسماء الصلوات وأوقاتها بوضوح مع تباعد مريح حتى عند تكبير النص.",
+      "اقرأ الروايات الكاملة للأحاديث في صفحة فوائد الذكر بالعربية والإنجليزية، وشارك نصها مع مصادرها."
+    ],
+    "en": [
+      "Browse Home with steadier prayer cards and keep the next-prayer countdown visible while scrolling.",
+      "Read prayer names and times clearly with comfortable spacing, including enlarged text.",
+      "Read complete hadith narrations in Benefits in Arabic and English, and share their text with sources."
+    ]
+  },
+  {
+    "release": "2026-10-18.10",
+    "ar": [
+      "اقرأ معاني كلمات القرآن فوق خلفية زجاجية أوضح تحجب تداخل النص خلف الشرح.",
+      "اعرف أن المظهر الزجاجي مفعّل عند اختيار لون صفحة المصحف، مع توضيح مكان تغيير المظهر.",
+      "اقرأ خيارات المصحف وإعدادات المظهر بوضوح فوق الآيات، بخلفيات تحجب تداخل النص في المتصفحات المختلفة.",
+      "استفد من مساحة أوسع في الصفحة الرئيسية، بعرض وهوامش متناسقة مع صفحة الأذكار وتباعد أوضح داخل بطاقات الصلاة."
+    ],
+    "en": [
+      "Read Quran word explanations on a clearer frosted surface that keeps underlying text from competing with the meaning.",
+      "See when Glass mode is active while choosing a Mushaf page color, with guidance on where to change the surface.",
+      "Read Mushaf options and appearance settings clearly over the verses, with protected backgrounds across browsers.",
+      "Use a wider Home layout with Azkar’s page width and gutters, plus consistent spacing inside prayer cards."
+    ]
+  },
+  {
+    "release": "2026-10-18.9",
+    "ar": [
+      "اقرأ معاني كلمات القرآن فوق خلفية زجاجية أوضح تحجب تداخل النص خلف الشرح.",
+      "اعرف أن المظهر الزجاجي مفعّل عند اختيار لون صفحة المصحف، مع توضيح مكان تغيير المظهر.",
+      "اقرأ خيارات المصحف وإعدادات المظهر بوضوح فوق الآيات، بخلفيات تحجب تداخل النص في المتصفحات المختلفة.",
+      "استفد من مساحة أوسع في الصفحة الرئيسية، بعرض وهوامش متناسقة مع صفحة الأذكار على مختلف الشاشات."
+    ],
+    "en": [
+      "Read Quran word explanations on a clearer frosted surface that keeps underlying text from competing with the meaning.",
+      "See when Glass mode is active while choosing a Mushaf page color, with guidance on where to change the surface.",
+      "Read Mushaf options and appearance settings clearly over the verses, with protected backgrounds across browsers.",
+      "Use a wider Home layout with the same page width and gutters as Azkar across screen sizes."
+    ]
+  },
+  {
+    "release": "2026-10-18.8",
+    "ar": [
+      "اقرأ معاني كلمات القرآن فوق خلفية زجاجية أوضح تحجب تداخل النص خلف الشرح.",
+      "اعرف أن المظهر الزجاجي مفعّل عند اختيار لون صفحة المصحف، مع توضيح مكان تغيير المظهر.",
+      "اقرأ خيارات المصحف وإعدادات المظهر بوضوح فوق الآيات، بخلفيات تحجب تداخل النص في المتصفحات المختلفة."
+    ],
+    "en": [
+      "Read Quran word explanations on a clearer frosted surface that keeps underlying text from competing with the meaning.",
+      "See when Glass mode is active while choosing a Mushaf page color, with guidance on where to change the surface.",
+      "Read Mushaf options and appearance settings clearly over the verses, with protected backgrounds across browsers."
+    ]
+  },
+  {
+    "release": "2026-10-18.7",
+    "ar": [
+      "اقرأ معاني كلمات القرآن فوق خلفية زجاجية أوضح تحجب تداخل النص خلف الشرح.",
+      "اعرف أن المظهر الزجاجي مفعّل عند اختيار لون صفحة المصحف، مع توضيح مكان تغيير المظهر.",
+      "افتح شروح الكلمات داخل حدود الشاشة في المتصفحات المختلفة، دون تداخلها مع نص الآيات."
+    ],
+    "en": [
+      "Read Quran word explanations on a clearer frosted surface that keeps underlying text from competing with the meaning.",
+      "See when Glass mode is active while choosing a Mushaf page color, with guidance on where to change the surface.",
+      "Open word explanations within the screen edges across browsers, without competing verse text behind them."
+    ]
+  },
+  {
+    "release": "2026-10-18.6",
+    "ar": [
+      "اقرأ الأذكار على الجوال بخلفية متصلة وشريط تقدم أوضح، دون الفاصل الداكن أسفل العنوان.",
+      "افتح أذكار ما بعد الصلاة من زر قراءة أخف، مع بقاء التسميات واضحة عند تكبير النص وضيق الشاشة.",
+      "استعد تعليمات لوحة المفاتيح في المسبحة والصلاة على النبي، وتحكم في اختصارات الحروف.",
+      "اقرأ التذكيرات كاملة مع معانٍ موجزة ومراجع أدق، واحفظ البطاقات المعتمدة مع رابط الموقع."
+    ],
+    "en": [
+      "Read adhkar on mobile with one continuous background and a clearer progress track, without the dark break below the title.",
+      "Open after-prayer adhkar from a lighter Read action, with readable labels on narrow screens and enlarged text.",
+      "Reach keyboard help in Masbaha and Salawat again and choose whether letter shortcuts are enabled.",
+      "Read complete reminders with concise meanings and clearer references, and save approved cards with the website link."
+    ]
+  },
+  {
+    "release": "2026-10-18.4",
+    "ar": [
+      "اقرأ النص الكامل للتذكيرات المتجددة وافتح معناها المختصر ومصادرها بشكل مستقل، مع حفظها بعد التحميل للقراءة دون اتصال.",
+      "استكشف اتجاهات الصلاة والأذكار خلال الفترات المختلفة، مع تفاصيل أوضح وسجل الأذكار المسجلة من الآن فصاعداً.",
+      "يبقى عنوان صفحة الأذكار فوق الصورة بينما تتحرك المجموعات أسفله، مع أدوات قراءة وتسبيح أكثر اتساقاً وملاءمة للشاشات.",
+      "تتضمن بطاقات المشاركة عنوان الموقع داخل الصورة، وتتيح بطاقات الصلاة فتح أذكار ما بعد الصلاة بجوار تسجيلها."
+    ],
+    "en": [
+      "Read complete rotating reminders and open their brief meanings and sources independently, with offline access after loading.",
+      "Explore prayer and routine trends across periods, with clearer details and individual zikr history recorded from now on.",
+      "The Azkar header stays over its photograph while collections scroll below, with more consistent reading and counter controls across screen sizes.",
+      "Shared cards include the website inside the image, and prayer cards place after-prayer reading beside its completion control."
+    ]
+  },
+  {
+    "release": "2026-10-18.3",
+    "ar": [
+      "صفحة تقدم أبسط تعرض إحصاءات للقراءة فقط وتفاصيل اختيارية لكل صلاة، دون حقول تسجيل.",
+      "خلفيات زجاجية متناسقة للقائمة الجانبية والعناوين، مع صياغة أوضح لتسجيل الصلاة في المسجد.",
+      "بطاقات صلاة أكثر إحكاماً ومحاذاة أفضل لبطاقات الرئيسية وأزرار القراءة والمشاركة.",
+      "عناوين قراءة أقصر ولوحة قائمة أذكار تبدأ مطوية لتوفير مساحة أكبر للنص."
+    ],
+    "en": [
+      "Simpler Progress statistics with optional per-prayer details and no recording fields.",
+      "Consistent frosted navigation and headers, with clearer wording for recording prayer at the mosque.",
+      "More compact prayer cards and better alignment for Home cards, reading and sharing actions.",
+      "Shorter reading headers and an initially collapsed collection panel leave more room for the text."
+    ]
+  },
+  {
+    "release": "2026-10-18.2",
+    "ar": [
+      "أصبحت صفحة التقدم أبسط: إحصاءات للقراءة فقط وتفاصيل اختيارية لكل صلاة، دون حقول تسجيل.",
+      "بطاقات صلاة أكثر إحكاماً وحركة تمرير أهدأ، مع وضوح الصلاة المحددة وتفاصيلها.",
+      "تحسين الزجاجية ومحاذاة بطاقات الرئيسية وأزرار القراءة والمشاركة عبر أحجام الشاشات.",
+      "عناوين قراءة أقصر وأكثر اتساقاً، ولوحة قائمة الأذكار تبدأ مطوية لتوفير مساحة للنص."
+    ],
+    "en": [
+      "Progress is simpler, with read-only statistics and optional per-prayer details instead of recording fields.",
+      "More compact prayer cards and calmer scrolling make the selected prayer and its details clearer.",
+      "Refined glass surfaces and aligned Home cards, reading and sharing actions across screen sizes.",
+      "Shorter, consistent reading headers and an initially collapsed collection panel leave more room for the text."
+    ]
+  },
+  {
+    "release": "2026-10-18.1",
+    "ar": [
+      "أصبحت صفحة التقدم أبسط: إحصاءات للقراءة فقط وتفاصيل اختيارية لكل صلاة، دون حقول تسجيل.",
+      "بطاقات صلاة أكثر إحكاماً وحركة تمرير أهدأ، مع وضوح الصلاة المحددة وتفاصيلها.",
+      "تحسين الزجاجية ومحاذاة بطاقات الرئيسية وأزرار القراءة والمشاركة عبر أحجام الشاشات.",
+      "عناوين قراءة أقصر وأكثر اتساقاً، ولوحة قائمة الأذكار تبدأ مطوية لتوفير مساحة للنص."
+    ],
+    "en": [
+      "Progress is simpler, with read-only statistics and optional per-prayer details instead of recording fields.",
+      "More compact prayer cards and calmer scrolling make the selected prayer and its details clearer.",
+      "Refined glass surfaces and aligned Home cards, reading and sharing actions across screen sizes.",
+      "Shorter, consistent reading headers and an initially collapsed collection panel leave more room for the text."
+    ]
+  },
+  {
+    "release": "2026-10-17.13",
+    "ar": [
+      "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات ومكتبة الأذكار.",
+      "تحسين محاذاة خيارات القراءة وخطة الختمة لضمان سهولة الاختيار والاستجابة في الوضع الزجاجي.",
+      "تنسيق متناسق وهوامش موحدة عبر شاشات التطبيق والقارئ لراحة العين والتركيز على الذكر."
+    ],
+    "en": [
+      "Pinned Settings search with complete protection against text overlap when scrolling through Progress, Settings, and Azkar Library.",
+      "Refined reading plan options and selection highlights for seamless responsiveness in glass mode.",
+      "Consistent margins and balanced heading alignment across Reader and settings panels for calm devotional focus."
+    ]
+  },
+  {
+    "release": "2026-10-17.12",
+    "ar": [
+      "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات ومكتبة الأذكار.",
+      "تحسين محاذاة خيارات القراءة وخطة الختمة لضمان سهولة الاختيار والاستجابة في الوضع الزجاجي.",
+      "تنسيق متناسق وهوامش موحدة عبر شاشات التطبيق والقارئ لراحة العين والتركيز على الذكر."
+    ],
+    "en": [
+      "Pinned Settings search with complete protection against text overlap when scrolling through Progress, Settings, and Azkar Library.",
+      "Refined reading plan options and selection highlights for seamless responsiveness in glass mode.",
+      "Consistent margins and balanced heading alignment across Reader and settings panels for calm devotional focus."
+    ]
+  },
+  {
+    "release": "2026-10-17.11",
+    "ar": [
+      "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات ومكتبة الأذكار.",
+      "تحسين محاذاة خيارات القراءة وخطة الختمة لضمان سهولة الاختيار والاستجابة في الوضع الزجاجي.",
+      "تنسيق متناسق وهوامش موحدة عبر شاشات التطبيق والقارئ لراحة العين والتركيز على الذكر."
+    ],
+    "en": [
+      "Pinned Settings search with complete protection against text overlap when scrolling through Progress, Settings, and Azkar Library.",
+      "Refined reading plan options and selection highlights for seamless responsiveness in glass mode.",
+      "Consistent margins and balanced heading alignment across Reader and settings panels for calm devotional focus."
+    ]
+  },
+  {
+    "release": "2026-10-17.10",
+    "ar": [
+      "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات.",
+      "تحسين شريط أدوات القارئ ليظهر زر التركيز بحجم متناسق ودقيق على مختلف أحجام الشاشات.",
+      "خلفية المشهد الهادئة تتكامل بسلاسة مع نمط الزجاج الضبابي في جميع شاشات التطبيق."
+    ],
+    "en": [
+      "Pinned Settings search with complete protection against text overlap when scrolling through Progress and Settings.",
+      "Refined reader tools with a clean focus action tailored for compact and mobile screens.",
+      "Peaceful scene background now integrates seamlessly across all application views in glass mode."
+    ]
+  },
+  {
+    "release": "2026-10-17.9",
+    "ar": [
+      "زجاج أكثر ضبابية وبطاقات أوضح مع ألوان مقروءة لحالات الإكمال وأزرار المشاركة.",
+      "رؤوس صفحات بزجاج ضبابي أفتح ومساحة أوسع تفصل المحتوى أثناء التمرير، مع فواصل زخرفية أقل.",
+      "عنوان الأذكار بمحاذاة أدواته في رأس أقصر، مع نفس الترتيب للمسبحة والصلاة على النبي وإزالة شريط التعليمات السفلي."
+    ],
+    "en": [
+      "Stronger frost makes cards clearer, with readable completion colors and share buttons.",
+      "Headers use lighter frost and more space to separate scrolling content, with fewer decorative separators.",
+      "Zikr titles align with their controls in shorter headers, shared by Masbaha and Salawat, without the bottom instruction banner."
+    ]
+  },
+  {
+    "release": "2026-10-17.8",
+    "ar": [
+      "زر معلومات الصلاة بمحاذاة مربعات التسجيل على الهاتف.",
+      "المحاذاة متناسقة عند التبديل بين العربية والإنجليزية.",
+      "زر المعلومات يبقى داخل حافة البطاقة مع مساحة لمس مريحة."
+    ],
+    "en": [
+      "Prayer information buttons line up with the tracking checkboxes on phones.",
+      "Alignment stays consistent when switching between Arabic and English.",
+      "The information button sits inside the card edge with a comfortable touch target."
+    ]
+  },
+  {
+    "release": "2026-10-17.7",
+    "ar": [
+      "بطاقات الصلاة أهدأ بحواف أخف ومحاذاة موحدة وعدّ تنازلي واضح دون شريط أو فواصل زائدة.",
+      "تفاصيل الصلاة أوضح: خطوات التسجيل والإجراء الرئيسي أولاً، ثم النصوص الداعمة، مع ترتيب مناسب للهاتف والحاسوب.",
+      "النوافذ وخيارات الصوت أكثر ضبابية ووضوحًا، ويُخفى نص القراءة خلف المشغل الموسّع لمنع تداخل النصوص."
+    ],
+    "en": [
+      "Prayer cards have softer edges, consistent alignment and a clear countdown without extra dividers or a progress bar.",
+      "Expanded prayer details put tracking and the main action first, followed by supporting text, with organized phone and desktop layouts.",
+      "Dialogs and audio options have denser frost, and expanded playback hides the covered reading text to prevent overlapping layers."
+    ]
+  },
+  {
+    "release": "2026-10-17.6",
+    "ar": [
+      "المظهر الزجاجي يطابق الرئيسية الآن في البطاقات والعناوين والتنقل عبر شاشات التطبيق.",
+      "تظهر خلفية الرئيسية نفسها بوضوح خلف الواجهات، مع انعكاس وحواف زجاجية موحدة.",
+      "تمتد الأسطح الزجاجية إلى القراءة والنوافذ وعناصر الصوت، مع تظليل أقوى للنصوص الطويلة وخيارات التباين المعتادة.",
+      "بطاقات الصلاة أوضح بأوقات أكبر وأيقونات مميزة وحالات ذهبية، مع تمرير مريح وإظهار الصلاة الحالية والتالية معًا في البداية."
+    ],
+    "en": [
+      "Glass now matches Home across cards, headers and navigation throughout the app.",
+      "The same Home scenery shows clearly behind interface layouts with consistent reflections and glass edges.",
+      "Reading, dialogs and audio surfaces share Glass styling, with stronger tint for long text and the existing contrast options.",
+      "Prayer cards have larger times, distinct icon tiles and gold status pills, with comfortable scrolling that initially shows current and next together."
+    ]
+  },
+  {
+    "release": "2026-10-17.5",
+    "ar": [
+      "المظهر الزجاجي يطابق الرئيسية الآن في البطاقات والعناوين والتنقل عبر شاشات التطبيق.",
+      "تظهر خلفية الرئيسية نفسها بوضوح خلف الواجهات، مع انعكاس وحواف زجاجية موحدة.",
+      "تمتد الأسطح الزجاجية إلى القراءة والنوافذ وعناصر الصوت، مع تظليل أقوى للنصوص الطويلة وخيارات التباين المعتادة."
+    ],
+    "en": [
+      "Glass now matches Home across cards, headers and navigation throughout the app.",
+      "The same Home scenery shows clearly behind interface layouts with consistent reflections and glass edges.",
+      "Reading, dialogs and audio surfaces share Glass styling, with stronger tint for long text and the existing contrast options."
+    ]
+  },
+  {
+    "release": "2026-10-17.4",
+    "ar": [
+      "اختر المظهر الزجاجي أو المعتم للتطبيق والرئيسية بشكل مستقل؛ تغيير أحدهما لا يلغي اختيارك للآخر.",
+      "خيارات مظهر الرئيسية ظاهرة مباشرة في إعدادات المظهر، دون فتح قائمة إضافية.",
+      "يمكنك إبقاء الرئيسية تابعة لمظهر التطبيق أو تخصيصها، مع توضيح استخدام خلفية الرئيسية المشتركة وحماية وضوح القراءة.",
+      "تحسين وضوح النصوص الصغيرة فوق الخلفية الزجاجية، بما في ذلك بطاقة الصلاة النشطة."
+    ],
+    "en": [
+      "Choose Glass or Opaque independently for the app and Home; changing one keeps your choice for the other.",
+      "Home appearance controls are directly visible in Appearance settings without opening another section.",
+      "Let Home follow the app or give it its own appearance, with clearer guidance about the shared background and protected reading surfaces.",
+      "Small text stays clearer over the Glass background, including the active prayer card."
+    ]
+  },
+  {
+    "release": "2026-10-17.3",
+    "ar": [
+      "اختر المظهر الزجاجي أو المعتم للتطبيق والرئيسية بشكل مستقل؛ تغيير أحدهما لا يلغي اختيارك للآخر.",
+      "خيارات مظهر الرئيسية ظاهرة مباشرة في إعدادات المظهر، دون فتح قائمة إضافية.",
+      "يمكنك إبقاء الرئيسية تابعة لمظهر التطبيق أو تخصيصها، مع توضيح استخدام خلفية الرئيسية المشتركة وحماية وضوح القراءة."
+    ],
+    "en": [
+      "Choose Glass or Opaque independently for the app and Home; changing one keeps your choice for the other.",
+      "Home appearance controls are directly visible in Appearance settings without opening another section.",
+      "Let Home follow the app or give it its own appearance, with clearer guidance about the shared background and protected reading surfaces."
+    ]
+  },
+  {
+    "release": "2026-10-17.2",
+    "ar": [
+      "تفتح مشاركة إتمام الجلسة معاينة صورة قبل إرسالها بدل المشاركة النصية المباشرة.",
+      "توزيع متوازن للمحتوى على صور التقدم والإتمام، مع حفظ الصور وخيارات النص والرابط دون تغيير تقدمك المسجل.",
+      "تظهر مشاركة الآية كصورة قبل المشاركة النصية بتمييز أوضح، مع بقاء النسخ والإشارة المرجعية متاحين."
+    ],
+    "en": [
+      "Sharing session completion now opens an image preview instead of immediately sending text.",
+      "Progress and completion images balance their content, with image saving and Text or Link choices that leave recorded progress unchanged.",
+      "The ayah menu puts image sharing before text with clearer emphasis, while Copy and Bookmark stay available."
+    ]
+  },
+  {
+    "release": "2026-10-17.1",
+    "ar": [
+      "مشاركة الصور أوضح ومعاينتها أكبر، مع خيارات نص ورابط أهدأ وإعدادات البطاقات بعد المعاينة.",
+      "يمكن الآن معاينة بطاقة التقدم وحفظها ومشاركتها كصورة، مع اختيار لغة البطاقة ومظهرها.",
+      "تُحمّل البطاقات الجاهزة عند اختيارها فقط، وتظهر إعدادات تخص التصميم المحدد، مع توضيح بدائل نسخ الصور."
+    ],
+    "en": [
+      "Image sharing has a larger preview and clearer priority, with quieter Text and Link choices and card settings after the preview.",
+      "Preview, save and share your progress as an image, with card language and appearance choices.",
+      "Ready-made artwork loads only when selected, settings match the chosen design, and image-copy alternatives are explained."
+    ]
+  },
+  {
+    "release": "2026-10-16.12",
+    "ar": [
+      "يبقى تقدّم مجموعات الأذكار واضحًا عند التبديل بين المظهر الفاتح والداكن.",
+      "تحتفظ ملخّصات المجموعات بتباين مقروء في بطاقات المكتبة الزجاجية.",
+      "تتبع أعداد الأذكار المكتملة المظهر النشط بالعربية والإنجليزية مع الحفاظ على اتجاه النص."
+    ],
+    "en": [
+      "Collection progress stays readable when switching between Light and dark themes.",
+      "Collection summaries retain readable contrast on Glass library cards.",
+      "Completed-item counts follow the active theme in Arabic and English while preserving text direction."
+    ]
+  },
+  {
+    "release": "2026-10-16.11",
+    "ar": [
+      "اختيار أبسط بين معتم وزجاجي للتطبيق كله، مع تخصيص اختياري للرئيسية وخلفيتها الحالية على صفحات المظهر الزجاجي، وبقاء القراءة معتمة.",
+      "تمرير أكثر مباشرة ومؤثرات أخف، وظهور فوري للبطاقات عند تقليل الحركة، واحترام توفير البيانات وتوقّف تحديث الشاشة في الخلفية.",
+      "أحاديث وأدعية موثّقة وتذكيرات مناسبة للصيام والأخلاق ومساعدة الآخرين، مع استعادة عدد الزوار وتتبع النخلة والذهبية والواحة في مسارك اليومي.",
+      "قفل يمنع لمس الأزرار ويبقي النص والصوت ظاهرين للتعلّم، مع فتح بالضغط المطوّل، وتحسين عرض الآيات ومشاركة الورد وحفظ تشغيل الكل وتصحيح التسجيلات."
+    ],
+    "en": [
+      "Simpler Opaque or Glass appearance for the whole app, optional Home customization and the current Home scene across Glass pages, with opaque reading.",
+      "More direct scrolling, lighter effects, immediate cards with reduced motion, data-saving backgrounds and paused background screen updates.",
+      "Authenticated hadith and dua with relevant fasting, character and helping reminders, a restored visitor footer and automatic palm, gold and oasis tracking.",
+      "A touch lock keeps learning text and audio visible with hold-to-unlock, plus clearer Quran display, routine sharing, remembered Play all and corrected recordings."
+    ]
+  },
+  {
+    "release": "2026-10-16.10",
+    "ar": [
+      "مظهر زجاجي اختياري للتطبيق مع مظهر مستقل للرئيسية وصورها؛ تبقى الشاشات الأخرى مصمتة افتراضيًا، ويعيدك شعار سطح المكتب للرئيسية.",
+      "استجابة أخف للتمرير والقراءة، ومؤثرات أقل تراكبًا، وتوقّف تحديث الشاشة في الخلفية، واحترام توفير البيانات عند عرض الخلفيات.",
+      "أحاديث وأدعية موثّقة وسياق أنسب للتذكير بالصيام والأخلاق ومساعدة الآخرين، مع تتبّع تلقائي للنخلة والذهبية والواحة في مسارك اليومي.",
+      "حالات اختيار واضحة لورد القرآن حتى مع المظهر الزجاجي، وآيات ظاهرة عند تكبير النص، ومشاركة بطاقات الورد وقفل أزرار الصوت وحفظ تشغيل الكل وتصحيح التسجيلات."
+    ],
+    "en": [
+      "Opt into Glass across the app with separate Home appearance and photos; other screens remain Solid by default, and the desktop logo brings you Home.",
+      "More direct scrolling and reading, fewer overlapping effects, paused background screen updates, and data-saving background delivery.",
+      "Authenticated hadith and dua with contextual fasting, character and helping reminders, plus automatic palm, gold and oasis tracking in your daily path.",
+      "Clear selected Quran-plan choices even in Glass, visible verses with enlarged text, routine-card sharing, audio-control lock, remembered Play all and corrected recordings."
+    ]
+  },
+  {
+    "release": "2026-10-16.9",
+    "ar": [
+      "اختر المظهر الزجاجي أو المصمت للتطبيق، مع مظهر مستقل للرئيسية وصور منفصلة؛ واضغط شعار سطح المكتب للعودة للرئيسية.",
+      "تمرير أخف واستجابة أسرع، مع تقليل المؤثرات المتراكبة وإيقاف تحديث الشاشات المخفية وتجنّب صور الخلفية عند تفعيل توفير البيانات.",
+      "تذكيرات موثّقة للأخلاق والدعاء ومساعدة الآخرين، وتذكير مسبق بصيام الاثنين والخميس؛ ومسار يومي يتتبّع النخلة والذهبية والواحة تلقائيًا.",
+      "قراءة أوضح للقرآن عند تكبير النص، ومشاركة بطاقات الورد من الرئيسية، وقفل أزرار الاستماع وحفظ تشغيل الكل وتصحيح تكرار التسجيلات وإيقاف التسجيل غير المطابق."
+    ],
+    "en": [
+      "Choose Glass or Solid across the app, with a separate Home appearance and independent card images; click the desktop logo to return Home.",
+      "Lighter scrolling and quicker feedback, with fewer overlapping effects, paused hidden-screen updates, and no background photos when device data saving is enabled.",
+      "Sourced reminders for character, dua and helping others, plus advance Monday/Thursday fasting reminders and automatic palm, gold and oasis tracking.",
+      "Clearer Quran reading with enlarged text, Home routine-card sharing, listening-control lock, a remembered Play all choice and corrected recording repetitions; the mismatched recording is withdrawn."
+    ]
+  },
+  {
+    "release": "2026-10-16.8",
+    "ar": [
+      "مسارك اليومي يتتبّع الأوراد تلقائيًا: نخلة للأذكار الثلاثة وورد القرآن، وذهبية مع ٣ صلوات في المسجد، وواحة مع الصلوات الخمس.",
+      "بطاقات صلاة أكثر سلاسة ووضوحًا أثناء التمرير، مع مظهر زجاجي أو حسب الجهاز أو مصمت، وصور ممتدة ومشاركة بطاقات الورد من الرئيسية.",
+      "تذكيرات أكثر مع مصادرها وسياقها، وتنبيه مسبق لصيام الاثنين والخميس يراعي أوقات الصلاة وأيام منع الصيام.",
+      "اقفل أزرار الصوت أثناء الاستماع، مع حفظ اختيار تشغيل الكل وتصحيح تكرار التسجيل الذي يتضمن الدعاء ثلاث مرات؛ أُوقف التسجيل العربي غير المطابق."
+    ],
+    "en": [
+      "Today’s path tracks your awrad automatically: a palm for the three zikr groups and Qur’an wird, gold with 3 mosque prayers, and an oasis with all 5.",
+      "Smoother, clearer prayer cards while scrolling, with Glass, Follow device or Solid appearances, full-card photos and routine-card sharing from Home.",
+      "More reminders with their sources and context, plus advance Monday and Thursday fasting reminders that respect prayer times and excluded fasting days.",
+      "Lock audio controls while listening, keep your Play all choice, and avoid extra loops when a recording already recites the dua three times; the mismatched Arabic recording is withdrawn."
+    ]
+  },
+  {
+    "release": "2026-10-16.5",
+    "ar": [
+      "شارك بطاقات أذكار الصباح والمساء والنوم المعتمدة مباشرة من تذكير الرئيسية.",
+      "صور الورد تبقى ظاهرة مع تقليل الشفافية، مع صور محسّنة وأسرع تحميلًا من التخزين السحابي.",
+      "تمييز هادئ يربط الصلاة المختارة بتفاصيلها، وملخص للصلاة الحالية والقادمة أثناء التمرير.",
+      "تشغيل الكل مفعّل افتراضيًا ويحفظ اختيارك، مع خيارات صوت متناسقة ومساحة قراءة أوضح."
+    ],
+    "en": [
+      "Share approved morning, evening and sleep cards directly from your Home reminder.",
+      "Wird photos stay visible with reduced transparency, with optimized images delivered from cloud storage.",
+      "Quiet matching accents identify the selected prayer and its details, with current and next prayer information while scrolling.",
+      "Play all starts enabled and remembers your choice, with consistent audio options and a clearer reading area."
+    ]
+  },
+  {
+    "release": "2026-10-16.4",
+    "ar": [
+      "أعمال صلاة الجمعة ومعلومات سنتها البعدية وفضلها أصبحت خاصة بالجمعة مع ذكر المصادر.",
+      "صور الورد تملأ البطاقات مع عودة ملخص الإنجاز والثمرات اليومية.",
+      "اتصال انسيابي متناظر يربط الصلاة المختارة بتفاصيلها دون تغيير تباعد البطاقات.",
+      "خلفيات محسّنة التحميل وصورة الجمعة تظهر بسرعة؛ وعند تعذّر تحميل صورة، تبقى البدائل واضحة دون تغيير تفضيلاتك."
+    ],
+    "en": [
+      "Friday prayer now has its own deeds, after-prayer Sunnah guidance and benefit with sources.",
+      "Wird photos fill their cards, with daily completion and fruit totals restored.",
+      "A smooth, symmetrical connection links the selected prayer to its details without changing card spacing.",
+      "Optimized backgrounds load from dedicated storage, and Friday artwork appears promptly. If an image fails, readable fallbacks preserve your appearance preference."
+    ]
+  },
+  {
+    "release": "2026-10-16.3",
+    "ar": [
+      "خلفيات أهدأ لأوقات اليوم مع مشهد خاص لصباح الجمعة، مع وضوح أعلى للبطاقات الزجاجية على جميع الشاشات.",
+      "اضغط أي موضع في بطاقة الصلاة لعرض تفاصيلها أسفل الصف، مع مؤشر يربط البطاقة بالتفاصيل دون إزاحة البطاقات الأخرى.",
+      "تنتقل إضاءة التركيز من الصلاة الحالية إلى القادمة عند اقتراب وقتها، ويظهر الوقت المتبقي في تذييل البطاقة القادمة.",
+      "يمكن تسجيل أعمال الصلاة من بطاقة التفاصيل؛ ويظهر اسم الظهر «الجمعة» يوم الجمعة."
+    ],
+    "en": [
+      "Calmer time-of-day backgrounds, including a special Friday morning scene, make glass cards clearer across screens.",
+      "Tap anywhere on a prayer card to open its details below the row; a small marker connects them without shifting other cards.",
+      "Focus moves from the current prayer toward the next as its time approaches, with the countdown in the next card's footer.",
+      "Record prayer actions in the expanded card, and see the noon prayer labelled Jumu‘ah on Fridays."
+    ]
+  },
+  {
+    "release": "2026-10-16.2",
+    "ar": [
+      "زجاجية أوضح لبطاقات الرئيسية على الهاتف والتابلت والكمبيوتر، مع احترام إعدادات تقليل الشفافية.",
+      "تبرز الصلاة الحالية، ثم ينتقل التركيز تدريجيًا إلى القادمة خلال آخر نصف ساعة، مع بقاء النصوص واضحة.",
+      "عدّ تنازلي أكبر وشريط الوقت في تذييل القادمة، وتذييلات لباقي الصلوات تعرض التسجيل أو ترتيب الصلاة بدل ملخص الرواتب.",
+      "يظهر اسم صلاة الظهر «الجمعة» يوم الجمعة، مع الاحتفاظ بالمواقيت والتسجيلات الحالية."
+    ],
+    "en": [
+      "Clearer glass surfaces across Home on phones, tablets and desktop, while respecting reduced-transparency preferences.",
+      "The current prayer stands out, then emphasis gradually shifts to the next during the final half hour while all text stays readable.",
+      "A larger countdown and remaining-time bar sit in the next prayer's footer; other footers show recorded status or prayer order instead of Rawatib summaries.",
+      "The noon prayer is labelled Jumu‘ah on Fridays, keeping your existing times and records."
+    ]
+  },
+  {
+    "release": "2026-10-16",
+    "ar": [
+      "بطاقات الرئيسية الزجاجية أوضح فوق خلفية الوقت، مع عرض التاريخ والنخيل وأيام المواظبة في شريط علوي متوازن.",
+      "عرض الصلوات الخمس في بطاقات متساوية، مع وقت الصلاة القادمة والعدّ التنازلي وشريط الوقت المتبقي.",
+      "تُظهر بطاقات الصلاة ملخصًا موجزًا للرواتب أو السنة المستحبة، وتبقى تفاصيلها الكاملة متاحة عند فتح الصلاة.",
+      "تاريخ سجل الصلاة يتبع التقويم الهجري أو الميلادي المختار، مع خيارات مستقلة لتسجيل الجماعة والسنن والأذكار."
+    ],
+    "en": [
+      "Clearer glass cards on Home show the time-of-day scenery, with the date, palms and practice streak balanced in the header.",
+      "See all five prayers in equal-sized cards, with the next prayer's time, countdown and remaining-time bar.",
+      "Prayer cards show a short Rawatib or optional Sunnah summary, with full details when you open a prayer.",
+      "Prayer record dates follow your chosen Hijri or Gregorian calendar, with independent options for congregation, Sunnah and adhkar."
+    ]
+  },
+  {
+    "release": "2026-10-15-8",
+    "ar": [
+      "قراءة أهدأ للمصحف والترجمة، مع رقم الآية في زاويتها ومشغّل صوت عائم يمكنك إخفاؤه وإظهاره.",
+      "الوصول إلى ملفات الصوت المنزّلة وتصديرها بسهولة، مع توضيح استئناف الأذكار وإعادة ضبط الجلسة.",
+      "عرض سور الرقية الثلاث في بطاقات مستقلة مع الاحتفاظ بمحفوظاتك وتقدمك، وتحسين وضوح معاني الكلمات وزجاج بطاقات الرئيسية على الحاسوب.",
+      "تحسين عودة التركيز بعد المشاركة واستمرار متابعة التلاوة عند استخدام خيارات الصوت."
+    ],
+    "en": [
+      "Read a calmer Mushaf and translation, with corner ayah numbers and a floating audio player you can hide and restore.",
+      "Find and export downloaded audio more easily, with clearer guidance for resuming azkar and resetting a session.",
+      "Read the three Ruqyah surahs in separate cards while keeping saved items and progress, with clearer word meanings and translucent Home cards on desktop.",
+      "Return to your sharing control reliably and keep recitation following active while using audio options."
+    ]
+  },
+  {
+    "release": "2026-10-15-7",
+    "ar": [
+      "عرض سور الإخلاص والفلق والناس في أذكار الرقية ببطاقات قرآنية مستقلة بخط المصحف العثماني.",
+      "استخدام خط القراءة الواضح للكلمة المختارة في بطاقة معاني المفردات لتتناغم مع شرحها.",
+      "تفعيل تأثير الزجاج الشفاف المريح لبطاقات الشاشة الرئيسية على أجهزة الحاسوب المكتبية.",
+      "استمرار متابعة التلاوة تلقائياً عند فتح خيارات الصوت أو التنقل في عناصر التحكم."
+    ],
+    "en": [
+      "Surahs Al-Ikhlas, Al-Falaq, and An-Nas in Ruqyah are now presented in dedicated Quranic cards with full Mushaf typography.",
+      "Word meanings now display the selected Quranic term in the clear reading font alongside its explanation.",
+      "Translucent frosted glass cards on the Home screen now render smoothly on desktop displays.",
+      "Recitation following now stays active seamlessly while opening audio options or navigating controls."
+    ]
+  },
+  {
+    "release": "2026-10-15-6",
+    "ar": [
+      "عرض سور الإخلاص والفلق والناس في أذكار الرقية ببطاقات قرآنية مستقلة بخط المصحف العثماني.",
+      "استخدام خط القراءة الواضح للكلمة المختارة في بطاقة معاني المفردات لتتناغم مع شرحها.",
+      "تفعيل تأثير الزجاج الشفاف المريح لبطاقات الشاشة الرئيسية على أجهزة الحاسوب المكتبية."
+    ],
+    "en": [
+      "Surahs Al-Ikhlas, Al-Falaq, and An-Nas in Ruqyah are now presented in dedicated Quranic cards with full Mushaf typography.",
+      "Word meanings now display the selected Quranic term in the clear reading font alongside its explanation.",
+      "Translucent frosted glass cards on the Home screen now render smoothly on desktop displays."
+    ]
+  },
+  {
+    "release": "2026-10-15-5",
+    "ar": [
+      "تمييز أهدأ للآية الحالية، وترجمة إنجليزية بحواشٍ مريحة ورقم صغير في الزاوية دون سطر إضافي.",
+      "يمكن إخفاء مشغّل المصحف وإظهاره دون إيقاف الصوت أو تصغير مساحة الصفحة.",
+      "اعثر على الصوتيات المنزّلة في مكان واحد، واعرف حجمها وحالتها واحفظ نسخة على جهازك.",
+      "توضيح الاحتفاظ بجلسات أذكار المواقف وسجل النشاط، وتحسين استعادة التركيز والتنقل بالنص المكبّر."
+    ],
+    "en": [
+      "Calmer current-ayah highlighting and padded English verses with a small corner number, without an extra row.",
+      "Hide and show the Mushaf player without stopping audio or shrinking the page.",
+      "Find downloaded audio in one place, check its size and offline status, and save a copy to your device.",
+      "Clearer situational-session and history guidance, with improved focus return and enlarged-text navigation."
+    ]
+  },
+  {
+    "release": "2026-10-15-4",
+    "ar": [
+      "بطاقات الرئيسية أكثر اختصارًا، وتظهر علامة الإكمال في زاوية مستقلة مع إطار داخلي واضح.",
+      "يمكن تقديم الصوت وتأخيره من المشغل المصغّر، مع أزرار متباعدة وإخفاء زر الفائدة أثناء الاستماع.",
+      "يفتح إكمال المجموعة ملخص الجلسة؛ ويمكن بدء جلسة جديدة لأذكار المواقف مع الاحتفاظ بسجل الجلسات.",
+      "يمكن مشاركة أدلة أهمية الورد كصور أو نصوص أو روابط؛ وتحسّنت مزامنة الأجهزة والبحث ووضوح الخصوصية."
+    ],
+    "en": [
+      "Home cards are more compact, with a separate corner checkmark and inset outline for completed routines.",
+      "Seek directly from the compact audio player, with better-spaced buttons and the Benefit action hidden while listening.",
+      "Finishing a collection opens its summary; start a new situational session while keeping your session history.",
+      "Share Wird evidence as images, text or links, alongside improved device sync, search and clearer privacy details."
+    ]
+  },
+  {
     "release": "2026-10-15-3",
     "ar": [
       "يفتح إكمال آخر ذكر ملخص الجلسة مباشرة، وتظل بياناتك قابلة للوصول عند تقييد تخزين المتصفح.",

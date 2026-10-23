@@ -1,8 +1,43 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { useAppRouting } from "./useAppRouting";
+import { acquireAudioControlLock } from "../audioControlLock";
 
 afterEach(() => window.history.replaceState(null, "", "/"));
+
+it("blocks internal navigation while listening is locked without pushing a history trap", () => {
+  window.history.replaceState({ view: "home" }, "", "/#/home");
+  const { result } = renderHook(() =>
+    useAppRouting({
+      routineModes: { morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" },
+      hasCompletedOnboarding: true,
+      reduceMotion: true,
+    }),
+  );
+  const release = acquireAudioControlLock();
+  const push = vi.spyOn(window.history, "pushState");
+  try {
+    act(() => {
+      result.current.push("library");
+      result.current.replace("progress");
+      result.current.handleNavTab("settings");
+    });
+    expect(result.current.view).toBe("home");
+    expect(result.current.activeTab).toBe("home");
+    act(() => {
+      window.history.replaceState({ view: "library" }, "", "/#/azkar");
+      window.dispatchEvent(new PopStateEvent("popstate", { state: { view: "library" } }));
+    });
+    expect(result.current.view).toBe("home");
+    expect(window.location.hash).toBe("#/home");
+    expect(push).not.toHaveBeenCalled();
+  } finally {
+    release();
+    push.mockRestore();
+  }
+  act(() => result.current.handleNavTab("azkar"));
+  expect(result.current.view).toBe("library");
+});
 
 it("keeps shared reading context through completion and clears it on leaving the flow", () => {
   window.history.replaceState(null, "", "/#/azkar/morning?mode=complete");

@@ -12,9 +12,9 @@ import type { CategoryId, DailyCollectionCompletion, PrayerTrackingRecord, Quran
  * of "did today count" would be one more thing that can disagree with the first.
  *
  * Two metrics come out of it and they mean different things. The streak
- * measures returning: two of the day's active pillars. The palm measures a
- * balanced day: all of them, with the dhikr complete rather than merely
- * consistent. Neither measures anyone's faith, and nothing here should ever be
+ * measures returning. The palm measures the completed daily awrad; mosque
+ * attendance adds a golden or oasis tier. Neither measures anyone's faith,
+ * and nothing here should ever be
  * phrased as though it did.
  */
 
@@ -28,8 +28,16 @@ import type { CategoryId, DailyCollectionCompletion, PrayerTrackingRecord, Quran
  * records it reads did not sync until recently and may not exist locally for a
  * past day at all, so re-judging history under it would delete palms people
  * earned. Days before the reader's activation keep their original verdict.
+ *
+ * 3 applies from 2026-10-16: all three timed groups and an actually completed
+ * Quran wird earn a palm. Three mosque prayers upgrade it to gold; five add
+ * an oasis. There is no chosen congregation target and no historical rewrite.
  */
-export type ProgressPolicyVersion = 1 | 2;
+export type ProgressPolicyVersion = 1 | 2 | 3;
+
+/** Prospective automatic tiers preserve historical awards. */
+export const AUTOMATIC_PATH_START = "2026-10-16";
+export type PalmTier = "none" | "palm" | "golden" | "oasis";
 
 export interface DailyPathStatus {
   dayKey: string;
@@ -57,13 +65,14 @@ export interface DailyPathStatus {
     recordedCount: number;
     mosqueCount: number;
     complete: boolean;
-    /** False until the reader has chosen a goal. */
+    /** Always true for automatic tiers; historical policies retain their saved intention. */
     configured: boolean;
   };
   activePillarCount: number;
   achievedPillarCount: number;
   streakQualified: boolean;
   palmEarned: boolean;
+  palmTier: PalmTier;
 }
 
 export interface DailyPathInput {
@@ -83,6 +92,30 @@ export interface DailyPathInput {
    * before keeps the old verdict; nothing already earned changes.
    */
   dailyPathStartDayKey?: string;
+}
+
+/** Revision-owned index; callers replace it when records or policy inputs change.
+ * Keep all judging in getDailyPathStatus so indexed and individual views agree. */
+export function createDailyPathIndex(input: Omit<DailyPathInput, "dayKey">) {
+  const completions = new Map<string, DailyCollectionCompletion[]>();
+  const prayers = new Map<string, PrayerTrackingRecord[]>();
+  for (const record of input.dailyCompletions) {
+    const day = completions.get(record.dayKey) ?? [];
+    day.push(record);
+    completions.set(record.dayKey, day);
+  }
+  for (const record of input.prayerTracking) {
+    const day = prayers.get(record.dayKey) ?? [];
+    day.push(record);
+    prayers.set(record.dayKey, day);
+  }
+  return (dayKey: string) =>
+    getDailyPathStatus({
+      ...input,
+      dayKey,
+      dailyCompletions: completions.get(dayKey) ?? [],
+      prayerTracking: prayers.get(dayKey) ?? [],
+    });
 }
 
 /**
@@ -116,7 +149,8 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
   const progress = qDay.read;
   const quranActive = goal > 0;
 
-  const target = input.mosquePrayerGoal && input.mosquePrayerGoal > 0 ? input.mosquePrayerGoal : null;
+  const automatic = input.dayKey >= AUTOMATIC_PATH_START;
+  const target = automatic ? 3 : input.mosquePrayerGoal && input.mosquePrayerGoal > 0 ? input.mosquePrayerGoal : null;
   const dayRecords = input.prayerTracking.filter((record) => record.dayKey === input.dayKey);
   const recordedCount = PRAYER_NAMES.filter((prayer) =>
     dayRecords.some((record) => record.prayer === prayer && trackedLocation(record) !== null),
@@ -151,7 +185,7 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
   const achievedPillarCount = achieved.filter((value, index) => value && active[index]).length;
 
   const policyVersion: ProgressPolicyVersion =
-    input.dailyPathStartDayKey && input.dayKey >= input.dailyPathStartDayKey ? 2 : 1;
+    input.dailyPathStartDayKey && input.dayKey >= input.dailyPathStartDayKey ? (automatic ? 3 : 2) : 1;
 
   if (policyVersion === 1) {
     /* The old rules, unchanged, for days that were lived under them. A palm was
@@ -168,6 +202,24 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
       achievedPillarCount,
       streakQualified: completedCount > 0,
       palmEarned: dhikr.fullComplete,
+      palmTier: dhikr.fullComplete ? "palm" : "none",
+    };
+  }
+
+  if (policyVersion === 3) {
+    const palmEarned = dhikr.fullComplete && quran.complete;
+    const palmTier: PalmTier = !palmEarned ? "none" : mosqueCount >= 5 ? "oasis" : mosqueCount >= 3 ? "golden" : "palm";
+    return {
+      dayKey: input.dayKey,
+      policyVersion,
+      dhikr,
+      quran,
+      salah,
+      activePillarCount: 4,
+      achievedPillarCount: completedCount + Number(quran.complete),
+      streakQualified: completedCount > 0 || quran.complete || mosqueCount >= 3,
+      palmEarned,
+      palmTier,
     };
   }
 
@@ -183,6 +235,10 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
     activePillarCount,
     achievedPillarCount,
     streakQualified,
+    palmTier:
+      dhikr.fullComplete && (!quran.active || quran.complete) && (!salah.configured || salah.complete)
+        ? "palm"
+        : "none",
     // Full dhikr, and every pillar that asks anything of the day.
     palmEarned: dhikr.fullComplete && (!quran.active || quran.complete) && (!salah.configured || salah.complete),
   };

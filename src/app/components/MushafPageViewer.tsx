@@ -202,14 +202,6 @@ const MushafTextLine = memo(function MushafTextLine({
       data-mushaf-line=""
       className={`flex h-full w-full min-w-0 items-center justify-center ${readOnly ? "relative" : ""}`}
     >
-      {highlightedVerseKey && words.some((word) => word.verseKey === highlightedVerseKey) && (
-        <span
-          aria-hidden="true"
-          data-playback-line=""
-          className="absolute h-3.5 w-1 rounded-full bg-primary"
-          style={{ insetInlineStart: "-0.35rem" }}
-        />
-      )}
       {/* QCF glyph advances preserve printed spacing; the canvas never stretches word gaps. */}
       <div
         data-mushaf-line-content=""
@@ -229,6 +221,7 @@ const MushafTextLine = memo(function MushafTextLine({
               <span
                 key={key}
                 aria-hidden="true"
+                data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 className={
                   highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode
                     ? "text-primary transition-colors"
@@ -257,13 +250,25 @@ const MushafTextLine = memo(function MushafTextLine({
                   highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode ? "text-primary" : ""
                 }`}
                 aria-current={highlightedVerseKey === w.verseKey ? "true" : undefined}
+                data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
                 aria-label={t(language, "reader.openAyahActions", {
                   ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),
                 })}
                 onClick={(event) => {
                   event.currentTarget.focus();
-                  onAyahAction?.(w.verseKey);
+                  // Pointer/mouse/touch clicks are ignored to prevent unintentional opening
+                  // while scrolling or reading. Readers can hold-press (long press) any word
+                  // or the marker to open actions. Keyboard Enter/Space (detail === 0) is preserved.
+                  if (event.detail === 0) {
+                    onAyahAction?.(w.verseKey);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onAyahAction?.(w.verseKey);
+                  }
                 }}
                 onContextMenu={(e) => {
                   e.preventDefault();
@@ -319,6 +324,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
+                    e.stopPropagation();
                     onActiveWordChange(
                       isOpen
                         ? null
@@ -1345,7 +1351,7 @@ export function MushafPageViewer({
     const travel = pageTransitionDirection === "forward" ? "-28px" : "28px";
     const animation = paper.animate(
       [
-        { opacity: 0.35, transform: `translateX(${travel})` },
+        { opacity: 0.8, transform: `translateX(${travel})` },
         { opacity: 1, transform: "translateX(0)" },
       ],
       { duration: 220, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "both" },
@@ -1427,7 +1433,7 @@ export function MushafPageViewer({
 
   return (
     <article
-      className={`relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
+      className={`glass-reading relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
       data-mushaf-chrome-mode={useRail ? "rail" : headerContent ? "bars" : "clean"}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
@@ -1623,6 +1629,10 @@ export function MushafPageViewer({
         className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage || facingContent ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"
+        // WebKit can start dragging the text selection on a reverse swipe,
+        // stealing pointer-up from the page. Keep native selection/copy, but
+        // let the reader's gestures own movement instead of HTML drag/drop.
+        onDragStart={(event) => event.preventDefault()}
         onPointerDown={(event) => {
           if (event.target instanceof Element && event.target.closest("[data-mushaf-meaning]")) {
             paperTap.current = null;
@@ -1892,7 +1902,7 @@ export function MushafListeningPage({
           } as CSSProperties
         }
         aria-hidden="true"
-        className={`audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
+        className={`glass-reading audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
         dir="rtl"
         lang="ar"
       >

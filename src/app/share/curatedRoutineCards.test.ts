@@ -1,4 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { attributeCardImage } from "./attributedCard";
+vi.mock("./attributedCard", () => ({
+  attributeCardImage: vi.fn(async (_blob: Blob, type = "image/webp") => new Blob(["attributed"], { type })),
+}));
 import {
   CURATED_ROUTINE_PACKS,
   getCuratedRoutinePack,
@@ -78,6 +82,7 @@ describe("curatedRoutineCards", () => {
     const result = await copyCuratedCardImage(pack.cards[0]!);
     expect(result).toBe(true);
     expect(copySpy).toHaveBeenCalled();
+    expect(attributeCardImage).toHaveBeenCalledWith(fakeBlob, "image/png");
   });
 
   it("rejects missing images and HTML fallback responses instead of exporting fake files", async () => {

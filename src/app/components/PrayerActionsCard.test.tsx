@@ -5,9 +5,34 @@ import type { PrayerTrackingRecord } from "../types";
 
 afterEach(cleanup);
 
-const DAY = "2026-09-18";
+// Weekday fixture keeps the ordinary Dhuhr rawatib expectations distinct from Friday guidance.
+const DAY = "2026-09-17";
 
 describe("PrayerActionsCard", () => {
+  it("keeps reading independent from completion, including a completed future preview", () => {
+    const onToggle = vi.fn();
+    const onOpenAdhkar = vi.fn();
+    render(
+      <PrayerActionsCard
+        prayer="fajr"
+        language="en"
+        direction="ltr"
+        records={[{ dayKey: DAY, prayer: "fajr", mosque: false, adhkar: true }]}
+        dayKey={DAY}
+        canRecord={false}
+        onToggle={onToggle}
+        onOpenAdhkar={onOpenAdhkar}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Read after-prayer adhkar" });
+    const checkbox = screen.getByRole("checkbox", { name: "Azkar after prayer" });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toBeDisabled();
+    expect(button.closest("label")).toBeNull();
+    fireEvent.click(button);
+    expect(onOpenAdhkar).toHaveBeenCalledExactlyOnceWith("fajr");
+    expect(onToggle).not.toHaveBeenCalled();
+  });
   it("returns information-sheet focus to its pointer trigger rather than the previous checkbox", async () => {
     render(
       <PrayerActionsCard
@@ -90,7 +115,7 @@ describe("PrayerActionsCard", () => {
     fireEvent.click(screen.getByTestId("modal-close-button"));
 
     // Checklist rows (4 for Dhuhr)
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليتها في المسجد");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("أربع ركعات قبل الظهر");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("ركعتان بعد الظهر");
@@ -114,7 +139,7 @@ describe("PrayerActionsCard", () => {
     );
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة الفجر");
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الفجر جماعة");
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليتها في المسجد");
     expect(screen.getByTestId("prayer-action-fajr-sunnah-before")).toHaveTextContent("ركعتان قبل الفجر");
     expect(screen.getByTestId("prayer-action-fajr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.queryByTestId("prayer-action-fajr-sunnah-after")).toBeNull();
@@ -136,7 +161,7 @@ describe("PrayerActionsCard", () => {
     );
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة العصر");
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت العصر جماعة");
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليتها في المسجد");
     expect(screen.getByTestId("prayer-action-asr-sunnah-before")).toHaveTextContent("أربع ركعات قبل العصر");
     expect(screen.getByTestId("prayer-action-asr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.queryByTestId("prayer-action-asr-sunnah-after")).toBeNull();
@@ -158,7 +183,7 @@ describe("PrayerActionsCard", () => {
     );
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة المغرب");
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت المغرب جماعة");
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليتها في المسجد");
     expect(screen.getByTestId("prayer-action-maghrib-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.getByTestId("prayer-action-maghrib-sunnah-after")).toHaveTextContent("ركعتان بعد المغرب");
     expect(screen.queryByTestId("prayer-action-maghrib-sunnah-before")).toBeNull();
@@ -180,7 +205,7 @@ describe("PrayerActionsCard", () => {
     );
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة العشاء");
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت العشاء جماعة");
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليتها في المسجد");
     expect(screen.getByTestId("prayer-action-isha-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.getByTestId("prayer-action-isha-sunnah-after")).toHaveTextContent("ركعتان بعد العشاء");
     expect(screen.queryByTestId("prayer-action-isha-sunnah-before")).toBeNull();
@@ -344,7 +369,7 @@ describe("PrayerActionsCard", () => {
     expect(modal).toHaveTextContent("رَحِمَ اللَّهُ امْرَأً صَلَّى قَبْلَ الْعَصْرِ أَرْبَعًا");
   });
 
-  it("triggers onOpenAdhkar when bottom primary CTA is clicked", () => {
+  it("triggers onOpenAdhkar when inline reading action is clicked", () => {
     const onOpenAdhkar = vi.fn();
     render(
       <PrayerActionsCard
@@ -359,7 +384,8 @@ describe("PrayerActionsCard", () => {
     );
 
     const button = screen.getByTestId("prayer-open-adhkar");
-    expect(button).toHaveTextContent("ابدأ أذكار بعد الصلاة");
+    expect(button).toHaveTextContent("قراءة");
+    expect(button.closest("li")).toBe(screen.getByTestId("prayer-action-maghrib-adhkar"));
     fireEvent.click(button);
     expect(onOpenAdhkar).toHaveBeenCalledWith("maghrib");
   });
@@ -378,11 +404,11 @@ describe("PrayerActionsCard", () => {
     );
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Deeds of Dhuhr prayer");
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("Prayed Dhuhr in congregation");
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("Prayed at the mosque");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("4 rak'ahs before Dhuhr");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("Azkar after prayer");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("2 rak'ahs after Dhuhr");
-    expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Start after-prayer adhkar");
+    expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Read");
   });
 
   it("renders with clean aligned rows without fill/stroke when onGlass is true", () => {
@@ -406,17 +432,18 @@ describe("PrayerActionsCard", () => {
     expect(row).not.toHaveClass("backdrop-blur-md");
     expect(row).not.toHaveClass("bg-on-media-surface/60");
     expect(row).not.toHaveClass("border");
-    expect(row).toHaveClass("px-2");
-    expect(row).toHaveClass("-mx-2");
-    expect(row).toHaveClass("text-white");
+    expect(row.querySelector("label")).toHaveClass("px-3");
+    expect(row).toHaveClass("min-h-11");
+    expect(row.querySelector("label")).toHaveClass("text-on-media");
     expect(row.querySelector(":scope > div svg")).toBeNull();
-    expect(row.querySelector(".tracking-check")).toHaveClass("size-5");
-    expect(row.querySelector("input")).toHaveAccessibleName("صليت الظهر جماعة");
+    expect(row.querySelector(".tracking-check")).toHaveClass("size-5", "rounded-md");
+    expect(row.querySelector(".tracking-check")).not.toHaveClass("rounded-full");
+    expect(row.querySelector("input")).toHaveAccessibleName("صليتها في المسجد");
 
     const heading = screen.getByRole("heading", { level: 3 });
     expect(heading).toHaveClass("text-on-media");
 
     const cta = screen.getByTestId("prayer-open-adhkar");
-    expect(cta).toHaveClass("bg-primary");
+    expect(cta).toHaveClass("bg-transparent", "text-on-media-accent");
   });
 });

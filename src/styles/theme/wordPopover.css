@@ -1,14 +1,6 @@
-/* wordPopover.css — the anchored Qur'an word gloss.
-
-   Positioning uses the CSS anchor API where available (Baseline 2026, ~91%)
-   and falls back to measured `top`/`left` written by the component. No
-   positioning library: the whole behaviour is three properties plus one
-   fallback rule, and the bundle budget is enforced. */
-
-/* The tapped word lends its box to the popover. Only ever one at a time. */
-[data-word-active="true"] {
-  anchor-name: --quran-active-word;
-}
+/* The Quran word gloss is measured once in viewport coordinates and portaled
+   outside the reading canvas. This preserves frost and fixed positioning
+   across engines without another positioning dependency. */
 
 .quran-word-popover {
   position: fixed;
@@ -17,7 +9,7 @@
   /* Keeps the box off the screen edge when it is clamped. Without it the
      browser parks it flush against the edge on a phone, which reads as
      clipped rather than placed. */
-  margin-inline: 0.75rem;
+  margin-inline: 0;
   border-radius: var(--ds-radius-card, 1rem);
   border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
   /* Reads as a layer above the page rather than another card in it: the tint
@@ -31,18 +23,6 @@
   padding: 0.625rem 0.75rem;
   transform-origin: var(--caret-x, 50%) 0;
   animation: quran-word-popover-in var(--motion-duration-fast) var(--motion-ease-enter) both;
-}
-
-@supports (anchor-name: --a) {
-  .quran-word-popover {
-    position-anchor: --quran-active-word;
-    position-area: block-end;
-    justify-self: anchor-center;
-    margin-block-start: 0.5rem;
-    /* Flips above the word near the bottom edge instead of being clipped. */
-    position-try-fallbacks: flip-block;
-    position-visibility: anchors-visible;
-  }
 }
 
 /* Caret. Centred under anchor positioning (the popover is anchor-centred);
@@ -106,4 +86,9 @@
     content-visibility: auto;
     contain-intrinsic-size: auto 40rem;
   }
+}
+
+/* Shortcut feedback shares the protected overlay material in Glass mode. */
+.mushaf-theme-hud-surface {
+  background: var(--popover);
 }

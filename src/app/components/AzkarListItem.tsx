@@ -151,6 +151,7 @@ export function AzkarListItem({
   return (
     <div
       id={`zikr-card-${index}`}
+      data-material-card={!isActive || undefined}
       ref={isActive ? activeRef : undefined}
       aria-current={isActive ? "step" : undefined}
       className={`group relative flex w-full flex-col ${grouped ? "" : "rounded-2xl border"} transition-[background-color,border-color,box-shadow,opacity] duration-200 ${
@@ -197,7 +198,7 @@ export function AzkarListItem({
             }
           >
             {isCardCompleted ? (
-              <span className="flex size-5 items-center justify-center rounded-full bg-success text-white shadow-xs dark:text-primary-foreground">
+              <span className="flex size-5 items-center justify-center rounded-full bg-success text-success-foreground shadow-xs">
                 <Check size={12} strokeWidth={3} aria-hidden="true" />
               </span>
             ) : (

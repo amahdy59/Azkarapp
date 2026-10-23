@@ -44,11 +44,17 @@ export function SettingsScreen({
   textSize,
   showTranslation,
   showTransliteration,
+  readerToolLabels = true,
+  onReaderToolLabelsChange,
   highContrast,
   boldText,
   reduceMotion,
   reduceTransparency,
   homeWirdImages = false,
+  appMaterial = "solid",
+  onAppMaterialChange,
+  homeMaterial = "inherit",
+  onHomeMaterialChange,
   onHomeWirdImagesChange,
   hapticFeedback,
   forceRtl,
@@ -168,6 +174,7 @@ export function SettingsScreen({
 
   return (
     <div
+      data-testid="settings-screen"
       className="relative mx-auto flex h-full w-full max-w-[80rem] flex-col overflow-hidden bg-background"
       dir={direction}
     >
@@ -270,6 +277,10 @@ export function SettingsScreen({
       case "appearance":
         return (
           <AppearancePanel
+            appMaterial={appMaterial}
+            onAppMaterialChange={onAppMaterialChange}
+            homeMaterial={homeMaterial}
+            onHomeMaterialChange={onHomeMaterialChange}
             homeWirdImages={homeWirdImages}
             onHomeWirdImagesChange={onHomeWirdImagesChange}
             reduceTransparency={reduceTransparency}
@@ -320,6 +331,8 @@ export function SettingsScreen({
             zikrFont={zikrFont}
             showTranslation={showTranslation}
             showTransliteration={showTransliteration}
+            readerToolLabels={readerToolLabels}
+            onReaderToolLabelsChange={onReaderToolLabelsChange}
             onTextSizeChange={onTextSizeChange}
             onZikrFontChange={onZikrFontChange}
             onShowTranslationChange={onShowTranslationChange}

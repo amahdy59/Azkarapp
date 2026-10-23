@@ -37,6 +37,8 @@
     "check:release-notes": "node scripts/check-release-notes.mjs",
     "archive:release-notes": "node scripts/archive-release-notes.mjs",
     "typecheck": "tsc --noEmit",
+    "pack:home-reminders": "node scripts/pack-home-reminder-readings.mjs",
+    "upload:home-reminders": "node scripts/upload-home-reminder-readings.mjs",
     "validate:audio": "node scripts/validate-audio-manifest.mjs",
     "validate:audio:local": "node scripts/validate-audio-manifest.mjs --local",
     "verify:toolchain": "node scripts/verify-toolchain.mjs",

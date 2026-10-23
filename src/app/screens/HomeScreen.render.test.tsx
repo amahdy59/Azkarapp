@@ -1,10 +1,14 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getAzkarForMode } from "../content/azkar";
+import { DEFAULT_LOCATION } from "../content/prayerCalculation";
 import * as dailyEvidence from "../dailyEvidence";
 import * as maintenance from "../startupMaintenance";
+import * as reminderReadings from "../content/reminderReadings";
 import { CATEGORY_IDS, type CategoryId } from "../types";
 import { HomeScreen } from "./HomeScreen";
+import { ActiveVisitorPresence } from "../components/VisitorCount";
+import * as cloudflare from "../../lib/cloudflareSync";
 
 function emptyProgress() {
   return Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<string>()])) as Record<CategoryId, Set<string>>;
@@ -21,6 +25,29 @@ describe("HomeScreen quick access", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("renders the visitor count at the bottom of Home through the shared presence provider", async () => {
+    vi.spyOn(cloudflare, "sendActiveVisitorHeartbeat").mockResolvedValue(12);
+    render(
+      <ActiveVisitorPresence>
+        <HomeScreen
+          completed={emptyProgress()}
+          dailyCompletions={[]}
+          quietProgressEnabled={false}
+          progressDayStartHour={4}
+          language="en"
+          direction="ltr"
+          onResume={() => undefined}
+          routineModes={routineModes}
+        />
+      </ActiveVisitorPresence>,
+    );
+    expect(await screen.findByText("Visitors now: 12")).toBeInTheDocument();
+    const footer = screen.getByTestId("home-visitor-footer");
+    expect(footer).toContainElement(screen.getByText("Visitors now: 12"));
+    expect(screen.getByTestId("home-content-grid").lastElementChild).toBe(footer);
+    expect(screen.getByTestId("home-sticky-prayers")).not.toContainElement(footer);
   });
 
   it("does not reload optional reminder evidence on ordinary clock ticks and refreshes for a language change", () => {
@@ -99,7 +126,7 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByTestId("home-benefits-card")).not.toBeInTheDocument();
   });
 
-  it("shows current and next prayers and reveals the complete rail on request", () => {
+  it("shows all five prayer summaries without a disclosure", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
     render(
@@ -115,9 +142,12 @@ describe("HomeScreen quick access", () => {
       />,
     );
 
-    expect(screen.queryByTestId("prayer-card-fajr")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Show all prayers" }));
+    expect(screen.queryByRole("button", { name: "Show all prayers" })).not.toBeInTheDocument();
+    expect(screen.getAllByTestId(/^prayer-card-/)).toHaveLength(5);
     expect(screen.getByTestId("prayer-card-fajr")).toBeInTheDocument();
+    expect(screen.getByTestId("home-sticky-prayers")).toContainElement(screen.getByTestId("home-prayer-strip"));
+    expect(screen.getByTestId("home-sticky-prayers")).toHaveClass("sticky", "top-0");
+    expect(screen.getByTestId("home-context-grid")).not.toContainElement(screen.getByTestId("home-prayer-strip"));
     expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
 
     expect(screen.queryByRole("button", { name: "Masbaha" })).not.toBeInTheDocument();
@@ -143,6 +173,64 @@ describe("HomeScreen quick access", () => {
     fireEvent.scroll(screen.getByRole("region", { name: "Azkar" }), { target: { scrollTop: 12 } });
     expect(screen.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
     expect(screen.getByTestId("home-utility-header")).toHaveClass("home-glass-header");
+    const scroll = screen.getByRole("region", { name: "Azkar" });
+    const sticky = screen.getByTestId("home-sticky-prayers");
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 40 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+  });
+
+  it("releases closed prayer geometry when WebKit leaves focus on the horizontal scroll region", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-16T14:00:00+03:00"));
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled
+        progressDayStartHour={4}
+        language="en"
+        direction="ltr"
+        onResume={() => undefined}
+        routineModes={routineModes}
+      />,
+    );
+    const sticky = screen.getByTestId("home-sticky-prayers");
+    const scroll = sticky.parentElement!;
+    const current = screen.getByTestId("prayer-card-dhuhr").querySelector("button")!;
+    const row = screen.getByTestId("home-all-prayers-row");
+    // Match the native keyboard focusability of the real narrow overflow row.
+    row.tabIndex = 0;
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    act(() => current.focus());
+    fireEvent.click(current);
+    expect(current).toHaveAttribute("aria-expanded", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    act(() => row.focus());
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.click(current);
+    expect(current).toHaveAttribute("aria-expanded", "false");
+    expect(row).toHaveFocus();
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+    // Real keyboard focus retains the hold until it leaves the prayer button.
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    act(() => current.focus());
+    fireEvent.click(current);
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    fireEvent.click(current);
+    expect(current).toHaveAttribute("aria-expanded", "false");
+    expect(current).toHaveFocus();
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    act(() => row.focus());
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
   });
 
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {
@@ -211,7 +299,10 @@ describe("HomeScreen quick access", () => {
 });
 
 describe("HomeScreen document outline", () => {
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
 
   it("nests each card under the group it belongs to, and names every prayer card", () => {
     vi.useFakeTimers();
@@ -363,6 +454,13 @@ describe("HomeScreen document outline", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
     const spyContextual = vi.spyOn(dailyEvidence, "getContextualEvidence");
+    vi.spyOn(reminderReadings, "loadReminderReadings").mockResolvedValue(
+      reminderReadings.createReminderReadingCatalogue({ readings: {}, fallbacks: {} }),
+    );
+    vi.spyOn(maintenance, "scheduleIdleAfterPaint").mockImplementation((callback) => {
+      callback();
+      return () => undefined;
+    });
 
     render(
       <HomeScreen
@@ -376,6 +474,9 @@ describe("HomeScreen document outline", () => {
       />,
     );
 
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
     const refreshBtn = screen.getByTestId("daily-evidence-refresh");
     expect(refreshBtn).toBeInTheDocument();
 
@@ -390,11 +491,27 @@ describe("HomeScreen document outline", () => {
     expect(afterClickCalls).toContain(1);
   });
 
-  it("rotates evidence slot key automatically when 30 minutes pass", () => {
+  it.each([
+    {
+      label: "regular 30-minute",
+      time: "2026-08-07T14:05:00+03:00",
+      minutes: 30,
+      initialSlot: "-s30-28",
+      nextSlot: "-s30-29",
+    },
+    {
+      label: "Duha 45-minute",
+      time: "2026-08-07T10:05:00+03:00",
+      minutes: 45,
+      initialSlot: "-s45-13",
+      nextSlot: "-s45-14",
+    },
+  ])("rotates the $label evidence slot in the selected timezone", ({ time, minutes, initialSlot, nextSlot }) => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+    // An offset-qualified instant keeps the intended Cairo window identical
+    // on UTC CI runners and on a developer's differently zoned device.
+    vi.setSystemTime(new Date(time));
     const spyContextual = vi.spyOn(dailyEvidence, "getContextualEvidence");
-
     render(
       <HomeScreen
         completed={emptyProgress()}
@@ -404,17 +521,16 @@ describe("HomeScreen document outline", () => {
         direction="rtl"
         dailyCompletions={[]}
         prayerTracking={[]}
+        locationSettings={DEFAULT_LOCATION}
       />,
     );
-
     const initialKey = spyContextual.mock.calls[0]?.[0];
-    expect(initialKey).toContain("-s30-");
-
+    expect(initialKey).toContain("2026-08-07" + initialSlot);
     act(() => {
-      vi.advanceTimersByTime(30 * 60 * 1000);
+      vi.advanceTimersByTime(minutes * 60 * 1000);
     });
-
     const latestKey = spyContextual.mock.calls.at(-1)?.[0];
+    expect(latestKey).toContain("2026-08-07" + nextSlot);
     expect(latestKey).not.toBe(initialKey);
   });
 });

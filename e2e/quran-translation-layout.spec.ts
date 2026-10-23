@@ -46,7 +46,7 @@ for (const language of ["ar", "en"] as const) {
         .locator("p")
         .first()
         .evaluate((paragraph) => parseFloat(getComputedStyle(paragraph).marginBottom));
-      expect(verseGap).toBe(6);
+      expect(verseGap).toBe(8);
     });
 
     test("Independent geometry and keyboard reading @cross-browser", async ({ page }, testInfo) => {
@@ -110,7 +110,68 @@ for (const language of ["ar", "en"] as const) {
       expect((await new AxeBuilder({ page }).include(".mushaf-paper").analyze()).violations).toEqual([]);
     });
 
-    test("Three-digit ayah numbers remain on one line with clear text separation @cross-browser", async ({ page }) => {
+    test("Translation header and footer share comfortable responsive insets @cross-browser", async ({
+      page,
+    }, testInfo) => {
+      for (const width of [320, 390, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        for (const scale of [1, 2]) {
+          await page.evaluate((scale) => {
+            document.documentElement.style.fontSize = `${16 * scale}px`;
+          }, scale);
+          const panel = page.locator(".quran-page-meaning");
+          // WebKit applies rem changes on a rendering frame after root text
+          // resizing. Wait for that exact inset before measuring the row.
+          await expect
+            .poll(() =>
+              panel.locator(".quran-meaning-header").evaluate((node) => parseFloat(getComputedStyle(node).paddingLeft)),
+            )
+            .toBe(24 * scale + 3);
+          const spacing = await panel.evaluate((panel) => {
+            const furniture = [...panel.querySelectorAll(".quran-meaning-header, .quran-meaning-footer")];
+            const bounds = panel.getBoundingClientRect();
+            return furniture.map((node) => {
+              const style = getComputedStyle(node);
+              return {
+                left: parseFloat(style.paddingLeft),
+                right: parseFloat(style.paddingRight),
+                top: parseFloat(style.paddingTop),
+                bottom: parseFloat(style.paddingBottom),
+                borderTop: parseFloat(style.borderTopWidth),
+                borderBottom: parseFloat(style.borderBottomWidth),
+                contained: [...node.children].every((child) => {
+                  const childBounds = child.getBoundingClientRect();
+                  return childBounds.left >= bounds.left && childBounds.right <= bounds.right;
+                }),
+              };
+            });
+          });
+          expect(spacing).toHaveLength(2);
+          for (const row of spacing) {
+            expect(row.left).toBe(24 * scale + 3);
+            expect(row.right).toBe(row.left);
+            expect(row.top).toBe(6 * scale);
+            expect(row.bottom).toBe(row.top);
+            expect(row.borderTop).toBe(0);
+            expect(row.borderBottom).toBe(0);
+            expect(row.contained).toBe(true);
+          }
+          expect(
+            await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+          ).toBeLessThanOrEqual(1);
+          if (scale === 1 && width !== 320)
+            await page.screenshot({
+              path: testInfo.outputPath(`translation-furniture-${language}-${width}.png`),
+              scale: "css",
+            });
+        }
+      }
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = "";
+      });
+    });
+
+    test("Three-digit ayah chips remain on one line at the bottom right @cross-browser", async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto("/#/quran/16");
       const english = page.locator(".quran-meaning-text");
@@ -123,15 +184,26 @@ for (const language of ["ar", "en"] as const) {
           range.selectNodeContents(marker);
           return {
             lines: range.getClientRects().length,
-            gap:
-              paragraph.querySelector(".quran-meaning-verse-text")!.getBoundingClientRect().left -
-              range.getBoundingClientRect().right,
+            right: paragraph.getBoundingClientRect().right - marker.getBoundingClientRect().right,
+            bottom: paragraph.getBoundingClientRect().bottom - marker.getBoundingClientRect().bottom,
+            position: getComputedStyle(marker).position,
+            leftPadding: parseFloat(getComputedStyle(paragraph).paddingLeft),
+            rightPadding: parseFloat(getComputedStyle(paragraph).paddingRight),
+            topPadding: parseFloat(getComputedStyle(paragraph).paddingTop),
+            bottomPadding: parseFloat(getComputedStyle(paragraph).paddingBottom),
           };
         }),
       );
       geometry.forEach((verse) => {
         expect(verse.lines).toBe(1);
-        expect(verse.gap).toBeGreaterThanOrEqual(4);
+        expect(verse.position).toBe("absolute");
+        expect(verse.right).toBeGreaterThanOrEqual(14);
+        expect(verse.right).toBeLessThanOrEqual(16);
+        expect(verse.bottom).toBeGreaterThanOrEqual(10);
+        expect(verse.bottom).toBeLessThanOrEqual(12);
+        expect(verse.leftPadding).toBe(14);
+        expect(verse.leftPadding).toBe(verse.rightPadding);
+        expect(verse.bottomPadding - verse.topPadding).toBe(2);
       });
     });
 
@@ -147,9 +219,10 @@ for (const language of ["ar", "en"] as const) {
       const gutter = await english.evaluate((region) => {
         const paragraph = region.querySelector("p")!;
         const number = paragraph.querySelector(".audio-translation-marker")!;
-        return number.getBoundingClientRect().left - region.getBoundingClientRect().left;
+        return paragraph.getBoundingClientRect().right - number.getBoundingClientRect().right;
       });
-      expect(gutter).toBeLessThanOrEqual(4);
+      expect(gutter).toBeGreaterThanOrEqual(14);
+      expect(gutter).toBeLessThanOrEqual(16);
       await page.screenshot({ path: testInfo.outputPath(`translation-${language}-390.png`), scale: "css" });
       for (const width of [390, 320]) {
         await page.setViewportSize({ width, height: 844 });

@@ -24,6 +24,16 @@ function renderControl(overrides: Partial<Parameters<typeof SegmentedControl<"co
 }
 
 describe("SegmentedControl", () => {
+  it("can explicitly apply a checked preference without changing ordinary selection behavior", () => {
+    const onReselect = vi.fn();
+    const { onChange } = renderControl({ onReselect });
+    fireEvent.click(screen.getByRole("radio", { name: "Complete" }));
+    expect(onReselect).toHaveBeenCalledWith("complete");
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("radio", { name: "Abbreviated" }));
+    expect(onChange).toHaveBeenCalledWith("core");
+    expect(onReselect).toHaveBeenCalledTimes(1);
+  });
   it("exposes radiogroup semantics, not a group of toggle buttons", () => {
     renderControl();
 

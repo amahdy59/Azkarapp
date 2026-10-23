@@ -1,3 +1,4 @@
+import { AUDIO_CATALOG } from "./audioManifest";
 import { describe, expect, it } from "vitest";
 import { ALL_AZKAR, getAzkarForMode } from "../content/azkar";
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
@@ -76,6 +77,27 @@ function catalogFor(zikrs: readonly Zikr[], voices = ["voice-a"]): { catalog: Au
 }
 
 describe("explicit audio content architecture", () => {
+  it("quarantines the owner-reported guidance Arabic recording for both identities without changing text or English", () => {
+    for (const zikr of [
+      ALL_AZKAR.find((item) => item.id === "misc-ref-1")!,
+      COMPREHENSIVE_DUAS.find((item) => item.id === "comprehensive-dua-39")!,
+    ]) {
+      const input = {
+        zikrs: [zikr],
+        catalog: AUDIO_CATALOG,
+        context: { category: zikr.category, source: "single" as const, routineMode: "complete" as const },
+      };
+      expect(buildPlaybackPlan({ ...input, audioLanguage: "ar" }).entries).toHaveLength(0);
+      const english = buildPlaybackPlan({ ...input, audioLanguage: "en" });
+      expect(english.entries).toHaveLength(1);
+      expect(english.entries[0]!.availableVoiceIds).toEqual(["english-george"]);
+    }
+    expect(
+      AUDIO_CATALOG.assets["comprehensive-dua-39"]!.segments[0]!.variants.find(
+        (item) => item.voiceId === "abdullah-muhammad",
+      )!.reviewStatus,
+    ).toBe("rejected");
+  });
   it("carries reviewed page boundaries, Quran ranges and exact recording checksums for all four long surahs", () => {
     const zikrs = [...ALL_AZKAR, ...FRIDAY_KAHF].filter((zikr) =>
       ["ir-baqarah", "friday-kahf", "s-hm-110a", "s-hm-110b"].includes(zikr.id),
@@ -229,7 +251,7 @@ describe("explicit audio content architecture", () => {
     const expectShared = (ids: string[]) =>
       expect(new Set(ids.map((id) => ALL_AZKAR.find((zikr) => zikr.id === id)?.canonicalKey)).size).toBe(1);
     expectShared(["m-hm-75", "e-hm-75", "s-hm-100", "ap-ref-9"]);
-    expectShared(["m-hm-76a", "e-hm-76a", "s-hm-99-ikhlas"]);
+    expectShared(["m-hm-76a", "e-hm-76a", "s-hm-99-ikhlas", "ir-ref-5a"]);
     expectShared(["m-hm-79", "e-hm-79", "misc-ref-8"]);
     expectShared(["s-hm-106-allahu-akbar", "ap-tasbeeh-allahuakbar"]);
   });
@@ -318,6 +340,32 @@ describe("explicit audio content architecture", () => {
     const incompatible = withPlaybackVoice({ ...entry, prescribedRepetitions: 34 }, entry.defaultVoiceId);
     expect(incompatible.repetitions).toBe(1);
     expect(incompatible.supportedModes).toEqual(["play-once"]);
+  });
+
+  it("plays the owner's three embedded repentance recitations only once and keeps English repetition independent", () => {
+    const zikr = COMPREHENSIVE_DUAS.find((item) => item.id === "comprehensive-dua-42")!;
+    const plan = buildPlaybackPlan({
+      zikrs: [zikr],
+      baseUrl: "https://audio.example.test",
+      context: { category: zikr.category, routineMode: "complete", source: "single" },
+    });
+    const entry = plan.entries[0]!;
+    expect(entry.embeddedRepetitions).toBe(3);
+    expect(entry.prescribedRepetitions).toBe(3);
+    expect(entry.repetitions).toBe(1);
+    const english = withPlaybackVoice(entry, "english-george");
+    expect(english.embeddedRepetitions).toBe(1);
+    expect(english.repetitions).toBe(3);
+    expect(withPlaybackVoice(english, entry.defaultVoiceId).repetitions).toBe(1);
+    const hundred = ALL_AZKAR.find((item) => item.id === "misc-ref-13")!;
+    const other = buildPlaybackPlan({
+      zikrs: [hundred],
+      baseUrl: "https://audio.example.test",
+      context: { category: hundred.category, routineMode: "complete", source: "single" },
+    }).entries[0]!;
+    expect(other.prescribedRepetitions).toBe(100);
+    expect(other.supportedModes).toEqual(["play-once"]);
+    expect(other.repetitions).toBe(1);
   });
 
   it("fails validation for an incomplete Quran range", () => {

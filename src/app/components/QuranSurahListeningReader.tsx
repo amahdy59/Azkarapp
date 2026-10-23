@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { AudioOptionToggle } from "./AudioOptionToggle";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { QuranListeningReaderProps } from "./QuranListeningReader";
 import { useReviewedQuranTiming } from "../hooks/useReviewedListeningTiming";
@@ -11,7 +12,6 @@ import { QuranListeningTranslation } from "./QuranListeningTranslation";
 import { MushafBismillahArt } from "./MushafBismillahArt";
 import { BASMALAH_ARABIC } from "./QuranChrome";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
-import { Check } from "./icons";
 import { t } from "../i18n";
 
 const actionClass =
@@ -25,6 +25,7 @@ function Passage({
   verseKey,
   word,
   follow,
+  followIntent,
 }: {
   page: number;
   fallback: string;
@@ -32,6 +33,7 @@ function Passage({
   verseKey: string | null;
   word: { verseKey: string; position: number } | null;
   follow: boolean;
+  followIntent: RefObject<boolean>;
 }) {
   const [retry, setRetry] = useState(0);
   const { result, error } = useListeningMushafPage(page, retry);
@@ -53,12 +55,13 @@ function Passage({
     if (!outerViewport) return;
     let frame = 0;
     const reveal = () => {
+      if (!followIntent.current) return;
       const pageRange = props.entry.mushafPages?.find((item) => item.page === page);
       const ayah = Number(verseKey?.split(":")[1]);
       const atOpening = !verseKey && page === props.entry.mushafPages?.[0]?.page;
       // A verse can straddle printed pages; without a word cue use its declared page.
       if (!atOpening && !word && pageRange && (ayah < pageRange.startAyah || ayah > pageRange.endAyah)) return;
-      const target = atOpening
+      let target = atOpening
         ? root.current?.querySelector<HTMLElement>(`[data-mushaf-surah-number="${range.surah}"]`)
         : word
           ? root.current?.querySelector<HTMLElement>('[data-playback-word="true"]')
@@ -66,6 +69,13 @@ function Passage({
       if (!target) return;
       const region = root.current?.closest<HTMLElement>(".audio-listening-arabic");
       const viewport = region && region.scrollHeight > region.clientHeight + 1 ? region : outerViewport;
+      // Enlarged text can place all opening verses below a tall surah heading.
+      // Reveal actual reading ink while retaining the heading above for scrolling.
+      if (atOpening) {
+        const firstVerse = root.current?.querySelector<HTMLElement>("[data-listening-verse]");
+        if (firstVerse && firstVerse.getBoundingClientRect().top >= viewport.getBoundingClientRect().bottom - 8)
+          target = firstVerse;
+      }
       if (!atOpening && region && region.scrollWidth > region.clientWidth) {
         const view = region.getBoundingClientRect();
         const wordBounds = target.getBoundingClientRect();
@@ -97,7 +107,7 @@ function Passage({
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, [follow, result, verseKey, word, page, props.entry.mushafPages, range.surah]);
+  }, [follow, followIntent, result, verseKey, word, page, props.entry.mushafPages, range.surah]);
   const typeScale = props.textScale === "small" ? 0.9 : props.textScale === "large" ? 1.08 : 1;
   const scale = (typeScale * (props.magnification ?? 100)) / 100;
   return (
@@ -170,7 +180,13 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
   } = props;
   const timing = useReviewedQuranTiming(segment);
   const cue = useQuranPlaybackCue(timing, currentTime, playing, readTime);
-  const [follow, setFollow] = useState(true);
+  const [follow, setFollowState] = useState(true);
+  const followIntent = useRef(true);
+  const setFollow = (value: boolean) => {
+    // Stop already-scheduled geometry recovery before React commits the new state.
+    followIntent.current = value;
+    setFollowState(value);
+  };
   const [words, setWords] = useState(true);
   const root = useRef<HTMLElement>(null);
   const pages = useMemo(
@@ -184,23 +200,52 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
   useEffect(() => {
     setFollow(true);
   }, [entry.entryId, segment?.variantId]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const viewport = root.current?.closest<HTMLElement>(".audio-expanded-text");
-    const pause = () => setFollow(false);
+    let endTarget: HTMLElement | null = null;
+    const pause = () => {
+      endTarget = null;
+      followIntent.current = false;
+      setFollowState(false);
+    };
     const key = (event: KeyboardEvent) => {
+      const target = event.target;
       if (
-        event.target === viewport &&
+        target instanceof HTMLElement &&
+        (target === viewport || target.classList.contains("audio-listening-arabic")) &&
         ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End"].includes(event.key)
-      )
+      ) {
         pause();
+        if (event.key === "End" || event.key === "Home") {
+          event.preventDefault();
+          target.scrollTo({ top: event.key === "End" ? target.scrollHeight : 0, behavior: "instant" });
+          if (event.key === "End") endTarget = target;
+        }
+      }
+    };
+    // Late page/font fitting can increase the range after End. Honor the user's
+    // explicit endpoint while that region is focused, until another browse action.
+    const resize = new ResizeObserver(() => {
+      if (endTarget && document.activeElement === endTarget)
+        endTarget.scrollTo({ top: endTarget.scrollHeight, behavior: "instant" });
+    });
+    if (root.current) resize.observe(root.current);
+    if (viewport) resize.observe(viewport);
+    const blur = () => {
+      endTarget = null;
     };
     viewport?.addEventListener("wheel", pause, { passive: true });
     viewport?.addEventListener("touchmove", pause, { passive: true });
+    viewport?.addEventListener("pointerdown", pause, { passive: true });
+    viewport?.addEventListener("focusout", blur);
     viewport?.addEventListener("keydown", key);
     return () => {
       viewport?.removeEventListener("wheel", pause);
       viewport?.removeEventListener("touchmove", pause);
+      viewport?.removeEventListener("pointerdown", pause);
+      viewport?.removeEventListener("focusout", blur);
       viewport?.removeEventListener("keydown", key);
+      resize.disconnect();
     };
   }, []);
   const preferences = (
@@ -211,26 +256,23 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
     >
       <p className="text-sm">{t(language, timing ? "quranListening.browseHint" : "quranListening.unavailable")}</p>
       {timing && (
-        <button
-          type="button"
-          className={actionClass}
-          aria-pressed={follow}
-          onClick={() => setFollow((value) => !value)}
-        >
-          <span>{t(language, "quranListening.follow")}</span>
-          {follow && <Check size={16} className="shrink-0" aria-hidden="true" />}
-        </button>
+        <AudioOptionToggle
+          label={t(language, "quranListening.follow")}
+          checked={follow}
+          onChange={() => {
+            setFollow(!follow);
+          }}
+        />
       )}
       {timing?.verses.some((verse) => verse.words?.length) && (
-        <button type="button" className={actionClass} aria-pressed={words} onClick={() => setWords((value) => !value)}>
-          <span>
-            {t(
-              language,
-              timing.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
-            )}
-          </span>
-          {words && <Check size={16} className="shrink-0" aria-hidden="true" />}
-        </button>
+        <AudioOptionToggle
+          label={t(
+            language,
+            timing?.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
+          )}
+          checked={words}
+          onChange={() => setWords((value) => !value)}
+        />
       )}
     </div>
   );
@@ -276,6 +318,7 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
               verseKey={cue.verseKey}
               word={words ? cue.word : null}
               follow={follow}
+              followIntent={followIntent}
             />
           ))}
         </div>

@@ -259,6 +259,9 @@
    surface tokens opt into this companion class when they sit on that canvas,
    keeping their existing anatomy while moving copy and nested controls onto
    the measured on-media palette. */
+.home-photo-canvas {
+  --home-glass-accent: #fff0bd;
+}
 .home-glass-surface {
   --foreground: var(--on-media);
   --muted-foreground: var(--on-media-muted);
@@ -271,23 +274,18 @@
    long reading and sticky chrome use a stronger tint without stacking fills. */
 .hero-glass.home-glass-surface {
   /* Pale gold preserves small citation/control contrast on bright scenery. */
-  --on-media-accent: #fff0bd;
+  --on-media-accent: var(--home-glass-accent);
   --home-glass-tint: rgb(15 23 42 / 0.48);
   background-color: var(--home-glass-tint);
   background-image: linear-gradient(135deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.01) 60%);
   backdrop-filter: blur(18px) saturate(120%);
 }
-@media (prefers-reduced-transparency: reduce) {
-  .hero-glass.home-glass-surface {
-    background: var(--on-media-surface);
-    backdrop-filter: none;
-  }
-}
 
 .home-photo-scrim {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to bottom, rgb(2 6 23 / 0.5), rgb(2 6 23 / 0.35), rgb(2 6 23 / 0.75));
+  /* Bound small-text contrast even beneath the active prayer's brightest sheen. */
+  background-image: linear-gradient(to bottom, rgb(2 6 23 / 0.6), rgb(2 6 23 / 0.58), rgb(2 6 23 / 0.64));
 }
 
 @keyframes stagger-enter {
@@ -304,6 +302,16 @@
 .stagger-enter {
   opacity: 0;
   animation: stagger-enter var(--motion-duration-entrance) var(--motion-ease-enter) forwards;
+}
+.reduce-motion .stagger-enter {
+  animation: none !important;
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stagger-enter {
+    animation: none !important;
+    opacity: 1;
+  }
 }
 /* Facing Mushaf pages keep their paper measure near the spine, with a real
    desktop gutter so the two canvases never read as one crowded block. */

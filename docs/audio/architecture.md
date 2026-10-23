@@ -1,5 +1,21 @@
 # Audio architecture
 
+## Hold progress and internal navigation protection — 2026-10-20
+
+The owner approves a factual elapsed-time unlock ring and a stronger in-app guard. A mount-owned temporary lock prevents routing actions and AudioPlayerSurface's hashchange collapse while the modal remains active; same-document route attempts restore the rendered URL without synthetic history pushes. The transparent shield and readable playback remain. One 100ms progress interval exists only during a continuous two-second hold; release, lost capture, movement outside, blur, hidden visibility and pagehide cancel it. Cleanup releases the guard and timers. Escape and native focus recovery remain available. Audio options explains Android App pinning/iOS Guided Access with official help links: this is not an OS or browser security lock. Queue advancement, media ownership, timing, counts and persisted state are unchanged.
+
+## Visible learning while controls are locked — 2026-10-16
+
+Owner supersedes the centered opaque lock panel: the same modal focus trap and outside-dismiss protection now use a transparent, non-blurred full-screen touch shield. Only a small fixed safe-area hold-to-unlock pill is visible. The underlying exact text, audio progress and playback continue unchanged; pointer/keyboard controls behind it cannot activate. Continuous two-second pointer/Space/Enter hold, cancellation, focus restoration and Escape recovery remain. No media/session/count/recording/timing changes.
+
+## Mushaf overlay and manual browse intent — 2026-10-15
+
+The main Mushaf's compact player overlays the page without refitting its height. Explicit Hide/Show changes presentation only, preserving plan, media clock and playback state; full expansion and Stop remain distinct. The hidden labeled 44px tab states Playing/Paused and restores keyboard focus to Hide. Ordinary screen clearance is unchanged. Manual continuous-surah keyboard browse cancels already-scheduled follow recovery synchronously; End tracks late-fitting content while the reading region stays focused, until another browse action. Canonical lines, reviewed timing and recordings remain unchanged.
+
+## Interactive compact timeline — 2026-10-15
+
+The compact player's former display-only progress line is replaced by one native range input in its own 44px-high row, with a visible thumb and elapsed/total time. Click, drag and keyboard seek the same controller as the expanded timeline. Unknown duration disables seeking; RTL reverses the fill and horizontal arrow meaning. PageUp/PageDown seek 30 seconds, arrows 5 seconds and Home/End select boundaries. Header controls retain independent 44px or larger targets with 8px separation. The existing measured dock clearance adapts to the taller compact surface. Playback completion, cache, timing and media ownership are unchanged. This supersedes historical compact-strip descriptions below.
+
 ## Calm flowing Quran presentation — 2026-10-12
 
 The owner's request supersedes the earlier automatic 125% enlargement in continuous Al-Kahf, As-Sajdah and Al-Mulk listening. Flowing Quran uses shared 21.5/23/27px typography and 1.65 leading; explicit text scale/magnification remain. Basmalah is compact and page-fragment margins no longer add gaps between verses. Complete local words render immediately while page fonts load, with page-specific late-font recovery and cancellation guards. No recording, timing annotation, verse range, media ownership or completion contract changes.
@@ -105,3 +121,21 @@ Expanded full-surah following observes reading/page geometry so text resizing ke
 ## Canonical continuous Surah listening — 2026-10-13
 
 Owner correction replaces flowing Al-Kahf/As-Sajdah/Al-Mulk streams with continuous canonical pages. Keep each source page's fifteen slots and original word lines; remove adjacent surah tokens/headings without compacting rows. Use MushafListeningPage with the selected surah filter and original semantic verse alternative. Enlarge both dimensions proportionally, retain normal fitting across zoom and allow horizontal panning. Reveal the selected opening rather than preceding blank slots. Reviewed timings, single native media ownership, exact word cues, manual-browse pause/resume, complete English translation and offline Unicode recovery remain unchanged.
+
+## Persistent automatic continuation — 2026-10-16
+
+Play all defaults on for new/legacy preference snapshots and single/full-session starts. An explicit manual choice is saved through the existing audio-preference boundary and retained across plans/reloads. A Reader listen still begins at the selected zikr in its existing language-filtered queue. This changes continuation only; prescribed repeats, exact recording identity, natural-ending-only completion and media ownership are unchanged. Binary audio options reuse AudioOptionToggle, and the expanded player omits the redundant visible title while retaining accessible/media identity. Desktop Play all feedback sits beside centered transport; narrow layouts move the label below at the left.
+
+## Recording quarantine and accidental-touch lock — 2026-10-16
+
+The owner-reported wrong comprehensive-dua-39 Arabic variant is rejected; misc-ref-1 shares that asset and likewise has no Arabic coverage. Approved English remains available. Identical bytes remain approved for the correctly matched friday-dua-25. Two mismatched transcript annotations are removed from the compressed owner-preview pack and all references to the rejected variant are stripped. No sacred text, prescribed count or progress rule changes. Restore coverage only through the existing independent recording review process.
+
+Expanded ordinary and Quran playback expose one 44px Lock controls action. Its shared modal blocks outside pointer interaction, traps focus and leaves media running. Hold the unlock action for two seconds with pointer, Space or Enter; release/cancel/blur resets the hold. Escape is an accessible recovery path; focus returns to the opener. This prevents accidental touches, not device navigation or OS interaction. It is temporary UI state, never a child practice or repetition mode.
+
+The owner-confirmed three recitations in the comprehensive-dua-42 Arabic recording require three-occurrence timing coverage. Its two one-occurrence preview candidates are quarantined; English timing remains. Arabic playback remains available without fabricated word highlighting until matching timing is reviewed. Existing prescribed counts remain unchanged.
+
+## Calm prayer and overlay separation — 2026-10-17
+
+The owner's screenshot review supersedes the icon divider, bright blue/white summary outlines, next-prayer interval bar and 28% overlay tint. Prayer summaries use quieter boundaries and a text countdown, without vertical dividers or a progress bar. Keep current/next initial visibility, native free scrolling, recorded-state descriptions, full-card targets and stable name/time geometry through collapse. Expanded actions precede supporting evidence on phone; desktop retains separate evidence and tracking columns. Reviewed sources and tracking/calculation behavior are unchanged.
+
+Text-over-text overlays require a denser material than cards: dialogs, menus, listboxes and expanded audio use 80% navy with stationary 28px/135% frost. Ordinary cards and reading tint retain their existing values. Expanded AudioPlayerSurface visually hides its covered main-canvas siblings using a reversible attribute, in addition to inert/aria-hidden, and restores them on collapse. The shared shell scene remains visible; transparent backgrounds cannot reveal duplicate Reader text. Native focus, Escape, touch lock, Solid/high-contrast/forced-color recovery and offline state remain. See docs/agent/phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md.

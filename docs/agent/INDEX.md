@@ -1,4 +1,84 @@
+[Larger Home prayer times and action feedback](phases/HOME_PRAYER_TIME_AND_ACTIONS_2026_10_21.md) is the active owner-approved phase: enlarge expanded digits within the existing card dimensions, preserve collapsed typography and coordinated motion, and refine Home Share/Refresh and common action cues. Preserve unrelated work and complete the repository's release gates.
+
+[Motion and control polish](phases/MOTION_CONTROL_POLISH_2026_10_20.md) records the earlier motion foundation, keyboard/pointer cancellation, shared still-aware icon cues and native range engagement. Its prior publication hold was superseded by the final Progress/Mushaf release decision; retain its motion and cancellation contracts.
+
+[Mushaf interactions and focused Progress](phases/MUSHAF_INTERACTIONS_PROGRESS_TABS_2026_10_20.md) is the active owner-approved continuation: apply all six screenshot-review recommendations, preserving the verified mobile-sharing release and complete release gates. Fix tap ownership/meaning dismissal, reversible Mushaf colours, critical loading, task-based sheets, clearer filter disclosures and Overview/Trends/Records navigation.
+
+[Mobile sharing, compact filters and listening protection](phases/MOBILE_SHARING_FILTERS_LOCK_2026_10_20.md) is deployed and verified at 642520bd; exact-commit Quality, Pages and production smoke passed.
+
+[Protected dropdowns](phases/DROPDOWN_PROTECTION_2026_10_20.md) fixes the supplied Juz-picker text bleed and stacking defect through portalled searchable pickers and a shared opaque dropdown contract across layouts/themes. Local only; preserve concurrent work, no commit/push/deployment.
+
+[Focused Progress dashboard report](reports/PROGRESS_FOCUSED_DASHBOARD_2026_10_20_REPORT.md) records the local layout/date-range implementation, app-matched menus, transparent scrolling frost, independent analytics and verification evidence. No commit, push or deployment.
+
+[Local reliability and performance](phases/LOCAL_RELIABILITY_PERFORMANCE_2026_10_20.md) applies all five owner-approved review recommendations: non-destructive recovery, generation-owned sharing preparation/cancellation, synchronous count-save reuse, boot hydration reuse and indexed historical judgments. Preserve concurrent Progress/reading changes; no commit, push or deployment.
+
+[Sharing board adaptation](phases/SHARING_BOARD_ADAPTATION_2026_10_19.md) applies the owner-approved balanced wide-screen preview/settings layout, explicit optional design skip, labelled artwork choices and truthful visible feedback. Keep current card generation and image-first flow; no hosted permissions/expiry/embed features. Local only; no push without confirmation.
+
+[Compact Quran wird plan form](phases/WIRD_COMPACT_PLAN_FORM_2026_10_19.md) applies the owner-approved four-choice Reading plan select, conditional completion schedule, selected-only fields and live summary. Existing saved kinds/calculations/history remain unchanged. Local only; owner confirmation is required before any push.
+
+[Prominent Progress time series](phases/PROGRESS_TIME_SERIES_2026_10_18.md) responds to the owner's chart correction: large inspectable remembrance and prayer lines precede retained comparisons and actionable insights. This supersedes the miniature-trend presentation in [Actionable Progress insights](phases/PROGRESS_ACTIONABLE_INSIGHTS_2026_10_18.md), preserving complete-day analysis, JSON exports and honest individual-zikr history limits. Local only; preserve pending work and do not publish.
+
 # AI Improvement System Index
+
+[Complete sharing and Home attribution](phases/SHARING_CONTINUATIONS_HOME_2026_10_19.md) records the owner's local-only continuation cards, full Benefits exports, shared four-size selector with platform tags, QCF evidence lettering and Home Share matching Reload. No push or deployment.
+
+[Verified sharing phase report](reports/SHARING_CONTINUATIONS_HOME_2026_10_19_REPORT.md) records complete quality/Pages builds, 30 selected cross-engine cases covered by passing results, exact diagnostics and local export evidence.
+
+[Complete Home reminder readings](phases/HOME_REMINDER_FULL_READING_2026_10_18.md) applies the approved Reading flow, independent four-line text/meaning disclosure, all 71 curated sources and the review of 185 fallback identities. Owner-authorized immutable R2 content upload, checksum-verified offline caching and source-fidelity/browser evidence; application changes remain local.
+
+[Home card alignment](phases/HOME_CARD_ALIGNMENT_2026_10_18.md) aligns tablet/desktop Home sections with the outer prayer-card edges through one shared frame. Local only; preserve pending changes.
+
+[Reader surface and collapsed sidebar](phases/READER_SURFACE_AND_COLLAPSED_SIDEBAR_2026_10_18.md) records the owner-requested softened reading-panel outline and initially collapsed collection navigation. Preserve pending work; local only, no push.
+
+[Home routine action bounds](phases/HOME_ROUTINE_ACTION_BOUNDS_2026_10_18.md) keeps the continuation and share buttons inside the card with a flexible, truncating primary action. The owner follow-up matches their heights, corners and focus treatment, with a 52px-wide share target and all-theme review. Local only; preserve pending material/prayer work.
+
+[Routine-card frost reference](phases/CARD_FROST_REFERENCE_2026_10_18.md) applies the owner's supplied morning-card benchmark to ordinary Glass cards through shared reflection/edge tokens. Preserve reading/overlay contrast, selected prayer treatments and all pending local work. No commit, push or deployment.
+
+[Local prayer selection connection](phases/PRAYER_SELECTION_CONNECTION_2026_10_18.md) is the owner's approved localized receiving light and 20px separation refinement. Preserve pending compact/glass work, show screenshots during development, and do not commit, push or deploy.
+
+Latest local preview correction: [Glass and scrolling](phases/GLASS_SCROLL_REFINEMENT_2026_10_18.md) keeps header tint/sheen unchanged while increasing scrolling frost from 22px to 32px. The owner rejects the solid visor and requests passing-content frost like Home, superseding earlier complete-header-occlusion and interim clipped-records notes. Glass removes the named route backdrop boundary so the effect actually samples content. Preserve all local-only authority and fallback behavior.
+
+[Compact prayer cards](phases/COMPACT_PRAYER_CARDS_2026_10_18.md) records the owner's local-only spacing refinement: retain the earlier icons/status pills, tighten horizontal and vertical gaps, preserve browsing/sticky motion, and repair the separately approved Progress scroll ownership failure.
+
+Current local-only refinement: [Glass and scrolling](phases/GLASS_SCROLL_REFINEMENT_2026_10_18.md). The owner approves balanced 24% card/36% reading tint and 22px frost, explicit surface ownership, quieter depth, actual scroll-owner elevation and a coordinated Home card/footer/icon handoff. The live-preview correction removes the shared prayer-row backing, compact countdown and visible scrollbar, preserving actual individual frost. Share actual screenshots during development; do not commit, push or deploy. Preserve complete scrolled-header text occlusion.
+
+Design system benchmark: [Frostness visual reference](evidence/design-references/frostness-reference.png) establishes the owner's canonical benchmark for frosted glass / glassmorphic devotional surfaces (translucency, blur, beveled borders, layered squircle sub-elements, warm glow, and high-contrast typography; see `docs/DESIGN_SYSTEM.md` and `docs/agent/DECISION_LOG.md`).
+
+Final global-sharing audit: [Remaining image entry points](phases/IMAGE_SHARE_ENTRYPOINTS_2026_10_17.md) brings completion into the existing image studio and gives the ayah-image action priority over text. Preserve all completion and Quran contracts; finish the same release cycle.
+
+Current owner-authorized continuation: [Image-first sharing](phases/IMAGE_FIRST_SHARING_2026_10_17.md). Prioritize image previews/export globally in the shared studio, give Text/Link less visual weight, preserve approved art and content, and keep performance/fallback behavior explicit.
+
+Current exact-commit release correction: [Library theme contrast](phases/LIBRARY_THEME_CONTRAST_2026_10_16.md). Resolve nested progress phrases against the active semantic colour after WebKit exposed stale dark-theme inheritance; retain bidi text and unchanged axe checks. Existing direct-main release authority applies.
+
+Current bounded release repair: [QA backend isolation and presence diagnosis](phases/RELEASE_QA_ISOLATION_2026_10_16.md). Isolate browser builds from production API writes, explicitly select Glass in the on-media test and finish exact-commit release verification. Keep the current billing plan and report the confirmed D1 quota recovery limit honestly.
+
+Current owner-approved continuation: [Simple appearance and visible listening lock](phases/SIMPLE_APPEARANCE_VISIBLE_LOCK_2026_10_16.md). The subsequent owner request replaces the exposed three/four-way material controls with Opaque/Glass, shares the current Home photograph across Glass interface pages and keeps learning text/audio visible while locked. Earlier direct-main release authority remains; this chat owns the combined release and verification.
+
+Current owner-approved release continuation: [App-wide materials and remaining fixes](phases/APP_MATERIALS_AND_RELEASE_2026_10_16.md). Apply app-wide appearance with independent Home overrides, finish outstanding fixes, and push all changes through intact gates and production verification.
+
+Current coordinated snapshot is local only: the owner authorized chat coordination and subsequently instructed “Coordinate; keep these changes local” in the Home refinement chat. Finish local integration and verification; do not commit, push or publish this combined snapshot. This publication hold supersedes earlier release authority for the current pending changes.
+
+Latest owner-authorized combined work: [Authenticated reminders](phases/HOME_RELEVANT_REMINDERS_2026_10_16.md) and [Home scrolling/presence report](phases/HOME_PRAYER_SCROLL_AND_PRESENCE_2026_10_16.md). The owner explicitly supersedes the initial content-workbook approval gate for authenticated material and asks for both relevance plans to work together. Existing approved appearance/audio/Qibla work retains its separately documented release authority and verification requirements.
+
+Current bounded local follow-up: [Qibla shortcut visibility](phases/QIBLA_SHORTCUT_VISIBILITY_2026_10_16.md). The owner requests hiding desktop Qibla while retaining phone/tablet layouts and explicitly prohibits pushing changes.
+
+Latest owner-approved Home follow-up: Friday-specific deeds/evidence, full-photo Wird tiles and progress badges, versioned R2 backgrounds with opaque load-failure recovery, and a single symmetric liquid connector. See the active Home phase and decision log. Preserve normal glass values; inspect local responsive images before the authorized release.
+
+Latest release authorization, 2026-10-16: the owner reviewed the new Home image candidates and their real phone/desktop composites, selected the calmer Friday-morning scene, and requests applying the optimized backgrounds and pushing all pending Home refinements. This supersedes earlier local-preview holds. See the active Home phase, decision log, and the final Home release report.
+
+Latest Home material continuation, 2026-10-16: verify visible translucency for every Home card family across phone and desktop, including optional photo Wird captions, while preserving contrast and opaque device/application fallbacks. The local image-review-before-push hold remains. See the active Home phase and `docs/agent/HOME_GLASS_ALL_CARDS_2026_10_16_REPORT.md`.
+
+Latest Home continuation, 2026-10-16: the owner approves a full-width prayer disclosure below the summary row so Maghrib/Isha never swap contextual cards. Verify every expanded-card checkbox by pointer/keyboard and reload, and preview the recommended borderless utility header. The local screenshot review/publication hold remains. See the active Home phase and notch report.
+
+Latest owner follow-up, 2026-10-16: full-card prayer click targets, larger insets, no Viewing copy and next-only approaching emphasis require local image review before any further push. This supersedes the release authorization below for the new follow-up. The pushed `2c46d17f` failed one exact-geometry browser check (status badge alignment); Pages correctly skipped it. The local follow-up fixes the row alignment without relaxing that assertion. See the active Home phase and `docs/agent/HOME_PRAYER_CARD_TARGETS_2026_10_16_REPORT.md`.
+
+Release authorization, 2026-10-16: the owner approves all pending Home glass, Friday naming, contextual footer, countdown alignment and current-to-next focus changes and explicitly requests pushing all changes. This supersedes the local-only publication holds for the current continuation. Run the tracked hook, push verified `main`, require exact-commit Quality and Pages success, and verify the live application. Final release evidence is recorded in `output/home-refinements-release-2026-10-16/PHASE_REPORT.md`.
+
+Current owner-approved continuation: [Home glass clarity and material refinement](phases/HOME_GLASS_REFINEMENT_2026_10_15.md). Restore visible Home translucency and apply the owner-requested two-column, fit-or-scroll prayer overview; actual local previews precede publication and complete release gates remain intact. [Final reading, offline clarity and release acceptance](phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md) is deployed at 2e93b36c.
+
+Current follow-up: [Cards, situational sessions and compact audio](phases/CARDS_AND_COMPACT_AUDIO_2026_10_15.md), approved by the owner after the audit. Preserve the coordinated Android/release acceptance work below.
+
+The owner also approves [Wird evidence sharing and the Progress explanation](phases/WIRD_EVIDENCE_SHARING_2026_10_15.md) as a bounded follow-up in the same verified release.
 
 Current coordinated effort: [Audit remediation and Android preparation](phases/APP_AUDIT_REMEDIATION_2026_10_15.md). The owner approved applying the audit recommendations and adding Capacitor Android/native widgets and reminders while retaining the PWA. Earlier entries below record historical phase authority; they are not additional simultaneously active briefs.
 
@@ -329,3 +409,77 @@ The latest owner-approved continuation is [Canonical Surah magnification and rec
 [Home clarity and independent appearance](phases/HOME_CLARITY_2026_10_14.md) implements the owner-approved final concept and desktop-only Today’s path. [Supplied sleep cards and reliance lettering](phases/SLEEP_SHARING_AND_RELIANCE_LETTERING_2026_10_14.md) records the two subsequent owner requests. The owner explicitly approved a 12 MiB total-output exception and publication of all changes; intact release gates apply.
 
 [Home glass and desktop header](phases/HOME_GLASS_AND_HEADER_2026_10_14.md) is the active owner-approved refinement: full-width main-canvas header, visible photographic glass, stronger reading surfaces, simpler nested controls and intact accessibility preferences.
+
+Latest owner-approved combined follow-up: [Home sharing, selection and audio](phases/HOME_SHARING_AUDIO_2026_10_16.md) supersedes the hourglass connector with matching edges, adds direct approved-card sharing, persists the Play all choice, unifies audio option controls and fixes visible compressed photo delivery. Include the independently verified scrolling prayer summary as requested by the owner.
+
+[Desktop Home material and audio controls lock](phases/DESKTOP_GLASS_AUDIO_LOCK_2026_10_16.md) records the owner-approved Glass / Follow device / Solid choice, recording quarantine and touch-lock-only scope. The owner also approves including the verified concurrent Qibla edits, superseding their local publication hold.
+
+[Automatic path and Home polish](phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md) is the current owner-requested local-only follow-up: prospective regular/golden/oasis palm tiers, read-only path clarity, embedded-three audio metadata, separated selection edge, coordinated prayer-card collapse and translucent scrolled ground. The owner approves coordination while withholding publication.
+
+## Combined release authorization — 2026-10-16
+
+The owner's subsequent “push all changes” instruction supersedes the current local-only holds. [Combined release report](phases/COMBINED_HOME_RELEASE_2026_10_16.md) records verification/publication for the frozen Home, automatic path, reminders, audio protection and Qibla work. One coordinating chat owns commit/push and exact-commit Quality/Pages/production verification.
+
+[Independent App and Home Glass](phases/INDEPENDENT_GLASS_CONTROLS_2026_10_17.md) is the owner-approved implementation phase: directly visible controls, four mix-and-match combinations, persistent Home overrides, shared existing background and protected reading surfaces. This supersedes the earlier reset-Home-on-App-selection rule.
+
+[Home glass across all layouts](phases/UNIFIED_HOME_GLASS_2026_10_17.md) is the active owner-requested appearance correction: material parity with Home across screens, cards, navigation, reading layouts and overlays.
+
+[Frosted prayer hierarchy](phases/PRAYER_GLASS_HIERARCHY_2026_10_17.md) follows the separately committed global material phase: reference-inspired icon/time/status anatomy and comfortable free horizontal scrolling with initial current/next visibility.
+
+[Calm prayer and overlay separation](phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md) is the active owner-requested follow-up: quieter summaries, no next-prayer bar/dividers, clearer expanded actions, denser overlays and reversible covered-reader visibility.
+
+Latest owner continuation: [Frost clarity and compact consistent headers](phases/FROST_CLARITY_COMPACT_HEADERS_2026_10_17.md) supersedes the lighter material after screenshot review; stronger frost, protected scrolling headers, accessible status colors and compact shared zikr chrome. Standing main-branch release authority applies.
+
+[Read-only Progress statistics](phases/PROGRESS_COMPACT_TRACKING_2026_10_18.md) records the owner's clarified statistics-only purpose: concise daily totals, optional read-only prayer breakdown and plain wird records. Local only; Home and historical charts are preserved.
+
+[Compact devotional title rows](phases/COMPACT_DEVOTIONAL_TITLE_ROWS_2026_10_18.md) records the owner-requested local-only title/control alignment, raised progress and shorter shared Reader/Masbaha/Salawat heroes.
+
+[Combined release](phases/COMBINED_RELEASE_2026_10_18.md) records the owner-authorized publication of all pending refinements, superseding their earlier local-only holds.
+
+[Shared chrome frost and mosque wording](phases/CHROME_PARITY_MOSQUE_LABEL_2026_10_18.md) records the owner's material-parity/accurate recording follow-up and responsive CI remediation.
+
+[Adjacent after-prayer reading action](phases/PRAYER_ACTIONS_ADJACENT_READING_2026_10_18.md) is the owner-approved local-only card implementation: independent inline Read/completion controls, adjacent checkbox labels, card-width responsive evidence and unchanged mode colors/Glass. Do not push.
+
+Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026_10_18.md) applies all remaining owner-approved recommendations: concise disclosures, tap/keyboard points, matched elapsed-period comparisons and new observed individual-zikr history. Preserve unrelated pending work; no publication.
+
+[Consistent devotional footer and text fit](phases/DEVOTIONAL_FOOTER_TEXT_FIT_2026_10_18.md) records the owner's local-only shared Reader/Masbaha/Salawat footer, complete labels and responsive content-sized controls.
+
+[Seamless headers and shared-card links](phases/SEAMLESS_HEADERS_AND_CARD_LINKS_2026_10_18.md) records the owner's local-only text-highlight removal, verified independent Home Glass, scroll-only header material and app links accompanying shared images. No push.
+
+[Stationary Library image header](phases/STATIONARY_LIBRARY_IMAGE_HEADER_2026_10_18.md) records the owner-requested local-only image-backed Library header and independently scrolling list. No push.
+
+[Session gap closure](phases/SESSION_GAP_CLOSURE_2026_10_18.md) records owner-approved image attribution, precise collection citations, concise hadith meanings and reconciled verification, with physical/human acceptance tracked separately. Local application only.
+
+[Combined release .4](phases/COMBINED_RELEASE_2026_10_18_4.md) records the owner-authorized R2 verification, all-pending-change integration and full release cycle, superseding prior local-only holds.
+
+[Mobile Reader surface and release](phases/MOBILE_READER_SURFACE_2026_10_18.md) records the owner-requested mobile progress seam repair, related compact-counter inspection and authorized all-pending-change release.
+
+[Mushaf clarity, source comparison and timed CI](phases/MUSHAF_CLARITY_SOURCE_REVIEW_CI_2026_10_18.md) is the active owner request. All 20 pending comparisons include the owner-requested Dorar follow-up: 12 source-attributed entries supported and eight specific content mismatches documented; grading disagreement alone causes no blanket hold. Protect Mushaf tooltip/status overlays, identify active Glass material separately from page color, and schedule the unchanged browser inventory using recorded durations. Standing main release authority applies.
+
+[Complete Benefits hadith narrations](phases/BENEFITS_FULL_HADITH_2026_10_18.md) records the owner-requested local-only replacement of 21 abbreviated summaries with complete sourced bilingual narrations. Coordinate with the active release; no publication.
+
+[Stable prayer cards and scrolling](phases/STABLE_PRAYER_CARD_SCROLL_2026_10_18.md) records the approved local-only protected strip, stable typography/scroll geometry, retained next countdown and enlarged-text spacing. [Final pending-change review](phases/FINAL_PENDING_REVIEW_2026_10_18.md) records integration checks and reconciles the domain guides before publication.
+
+[Final pending release](phases/FINAL_PENDING_RELEASE_2026_10_18.md) records the owner's subsequent authorization to publish all pending changes with fresh release notes, complete required testing and exact-commit deployment verification. This supersedes the two pending local-only holds.
+
+[Home frost, motion and Android handoff](phases/FROST_MOTION_ANDROID_HANDOFF_2026_10_19.md) is the active owner-requested follow-up: one softer scrolled Home material, synchronized 220ms prayer geometry/details and verified Android build/developer handoff. Persistent native-file downloads and device/Play acceptance remain explicit Android follow-up work. The owner's latest instruction withholds push/deployment until returning for review.
+
+[Sharing steps and truthful availability](phases/SHARING_STEPS_AND_AVAILABILITY_2026_10_19.md) is the active owner-requested sharing phase: Content/Design/Share, retained live preview, explicit dropdown menus, existing reviewed English content, honest presets/capabilities and responsive/accessibility verification.
+
+[Progress unified-range proposal](PROGRESS_UNIFIED_RANGE_PLAN_2026_10_19.md) reviews the existing long statistics page and proposes a shared Day/Week/Month/Year/Custom filter, chosen metrics and one selectable prominent timeline. Plan only; no Progress data/presentation change in this sharing/wird release.
+
+[Sharing and Quran plan release](phases/COMBINED_SHARING_WIRD_RELEASE_2026_10_20.md) records the owner's "push all changes" confirmation, superseding pending publication holds, and the verification/publication plan.
+
+[Performance, Progress and header review](phases/PERFORMANCE_PROGRESS_HEADER_REVIEW_2026_10_20.md) is the owner's subsequent review/repair request: measured scroll-calculation reuse, protected unavailable-frost headers, responsive target repair and release verification. [Review findings](reports/PERFORMANCE_PROGRESS_REVIEW_2026_10_20.md) prioritize future work and qualify the still-proposed Progress redesign.
+
+[Local Progress overlap and cancellation repair](phases/PROGRESS_INTERNAL_HEADER_LOCAL_2026_10_20.md) is the active follow-up. The owner identifies Progress and explicitly withholds further pushes while working elsewhere. Protect the title during independently scrolling filters, restore keyboard clearance and avoid cancelled export preparation. Preserve concurrent edits; leave this work local for review.
+
+[Focused Progress dashboard and date ranges](phases/PROGRESS_FOCUSED_DASHBOARD_2026_10_20.md) is the active owner-approved implementation, superseding the proposal-only dashboard status. Preserve the no-push hold and stronger-frost/no-darkening correction. Build shared ranges, concise independent metrics, one selected trend and useful optional comparisons/exact records with tested calendar/data semantics and responsive accessibility.
+
+[Footer, sharing and control feedback](phases/CONTROL_FEEDBACK_SHARING_2026_10_20.md) is the owner's current local-only control refinement, including the subsequent English-reader translation toggle. Preserve concurrent Progress and card work; no publication.
+
+[Remembered reading and feedback polish](phases/READING_PREFERENCES_FEEDBACK_POLISH_2026_10_20.md) is the owner's current approved follow-up: device-only meaning preference, stationary reading-language action, live Settings footer preview and finite interaction polish. All work stays local; the owner will handle pushing later.
+
+[Prayer seconds and purposeful motion](phases/PRAYER_SECONDS_AND_PURPOSEFUL_MOTION_2026_10_20.md) is the owner's approved local-only follow-up: one-line mobile seconds without “left”, a small functional interval ring, visibility-paused isolated clock and an explicit positive animation policy with OS/app reduced-motion alternatives. Preserve concurrent work; no publication.
+Latest release authority: the owner approves final Progress/Mushaf polish and requests publishing all pending changes. This supersedes the coordinated hold in [Mushaf interactions and focused Progress](phases/MUSHAF_INTERACTIONS_PROGRESS_TABS_2026_10_20.md); this chat owns final integration/gates/CI/Pages verification. The motion/control scope remains frozen and included, with purposeful default motion preserved.
+[Masbaha/Salawat footer and picker repair](phases/COUNTER_FOOTER_PICKERS_2026_10_21.md) is the current small owner-requested patch: consistent icons/labels, longer existing-text menu previews, saved-count alignment and keyboard/reflow verification. Normal release gates still apply.

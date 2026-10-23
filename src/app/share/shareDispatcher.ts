@@ -5,6 +5,15 @@
 
 import { isNativeAndroid, saveWithAndroid, shareWithAndroid } from "./nativeSharing";
 
+import { getImageCaption } from "./shareCaption";
+export { SHARED_APP_URL } from "./shareCaption";
+
+/** Share targets commonly use text as the caption accompanying image files. */
+export function imageShareText(files: readonly File[], text?: string): string | undefined {
+  if (!files.some((file) => file.type.startsWith("image/"))) return text;
+  return getImageCaption(text);
+}
+
 export type MultiShareMethod = "shared" | "downloaded" | "cancelled" | "error";
 
 export interface MultiShareResult {
@@ -83,7 +92,7 @@ export async function shareSingleFile(
       await navigator.share({
         files: [file],
         title: options.title,
-        text: options.text,
+        text: imageShareText([file], options.text),
       });
       options.onStatus?.("shared");
       return { method: "shared", fileCount: 1 };
@@ -182,7 +191,7 @@ export async function shareMultipleFiles(
       await navigator.share({
         files,
         title: options.title,
-        text: options.text,
+        text: imageShareText(files, options.text),
       });
       options.onStatus?.("shared");
       return { method: "shared", fileCount: files.length };

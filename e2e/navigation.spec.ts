@@ -9,6 +9,7 @@ async function enterAsEnglishGuest(page: Page) {
 }
 
 async function enterAsReturningEnglishGuest(page: Page) {
+  await page.clock.setFixedTime(new Date("2026-10-18T08:00:00+03:00"));
   await page.addInitScript(() => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     localStorage.setItem("azkarapp.state.v1", JSON.stringify({ settings: { language: "en" } }));
@@ -22,6 +23,11 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
 
   await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
+  const filters = page.getByTestId("library-filter-disclosure");
+  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) {
+    await expect(page.getByRole("textbox", { name: "Search azkar and duas", exact: true })).toBeHidden();
+    await filters.locator("summary").click();
+  }
   await expect(page.getByRole("textbox", { name: "Search azkar and duas", exact: true })).toBeVisible();
 
   await page.getByTestId("category-card-morning").click();
@@ -45,7 +51,20 @@ for (const viewport of [
     await expect(page.getByTestId("home-tool-qibla")).toBeVisible();
     await expect(page.getByTestId("home-tool-masbaha")).toBeVisible();
 
-    await page.getByTestId("home-tool-qibla").click();
+    const qibla = page.getByTestId("home-tool-qibla");
+    await qibla.scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+    // The scroll compacts the sticky row. Wait for that finite handoff before
+    // testing a pointer click on the content it moves, including Firefox.
+    await page.getByTestId("home-sticky-prayers").evaluate(async (node) => {
+      await Promise.all(
+        node
+          .getAnimations({ subtree: true })
+          .filter((a) => a.playState === "running")
+          .map((a) => a.finished.catch(() => undefined)),
+      );
+    });
+    await qibla.click();
     await expect(page).toHaveURL(/#\/qibla$/);
     await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Qibla is 136° from north/ })).toBeVisible();
@@ -73,6 +92,16 @@ for (const viewport of [
     }
 
     await page.getByTestId("nav-home").click();
+    await page.getByTestId("home-tool-masbaha").scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+    await page.getByTestId("home-sticky-prayers").evaluate(async (node) => {
+      await Promise.all(
+        node
+          .getAnimations({ subtree: true })
+          .filter((a) => a.playState === "running")
+          .map((a) => a.finished.catch(() => undefined)),
+      );
+    });
     await page.getByTestId("home-tool-masbaha").click();
     await expect(page).toHaveURL(/#\/counter$/);
     await expect(page.getByRole("heading", { name: "Masbaha", exact: true })).toBeVisible();
@@ -88,7 +117,7 @@ test("@cross-browser navigation switches to wide utilities and opens Settings", 
   await expect(page.getByTestId("nav-quran")).toHaveAttribute("aria-current", "page");
   await expect(page).toHaveTitle("Quran Wird - wa-zaker");
   await expect(page.getByTestId("nav-more")).toHaveCount(0);
-  await expect(page.getByTestId("nav-qibla")).toBeVisible();
+  await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
   await page.getByTestId("nav-settings").click();
@@ -101,6 +130,40 @@ test("@cross-browser navigation switches to wide utilities and opens Settings", 
     await expect(page.getByText("Turn clockwise to 136°.")).toBeVisible();
   }
 });
+
+for (const language of ["ar", "en"] as const) {
+  test(`@cross-browser Qibla shortcuts follow phone/tablet layouts in ${language}`, async ({ page }) => {
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem("azkarapp.state.v1", JSON.stringify({ settings: { language } }));
+    }, language);
+    await page.goto("/#/home");
+
+    for (const width of [834, 899, 900, 1199, 1200, 1440, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const qibla = page.getByTestId("home-tool-qibla");
+      if (width < 900) {
+        await expect(qibla).toBeVisible();
+      } else {
+        await expect(qibla).toHaveCount(0);
+      }
+      await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
+      const masbaha = page.getByTestId("home-tool-masbaha");
+      await expect(masbaha).toBeVisible();
+      if (width >= 900) {
+        const bounds = await masbaha.evaluate((element) => ({
+          card: element.getBoundingClientRect().width,
+          row: element.parentElement!.getBoundingClientRect().width,
+        }));
+        expect(Math.abs(bounds.card - bounds.row)).toBeLessThanOrEqual(1);
+      }
+      if (language === "ar" && (width === 834 || width === 1440)) {
+        await masbaha.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: `output/playwright/qibla-shortcuts-${width}.png` });
+      }
+    }
+  });
+}
 
 test("Qibla keeps the static bearing and explains Android sensor denial", async ({ page }) => {
   await page.addInitScript(() => {
@@ -154,7 +217,10 @@ test("secondary app state is deep-linkable and browser Back restores Settings ro
   await expect(page.getByTestId("settings-sub-audio")).toBeVisible();
 
   await page.goto("/#/progress/month");
-  await expect(page.getByRole("tab", { name: "Month" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true })).toHaveAttribute(
+    "data-progress-value",
+    "month",
+  );
 
   await page.goto("/#/azkar/saved");
   await expect(page.getByText("Nothing saved yet", { exact: true })).toBeVisible();

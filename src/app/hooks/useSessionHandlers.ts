@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   AppLanguage,
   CategoryId,
@@ -13,6 +13,7 @@ import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../conten
 import { isPrayerName } from "../content/prayerTimes";
 import {
   getFirstIncompleteZikrIndex,
+  SITUATIONAL_SESSION_CATEGORY_IDS,
   getNextIncompleteIndex,
   getNextIncompleteZikrIndex,
   recordDailyCollectionCompletion,
@@ -22,6 +23,7 @@ import {
 } from "../progress";
 import { isLongSurah } from "../content/mushafPages";
 import { t } from "../i18n";
+import { isTrackedRoutine } from "../zikrHistory";
 
 export function useSessionHandlers({
   activeCat,
@@ -52,6 +54,7 @@ export function useSessionHandlers({
   showConfirm,
   onResetPartialCounts,
   onResetSurahPages,
+  onRecordZikrDay,
 }: {
   activeCat: CategoryId;
   /** Current reading context can differ from the saved preference for a shared link. */
@@ -100,6 +103,7 @@ export function useSessionHandlers({
   ) => void;
   onResetPartialCounts?: (ids: string[]) => void;
   onResetSurahPages?: (ids: string[]) => void;
+  onRecordZikrDay?: (category: "morning" | "evening" | "before_sleep", offered: string[], completed: string[]) => void;
 }) {
   const readerOpenedFromCategoryRef = useRef(false);
   const [sessionStart, setSessionStart] = useState(Date.now());
@@ -120,6 +124,20 @@ export function useSessionHandlers({
     subCat = catId === activeCat ? activeSubCategory : undefined,
   ) =>
     catId === "after_prayer" && isPrayerName(subCat) ? getAzkarForPrayer(subCat, mode) : getAzkarForMode(catId, mode);
+  const historyCallback = useRef(onRecordZikrDay);
+  historyCallback.current = onRecordZikrDay;
+  const offeredKey = isTrackedRoutine(activeCat)
+    ? sessionAzkar(activeCat)
+        .filter((item) => !item.isCollectionIntroduction)
+        .map((item) => item.id)
+        .join("|")
+    : "";
+  // Direct links and browser Back enter the reader without openReader.
+  useEffect(() => {
+    if (view === "reader" && isTrackedRoutine(activeCat) && offeredKey) {
+      historyCallback.current?.(activeCat, offeredKey.split("|"), []);
+    }
+  }, [view, activeCat, offeredKey]);
 
   const handleResetCategory = (catId: CategoryId, subCat?: string) => {
     showConfirm(
@@ -191,6 +209,24 @@ export function useSessionHandlers({
     openReader(catId, 0, undefined, subCat);
   };
 
+  // A new situational session replaces its current tally, never its history.
+  const startNewSession = (catId: CategoryId) => {
+    if (!SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)) return;
+    const azkar = sessionAzkar(catId, "complete", undefined);
+    onResetPartialCounts?.(azkar.map((zikr) => prefixZikrId(catId, zikr.id)));
+    const surahIds = azkar.filter(isLongSurah).map((zikr) => zikr.id);
+    if (surahIds.length) onResetSurahPages?.(surahIds);
+    setCompleted((previous) => ({ ...previous, [catId]: new Set() }));
+    setIsRepeatSession(false);
+    setRepeatCompleted(new Set());
+    setActiveCat(catId);
+    setActiveSubCategory(undefined);
+    setActiveIdx(0);
+    setSessionStart(Date.now());
+    readerOpenedFromCategoryRef.current = false;
+    setView("reader");
+  };
+
   const leaveReader = () => {
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
@@ -236,6 +272,13 @@ export function useSessionHandlers({
     const zikrId = azkar[idx]?.id;
     if (!zikrId) {
       return;
+    }
+    if (isTrackedRoutine(activeCat)) {
+      onRecordZikrDay?.(
+        activeCat,
+        azkar.filter((item) => !item.isCollectionIntroduction).map((item) => item.id),
+        [zikrId],
+      );
     }
     const effectiveCompleted = new Set(getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory));
     const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => effectiveCompleted.has(zikr.id));
@@ -316,6 +359,13 @@ export function useSessionHandlers({
     const prefixedId = prefixZikrId(catId, zikrId, subCategory);
     const setForCat = new Set(completed[catId] ?? new Set());
     const wasCompleted = setForCat.has(prefixedId);
+    if (!wasCompleted && isTrackedRoutine(catId)) {
+      onRecordZikrDay?.(
+        catId,
+        azkar.filter((item) => !item.isCollectionIntroduction).map((item) => item.id),
+        [zikrId],
+      );
+    }
 
     if (wasCompleted) {
       setForCat.delete(prefixedId);
@@ -394,6 +444,7 @@ export function useSessionHandlers({
     openReader,
     resumeCategory,
     repeatCategory,
+    startNewSession,
     leaveReader,
     viewAllAzkar,
     toggleSavedZikr,

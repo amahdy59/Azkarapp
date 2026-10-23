@@ -1,0 +1,827 @@
+{
+  "m-hm-75a": {
+    "reference": "Sunan Abi Dawud 3667",
+    "url": "https://sunnah.com/abudawud%3A3667",
+    "referenceArabic": "سنن أبي داود ٣٦٦٧"
+  },
+  "m-hm-76a": {
+    "reference": "Sunan Abi Dawud 5082",
+    "url": "https://sunnah.com/abudawud%3A5082",
+    "referenceArabic": "سنن أبي داود ٥٠٨٢"
+  },
+  "m-hm-76b": {
+    "reference": "Sunan Abi Dawud 5082",
+    "url": "https://sunnah.com/abudawud%3A5082",
+    "referenceArabic": "سنن أبي داود ٥٠٨٢"
+  },
+  "m-hm-76c": {
+    "reference": "Sunan Abi Dawud 5082",
+    "url": "https://sunnah.com/abudawud%3A5082",
+    "referenceArabic": "سنن أبي داود ٥٠٨٢"
+  },
+  "m-hm-77m": {
+    "reference": "Sahih Muslim 2723b",
+    "url": "https://sunnah.com/muslim%3A2723b",
+    "referenceArabic": "صحيح مسلم ٢٧٢٣ب"
+  },
+  "m-hm-78m": {
+    "reference": "Sunan Abi Dawud 5068",
+    "url": "https://sunnah.com/abudawud%3A5068",
+    "referenceArabic": "سنن أبي داود ٥٠٦٨"
+  },
+  "m-hm-79": {
+    "reference": "Sahih al-Bukhari 6306",
+    "url": "https://sunnah.com/bukhari%3A6306",
+    "referenceArabic": "صحيح البخاري ٦٣٠٦"
+  },
+  "m-hm-82": {
+    "reference": "Sunan Abi Dawud 5090",
+    "url": "https://sunnah.com/abudawud%3A5090",
+    "referenceArabic": "سنن أبي داود ٥٠٩٠"
+  },
+  "m-hm-84": {
+    "reference": "Sunan Abi Dawud 5074",
+    "url": "https://sunnah.com/abudawud%3A5074",
+    "referenceArabic": "سنن أبي داود ٥٠٧٤"
+  },
+  "m-hm-85": {
+    "reference": "Jami al-Tirmidhi 3392",
+    "url": "https://sunnah.com/tirmidhi%3A3392",
+    "referenceArabic": "جامع الترمذي ٣٣٩٢"
+  },
+  "m-hm-86": {
+    "reference": "Sunan Abi Dawud 5088",
+    "url": "https://sunnah.com/abudawud%3A5088",
+    "referenceArabic": "سنن أبي داود ٥٠٨٨"
+  },
+  "m-hm-88": {
+    "reference": "al-Nasai, al-Sunan al-Kubra 10330",
+    "url": "https://dorar.net/hadith/sharh/209179",
+    "referenceArabic": "السنن الكبرى للنسائي ١٠٣٣٠"
+  },
+  "m-hm-91": {
+    "reference": "Sahih al-Bukhari 6405",
+    "url": "https://sunnah.com/bukhari%3A6405",
+    "referenceArabic": "صحيح البخاري ٦٤٠٥"
+  },
+  "m-hm-93": {
+    "reference": "Sahih al-Bukhari 3293",
+    "url": "https://sunnah.com/bukhari%3A3293",
+    "referenceArabic": "صحيح البخاري ٣٢٩٣"
+  },
+  "m-hm-94": {
+    "reference": "Sahih Muslim 2726a",
+    "url": "https://sunnah.com/muslim%3A2726a",
+    "referenceArabic": "صحيح مسلم ٢٧٢٦أ"
+  },
+  "m-hm-95": {
+    "reference": "Sunan Ibn Majah 925",
+    "url": "https://sunnah.com/ibnmajah%3A925",
+    "referenceArabic": "سنن ابن ماجه ٩٢٥"
+  },
+  "m-hm-96": {
+    "reference": "Sunan Abi Dawud 1516",
+    "url": "https://sunnah.com/abudawud%3A1516",
+    "referenceArabic": "سنن أبي داود ١٥١٦"
+  },
+  "m-hm-97": {
+    "reference": "Sahih Muslim 2709a",
+    "url": "https://sunnah.com/muslim%3A2709a",
+    "referenceArabic": "صحيح مسلم ٢٧٠٩أ"
+  },
+  "e-hm-75a": {
+    "reference": "Sunan Abi Dawud 3667",
+    "url": "https://sunnah.com/abudawud%3A3667",
+    "referenceArabic": "سنن أبي داود ٣٦٦٧"
+  },
+  "e-hm-76a": {
+    "reference": "Sunan Abi Dawud 5082",
+    "url": "https://sunnah.com/abudawud%3A5082",
+    "referenceArabic": "سنن أبي داود ٥٠٨٢"
+  },
+  "e-hm-76b": {
+    "reference": "Sunan Abi Dawud 5082",
+    "url": "https://sunnah.com/abudawud%3A5082",
+    "referenceArabic": "سنن أبي داود ٥٠٨٢"
+  },
+  "e-hm-76c": {
+    "reference": "Sunan Abi Dawud 5082",
+    "url": "https://sunnah.com/abudawud%3A5082",
+    "referenceArabic": "سنن أبي داود ٥٠٨٢"
+  },
+  "e-hm-77e": {
+    "reference": "Sahih Muslim 2723b",
+    "url": "https://sunnah.com/muslim%3A2723b",
+    "referenceArabic": "صحيح مسلم ٢٧٢٣ب"
+  },
+  "e-hm-78e": {
+    "reference": "Sunan Abi Dawud 5068",
+    "url": "https://sunnah.com/abudawud%3A5068",
+    "referenceArabic": "سنن أبي داود ٥٠٦٨"
+  },
+  "e-hm-79": {
+    "reference": "Sahih al-Bukhari 6306",
+    "url": "https://sunnah.com/bukhari%3A6306",
+    "referenceArabic": "صحيح البخاري ٦٣٠٦"
+  },
+  "e-hm-82": {
+    "reference": "Sunan Abi Dawud 5090",
+    "url": "https://sunnah.com/abudawud%3A5090",
+    "referenceArabic": "سنن أبي داود ٥٠٩٠"
+  },
+  "e-hm-84": {
+    "reference": "Sunan Abi Dawud 5074",
+    "url": "https://sunnah.com/abudawud%3A5074",
+    "referenceArabic": "سنن أبي داود ٥٠٧٤"
+  },
+  "e-hm-85": {
+    "reference": "Jami al-Tirmidhi 3392",
+    "url": "https://sunnah.com/tirmidhi%3A3392",
+    "referenceArabic": "جامع الترمذي ٣٣٩٢"
+  },
+  "e-hm-86": {
+    "reference": "Sunan Abi Dawud 5088",
+    "url": "https://sunnah.com/abudawud%3A5088",
+    "referenceArabic": "سنن أبي داود ٥٠٨٨"
+  },
+  "e-hm-88": {
+    "reference": "al-Nasai, al-Sunan al-Kubra 10330",
+    "url": "https://dorar.net/hadith/sharh/209179",
+    "referenceArabic": "السنن الكبرى للنسائي ١٠٣٣٠"
+  },
+  "e-hm-91": {
+    "reference": "Sahih al-Bukhari 6405",
+    "url": "https://sunnah.com/bukhari%3A6405",
+    "referenceArabic": "صحيح البخاري ٦٤٠٥"
+  },
+  "e-hm-92": {
+    "reference": "Sahih al-Bukhari 3293",
+    "url": "https://sunnah.com/bukhari%3A3293",
+    "referenceArabic": "صحيح البخاري ٣٢٩٣"
+  },
+  "e-hm-96": {
+    "reference": "Sunan Abi Dawud 1516",
+    "url": "https://sunnah.com/abudawud%3A1516",
+    "referenceArabic": "سنن أبي داود ١٥١٦"
+  },
+  "e-hm-97": {
+    "reference": "Sahih Muslim 2709a",
+    "url": "https://sunnah.com/muslim%3A2709a",
+    "referenceArabic": "صحيح مسلم ٢٧٠٩أ"
+  },
+  "s-hm-99-ikhlas": {
+    "reference": "Sahih al-Bukhari 5017",
+    "url": "https://sunnah.com/bukhari%3A5017",
+    "referenceArabic": "صحيح البخاري ٥٠١٧"
+  },
+  "s-hm-99-falaq": {
+    "reference": "Sahih al-Bukhari 5017",
+    "url": "https://sunnah.com/bukhari%3A5017",
+    "referenceArabic": "صحيح البخاري ٥٠١٧"
+  },
+  "s-hm-99-nas": {
+    "reference": "Sahih al-Bukhari 5017",
+    "url": "https://sunnah.com/bukhari%3A5017",
+    "referenceArabic": "صحيح البخاري ٥٠١٧"
+  },
+  "s-hm-100": {
+    "reference": "Sahih al-Bukhari 2311",
+    "url": "https://sunnah.com/bukhari%3A2311",
+    "referenceArabic": "صحيح البخاري ٢٣١١"
+  },
+  "s-hm-101": {
+    "reference": "Sahih al-Bukhari 5009",
+    "url": "https://sunnah.com/bukhari%3A5009",
+    "referenceArabic": "صحيح البخاري ٥٠٠٩"
+  },
+  "s-hm-109a": {
+    "reference": "Sunan Abi Dawud 5055",
+    "url": "https://sunnah.com/abudawud%3A5055",
+    "referenceArabic": "سنن أبي داود ٥٠٥٥"
+  },
+  "s-hm-110b": {
+    "reference": "Jami al-Tirmidhi 2891",
+    "url": "https://sunnah.com/tirmidhi%3A2891",
+    "referenceArabic": "جامع الترمذي ٢٨٩١"
+  },
+  "s-hm-106-subhanallah": {
+    "reference": "Sahih al-Bukhari 3113",
+    "url": "https://sunnah.com/bukhari%3A3113",
+    "referenceArabic": "صحيح البخاري ٣١١٣"
+  },
+  "s-hm-106-alhamdulillah": {
+    "reference": "Sahih al-Bukhari 3113",
+    "url": "https://sunnah.com/bukhari%3A3113",
+    "referenceArabic": "صحيح البخاري ٣١١٣"
+  },
+  "s-hm-106-allahu-akbar": {
+    "reference": "Sahih al-Bukhari 3113",
+    "url": "https://sunnah.com/bukhari%3A3113",
+    "referenceArabic": "صحيح البخاري ٣١١٣"
+  },
+  "s-hm-102": {
+    "reference": "Sahih al-Bukhari 6320",
+    "url": "https://sunnah.com/bukhari%3A6320",
+    "referenceArabic": "صحيح البخاري ٦٣٢٠"
+  },
+  "s-hm-105": {
+    "reference": "Sahih al-Bukhari 6312",
+    "url": "https://sunnah.com/bukhari%3A6312",
+    "referenceArabic": "صحيح البخاري ٦٣١٢"
+  },
+  "s-hm-104": {
+    "reference": "Jami al-Tirmidhi 3399",
+    "url": "https://sunnah.com/tirmidhi%3A3399",
+    "referenceArabic": "جامع الترمذي ٣٣٩٩"
+  },
+  "s-hm-108": {
+    "reference": "Sahih Muslim 2715",
+    "url": "https://sunnah.com/muslim%3A2715",
+    "referenceArabic": "صحيح مسلم ٢٧١٥"
+  },
+  "s-hm-107": {
+    "reference": "Sahih Muslim 2713a",
+    "url": "https://sunnah.com/muslim%3A2713a",
+    "referenceArabic": "صحيح مسلم ٢٧١٣أ"
+  },
+  "s-hm-109": {
+    "reference": "Sunan Abi Dawud 5067",
+    "url": "https://sunnah.com/abudawud%3A5067",
+    "referenceArabic": "سنن أبي داود ٥٠٦٧"
+  },
+  "s-hm-111": {
+    "reference": "Sahih al-Bukhari 247",
+    "url": "https://sunnah.com/bukhari%3A247",
+    "referenceArabic": "صحيح البخاري ٢٤٧"
+  },
+  "wu-hm-1": {
+    "reference": "Sahih al-Bukhari 6312",
+    "url": "https://sunnah.com/bukhari%3A6312",
+    "referenceArabic": "صحيح البخاري ٦٣١٢"
+  },
+  "wu-hm-2": {
+    "reference": "Sahih al-Bukhari 1154",
+    "url": "https://sunnah.com/bukhari%3A1154",
+    "referenceArabic": "صحيح البخاري ١١٥٤"
+  },
+  "wu-hm-3": {
+    "reference": "Jami al-Tirmidhi 3401",
+    "url": "https://sunnah.com/tirmidhi%3A3401",
+    "referenceArabic": "جامع الترمذي ٣٤٠١"
+  },
+  "wu-hm-4": {
+    "reference": "Sahih Muslim 763b",
+    "url": "https://sunnah.com/muslim%3A763b",
+    "referenceArabic": "صحيح مسلم ٧٦٣ب"
+  },
+  "home-hm-15": {
+    "reference": "Sunan Abi Dawud 5095",
+    "url": "https://sunnah.com/abudawud%3A5095",
+    "referenceArabic": "سنن أبي داود ٥٠٩٥"
+  },
+  "home-hm-17": {
+    "reference": "Sahih Muslim 2018",
+    "url": "https://sunnah.com/muslim%3A2018",
+    "referenceArabic": "صحيح مسلم ٢٠١٨"
+  },
+  "home-hm-18": {
+    "reference": "Sunan Abi Dawud 5094",
+    "url": "https://sunnah.com/abudawud%3A5094",
+    "referenceArabic": "سنن أبي داود ٥٠٩٤"
+  },
+  "msq-hm-20": {
+    "reference": "Sunan Abi Dawud 466",
+    "url": "https://sunnah.com/abudawud%3A466",
+    "referenceArabic": "سنن أبي داود ٤٦٦"
+  },
+  "msq-hm-21": {
+    "reference": "Sahih Muslim 713a",
+    "url": "https://sunnah.com/muslim%3A713a",
+    "referenceArabic": "صحيح مسلم ٧١٣أ"
+  },
+  "msq-hm-22": {
+    "reference": "Sahih Muslim 763",
+    "url": "https://sunnah.com/muslim%3A763",
+    "referenceArabic": "صحيح مسلم ٧٦٣"
+  },
+  "msq-hm-23": {
+    "reference": "Sahih al-Bukhari 444",
+    "url": "https://sunnah.com/bukhari%3A444",
+    "referenceArabic": "صحيح البخاري ٤٤٤"
+  },
+  "ap-ref-1": {
+    "reference": "Sahih Muslim 591",
+    "url": "https://sunnah.com/muslim%3A591",
+    "referenceArabic": "صحيح مسلم ٥٩١"
+  },
+  "ap-ref-2": {
+    "reference": "Sahih Muslim 591",
+    "url": "https://sunnah.com/muslim%3A591",
+    "referenceArabic": "صحيح مسلم ٥٩١"
+  },
+  "ap-ref-9": {
+    "reference": "al-Nasai, al-Sunan al-Kubra 9848",
+    "url": "https://dorar.net/h/cNxKfqOR?osoul=1",
+    "referenceArabic": "السنن الكبرى للنسائي ٩٨٤٨"
+  },
+  "ap-ref-3": {
+    "reference": "Sahih al-Bukhari 844",
+    "url": "https://sunnah.com/bukhari%3A844",
+    "referenceArabic": "صحيح البخاري ٨٤٤"
+  },
+  "ap-ref-4": {
+    "reference": "Sahih al-Bukhari 844",
+    "url": "https://sunnah.com/bukhari%3A844",
+    "referenceArabic": "صحيح البخاري ٨٤٤"
+  },
+  "ap-tasbeeh-subhanallah": {
+    "reference": "Sahih Muslim 597a",
+    "url": "https://sunnah.com/muslim%3A597a",
+    "referenceArabic": "صحيح مسلم ٥٩٧أ"
+  },
+  "ap-tasbeeh-alhamdulillah": {
+    "reference": "Sahih Muslim 597a",
+    "url": "https://sunnah.com/muslim%3A597a",
+    "referenceArabic": "صحيح مسلم ٥٩٧أ"
+  },
+  "ap-tasbeeh-allahuakbar": {
+    "reference": "Sahih Muslim 597a",
+    "url": "https://sunnah.com/muslim%3A597a",
+    "referenceArabic": "صحيح مسلم ٥٩٧أ"
+  },
+  "ap-tasbeeh-tawhid": {
+    "reference": "Sahih Muslim 597a",
+    "url": "https://sunnah.com/muslim%3A597a",
+    "referenceArabic": "صحيح مسلم ٥٩٧أ"
+  },
+  "ap-ref-6": {
+    "reference": "Sunan Abi Dawud 1522",
+    "url": "https://sunnah.com/abudawud%3A1522",
+    "referenceArabic": "سنن أبي داود ١٥٢٢"
+  },
+  "ap-ref-7": {
+    "reference": "Jami al-Tirmidhi 3474",
+    "url": "https://sunnah.com/tirmidhi%3A3474",
+    "referenceArabic": "جامع الترمذي ٣٤٧٤"
+  },
+  "ap-ref-8": {
+    "reference": "Jami al-Tirmidhi 3233",
+    "url": "https://sunnah.com/tirmidhi%3A3233",
+    "referenceArabic": "جامع الترمذي ٣٢٣٣"
+  },
+  "ap-ref-10": {
+    "reference": "Sunan Ibn Majah 925",
+    "url": "https://sunnah.com/ibnmajah%3A925",
+    "referenceArabic": "سنن ابن ماجه ٩٢٥"
+  },
+  "ap-ref-12a": {
+    "reference": "Sunan Abi Dawud 1523",
+    "url": "https://sunnah.com/abudawud%3A1523",
+    "referenceArabic": "سنن أبي داود ١٥٢٣"
+  },
+  "ap-ref-12b": {
+    "reference": "Sunan Abi Dawud 1523",
+    "url": "https://sunnah.com/abudawud%3A1523",
+    "referenceArabic": "سنن أبي داود ١٥٢٣"
+  },
+  "ap-ref-12c": {
+    "reference": "Sunan Abi Dawud 1523",
+    "url": "https://sunnah.com/abudawud%3A1523",
+    "referenceArabic": "سنن أبي داود ١٥٢٣"
+  },
+  "in-prayer-opening-praise": {
+    "reference": "Sunan Abi Dawud 775",
+    "url": "https://sunnah.com/abudawud%3A775",
+    "referenceArabic": "سنن أبي داود ٧٧٥"
+  },
+  "in-prayer-ruku-submission": {
+    "reference": "Sahih Muslim 771",
+    "url": "https://sunnah.com/muslim%3A771",
+    "referenceArabic": "صحيح مسلم ٧٧١"
+  },
+  "in-prayer-ruku-sujud-holy": {
+    "reference": "Sunan Abi Dawud 872",
+    "url": "https://sunnah.com/abudawud%3A872",
+    "referenceArabic": "سنن أبي داود ٨٧٢"
+  },
+  "in-prayer-ruku-sujud-majesty": {
+    "reference": "Sunan Abi Dawud 873",
+    "url": "https://sunnah.com/abudawud%3A873",
+    "referenceArabic": "سنن أبي داود ٨٧٣"
+  },
+  "in-prayer-sujud-submission": {
+    "reference": "Sahih Muslim 771",
+    "url": "https://sunnah.com/muslim%3A771",
+    "referenceArabic": "صحيح مسلم ٧٧١"
+  },
+  "in-prayer-sujud-tilawah": {
+    "reference": "Sunan Abi Dawud 1414",
+    "url": "https://sunnah.com/abudawud%3A1414",
+    "referenceArabic": "سنن أبي داود ١٤١٤"
+  },
+  "in-prayer-between-prostrations": {
+    "reference": "Sunan Abi Dawud 850",
+    "url": "https://sunnah.com/abudawud%3A850",
+    "referenceArabic": "سنن أبي داود ٨٥٠"
+  },
+  "in-prayer-between-prostrations-brief": {
+    "reference": "Sunan Abi Dawud 874",
+    "url": "https://sunnah.com/abudawud%3A874",
+    "referenceArabic": "سنن أبي داود ٨٧٤"
+  },
+  "in-prayer-before-salam-comprehensive": {
+    "reference": "Sunan al-Nasai 1305",
+    "url": "https://sunnah.com/nasai%3A1305",
+    "referenceArabic": "سنن النسائي ١٣٠٥"
+  },
+  "in-prayer-before-salam-forgiveness": {
+    "reference": "Sahih Muslim 771",
+    "url": "https://sunnah.com/muslim%3A771",
+    "referenceArabic": "صحيح مسلم ٧٧١"
+  },
+  "in-prayer-witr-qunut": {
+    "reference": "Sunan Abi Dawud 1425",
+    "url": "https://sunnah.com/abudawud%3A1425",
+    "referenceArabic": "سنن أبي داود ١٤٢٥"
+  },
+  "fasting-iftar-supplication": {
+    "reference": "Sunan Abi Dawud 2357",
+    "url": "https://sunnah.com/abudawud%3A2357",
+    "referenceArabic": "سنن أبي داود ٢٣٥٧"
+  },
+  "fasting-affront-response": {
+    "reference": "Sahih al-Bukhari 1894",
+    "url": "https://sunnah.com/bukhari%3A1894",
+    "referenceArabic": "صحيح البخاري ١٨٩٤"
+  },
+  "fasting-laylat-al-qadr": {
+    "reference": "Jami al-Tirmidhi 3513",
+    "url": "https://sunnah.com/tirmidhi%3A3513",
+    "referenceArabic": "جامع الترمذي ٣٥١٣"
+  },
+  "fasting-witr-completion": {
+    "reference": "Sunan al-Nasai 1699",
+    "url": "https://sunnah.com/nasai%3A1699",
+    "referenceArabic": "سنن النسائي ١٦٩٩"
+  },
+  "fasting-iftar-host": {
+    "reference": "Sunan Abi Dawud 3854",
+    "url": "https://sunnah.com/abudawud%3A3854",
+    "referenceArabic": "سنن أبي داود ٣٨٥٤"
+  },
+  "pur-ref-1": {
+    "reference": "Sunan Abi Dawud 101",
+    "url": "https://sunnah.com/abudawud%3A101",
+    "referenceArabic": "سنن أبي داود ١٠١"
+  },
+  "pur-ref-3": {
+    "reference": "Sahih al-Bukhari 142",
+    "url": "https://sunnah.com/bukhari%3A142",
+    "referenceArabic": "صحيح البخاري ١٤٢"
+  },
+  "pur-ref-4": {
+    "reference": "Sunan Abi Dawud 30",
+    "url": "https://sunnah.com/abudawud%3A30",
+    "referenceArabic": "سنن أبي داود ٣٠"
+  },
+  "pur-ref-5": {
+    "reference": "Sahih Muslim 234a",
+    "url": "https://sunnah.com/muslim%3A234a",
+    "referenceArabic": "صحيح مسلم ٢٣٤أ"
+  },
+  "fd-ref-1": {
+    "reference": "Sunan Abi Dawud 3767",
+    "url": "https://sunnah.com/abudawud%3A3767",
+    "referenceArabic": "سنن أبي داود ٣٧٦٧"
+  },
+  "fd-ref-2": {
+    "reference": "Sunan Abi Dawud 3767",
+    "url": "https://sunnah.com/abudawud%3A3767",
+    "referenceArabic": "سنن أبي داود ٣٧٦٧"
+  },
+  "fd-ref-4": {
+    "reference": "Sahih al-Bukhari 5458",
+    "url": "https://sunnah.com/bukhari%3A5458",
+    "referenceArabic": "صحيح البخاري ٥٤٥٨"
+  },
+  "fd-ref-6": {
+    "reference": "Sahih Muslim 2055",
+    "url": "https://sunnah.com/muslim%3A2055",
+    "referenceArabic": "صحيح مسلم ٢٠٥٥"
+  },
+  "fd-ref-7": {
+    "reference": "Sunan Abi Dawud 3854",
+    "url": "https://sunnah.com/abudawud%3A3854",
+    "referenceArabic": "سنن أبي داود ٣٨٥٤"
+  },
+  "fd-ref-8": {
+    "reference": "Sunan Abi Dawud 3730",
+    "url": "https://sunnah.com/abudawud%3A3730",
+    "referenceArabic": "سنن أبي داود ٣٧٣٠"
+  },
+  "fd-ref-9": {
+    "reference": "Jami al-Tirmidhi 3458",
+    "url": "https://sunnah.com/tirmidhi%3A3458",
+    "referenceArabic": "جامع الترمذي ٣٤٥٨"
+  },
+  "clo-ref-2": {
+    "reference": "Sunan Abi Dawud 4020",
+    "url": "https://sunnah.com/abudawud%3A4020",
+    "referenceArabic": "سنن أبي داود ٤٠٢٠"
+  },
+  "clo-ref-3": {
+    "reference": "Sunan Abi Dawud 4020",
+    "url": "https://sunnah.com/abudawud%3A4020",
+    "referenceArabic": "سنن أبي داود ٤٠٢٠"
+  },
+  "tr-ref-1": {
+    "reference": "Sahih Muslim 1342",
+    "url": "https://sunnah.com/muslim%3A1342",
+    "referenceArabic": "صحيح مسلم ١٣٤٢"
+  },
+  "tr-ref-2": {
+    "reference": "Sahih al-Bukhari 2993",
+    "url": "https://sunnah.com/bukhari%3A2993",
+    "referenceArabic": "صحيح البخاري ٢٩٩٣"
+  },
+  "tr-ref-3": {
+    "reference": "Sunan Ibn Majah 2825",
+    "url": "https://sunnah.com/ibnmajah%3A2825",
+    "referenceArabic": "سنن ابن ماجه ٢٨٢٥"
+  },
+  "tr-ref-5": {
+    "reference": "Sunan Abi Dawud 2600",
+    "url": "https://sunnah.com/abudawud%3A2600",
+    "referenceArabic": "سنن أبي داود ٢٦٠٠"
+  },
+  "tr-ref-6": {
+    "reference": "Sahih Ibn Khuzaymah 2565",
+    "url": "https://dorar.net/h/L2Px7h0l?osoul=1",
+    "referenceArabic": "صحيح ابن خزيمة ٢٥٦٥"
+  },
+  "tr-ref-7": {
+    "reference": "Sahih Muslim 2708",
+    "url": "https://sunnah.com/muslim%3A2708",
+    "referenceArabic": "صحيح مسلم ٢٧٠٨"
+  },
+  "tr-ref-8": {
+    "reference": "Sahih Muslim 2718",
+    "url": "https://sunnah.com/muslim%3A2718",
+    "referenceArabic": "صحيح مسلم ٢٧١٨"
+  },
+  "tr-ref-4": {
+    "reference": "Sahih Muslim 1342",
+    "url": "https://sunnah.com/muslim%3A1342",
+    "referenceArabic": "صحيح مسلم ١٣٤٢"
+  },
+  "tr-ref-9": {
+    "reference": "Sahih al-Bukhari 1797",
+    "url": "https://sunnah.com/bukhari%3A1797",
+    "referenceArabic": "صحيح البخاري ١٧٩٧"
+  },
+  "da-ref-1": {
+    "reference": "Sahih al-Bukhari 6363",
+    "url": "https://sunnah.com/bukhari%3A6363",
+    "referenceArabic": "صحيح البخاري ٦٣٦٣"
+  },
+  "da-ref-2": {
+    "reference": "Jami al-Tirmidhi 3505",
+    "url": "https://sunnah.com/tirmidhi%3A3505",
+    "referenceArabic": "جامع الترمذي ٣٥٠٥"
+  },
+  "da-ref-3": {
+    "reference": "Sunan Abi Dawud 1525",
+    "url": "https://sunnah.com/abudawud%3A1525",
+    "referenceArabic": "سنن أبي داود ١٥٢٥"
+  },
+  "da-ref-4": {
+    "reference": "Sunan Abi Dawud 5090",
+    "url": "https://sunnah.com/abudawud%3A5090",
+    "referenceArabic": "سنن أبي داود ٥٠٩٠"
+  },
+  "da-ref-6": {
+    "reference": "Musnad Ahmad 3712",
+    "url": "https://dorar.net/hadith/sharh/120832",
+    "referenceArabic": "مسند أحمد ٣٧١٢"
+  },
+  "da-ref-7": {
+    "reference": "Jami al-Tirmidhi 3563",
+    "url": "https://sunnah.com/tirmidhi%3A3563",
+    "referenceArabic": "جامع الترمذي ٣٥٦٣"
+  },
+  "da-ref-8": {
+    "reference": "Sahih al-Bukhari 6346",
+    "url": "https://sunnah.com/bukhari%3A6346",
+    "referenceArabic": "صحيح البخاري ٦٣٤٦"
+  },
+  "ir-ref-1": {
+    "reference": "Sahih Muslim 2202",
+    "url": "https://sunnah.com/muslim%3A2202",
+    "referenceArabic": "صحيح مسلم ٢٢٠٢"
+  },
+  "ir-ref-2": {
+    "reference": "Sahih Muslim 2191",
+    "url": "https://sunnah.com/muslim%3A2191",
+    "referenceArabic": "صحيح مسلم ٢١٩١"
+  },
+  "ir-ref-3": {
+    "reference": "Sahih Muslim 2185",
+    "url": "https://sunnah.com/muslim%3A2185",
+    "referenceArabic": "صحيح مسلم ٢١٨٥"
+  },
+  "ir-ref-4": {
+    "reference": "Sunan Abi Dawud 3106",
+    "url": "https://sunnah.com/abudawud%3A3106",
+    "referenceArabic": "سنن أبي داود ٣١٠٦"
+  },
+  "ir-ref-5a": {
+    "reference": "Sahih al-Bukhari 5017",
+    "url": "https://sunnah.com/bukhari%3A5017",
+    "referenceArabic": "صحيح البخاري ٥٠١٧"
+  },
+  "ir-ref-5b": {
+    "reference": "Sahih al-Bukhari 5017",
+    "url": "https://sunnah.com/bukhari%3A5017",
+    "referenceArabic": "صحيح البخاري ٥٠١٧"
+  },
+  "ir-ref-5c": {
+    "reference": "Sahih al-Bukhari 5017",
+    "url": "https://sunnah.com/bukhari%3A5017",
+    "referenceArabic": "صحيح البخاري ٥٠١٧"
+  },
+  "ir-ref-6": {
+    "reference": "Sahih Muslim 2186",
+    "url": "https://sunnah.com/muslim%3A2186",
+    "referenceArabic": "صحيح مسلم ٢١٨٦"
+  },
+  "ir-ref-7": {
+    "reference": "Sahih Muslim 916a",
+    "url": "https://sunnah.com/muslim%3A916a",
+    "referenceArabic": "صحيح مسلم ٩١٦أ"
+  },
+  "ir-baqarah": {
+    "reference": "Sahih Muslim 780",
+    "url": "https://sunnah.com/muslim%3A780",
+    "referenceArabic": "صحيح مسلم ٧٨٠"
+  },
+  "sc-ref-1": {
+    "reference": "Sunan Abi Dawud 5195",
+    "url": "https://sunnah.com/abudawud%3A5195",
+    "referenceArabic": "سنن أبي داود ٥١٩٥"
+  },
+  "sc-ref-2": {
+    "reference": "Sahih al-Bukhari 3217",
+    "url": "https://sunnah.com/bukhari%3A3217",
+    "referenceArabic": "صحيح البخاري ٣٢١٧"
+  },
+  "sc-ref-3": {
+    "reference": "Sahih al-Bukhari 6224",
+    "url": "https://sunnah.com/bukhari%3A6224",
+    "referenceArabic": "صحيح البخاري ٦٢٢٤"
+  },
+  "sc-ref-4": {
+    "reference": "Sahih al-Bukhari 6224",
+    "url": "https://sunnah.com/bukhari%3A6224",
+    "referenceArabic": "صحيح البخاري ٦٢٢٤"
+  },
+  "sc-ref-5": {
+    "reference": "Jami al-Tirmidhi 2035",
+    "url": "https://sunnah.com/tirmidhi%3A2035",
+    "referenceArabic": "جامع الترمذي ٢٠٣٥"
+  },
+  "sc-ref-6": {
+    "reference": "al-Nasai, al-Sunan al-Kubra 10062",
+    "url": "https://dorar.net/h/moDLH4GW",
+    "referenceArabic": "السنن الكبرى للنسائي ١٠٠٦٢"
+  },
+  "sc-ref-7": {
+    "reference": "Sunan Abi Dawud 2130",
+    "url": "https://sunnah.com/abudawud%3A2130",
+    "referenceArabic": "سنن أبي داود ٢١٣٠"
+  },
+  "sc-ref-8": {
+    "reference": "Sahih Muslim 918",
+    "url": "https://sunnah.com/muslim%3A918",
+    "referenceArabic": "صحيح مسلم ٩١٨"
+  },
+  "sc-ref-9": {
+    "reference": "Sahih Muslim 920",
+    "url": "https://sunnah.com/muslim%3A920",
+    "referenceArabic": "صحيح مسلم ٩٢٠"
+  },
+  "sc-ref-10": {
+    "reference": "Jami al-Tirmidhi 3433",
+    "url": "https://sunnah.com/tirmidhi%3A3433",
+    "referenceArabic": "جامع الترمذي ٣٤٣٣"
+  },
+  "sc-ref-11": {
+    "reference": "Sahih al-Bukhari 6388",
+    "url": "https://sunnah.com/bukhari%3A6388",
+    "referenceArabic": "صحيح البخاري ٦٣٨٨"
+  },
+  "sc-ref-12": {
+    "reference": "Sahih al-Bukhari 3371",
+    "url": "https://sunnah.com/bukhari%3A3371",
+    "referenceArabic": "صحيح البخاري ٣٣٧١"
+  },
+  "sc-ref-14": {
+    "reference": "Sunan Ibn Majah 3509",
+    "url": "https://sunnah.com/ibnmajah%3A3509",
+    "referenceArabic": "سنن ابن ماجه ٣٥٠٩"
+  },
+  "ne-ref-1": {
+    "reference": "Sahih Muslim 899b",
+    "url": "https://sunnah.com/muslim%3A899b",
+    "referenceArabic": "صحيح مسلم ٨٩٩ب"
+  },
+  "ne-ref-2": {
+    "reference": "Sahih al-Bukhari 1032",
+    "url": "https://sunnah.com/bukhari%3A1032",
+    "referenceArabic": "صحيح البخاري ١٠٣٢"
+  },
+  "ne-ref-3": {
+    "reference": "Sahih al-Bukhari 846",
+    "url": "https://sunnah.com/bukhari%3A846",
+    "referenceArabic": "صحيح البخاري ٨٤٦"
+  },
+  "ne-ref-4": {
+    "reference": "al-Adab al-Mufrad 723",
+    "url": "https://dorar.net/h/55RjSOSD",
+    "referenceArabic": "الأدب المفرد ٧٢٣"
+  },
+  "ne-ref-6": {
+    "reference": "Sunan Abi Dawud 1191",
+    "url": "https://sunnah.com/abudawud%3A1191",
+    "referenceArabic": "سنن أبي داود ١١٩١"
+  },
+  "ne-ref-7": {
+    "reference": "Sahih al-Bukhari 1014",
+    "url": "https://sunnah.com/bukhari%3A1014",
+    "referenceArabic": "صحيح البخاري ١٠١٤"
+  },
+  "misc-ref-1": {
+    "reference": "Sahih Muslim 2725a",
+    "url": "https://sunnah.com/muslim%3A2725a",
+    "referenceArabic": "صحيح مسلم ٢٧٢٥أ"
+  },
+  "misc-ref-2": {
+    "reference": "Sahih al-Bukhari 3293",
+    "url": "https://sunnah.com/bukhari%3A3293",
+    "referenceArabic": "صحيح البخاري ٣٢٩٣"
+  },
+  "misc-ref-3": {
+    "reference": "Sahih al-Bukhari 6405",
+    "url": "https://sunnah.com/bukhari%3A6405",
+    "referenceArabic": "صحيح البخاري ٦٤٠٥"
+  },
+  "misc-ref-4": {
+    "reference": "Sahih al-Bukhari 7563",
+    "url": "https://sunnah.com/bukhari%3A7563",
+    "referenceArabic": "صحيح البخاري ٧٥٦٣"
+  },
+  "misc-ref-5": {
+    "reference": "Sunan Abi Dawud 5074",
+    "url": "https://sunnah.com/abudawud%3A5074",
+    "referenceArabic": "سنن أبي داود ٥٠٧٤"
+  },
+  "misc-ref-6": {
+    "reference": "Sahih al-Bukhari 6384",
+    "url": "https://sunnah.com/bukhari%3A6384",
+    "referenceArabic": "صحيح البخاري ٦٣٨٤"
+  },
+  "misc-ref-7": {
+    "reference": "Sahih Muslim 2697a",
+    "url": "https://sunnah.com/muslim%3A2697a",
+    "referenceArabic": "صحيح مسلم ٢٦٩٧أ"
+  },
+  "misc-ref-8": {
+    "reference": "Sahih al-Bukhari 6306",
+    "url": "https://sunnah.com/bukhari%3A6306",
+    "referenceArabic": "صحيح البخاري ٦٣٠٦"
+  },
+  "misc-ref-9": {
+    "reference": "Sunan Abi Dawud 5088",
+    "url": "https://sunnah.com/abudawud%3A5088",
+    "referenceArabic": "سنن أبي داود ٥٠٨٨"
+  },
+  "misc-ref-10": {
+    "reference": "Sahih al-Bukhari 1166",
+    "url": "https://sunnah.com/bukhari%3A1166",
+    "referenceArabic": "صحيح البخاري ١١٦٦"
+  },
+  "misc-ref-12": {
+    "reference": "al-Adab al-Mufrad 716",
+    "url": "https://sunnah.com/adab%3A716",
+    "referenceArabic": "الأدب المفرد ٧١٦"
+  },
+  "misc-ref-13": {
+    "reference": "Sunan Abi Dawud 1516",
+    "url": "https://sunnah.com/abudawud%3A1516",
+    "referenceArabic": "سنن أبي داود ١٥١٦"
+  },
+  "misc-ref-14": {
+    "reference": "Sahih al-Bukhari 6115",
+    "url": "https://sunnah.com/bukhari%3A6115",
+    "referenceArabic": "صحيح البخاري ٦١١٥"
+  }
+}

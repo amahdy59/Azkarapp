@@ -8,6 +8,7 @@
  */
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { chooseProgressOption } from "./helpers/progress";
 
 type Settings = Record<string, unknown>;
 
@@ -197,11 +198,11 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
       `${viewport.name} page title`,
     );
 
-    const tabs = page.getByRole("tab");
-    for (let index = 0; index < 4; index += 1) {
-      await tabs.nth(index).click();
+    const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
+    for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
+      await chooseProgressOption(period, value);
       const heading = page.getByTestId("progress-primary-heading");
-      const context = `${viewport.name} Progress tab ${index + 1}`;
+      const context = `${viewport.name} Progress period ${value}`;
       if (index < 2) await expectSingleLineHeading(heading, context);
       else await expectUnclippedHeading(heading, context, 2);
     }
@@ -213,11 +214,11 @@ test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable with
   await seedAndOpen(page, { language: "ar" });
   await page.getByTestId("nav-progress").click();
 
-  const tabs = page.getByRole("tab");
-  for (let index = 0; index < 4; index += 1) {
-    await tabs.nth(index).click();
+  const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
+  for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
+    await chooseProgressOption(period, value);
     const heading = page.getByTestId("progress-primary-heading");
-    const context = `OnePlus Nord 4 Arabic Progress tab ${index + 1}`;
+    const context = `OnePlus Nord 4 Arabic Progress period ${value}`;
     if (index < 2) await expectSingleLineHeading(heading, context);
     else await expectUnclippedHeading(heading, context, 2);
   }
@@ -333,15 +334,11 @@ test("time-of-day imagery has no decorative overlay layer", async ({ page }) => 
   expect(imageWidth).toBeGreaterThan(0);
 });
 
-test("post-prayer summaries disclose all prayers and preserve actionable tracking", async ({ page }) => {
+test("post-prayer summaries show all prayers and preserve actionable tracking", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-09-05T13:40:00+03:00"));
   await seedAndOpen(page);
   const grid = page.getByTestId("prayer-tracker-cards");
   const cards = grid.locator('article[data-density="summary"]');
-  await expect(cards).toHaveCount(2);
-  const toggle = page.getByRole("button", { name: "Show all prayers", exact: true });
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await toggle.click();
   await expect(cards).toHaveCount(5);
   const future = cards.filter({ has: page.locator("button:disabled") });
   await expect(future).not.toHaveCount(0);

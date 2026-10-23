@@ -8,12 +8,13 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useId,
   useState,
 } from "react";
 import "../../styles/animations/ZikrAnimations.css";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
-import { prefixZikrId } from "../progress";
+import { prefixZikrId, SITUATIONAL_SESSION_CATEGORY_IDS } from "../progress";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
@@ -49,6 +50,7 @@ import {
   RefreshCw,
   Share2,
   Keyboard,
+  Translate,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
@@ -59,7 +61,6 @@ import type { AudioController } from "../audio/AudioProvider";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
-import { CounterGuidance } from "../components/CounterGuidance";
 import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { ReaderFooterTools } from "../components/ReaderFooterTools";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
@@ -72,6 +73,7 @@ import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { ReaderSceneArt } from "../components/ReaderSceneArt";
+import { ReadingHeroToolbar } from "../components/ReadingHeroToolbar";
 import { AppearanceMenu } from "../components/AppearanceMenu";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
@@ -109,7 +111,7 @@ const READER_WIDE_HEADER_ACTION_CLASS =
 const READER_SIDEBAR_TOGGLE_CLASS =
   "flex size-11 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-card shadow-xs text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
-const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran.jpg`;
+const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran-720.webp`;
 
 const SharingPreview = lazy(() =>
   import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
@@ -156,6 +158,8 @@ export function ReaderScreen({
   reduceMotion = false,
   showTranslation,
   showTransliteration,
+  readerMeaningOnly,
+  onReaderMeaningOnlyChange,
   textSize,
   onTextSizeChange,
   savedZikrIds,
@@ -207,6 +211,8 @@ export function ReaderScreen({
   reduceMotion?: boolean;
   showTranslation: boolean;
   showTransliteration: boolean;
+  readerMeaningOnly?: boolean;
+  onReaderMeaningOnlyChange?: (value: boolean) => void;
   textSize: TextSizeOption;
   onTextSizeChange: (value: TextSizeOption) => void;
   savedZikrIds: Set<string>;
@@ -290,6 +296,10 @@ export function ReaderScreen({
   const longSurah = isLongSurah(z);
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
+  const [localMeaningOnly, setLocalMeaningOnly] = useState(false);
+  const translationOnly = readerMeaningOnly ?? localMeaningOnly;
+  const readingRegionId = useId();
+  const showEnglishOnly = !isArabic && translationOnly && Boolean(z?.translation) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const restoreAudioFocusRef = useRef(false);
   useLayoutEffect(() => {
@@ -306,7 +316,7 @@ export function ReaderScreen({
     });
     return () => cancelAnimationFrame(frame);
   }, [audioModeActive]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
   const readerMenuRef = useRef<HTMLButtonElement>(null);
   const collectionMenuRequested = useRef(false);
@@ -585,7 +595,7 @@ export function ReaderScreen({
   useEffect(() => {
     const activeItem = activeNavigatorItemRef.current;
     if (!activeItem || !(canDockCollection ? isSidebarOpen : isCollectionDrawerOpen)) return;
-    activeItem.scrollIntoView?.({ block: "nearest", behavior: reducedMotion ? "auto" : "smooth" });
+    activeItem.scrollIntoView?.({ block: "nearest", behavior: "auto" });
   }, [idx, reducedMotion, canDockCollection, isSidebarOpen, isCollectionDrawerOpen]);
 
   const handleToggleSaved = useCallback(() => {
@@ -743,9 +753,37 @@ export function ReaderScreen({
       .trim();
   }
 
+  const renderReadingLanguageControl = () =>
+    !isArabic && !longSurah && z.translation ? (
+      <div className="reader-language-toolbar" data-prevent-count="true">
+        <button
+          type="button"
+          data-testid="reader-language-toggle"
+          aria-controls={readingRegionId}
+          onClick={(event) => {
+            event.stopPropagation();
+            setLocalMeaningOnly(!translationOnly);
+            onReaderMeaningOnlyChange?.(!translationOnly);
+            if (readingScrollRef.current) readingScrollRef.current.scrollTop = 0;
+          }}
+          className="inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 py-2 text-label font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <Translate size={18} className="shrink-0" aria-hidden="true" />
+          <span className="inline-grid min-w-0 [overflow-wrap:anywhere]">
+            <span className="col-start-1 row-start-1">
+              {t(language, showEnglishOnly ? "reader.showArabic" : "reader.showEnglishMeaning")}
+            </span>
+            <span className="invisible col-start-1 row-start-1" aria-hidden="true">
+              {t(language, showEnglishOnly ? "reader.showEnglishMeaning" : "reader.showArabic")}
+            </span>
+          </span>
+        </button>
+      </div>
+    ) : null;
+
   const renderReadingContent = () => (
     <article
-      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20"}`}
+      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation"}`}
     >
       {longSurah ? (
         <div
@@ -811,47 +849,65 @@ export function ReaderScreen({
           {/* Short surahs keep their canonical Quran identity and text, without a
               decorative card competing with the passage. Long surahs open in the
               Mushaf view instead. */}
-          {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
-
-          <div
-            className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
-            data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
-          >
-            {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none" />}
-
-            {isQuranicText ? (
-              <QuranWordText
-                text={displayArabicText}
-                meanings={allWordMeanings}
-                showMeanings={showDifficultWords}
-                language={language}
-                style={{
-                  fontFamily: readingFontFamily,
-                  fontSize: readingFontSize,
-                  ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
-                }}
-                onSelectMeanings={setWordMeaningSelection}
-                activeWordId={activeWordId}
-                canonicalKey={z.canonicalKey}
-              />
-            ) : (
+          {showEnglishOnly ? (
+            <section lang="en" dir="ltr" aria-label={t(language, "reader.translationLabel")}>
+              <h2 className="mb-3 text-label font-bold text-muted-foreground">
+                {t(language, "reader.translationLabel")}
+              </h2>
               <p
-                className="zikr-text pointer-events-none text-center font-medium leading-[1.85] text-foreground"
-                data-testid="zikr-text"
-                dir="rtl"
-                lang="ar"
-                style={{
-                  fontFamily: readingFontFamily,
-                  fontSize: readingFontSize,
-                  ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
-                }}
+                data-testid="reader-main-translation"
+                className="text-center leading-relaxed text-foreground"
+                style={{ fontSize: readingFontSize }}
               >
-                {displayArabicText}
+                {z.translation}
               </p>
-            )}
-          </div>
+            </section>
+          ) : (
+            <>
+              {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
 
-          {!isArabic && (showTranslation || showTransliteration) && (
+              <div
+                className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
+                data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
+              >
+                {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none" />}
+
+                {isQuranicText ? (
+                  <QuranWordText
+                    text={displayArabicText}
+                    meanings={allWordMeanings}
+                    showMeanings={showDifficultWords}
+                    language={language}
+                    style={{
+                      fontFamily: readingFontFamily,
+                      fontSize: readingFontSize,
+                      ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
+                    }}
+                    onSelectMeanings={(selection) =>
+                      setWordMeaningSelection((current) => (current?.anchor === selection.anchor ? null : selection))
+                    }
+                    activeWordId={activeWordId}
+                    canonicalKey={z.canonicalKey}
+                  />
+                ) : (
+                  <p
+                    className="zikr-text pointer-events-none text-center font-medium leading-[1.85] text-foreground"
+                    data-testid="zikr-text"
+                    dir="rtl"
+                    lang="ar"
+                    style={{
+                      fontFamily: readingFontFamily,
+                      fontSize: readingFontSize,
+                      ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
+                    }}
+                  >
+                    {displayArabicText}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+          {!showEnglishOnly && !isArabic && (showTranslation || showTransliteration) && (
             <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
               {showTranslation && z.translation && (
                 <section aria-labelledby="reader-translation-title">
@@ -1024,7 +1080,12 @@ export function ReaderScreen({
                 className="interactive-elem flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary shadow-xs transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <RefreshCw size={16} className="shrink-0" aria-hidden="true" />
-                <span>{t(language, "category.readAgain")}</span>
+                <span>
+                  {t(
+                    language,
+                    SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId) ? "completion.newSession" : "category.readAgain",
+                  )}
+                </span>
               </button>
             ) : (
               <button
@@ -1250,12 +1311,7 @@ export function ReaderScreen({
           : isValidElement(audioPlayer) && typeof audioPlayer.type !== "string"
             ? cloneElement(audioPlayer as React.ReactElement<Record<string, unknown>>, { dockSlots: {}, onClose })
             : audioPlayer;
-      return (
-        <>
-          {!longSurah && <DevotionalFooter>{renderBenefitDockButton()}</DevotionalFooter>}
-          {player}
-        </>
-      );
+      return player;
     }
 
     if (audioModeActive) {
@@ -1414,12 +1470,13 @@ export function ReaderScreen({
          which pushed the page down and left a strip of shell above a surface
          that is supposed to be the page itself. */
       edgeToEdge={showMushaf}
-      className={`reader-swipe-surface relative !pb-0 sm:!pt-0 ${showMushaf ? "overflow-hidden" : ""}`}
+      className={`reader-swipe-surface relative !pb-0 sm:!pt-0 ${showMushaf ? "overflow-hidden" : !isDesktopReader ? "glass-reading" : ""}`}
       data-testid="reader-screen"
       data-zikr-index={idx}
       data-zikr-id={z.id}
       data-counting-mode={longSurah ? "counter-only" : "canvas"}
       data-reader-layout={isDesktopReader ? "desktop" : "mobile"}
+      data-reader-scroll-recovery={!showMushaf && !isDesktopReader ? "true" : undefined}
       dir={direction}
       data-reader-category={catId}
       data-reading-focus={focusMode && !showMushaf ? "true" : "false"}
@@ -1525,20 +1582,24 @@ export function ReaderScreen({
                 }}
               >
                 <ReaderSceneArt category={catId} />
-                <div
-                  className="relative z-10 flex w-full items-center justify-between gap-3"
-                  data-testid="reader-header-toolbar"
+                <ReadingHeroToolbar
+                  title={displayCategoryName}
+                  testId="reader-header-toolbar"
+                  back={
+                    <IconButton
+                      onClick={onBack}
+                      label={t(language, "common.back")}
+                      className={READER_WIDE_HEADER_ACTION_CLASS}
+                    >
+                      <ArrowPrevious size={20} />
+                    </IconButton>
+                  }
                 >
-                  <IconButton
-                    onClick={onBack}
-                    label={t(language, "common.back")}
-                    className={READER_WIDE_HEADER_ACTION_CLASS}
-                  >
-                    <ArrowPrevious size={20} />
-                  </IconButton>
-
                   {/* Hero actions: appearance and contextual actions. */}
-                  <div className="flex flex-wrap items-center justify-end gap-2" data-testid="reader-hero-actions">
+                  <div
+                    className="flex min-w-0 flex-wrap items-center justify-end gap-2"
+                    data-testid="reader-hero-actions"
+                  >
                     <button
                       type="button"
                       data-testid="reader-help-trigger"
@@ -1597,14 +1658,7 @@ export function ReaderScreen({
                       />
                     </button>
                   </div>
-                </div>
-
-                <h1
-                  className="relative z-10 w-full break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent drop-shadow-sm"
-                  dir="auto"
-                >
-                  {displayCategoryName}
-                </h1>
+                </ReadingHeroToolbar>
 
                 <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-1">
                   <div className="flex w-full items-center justify-between px-1 leading-none" aria-hidden="true">
@@ -1634,7 +1688,7 @@ export function ReaderScreen({
                 and keyboard guidance. Page-level actions stay in the hero. */}
               <div className="reader-canvas-wrap relative mx-3 my-2 md:mx-4 md:my-2 flex min-h-0 flex-1 overflow-hidden bg-transparent">
                 <div
-                  className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
+                  className="glass-reading relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl cursor-pointer"
                   data-testid="reader-card"
                   {...surfaceProps}
                 >
@@ -1673,9 +1727,11 @@ export function ReaderScreen({
                     </div>
                   )}
                   <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
+                    {renderReadingLanguageControl()}
                     <div className="relative flex min-h-0 flex-1">
                       <div
                         ref={readingScrollRef}
+                        id={readingRegionId}
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
@@ -1703,16 +1759,6 @@ export function ReaderScreen({
                       {longSurah && renderSideNavigation()}
                     </div>
 
-                    {!longSurah && !audioModeActive && (
-                      <CounterGuidance
-                        language={language}
-                        direction={direction}
-                        reader
-                        hasStarted={count > 0}
-                        placement="above"
-                        showKeyboardHelp={false}
-                      />
-                    )}
                     {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}
                     {!audioModeActive && typeof audioPlayer !== "function" && audioPlayer}
                   </div>
@@ -1814,7 +1860,7 @@ export function ReaderScreen({
                 value={readingProgressValue}
                 max={azkar.length}
                 height={8}
-                trackColor="var(--card)"
+                trackColor="var(--muted)"
                 fillColor="var(--primary)"
                 direction={direction}
                 aria-label={t(language, "reader.groupProgress")}
@@ -1865,8 +1911,10 @@ export function ReaderScreen({
                   )}
                 </div>
               )}
+              {renderReadingLanguageControl()}
               <div
                 ref={readingScrollRef}
+                id={readingRegionId}
                 role="region"
                 tabIndex={0}
                 aria-label={t(language, "reader.readingText")}
@@ -1896,16 +1944,6 @@ export function ReaderScreen({
                 </div>
               </div>
 
-              {!longSurah && !audioModeActive && (
-                <CounterGuidance
-                  language={language}
-                  direction={direction}
-                  reader
-                  hasStarted={count > 0}
-                  placement="above"
-                  showKeyboardHelp={false}
-                />
-              )}
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
@@ -1935,6 +1973,12 @@ export function ReaderScreen({
             routineMode={routineMode}
             prayer={isPrayerName(subCategory) ? subCategory : undefined}
             items={[z]}
+            collection={{
+              items: azkarList ?? [z],
+              title: displayCategoryName,
+              titleArabic: CATEGORIES.find((category) => category.id === catId)?.nameArabic,
+              titleEnglish: CATEGORIES.find((category) => category.id === catId)?.name,
+            }}
             language={language}
             themeMode={themeMode}
           />

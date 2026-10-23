@@ -26,7 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { CounterGuidance } from "../components/CounterGuidance";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
@@ -293,7 +292,10 @@ export function FridaySalawatScreen({
             }}
             subRow={
               <div className="w-full" data-prevent-count="true">
-                <div className="relative z-20 flex items-center gap-2 sm:gap-3" data-prevent-count="true">
+                <div
+                  className="counter-picker-row relative z-20 flex items-center gap-2 sm:gap-3"
+                  data-prevent-count="true"
+                >
                   <div className="min-w-0 flex-1">
                     <SalawatFormulaPicker
                       formulas={SALAWAT_FORMULAS}
@@ -351,7 +353,7 @@ export function FridaySalawatScreen({
           {complete ? t(language, "fridaySalawat.completed") : ""}
         </p>
 
-        <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
+        <div className="counter-reading-canvas relative mx-4 mb-4 mt-4 flex flex-1 overflow-hidden bg-transparent">
           <div
             className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
             data-testid="reader-card"
@@ -402,12 +404,6 @@ export function FridaySalawatScreen({
                 </div>
               </div>
 
-              <CounterGuidance
-                language={language}
-                direction={direction}
-                hasStarted={progress.count > 0}
-                placement="above"
-              />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
                   {rounds > 0 && (
@@ -420,6 +416,7 @@ export function FridaySalawatScreen({
                   )}
                   <StandaloneCounterFooter
                     language={language}
+                    direction={direction}
                     focusMode={focusMode}
                     onToggleFocus={() => setFocusMode((value) => !value)}
                     focusToggleRef={focusToggleRef}
@@ -433,6 +430,7 @@ export function FridaySalawatScreen({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
+                          e.currentTarget.focus({ preventScroll: true });
                           setShowBenefits(true);
                         }}
                         aria-haspopup="dialog"
@@ -441,7 +439,9 @@ export function FridaySalawatScreen({
                         data-testid="salawat-benefit-dock-button"
                       >
                         <Lightbulb size={20} aria-hidden="true" />
-                        <span className="text-label font-semibold">{t(language, "reader.referencesButton")}</span>
+                        <span className="reader-tool-label text-label font-semibold">
+                          {t(language, "reader.referencesButton")}
+                        </span>
                       </DevotionalAction>
                     }
                     counter={
@@ -457,12 +457,6 @@ export function FridaySalawatScreen({
                         reduceMotion={reduceMotion}
                       />
                     }
-                  />
-                  <CounterGuidance
-                    language={language}
-                    direction={direction}
-                    hasStarted={progress.count > 0}
-                    placement="below"
                   />
                 </div>
               </footer>

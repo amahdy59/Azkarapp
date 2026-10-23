@@ -1,3 +1,4 @@
+import "./devotional-controls.css";
 import { forwardRef, type ComponentProps } from "react";
 import { cn } from "./ui/utils";
 
@@ -19,6 +20,7 @@ export const DevotionalAction = forwardRef<HTMLButtonElement, ComponentProps<"bu
         type="button"
         {...props}
         ref={ref}
+        data-press-compact
         className={cn(
           "flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border px-2 transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50",
           active

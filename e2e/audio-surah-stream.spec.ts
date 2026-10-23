@@ -75,17 +75,16 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       const preferenceLayout = await preferences.getByRole("button").evaluateAll((buttons) =>
         buttons.map((button) => {
           const bounds = button.getBoundingClientRect();
-          const icon = button.querySelector("svg")!.getBoundingClientRect();
+          const icon = button.querySelector("svg")?.getBoundingClientRect();
           const label = button.querySelector("span")!.getBoundingClientRect();
           return {
             height: bounds.height,
-            centerGap: Math.abs(icon.top + icon.height / 2 - (bounds.top + bounds.height / 2)),
-            labelGap: Math.abs(label.top + label.height / 2 - (icon.top + icon.height / 2)),
+            centerGap: icon ? Math.abs(icon.top + icon.height / 2 - (bounds.top + bounds.height / 2)) : 0,
+            labelGap: icon ? Math.abs(label.top + label.height / 2 - (icon.top + icon.height / 2)) : 0,
             contained:
               label.left >= bounds.left &&
               label.right <= bounds.right &&
-              icon.left >= bounds.left &&
-              icon.right <= bounds.right,
+              (!icon || (icon.left >= bounds.left && icon.right <= bounds.right)),
           };
         }),
       );
@@ -244,7 +243,30 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
           await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
         await expect
           .poll(() => player.evaluate((element) => element.scrollWidth - element.clientWidth))
-          .toBeLessThanOrEqual(1);
+          .toBeLessThanOrEqual(1)
+          .catch(async (error) => {
+            await testInfo.attach("expanded-player-overflow", {
+              contentType: "application/json",
+              body: JSON.stringify(
+                await player.evaluate((element) => {
+                  const box = element.getBoundingClientRect();
+                  return [...element.querySelectorAll<HTMLElement>("*")]
+                    .map((node) => ({
+                      tag: node.tagName,
+                      className: node.className,
+                      scrollWidth: node.scrollWidth,
+                      clientWidth: node.clientWidth,
+                      left: node.getBoundingClientRect().left - box.left,
+                      right: node.getBoundingClientRect().right - box.right,
+                    }))
+                    .filter((node) => node.right > 1 || node.left < -1 || node.scrollWidth > node.clientWidth + 1);
+                }),
+                null,
+                2,
+              ),
+            });
+            throw error;
+          });
         await expect(options).toBeVisible();
         await player.screenshot({
           path: testInfo.outputPath(`${item.id}-${language}-${size.width}.png`),

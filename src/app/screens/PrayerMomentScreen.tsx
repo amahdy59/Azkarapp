@@ -14,6 +14,8 @@ export function PrayerMomentScreen({
   direction,
   records,
   dayKey,
+  calendarType = "hijri",
+  hijriDateOffset = 0,
   locationSettings,
   now = new Date(),
   onBack,
@@ -26,6 +28,8 @@ export function PrayerMomentScreen({
   direction: "ltr" | "rtl";
   records: readonly PrayerTrackingRecord[];
   dayKey: string;
+  calendarType?: "hijri" | "gregorian";
+  hijriDateOffset?: number;
   locationSettings?: LocationSettings;
   /** Injected so the screen's states can be held to a fixed clock in a test. */
   now?: Date;
@@ -61,6 +65,8 @@ export function PrayerMomentScreen({
           direction={direction}
           records={records}
           dayKey={dayKey}
+          calendarType={calendarType}
+          hijriDateOffset={hijriDateOffset}
           locationSettings={locationSettings}
           now={now}
           onToggle={onToggle}

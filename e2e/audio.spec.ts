@@ -1,11 +1,13 @@
 import { playEnglishTranslation } from "./reader-options";
 import { expect, test } from "@playwright/test";
 
-for (const language of ["ar", "en"] as const) {
-  test(`individual listening keeps manual navigation and waveform seeking independent of automatic continuation in ${language} @cross-browser`, async ({
+for (const { language, width } of (["ar", "en"] as const).flatMap((language) =>
+  [390, 1440].map((width) => ({ language, width })),
+)) {
+  test(`individual listening keeps manual navigation and waveform seeking independent of automatic continuation in ${language} at ${width}px @cross-browser`, async ({
     page,
-  }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 844 });
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
       localStorage.setItem(
@@ -52,16 +54,69 @@ for (const language of ["ar", "en"] as const) {
     }
     const player = page.getByRole("region", { name: language === "ar" ? "مشغل الصوت" : "Audio player", exact: true });
     await expect(player.getByRole("button")).toHaveCount(4); // Stop, title expansion, Play and Expand are keyboard actions.
-    await expect(player.getByRole("slider")).toHaveCount(0);
+    await expect(player.getByRole("slider")).toHaveCount(1);
+    await expect(page.getByTestId("reader-benefit-dock-button")).toHaveCount(0);
+    const compactSeek = player.getByRole("slider");
+    const compactBounds = (await compactSeek.boundingBox())!;
+    expect(compactBounds.height).toBeGreaterThanOrEqual(44);
+    await compactSeek.click({
+      position: { x: compactBounds.width * (language === "ar" ? 0.25 : 0.75), y: compactBounds.height / 2 },
+    });
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
+      .toBeGreaterThan(80);
+    await compactSeek.focus();
+    await page.keyboard.press("Home");
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
+      .toBe(0);
+    // Drag the actual native thumb from the start; clicks alone do not prove dragging.
+    const zeroX = compactBounds.x + (language === "ar" ? compactBounds.width - 9 : 9);
+    const seekY = compactBounds.y + compactBounds.height / 2;
+    await page.mouse.move(zeroX, seekY);
+    await page.mouse.down();
+    await page.mouse.move(compactBounds.x + compactBounds.width * (language === "ar" ? 0.25 : 0.75), seekY, {
+      steps: 8,
+    });
+    await page.mouse.up();
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
+      .toBeGreaterThan(80);
+    const rowButtons = await player.locator(".audio-compact-row > button").evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const r = button.getBoundingClientRect();
+        return { x: r.x, right: r.right, width: r.width, height: r.height };
+      }),
+    );
+    for (const button of rowButtons) {
+      expect(button.width).toBeGreaterThanOrEqual(44);
+      expect(button.height).toBeGreaterThanOrEqual(44);
+    }
+    const sorted = rowButtons.sort((a, b) => a.x - b.x);
+    for (let i = 1; i < sorted.length; i++) expect(sorted[i].x - sorted[i - 1].right).toBeGreaterThanOrEqual(8);
     await player.getByTestId("audio-compact-title").click();
     const options = page.getByRole("button", {
       name: language === "ar" ? "خيارات الصوت" : "Audio options",
       exact: true,
     });
+    if (width === 1440) {
+      const indicator = page.getByTestId("audio-play-all-indicator");
+      await expect(indicator).toContainText(language === "ar" ? "تشغيل الكل" : "Play all");
+      const layout = await indicator.evaluate((node) => ({
+        label: node.getBoundingClientRect().right,
+        controls: document.querySelector(".audio-expanded-transport")!.getBoundingClientRect().left,
+      }));
+      expect(layout.label).toBeLessThanOrEqual(layout.controls);
+      await page.screenshot({ path: testInfo.outputPath(`play-all-beside-transport-${language}.png`), scale: "css" });
+    }
     await options.click();
     const continuation = page.getByRole("switch", {
       name: language === "ar" ? "تشغيل الذكر التالي تلقائيًا" : "Play next zikr automatically",
     });
+    await expect(continuation).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator(".audio-expanded-meta > .sr-only")).toHaveCount(0); // Reader already supplies context.
+    await page.screenshot({ path: testInfo.outputPath(`consistent-audio-options-${language}.png`), scale: "css" });
+    await continuation.click();
     await expect(continuation).toHaveAttribute("aria-checked", "false");
     await page.keyboard.press("Escape");
     const reader = page.getByTestId("reader-screen");
@@ -104,6 +159,14 @@ for (const language of ["ar", "en"] as const) {
     await options.click();
     await expect(continuation).toHaveAttribute("aria-checked", "false");
     await page.keyboard.press("Escape");
+    await player
+      .getByRole("button", {
+        name: language === "ar" ? "إيقاف الصوت وإغلاق المشغل" : "Stop audio and close player",
+        exact: true,
+      })
+      .click();
+    await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
+    await expect(page.getByTestId("counter-surface")).toBeFocused();
   });
 }
 
@@ -323,7 +386,7 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
   expect(compactPlayBox?.width).toBeGreaterThanOrEqual(44);
   expect(compactPlayBox?.width).toBeLessThanOrEqual(52);
 
-  await expect(player.getByRole("progressbar", { name: "تقدم الاستماع" })).toBeVisible();
+  await expect(player.getByRole("slider", { name: "تقديم أو تأخير الصوت" })).toBeVisible();
   await player.getByRole("button", { name: "توسيع المشغل" }).click();
   await expect(player).toHaveAttribute("data-variant", "expanded");
   await expect(player.getByRole("progressbar", { name: "تقدم الاستماع" })).toHaveCount(0);
@@ -376,7 +439,7 @@ test("desktop player stays inside the main canvas and reveals vertical volume on
 
   const player = page.getByRole("region", { name: "مشغل الصوت" });
   await expect(player.getByTestId("audio-compact-progress")).toBeVisible();
-  await expect(player.getByRole("slider")).toHaveCount(0);
+  await expect(player.getByRole("slider")).toHaveCount(1);
   await player.getByRole("button", { name: "توسيع المشغل", exact: true }).click();
   const timeline = player.getByRole("slider", { name: "تقديم أو تأخير الصوت" });
   await expect(timeline).toBeVisible();
@@ -544,6 +607,7 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
 
   // 2. Moving to another zikr in the Reader updates the active audio track
   // In desktop reader collection navigator, select Surah Al-Ikhlas (index 2 / s-hm-99-ikhlas)
+  await page.getByTestId("reader-sidebar-toggle").click();
   await page.locator("#zikr-card-2 button[data-zikr-select]").click();
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-ikhlas");
   await expect(player).toContainText("سورة الْإِخْلَاص");

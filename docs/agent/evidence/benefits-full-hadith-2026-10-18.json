@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-18",
+  "reviewer": "Coding-agent source comparison; independent scholarly review not claimed",
+  "scope": "21 Benefits cards: complete selected matn, excluding preceding transmission chains and subsequent compiler commentary. English is the app rendering of meaning.",
+  "reused": [
+    {
+      "id": "h-subhanallah-100",
+      "readingKey": "L:bukhari:6405",
+      "sourceUrl": "https://sunnah.com/bukhari:6405",
+      "sourceStart": 95,
+      "sourceEnd": 322
+    },
+    {
+      "id": "h-tahlil-100",
+      "readingKey": "L:bukhari:3293",
+      "sourceUrl": "https://sunnah.com/bukhari:3293",
+      "sourceStart": 119,
+      "sourceEnd": 652
+    },
+    {
+      "id": "h-sayyid",
+      "readingKey": "H08",
+      "sourceUrl": "https://sunnah.com/bukhari:6306",
+      "sourceStart": 260,
+      "sourceEnd": 853
+    },
+    {
+      "id": "h-juwayriyyah",
+      "readingKey": "L:muslim:2726a",
+      "sourceUrl": "https://sunnah.com/muslim:2726a",
+      "sourceStart": 251,
+      "sourceEnd": 800
+    },
+    {
+      "id": "h-after-prayer",
+      "readingKey": "H15",
+      "sourceUrl": "https://sunnah.com/muslim:597a",
+      "sourceStart": 335,
+      "sourceEnd": 727
+    },
+    {
+      "id": "h-bismillah",
+      "readingKey": "L:abudawud:5088",
+      "sourceUrl": "https://sunnah.com/abudawud:5088",
+      "sourceStart": 121,
+      "sourceEnd": 886
+    },
+    {
+      "id": "h-three-quls",
+      "readingKey": "L:abudawud:5082",
+      "sourceUrl": "https://sunnah.com/abudawud:5082",
+      "sourceStart": 146,
+      "sourceEnd": 725
+    },
+    {
+      "id": "h-kursi",
+      "readingKey": "H16",
+      "sourceUrl": "https://sunnah.com/bukhari:2311",
+      "sourceStart": 137,
+      "sourceEnd": 2663
+    },
+    {
+      "id": "h-baqarah-last-two",
+      "readingKey": "H17",
+      "sourceUrl": "https://sunnah.com/bukhari:5009",
+      "sourceStart": 208,
+      "sourceEnd": 297
+    },
+    {
+      "id": "h-place",
+      "readingKey": "L:muslim:2708",
+      "sourceUrl": "https://sunnah.com/muslim:2708",
+      "sourceStart": 345,
+      "sourceEnd": 630
+    },
+    {
+      "id": "h-yunus",
+      "readingKey": "L:tirmidhi:3505",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3505",
+      "sourceStart": 176,
+      "sourceEnd": 607
+    },
+    {
+      "id": "h-fatima",
+      "readingKey": "L:bukhari:3113",
+      "sourceUrl": "https://sunnah.com/bukhari:3113",
+      "sourceStart": 128,
+      "sourceEnd": 875
+    }
+  ],
+  "compared": [
+    {
+      "id": "h-subhanallah-am-pm",
+      "sourceUrl": "https://sunnah.com/muslim:2692",
+      "arabicMatn": "مَنْ قَالَ حِينَ يُصْبِحُ وَحِينَ يُمْسِي سُبْحَانَ اللَّهِ وَبِحَمْدِهِ مِائَةَ مَرَّةٍ ‏.‏ لَمْ يَأْتِ أَحَدٌ يَوْمَ الْقِيَامَةِ بِأَفْضَلَ مِمَّا جَاءَ بِهِ إِلاَّ أَحَدٌ قَالَ مِثْلَ مَا قَالَ أَوْ زَادَ عَلَيْهِ"
+    },
+    {
+      "id": "h-two-phrases",
+      "sourceUrl": "https://sunnah.com/bukhari:6682",
+      "arabicMatn": "كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ، حَبِيبَتَانِ إِلَى الرَّحْمَنِ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ"
+    },
+    {
+      "id": "h-palm",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3464",
+      "arabicMatn": "مَنْ قَالَ سُبْحَانَ اللَّهِ الْعَظِيمِ وَبِحَمْدِهِ ‏.‏ غُرِسَتْ لَهُ نَخْلَةٌ فِي الْجَنَّةِ"
+    },
+    {
+      "id": "h-four-phrases",
+      "sourceUrl": "https://sunnah.com/muslim:2695",
+      "arabicMatn": "لأَنْ أَقُولَ سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلاَ إِلَهَ إِلاَّ اللَّهُ وَاللَّهُ أَكْبَرُ أَحَبُّ إِلَىَّ مِمَّا طَلَعَتْ عَلَيْهِ الشَّمْسُ"
+    },
+    {
+      "id": "h-hawqalah",
+      "sourceUrl": "https://sunnah.com/muslim:2704a",
+      "arabicMatn": "كُنَّا مَعَ النَّبِيِّ صلى الله عليه وسلم فِي سَفَرٍ فَجَعَلَ النَّاسُ يَجْهَرُونَ بِالتَّكْبِيرِ فَقَالَ النَّبِيُّ صلى الله عليه وسلم ‏\"‏ أَيُّهَا النَّاسُ ارْبَعُوا عَلَى أَنْفُسِكُمْ إِنَّكُمْ لَيْسَ تَدْعُونَ أَصَمَّ وَلاَ غَائِبًا إِنَّكُمْ تَدْعُونَ سَمِيعًا قَرِيبًا وَهُوَ مَعَكُمْ ‏\"‏ ‏.‏ قَالَ وَأَنَا خَلْفَهُ وَأَنَا أَقُولُ لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ فَقَالَ ‏\"‏ يَا عَبْدَ اللَّهِ بْنَ قَيْسٍ أَلاَ أَدُلُّكَ عَلَى كَنْزٍ مِنْ كُنُوزِ الْجَنَّةِ ‏\"‏ ‏.‏ فَقُلْتُ بَلَى يَا رَسُولَ اللَّهِ ‏.‏ قَالَ ‏\"‏ قُلْ لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ ‏\""
+    },
+    {
+      "id": "h-salawat",
+      "sourceUrl": "https://sunnah.com/muslim:408",
+      "arabicMatn": "مَنْ صَلَّى عَلَىَّ وَاحِدَةً صَلَّى اللَّهُ عَلَيْهِ عَشْرًا"
+    },
+    {
+      "id": "h-raditu",
+      "sourceUrl": "https://sunnah.com/abudawud:1529",
+      "arabicMatn": "مَنْ قَالَ رَضِيتُ بِاللَّهِ رَبًّا وَبِالإِسْلاَمِ دِينًا وَبِمُحَمَّدٍ رَسُولاً وَجَبَتْ لَهُ الْجَنَّةُ"
+    },
+    {
+      "id": "h-living-heart",
+      "sourceUrl": "https://sunnah.com/bukhari:6407",
+      "arabicMatn": "مَثَلُ الَّذِي يَذْكُرُ رَبَّهُ وَالَّذِي لاَ يَذْكُرُ مَثَلُ الْحَىِّ وَالْمَيِّتِ"
+    },
+    {
+      "id": "h-gatherings",
+      "sourceUrl": "https://sunnah.com/muslim:2700a",
+      "arabicMatn": "لاَ يَقْعُدُ قَوْمٌ يَذْكُرُونَ اللَّهَ عَزَّ وَجَلَّ إِلاَّ حَفَّتْهُمُ الْمَلاَئِكَةُ وَغَشِيَتْهُمُ الرَّحْمَةُ وَنَزَلَتْ عَلَيْهِمُ السَّكِينَةُ وَذَكَرَهُمُ اللَّهُ فِيمَنْ عِنْدَهُ"
+    }
+  ],
+  "grading": "Existing named al-Albani authentication retained, including Tirmidhi 3464; provider grading differs (Darussalam Daif), while al-Tirmidhi says hasan sahih gharib. No new blanket authenticity judgment."
+}

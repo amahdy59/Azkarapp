@@ -4,6 +4,8 @@ import { PrayerMomentScreen } from "./PrayerMomentScreen";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
 import { getEstimatedPrayerTimes } from "../content/prayerTimes";
 import type { PrayerName, PrayerTrackingRecord } from "../types";
+import { formatDisplayDate } from "../formatting";
+import { dateFromProgressDayKey } from "../progress";
 
 afterEach(cleanup);
 
@@ -48,6 +50,58 @@ function renderScreen({
 }
 
 describe("the prayer as one surface", () => {
+  it("names the record date across midnight without repeating the timetable countdown or completion tally", () => {
+    render(
+      <PrayerMomentPanel
+        prayer="isha"
+        language="en"
+        direction="ltr"
+        records={[]}
+        dayKey="2026-09-04"
+        calendarType="gregorian"
+        now={new Date(2026, 8, 5, 1)}
+        onToggle={vi.fn()}
+        onOpenAdhkar={vi.fn()}
+      />,
+    );
+    expect(screen.queryByTestId("prayer-record-date")).toBeNull();
+    fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
+    expect(screen.getByTestId("prayer-record-date")).toHaveAttribute("datetime", "2026-09-04");
+    expect(screen.getByTestId("prayer-record-date")).toHaveTextContent("Record for Friday, September 4, 2026 AD");
+    expect(screen.queryByText("Not yet due")).toBeNull();
+    expect(screen.queryByText(/In \d+ min/)).toBeNull();
+    expect(screen.queryByTestId("prayer-actions-progress")).toBeNull();
+    expect(screen.getByTestId("prayer-moment-virtue")).toBeInTheDocument();
+  });
+  it.each(["ar", "en"] as const)(
+    "follows calendar and Hijri adjustment changes in %s without moving the record day",
+    (language) => {
+      const props = {
+        prayer: "isha" as const,
+        language,
+        direction: language === "ar" ? ("rtl" as const) : ("ltr" as const),
+        records: [],
+        dayKey: DAY,
+        now: new Date(2026, 8, 5, 1),
+        onBack: vi.fn(),
+        onToggle: vi.fn(),
+        onOpenAdhkar: vi.fn(),
+        onSelectPrayer: vi.fn(),
+      };
+      const { rerender } = render(<PrayerMomentScreen {...props} calendarType="hijri" hijriDateOffset={1} />);
+      fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
+      const date = screen.getByTestId("prayer-record-date");
+      expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "hijri", 1));
+      rerender(<PrayerMomentScreen {...props} calendarType="hijri" hijriDateOffset={-1} />);
+      expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "hijri", -1));
+      rerender(<PrayerMomentScreen {...props} calendarType="gregorian" hijriDateOffset={1} />);
+      expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "gregorian"));
+      expect(date).toHaveAttribute("datetime", DAY);
+      fireEvent.click(screen.getByTestId("prayer-actions-info-close"));
+      fireEvent.click(screen.getByTestId("prayer-action-location").querySelector("input")!);
+      expect(props.onToggle).toHaveBeenCalledWith("isha", "location", "mosque");
+    },
+  );
   it("allows an approaching prayer preview without allowing an early record", () => {
     const onToggle = vi.fn();
     render(
@@ -76,7 +130,7 @@ describe("the prayer as one surface", () => {
     expect(screen.getByTestId("prayer-moment-screen")).toHaveAttribute("data-prayer", "maghrib");
     expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة المغرب/ })).toBeInTheDocument();
     expect(screen.queryByTestId("prayer-moment-hero")).toBeNull();
-    expect(screen.getByTestId("prayer-moment-status")).toBeInTheDocument();
+    expect(screen.queryByTestId("prayer-moment-status")).toBeNull();
   });
 
   it("offers the virtue while it can still be an invitation", () => {
@@ -89,6 +143,18 @@ describe("the prayer as one surface", () => {
   it("keeps the virtue hadith present even after the prayer's time has passed", () => {
     renderScreen({ prayer: "fajr", now: at(shift(times.dhuhr, 30)) });
     expect(screen.getByTestId("prayer-moment-virtue")).toBeInTheDocument();
+  });
+
+  it("keeps the source inline with the complete narration and the record date in information", () => {
+    renderScreen({ prayer: "fajr" });
+    const source = screen.getByTestId("prayer-virtue-source");
+    expect(source.tagName).toBe("SPAN");
+    expect(source.parentElement).toHaveAttribute("lang", "ar");
+    expect(source.parentElement).toHaveTextContent("«مَنْ صَلَّى الصُّبْحَ فِي جَمَاعَةٍ فَهُوَ فِي ذِمَّةِ اللَّهِ»");
+    expect(source).toHaveTextContent("صحيح مسلم ٦٥٧");
+    expect(screen.queryByTestId("prayer-record-date")).toBeNull();
+    fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
+    expect(screen.getByRole("dialog")).toContainElement(screen.getByTestId("prayer-record-date"));
   });
 
   it("asks whether the prayer was in congregation, not where it was prayed", () => {
@@ -123,11 +189,11 @@ describe("the prayer as one surface", () => {
 
   it("renders the prayer actions card with prayer-specific deeds", () => {
     renderScreen({ prayer: "dhuhr" });
-    expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة الظهر/ })).toBeInTheDocument();
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("أربع ركعات قبل الظهر");
+    expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة الجمعة/ })).toBeInTheDocument();
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليتها في المسجد");
+    expect(screen.queryByTestId("prayer-action-dhuhr-sunnah-before")).toBeNull();
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("ركعتان بعد الظهر");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("سنة بعد الجمعة");
   });
 
   it("names an encouraged sunnah in More Info, not as one of the twelve", () => {

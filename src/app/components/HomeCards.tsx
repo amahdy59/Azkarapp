@@ -1,5 +1,8 @@
-import { QuranVerseText } from "./QuranVerseText";
-import { QURAN_TEXT_STYLE } from "../quranTypography";
+import { reminderText } from "../i18n/reminderReadings";
+import type { QuickRoutineShare } from "../hooks/useQuickRoutineShare";
+import { lazy, Suspense, useState, type ComponentProps } from "react";
+import { reminderToShareItem } from "../share/reminderSharing";
+import { ReminderReading } from "./ReminderReading";
 import { progressFillStyle } from "./progressFillStyle";
 import { t } from "../i18n";
 import type { DailyEvidence } from "../dailyEvidence";
@@ -8,8 +11,25 @@ import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowNext, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon, RefreshCw } from "./icons";
+import {
+  ArrowNext,
+  Bookmark,
+  BookOpen,
+  Clock,
+  Sparkles,
+  Heart,
+  Sun,
+  MoonStar,
+  Moon,
+  RefreshCw,
+  Mosque,
+  Share2,
+} from "./icons";
 import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
+
+const ReminderShareModal = lazy(() =>
+  import("./CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
 
@@ -34,6 +54,7 @@ export function PrayerRoutineCard({
   estimatedMinutes,
   showEstimate = true,
   ctaLabel,
+  quickShare,
   onOpen,
   onGlass = true,
 }: {
@@ -50,6 +71,7 @@ export function PrayerRoutineCard({
   estimatedMinutes: number;
   showEstimate?: boolean;
   ctaLabel: string;
+  quickShare?: QuickRoutineShare;
   onOpen: () => void;
   onGlass?: boolean;
 }) {
@@ -176,18 +198,44 @@ export function PrayerRoutineCard({
           </div>
         )}
 
-        <button
-          type="button"
-          data-testid="home-primary-cta"
-          aria-describedby={progressId}
-          onClick={onOpen}
-          className="group mt-3 flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          <span className="min-w-0 truncate" title={ctaLabel}>
-            {ctaLabel}
-          </span>
-          <ArrowNext size={20} className="shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
-        </button>
+        <div className="mt-3 flex w-full items-stretch gap-3">
+          <button
+            type="button"
+            data-testid="home-primary-cta"
+            aria-describedby={progressId}
+            onClick={onOpen}
+            className="group flex min-h-[52px] min-w-0 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <span className="min-w-0 truncate" title={ctaLabel}>
+              {ctaLabel}
+            </span>
+            <ArrowNext size={20} className="control-cue shrink-0" aria-hidden="true" />
+          </button>
+          {quickShare?.available && (
+            <div className="flex shrink-0 items-stretch gap-2">
+              <button
+                type="button"
+                data-testid="home-quick-share"
+                disabled={quickShare.busy}
+                aria-busy={quickShare.busy || undefined}
+                aria-label={quickShare.label}
+                title={quickShare.label}
+                onPointerEnter={quickShare.prepare}
+                onPointerDown={quickShare.prepare}
+                onFocus={quickShare.prepare}
+                onClick={quickShare.share}
+                className={`home-icon-action inline-flex min-h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl border border-current/30 ${onGlass ? "bg-on-media-surface/40 text-on-media-accent hover:bg-on-media-surface/60" : "bg-card text-foreground hover:bg-muted"} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50`}
+              >
+                <Share2 size={20} className="control-cue home-action-cue" aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </div>
+        {quickShare?.message && (
+          <p className="text-label" role={quickShare.error ? "alert" : "status"}>
+            {quickShare.message}
+          </p>
+        )}
       </HomeCard>
     </section>
   );
@@ -359,8 +407,9 @@ export function FridayHomeCard({
         padding="md"
         className="flex flex-col gap-4 sm:flex-row sm:items-center"
       >
-        <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
-          <ProductImage name="mosque_prophet" className="h-full w-full object-cover" />
+        <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+          <Mosque size={28} aria-hidden="true" />
+          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
         </span>
         <div className="min-w-0 flex-1 text-start">
           <h3
@@ -404,7 +453,8 @@ export function FridayHomeCard({
     >
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
-          <ProductImage name="mosque_prophet" className="absolute inset-0 h-full w-full object-cover" />
+          <Mosque size={52} aria-hidden="true" />
+          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
         </div>
 
         <div className="min-w-0 text-start">
@@ -468,10 +518,10 @@ export function FridayHomeCard({
  * the only place in the app making a claim it could not support, so
  * {@link getDailyEvidence} will not return an entry that lacks one.
  */
-export function DailyEvidenceCard({
+function DailyEvidenceCardContent({
   language,
   direction,
-  evidence,
+  evidence: incomingEvidence,
   onRefresh,
   onGlass = false,
 }: {
@@ -491,6 +541,11 @@ export function DailyEvidenceCard({
    */
   onGlass?: boolean;
 }) {
+  const [readingEvidence, setReadingEvidence] = useState<DailyEvidence | null>(null);
+  const [focusedEvidence, setFocusedEvidence] = useState<DailyEvidence | null>(null);
+  const [sharingEvidence, setSharingEvidence] = useState<DailyEvidence | null>(null);
+  const [refreshSequence, setRefreshSequence] = useState(0);
+  const evidence = sharingEvidence ?? readingEvidence ?? focusedEvidence ?? incomingEvidence;
   return (
     <HomeCard
       as="section"
@@ -498,8 +553,13 @@ export function DailyEvidenceCard({
       elevation="raised"
       aria-labelledby="home-evidence-heading"
       data-testid="home-daily-evidence"
+      data-evidence-id={evidence.evidenceId}
       dir={direction}
-      className="home-glass-reading flex min-h-0 flex-1 flex-col gap-3"
+      className="home-glass-reading flex min-h-0 w-full flex-col gap-3"
+      onFocusCapture={() => setFocusedEvidence(evidence)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusedEvidence(null);
+      }}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -515,26 +575,53 @@ export function DailyEvidenceCard({
           </span>
           <h2
             id="home-evidence-heading"
-            className={`truncate text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
+            className={`min-w-0 text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
           >
-            {t(language, "home.dailyEvidence")}
+            {evidence.title ?? reminderText(language, "home.dailyEvidence")}
           </h2>
         </div>
 
-        {onRefresh && (
+        <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
-            onClick={onRefresh}
-            aria-label={t(language, "home.nextDailyEvidence")}
-            title={t(language, "home.nextDailyEvidence")}
-            data-testid="daily-evidence-refresh"
-            className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
-              onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
-            }`}
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              setSharingEvidence(evidence);
+            }}
+            aria-label={reminderText(language, "home.shareEvidence")}
+            title={reminderText(language, "home.shareEvidence")}
+            data-testid="daily-evidence-share"
+            aria-haspopup="dialog"
+            aria-expanded={Boolean(sharingEvidence)}
+            className={`home-icon-action ui-icon-button -my-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${onGlass ? "text-on-media-accent hover:text-on-media" : "text-primary hover:text-foreground"}`}
           >
-            <RefreshCw size={16} aria-hidden="true" />
+            <Share2 size={16} className="control-cue home-action-cue" aria-hidden="true" />
           </button>
-        )}
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={() => {
+                setReadingEvidence(null);
+                setFocusedEvidence(null);
+                onRefresh();
+                setRefreshSequence((sequence) => sequence + 1);
+              }}
+              aria-label={reminderText(language, "home.nextDailyEvidence")}
+              title={reminderText(language, "home.nextDailyEvidence")}
+              data-testid="daily-evidence-refresh"
+              className={`home-icon-action ui-icon-button -my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
+                onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <RefreshCw
+                key={refreshSequence}
+                size={16}
+                className={`control-cue ${refreshSequence > 0 ? "home-refresh-feedback" : ""}`}
+                aria-hidden="true"
+              />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* The narration leads, in the reader's language where one was reviewed.
@@ -543,31 +630,28 @@ export function DailyEvidenceCard({
           `lang` and `dir` follow the text that is actually rendered, and the
           Arabic face is only applied when the text is Arabic. */}
 
-      <blockquote
-        className={`font-medium ${
-          evidence.isQuran ? "text-xl sm:text-2xl font-normal leading-relaxed tracking-wide" : "text-title leading-[2]"
-        } ${onGlass ? "text-on-media" : "text-foreground"} ${evidence.hadithInArabic ? "zikr-text" : ""}`}
-        style={evidence.isQuran ? QURAN_TEXT_STYLE : undefined}
-        dir={evidence.hadithInArabic ? "rtl" : "ltr"}
-        lang={evidence.hadithInArabic ? "ar" : "en"}
-        data-testid="daily-evidence-hadith"
-      >
-        {evidence.isQuran ? (
-          <QuranVerseText text={evidence.hadith} language={language} canonicalKey={evidence.canonicalKey} />
-        ) : (
-          evidence.hadith
-        )}
-      </blockquote>
-
-      <p
-        className={`text-label leading-relaxed ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
-        dir="auto"
-      >
-        {evidence.benefit}
-      </p>
+      {evidence.excerpt || evidence.reportedAction || evidence.companionReport ? (
+        <p className={`text-xs font-semibold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}>
+          {reminderText(
+            language,
+            evidence.companionReport
+              ? "home.companionReport"
+              : evidence.reportedAction
+                ? "home.reportedPropheticAction"
+                : "home.hadithExcerpt",
+          )}
+        </p>
+      ) : null}
+      <ReminderReading
+        key={`${evidence.evidenceId ?? evidence.zikrId ?? evidence.canonicalKey ?? evidence.hadith}|${language}`}
+        evidence={evidence}
+        language={language}
+        onGlass={onGlass}
+        onReadingChange={(reading) => setReadingEvidence(reading ? evidence : null)}
+      />
 
       <footer
-        className={`mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 ${
+        className={`flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 ${
           onGlass ? "border-white/20" : "border-border/40"
         }`}
       >
@@ -579,12 +663,49 @@ export function DailyEvidenceCard({
           {evidence.authenticity}
         </span>
         {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
+        {evidence.sourceUrl && (
+          <a
+            data-testid="daily-evidence-source"
+            href={evidence.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`ms-auto inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+          >
+            {reminderText(language, "home.viewEvidenceSource")}
+          </a>
+        )}
         {evidence.sourceReference && (
           <span className={`text-xs ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`} dir="auto">
             {evidence.sourceReference}
           </span>
         )}
       </footer>
+      {sharingEvidence && (
+        <Suspense
+          fallback={
+            <p role="status" className="sr-only">
+              {t(language, "common.loading")}
+            </p>
+          }
+        >
+          <ReminderShareModal
+            open
+            onClose={() => setSharingEvidence(null)}
+            items={[]}
+            single
+            language={language}
+            collectionTitle={sharingEvidence.title ?? reminderText(language, "home.dailyEvidence")}
+            dialogTitle={reminderText(language, "home.shareEvidence")}
+            shareItems={[reminderToShareItem(sharingEvidence, language)]}
+            shareUrl={sharingEvidence.sourceUrl}
+            initialFormat="portrait"
+          />
+        </Suspense>
+      )}
     </HomeCard>
   );
+}
+
+export function DailyEvidenceCard(props: ComponentProps<typeof DailyEvidenceCardContent>) {
+  return <DailyEvidenceCardContent key={props.language} {...props} />;
 }

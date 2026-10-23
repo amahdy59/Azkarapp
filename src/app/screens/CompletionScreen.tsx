@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import confetti from "canvas-confetti";
 import "./CompletionScreen.css";
 import { Check, Home, Share2 } from "../components/icons";
@@ -11,7 +11,11 @@ import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import "../../styles/animations/ZikrAnimations.css";
 import { getCategoryStreak, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, RoutineMode } from "../types";
-import { reportError } from "../../lib/observability";
+import { getShareUrl, type ShareItem } from "../share/shareLayout";
+
+const CollectionShareModal = lazy(() =>
+  import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
 
 /**
  * Confetti takes an array of colour strings, so these cannot be utility classes.
@@ -40,6 +44,7 @@ export function CompletionScreen({
   direction,
   completionLevel = "complete",
   onContinueComplete,
+  onNewSession,
   reduceMotion = false,
   hapticFeedback = true,
 }: {
@@ -54,6 +59,7 @@ export function CompletionScreen({
   direction: "ltr" | "rtl";
   completionLevel?: RoutineMode;
   onContinueComplete?: () => void;
+  onNewSession?: () => void;
   reduceMotion?: boolean;
   hapticFeedback?: boolean;
 }) {
@@ -61,9 +67,7 @@ export function CompletionScreen({
   const azkarCount = getAzkarForMode(catId, completionLevel).length;
   const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60_000));
   const isArabic = language === "ar";
-  const [shareStatus, setShareStatus] = useState("");
-  const [shareError, setShareError] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     // Haptics and motion are separate preferences: someone who suppresses
@@ -134,33 +138,6 @@ export function CompletionScreen({
     { value: azkarCount, label: t(language, "completion.completedAzkar") },
     { value: elapsedMin, label: t(language, "completion.minutes") },
   ];
-
-  const share = async () => {
-    if (isSharing) return;
-    const text = t(language, "completion.shareText", { category: categoryName });
-    try {
-      setIsSharing(true);
-      setShareError(false);
-      setShareStatus("");
-      if (navigator.share) {
-        await navigator.share({ title: "Azkar", text });
-        setShareStatus(t(language, "completion.shareSuccess"));
-      } else {
-        await navigator.clipboard.writeText(text);
-        setShareStatus(t(language, "completion.copySuccess"));
-      }
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        setShareStatus(t(language, "completion.shareCancelled"));
-        return;
-      }
-      reportError(error, "completion-share");
-      setShareError(true);
-      setShareStatus(t(language, "completion.shareError"));
-    } finally {
-      setIsSharing(false);
-    }
-  };
 
   return (
     <div
@@ -238,29 +215,71 @@ export function CompletionScreen({
               onClick={onHome}
               className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-primary px-4 font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <Home size={18} /> {t(language, "completion.returnHome")}
+              <Home size={18} aria-hidden="true" />{" "}
+              {t(language, onNewSession ? "completion.done" : "completion.returnHome")}
             </button>
+            {onNewSession && (
+              <button
+                type="button"
+                onClick={onNewSession}
+                className="flex min-h-12 items-center justify-center rounded-xl border border-border-control bg-card px-4 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "completion.newSession")}
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => void share()}
-              disabled={isSharing}
-              aria-busy={isSharing || undefined}
+              onClick={(event) => {
+                // Safari pointer clicks do not focus buttons automatically.
+                // Give the dialog a real opener to restore on dismissal.
+                event.currentTarget.focus({ preventScroll: true });
+                setShareOpen(true);
+              }}
+              aria-haspopup="dialog"
               className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-wait disabled:opacity-60"
             >
-              <Share2 size={18} /> {t(language, "completion.share")}
+              <Share2 size={18} aria-hidden="true" /> {t(language, "completion.share")}
             </button>
-            {shareStatus && (
-              <p
-                className={`text-xs font-semibold ${shareError ? "text-destructive" : "text-muted-foreground"}`}
-                role={shareError ? "alert" : "status"}
-                aria-live={shareError ? undefined : "polite"}
-              >
-                {shareStatus}
-              </p>
-            )}
           </div>
         </div>
       </div>
+      {shareOpen && (
+        <Suspense fallback={<p role="status">{t(language, "shareStoryPack.generating")}</p>}>
+          <CollectionShareModal
+            open
+            single
+            initialFormat="square"
+            contentAlignment="center"
+            onClose={() => setShareOpen(false)}
+            dialogTitle={t(language, "completion.share")}
+            dialogDescription={t(language, "completion.sessionComplete", { category: categoryName })}
+            collectionTitle={t(language, "completion.completedCategory", { category: categoryName })}
+            collectionTitleArabic={t("ar", "completion.completedCategory", { category: cat.nameArabic })}
+            collectionTitleEnglish={t("en", "completion.completedCategory", { category: cat.name })}
+            items={[]}
+            shareUrl={getShareUrl(catId)}
+            shareItemsByLanguage={
+              Object.fromEntries(
+                (["ar", "en"] as const).map((exportLanguage) => [
+                  exportLanguage,
+                  [
+                    {
+                      id: "session-completion",
+                      arabicText: t(exportLanguage, "completion.shareText", {
+                        category: exportLanguage === "ar" ? cat.nameArabic : cat.name,
+                      }),
+                      textDirection: exportLanguage === "ar" ? "rtl" : "ltr",
+                      language: exportLanguage,
+                      hideRepetition: true,
+                    } satisfies ShareItem,
+                  ],
+                ]),
+              ) as Record<AppLanguage, ShareItem[]>
+            }
+            language={language}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

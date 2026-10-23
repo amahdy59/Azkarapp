@@ -1,0 +1,305 @@
+/* Glass shares Home's stationary scene, palette and material. */
+.app-scene {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    /* The on-media ink always has a dark ground, also before scene decoding,
+       when offline, and beneath the decorative negative-z scene layer. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .app-shell {
+      background-color: var(--on-media-surface);
+    }
+    /* A named route capture creates a backdrop boundary. Keep the photographic
+       Glass canvas live so headers can frost content from the native viewport. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .app-main-view {
+      view-transition-name: none;
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui],
+        [data-material-surface],
+        [data-material-ui] [class*="theme-"],
+        [data-material-ui] [data-reader-category],
+        .app-sidebar,
+        .app-rail,
+        .bottom-nav,
+        [role="dialog"],
+        [role="menu"],
+        [role="listbox"],
+        .quran-word-popover
+      ) {
+      --background: transparent;
+      --card: var(--glass-card-tint);
+      --popover: var(--glass-reading-tint);
+      --foreground: #fff;
+      --card-foreground: #fff;
+      --popover-foreground: #fff;
+      --muted-foreground: rgb(255 255 255 / 0.9);
+      --muted: rgb(255 255 255 / 0.12);
+      --accent: rgb(255 255 255 / 0.12);
+      --accent-foreground: #fff;
+      --border: rgb(255 255 255 / 0.3);
+      --border-control: rgb(255 255 255 / 0.5);
+      --input: var(--border-control);
+      --primary: #d4a020;
+      --primary-foreground: #0a1228;
+      --success: #8aefb7;
+      --success-foreground: #062e16;
+      --warning: #ffe08a;
+      --warning-foreground: #271900;
+      --destructive: #ffb4b4;
+      --destructive-foreground: #3b0808;
+      color: var(--foreground);
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui]
+          :is([data-material-card], .bg-card, .bg-popover, header, .shared-screen-header, .glass-reading),
+        .app-sidebar,
+        [data-material-surface],
+        .app-rail,
+        .bottom-nav,
+        [role="dialog"],
+        [role="menu"],
+        [role="listbox"]
+      ):not(:where(input, select, textarea, label)) {
+      background-color: var(--glass-card-tint);
+      background-image: linear-gradient(
+        135deg,
+        rgb(255 255 255 / var(--glass-sheen-strength)),
+        var(--glass-sheen-midpoint) 55%,
+        var(--glass-sheen-shade)
+      );
+      border-color: var(--glass-edge);
+      backdrop-filter: var(--glass-frost);
+      box-shadow: var(--glass-shadow);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      html[data-app-material-resolved="glass"]:not(.high-contrast)
+        [data-material-ui]
+        :is([data-material-card], .bg-card, .glass-reading):hover {
+        border-color: var(--glass-edge-hover);
+      }
+    }
+    /* Exact .bg-card is the legacy surface contract; shared primitives carry
+       explicit ownership. Opacity/hover utility substrings never opt in. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      [data-material-ui]
+      .progress-records-surface.glass-reading {
+      background-color: color-mix(in srgb, var(--on-media-surface) 82%, transparent);
+      backdrop-filter: var(--glass-frost);
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] [data-material-elevation="flat"] {
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+    }
+    /* Home's stronger reading tint also supports Quran pages and overlays.
+       Glyphs, page geometry and reading interactions remain unchanged. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] .glass-reading,
+        [data-material-surface="reading"],
+        [role="dialog"],
+        [role="menu"],
+        .app-sidebar,
+        .app-rail,
+        .bottom-nav,
+        [data-material-ui] header,
+        [data-material-ui] .shared-screen-header
+      ) {
+      background-color: var(--glass-reading-tint);
+    }
+    /* A denser regular material separates moving content from navigation. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(.app-sidebar, .app-rail, .bottom-nav, [data-material-ui] header, [data-material-ui] .shared-screen-header) {
+      backdrop-filter: blur(22px) saturate(135%);
+    }
+    /* Overlaid text needs a denser material than scenery-backed cards. */
+    html:not(.high-contrast) [role="dialog"].hero-glass,
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [role="dialog"],
+        [role="menu"],
+        [role="listbox"],
+        .audio-options-menu,
+        .audio-player-surface,
+        .quran-word-popover,
+        .mushaf-theme-hud-surface
+      ):not(.audio-lock-shield) {
+      background-color: rgb(15 23 42 / 0.8);
+      background-image: linear-gradient(
+        135deg,
+        rgb(255 255 255 / 0.08),
+        rgb(255 255 255 / 0.015) 55%,
+        rgb(2 6 23 / 0.05)
+      );
+      backdrop-filter: blur(28px) saturate(135%);
+    }
+    /* Dense Quran lettering remains distracting through the ordinary overlay
+       tint when nested backdrop roots cannot sample the whole reading layer.
+       Keep the frost, with enough fill to protect the gloss independently. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        .quran-word-popover:is([role="tooltip"], [role="dialog"]),
+        .mushaf-protected-overlay[role="dialog"],
+        .progress-date-sheet[role="dialog"]
+      ) {
+      background-color: rgb(15 23 42);
+    }
+    html:not(.high-contrast) [role="dialog"].hero-glass,
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is([role="dialog"], [role="menu"], [role="listbox"], .audio-options-menu, .quran-word-popover):not(
+        .audio-player-surface,
+        .audio-lock-shield
+      ) {
+      border: 1px solid rgb(255 255 255 / 0.18);
+      box-shadow: 0 20px 48px rgb(2 6 23 / 0.45);
+    }
+    /* Nested surfaces use their parent's frost, avoiding stacked GPU layers. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is([data-material-ui], [data-material-surface], [role="dialog"], [role="menu"])
+      .text-primary {
+      color: #fff0bd;
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      [data-material-ui]
+      :is([data-material-card], .bg-card, .bg-popover, header, .glass-reading)
+      :is(
+        [data-material-card],
+        .bg-card,
+        .bg-popover,
+        .field-shell,
+        button:not([role="tab"]),
+        .backdrop-blur-xs,
+        .backdrop-blur-sm,
+        .backdrop-blur-md,
+        .backdrop-blur-lg,
+        .backdrop-blur-xl
+      ) {
+      backdrop-filter: none;
+      background-image: none;
+    }
+    /* Keep tint/sheen stationary. Elevation strengthens frost without a solid
+       panel or interpolated blur appearing during native scrolling. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        .app-sidebar,
+        .app-rail,
+        .bottom-nav,
+        [data-material-ui] header,
+        [data-material-ui] .shared-screen-header,
+        [data-material-ui] .settings-search-sticky,
+        [data-material-ui] .progress-screen-controls
+      ) {
+      background-color: var(--glass-reading-tint) !important;
+      background-image: linear-gradient(
+        135deg,
+        rgb(255 255 255 / 0.045),
+        rgb(255 255 255 / 0.012) 55%,
+        transparent
+      ) !important;
+      backdrop-filter: var(--glass-chrome-frost) !important;
+      border-bottom: 1px solid transparent;
+      box-shadow: none;
+      transition-property: border-color, box-shadow !important;
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] header[data-scrolled="true"],
+        [data-material-ui] .shared-screen-header[data-scrolled="true"],
+        [data-material-ui] .settings-search-sticky[data-scrolled="true"],
+        [data-material-ui] .progress-screen-controls[data-scrolled="true"]
+      ) {
+      backdrop-filter: var(--glass-chrome-frost) !important;
+      border-bottom-color: rgb(255 255 255 / 0.07);
+      box-shadow: 0 3px 12px rgb(2 6 23 / 0.12);
+    }
+    /* At the top, chrome belongs to the same canvas as its content. Only
+       passing content needs a separate frosted surface. Keep navigation fixed. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] header,
+        [data-material-ui] .shared-screen-header,
+        [data-material-ui] .settings-search-sticky,
+        [data-material-ui] .progress-screen-controls
+      ):not([data-scrolled="true"]) {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      border-bottom-color: transparent;
+      box-shadow: none;
+    }
+    /* In the settings root panel, the header sits directly above the sticky search bar, so only the search bar needs the bottom border/shadow */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is([data-testid="settings-screen"] > div > .shared-screen-header, .settings-nav-pane > .shared-screen-header) {
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+    }
+    /* Progress keeps the scene/color unchanged. Only frost strengthens when
+       records pass behind the title, tabs and date navigation. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] .progress-screen-controls {
+      background: transparent !important;
+      box-shadow: none !important;
+      inline-size: calc(100% + 2 * var(--spacing-page));
+      margin-inline: calc(-1 * var(--spacing-page));
+      padding-inline: var(--spacing-page);
+      padding-block-end: 1rem;
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .progress-screen-controls .shared-screen-header {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+    /* Parent frost cannot mask its own children. Independently scrolling
+       filters need title frost too, with no additional tint or dark fill. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      .progress-screen-controls
+      .shared-screen-header[data-scrolled="true"] {
+      background: transparent !important;
+      backdrop-filter: var(--glass-chrome-frost) !important;
+      -webkit-backdrop-filter: var(--glass-chrome-frost) !important;
+    }
+  }
+}
+.audio-lock-shield {
+  background: transparent;
+  backdrop-filter: none;
+  touch-action: none;
+}
+
+/* Match the resolved page material, including system and high-contrast fallback. */
+html[data-app-material-resolved="glass"]:not(.high-contrast) .mushaf-material-hint {
+  display: block;
+}
+
+/* Dropdowns cover functional text, unlike scene-backed cards. Protection must
+   survive nested backdrop roots, missing filters and every theme/layout. */
+html [data-dropdown-surface] {
+  background-color: var(--popover) !important;
+  max-width: calc(100vw - 1rem);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-dropdown-surface] {
+      background-color: rgb(15 23 42) !important;
+    }
+  }
+}
+
+html [data-dropdown-surface] .accessible-combobox-options[role="listbox"] {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+@media (forced-colors: active) {
+  html [data-dropdown-surface] {
+    background: Canvas !important;
+    color: CanvasText;
+  }
+}

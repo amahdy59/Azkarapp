@@ -1,11 +1,9 @@
+import { chooseProgressOption } from "../../test/progressSelect";
 import { useState } from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ProgressScreen } from "./ProgressScreen";
-
 vi.mock("../hooks/useNow", () => ({ useNow: () => new Date(2026, 9, 12, 12) }));
-
 function RoutedProgress() {
   const [period, setPeriod] = useState<"day" | "week" | "month" | "year">("year");
   return (
@@ -24,24 +22,39 @@ function RoutedProgress() {
     </>
   );
 }
-
-describe("Progress month exploration and routing", () => {
-  it("preserves the selected historical month when routing echoes the new period and restores keyboard context", async () => {
-    const user = userEvent.setup();
+describe("Progress period navigation", () => {
+  it("keeps the selected range across accessible tabs and opens a card's own trend", () => {
     render(<RoutedProgress />);
-    await screen.findByRole("combobox", { name: "Select month" });
     fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
-    await waitFor(() => expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2025"));
-    await user.click(screen.getByRole("combobox", { name: "Select month" }));
-    await user.click(screen.getByRole("option", { name: "February" }));
-    fireEvent.click(screen.getByRole("button", { name: "Explore this month" }));
-    await screen.findByTestId("month-weekly-chart");
-    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("February");
+    const date = screen.getByTestId("garden-view-date").textContent;
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Explore Quran pages read" }));
+    const trends = screen.getByRole("tab", { name: "Trends" });
+    expect(trends).toHaveFocus();
+    expect(trends).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("combobox", { name: "Show trend for" })).toHaveAttribute("data-progress-value", "pages");
+    expect(screen.getByTestId("garden-view-date").textContent).toBe(date);
+    fireEvent.keyDown(trends, { key: "End" });
+    expect(screen.getByRole("tabpanel", { name: "Records" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Export JSON" })).toBeInTheDocument();
+    expect(screen.queryByTestId("progress-main-trend")).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Records" }), { key: "Home" });
+    expect(screen.getByRole("tabpanel", { name: "Overview" })).toBeInTheDocument();
+    expect(screen.getByTestId("garden-view-date").textContent).toBe(date);
+  });
+  it("preserves historical ranges and synchronizes externally restored periods through the shared range selector", async () => {
+    render(<RoutedProgress />);
+    fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2025");
-    expect(screen.getByRole("tab", { name: "Month", exact: true })).toHaveFocus();
+    fireEvent.click(screen.getByTestId("progress-tab-trends"));
+    expect(screen.getByTestId("progress-main-trend")).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Period" })).toHaveAttribute("data-progress-value", "year");
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Period" }), "month");
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("1 – 31 Oct 2026");
+    fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("1 – 30 Sept 2026");
     fireEvent.click(screen.getByRole("button", { name: "History back to year" }));
-    await screen.findByTestId("year-monthly-chart");
-    expect(screen.getByRole("tab", { name: "Year", exact: true })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("combobox", { name: "Period" })).toHaveAttribute("data-progress-value", "year");
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2026");
   });
 });

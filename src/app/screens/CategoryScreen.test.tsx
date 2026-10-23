@@ -6,6 +6,23 @@ import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import { CategoryScreen } from "./CategoryScreen";
 
 describe("CategoryScreen comprehensive-dua session", () => {
+  it("explains explicit situational reset without labeling it daily progress", () => {
+    render(
+      <CategoryScreen
+        catId="travel"
+        completed={new Set()}
+        isArabic={false}
+        direction="ltr"
+        onZikr={vi.fn()}
+        onReset={vi.fn()}
+        onRepeat={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("session-reset-guidance")).toHaveTextContent("including after midnight");
+    expect(screen.getByRole("progressbar")).toHaveAccessibleName("Session progress");
+    expect(screen.getByTestId("session-reset-guidance")).toHaveTextContent("Past activity is kept");
+  });
   it("uses the standard collection progress and session controls", () => {
     const onZikr = vi.fn();
     registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);

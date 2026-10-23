@@ -34,6 +34,7 @@ export function useSwipeGestures({
   suppressTap,
   threshold = TURN_THRESHOLD,
   reduceMotion = false,
+  animateCommittedTurn = false,
 }: {
   direction: "ltr" | "rtl";
   onNext: () => void;
@@ -44,6 +45,8 @@ export function useSwipeGestures({
   threshold?: number;
   /** Suppresses the drag. The turn itself still happens on release. */
   reduceMotion?: boolean;
+  /** The Mushaf viewer animates a committed turn; do not settle against it. */
+  animateCommittedTurn?: boolean;
 }) {
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   /**
@@ -55,6 +58,7 @@ export function useSwipeGestures({
    */
   const axis = useRef<"undecided" | "horizontal" | "vertical">("undecided");
   const [dragOffset, setDragOffset] = useState(0);
+  const [committed, setCommitted] = useState(false);
 
   const handleSwipe = useCallback(
     (dx: number) => {
@@ -171,9 +175,13 @@ export function useSwipeGestures({
       if (pointer.current.id !== event.pointerId) return;
       const start = pointer.current;
       const lockedAxis = axis.current;
+      const dx = event.clientX - start.x;
+      const cancelled = event.type === "pointercancel";
+      setCommitted(!cancelled && lockedAxis === "horizontal" && Math.abs(dx) > threshold);
       setDragOffset(0);
       pointer.current = { id: -1, x: 0, y: 0 };
       axis.current = "undecided";
+      if (cancelled) return;
       if (lockedAxis === "vertical") {
         const dy = event.clientY - start.y;
         if (dy < -threshold && onSwipeUp) onSwipeUp();
@@ -194,7 +202,10 @@ export function useSwipeGestures({
    */
   const dragStyle: CSSProperties = {
     transform: dragOffset === 0 ? undefined : `translateX(${dragOffset}px)`,
-    transition: dragOffset === 0 ? "transform var(--motion-duration-release) var(--motion-ease-release)" : "none",
+    transition:
+      reduceMotion || (animateCommittedTurn && committed) || dragOffset !== 0
+        ? "none"
+        : "transform var(--motion-duration-release) var(--motion-ease-release)",
   };
 
   return {

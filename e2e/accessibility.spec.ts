@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { chooseProgressOption } from "./helpers/progress";
 
 async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.goto("/");
@@ -189,6 +190,8 @@ test("search results expose concise accessible names", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
   const searchInput = page.getByRole("textbox", { name: "Search azkar and duas" });
+  const filters = page.getByTestId("library-filter-disclosure");
+  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
   await searchInput.fill("sleep");
   await searchInput.press("Enter");
 
@@ -203,6 +206,8 @@ test("search results expose concise accessible names", async ({ page }) => {
 test("library filtering announces the collection result count", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
+  const filters = page.getByTestId("library-filter-disclosure");
+  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
   await page.getByRole("textbox", { name: "Search azkar and duas" }).fill("sleep");
 
   await expect(page.getByTestId("library-filter-status")).toHaveText("1 collection matches “sleep”");
@@ -213,8 +218,9 @@ test("Progress tabs expose a logical level-two heading in every view", async ({ 
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-progress").click();
 
-  for (const tabName of ["Day", "Week", "Month", "Year"] as const) {
-    await page.getByRole("tab", { name: tabName, exact: true }).click();
+  const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
+  for (const value of ["day", "week", "month", "year"] as const) {
+    await chooseProgressOption(period, value);
     await expect(page.getByTestId("progress-primary-heading")).toHaveRole("heading", { level: 2 });
   }
 });
@@ -329,10 +335,15 @@ test("custom counter has no automatically detectable WCAG A/AA violations", asyn
 });
 
 test("Light Home keeps Qibla and Masbaha copy on the on-media palette", async ({ page }) => {
+  await page.setViewportSize({ width: 834, height: 1112 });
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-settings").click();
   await page.getByTestId("settings-sub-appearance").click();
   await page.getByTestId("theme-option-light").click();
+  await page
+    .getByRole("radiogroup", { name: "App appearance", exact: true })
+    .getByRole("radio", { name: "Glass", exact: true })
+    .click();
   await page.goto("/#/home");
 
   for (const testId of ["home-tool-qibla", "home-tool-masbaha"]) {

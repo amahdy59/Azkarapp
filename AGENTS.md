@@ -96,6 +96,11 @@ Do not claim complete accessibility compliance from automated tests alone.
 - Progress feedback should be encouraging, not punitive.
 - Use progressive disclosure for complex settings and secondary detail.
 - Maintain consistent component anatomy, spacing, radius, type, iconography, and states.
+- Purposeful animation and microinteractions are part of the default product experience. Welcome beautiful, functional motion that clarifies interaction, time, progress or state without slowing the app or disturbing devotional reading. Provide a calmer alternative through both the app's Reduce Motion setting and the OS preference. Functional data-driven updates may recur while useful and visible; pause hidden/offscreen work, keep geometry stable, and avoid gratuitous ambient loops. See `docs/MOTION_SYSTEM.md` and the owner decision dated 2026-10-20.
+
+### Overlay legibility and stacking rule
+
+Dropdowns, searchable pickers and contextual menus must use shared portalled primitives, viewport collision/height bounds and the protected `data-dropdown-surface` contract. Their functional text must fully obscure underlying text and actions in every color/material mode; ordinary translucent card fills or higher z-index alone are insufficient. Keep search fields separate from scrolling options, allow enlarged labels to reflow, and preserve keyboard focus/recovery. Layout/theme changes require geometry, hit-testing and opaque-surface regressions at 320px/200% text, phone, tablet and desktop in RTL/LTR, including Glass, solid and accessibility fallbacks. Axe alone cannot detect text bleeding or stacking failures.
 
 ## 8. Source and content integrity
 

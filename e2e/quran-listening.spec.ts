@@ -153,15 +153,21 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
             direction: getComputedStyle(region).direction,
             align: getComputedStyle(region).textAlign,
             leading: parseFloat(getComputedStyle(region).lineHeight) / fontSize,
-            verseGap:
-              (parseFloat(verse.marginBottom) + parseFloat(verse.paddingTop) + parseFloat(verse.paddingBottom)) /
-              fontSize,
+            gap: parseFloat(verse.marginBottom),
+            topPadding: parseFloat(verse.paddingTop),
+            bottomPadding: parseFloat(verse.paddingBottom),
+            leftPadding: parseFloat(verse.paddingLeft),
+            rightPadding: parseFloat(verse.paddingRight),
           };
         });
         expect(typography.direction).toBe("ltr");
         expect(typography.align).toBe("start");
         expect(typography.leading).toBeCloseTo(1.65, 5);
-        expect(typography.verseGap).toBeLessThanOrEqual(1);
+        expect(typography.gap).toBe(8);
+        expect(typography.topPadding).toBe(8);
+        expect(typography.bottomPadding - typography.topPadding).toBe(2);
+        expect(typography.leftPadding).toBe(14);
+        expect(typography.rightPadding).toBe(typography.leftPadding);
       } else {
         await expect(translation).toHaveCount(0);
       }
@@ -417,7 +423,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       await player.getByRole("button", { name: t(language, "audioPlayer.collapse"), exact: true }).click();
       await expect(player).toHaveAttribute("data-variant", "compact");
       await page.setViewportSize({ width: 1440, height: 1100 });
-      await page.getByTestId("reader-sidebar-close").click();
+      await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
       await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
       await expect
         .poll(() => player.locator(".audio-listening-page").evaluate((el) => el.clientHeight))

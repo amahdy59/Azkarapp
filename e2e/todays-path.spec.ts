@@ -34,28 +34,49 @@ test("the indicators open today's path", async ({ page }) => {
   const sheet = page.getByTestId("todays-path-sheet");
   await expect(sheet).toBeVisible();
 
-  // The three summaries follow the reviewed order and expose their state in
+  // The three summaries expose recorded facts and their state in
   // text rather than colour.
-  await expect(sheet.getByText("Prayer", { exact: true })).toBeVisible();
-  await expect(sheet.getByText("0 of 5 recorded · 0 in congregation", { exact: true })).toBeVisible();
+  await expect(sheet.getByText("Prayers in congregation", { exact: true })).toBeVisible();
+  await expect(sheet.getByText("0 of 5 at the mosque", { exact: true })).toBeVisible();
   await expect(sheet.getByText("Qur'an wird", { exact: true })).toBeVisible();
   await expect(sheet.getByText("Dhikr", { exact: true })).toBeVisible();
   await expect(sheet.getByText("0 of 3 complete")).toBeVisible();
 });
 
-test("the secondary congregation intention can be set from its disclosure", async ({ page }) => {
+test("a phone keeps the full date and opens palm and streak counts in today's path @cross-browser", async ({
+  page,
+}) => {
+  await openHome(page);
+  await page.setViewportSize({ width: 320, height: 740 });
+  const date = page.getByTestId("hijri-date");
+  await expect(date.locator("time")).toBeVisible();
+  expect(await date.evaluate((node) => node.querySelector("time")!.scrollWidth <= node.clientWidth + 1)).toBe(true);
+  const path = page.getByTestId("home-header-routine-summary-mobile");
+  await expect(path).toBeVisible();
+  await expect(path).toHaveAttribute("aria-label", /Today's path.*Enduring Palms.*Consecutive practice days/);
+  await expect(path.locator("svg")).toHaveCount(2);
+  await path.click();
+  const sheet = page.getByTestId("todays-path-sheet");
+  await expect(sheet).toBeVisible();
+  await expect(sheet).toContainText("Consecutive practice days:");
+  await expect(sheet).toContainText("Enduring Palms:");
+});
+
+test("the path automatically explains all reward tiers without configuration", async ({ page }, testInfo) => {
   await openHome(page);
   await page.getByTestId("home-header-routine-summary").click();
   const sheet = page.getByTestId("todays-path-sheet");
-
-  // The optional congregation intention is configured separately from the
-  // prayer record and stays out of the primary summary until requested.
-  await sheet.getByText("Adjust congregation intention", { exact: true }).click();
-
-  const three = sheet.getByTestId("mosque-goal-3");
-  await expect(three).toHaveAttribute("aria-checked", "false");
-  await three.click();
-  await expect(three).toHaveAttribute("aria-checked", "true");
+  await expect(sheet.getByRole("radio")).toHaveCount(0);
+  await expect(sheet.getByRole("checkbox")).toHaveCount(0);
+  await expect(sheet).toContainText("Updates automatically from your recorded practice");
+  await expect(sheet.locator("[data-reward-tier]")).toHaveCount(3);
+  await expect(sheet).toContainText("plus 3 prayers at the mosque");
+  await expect(sheet).toContainText("plus all 5 prayers at the mosque");
+  await page.screenshot({ path: testInfo.outputPath("automatic-path-desktop.png") });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(sheet).toBeVisible();
+  expect(await sheet.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("automatic-path-phone.png") });
 });
 
 test("the day's record is explained without loss or faith-scoring language", async ({ page }) => {

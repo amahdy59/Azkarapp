@@ -24,6 +24,9 @@ for (const scenario of [
     const paper = page.locator(".mushaf-paper");
     const line = paper.locator("[data-mushaf-line-content]").first();
     await expect(line).toBeVisible();
+    // A slow bundled QCF font can replace the temporary Unicode fallback.
+    // Compare zoom/reset within the same rendering mode, not across font faces.
+    await expect(paper.locator("[data-mushaf-rendering]").first()).toHaveAttribute("data-mushaf-rendering", "qcf-v2");
     await page.evaluate(async () => {
       const line = document.querySelector<HTMLElement>("[data-mushaf-line-content]")!;
       const style = getComputedStyle(line);

@@ -29,11 +29,17 @@ export interface SettingsScreenProps {
   textSize: TextSizeOption;
   showTranslation: boolean;
   showTransliteration: boolean;
+  readerToolLabels?: boolean;
+  onReaderToolLabelsChange?: (value: boolean) => void;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
   reduceTransparency: boolean;
   homeWirdImages?: boolean;
+  appMaterial?: "system" | "glass" | "solid";
+  onAppMaterialChange?: (value: "system" | "glass" | "solid") => void;
+  homeMaterial?: "inherit" | "system" | "glass" | "solid";
+  onHomeMaterialChange?: (value: "inherit" | "system" | "glass" | "solid") => void;
   onHomeWirdImagesChange?: (value: boolean) => void;
   hapticFeedback: boolean;
   forceRtl: boolean;

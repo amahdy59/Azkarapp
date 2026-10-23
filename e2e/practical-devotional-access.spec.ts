@@ -71,7 +71,7 @@ for (const language of ["ar", "en"] as const) {
           }
           const material = await card.evaluate((element) => {
             const style = getComputedStyle(element);
-            const reference = getComputedStyle(document.querySelector('[data-testid="home-tool-qibla"]')!);
+            const reference = getComputedStyle(document.querySelector('[data-testid="home-tool-masbaha"]')!);
             return {
               background: style.backgroundColor,
               blur: style.backdropFilter,

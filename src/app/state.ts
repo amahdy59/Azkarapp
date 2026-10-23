@@ -28,6 +28,7 @@ import {
   isProgressDayKey,
 } from "./progress";
 import { ALL_STATIC_ZIKR_IDS, CATEGORY_ZIKR_IDS } from "./content/azkarIds";
+import { normalizeZikrHistory, mergeZikrHistory } from "./zikrHistory";
 import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
@@ -133,7 +134,11 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     highContrast: false,
     boldText: false,
     reduceMotion: false,
+    readerToolLabels: true,
+    readerMeaningOnly: false,
     reduceTransparency: false,
+    appMaterial: "solid",
+    homeMaterial: "inherit",
     homeWirdImages: false,
     hapticFeedback: true,
     forceRtl: false,
@@ -173,12 +178,14 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   },
   completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
   sessions: [],
+  zikrHistory: [],
   dailyCompletions: [],
   prayerTracking: [],
   dailyHabits: [],
   savedZikrIds: [],
   khatmahPage: 1,
   mushafTheme: "follow-app",
+  mushafColorGestures: true,
   mushafLayout: "auto",
   mushafToolbarSide: "right",
   mushafTextScale: "medium",
@@ -283,14 +290,24 @@ function normalizeSurahReadingPages(value: unknown): Record<string, number> {
   ) as Record<string, number>;
 }
 
+/** Owner-approved compatibility for the former combined Three Quls item. */
+const RUQYAH_SURAH_IDS = ["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"] as const;
+const expandLegacyZikrId = (id: string): readonly string[] => (id === "ir-ref-5" ? RUQYAH_SURAH_IDS : [id]);
+
 /** Zikr id to in-progress partial tally, dropping anything that is not a positive integer. */
 function normalizePartialZikrCounts(value: unknown): Record<string, number> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  return Object.fromEntries(
+  const counts = Object.fromEntries(
     Object.entries(value).filter(
       ([zikrId, count]) => zikrId.length > 0 && Number.isInteger(count) && Number(count) >= 1 && Number(count) <= 10000,
     ),
   ) as Record<string, number>;
+  const legacy = counts["ir-ref-5"];
+  if (legacy !== undefined) {
+    delete counts["ir-ref-5"];
+    for (const id of RUQYAH_SURAH_IDS) counts[id] ??= legacy;
+  }
+  return counts;
 }
 
 /** Match completed-state rollover: situational collections remain resumable. */
@@ -555,6 +572,7 @@ function normalizeRoutineModes(value: unknown): AppStateSnapshot["settings"]["ro
 
 /** Pre-arrangement order used only to migrate legacy numeric completion indexes safely. */
 const LEGACY_ROUTINE_ORDER: Partial<Record<CategoryId, string[]>> = {
+  illness_ruqyah: ["ir-ref-1", "ir-ref-2", "ir-ref-3", "ir-ref-4", "ir-ref-5", "ir-ref-6", "ir-ref-7", "ir-baqarah"],
   morning: [
     "m-hm-75a",
     "m-hm-75",
@@ -744,6 +762,7 @@ function normalizeCompletedIds(values: unknown, category: CategoryId) {
               ? legacyZikrIds[Number(value)]
               : undefined,
         )
+        .flatMap((value) => (typeof value === "string" ? expandLegacyZikrId(value) : []))
         .filter(
           (value): value is string =>
             typeof value === "string" && (acceptsLazyIds ? isLazyZikrId(value) : validIds.has(value)),
@@ -759,17 +778,19 @@ function dedupeSavedZikrIds(values: unknown): string[] {
 
   return [
     ...new Set(
-      values.filter(
-        (value): value is string =>
-          typeof value === "string" && (ALL_STATIC_ZIKR_IDS.has(value) || isLazyZikrId(value)),
-      ),
+      values
+        .flatMap((value) => (typeof value === "string" ? expandLegacyZikrId(value) : []))
+        .filter(
+          (value): value is string =>
+            typeof value === "string" && (ALL_STATIC_ZIKR_IDS.has(value) || isLazyZikrId(value)),
+        ),
     ),
   ].sort();
 }
 
-function loadLegacySavedZikrIds() {
+function loadLegacySavedZikrIds(raw: string | null) {
   try {
-    return dedupeSavedZikrIds(JSON.parse(window.localStorage.getItem(LEGACY_SAVED_ZIKR_STORAGE_KEY) ?? "[]"));
+    return dedupeSavedZikrIds(JSON.parse(raw ?? "[]"));
   } catch {
     return [];
   }
@@ -902,10 +923,20 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
       reduceMotion:
         typeof settings?.reduceMotion === "boolean" ? settings.reduceMotion : DEFAULT_APP_STATE.settings.reduceMotion,
+      readerToolLabels: typeof settings?.readerToolLabels === "boolean" ? settings.readerToolLabels : true,
+      readerMeaningOnly: typeof settings?.readerMeaningOnly === "boolean" ? settings.readerMeaningOnly : false,
       homeWirdImages:
         typeof settings?.homeWirdImages === "boolean"
           ? settings.homeWirdImages
           : DEFAULT_APP_STATE.settings.homeWirdImages,
+      appMaterial:
+        settings?.appMaterial === "glass" || settings?.appMaterial === "system" ? settings.appMaterial : "solid",
+      homeMaterial:
+        settings?.homeMaterial === "inherit" || settings?.homeMaterial === "glass" || settings?.homeMaterial === "solid"
+          ? settings.homeMaterial
+          : value && typeof value === "object"
+            ? "system"
+            : DEFAULT_APP_STATE.settings.homeMaterial,
       reduceTransparency:
         typeof settings?.reduceTransparency === "boolean"
           ? settings.reduceTransparency
@@ -971,6 +1002,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     },
     completed,
     sessions,
+    zikrHistory: normalizeZikrHistory(parsed.zikrHistory),
     dailyCompletions,
     prayerTracking,
     dailyHabits: normalizeDailyHabits(parsed.dailyHabits),
@@ -982,6 +1014,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         ? Math.floor(parsed.khatmahPage)
         : 1,
     mushafTheme: normalizeMushafTheme(parsed.mushafTheme),
+    mushafColorGestures: parsed.mushafColorGestures !== false,
     mushafLayout: parsed.mushafLayout === "single" || parsed.mushafLayout === "spread" ? parsed.mushafLayout : "auto",
     mushafToolbarSide: parsed.mushafToolbarSide === "left" ? "left" : "right",
     mushafTextScale: normalizeMushafTextScale(parsed.mushafTextScale),
@@ -1031,21 +1064,57 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
  *
  * @returns {AppStateSnapshot} The merged application state.
  */
+interface AppStateReadCache {
+  raw?: string | null;
+  legacy?: string | null;
+  dayKey?: string;
+  snapshot?: AppStateSnapshot;
+}
+
+/** Boot-owned reuse, invalidated by exact storage bytes and devotional rollover.
+ * This also catches another tab writing while the lazy application code loads. */
+export function createAppStateReader() {
+  const cache: AppStateReadCache = {};
+  return () => readAppState(cache);
+}
+
 export function loadAppState(): AppStateSnapshot {
+  return readAppState();
+}
+
+function readAppState(cache?: AppStateReadCache): AppStateSnapshot {
   if (typeof window === "undefined") {
     return DEFAULT_APP_STATE;
   }
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return {
-        ...DEFAULT_APP_STATE,
-        savedZikrIds: loadLegacySavedZikrIds(),
-      };
+    let legacy: string | null = null;
+    try {
+      legacy = window.localStorage.getItem(LEGACY_SAVED_ZIKR_STORAGE_KEY);
+    } catch {
+      // An unavailable legacy namespace must not hide the primary snapshot.
     }
-
-    return normalizeAppState(JSON.parse(raw), loadLegacySavedZikrIds());
+    if (
+      cache?.snapshot &&
+      cache.raw === raw &&
+      cache.legacy === legacy &&
+      cache.dayKey === getProgressDayKey(new Date(), cache.snapshot.settings.progressDayStartHour)
+    )
+      return cache.snapshot;
+    const snapshot = !raw
+      ? {
+          ...DEFAULT_APP_STATE,
+          savedZikrIds: loadLegacySavedZikrIds(legacy),
+        }
+      : normalizeAppState(JSON.parse(raw), loadLegacySavedZikrIds(legacy));
+    if (cache) {
+      cache.raw = raw;
+      cache.legacy = legacy;
+      cache.snapshot = snapshot;
+      cache.dayKey = getProgressDayKey(new Date(), snapshot.settings.progressDayStartHour);
+    }
+    return snapshot;
   } catch {
     return DEFAULT_APP_STATE;
   }
@@ -1071,10 +1140,50 @@ export function saveAppState(state: AppStateSnapshot): boolean {
   }
 }
 
-/** Resets preferences while preserving progress, sessions, saved items, and account metadata. */
-export function resetStoredSettings() {
+/** Mount-owned fast path for immutable application snapshots. External/imported
+ * values still use saveAppState's full normalization. One serialized base is
+ * retained; count changes never defer the actual durable single-key write. */
+export function createAppStateWriter() {
+  let previous: AppStateSnapshot | undefined;
+  let previousDay = "";
+  let baseJson = "";
+  const isBaseKey = (key: string) =>
+    key !== "partialZikrCounts" && key !== "masbahaState" && key !== "lastActiveDayKey";
+  return (snapshot: AppStateSnapshot): boolean => {
+    if (typeof window === "undefined") return false;
+    try {
+      const dayKey = getProgressDayKey(new Date(), snapshot.settings.progressDayStartHour);
+      const keys = Object.keys(snapshot).filter(isBaseKey) as (keyof AppStateSnapshot)[];
+      if (
+        !previous ||
+        previousDay !== dayKey ||
+        Object.keys(previous).filter(isBaseKey).length !== keys.length ||
+        keys.some((key) => previous![key] !== snapshot[key])
+      ) {
+        const normalized = normalizeAppState({ ...snapshot, lastActiveDayKey: dayKey });
+        baseJson = JSON.stringify({ ...normalized, partialZikrCounts: undefined, masbahaState: undefined }).slice(
+          0,
+          -1,
+        );
+        previous = { ...snapshot };
+        previousDay = dayKey;
+      }
+      const counters = JSON.stringify({
+        partialZikrCounts: normalizePartialZikrCounts(snapshot.partialZikrCounts),
+        masbahaState: normalizeMasbahaState(snapshot.masbahaState),
+      });
+      window.localStorage.setItem(STORAGE_KEY, `${baseJson},${counters.slice(1)}`);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+}
+
+/** Never discard the only saved snapshot when recovery cannot be committed. */
+export function resetStoredSettings(): boolean {
   if (typeof window === "undefined") {
-    return;
+    return false;
   }
 
   try {
@@ -1086,12 +1195,9 @@ export function resetStoredSettings() {
         settings: DEFAULT_APP_STATE.settings,
       }),
     );
+    return true;
   } catch {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // The recovery screen can still reload with in-memory defaults.
-    }
+    return false;
   }
 }
 
@@ -1264,10 +1370,29 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         typeof incoming.settings?.reduceMotion === "boolean"
           ? incoming.settings.reduceMotion
           : safeBase.settings.reduceMotion,
+      // A foreign snapshot must not change this device's reading-language choice.
+      readerMeaningOnly: safeBase.settings.readerMeaningOnly,
+      readerToolLabels:
+        typeof incoming.settings?.readerToolLabels === "boolean"
+          ? incoming.settings.readerToolLabels
+          : safeBase.settings.readerToolLabels,
       homeWirdImages:
         typeof incoming.settings?.homeWirdImages === "boolean"
           ? incoming.settings.homeWirdImages
           : safeBase.settings.homeWirdImages,
+      appMaterial:
+        incoming.settings?.appMaterial === "glass" ||
+        incoming.settings?.appMaterial === "solid" ||
+        incoming.settings?.appMaterial === "system"
+          ? incoming.settings.appMaterial
+          : safeBase.settings.appMaterial,
+      homeMaterial:
+        incoming.settings?.homeMaterial === "inherit" ||
+        incoming.settings?.homeMaterial === "glass" ||
+        incoming.settings?.homeMaterial === "solid" ||
+        incoming.settings?.homeMaterial === "system"
+          ? incoming.settings.homeMaterial
+          : safeBase.settings.homeMaterial,
       reduceTransparency:
         typeof incoming.settings?.reduceTransparency === "boolean"
           ? incoming.settings.reduceTransparency
@@ -1326,6 +1451,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     },
     completed,
     sessions: newestSessions([...sessions.values()]),
+    zikrHistory: mergeZikrHistory(safeBase.zikrHistory, incoming.zikrHistory),
     dailyCompletions: mergeDailyCompletions(
       safeBase.dailyCompletions,
       Array.isArray(incoming.dailyCompletions)
@@ -1348,6 +1474,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
     khatmahPage: incoming.khatmahPage ?? safeBase.khatmahPage ?? 1,
     mushafTheme: normalizeMushafTheme(incoming.mushafTheme ?? safeBase.mushafTheme),
+    mushafColorGestures: safeBase.mushafColorGestures ?? true,
     mushafLayout:
       incoming.mushafLayout === "single" || incoming.mushafLayout === "spread"
         ? incoming.mushafLayout
@@ -1405,6 +1532,7 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     profile: { ...DEFAULT_APP_STATE.profile },
     completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
     sessions: [],
+    zikrHistory: [],
     dailyCompletions: [],
     prayerTracking: [],
     dailyHabits: [],

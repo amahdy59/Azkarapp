@@ -1,4 +1,4 @@
-export type AzkarBackgroundKey = "morning" | "evening" | "sleep" | "friday" | "prayer";
+export type AzkarBackgroundKey = "morning" | "evening" | "sleep" | "friday_morning" | "friday" | "prayer";
 
 export interface ResponsiveBackgroundAsset {
   alt: "";
@@ -15,8 +15,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
   morning: {
     alt: "",
     decorative: true,
-    objectPositionCompact: "28% 72%",
-    objectPositionWide: "40% 70%",
+    objectPositionCompact: "50% 72%",
+    objectPositionWide: "50% 70%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -51,8 +51,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
   evening: {
     alt: "",
     decorative: true,
-    objectPositionCompact: "72% 74%",
-    objectPositionWide: "58% 72%",
+    objectPositionCompact: "50% 74%",
+    objectPositionWide: "50% 72%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -87,8 +87,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
   sleep: {
     alt: "",
     decorative: true,
-    objectPositionCompact: "25% 74%",
-    objectPositionWide: "42% 72%",
+    objectPositionCompact: "50% 74%",
+    objectPositionWide: "50% 72%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -120,11 +120,29 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
     ],
     placeholder: "/assets/backgrounds/sleep/sleep-placeholder.webp",
   },
+  friday_morning: {
+    alt: "",
+    decorative: true,
+    objectPositionCompact: "50% 65%",
+    objectPositionWide: "50% 60%",
+    sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
+    avif: [
+      { src: "/assets/backgrounds/friday-morning/friday-morning-768.avif", width: 768 },
+      { src: "/assets/backgrounds/friday-morning/friday-morning-1280.avif", width: 1280 },
+      { src: "/assets/backgrounds/friday-morning/friday-morning-1600.avif", width: 1600 },
+    ],
+    webp: [
+      { src: "/assets/backgrounds/friday-morning/friday-morning-768.webp", width: 768 },
+      { src: "/assets/backgrounds/friday-morning/friday-morning-1280.webp", width: 1280 },
+      { src: "/assets/backgrounds/friday-morning/friday-morning-1600.webp", width: 1600 },
+    ],
+    placeholder: "/assets/backgrounds/friday-morning/friday-morning-placeholder.webp",
+  },
   friday: {
     alt: "",
     decorative: true,
-    objectPositionCompact: "22% 60%",
-    objectPositionWide: "42% 60%",
+    objectPositionCompact: "50% 60%",
+    objectPositionWide: "50% 60%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -160,8 +178,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
     alt: "",
     decorative: true,
     // Slightly higher crop than evening to show more sky — peaceful post-prayer feel
-    objectPositionCompact: "72% 74%",
-    objectPositionWide: "58% 72%",
+    objectPositionCompact: "50% 74%",
+    objectPositionWide: "50% 72%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -196,7 +214,28 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
 } as const;
 
 export function toSrcSet(items: readonly { src: string; width: number }[]): string {
+  return items.map(({ src, width }) => `${backgroundAssetUrl(src)} ${width}w`).join(", ");
+}
+
+export function backgroundAssetUrl(path: string): string {
+  if (usesHostedHomeArtwork()) {
+    return `https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/visuals/home/2026-10-16${path}`;
+  }
   const base = import.meta.env.BASE_URL || "/";
   const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
-  return items.map(({ src, width }) => `${cleanBase}${src} ${width}w`).join(", ");
+  return `${cleanBase}${path}`;
+}
+
+/** Versioned Home artwork; native/local builds retain packaged offline assets. */
+export function homeArtworkUrl(path: string): string {
+  return usesHostedHomeArtwork()
+    ? `https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/visuals/home/2026-10-16-cards/${path}`
+    : `${import.meta.env.BASE_URL}${path}`;
+}
+
+function usesHostedHomeArtwork(): boolean {
+  return (
+    import.meta.env.MODE === "github-pages" ||
+    (import.meta.env.MODE === "production" && typeof location !== "undefined" && location.protocol === "https:")
+  );
 }

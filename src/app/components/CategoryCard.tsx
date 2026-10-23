@@ -78,14 +78,19 @@ export function CategoryCard({
                   across the separator: "٢٥ ذكرًا · ٠ من ٢٥" rendered as
                   "٢٥٠ ذكرًا ٢٥٠", which reads as a wrong total. <bdi> is
                   exactly the element for this. */}
+              {/* Resolve the token on each bidi boundary: WebKit can retain an
+                  inherited dark colour when the mounted library changes theme. */}
               <span>
                 {routineSummary ? (
                   <>
-                    <bdi>{routineSummary}</bdi>
-                    <span aria-hidden="true"> · </span>
+                    <bdi className="text-muted-foreground">{routineSummary}</bdi>
+                    <span className="text-muted-foreground" aria-hidden="true">
+                      {" "}
+                      ·{" "}
+                    </span>
                   </>
                 ) : null}
-                <bdi>{progressText}</bdi>
+                <bdi className="text-muted-foreground">{progressText}</bdi>
               </span>
             </span>
           </div>
@@ -102,6 +107,7 @@ export function CategoryCard({
     };
     return (
       <a
+        data-material-card
         href={href}
         data-testid={`category-card-${id}`}
         dir={direction}
@@ -117,6 +123,7 @@ export function CategoryCard({
 
   return (
     <button
+      data-material-card
       type="button"
       data-testid={`category-card-${id}`}
       dir={direction}

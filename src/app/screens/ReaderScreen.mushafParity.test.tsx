@@ -343,7 +343,7 @@ describe("the phone layout integrates controls directly into the Mushaf canvas",
 
     const closeSvg = closeBtn.querySelector("svg");
     expect(closeSvg).toBeInTheDocument();
-    expect(closeSvg).toHaveAttribute("data-rtl-flip", "");
+    expect(closeSvg).not.toHaveAttribute("data-rtl-flip", "");
 
     // In RTL, Back button sits at top-right (leading) and More options sits at top-left (trailing)
     expect(closeBtn.closest("[data-testid='mushaf-corner-top-right']")).not.toBeNull();

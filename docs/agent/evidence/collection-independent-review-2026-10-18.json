@@ -1,0 +1,310 @@
+{
+  "reviewedOn": "2026-10-18",
+  "method": "Fresh source comparison against original collection entries and effective content/translation overrides, independently of the Home substitute mappings. This is a coding-agent audit, not independent scholarly approval. Owner follow-up explicitly requests Dorar verification and preserving on-card source attribution; this follow-up supersedes initial broad unresolved classifications.",
+  "contentExpansion": "No blanket hold for documented grading disagreements. The comparison covers all 20; fix the eight identified source/wording/attribution mismatches before treating those entries as corrected. No new devotional content was requested or added.",
+  "counts": {
+    "reviewed": 20,
+    "sourceAttributionsSupported": 12,
+    "specificContentCorrections": 8
+  },
+  "snapshots": [
+    {
+      "file": "src/app/content/azkar.ts",
+      "sha256": "93ad65116de5fe44b422c3f68fd622c59c00098ef81e7c42f7c1af894933c384"
+    },
+    {
+      "file": "src/app/content/contentReview.ts",
+      "sha256": "c557ff710cae3b05ba17c8f68c0cc758041508f6bf7c966d0d7755bab59a1e31"
+    },
+    {
+      "file": "src/app/content/localizedZikr.ts",
+      "sha256": "52980703456b2d2159e5771329cd1b63facaea202e703095b50dd8be400ddd4b"
+    }
+  ],
+  "entries": [
+    {
+      "id": "m-hm-75",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:75", "https://dorar.net/h/UA2ZPwXk"],
+      "wording": "Quran 2:255 matches the canonical passage; translation is the existing reviewed Quran meaning.",
+      "context": "Hisn includes morning/evening protection. Dorar records al-Albani rejecting this addition in al-Silsilah al-Sahihah 7/743. Earlier blanket authentication is insufficient.",
+      "count": "One recitation; no added repetition claim.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/aNzgr7xS",
+        "attributedGrade": "Al-Albani, Sahih al-Targhib 662; al-Hakim, Mustadrak 2091",
+        "finding": "The original named authentication exists in Sahih al-Targhib 662. Dorar also records a later rejection of the timing addition in Silsilah 7/743. Preserve the edition-specific attribution; disagreement alone is not an error."
+      }
+    },
+    {
+      "id": "m-hm-80m",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:80", "https://sunnah.com/abudawud:5069"],
+      "wording": "Witness declaration and translated meaning match, with the appropriate morning/evening opening.",
+      "context": "Morning/evening and freedom-from-Fire claim appear in the reports. Hisn attributes Hasan to Ibn Baz; Abu Dawud page attributes Daif to al-Albani.",
+      "count": "Four matches the cited report.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/0ZB6bElM",
+        "attributedGrade": "Ibn Baz, Majmu Fatawa 26/29: Hasan chain",
+        "finding": "Exact morning/evening declaration, four repetitions and reported reward have the named Ibn Baz grading. Preserve it; al-Albani grading another route does not invalidate the citation."
+      }
+    },
+    {
+      "id": "m-hm-81m",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:81", "https://sunnah.com/abudawud:5073"],
+      "wording": "Blessings and gratitude declaration matches, including the evening variant in Hisn.",
+      "context": "Day/night gratitude appears in the report. Hisn cites Ibn Baz Hasan; Abu Dawud page records al-Albani Daif.",
+      "count": "One; no unsupported multiplier.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/l6vOujM8",
+        "attributedGrade": "Ibn Baz, Majmu Fatawa 26/30: Hasan chain",
+        "finding": "Exact blessing declaration and day/night gratitude have the named Ibn Baz grading. Preserve the existing attribution."
+      }
+    },
+    {
+      "id": "m-hm-87",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:87", "https://sunnah.com/tirmidhi:3389", "https://sunnah.com/abudawud:5072"],
+      "wording": "Contentment declaration matches Hisn, including Prophet wording. Tirmidhi is a related route, not complete evidence for all variants.",
+      "context": "Hisn explicitly supports morning/evening and cites Ibn Baz Hasan. Tirmidhi 3389 concerns evening; Abu Dawud 5072 is graded Daif by al-Albani.",
+      "count": "Three is explicit in Hisn, absent from the two numbered routes checked.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/YxwUoX1J",
+        "attributedGrade": "Ibn Baz, Majmu Fatawa 26/28: Hasan chain",
+        "finding": "The full morning/evening three-repeat report exists on Dorar, with the named Hasan chain. No missing-timing objection remains under this attribution."
+      }
+    },
+    {
+      "id": "m-hm-89m",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/abudawud:5084"],
+      "wording": "Recited dua matches Abu Malik/Abu Dawud 5084, but the attached expanded narration is the different Ibn Masud/Muslim 2723 report.",
+      "context": "Morning/evening practice has a recorded Hasan grading. Attached narration mismatch is independent of grading.",
+      "count": "One; no additional count prescribed on this route.",
+      "decision": "The recited day/night dua matches Abu Dawud 5084 and has favourable grading. HOWEVER the original expanded Arabic/English narration quotes Ibn Masud/Muslim 2723 instead of this Abu Malik report. Correct the attached narration in a separately reviewed content change; grading disagreement is not the blocker.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/dGFR5byf",
+        "attributedGrade": "Shuayb al-Arnaut, Takhrij Zad al-Maad 2/340: Hasan chain",
+        "finding": "The recited day/night dua matches Abu Dawud 5084 and has favourable grading. HOWEVER the original expanded Arabic/English narration quotes Ibn Masud/Muslim 2723 instead of this Abu Malik report. Correct the attached narration in a separately reviewed content change; grading disagreement is not the blocker."
+      }
+    },
+    {
+      "id": "e-hm-75",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:75", "https://dorar.net/h/UA2ZPwXk"],
+      "wording": "Quran 2:255 matches the canonical passage; translation is the existing reviewed Quran meaning.",
+      "context": "Hisn includes morning/evening protection. Dorar records al-Albani rejecting this addition in al-Silsilah al-Sahihah 7/743. Earlier blanket authentication is insufficient.",
+      "count": "One recitation; no added repetition claim.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/aNzgr7xS",
+        "attributedGrade": "Al-Albani, Sahih al-Targhib 662; al-Hakim, Mustadrak 2091",
+        "finding": "The original named authentication exists in Sahih al-Targhib 662. Dorar also records a later rejection of the timing addition in Silsilah 7/743. Preserve the edition-specific attribution; disagreement alone is not an error."
+      }
+    },
+    {
+      "id": "e-hm-80e",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:80", "https://sunnah.com/abudawud:5069"],
+      "wording": "Witness declaration and translated meaning match, with the appropriate morning/evening opening.",
+      "context": "Morning/evening and freedom-from-Fire claim appear in the reports. Hisn attributes Hasan to Ibn Baz; Abu Dawud page attributes Daif to al-Albani.",
+      "count": "Four matches the cited report.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/0ZB6bElM",
+        "attributedGrade": "Ibn Baz, Majmu Fatawa 26/29: Hasan chain",
+        "finding": "Exact morning/evening declaration, four repetitions and reported reward have the named Ibn Baz grading. Preserve it; al-Albani grading another route does not invalidate the citation."
+      }
+    },
+    {
+      "id": "e-hm-81e",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:81", "https://sunnah.com/abudawud:5073"],
+      "wording": "Blessings and gratitude declaration matches, including the evening variant in Hisn.",
+      "context": "Day/night gratitude appears in the report. Hisn cites Ibn Baz Hasan; Abu Dawud page records al-Albani Daif.",
+      "count": "One; no unsupported multiplier.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/l6vOujM8",
+        "attributedGrade": "Ibn Baz, Majmu Fatawa 26/30: Hasan chain",
+        "finding": "Exact blessing declaration and day/night gratitude have the named Ibn Baz grading. Preserve the existing attribution."
+      }
+    },
+    {
+      "id": "e-hm-87",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/hisn:87", "https://sunnah.com/tirmidhi:3389", "https://sunnah.com/abudawud:5072"],
+      "wording": "Contentment declaration matches Hisn, including Prophet wording. Tirmidhi is a related route, not complete evidence for all variants.",
+      "context": "Hisn explicitly supports morning/evening and cites Ibn Baz Hasan. Tirmidhi 3389 concerns evening; Abu Dawud 5072 is graded Daif by al-Albani.",
+      "count": "Three is explicit in Hisn, absent from the two numbered routes checked.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/YxwUoX1J",
+        "attributedGrade": "Ibn Baz, Majmu Fatawa 26/28: Hasan chain",
+        "finding": "The full morning/evening three-repeat report exists on Dorar, with the named Hasan chain. No missing-timing objection remains under this attribution."
+      }
+    },
+    {
+      "id": "e-hm-89e",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/abudawud:5084"],
+      "wording": "Recited dua matches Abu Malik/Abu Dawud 5084, but the attached expanded narration is the different Ibn Masud/Muslim 2723 report.",
+      "context": "Morning/evening practice has a recorded Hasan grading. Attached narration mismatch is independent of grading.",
+      "count": "One; no additional count prescribed on this route.",
+      "decision": "The recited day/night dua matches Abu Dawud 5084 and has favourable grading. HOWEVER the original expanded Arabic/English narration quotes Ibn Masud/Muslim 2723 instead of this Abu Malik report. Correct the attached narration in a separately reviewed content change; grading disagreement is not the blocker.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/dGFR5byf",
+        "attributedGrade": "Shuayb al-Arnaut, Takhrij Zad al-Maad 2/340: Hasan chain",
+        "finding": "The recited day/night dua matches Abu Dawud 5084 and has favourable grading. HOWEVER the original expanded Arabic/English narration quotes Ibn Masud/Muslim 2723 instead of this Abu Malik report. Correct the attached narration in a separately reviewed content change; grading disagreement is not the blocker."
+      }
+    },
+    {
+      "id": "s-hm-110a",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/tirmidhi:2892"],
+      "wording": "The displayed chapter is canonical Quran; the bedtime hadith is a separate claim, not proof of the Quran wording.",
+      "context": "Report mentions As-Sajdah and Al-Mulk before sleep. Darussalam grades this route Daif; local Arabic benefit already acknowledges disagreement, while the original authenticity says Sahih by al-Albani.",
+      "count": "One chapter reading; no multiplier on this route.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/JD4cuhNa",
+        "attributedGrade": "Al-Albani, Sahih al-Jami 4873: Sahih",
+        "finding": "The named Sahih grade for both bedtime chapters is recorded. The effective existing English/Arabic benefit already acknowledges grading disagreement. No new blanket hold."
+      }
+    },
+    {
+      "id": "pur-ref-2",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/ibnmajah:299", "https://dorar.net/h/MN63NdvH", "https://dorar.net/h/1FhXDXM0"],
+      "wording": "Original dua is found under Nasai al-Kubra 9828 in Dorar, not Ibn Majah 299, which contains a different toilet-entry supplication.",
+      "context": "Narration variants place it around ablution/prayer. Ibn Hajar questions Abu Mijlaz hearing Abu Musa; Ibn Baz questions the chain.",
+      "count": "One UI repetition; source does not prescribe a numerical ritual.",
+      "decision": "Matching ablution dua has favourable grading in Dorar; Ibn Hajar/Ibn Baz record chain concerns. The card citation Ibn Majah 299 is definitely a different supplication, and the original al-Albani attribution still needs the exact source. This is a citation/attribution correction, not rejection of every favourable grade.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/mnAZbPXY",
+        "attributedGrade": "Al-Nawawi, al-Adhkar 44: Sahih chain",
+        "finding": "Matching ablution dua has favourable grading in Dorar; Ibn Hajar/Ibn Baz record chain concerns. The card citation Ibn Majah 299 is definitely a different supplication, and the original al-Albani attribution still needs the exact source. This is a citation/attribution correction, not rejection of every favourable grade."
+      }
+    },
+    {
+      "id": "pur-ref-6",
+      "status": "source-attribution-supported",
+      "urls": [
+        "https://sunnah.com/hisn:15",
+        "https://sunnah.com/hisn:10",
+        "https://dorar.net/index.php/azkar/mukhtasar/227"
+      ],
+      "wording": "Dua and translated meaning match Hisn 15. Number 10 on this site denotes bathroom entry, so edition numbers cannot be silently equated.",
+      "context": "Dorar supports a companion report after ablution and records Nasai preferring mawquf. Existing local hadith presents a Prophetic report.",
+      "count": "One; no additional count claim.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/GSmBE41m",
+        "attributedGrade": "Al-Albani, Sahih al-Jami 6170: Sahih",
+        "finding": "Dorar records the original Prophetic post-ablution wording with the named Sahih grade. Its thematic collection prefers mawquf and explains the disagreement. Preserve the attributed view. Hisn 10 is edition-dependent; Sunnah.com places this dua at 15."
+      }
+    },
+    {
+      "id": "fd-ref-3",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/abudawud:3850"],
+      "wording": "Food/drink/Muslim praise and translated meaning match.",
+      "context": "After eating matches. Al-Albani grades the linked route Daif, conflicting with local blanket Hasan attribution.",
+      "count": "One; no source multiplier.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/BfGkuO8T",
+        "attributedGrade": "Ibn Hajar, al-Futuhat al-Rabbaniyyah 5/229: Hasan",
+        "finding": "The exact after-food wording has a recorded Hasan view. The original Abu Dawud/Tirmidhi citations are relevant; it must not be labelled simply unsupported because another scholar weakens a route."
+      }
+    },
+    {
+      "id": "fd-ref-5",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/tirmidhi:3455", "https://sunnah.com/abudawud:3730"],
+      "wording": "Food blessing and translated meaning match both reports; milk has a distinct ending and must not replace this wording.",
+      "context": "Food context matches. Tirmidhi calls the report Hasan; Darussalam grades that route Daif; Abu Dawud parallel is Hasan by al-Albani, not the local blanket Sahih.",
+      "count": "One; no multiplier.",
+      "decision": "Exact food dua and context supported; Dorar records Hasan (and Hasan li-ghayrihi in Hidayat al-Ruwat 4213), rather than the card original Sahih claim. Correct the strength attribution and add the precise parallel citation, without changing the dua.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/31vfOGXC",
+        "attributedGrade": "Al-Albani, al-Taliqat al-Radiyyah 3/83: Hasan",
+        "finding": "Exact food dua and context supported; Dorar records Hasan (and Hasan li-ghayrihi in Hidayat al-Ruwat 4213), rather than the card original Sahih claim. Correct the strength attribution and add the precise parallel citation, without changing the dua."
+      }
+    },
+    {
+      "id": "clo-ref-1",
+      "status": "source-attribution-supported",
+      "urls": ["https://sunnah.com/abudawud:4023"],
+      "wording": "Garment praise and translated meaning match the original citation; Abu Dawud 4020 is a different new-garment dua.",
+      "context": "Clothing context matches. Al-Albani accepts Hasan excluding the later-sins addition; the local quotation promises past sins only.",
+      "count": "One; no additional multiplier.",
+      "decision": "Retain the existing source-attributed entry; document disagreement without a new blanket hold.",
+      "dorarFollowUp": {
+        "url": "https://sunnah.com/abudawud:4023",
+        "attributedGrade": "Al-Albani: Hasan excluding the later-sins addition",
+        "finding": "Original 4023 citation matches garment praise and past-sins wording. Home alternative 4020 is a different dua."
+      }
+    },
+    {
+      "id": "clo-ref-4",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/ibnmajah:297"],
+      "wording": "Bismillah matches; translation is the standard existing rendering.",
+      "context": "This route concerns entry to the toilet, not generic undressing. It is graded Daif by Darussalam; a separate route is required for the displayed broader context.",
+      "count": "One; no multiplier.",
+      "decision": "Exact undressing wording and benefit have Sahih grading via Anas. Original card attaches Ali/Ibn Majah 297 toilet-entry route instead. Fix narrator/source pairing in a reviewed content change; the wording itself has supporting evidence.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/sXsxl5OW",
+        "attributedGrade": "Al-Albani, Sahih al-Jami 3610: Sahih",
+        "finding": "Exact undressing wording and benefit have Sahih grading via Anas. Original card attaches Ali/Ibn Majah 297 toilet-entry route instead. Fix narrator/source pairing in a reviewed content change; the wording itself has supporting evidence."
+      }
+    },
+    {
+      "id": "sc-ref-13",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/tirmidhi:3431"],
+      "wording": "Affliction praise and translated meaning match the report.",
+      "context": "Report contains lifetime protection; Darussalam grades this route Daif. Quiet recitation occurs in Tirmidhi commentary as a separate attributed instruction, not the quoted Prophetic sentence.",
+      "count": "One; no multiplier.",
+      "decision": "Dorar supports the dua/protection through Abu Hurayrah/Tirmidhi 3432. Original card quotes Ibn Umar and 3431 with lifetime wording. These related routes must not be conflated; source wording/attribution needs precise reconciliation.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/YCIpXXvA",
+        "attributedGrade": "Al-Albani, al-Kalim al-Tayyib 229: Hasan",
+        "finding": "Dorar supports the dua/protection through Abu Hurayrah/Tirmidhi 3432. Original card quotes Ibn Umar and 3431 with lifetime wording. These related routes must not be conflated; source wording/attribution needs precise reconciliation."
+      }
+    },
+    {
+      "id": "ne-ref-5",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/tirmidhi:3451"],
+      "wording": "Existing opening uses security; this numbered route uses blessing. Meaning is related but not a word-for-word match.",
+      "context": "Crescent context matches. Tirmidhi says Hasan Gharib, while Darussalam says Daif.",
+      "count": "One; no multiplier.",
+      "decision": "Security/faith opening occurs in an Ibn Umar version with additional wording. Talhah/Tirmidhi 3451 uses blessing/faith, graded Hasan Gharib by Tirmidhi. Original mixes the wording and narrator/reference. Keep both views distinguished before correcting.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/XmOVhE7Z",
+        "attributedGrade": "Al-Albani, al-Kalim al-Tayyib 162: Sahih bi-shawahid",
+        "finding": "Security/faith opening occurs in an Ibn Umar version with additional wording. Talhah/Tirmidhi 3451 uses blessing/faith, graded Hasan Gharib by Tirmidhi. Original mixes the wording and narrator/reference. Keep both views distinguished before correcting."
+      }
+    },
+    {
+      "id": "misc-ref-11",
+      "status": "specific-content-correction",
+      "urls": ["https://sunnah.com/tirmidhi:3428"],
+      "wording": "Marketplace declaration and translated meaning match the report.",
+      "context": "Marketplace and millionfold reward are in the route; Darussalam grades it Daif, conflicting with the local attributed Hasan.",
+      "count": "One; the numerical reward is a separate disputed claim.",
+      "decision": "Dorar records the extended marketplace declaration and millionfold reward as Hasan via Ibn Umar; the card quotes Umar/Tirmidhi 3428. Favourable grading exists; reconcile the exact narrator/route rather than substitute generic remembrance.",
+      "dorarFollowUp": {
+        "url": "https://dorar.net/h/kqnagYqj",
+        "attributedGrade": "Al-Albani, Sahih al-Jami 6231: Hasan",
+        "finding": "Dorar records the extended marketplace declaration and millionfold reward as Hasan via Ibn Umar; the card quotes Umar/Tirmidhi 3428. Favourable grading exists; reconcile the exact narrator/route rather than substitute generic remembrance."
+      }
+    }
+  ]
+}

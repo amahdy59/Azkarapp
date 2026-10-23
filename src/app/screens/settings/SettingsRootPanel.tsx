@@ -1,3 +1,4 @@
+import { useScrollElevation } from "../../hooks/useScrollElevation";
 import { displayLocationName } from "../../content/prayerLocations";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
@@ -399,10 +400,15 @@ export function SettingsRootPanel({
       )
     : [];
 
+  const hasScrolled = useScrollElevation(panelRef);
+
   return (
-    <div ref={panelRef} className="settings-root-panel flex-1 overflow-y-auto pb-8" dir={direction}>
-      {/* ── Client-side Instant Search Bar ── */}
-      <div className="px-[var(--settings-gutter,1rem)] pt-3 pb-1">
+    <div className="flex flex-1 flex-col min-h-0 overflow-hidden" dir={direction}>
+      {/* ── Client-side Instant Search Bar Pinned at Top (sticky with Header) ── */}
+      <div
+        data-scrolled={hasScrolled || undefined}
+        className="settings-search-sticky shrink-0 border-b border-border/40 px-[var(--settings-gutter,1rem)] pt-1 pb-3 transition-colors duration-standard"
+      >
         <div className="relative">
           <label htmlFor="settings-search-input" className="sr-only">
             {t(language, "settings.searchPlaceholder")}
@@ -440,66 +446,69 @@ export function SettingsRootPanel({
         </div>
       </div>
 
-      {trimmedQuery ? (
-        /* ── Search Results ── */
-        <div className="mt-3">
-          {filteredItems.length > 0 ? (
-            <SettingsSection label={t(language, "common.searchResults")}>
-              {filteredItems.map((item, idx) => (
+      {/* ── Scrollable Settings Rows ── */}
+      <div ref={panelRef} data-header-scroll-owner className="settings-root-panel flex-1 overflow-y-auto pb-8 pt-3">
+        {trimmedQuery ? (
+          /* ── Search Results ── */
+          <div className="mt-3">
+            {filteredItems.length > 0 ? (
+              <SettingsSection label={t(language, "common.searchResults")}>
+                {filteredItems.map((item, idx) => (
+                  <SettingsRowItem
+                    key={item.id}
+                    iconBg={iconBackground}
+                    icon={item.icon}
+                    label={item.title}
+                    right={<RowChevron />}
+                    onPress={() => onNav(item.id)}
+                    hasDivider={idx < filteredItems.length - 1}
+                    {...itemProps(item.id)}
+                  />
+                ))}
+              </SettingsSection>
+            ) : (
+              <div className="mx-[var(--settings-gutter,1rem)] mt-6 rounded-2xl border border-border/50 bg-card p-6 text-center shadow-xs">
+                <Search size={28} className="mx-auto mb-2 text-muted-foreground/60" aria-hidden="true" />
+                <p className="text-sm font-semibold text-foreground">{t(language, "settings.noSearchResults")}</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <SettingsSection className="mt-3">
+              {mainItems.map((item, index) => (
                 <SettingsRowItem
                   key={item.id}
                   iconBg={iconBackground}
                   icon={item.icon}
                   label={item.title}
+                  description={item.value}
                   right={<RowChevron />}
                   onPress={() => onNav(item.id)}
-                  hasDivider={idx < filteredItems.length - 1}
+                  hasDivider={index < mainItems.length - 1}
                   {...itemProps(item.id)}
                 />
               ))}
             </SettingsSection>
-          ) : (
-            <div className="mx-[var(--settings-gutter,1rem)] mt-6 rounded-2xl border border-border/50 bg-card p-6 text-center shadow-xs">
-              <Search size={28} className="mx-auto mb-2 text-muted-foreground/60" aria-hidden="true" />
-              <p className="text-sm font-semibold text-foreground">{t(language, "settings.noSearchResults")}</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <>
-          <SettingsSection className="mt-3">
-            {mainItems.map((item, index) => (
-              <SettingsRowItem
-                key={item.id}
-                iconBg={iconBackground}
-                icon={item.icon}
-                label={item.title}
-                description={item.value}
-                right={<RowChevron />}
-                onPress={() => onNav(item.id)}
-                hasDivider={index < mainItems.length - 1}
-                {...itemProps(item.id)}
-              />
-            ))}
-          </SettingsSection>
-          <SettingsSection label={t(language, "settings.supportSection")}>
-            {searchableItems
-              .filter((item) => ["help", "sources", "legal", "about"].includes(item.id))
-              .map((item, index) => (
-                <SettingsRowItem
-                  key={item.id}
-                  iconBg={iconBackground}
-                  icon={item.icon}
-                  label={item.title}
-                  right={<RowChevron />}
-                  onPress={() => onNav(item.id)}
-                  hasDivider={index < 3}
-                  {...itemProps(item.id)}
-                />
-              ))}
-          </SettingsSection>
-        </>
-      )}
+            <SettingsSection label={t(language, "settings.supportSection")}>
+              {searchableItems
+                .filter((item) => ["help", "sources", "legal", "about"].includes(item.id))
+                .map((item, index) => (
+                  <SettingsRowItem
+                    key={item.id}
+                    iconBg={iconBackground}
+                    icon={item.icon}
+                    label={item.title}
+                    right={<RowChevron />}
+                    onPress={() => onNav(item.id)}
+                    hasDivider={index < 3}
+                    {...itemProps(item.id)}
+                  />
+                ))}
+            </SettingsSection>
+          </>
+        )}
+      </div>
     </div>
   );
 }

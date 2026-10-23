@@ -1,5 +1,7 @@
+import { MushafMaterialHint } from "./MushafMaterialHint";
 import { type ReactNode } from "react";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
+import { handleRadioNavigation } from "./radioNavigation";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTheme, ThemeMode } from "../types";
@@ -231,9 +233,10 @@ export function MushafQuickMenu({
       title={t(language, "mushaf.readingViewOptions")}
       direction={direction}
       testId="mushaf-quick-menu"
+      dialogClassName="mushaf-protected-overlay"
       maxWidthClassName="max-w-sm"
       showCloseButton={false}
-      drawerClassName="pb-safe"
+      drawerClassName="mushaf-protected-overlay pb-safe"
     >
       <div className="flex flex-col h-full overflow-hidden text-start" dir={direction}>
         <SheetHeader
@@ -436,17 +439,26 @@ export function MushafQuickMenu({
                 id="quick-appearance-heading"
                 className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
               >
-                {t(language, "mushaf.appearanceTitle")}
+                {t(language, "mushaf.pageColor")}
               </h3>
-              <div role="radiogroup" aria-labelledby="quick-appearance-heading" className="grid grid-cols-4 gap-2">
+              <MushafMaterialHint language={language} />
+              <p className="text-xs leading-relaxed text-muted-foreground">{t(language, "mushaf.pageColorHint")}</p>
+              <div
+                role="radiogroup"
+                dir={direction}
+                aria-labelledby="quick-appearance-heading"
+                className="grid grid-cols-4 gap-2"
+              >
                 {THEME_OPTIONS.map((opt) => {
-                  const isSelected = theme === opt.id || (theme === "follow-app" && opt.id === appTheme);
+                  const isSelected = theme === opt.id;
                   return (
                     <button
                       key={opt.id}
                       type="button"
                       role="radio"
                       aria-checked={isSelected}
+                      tabIndex={isSelected ? 0 : -1}
+                      onKeyDown={handleRadioNavigation}
                       title={t(language, opt.nameKey)}
                       aria-label={t(language, opt.nameKey)}
                       data-testid={`quick-theme-${opt.id}`}
@@ -462,6 +474,24 @@ export function MushafQuickMenu({
                     </button>
                   );
                 })}
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={theme === "follow-app"}
+                  tabIndex={theme === "follow-app" || !theme ? 0 : -1}
+                  onKeyDown={handleRadioNavigation}
+                  onClick={() => onSelectTheme("follow-app")}
+                  data-testid="quick-theme-follow-app"
+                  className="col-span-4 flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border-control px-3 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="size-4 shrink-0 rounded-full border border-border"
+                    style={{ backgroundColor: THEME_OPTIONS.find((option) => option.id === appTheme)?.swatchBg }}
+                  />
+                  {t(language, "mushaf.themeFollowApp")}
+                  {theme === "follow-app" && <Check size={16} aria-hidden="true" />}
+                </button>
               </div>
             </section>
           )}

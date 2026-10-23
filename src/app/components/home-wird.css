@@ -1,3 +1,90 @@
+/* Home and interface cards share the routine card's material tokens.
+   Reading, chrome and overlays retain their deliberate contrast hierarchy. */
+@property --home-prayer-expansion {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+.home-prayer-sticky {
+  --home-prayer-expansion: 1;
+  transition: --home-prayer-expansion var(--motion-duration-standard) var(--motion-ease-standard);
+  margin-block-end: var(--home-prayer-reserved-space, 0px);
+}
+.home-prayer-sticky[data-prayer-cards-condensed] {
+  --home-prayer-expansion: 0;
+}
+.home-prayer-sticky-row {
+  padding-block-start: calc(0.125rem + 0.375rem * var(--home-prayer-expansion));
+  padding-block-end: calc(0.25rem + 0.75rem * var(--home-prayer-expansion));
+}
+.reduce-motion .home-prayer-sticky,
+.home-prayer-sticky[data-home-motion="reduced"] {
+  transition: none;
+}
+/* WebKit can cache inherited registered values across size containers when
+   motion is off. Apply the same static endpoint directly in this still path. */
+.reduce-motion .home-prayer-sticky *,
+.home-prayer-sticky[data-home-motion="reduced"] * {
+  --home-prayer-expansion: 1;
+}
+.reduce-motion .home-prayer-sticky[data-prayer-cards-condensed] *,
+.home-prayer-sticky[data-home-motion="reduced"][data-prayer-cards-condensed] * {
+  --home-prayer-expansion: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-prayer-sticky {
+    transition: none;
+  }
+  .home-prayer-sticky * {
+    --home-prayer-expansion: 1;
+  }
+  .home-prayer-sticky[data-prayer-cards-condensed] * {
+    --home-prayer-expansion: 0;
+  }
+}
+.home-photo-canvas .hero-glass.home-glass-surface {
+  --home-glass-tint: var(--glass-card-tint);
+  background-color: var(--home-glass-tint);
+  /* A directional sheen makes the material visible even over the dark sky.
+     Keep the brightest stop bounded by the white-source contrast test. */
+  background-image: linear-gradient(
+    135deg,
+    rgb(255 255 255 / var(--home-glass-sheen, var(--glass-sheen-strength))),
+    var(--glass-sheen-midpoint) 55%,
+    var(--glass-sheen-shade)
+  );
+  border-color: var(--glass-edge);
+  backdrop-filter: var(--glass-frost);
+  box-shadow: var(--glass-shadow);
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-photo-canvas .hero-glass.home-glass-surface:hover {
+    border-color: var(--glass-edge-hover);
+  }
+}
+
+/* Preserve the material's legible ground without relying on blur support. */
+@supports not (backdrop-filter: blur(1px)) {
+  .home-photo-canvas .hero-glass.home-glass-surface {
+    background-color: var(--on-media-surface);
+    background-image: none;
+  }
+}
+
+.high-contrast .home-photo-canvas .hero-glass.home-glass-surface {
+  background-color: var(--on-media-surface);
+  background-image: none;
+  backdrop-filter: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-photo-canvas .hero-glass.home-glass-surface {
+    background-color: var(--on-media-surface);
+    background-image: none;
+    backdrop-filter: none;
+  }
+}
+
 .home-wird-section,
 .home-shortcuts {
   container-type: inline-size;
@@ -26,6 +113,40 @@
   gap: 0.5rem;
   padding: 0.75rem 1rem;
 }
+.home-wird-tile[data-complete="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--primary);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.home-wird-completed-badge {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  pointer-events: none;
+}
+.home-wird-tile[data-complete="true"] .home-wird-caption > svg {
+  margin-inline-end: 32px;
+}
+@media (forced-colors: active) {
+  .home-wird-completed-badge {
+    background: Highlight;
+    color: HighlightText;
+  }
+  .home-wird-tile[data-complete="true"]::after {
+    border-color: Highlight;
+  }
+}
 .home-wird-photo {
   min-height: 13rem;
   display: flex;
@@ -43,20 +164,31 @@
 }
 .home-wird-photo .home-wird-caption {
   width: 100%;
-  height: auto;
-  min-height: 9rem;
+  height: 100%;
+  min-height: 13rem;
   padding: 1rem;
-  margin-top: 4rem;
+  padding-top: 4rem;
+  justify-content: flex-end;
   border-radius: 0;
 }
-.home-wird-photo .hero-glass.home-glass-surface {
-  --home-glass-tint: rgb(2 6 23 / 0.66);
-}
-.home-wird-photo-solid {
-  background: var(--on-media-surface);
+.home-wird-photo-caption {
+  background: linear-gradient(to bottom, rgb(2 6 23 / 0.08), rgb(2 6 23 / 0.62) 35%, rgb(2 6 23 / 0.92));
   color: var(--on-media);
   --muted-foreground: var(--on-media-muted);
+}
+.high-contrast .home-wird-photo-caption {
+  background: linear-gradient(to bottom, rgb(2 6 23 / 0.25), rgb(2 6 23 / 0.8) 35%, rgb(2 6 23 / 0.98));
+}
+/* A fixed gradient shades the photograph itself. Reduced transparency removes
+   glass elsewhere; it must not replace independently enabled card artwork. */
+.home-wird-photo-solid {
   --primary: var(--on-media-accent);
+}
+@media (forced-colors: active) {
+  .home-wird-photo-caption {
+    background: Canvas;
+    color: CanvasText;
+  }
 }
 @container (max-width: 15rem) {
   .home-wird-grid,
@@ -70,19 +202,76 @@
   }
 }
 
+/* Use Library's page gutters without adding a second horizontal focus inset. */
+@media (min-width: 600px) {
+  .home-all-prayers-row {
+    padding-inline: 0;
+  }
+}
+
+.home-prayer-overview {
+  width: 100%;
+  margin-inline: auto;
+}
 .home-all-prayers-row {
   grid-auto-flow: column;
-  grid-auto-columns: minmax(7rem, 1fr);
+  grid-auto-columns: max(min(8.25rem, calc(100% - 1.5rem)), calc((100% - 2rem) / 5));
+  justify-content: safe center;
+  scroll-padding-inline: 0.25rem;
+  scrollbar-width: none;
+  padding-bottom: calc(0.125rem + 0.625rem * var(--home-prayer-expansion, 1));
+  overflow-y: hidden;
+}
+.home-all-prayers-row::-webkit-scrollbar {
+  display: none;
 }
 
 /* Home-only chrome and inset variants load with the Home screen. */
-.hero-glass.home-glass-reading,
-.hero-glass.home-glass-header {
-  --home-glass-tint: rgb(15 23 42 / 0.58);
+.home-photo-canvas .hero-glass.home-glass-reading {
+  --home-glass-tint: var(--glass-reading-tint);
+}
+.home-photo-canvas .hero-glass.home-glass-header {
+  --home-glass-tint: var(--glass-reading-tint);
 }
 .hero-glass.home-glass-header {
-  border-width: 0 0 1px;
+  border-width: 0;
   box-shadow: none;
+}
+.home-photo-canvas .hero-glass.home-glass-header[data-scrolled="true"] {
+  --home-glass-tint: rgb(15 23 42 / 0.48);
+}
+
+.home-header-path-button {
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background-color: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
+}
+.home-header-path-button:hover {
+  background-color: rgb(255 255 255 / 0.14);
+}
+.home-header-path-divider {
+  width: 1px;
+  height: 1.25rem;
+  background-color: rgb(255 255 255 / 0.24);
+}
+.home-photo-canvas:not(:has(.hero-glass.home-glass-header)) .home-header-path-button {
+  border-color: var(--border);
+  background-color: var(--muted);
+  box-shadow: none;
+}
+.home-photo-canvas:not(:has(.hero-glass.home-glass-header)) .home-header-path-divider {
+  background-color: var(--border);
+}
+.high-contrast .home-header-path-button,
+.reduce-transparency .home-header-path-button {
+  background-color: var(--on-media-surface);
+  box-shadow: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .home-header-path-button {
+    background-color: var(--on-media-surface);
+    box-shadow: none;
+  }
 }
 
 /* Insets tint the existing frosted parent without another backdrop filter. */
@@ -93,10 +282,585 @@
   background-color: rgb(2 6 23 / 0.2);
 }
 
-.home-prayer-summary {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+/* Local feedback uses the shared press response without moving card content. */
+.home-icon-action {
+  position: relative;
 }
-.home-focused-prayers-row {
-  grid-auto-columns: minmax(6rem, 1fr);
+.home-icon-action::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.home-icon-action:enabled:focus-visible::before {
+  opacity: 0.1;
+}
+.home-action-cue {
+  transition:
+    scale var(--motion-duration-fast) var(--motion-ease-standard),
+    translate var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.home-icon-action:enabled:focus-visible .home-action-cue {
+  translate: 0 var(--home-action-lift, -2px);
+}
+.home-photo-canvas :is(a, summary):focus-visible .control-cue {
+  scale: var(--control-cue-scale, 1.08);
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-icon-action:enabled:hover::before {
+    opacity: 0.1;
+  }
+  .home-icon-action:enabled:hover .home-action-cue {
+    translate: 0 var(--home-action-lift, -2px);
+  }
+  .home-photo-canvas :is(a, summary):hover .control-cue {
+    scale: var(--control-cue-scale, 1.08);
+  }
+}
+.home-icon-action:enabled:is(:active, [data-key-pressed])::before {
+  opacity: 0.18;
+}
+.home-refresh-feedback {
+  animation: home-refresh-confirm var(--motion-duration-standard) var(--motion-ease-standard);
+}
+@keyframes home-refresh-confirm {
+  from {
+    transform: rotate(-180deg);
+    opacity: 0.5;
+  }
+  to {
+    transform: rotate(0);
+    opacity: 1;
+  }
+}
+.reduce-motion .home-photo-canvas {
+  --home-action-lift: 0px;
+}
+.reduce-motion .home-refresh-feedback {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-photo-canvas {
+    --home-action-lift: 0px;
+  }
+  .home-refresh-feedback {
+    animation: none;
+  }
+}
+
+.home-prayer-summary-card {
+  container-type: inline-size;
+  align-self: stretch;
+  grid-template-rows: 1fr auto;
+  overflow: visible;
+  scroll-margin-inline: 0.25rem;
+}
+.home-prayer-summary-card:not(.hero-glass) {
+  border-color: color-mix(in srgb, var(--primary) calc(var(--prayer-focus) * 80%), var(--border));
+  background-color: color-mix(in srgb, var(--primary) calc(var(--prayer-focus) * 8%), var(--card));
+}
+.home-photo-canvas .hero-glass.home-glass-surface.home-prayer-summary-card {
+  /* Quiet surfaces retain full text contrast and the same single frost layer.
+     Only reflections, boundaries and a small stationary glow change. */
+  --home-glass-sheen: calc(0.035 + 0.035 * var(--prayer-focus));
+  border-color: rgb(255 255 255 / 0.18);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / calc(0.2 + 0.16 * var(--prayer-focus))),
+    inset 0 -1px 0 rgb(255 255 255 / 0.04),
+    0 8px 24px rgb(2 6 23 / calc(0.08 + 0.06 * var(--prayer-focus))),
+    0 0 20px color-mix(in srgb, var(--on-media-accent) calc(var(--prayer-focus) * 10%), transparent);
+}
+.reduce-transparency .home-photo-canvas .hero-glass.home-glass-surface.home-prayer-summary-card,
+.high-contrast .home-photo-canvas .hero-glass.home-glass-surface.home-prayer-summary-card {
+  box-shadow: none;
+}
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .home-photo-canvas .hero-glass.home-glass-surface.home-prayer-summary-card {
+    box-shadow: none;
+  }
+}
+.home-prayer-summary-button {
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  align-content: start;
+  min-height: 4rem;
+  padding: calc(0.5rem + 0.25rem * var(--home-prayer-expansion, 1)) 0.75rem 0.5rem;
+  row-gap: calc(0.125rem + 0.125rem * var(--home-prayer-expansion, 1));
+  direction: ltr;
+}
+.home-content-scroll {
+  /* The compact strip owns its discrete layout change. Native anchoring must
+     not turn that change into a second scroll event across its thresholds. */
+  overflow-anchor: none;
+}
+@container (max-width: 9rem) {
+  .home-prayer-icon {
+    width: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1));
+    height: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1));
+  }
+  .home-prayer-summary-button {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    column-gap: 0.375rem;
+  }
+}
+/* One native button owns the whole card hit area, including its noninteractive
+   footer. Keep native progress outside the button for accessible semantics. */
+.home-prayer-summary-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.home-prayer-summary-button:enabled::after {
+  cursor: pointer;
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-prayer-summary-button:enabled:hover::after {
+    background: rgb(255 255 255 / 0.025);
+  }
+}
+.home-prayer-summary-button:enabled:active::after {
+  background: rgb(255 255 255 / 0.08);
+}
+.home-prayer-summary-button:focus-visible::after {
+  outline: 3px solid var(--ring);
+  outline-offset: -4px;
+}
+/* A selected summary casts a local light onto its details, clear of its neighbors. */
+.home-prayer-summary-card[data-selected="true"] {
+  border-color: color-mix(in srgb, var(--primary) 70%, transparent);
+}
+.home-prayer-summary-card.hero-glass[data-selected="true"] {
+  border-color: var(--home-glass-accent);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    var(--glass-shadow);
+}
+.home-prayer-summary-card[data-selected="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary);
+  pointer-events: none;
+  z-index: 1;
+}
+.home-prayer-summary-card.hero-glass[data-selected="true"]::after {
+  background: var(--home-glass-accent);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--home-glass-accent) 35%, transparent);
+}
+.home-prayer-connected-panel {
+  --prayer-connection-color: var(--primary);
+  position: relative;
+  /* Account for the strip's changing lower padding to keep a 20px clear gap. */
+  margin-top: var(--prayer-panel-offset, 0px);
+  border-radius: 1.5rem;
+}
+.home-prayer-connected-panel:has(.hero-glass) {
+  --prayer-connection-color: var(--home-glass-accent);
+}
+.home-prayer-connected-panel::before,
+.home-prayer-connected-panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  opacity: var(--prayer-anchor-opacity, 0);
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.home-prayer-connected-panel::before {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--prayer-connection-color), transparent)
+    calc(var(--prayer-anchor-x, 0px) - var(--prayer-anchor-width, 0px) / 2) 0 / var(--prayer-anchor-width, 0px) 2px
+    no-repeat;
+}
+.home-prayer-connected-panel::after {
+  height: 32px;
+  background: radial-gradient(
+    ellipse calc(var(--prayer-anchor-width, 0px) * 0.65) 28px at var(--prayer-anchor-x, 0px) 0,
+    color-mix(in srgb, var(--prayer-connection-color) 12%, transparent),
+    transparent
+  );
+}
+.high-contrast .home-prayer-connected-panel::after {
+  display: none;
+}
+.reduce-motion .home-prayer-connected-panel::before,
+.reduce-motion .home-prayer-connected-panel::after {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-prayer-connected-panel::before,
+  .home-prayer-connected-panel::after {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .home-prayer-summary-card[data-selected="true"]::after {
+    background: Highlight;
+    box-shadow: none;
+  }
+  .home-prayer-summary-card[data-selected="true"],
+  .home-prayer-connected-panel .hero-glass {
+    border-color: Highlight;
+    box-shadow: none;
+  }
+  .home-prayer-connected-panel::before,
+  .home-prayer-connected-panel::after {
+    display: none;
+  }
+}
+.home-prayer-icon {
+  position: relative;
+  width: min(100%, calc(1.75rem + 1rem * var(--home-prayer-expansion, 1)));
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 0.875rem;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  background: linear-gradient(145deg, rgb(255 255 255 / 0.12), rgb(2 6 23 / 0.18));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2);
+}
+.home-prayer-icon svg {
+  width: calc(1.125rem + 0.375rem * var(--home-prayer-expansion, 1));
+  height: calc(1.125rem + 0.375rem * var(--home-prayer-expansion, 1));
+}
+.home-prayer-summary-card[data-prayer-state="current"] .home-prayer-icon::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -2px;
+  bottom: -2px;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: calc(1 - var(--home-prayer-expansion, 1));
+}
+.home-prayer-identity,
+.home-prayer-timing {
+  display: contents;
+}
+.home-prayer-identity > * {
+  grid-column: 2;
+}
+.home-prayer-identity > [data-prayer-icon] {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: start;
+}
+.home-prayer-timing > * {
+  grid-column: 2;
+}
+.home-prayer-identity > h3 {
+  grid-row: 1;
+  text-align: right;
+}
+.home-prayer-identity > span:last-child:not([data-prayer-icon]) {
+  grid-row: 3;
+}
+.home-prayer-timing > p {
+  --prayer-time-size: clamp(1rem, 12cqi, 1.75rem);
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  /* Keep the original line's footprint. Only the actual digits grow into
+     available space; the inherited handoff also restores the compact type. */
+  height: calc(var(--prayer-time-size) * 1.2);
+  max-width: none;
+  margin-left: calc(-2.375rem * var(--home-prayer-expansion, 1));
+  font-size: var(--prayer-time-size);
+  line-height: 1;
+  direction: ltr;
+  white-space: nowrap;
+  text-align: right;
+}
+.home-prayer-timing > p > span {
+  translate: 0 var(--prayer-time-drop, 0.25rem);
+  transition: translate var(--motion-duration-standard) var(--motion-ease-standard);
+}
+.home-prayer-timing [data-prayer-time-digits] {
+  font-size: calc(var(--prayer-time-size) * 1.4);
+  /* Explicit endpoints avoid WebKit retaining an inherited em calculation
+     after a viewport change. The fixed line keeps the card footprint stable. */
+  transition:
+    font-size var(--motion-duration-standard) var(--motion-ease-standard),
+    translate var(--motion-duration-standard) var(--motion-ease-standard);
+}
+.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-timing > p > span {
+  translate: 0 0;
+}
+.home-prayer-sticky[data-prayer-cards-condensed] [data-prayer-time-digits] {
+  font-size: var(--prayer-time-size);
+}
+.home-prayer-sticky[data-home-motion="reduced"] [data-prayer-time-digits] {
+  transition: none;
+}
+@container (max-width: 9rem) {
+  .home-prayer-timing > p {
+    --prayer-time-drop: 0.5rem;
+  }
+  .home-prayer-identity > [data-prayer-icon] {
+    width: calc(1.75rem + 0.125rem * var(--home-prayer-expansion, 1));
+    height: calc(1.75rem + 0.125rem * var(--home-prayer-expansion, 1));
+    translate: 0 -0.1875rem;
+    transition: translate var(--motion-duration-standard) var(--motion-ease-standard);
+  }
+}
+.home-prayer-sticky[data-prayer-cards-condensed] [data-prayer-icon] {
+  translate: 0 0;
+}
+.home-prayer-timing > [data-prayer-state-label] {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+}
+.home-prayer-footer {
+  height: calc(var(--home-prayer-expansion, 1) * max(3.25rem, var(--prayer-footer-height, 0px)));
+  min-height: 0;
+  overflow: clip;
+  opacity: 1;
+  transition: opacity 60ms linear 160ms;
+  padding: 0;
+  border-top: 0;
+}
+.home-prayer-footer-content {
+  display: flex;
+  min-height: 3.25rem;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+}
+.home-prayer-status-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  padding: 0.25rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(2 6 23 / 0.14));
+}
+.home-prayer-status-pill .prayer-countdown-digits {
+  font-size: 0.9375rem;
+}
+@container (max-width: 9rem) {
+  .home-prayer-status-pill > svg {
+    display: none;
+  }
+}
+/* At enlarged text on the narrowest phones, give the time the whole row
+   rather than shrinking type or clipping its period label. */
+@container (max-width: 7rem) {
+  .home-prayer-timing > p {
+    grid-column: 1 / -1;
+    display: block;
+    height: auto;
+    margin-left: 0;
+    translate: none;
+    line-height: 1.2;
+    white-space: normal;
+  }
+  .home-prayer-timing [data-prayer-time-digits] {
+    font-size: 1em;
+  }
+  .home-prayer-timing > p > span {
+    translate: none;
+  }
+  .home-prayer-identity > [data-prayer-icon] {
+    grid-row: 1;
+    width: min(100%, calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1)));
+    height: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1));
+    translate: none;
+  }
+}
+.home-prayer-now-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+.home-prayer-summary-card[data-prayer-state="current"] .home-prayer-status-pill {
+  color: var(--primary-foreground);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.18), transparent 52%, rgb(2 6 23 / 0.05)) var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 80%, var(--primary-foreground));
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--primary) 20%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+.high-contrast .home-prayer-summary-card[data-prayer-state="current"] .home-prayer-status-pill {
+  background-image: none;
+  box-shadow: none;
+}
+@media (forced-colors: active) {
+  .home-prayer-summary-card[data-prayer-state="current"] .home-prayer-status-pill {
+    background-image: none;
+    box-shadow: none;
+  }
+}
+.home-prayer-summary-card.hero-glass {
+  border-radius: 1.5rem;
+  border-color: rgb(255 255 255 / 0.18);
+}
+.home-photo-canvas
+  .hero-glass.home-glass-surface.home-prayer-summary-card:is(
+    [data-prayer-state="current"],
+    [data-prayer-state="next"]
+  ) {
+  border-color: color-mix(in srgb, var(--home-glass-accent) 45%, transparent);
+}
+.home-prayer-footer > * {
+  flex-shrink: 0;
+}
+
+/* Explicit owner-selected Home glass overrides only reduced transparency.
+   High contrast, forced colors and unsupported blur retain their fallbacks. */
+@supports (backdrop-filter: blur(1px)) {
+  html:not(.high-contrast) .home-force-glass .hero-glass.home-glass-surface {
+    background-color: var(--home-glass-tint) !important;
+    background-image: linear-gradient(
+      135deg,
+      rgb(255 255 255 / var(--home-glass-sheen, var(--glass-sheen-strength))),
+      var(--glass-sheen-midpoint) 55%,
+      var(--glass-sheen-shade)
+    ) !important;
+    backdrop-filter: var(--glass-frost) !important;
+  }
+  @media (forced-colors: active) {
+    html:not(.high-contrast) .home-force-glass .hero-glass.home-glass-surface {
+      background: Canvas !important;
+      color: CanvasText;
+      backdrop-filter: none !important;
+    }
+  }
+}
+
+/* On-media actions must not inherit a light theme's dark success ink. */
+html:not(.high-contrast) .home-photo-canvas {
+  --success: #8aefb7;
+  --success-foreground: #062e16;
+}
+
+/* Navigation and header chrome share one material when App Glass is selected. */
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .home-photo-canvas .hero-glass.home-glass-header {
+      background-color: var(--glass-reading-tint) !important;
+      background-image: linear-gradient(
+        135deg,
+        rgb(255 255 255 / 0.045),
+        rgb(255 255 255 / 0.012) 55%,
+        transparent
+      ) !important;
+      backdrop-filter: var(--glass-chrome-frost) !important;
+    }
+    /* Home retains independent Glass even when the rest of the app is opaque. */
+    html:not(.high-contrast) .home-photo-canvas .hero-glass.home-glass-header:not([data-scrolled="true"]) {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      border-color: transparent;
+      box-shadow: none;
+    }
+  }
+}
+
+/* The scrolled strip protects its full width, including gaps and page gutters.
+   Material changes are discrete; native scrolling never interpolates frost. */
+.home-prayer-sticky[data-scrolled] {
+  background: var(--background);
+}
+@supports (backdrop-filter: blur(1px)) {
+  /* Only an active Glass header opts the shared strip into photographic frost.
+     Opaque Home and failed-photo recovery keep the ordinary theme ground. */
+  html:not(.high-contrast)
+    .home-photo-canvas
+    .home-prayer-sticky[data-scrolled]:where(:has(> .hero-glass.home-glass-header)) {
+    background-color: color-mix(in srgb, var(--on-media-surface) 60%, transparent);
+    background-image: linear-gradient(135deg, rgb(255 255 255 / 0.045), var(--glass-sheen-midpoint) 55%, transparent);
+    backdrop-filter: var(--glass-chrome-frost);
+  }
+  html:not(.high-contrast) .home-photo-canvas .home-prayer-sticky[data-scrolled] .hero-glass.home-glass-surface {
+    backdrop-filter: none !important;
+  }
+  /* The strip owns the material. A second header tint made the top read as
+     two dark bands and obscured the photograph even with Home Glass enabled. */
+  html:not(.high-contrast) .home-photo-canvas .home-prayer-sticky[data-scrolled] > .hero-glass.home-glass-header {
+    background: transparent !important;
+  }
+  @media not (forced-colors: active) {
+    /* Match the existing explicit Home Glass override on individual surfaces.
+       The global reduced-transparency rule otherwise removes this new parent
+       filter while its children correctly suppress their nested filters. */
+    html:not(.high-contrast)
+      .home-force-glass
+      .home-prayer-sticky[data-scrolled]:where(:has(> .hero-glass.home-glass-header)) {
+      backdrop-filter: var(--glass-chrome-frost) !important;
+    }
+  }
+}
+html.reduce-transparency .home-photo-canvas:not(.home-force-glass) .home-prayer-sticky[data-scrolled],
+.high-contrast .home-photo-canvas .home-prayer-sticky[data-scrolled] {
+  background: var(--background);
+  backdrop-filter: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  html:not(.high-contrast) .home-photo-canvas:not(.home-force-glass) .home-prayer-sticky[data-scrolled] {
+    background: var(--background);
+    backdrop-filter: none;
+  }
+}
+@media (forced-colors: active) {
+  .home-prayer-sticky[data-scrolled] {
+    background: Canvas !important;
+    backdrop-filter: none !important;
+  }
+}
+.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-footer {
+  opacity: 0;
+  transition-delay: 0ms;
+}
+/* The compact countdown uses the same text/accessible description as the footer.
+   Reveal it after the footer fades, without announcing duplicate information. */
+.home-prayer-compact-countdown {
+  position: absolute;
+  inset-inline: 0.75rem;
+  bottom: 0.5rem;
+  text-align: right;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  opacity: 0;
+  transition: opacity 60ms linear;
+}
+.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-compact-countdown {
+  opacity: 1;
+  transition-delay: 160ms;
+}
+.home-prayer-summary-card[data-prayer-state="next"] .home-prayer-summary-button {
+  padding-bottom: calc(0.5rem + 1.125rem * (1 - var(--home-prayer-expansion, 1)));
+}
+.reduce-motion :is(.home-prayer-footer, .home-prayer-compact-countdown),
+.home-prayer-sticky[data-home-motion="reduced"] :is(.home-prayer-footer, .home-prayer-compact-countdown) {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-prayer-footer,
+  .home-prayer-compact-countdown {
+    transition: none;
+  }
 }

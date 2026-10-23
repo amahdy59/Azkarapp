@@ -55,7 +55,7 @@ export function benefitEvidenceToShareItem(item: BenefitEvidence, language: AppL
   const isQuran = item.kind === "quran";
   const title = localizeBenefitText(item.title, language);
   const text = isQuran ? item.text.ar : localizeBenefitText(item.text, language);
-  const meaning = isQuran && language === "en" ? item.text.en : undefined;
+  const meaning = isQuran || language === "ar" ? item.text.en : undefined;
   const source = isQuran ? quranCitation(item, language) : localizeBenefitText(item.source, language);
 
   return {
@@ -63,6 +63,8 @@ export function benefitEvidenceToShareItem(item: BenefitEvidence, language: AppL
     canonicalKey: isQuran ? item.id : undefined,
     arabicText: text,
     quranText: isQuran,
+    textDirection: isQuran || language === "ar" ? "rtl" : "ltr",
+    hideRepetition: true,
     title: item.kind === "hadith" ? title : undefined,
     translation: meaning,
     sourceReference: source,
@@ -113,7 +115,10 @@ function EvidenceCard({
         </a>
         <button
           type="button"
-          onClick={() => onShare(item)}
+          onClick={(event) => {
+            event.currentTarget.focus({ preventScroll: true });
+            onShare(item);
+          }}
           className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           aria-label={t(language, "benefits.shareBenefitAria", { category: title })}
           title={t(language, "benefits.shareBenefit")}
@@ -202,7 +207,10 @@ export function BenefitsScreen({
           <button
             type="button"
             data-testid="share-benefits-collection-button"
-            onClick={() => setSharingAllTab(true)}
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              setSharingAllTab(true);
+            }}
             className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-btn border border-border bg-card px-3 text-label font-bold text-foreground shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-muted active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={t(language, "benefits.shareTabCollectionAria", {
               tab: t(language, `benefits.${activeSection}Tab`, { count: formatNumerals(total, language) }),
@@ -258,6 +266,7 @@ export function BenefitsScreen({
           <Suspense fallback={null}>
             <CollectionShareModal
               open
+              dialogTitle={t(language, sharingEvidence ? "benefits.shareBenefit" : "benefits.shareTabCollection")}
               onClose={() => {
                 setSharingEvidence(null);
                 setSharingAllTab(false);
@@ -274,11 +283,17 @@ export function BenefitsScreen({
                   : t(language, `benefits.${activeSection}Heading`)
               }
               items={[]}
-              shareItems={
-                sharingEvidence
-                  ? [benefitEvidenceToShareItem(sharingEvidence, language)]
-                  : visibleEvidence.map((ev) => benefitEvidenceToShareItem(ev, language))
-              }
+              shareItemsByLanguage={{
+                ar: (sharingEvidence ? [sharingEvidence] : evidenceItems).map((ev) =>
+                  benefitEvidenceToShareItem(ev, "ar"),
+                ),
+                en: (sharingEvidence ? [sharingEvidence] : evidenceItems).map((ev) =>
+                  benefitEvidenceToShareItem(ev, "en"),
+                ),
+              }}
+              initialScope={sharingEvidence ? "current" : "all"}
+              initialFormat={sharingEvidence ? "square" : "story"}
+              contentAlignment={sharingEvidence ? "center" : "start"}
               language={language}
             />
           </Suspense>

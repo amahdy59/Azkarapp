@@ -1,6 +1,43 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+for (const appMaterial of ["glass", "solid"] as const) {
+  test(`Reader surface has calm rounded edges in ${appMaterial} @cross-browser`, async ({ page }, testInfo) => {
+    await page.addInitScript((appMaterial) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({ settings: { language: "ar", appMaterial, reduceMotion: true }, profile: { isGuest: true } }),
+      );
+    }, appMaterial);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("./#/azkar/morning/1");
+    const card = page.getByTestId("reader-card");
+    const hero = page.getByTestId("reader-desktop-hero");
+    await expect(card).toBeVisible();
+    await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+    for (const width of [1440, 820]) {
+      await page.setViewportSize({ width, height: 900 });
+      const corners = await card.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return [
+          style.borderTopLeftRadius,
+          style.borderTopRightRadius,
+          style.borderBottomLeftRadius,
+          style.borderBottomRightRadius,
+        ];
+      });
+      for (const radius of corners) expect(parseFloat(radius)).toBeGreaterThanOrEqual(16);
+      const cardBox = (await card.boundingBox())!;
+      const heroBox = (await hero.boundingBox())!;
+      expect(cardBox.y - heroBox.y - heroBox.height).toBeGreaterThanOrEqual(8);
+      await expect(page.getByTestId("counter-surface")).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.screenshot({ path: testInfo.outputPath(`${appMaterial}-${width}-reader.png`) });
+    }
+  });
+}
+
 for (const language of ["ar", "en"] as const) {
   test(`collection panel resizes, restores and uses a drawer in ${language} @cross-browser`, async ({
     page,
@@ -17,6 +54,12 @@ for (const language of ["ar", "en"] as const) {
     const panel = page.getByTestId("reader-collection-navigator");
     const toggle = page.getByTestId("reader-sidebar-toggle");
     const handle = page.getByTestId("reader-sidebar-resizer");
+    await expect(panel).toBeHidden();
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(handle).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath(language + "-collapsed-reader.png") });
+    await toggle.click();
     await expect(panel).toBeVisible();
     await expect(toggle).toBeHidden();
     await expect(handle).toHaveAttribute("aria-valuenow", "420");

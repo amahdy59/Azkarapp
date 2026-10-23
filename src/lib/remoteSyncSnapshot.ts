@@ -1,7 +1,9 @@
 import type { AppStateSnapshot, UserSettingsState } from "../app/types";
+import { recentDayKeys } from "../app/syncMerge";
+import { normalizeZikrHistory } from "../app/zikrHistory";
 
 export type RemoteSyncSnapshot = Omit<AppStateSnapshot, "settings" | "profile"> & {
-  settings: Omit<UserSettingsState, "location">;
+  settings: Omit<UserSettingsState, "location" | "readerMeaningOnly">;
   profile?: {
     displayName: string;
   };
@@ -15,6 +17,7 @@ export const FORBIDDEN_SYNC_KEYS = new Set([
   "phone",
   "accountUserId",
   "avatarUrl",
+  "readerMeaningOnly",
 ]);
 
 /**
@@ -49,7 +52,7 @@ export function assertNoForbiddenSyncFields(data: unknown, path = ""): void {
  * Bounds session history to the newest 100 entries.
  */
 export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnapshot {
-  const safeSettings: Omit<UserSettingsState, "location"> = {
+  const safeSettings: Omit<UserSettingsState, "location" | "readerMeaningOnly"> = {
     language: state.settings.language,
     darkMode: state.settings.darkMode,
     themeMode: state.settings.themeMode,
@@ -60,6 +63,7 @@ export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnap
     highContrast: state.settings.highContrast,
     boldText: state.settings.boldText,
     reduceMotion: state.settings.reduceMotion,
+    readerToolLabels: state.settings.readerToolLabels,
     reduceTransparency: state.settings.reduceTransparency,
     homeWirdImages: state.settings.homeWirdImages,
     hapticFeedback: state.settings.hapticFeedback,
@@ -92,6 +96,7 @@ export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnap
     completed: state.completed,
     sessions: sortedSessions,
     dailyCompletions: state.dailyCompletions,
+    zikrHistory: recentZikrHistory(state.zikrHistory),
     prayerTracking: state.prayerTracking,
     dailyHabits: state.dailyHabits,
     savedZikrIds: state.savedZikrIds,
@@ -116,4 +121,10 @@ export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnap
 
   assertNoForbiddenSyncFields(snapshot);
   return snapshot;
+}
+
+function recentZikrHistory(value: AppStateSnapshot["zikrHistory"]) {
+  const records = normalizeZikrHistory(value);
+  const days = new Set(recentDayKeys([...new Set(records.map((row) => row.dayKey))]));
+  return records.filter((row) => days.has(row.dayKey));
 }

@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { saveAppState } from "../state";
+import { createAppStateWriter } from "../state";
 import type { AppStateSnapshot } from "../types";
 
 /** Coalesce rapid changes, but save before the browser can freeze the page. */
 export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (saved: boolean) => void) {
+  const writer = useRef<ReturnType<typeof createAppStateWriter> | null>(null);
+  if (!writer.current) writer.current = createAppStateWriter();
   const pending = useRef(false);
   const latest = useRef({ snapshot, onResult });
   const previousPartialCounts = useRef(snapshot.partialZikrCounts);
@@ -18,13 +20,13 @@ export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (sa
     if (previousPartialCounts.current !== snapshot.partialZikrCounts) {
       previousPartialCounts.current = snapshot.partialZikrCounts;
       pending.current = false;
-      onResult(saveAppState(snapshot));
+      onResult(writer.current!(snapshot));
       return;
     }
     const timer = window.setTimeout(() => {
       if (!pending.current) return;
       pending.current = false;
-      onResult(saveAppState(snapshot));
+      onResult(writer.current!(snapshot));
     }, 400);
     return () => window.clearTimeout(timer);
   }, [snapshot, onResult]);
@@ -33,7 +35,7 @@ export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (sa
     const flush = () => {
       if (!pending.current) return;
       pending.current = false;
-      latest.current.onResult(saveAppState(latest.current.snapshot));
+      latest.current.onResult(writer.current!(latest.current.snapshot));
     };
     const onVisibility = () => {
       if (document.visibilityState === "hidden") flush();

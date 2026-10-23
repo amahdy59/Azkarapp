@@ -1,5 +1,7 @@
+import { homeArtworkUrl } from "./azkar-backgrounds";
 import { BookOpen, Calendar, Check, ChevronNext, Info, MoonStar, Sunrise, Sunset } from "./icons";
-import { formatNumerals } from "../formatting";
+import { formatNumerals, formatRatio } from "../formatting";
+import { THIMAR_PER_ROUTINE, TOTAL_DAILY_THIMAR } from "../oasis/oasisModel";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
 import type { GardenSummary } from "../progress";
@@ -60,6 +62,7 @@ export function HomeWirdSection({
       onPress: quranWird.onPress,
     },
   ];
+  const completedCount = items.filter((item) => item.complete).length;
   return (
     <section
       data-testid="today-garden-card"
@@ -82,10 +85,30 @@ export function HomeWirdSection({
             onClick={onOpenWirdBenefits}
             className="flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <Info size={20} aria-hidden="true" />
+            <Info size={20} className="control-cue" aria-hidden="true" />
             {t(language, "wirdBenefits.openCta")}
           </button>
         )}
+      </div>
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-label font-semibold" data-testid="home-wird-summary">
+        <span className="rounded-full border border-current/20 px-3 py-1.5">
+          <span className="sr-only">
+            {t(language, "prayerActions.completedCount", {
+              count: formatNumerals(completedCount, language),
+              total: formatNumerals(items.length, language),
+            })}
+          </span>
+          <bdi aria-hidden="true">{formatRatio(completedCount, items.length, language)}</bdi>
+        </span>
+        <span className="rounded-full border border-current/20 px-3 py-1.5" data-testid="thimar-progress-badge">
+          <span aria-hidden="true">🌱 </span>
+          <bdi>
+            {t(language, "progress.todayThimarProgress", {
+              earned: formatNumerals(completedCount * THIMAR_PER_ROUTINE, language),
+              total: formatNumerals(TOTAL_DAILY_THIMAR, language),
+            })}
+          </bdi>
+        </span>
       </div>
       <div className="home-wird-grid">
         {items.map(({ id, name, Icon, image, complete, status, onPress }) => (
@@ -101,23 +124,45 @@ export function HomeWirdSection({
             data-recommended-now={id === recommendedCategoryId && !complete ? "true" : undefined}
             data-testid="wird-category-card"
             data-category={id}
+            data-complete={complete ? "true" : undefined}
             data-images={showImages ? "true" : "false"}
             className={`home-wird-tile focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${showImages ? "home-wird-photo" : onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card text-foreground"}`}
           >
             {showImages && (
-              <img
-                src={`${import.meta.env.BASE_URL}assets/cards/${image}`}
-                alt=""
-                loading="lazy"
-                className="home-wird-photo-image"
-              />
+              <picture>
+                <source
+                  type="image/avif"
+                  srcSet={`${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-360.avif")}`)} 360w, ${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-720.avif")}`)} 720w`}
+                  sizes="(min-width: 1280px) 240px, 50vw"
+                />
+                <source
+                  type="image/webp"
+                  srcSet={`${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-360.webp")}`)} 360w, ${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-720.webp")}`)} 720w`}
+                  sizes="(min-width: 1280px) 240px, 50vw"
+                />
+                <img
+                  src={`${import.meta.env.BASE_URL}assets/cards/${image.replace(".jpg", "-720.webp")}`}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  onError={(event) => {
+                    event.currentTarget.hidden = true;
+                  }}
+                  className="home-wird-photo-image"
+                />
+              </picture>
+            )}
+            {complete && (
+              <span className="home-wird-completed-badge" aria-hidden="true">
+                <Check size={16} strokeWidth={3} />
+              </span>
             )}
             <div
-              className={`home-wird-caption ${showImages ? (onGlass ? "hero-glass home-glass-surface" : "home-wird-photo-solid") : ""}`}
+              className={`home-wird-caption ${showImages ? `home-wird-photo-caption ${onGlass ? "" : "home-wird-photo-solid"}` : ""}`}
             >
               <Icon
                 size={28}
-                className={onGlass || showImages ? "text-on-media-accent" : "text-primary"}
+                className={`control-cue ${onGlass || showImages ? "text-on-media-accent" : "text-primary"}`}
                 aria-hidden="true"
               />
               <span className="flex w-full min-w-0 items-center justify-between gap-2">
@@ -126,8 +171,7 @@ export function HomeWirdSection({
                   <span className="text-sm text-muted-foreground">{status}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2" aria-hidden="true">
-                  {complete && <Check size={18} />}
-                  <ChevronNext size={18} data-rtl-flip />
+                  <ChevronNext size={18} className="control-cue" data-rtl-flip />
                 </span>
               </span>
             </div>

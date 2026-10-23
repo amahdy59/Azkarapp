@@ -31,7 +31,11 @@ it("verifies and expands the real compressed library while preserving explicit g
   vi.stubGlobal("fetch", fetcher);
   const { loadOwnerTimingPack } = await import("./ownerTimingLoader");
   const pack = await loadOwnerTimingPack(new AbortController().signal);
-  expect(pack?.records).toHaveLength(289);
+  expect(pack?.records).toHaveLength(285);
+  expect(pack?.records.some((record) => record.v.includes("comprehensive-dua-42-abdullah-muhammad-v1"))).toBe(false);
+  expect(pack?.records.some((record) => record.v.includes("comprehensive-dua-42-english-george-v1"))).toBe(true);
+  expect(pack?.records.some((record) => record.v.includes("comprehensive-dua-39-abdullah-muhammad-v1"))).toBe(false);
+  expect(pack?.records.some((record) => record.v.includes("friday-dua-25-abdullah-muhammad-v1"))).toBe(true);
   expect(pack?.records.some((record) => record.v.includes("wu-hm-4-abdullah-muhammad-v1"))).toBe(false);
   expect(pack?.approval.reviewStatus).toBe("owner-preview");
   expect(pack?.approval.reviewedBy).toBe("");

@@ -414,6 +414,7 @@ test("the Library displays unified section tabs beside the heading across mobile
   await expect(collectionsTab).toBeVisible();
   await expect(savedTab).toBeVisible();
 
+  await page.getByTestId("library-filter-disclosure").locator("summary").click();
   const allPill = page.getByRole("button", { name: "All", exact: true });
   await expect(allPill).toBeVisible();
   await expect(page.getByRole("button", { name: "Daily Azkar", exact: true })).toBeVisible();
@@ -495,8 +496,8 @@ for (const language of ["ar", "en"] as const) {
           expect(Math.abs(iconBox.y + iconBox.height / 2 - buttonBox.y - buttonBox.height / 2)).toBeLessThan(1);
         }
         expect(tabsBox.width).toBeLessThanOrEqual(scale === "100%" ? 110 : 200);
-        const formBox = await page.locator("header form").boundingBox();
-        expect(formBox!.y - (tabsBox.y + tabsBox.height)).toBeCloseTo(scale === "100%" ? 8 : 16, 0);
+        const filtersBox = await page.getByTestId("library-filter-disclosure").boundingBox();
+        expect(filtersBox!.y - (tabsBox.y + tabsBox.height)).toBeCloseTo(scale === "100%" ? 8 : 16, 0);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
     }
@@ -568,7 +569,7 @@ test("shared screen headers stay opaque after scrolling without changing Home", 
   await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
 
   await page.getByTestId("nav-progress").click();
-  const header = page.getByTestId("shared-screen-header");
+  const header = page.getByTestId("progress-sticky-controls");
   await expect(header).toBeVisible();
   await expect(header).not.toHaveAttribute("data-scrolled");
 
@@ -577,7 +578,7 @@ test("shared screen headers stay opaque after scrolling without changing Home", 
     surface.dispatchEvent(new Event("scroll"));
   });
   await expect(header).toHaveAttribute("data-scrolled", "true");
-  await expect(header).toHaveClass(/bg-background/);
+  await expect(header.getByTestId("shared-screen-header")).toHaveClass(/bg-background/);
   await expect(header).toHaveCSS(
     "background-color",
     await page.locator(".app-screen-surface").evaluate((surface) => getComputedStyle(surface).backgroundColor),

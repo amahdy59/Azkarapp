@@ -323,6 +323,8 @@ test("wide Reader keeps a bounded RTL collection navigator and supports direct j
 
   const navigator = page.getByTestId("reader-collection-navigator");
   const readerCard = page.getByTestId("reader-card");
+  await expect(navigator).toBeHidden();
+  await page.getByTestId("reader-sidebar-toggle").click();
   await expect(navigator).toBeVisible();
   await expect(navigator).toHaveAccessibleName("عرض جميع الأذكار");
 
@@ -408,18 +410,16 @@ test("desktop and tablet keep navigation below reading text and one reachable ke
     await expect(counter).toHaveAccessibleName(/Click the dhikr or press Space 0 \/ 1/);
 
     const zikrText = card.getByTestId("zikr-text").first();
-    const [textBox, navigationBox, counterBox, guideBox] = await Promise.all([
+    const [textBox, navigationBox, counterBox] = await Promise.all([
       zikrText.boundingBox(),
       navigation.boundingBox(),
       counter.boundingBox(),
-      shortcutGuide.boundingBox(),
     ]);
     expect(textBox).not.toBeNull();
     expect(navigationBox).not.toBeNull();
     expect(counterBox).not.toBeNull();
-    expect(guideBox).not.toBeNull();
+    await expect(shortcutGuide).toHaveCount(0);
     if (textBox && navigationBox) expect(textBox.y + textBox.height).toBeLessThanOrEqual(navigationBox.y);
-    if (counterBox && guideBox) expect(guideBox.y + guideBox.height).toBeLessThanOrEqual(counterBox.y);
   }
 
   await expect(desktopHero).toBeVisible();
@@ -1000,6 +1000,8 @@ test("the reader header keeps options and wide collection navigation together", 
   const collectionToggle = actions.getByTestId("reader-sidebar-toggle");
   if (width >= 1200) {
     const collectionPanel = page.getByTestId("reader-collection-navigator");
+    await expect(collectionPanel).toBeHidden();
+    await collectionToggle.click();
     await expect(collectionPanel).toBeVisible();
     await expect(collectionToggle).toBeHidden();
     await expect(actions.locator("button:visible")).toHaveCount(3);

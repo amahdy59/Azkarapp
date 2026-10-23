@@ -4,7 +4,7 @@ import type { ZikrDraft } from "../types";
 export const BAQARAH_SURAH: ZikrDraft = {
   id: "ir-baqarah",
   category: "illness_ruqyah",
-  orderIndex: 7,
+  orderIndex: 9,
   isSurah: true,
   surahNameArabic: "البَقَرَة",
   surahNameEnglish: "Al-Baqarah",

@@ -6,6 +6,7 @@ for (const language of ["ar", "en"] as const) {
     const items = getAzkarForMode("home", "complete");
     await page.addInitScript(
       ({ language, completed }) => {
+        if (localStorage.getItem("azkarapp.state.v1")) return;
         localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
         localStorage.setItem(
           "azkarapp.state.v1",
@@ -26,5 +27,18 @@ for (const language of ["ar", "en"] as const) {
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1") ?? "{}"));
     expect(saved.completed.home).toHaveLength(items.length);
     expect(saved.sessions.filter((session: { category: string }) => session.category === "home")).toHaveLength(1);
+    await expect(page.getByRole("button", { name: language === "ar" ? "تم" : "Done", exact: true })).toBeVisible();
+    await page
+      .getByRole("button", { name: language === "ar" ? "بدء جلسة جديدة" : "Start new session", exact: true })
+      .click();
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
+    const restarted = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1") ?? "{}"));
+    expect(restarted.completed.home).toEqual([]);
+    expect(restarted.sessions.filter((session: { category: string }) => session.category === "home")).toHaveLength(1);
+    await page.reload();
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
+    expect(
+      await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1") ?? "{}").completed.home),
+    ).toEqual([]);
   });
 }

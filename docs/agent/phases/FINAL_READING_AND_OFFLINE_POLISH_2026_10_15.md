@@ -1,0 +1,24 @@
+# Final reading, offline clarity and release acceptance
+
+The owner approved all six final recommendations on 2026-10-15 and requires actual screen previews before pushing.
+
+Plan, in bounded reviewable changes:
+
+1. Reading presentation: replace repeated current-ayah side marks with a faint word-level verse tint and emphasized existing end marker. Preserve exact-word emphasis, semantic current state, canonical fifteen-slot/page/font geometry, manual browsing and reduced motion. Shared English translation uses at least 12px inline clearance, stable scrollbar space and a non-overlay bottom-right verse chip. This explicitly supersedes the earlier numbered left-gutter presentation and line-mark contract; devotional content is unchanged.
+2. Offline and progress clarity: reuse existing verified download/cancel/remove/export boundaries, make downloaded audio discoverable and states/sizes explicit, and explain the existing daily-versus-situational reset policy beside its action. Retain all recorded history and current schema. Standardize only affected controls through existing shared components.
+3. Reliability: inspect the two retained WebKit failures (large-text listening scroll-bottom and devotional share return focus), fix evidence-supported lifecycle/interaction causes and add regression coverage. No retries/timeouts/assertions/coverage/budget limits are weakened.
+4. Verification/release: actual Arabic/English, phone/desktop and enlarged-text screenshots during work; targeted unit/browser checks; intact local hooks and exact-commit CI/Pages/production smoke. Run available Android build/device checks and record unavailable physical-phone/TalkBack/reminder/widget acceptance honestly. Do not claim Play readiness from compilation or browser emulation.
+
+No runtime dependency, reviewed source content, recording permission or persistence migration is authorized or needed. Physical acceptance/signing and store declarations remain separate evidence requirements.
+
+Owner screenshot correction: the English ayah number must not consume its own row. Use an absolute bottom-right chip, 8px top and 10px bottom paragraph padding (scaling together), and a narrow inline text clearance. Remove the English header/footer rules. The owner proposes overlaying compact playback over the Mushaf with explicit Hide/Show rather than shrinking the canonical page; apply locally and show actual visible/hidden previews before publication. Keep Stop, full-player expansion and manual seeking distinct, retain a labeled 44px Show player tab with playback state, and preserve current timing on hiding.
+
+Subsequent owner correction supersedes the reserved inline clearance: increase the prior 12px left paragraph padding by 2px and use that same 14px on both sides (calc(0.75rem + 2px) scales with text). No dedicated right gutter; the absolutely positioned chip may overlay the paragraph as the owner explicitly requested. Keep the 2px top/bottom difference and show an updated preview.
+
+## Review gate — owner continuation
+
+The owner subsequently requested review and a report before another push, including stronger test quality. Publication is held while reviewing the combined undeployed changes. CI exposed outdated translation-layout expectations and lost opener focus when sharing switches between a compact drawer and desktop dialog. Preserve the original opener across that responsive handoff using a shared focus scope, while retaining nested-dialog return behavior. Test the approved equal insets, bounded chip placement, 2px bottom-padding difference and keyboard recovery rather than the superseded left-gutter layout. Keep all existing release gates, browser projects and assertion deadlines intact. Release notes must be reconciled against the last successful deployment before publication resumes.
+
+The owner then requested matching translation-header/footer padding for mobile and desktop. Apply shared 27px inline and 6px block padding at default text scale (rem-based, retaining the paragraph's fixed 3px border/spacing contribution). Preserve borderless furniture, equal paragraph padding, readable wrapped metadata and independent native scrolling. Add narrow/desktop and 200% text checks plus actual screenshots. The owner separately approved the Ruqyah identity migration recorded in the decision log.
+
+After receiving the review report and final previews, the owner agreed to proceed with release verification. This supersedes the review publication hold. Commit the reviewed repairs and responsive padding, push through intact hooks, require complete exact-commit Quality and Pages success, and smoke-test production. Further reading-comfort and structural maintenance improvements remain bounded follow-up work after this release; physical Android acceptance requires an attached device.

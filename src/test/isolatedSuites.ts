@@ -11,6 +11,13 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/share/curatedRoutineCards.test.ts",
+  "src/app/content/reminderReadings.test.ts",
+  "src/app/components/PrayerTrackerStats.test.tsx",
+  "src/app/components/RoutineInsights.test.tsx",
+  "src/app/screens/CompletionScreen.sharing.test.tsx",
+  "src/app/components/AppSceneBackground.test.tsx",
+  "src/app/share/quickRoutineShare.test.ts",
   "src/app/native/reminders.test.ts",
   "src/app/native/saveFile.test.ts",
   "src/app/hooks/useForegroundReminders.lifecycle.test.ts",
@@ -19,6 +26,7 @@ export const ISOLATED_SUITES = [
   "src/app/screens/settings/AudioFileExports.test.tsx",
   "src/app/components/QuranVerseText.test.tsx",
   "src/app/hooks/useListeningMushafPage.test.tsx",
+  "src/app/hooks/useMushafMeaningsReady.test.tsx",
   "src/app/share/quranGlyphs.test.ts",
   "src/app/hooks/useMushafPlayback.test.tsx",
   "src/app/content/quranTranslations.test.ts",
@@ -33,6 +41,7 @@ export const ISOLATED_SUITES = [
   "src/app/audio/travelPreparation.test.ts",
   "src/app/components/AppErrorBoundary.test.tsx",
   "src/app/components/CollectionShareModal.test.tsx",
+  "src/app/components/ShareableCardModal.test.tsx",
   "src/app/components/ReadingScreenChrome.test.tsx",
   "src/app/content/qcfMushaf.test.ts",
   "src/app/content/nativeMushafDownload.test.ts",

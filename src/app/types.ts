@@ -48,7 +48,9 @@ export type DayMomentContext = "friday" | "friday_after_asr" | "monday" | "thurs
  * `general` is the floor rather than a competitor — it is what remains when no
  * more specific pool has anything in it.
  */
-export type ReminderContext = CategoryId | PrayerMomentContext | DayMomentContext | "general";
+export type ReminderTopicContext =
+  "character" | "helping_others" | "general_dua" | "fasting_virtue" | "fasting_tomorrow";
+export type ReminderContext = CategoryId | PrayerMomentContext | DayMomentContext | ReminderTopicContext | "general";
 export type TextSizeOption = "small" | "medium" | "large";
 
 /**
@@ -232,6 +234,14 @@ export interface Zikr {
 export type ZikrDraft = Omit<Zikr, "canonicalKey" | "audioBehavior"> &
   Partial<Pick<Zikr, "canonicalKey" | "audioBehavior">>;
 
+/** Explicit daily item history; no reconstruction from collection totals. */
+export interface ZikrDayRecord {
+  dayKey: string;
+  category: "morning" | "evening" | "before_sleep";
+  offeredIds: string[];
+  completedIds: string[];
+}
+
 export interface StoredSession {
   id: string;
   category: CategoryId;
@@ -271,8 +281,14 @@ export interface UserSettingsState {
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
+  /** Visible labels on devotional footer actions; absent legacy values default to true. */
+  readerToolLabels?: boolean;
+  /** Device-only main-text preference for the English Reader; never synchronized. */
+  readerMeaningOnly?: boolean;
   /** Blurred materials go solid. See the .reduce-transparency rules. */
   reduceTransparency: boolean;
+  appMaterial?: "system" | "glass" | "solid";
+  homeMaterial?: "inherit" | "system" | "glass" | "solid";
   /** Optional Home daily-wird photography; independent of transparency. */
   homeWirdImages: boolean;
   hapticFeedback: boolean;
@@ -435,6 +451,7 @@ export interface AppStateSnapshot {
   completed: Record<CategoryId, string[]>;
   sessions: StoredSession[];
   dailyCompletions: DailyCollectionCompletion[];
+  zikrHistory?: ZikrDayRecord[];
   /** Per-prayer mosque/adhkar tracking, by day and stable prayer id. */
   prayerTracking: PrayerTrackingRecord[];
   /** Companion daily spiritual habits (Quran wird, mosque prayers) recorded per day. */
@@ -458,6 +475,8 @@ export interface AppStateSnapshot {
   khatmahPage?: number;
   /** Mushaf color preference; follows the app theme unless explicitly overridden. */
   mushafTheme?: MushafTheme;
+  /** Device-only vertical page-colour shortcut; explicit colour choices stay available. */
+  mushafColorGestures?: boolean;
   mushafLayout?: MushafLayout;
   /** Which edge of a wide reading surface carries the vertical tool rail. */
   mushafToolbarSide?: MushafToolbarSide;

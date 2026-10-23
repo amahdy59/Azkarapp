@@ -16,8 +16,20 @@ describe("ReadingPanel preview", () => {
       onShowTranslationChange: vi.fn(),
       onShowTransliterationChange: vi.fn(),
       onBack: vi.fn(),
+      onReaderToolLabelsChange: vi.fn(),
     };
     const { rerender } = render(<ReadingPanel {...props} />);
+    const sample = screen.getByTestId("reader-footer-preview");
+    expect(sample).toHaveAttribute("aria-hidden", "true");
+    expect(sample.querySelectorAll("button")).toHaveLength(4);
+    for (const button of sample.querySelectorAll("button")) expect(button).toBeDisabled();
+    expect(sample).toHaveTextContent("Benefit");
+    expect(sample).toHaveTextContent("Listen");
+    expect(sample).toHaveTextContent("Share");
+    expect(sample).toHaveTextContent("Focus");
+    fireEvent.click(screen.getByRole("radio", { name: "Icons only" }));
+    expect(props.onReaderToolLabelsChange).toHaveBeenCalledWith(false);
+    expect(screen.getByRole("radio", { name: "Icons with labels" })).toBeChecked();
     expect(screen.getAllByText("الحمد لله")).toHaveLength(1);
     expect(screen.getByTestId("reading-preview")).toHaveStyle({ fontSize: "1.5rem" });
     fireEvent.click(screen.getByTestId("reading-text-size-large"));

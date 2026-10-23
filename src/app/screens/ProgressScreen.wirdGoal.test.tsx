@@ -1,8 +1,16 @@
+import { chooseProgressOption } from "../../test/progressSelect";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { ProgressScreen } from "./ProgressScreen";
 import { getProgressDayKey } from "../progress";
 import type { DailyCollectionCompletion, QuranWirdPlan } from "../types";
+
+async function openDailyDetails() {
+  const details = screen.getByTestId("progress-detailed-context") as HTMLDetailsElement;
+  details.open = true;
+  fireEvent(details, new Event("toggle"));
+  await chooseProgressOption(screen.getByRole("combobox", { name: "Explore details" }), "routines");
+}
 
 describe("ProgressScreen Quran wird completion consistency", () => {
   const now = new Date();
@@ -22,7 +30,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
     startedDayKey: dayKey,
   };
 
-  it("marks wird as incomplete when 0 pages of goal are read", () => {
+  it("marks wird as incomplete when 0 pages of goal are read", async () => {
     render(
       <ProgressScreen
         dailyCompletions={completions}
@@ -37,13 +45,13 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - \d+ \/ \d+ pages$/);
+    await openDailyDetails();
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("0 / 4 pages")).toBeInTheDocument();
   });
 
-  it("marks wird as incomplete and displays fractional progress when 1 of 4 pages is read", () => {
+  it("marks wird as incomplete and displays fractional progress when 1 of 4 pages is read", async () => {
     render(
       <ProgressScreen
         dailyCompletions={completions}
@@ -58,13 +66,13 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - \d+ \/ \d+ pages$/);
+    await openDailyDetails();
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("1 / 4 pages")).toBeInTheDocument();
   });
 
-  it("marks wird as completed when full goal of 4 pages is reached", () => {
+  it("marks wird as completed when full goal of 4 pages is reached", async () => {
     render(
       <ProgressScreen
         dailyCompletions={completions}
@@ -79,13 +87,13 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - Completed$/);
+    await openDailyDetails();
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
   });
 
-  it("hides completion tracking in free reading even with existing history", () => {
+  it("hides completion tracking in free reading even with existing history", async () => {
     render(
       <ProgressScreen
         dailyCompletions={completions}
@@ -100,11 +108,13 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
+    await openDailyDetails();
+    expect(screen.queryByText("Quran Wird", { exact: true })).not.toBeInTheDocument();
     expect(screen.queryByTestId("daily-companions-card")).not.toBeInTheDocument();
-    expect(screen.queryByText(/pages/i)).not.toBeInTheDocument();
+    expect(within(screen.getByTestId("today-garden-card")).queryByText(/pages/i)).not.toBeInTheDocument();
   });
 
-  it("honors manual habit tick even when pages read is 0", () => {
+  it("honors manual habit tick even when pages read is 0", async () => {
     render(
       <ProgressScreen
         dailyCompletions={completions}
@@ -119,13 +129,13 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - Completed$/);
+    await openDailyDetails();
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
   });
 
-  it("marks repeating wird as complete only when all pages in repeat range are read today", () => {
+  it("marks repeating wird as complete only when all pages in repeat range are read today", async () => {
     const repeatingPlan: QuranWirdPlan = {
       kind: "repeating",
       dailyPages: 20,
@@ -150,9 +160,9 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - \d+ \/ \d+ pages$/);
+    await openDailyDetails();
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("3 / 20 pages")).toBeInTheDocument();
 
     const fullRange = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -170,8 +180,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - Completed$/);
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
   });
 });

@@ -69,32 +69,26 @@ test("the interactive word-meaning card is named, reachable, and has no automati
   expect(await scan(page, '[data-testid="quran-word-popover"]')).toEqual([]);
 });
 
-test("the prayer virtue dialog has no automatically detectable WCAG A/AA violations", async ({ page }) => {
-  await seed(page, "/#/progress");
-  await page.getByText("مراجعة الصلاة وما يتصل بها", { exact: true }).click();
-  await expect(page.getByTestId("prayer-tracker-cards")).toBeVisible();
-
-  const prayer = await page
-    .getByTestId("prayer-tracker-cards")
-    .locator('article[data-prayer-state="past"], article[data-prayer-state="current"]')
-    .first()
-    .getAttribute("data-prayer");
-  expect(prayer, "the fixed evening fixture must expose a recordable prayer").toBeTruthy();
-
-  await page.locator(`#prayer-${prayer}-mosque`).check();
-  await expect(page.getByTestId("prayer-virtue-modal")).toBeVisible();
-
-  expect(await scan(page, '[data-testid="prayer-virtue-modal"]')).toEqual([]);
+test("the prayer information dialog has no automatically detectable WCAG A/AA violations", async ({ page }) => {
+  await seed(page, "/#/home");
+  await page.getByTestId("prayer-card-isha").getByRole("button").click();
+  const actions = page.getByTestId("prayer-actions-card");
+  await expect(actions).toBeVisible();
+  await actions.getByTestId("prayer-actions-more-info").click();
+  await expect(page.getByTestId("prayer-actions-info-modal")).toBeVisible();
+  expect(await scan(page, '[data-testid="prayer-actions-info-modal"]')).toEqual([]);
 });
 
 test("the collection share modal has no automatically detectable WCAG A/AA violations", async ({ page }, testInfo) => {
   await seed(page, "/#/azkar");
   await page.getByTestId("category-card-morning").click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
-  await page.getByRole("button", { name: /خيارات القارئ|Reader options/ }).click();
-  const sidebar = page.getByRole("menuitem", { name: /عرض القائمة الجانبية|Show sidebar/ });
-  if (await sidebar.count()) await sidebar.click();
-  else await page.keyboard.press("Escape");
+  const sidebarToggle = page.getByTestId("reader-sidebar-toggle");
+  if (await sidebarToggle.isVisible()) await sidebarToggle.click();
+  else {
+    await page.getByRole("button", { name: /خيارات القارئ|Reader options/ }).click();
+    await page.getByRole("menuitem", { name: /عرض القائمة الجانبية|Show sidebar/ }).click();
+  }
   const shareBtn = page.getByRole("button", {
     name: /Share collection azkar as story cards for social status|مشاركة أذكار المجموعة/,
   });

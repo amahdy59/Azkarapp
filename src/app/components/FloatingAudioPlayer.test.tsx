@@ -88,6 +88,27 @@ function createController(): AudioController {
 }
 
 describe("FloatingAudioPlayer", () => {
+  it("hides the Mushaf overlay without stopping playback or reserving page height", async () => {
+    const main = document.createElement("main");
+    main.id = "main-content";
+    document.body.append(main);
+    const controller = createController();
+    const view = render(
+      <FloatingAudioPlayer controller={controller} language="en" overReadingSurface preferCompactReading />,
+      { container: main },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Hide player" }));
+    const show = screen.getByRole("button", { name: "Show player" });
+    await waitFor(() => expect(show).toHaveFocus());
+    expect(controller.stop).not.toHaveBeenCalled();
+    expect(controller.pause).not.toHaveBeenCalled();
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    fireEvent.click(show);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Hide player" })).toHaveFocus());
+    expect(screen.getByRole("slider", { name: "Seek audio" })).toBeVisible();
+    view.unmount();
+    main.remove();
+  });
   beforeEach(() => {
     document.documentElement.classList.add("reduce-motion");
   });
@@ -185,13 +206,13 @@ describe("FloatingAudioPlayer", () => {
     });
   });
 
-  it("shows only the seek timeline after expansion", () => {
+  it("keeps one usable seek timeline in compact and expanded layouts", () => {
     render(<FloatingAudioPlayer controller={createController()} language="en" direction="ltr" />);
 
-    expect(screen.getByRole("progressbar", { name: "Listening progress" })).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: "Seek audio" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
-    expect(screen.queryByRole("progressbar", { name: "Listening progress" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("audio-compact-progress")).not.toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Seek audio" })).toBeInTheDocument();
   });
 
@@ -233,14 +254,36 @@ describe("FloatingAudioPlayer", () => {
     controller.state.plan = { ...plan, entries: [entry, { ...entry, entryId: "second" }] };
     controller.state.entryIndex = 1;
     render(<FloatingAudioPlayer controller={controller} language="en" />);
-    const progress = screen.getByRole("progressbar", { name: "Listening progress" });
-    expect(progress).toHaveAttribute("aria-valuenow", "20");
-    expect(screen.getByTestId("audio-compact-waveform").firstElementChild).toHaveStyle({ width: "20%" });
-    expect(screen.getAllByRole("progressbar")).toHaveLength(1);
-    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    const progress = screen.getByRole("slider", { name: "Seek audio" });
+    expect(progress).toHaveValue("120");
+    expect(progress).toHaveAttribute("max", "600");
+    expect(progress).toHaveStyle({
+      "--audio-range-fill": "linear-gradient(to right, var(--primary) 20%, var(--muted-foreground) 20%)",
+    });
+    expect(screen.getAllByRole("slider")).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.queryByTestId("audio-compact-waveform")).not.toBeInTheDocument();
     expect(screen.getByTestId("audio-seek-waveform")).toBeInTheDocument();
+  });
+
+  it.each(["ar", "en"] as const)("seeks directly from the compact player in %s without expanding", (language) => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language={language} />);
+    const seek = screen.getByRole("slider");
+    fireEvent.change(seek, { target: { value: "300" } });
+    expect(controller.seek).toHaveBeenLastCalledWith(300);
+    fireEvent.keyDown(seek, { key: language === "ar" ? "ArrowLeft" : "ArrowRight" });
+    expect(controller.seek).toHaveBeenLastCalledWith(125);
+    fireEvent.keyDown(seek, { key: "End" });
+    expect(controller.seek).toHaveBeenLastCalledWith(600);
+    expect(document.querySelector('[data-variant="compact"]')).toBeInTheDocument();
+  });
+
+  it("disables compact seeking until the recording duration is known", () => {
+    const controller = createController();
+    controller.state.duration = 0;
+    render(<FloatingAudioPlayer controller={controller} language="en" />);
+    expect(screen.getByRole("slider", { name: "Seek audio" })).toBeDisabled();
   });
 
   it("offers keyboard expansion from compact context and keeps Play independent", () => {
@@ -639,10 +682,12 @@ describe("FloatingAudioPlayer", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.getByTestId("reading-content").closest('[data-testid="reader-card"]')).toHaveAttribute("inert");
+    expect(screen.getByTestId("reader-card")).toHaveAttribute("data-audio-covered");
     expect(screen.queryByRole("button", { name: "Reading action" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Reader header" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Minimize player" })).toHaveFocus();
     fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.getByTestId("reader-card")).not.toHaveAttribute("data-audio-covered");
     expect(screen.getByTestId("reading-content")).not.toHaveAttribute("inert");
     expect(screen.getByRole("button", { name: "Reading action" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Expand player" })).toHaveFocus();
@@ -766,7 +811,9 @@ describe("FloatingAudioPlayer", () => {
     };
     render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
     expect(screen.getByTestId("audio-compact-progress")).toHaveAttribute("dir", "rtl");
-    expect(screen.getByTestId("audio-compact-waveform").firstElementChild).toHaveStyle({ width: "20%" });
+    expect(screen.getByRole("slider")).toHaveStyle({
+      "--audio-range-fill": "linear-gradient(to left, var(--primary) 20%, var(--muted-foreground) 20%)",
+    });
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     const timeline = screen.getByRole("slider", { name: "تقديم أو تأخير الصوت" });
     expect(timeline.closest(".audio-seek-row")).toHaveAttribute("dir", "rtl");
@@ -791,7 +838,9 @@ describe("FloatingAudioPlayer", () => {
     };
     render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
 
-    expect(screen.getByTestId("audio-compact-waveform").firstElementChild).toHaveStyle({ width: "20%" });
+    expect(screen.getByRole("slider")).toHaveStyle({
+      "--audio-range-fill": "linear-gradient(to left, var(--primary) 20%, var(--muted-foreground) 20%)",
+    });
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     const seekPlayhead = screen.getByTestId("audio-seek-waveform-playhead");
     expect(seekPlayhead).toBeInTheDocument();

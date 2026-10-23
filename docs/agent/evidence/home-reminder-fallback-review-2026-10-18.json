@@ -1,0 +1,1156 @@
+{
+  "reviewDate": "2026-10-18",
+  "scope": "Home-only; canonical azkar unchanged",
+  "reviewType": "Source comparison by coding agent; not independent scholarly endorsement",
+  "entries": {
+    "m-hm-75a": {
+      "source": "abudawud:3667",
+      "status": "verified",
+      "originalReference": "Abu Dawud no. 3667; Hisn al-Muslim 75a.",
+      "reviewedCandidate": "abudawud:3667"
+    },
+    "m-hm-75": {
+      "source": "muslim:810",
+      "status": "replacement",
+      "originalReference": "Qur’an 2:255; Al-Hakim 1/562; Hisn al-Muslim 75.",
+      "reviewedCandidate": "hisn:75",
+      "reason": "Morning/evening protection addition is disputed; use the authenticated merit of Ayat al-Kursi without assigning that timing.",
+      "reviewUrl": "https://dorar.net/h/UA2ZPwXk"
+    },
+    "m-hm-76a": {
+      "source": "abudawud:5082",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "reviewedCandidate": "abudawud:5082"
+    },
+    "m-hm-76b": {
+      "source": "abudawud:5082",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "reviewedCandidate": "abudawud:5082"
+    },
+    "m-hm-76c": {
+      "source": "abudawud:5082",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "reviewedCandidate": "abudawud:5082"
+    },
+    "m-hm-77m": {
+      "source": "muslim:2723b",
+      "status": "verified",
+      "originalReference": "Muslim 4/2088; Hisn al-Muslim 77.",
+      "reviewedCandidate": "muslim:2723b"
+    },
+    "m-hm-78m": {
+      "source": "abudawud:5068",
+      "status": "verified",
+      "originalReference": "At-Tirmidhi 5/466; Abu Dawud 4/317; Ibn Majah; Hisn al-Muslim 78.",
+      "reviewedCandidate": "abudawud:5068"
+    },
+    "m-hm-79": {
+      "source": "bukhari:6306",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 7/150; Hisn al-Muslim 79.",
+      "reviewedCandidate": "bukhari:6306"
+    },
+    "m-hm-80m": {
+      "source": "bukhari:6306",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/317; Al-Bukhari in Al-Adab al-Mufrad; An-Nasa’i; Ibn as-Sunni; Hisn al-Muslim 80.",
+      "reviewedCandidate": "abudawud:5069",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated master supplication for forgiveness.",
+      "reviewUrl": "https://sunnah.com/abudawud:5069"
+    },
+    "m-hm-81m": {
+      "source": "muslim:2734",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/318; An-Nasa’i Amal al-Yawm wa al-Laylah no. 7; Ibn as-Sunni no. 41; Ibn Hibban no. 2361; Hisn al-Muslim 81.",
+      "reviewedCandidate": "abudawud:5073",
+      "reason": "Linked route is weak according to al-Albani; use authenticated gratitude for food and drink.",
+      "reviewUrl": "https://sunnah.com/abudawud:5073"
+    },
+    "m-hm-82": {
+      "source": "abudawud:5090",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/324; Ahmad 5/42; An-Nasa’i; Ibn as-Sunni; Al-Adab al-Mufrad; Hisn al-Muslim 82.",
+      "reviewedCandidate": "abudawud:5090"
+    },
+    "m-hm-84": {
+      "source": "abudawud:5074",
+      "status": "verified",
+      "originalReference": "Abu Dawud; Ibn Majah; Ahmad; An-Nasa’i; Hisn al-Muslim 84.",
+      "reviewedCandidate": "abudawud:5074"
+    },
+    "m-hm-85": {
+      "source": "tirmidhi:3392",
+      "status": "verified",
+      "originalReference": "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
+      "reviewedCandidate": "tirmidhi:3392"
+    },
+    "m-hm-86": {
+      "source": "abudawud:5088",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/323; At-Tirmidhi 5/465; Ibn Majah; Ahmad; Hisn al-Muslim 86.",
+      "reviewedCandidate": "abudawud:5088"
+    },
+    "m-hm-87": {
+      "source": "muslim:386",
+      "status": "replacement",
+      "originalReference": "Ahmad 4/337; An-Nasa’i; Ibn as-Sunni; At-Tirmidhi 5/465; Hisn al-Muslim 87.",
+      "reviewedCandidate": "tirmidhi:3389",
+      "reason": "Older claim adds three repetitions and morning timing absent from this route; use the authenticated satisfaction declaration with its explicit adhan context.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3389"
+    },
+    "m-hm-88": {
+      "source": "nasai-kubra:10330",
+      "status": "verified",
+      "originalReference": "Al-Hakim; Al-Albani, Sahih al-Jamiʿ; Hisn al-Muslim 88.",
+      "reviewedCandidate": "nasai-kubra:10330"
+    },
+    "m-hm-89m": {
+      "source": "muslim:2723b",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/322; Hisn al-Muslim 89.",
+      "reviewedCandidate": "abudawud:5084",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated morning/evening report.",
+      "reviewUrl": "https://sunnah.com/abudawud:5084"
+    },
+    "m-hm-91": {
+      "source": "bukhari:6405",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 4/2071; Hisn al-Muslim 91.",
+      "reviewedCandidate": "bukhari:6405"
+    },
+    "m-hm-93": {
+      "source": "bukhari:3293",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 4/95; Muslim 4/2071; Hisn al-Muslim 93.",
+      "reviewedCandidate": "bukhari:3293"
+    },
+    "m-hm-94": {
+      "source": "muslim:2726a",
+      "status": "verified",
+      "originalReference": "Muslim 4/2090; Hisn al-Muslim 94.",
+      "reviewedCandidate": "muslim:2726a"
+    },
+    "m-hm-95": {
+      "source": "ibnmajah:925",
+      "status": "verified",
+      "originalReference": "Ibn as-Sunni no. 54; Ibn Majah no. 925; Hisn al-Muslim 95.",
+      "reviewedCandidate": "ibnmajah:925"
+    },
+    "m-hm-96": {
+      "source": "abudawud:1516",
+      "status": "verified",
+      "originalReference": "Al-Bukhari; Muslim 4/2075; Hisn al-Muslim 96.",
+      "reviewedCandidate": "abudawud:1516"
+    },
+    "m-hm-97": {
+      "source": "muslim:2709a",
+      "status": "verified",
+      "originalReference": "Ahmad 2/290; An-Nasa’i; At-Tirmidhi 3/187; Ibn as-Sunni; Hisn al-Muslim 97.",
+      "reviewedCandidate": "muslim:2709a"
+    },
+    "e-hm-75a": {
+      "source": "abudawud:3667",
+      "status": "verified",
+      "originalReference": "Abu Dawud no. 3667; Hisn al-Muslim 75a.",
+      "reviewedCandidate": "abudawud:3667"
+    },
+    "e-hm-75": {
+      "source": "muslim:810",
+      "status": "replacement",
+      "originalReference": "Qur’an 2:255; Al-Hakim 1/562; Hisn al-Muslim 75.",
+      "reviewedCandidate": "hisn:75",
+      "reason": "Morning/evening protection addition is disputed; use the authenticated merit of Ayat al-Kursi without assigning that timing.",
+      "reviewUrl": "https://dorar.net/h/UA2ZPwXk"
+    },
+    "e-hm-76a": {
+      "source": "abudawud:5082",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "reviewedCandidate": "abudawud:5082"
+    },
+    "e-hm-76b": {
+      "source": "abudawud:5082",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "reviewedCandidate": "abudawud:5082"
+    },
+    "e-hm-76c": {
+      "source": "abudawud:5082",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "reviewedCandidate": "abudawud:5082"
+    },
+    "e-hm-77e": {
+      "source": "muslim:2723b",
+      "status": "verified",
+      "originalReference": "Muslim 4/2088; Hisn al-Muslim 77.",
+      "reviewedCandidate": "muslim:2723b"
+    },
+    "e-hm-78e": {
+      "source": "abudawud:5068",
+      "status": "verified",
+      "originalReference": "At-Tirmidhi 5/466; Abu Dawud 4/317; Ibn Majah; Hisn al-Muslim 78.",
+      "reviewedCandidate": "abudawud:5068"
+    },
+    "e-hm-79": {
+      "source": "bukhari:6306",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 7/150; Hisn al-Muslim 79.",
+      "reviewedCandidate": "bukhari:6306"
+    },
+    "e-hm-80e": {
+      "source": "bukhari:6306",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/317; Al-Bukhari in Al-Adab al-Mufrad; An-Nasa’i; Ibn as-Sunni; Hisn al-Muslim 80.",
+      "reviewedCandidate": "abudawud:5069",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated master supplication for forgiveness.",
+      "reviewUrl": "https://sunnah.com/abudawud:5069"
+    },
+    "e-hm-81e": {
+      "source": "muslim:2734",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/318; An-Nasa’i Amal al-Yawm wa al-Laylah no. 7; Ibn as-Sunni no. 41; Ibn Hibban no. 2361; Hisn al-Muslim 81.",
+      "reviewedCandidate": "abudawud:5073",
+      "reason": "Linked route is weak according to al-Albani; use authenticated gratitude for food and drink.",
+      "reviewUrl": "https://sunnah.com/abudawud:5073"
+    },
+    "e-hm-82": {
+      "source": "abudawud:5090",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/324; Ahmad 5/42; An-Nasa’i; Ibn as-Sunni; Al-Adab al-Mufrad; Hisn al-Muslim 82.",
+      "reviewedCandidate": "abudawud:5090"
+    },
+    "e-hm-84": {
+      "source": "abudawud:5074",
+      "status": "verified",
+      "originalReference": "Abu Dawud; Ibn Majah; Ahmad; An-Nasa’i; Hisn al-Muslim 84.",
+      "reviewedCandidate": "abudawud:5074"
+    },
+    "e-hm-85": {
+      "source": "tirmidhi:3392",
+      "status": "verified",
+      "originalReference": "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
+      "reviewedCandidate": "tirmidhi:3392"
+    },
+    "e-hm-86": {
+      "source": "abudawud:5088",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/323; At-Tirmidhi 5/465; Ibn Majah; Ahmad; Hisn al-Muslim 86.",
+      "reviewedCandidate": "abudawud:5088"
+    },
+    "e-hm-87": {
+      "source": "muslim:386",
+      "status": "replacement",
+      "originalReference": "Ahmad 4/337; An-Nasa’i; Ibn as-Sunni; At-Tirmidhi 5/465; Hisn al-Muslim 87.",
+      "reviewedCandidate": "tirmidhi:3389",
+      "reason": "Older claim adds three repetitions and morning timing absent from this route; use the authenticated satisfaction declaration with its explicit adhan context.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3389"
+    },
+    "e-hm-88": {
+      "source": "nasai-kubra:10330",
+      "status": "verified",
+      "originalReference": "Al-Hakim; Al-Albani, Sahih al-Jamiʿ; Hisn al-Muslim 88.",
+      "reviewedCandidate": "nasai-kubra:10330"
+    },
+    "e-hm-89e": {
+      "source": "muslim:2723b",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/322; Hisn al-Muslim 89.",
+      "reviewedCandidate": "abudawud:5084",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated morning/evening report.",
+      "reviewUrl": "https://sunnah.com/abudawud:5084"
+    },
+    "e-hm-91": {
+      "source": "bukhari:6405",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 4/2071; Hisn al-Muslim 91.",
+      "reviewedCandidate": "bukhari:6405"
+    },
+    "e-hm-92": {
+      "source": "bukhari:3293",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 3293; Muslim 2691; Hisn al-Muslim 92–93.",
+      "reviewedCandidate": "bukhari:3293"
+    },
+    "e-hm-96": {
+      "source": "abudawud:1516",
+      "status": "verified",
+      "originalReference": "Al-Bukhari; Muslim 4/2075; Hisn al-Muslim 96.",
+      "reviewedCandidate": "abudawud:1516"
+    },
+    "e-hm-97": {
+      "source": "muslim:2709a",
+      "status": "verified",
+      "originalReference": "Ahmad 2/290; An-Nasa’i; At-Tirmidhi 3/187; Ibn as-Sunni; Hisn al-Muslim 97.",
+      "reviewedCandidate": "muslim:2709a"
+    },
+    "s-hm-99-ikhlas": {
+      "source": "bukhari:5017",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+      "reviewedCandidate": "bukhari:5017"
+    },
+    "s-hm-99-falaq": {
+      "source": "bukhari:5017",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+      "reviewedCandidate": "bukhari:5017"
+    },
+    "s-hm-99-nas": {
+      "source": "bukhari:5017",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+      "reviewedCandidate": "bukhari:5017"
+    },
+    "s-hm-100": {
+      "source": "bukhari:2311",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 2311; Hisn al-Muslim 100.",
+      "reviewedCandidate": "bukhari:2311"
+    },
+    "s-hm-101": {
+      "source": "bukhari:5009",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 5009; Sahih Muslim 807; Hisn al-Muslim 101.",
+      "reviewedCandidate": "bukhari:5009"
+    },
+    "s-hm-109a": {
+      "source": "abudawud:5055",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 5055; Jami' at-Tirmidhi 3403.",
+      "reviewedCandidate": "abudawud:5055"
+    },
+    "s-hm-110a": {
+      "source": "bukhari:5017",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 2892; Sunan an-Nasa'i 10043.",
+      "reviewedCandidate": "tirmidhi:2892",
+      "reason": "Darussalam grades the linked route weak; use the authenticated bedtime recitation report.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:2892"
+    },
+    "s-hm-110b": {
+      "source": "tirmidhi:2891",
+      "status": "verified",
+      "originalReference": "Jami' at-Tirmidhi 2891 (Hasan).",
+      "reviewedCandidate": "tirmidhi:2891"
+    },
+    "s-hm-106-subhanallah": {
+      "source": "bukhari:3113",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
+      "reviewedCandidate": "bukhari:3113"
+    },
+    "s-hm-106-alhamdulillah": {
+      "source": "bukhari:3113",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
+      "reviewedCandidate": "bukhari:3113"
+    },
+    "s-hm-106-allahu-akbar": {
+      "source": "bukhari:3113",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
+      "reviewedCandidate": "bukhari:3113"
+    },
+    "s-hm-102": {
+      "source": "bukhari:6320",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6320; Sahih Muslim 2714; Hisn al-Muslim 102.",
+      "reviewedCandidate": "bukhari:6320"
+    },
+    "s-hm-105": {
+      "source": "bukhari:6312",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6312; Sahih Muslim 2711; Hisn al-Muslim 105.",
+      "reviewedCandidate": "bukhari:6312"
+    },
+    "s-hm-104": {
+      "source": "tirmidhi:3399",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 5045; Jami' at-Tirmidhi 3398; Hisn al-Muslim 104.",
+      "reviewedCandidate": "tirmidhi:3399"
+    },
+    "s-hm-108": {
+      "source": "muslim:2715",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2715; Hisn al-Muslim 108.",
+      "reviewedCandidate": "muslim:2715"
+    },
+    "s-hm-107": {
+      "source": "muslim:2713a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2713; Hisn al-Muslim 107.",
+      "reviewedCandidate": "muslim:2713a"
+    },
+    "s-hm-109": {
+      "source": "abudawud:5067",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 5067; Jami' at-Tirmidhi 3392; Hisn al-Muslim 109.",
+      "reviewedCandidate": "abudawud:5067"
+    },
+    "s-hm-111": {
+      "source": "bukhari:247",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 247; Sahih Muslim 2710; Hisn al-Muslim 111.",
+      "reviewedCandidate": "bukhari:247"
+    },
+    "wu-hm-1": {
+      "source": "bukhari:6312",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 11/113; Muslim 4/2083; Hisn al-Muslim 1.",
+      "reviewedCandidate": "bukhari:6312"
+    },
+    "wu-hm-2": {
+      "source": "bukhari:1154",
+      "status": "verified",
+      "originalReference": "Al-Bukhari 3/39; Hisn al-Muslim 2.",
+      "reviewedCandidate": "bukhari:1154"
+    },
+    "wu-hm-3": {
+      "source": "tirmidhi:3401",
+      "status": "verified",
+      "originalReference": "Jami` at-Tirmidhi 3401 (Hasan).",
+      "reviewedCandidate": "tirmidhi:3401"
+    },
+    "wu-hm-4": {
+      "source": "muslim:763b",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 4569; Sahih Muslim 763; Hisn al-Muslim 4.",
+      "reviewedCandidate": "muslim:763b"
+    },
+    "home-hm-15": {
+      "source": "abudawud:5095",
+      "status": "verified",
+      "originalReference": "Abu Dawud 4/325; At-Tirmidhi 5/490; Hisn al-Muslim 15.",
+      "reviewedCandidate": "abudawud:5095"
+    },
+    "home-hm-17": {
+      "source": "muslim:2018",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2018.",
+      "reviewedCandidate": "muslim:2018"
+    },
+    "home-hm-18": {
+      "source": "abudawud:5094",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 5094; Jami` at-Tirmidhi 3427 (Sahih).",
+      "reviewedCandidate": "abudawud:5094"
+    },
+    "msq-hm-20": {
+      "source": "abudawud:466",
+      "status": "verified",
+      "originalReference": "Abu Dawud; Muslim 1/494; Hisn al-Muslim 20.",
+      "reviewedCandidate": "abudawud:466"
+    },
+    "msq-hm-21": {
+      "source": "muslim:713a",
+      "status": "verified",
+      "originalReference": "Muslim 1/494; Ibn Majah; Hisn al-Muslim 21.",
+      "reviewedCandidate": "muslim:713a"
+    },
+    "msq-hm-22": {
+      "source": "muslim:763",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 763; Sahih al-Bukhari 6316; Hisn al-Muslim 19.",
+      "reviewedCandidate": "muslim:763"
+    },
+    "msq-hm-23": {
+      "source": "bukhari:444",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 1163; Sahih Muslim 714.",
+      "reviewedCandidate": "bukhari:444"
+    },
+    "ap-ref-1": {
+      "source": "muslim:591",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 591; Hisn al-Muslim 66.",
+      "reviewedCandidate": "muslim:591"
+    },
+    "ap-ref-2": {
+      "source": "muslim:591",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 592; Hisn al-Muslim 66.",
+      "reviewedCandidate": "muslim:591"
+    },
+    "ap-ref-9": {
+      "source": "nasai-kubra:9848",
+      "status": "verified",
+      "originalReference": "Sunan an-Nasa'i 9928; Ibn Hibban 2004; Hisn al-Muslim 31.",
+      "reviewedCandidate": "nasai-kubra:9848"
+    },
+    "ap-ref-3": {
+      "source": "bukhari:844",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6329; Sahih Muslim 595; Hisn al-Muslim 25.",
+      "reviewedCandidate": "bukhari:844"
+    },
+    "ap-ref-4": {
+      "source": "bukhari:844",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 844; Sahih Muslim 593; Hisn al-Muslim 26.",
+      "reviewedCandidate": "bukhari:844"
+    },
+    "ap-tasbeeh-subhanallah": {
+      "source": "muslim:597a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "reviewedCandidate": "muslim:597a"
+    },
+    "ap-tasbeeh-alhamdulillah": {
+      "source": "muslim:597a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "reviewedCandidate": "muslim:597a"
+    },
+    "ap-tasbeeh-allahuakbar": {
+      "source": "muslim:597a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "reviewedCandidate": "muslim:597a"
+    },
+    "ap-tasbeeh-tawhid": {
+      "source": "muslim:597a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "reviewedCandidate": "muslim:597a"
+    },
+    "ap-ref-6": {
+      "source": "abudawud:1522",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 1522 (Sahih); Hisn al-Muslim 28.",
+      "reviewedCandidate": "abudawud:1522"
+    },
+    "ap-ref-7": {
+      "source": "tirmidhi:3474",
+      "status": "verified",
+      "originalReference": "Jami' at-Tirmidhi 3474; Sunan an-Nasa'i 10234; Hisn al-Muslim 29.",
+      "reviewedCandidate": "tirmidhi:3474"
+    },
+    "ap-ref-8": {
+      "source": "tirmidhi:3233",
+      "status": "verified",
+      "originalReference": "Jami' at-Tirmidhi 3233 (Hasan).",
+      "reviewedCandidate": "tirmidhi:3233"
+    },
+    "ap-ref-10": {
+      "source": "ibnmajah:925",
+      "status": "verified",
+      "originalReference": "Sunan Ibn Majah 925; Hisn al-Muslim 32.",
+      "reviewedCandidate": "ibnmajah:925"
+    },
+    "ap-ref-12a": {
+      "source": "abudawud:1523",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 1523 (Sahih).",
+      "reviewedCandidate": "abudawud:1523"
+    },
+    "ap-ref-12b": {
+      "source": "abudawud:1523",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 1523 (Sahih).",
+      "reviewedCandidate": "abudawud:1523"
+    },
+    "ap-ref-12c": {
+      "source": "abudawud:1523",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 1523 (Sahih).",
+      "reviewedCandidate": "abudawud:1523"
+    },
+    "in-prayer-opening-praise": {
+      "source": "abudawud:775",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 775 (Sahih, al-Albani).",
+      "reviewedCandidate": "abudawud:775"
+    },
+    "in-prayer-ruku-submission": {
+      "source": "muslim:771",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 771.",
+      "reviewedCandidate": "muslim:771"
+    },
+    "in-prayer-ruku-sujud-holy": {
+      "source": "abudawud:872",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 872 (Sahih, al-Albani); also reported by Muslim.",
+      "reviewedCandidate": "abudawud:872"
+    },
+    "in-prayer-ruku-sujud-majesty": {
+      "source": "abudawud:873",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 873; Sunan an-Nasa'i 1049.",
+      "reviewedCandidate": "abudawud:873"
+    },
+    "in-prayer-sujud-submission": {
+      "source": "muslim:771",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 771.",
+      "reviewedCandidate": "muslim:771"
+    },
+    "in-prayer-sujud-tilawah": {
+      "source": "abudawud:1414",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 1414; Jami' at-Tirmidhi 580.",
+      "reviewedCandidate": "abudawud:1414"
+    },
+    "in-prayer-between-prostrations": {
+      "source": "abudawud:850",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 850 (Hasan, al-Albani).",
+      "reviewedCandidate": "abudawud:850"
+    },
+    "in-prayer-between-prostrations-brief": {
+      "source": "abudawud:874",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 874 (Sahih, al-Albani).",
+      "reviewedCandidate": "abudawud:874"
+    },
+    "in-prayer-before-salam-comprehensive": {
+      "source": "nasai:1305",
+      "status": "verified",
+      "originalReference": "Sunan an-Nasa'i 1305; Musnad Ahmad 4/264.",
+      "reviewedCandidate": "nasai:1305"
+    },
+    "in-prayer-before-salam-forgiveness": {
+      "source": "muslim:771",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 771.",
+      "reviewedCandidate": "muslim:771"
+    },
+    "in-prayer-witr-qunut": {
+      "source": "abudawud:1425",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 1425 (Sahih, al-Albani).",
+      "reviewedCandidate": "abudawud:1425"
+    },
+    "fasting-iftar-supplication": {
+      "source": "abudawud:2357",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 2357 (Hasan, al-Albani).",
+      "reviewedCandidate": "abudawud:2357"
+    },
+    "fasting-affront-response": {
+      "source": "bukhari:1894",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 1894; Sahih Muslim 1151.",
+      "reviewedCandidate": "bukhari:1894"
+    },
+    "fasting-laylat-al-qadr": {
+      "source": "tirmidhi:3513",
+      "status": "verified",
+      "originalReference": "Jami` at-Tirmidhi 3513 (Hasan Sahih).",
+      "reviewedCandidate": "tirmidhi:3513"
+    },
+    "fasting-witr-completion": {
+      "source": "nasai:1699",
+      "status": "verified",
+      "originalReference": "Sunan an-Nasa'i 1699, 1732 (Sahih, al-Albani).",
+      "reviewedCandidate": "nasai:1699"
+    },
+    "fasting-iftar-host": {
+      "source": "abudawud:3854",
+      "status": "verified",
+      "originalReference": "Sunan Abi Dawud 3854 (Sahih, al-Albani).",
+      "reviewedCandidate": "abudawud:3854"
+    },
+    "pur-ref-1": {
+      "source": "abudawud:101",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 101; Sunan Ibn Majah 399; Hisn al-Muslim 8.",
+      "reviewedCandidate": "abudawud:101"
+    },
+    "pur-ref-2": {
+      "source": "muslim:234a",
+      "status": "replacement",
+      "originalReference": "Sunan Ibn Majah 299.",
+      "reviewedCandidate": "nasai-kubra:9828",
+      "reason": "Scholarly grading disagreement; use an undisputed Sahih Muslim purification report.",
+      "reviewUrl": "https://dorar.net/index.php/azkar/mukhtasar/227"
+    },
+    "pur-ref-3": {
+      "source": "bukhari:142",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 142; Sahih Muslim 375; Hisn al-Muslim 6.",
+      "reviewedCandidate": "bukhari:142"
+    },
+    "pur-ref-4": {
+      "source": "abudawud:30",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 30; Jami' at-Tirmidhi 7; Hisn al-Muslim 7.",
+      "reviewedCandidate": "abudawud:30"
+    },
+    "pur-ref-5": {
+      "source": "muslim:234a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 234; Jami` at-Tirmidhi 55; Hisn al-Muslim 9.",
+      "reviewedCandidate": "muslim:234a"
+    },
+    "pur-ref-6": {
+      "source": "muslim:234a",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 3/153; Sunan an-Nasa'i; Hisn al-Muslim 10.",
+      "reviewedCandidate": "nasai-kubra:9909",
+      "reason": "Attribution as prophetic or companion is disputed; use Sahih Muslim purification evidence.",
+      "reviewUrl": "https://dorar.net/index.php/azkar/mukhtasar/227"
+    },
+    "fd-ref-1": {
+      "source": "abudawud:3767",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 3/347; Jami' at-Tirmidhi 4/288; Hisn al-Muslim 178.",
+      "reviewedCandidate": "abudawud:3767"
+    },
+    "fd-ref-2": {
+      "source": "abudawud:3767",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 3767; Jami' at-Tirmidhi 1858; Hisn al-Muslim 178.",
+      "reviewedCandidate": "abudawud:3767"
+    },
+    "fd-ref-3": {
+      "source": "bukhari:5458",
+      "status": "replacement",
+      "originalReference": "Sunan Abu Dawud 3850; Jami' at-Tirmidhi 3457; Hisn al-Muslim 180.",
+      "reviewedCandidate": "abudawud:3850",
+      "reason": "Linked route is weak according to al-Albani; use authenticated praise after eating.",
+      "reviewUrl": "https://sunnah.com/abudawud:3850"
+    },
+    "fd-ref-4": {
+      "source": "bukhari:5458",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 7/84; Hisn al-Muslim 180.",
+      "reviewedCandidate": "bukhari:5458"
+    },
+    "fd-ref-5": {
+      "source": "abudawud:3730",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 5/506; Hisn al-Muslim 181.",
+      "reviewedCandidate": "tirmidhi:3455",
+      "reason": "Darussalam grades this route weak; use the linked Abu Dawud route graded Hasan by al-Albani.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3455"
+    },
+    "fd-ref-6": {
+      "source": "muslim:2055",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2055; Hisn al-Muslim 182.",
+      "reviewedCandidate": "muslim:2055"
+    },
+    "fd-ref-7": {
+      "source": "abudawud:3854",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 3854; Sunan Ibn Majah 1747; Hisn al-Muslim 183.",
+      "reviewedCandidate": "abudawud:3854"
+    },
+    "fd-ref-8": {
+      "source": "abudawud:3730",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 3730; Jami' at-Tirmidhi 3455; Hisn al-Muslim 181.",
+      "reviewedCandidate": "abudawud:3730"
+    },
+    "fd-ref-9": {
+      "source": "tirmidhi:3458",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 4023; Jami' at-Tirmidhi 3458; Hisn al-Muslim 179.",
+      "reviewedCandidate": "tirmidhi:3458"
+    },
+    "clo-ref-1": {
+      "source": "abudawud:4020",
+      "status": "replacement",
+      "originalReference": "Sunan Abu Dawud 4023; Jami' at-Tirmidhi 3458; Hisn al-Muslim 2.",
+      "reviewedCandidate": "abudawud:4020",
+      "reason": "The Home mapping uses Abu Dawud 4020 as an authenticated alternative; it does not verify the original Abu Dawud 4023 clothing-praise entry. Keep original collection content pending independent review."
+    },
+    "clo-ref-2": {
+      "source": "abudawud:4020",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 4020; Jami' at-Tirmidhi 1767; Hisn al-Muslim 3.",
+      "reviewedCandidate": "abudawud:4020"
+    },
+    "clo-ref-3": {
+      "source": "abudawud:4020",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 4020; Hisn al-Muslim 4.",
+      "reviewedCandidate": "abudawud:4020"
+    },
+    "clo-ref-4": {
+      "source": "abudawud:4020",
+      "status": "replacement",
+      "originalReference": "Sunan Ibn Majah 297; Jami' at-Tirmidhi; Hisn al-Muslim 5.",
+      "reviewedCandidate": "ibnmajah:297",
+      "reason": "Darussalam grades this route weak; use authenticated supplication on receiving new clothing.",
+      "reviewUrl": "https://sunnah.com/ibnmajah:297"
+    },
+    "tr-ref-1": {
+      "source": "muslim:1342",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 1342; Sunan Abu Dawud 2599; Hisn al-Muslim 75–76.",
+      "reviewedCandidate": "muslim:1342"
+    },
+    "tr-ref-2": {
+      "source": "bukhari:2993",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 2993; Hisn al-Muslim 79.",
+      "reviewedCandidate": "bukhari:2993"
+    },
+    "tr-ref-3": {
+      "source": "ibnmajah:2825",
+      "status": "verified",
+      "originalReference": "Sunan Ibn Majah 2825; Musnad Ahmad 8690; Hisn al-Muslim 78.",
+      "reviewedCandidate": "ibnmajah:2825"
+    },
+    "tr-ref-5": {
+      "source": "abudawud:2600",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 2600; Jami' at-Tirmidhi 3443; Hisn al-Muslim 77.",
+      "reviewedCandidate": "abudawud:2600"
+    },
+    "tr-ref-6": {
+      "source": "ibnkhuzaymah:2565",
+      "status": "verified",
+      "originalReference": "Sahih Ibn Hibban 2697; Al-Hakim 1/442; Hisn al-Muslim 80.",
+      "reviewedCandidate": "ibnkhuzaymah:2565"
+    },
+    "tr-ref-7": {
+      "source": "muslim:2708",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2708; Hisn al-Muslim 81.",
+      "reviewedCandidate": "muslim:2708"
+    },
+    "tr-ref-8": {
+      "source": "muslim:2718",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2718; Hisn al-Muslim 82.",
+      "reviewedCandidate": "muslim:2718"
+    },
+    "tr-ref-4": {
+      "source": "muslim:1342",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 1342; Hisn al-Muslim 76.",
+      "reviewedCandidate": "muslim:1342"
+    },
+    "tr-ref-9": {
+      "source": "bukhari:1797",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 1797, 3084; Sahih Muslim 1344; Hisn al-Muslim 77–78.",
+      "reviewedCandidate": "bukhari:1797"
+    },
+    "da-ref-1": {
+      "source": "bukhari:6363",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6363; Sunan Abu Dawud 1555; Hisn al-Muslim 120.",
+      "reviewedCandidate": "bukhari:6363"
+    },
+    "da-ref-2": {
+      "source": "tirmidhi:3505",
+      "status": "verified",
+      "originalReference": "Jami' at-Tirmidhi 3505; Quran 21:87; Hisn al-Muslim 121.",
+      "reviewedCandidate": "tirmidhi:3505"
+    },
+    "da-ref-3": {
+      "source": "abudawud:1525",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 1525; Hisn al-Muslim 122.",
+      "reviewedCandidate": "abudawud:1525"
+    },
+    "da-ref-4": {
+      "source": "abudawud:5090",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 5090; Hisn al-Muslim 123.",
+      "reviewedCandidate": "abudawud:5090"
+    },
+    "da-ref-6": {
+      "source": "ahmad:3712",
+      "status": "verified",
+      "originalReference": "Musnad Ahmad 3712; Hisn al-Muslim 120.",
+      "reviewedCandidate": "ahmad:3712"
+    },
+    "da-ref-7": {
+      "source": "tirmidhi:3563",
+      "status": "verified",
+      "originalReference": "Jami` at-Tirmidhi 3563; Hisn al-Muslim 136.",
+      "reviewedCandidate": "tirmidhi:3563"
+    },
+    "da-ref-8": {
+      "source": "bukhari:6346",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6346; Sahih Muslim 2730; Hisn al-Muslim 121.",
+      "reviewedCandidate": "bukhari:6346"
+    },
+    "ir-ref-1": {
+      "source": "muslim:2202",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2202; Hisn al-Muslim 131.",
+      "reviewedCandidate": "muslim:2202"
+    },
+    "ir-ref-2": {
+      "source": "muslim:2191",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 7/131; Sahih Muslim 2191; Hisn al-Muslim 129.",
+      "reviewedCandidate": "muslim:2191"
+    },
+    "ir-ref-3": {
+      "source": "muslim:2185",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2186; Hisn al-Muslim 130.",
+      "reviewedCandidate": "muslim:2185"
+    },
+    "ir-ref-4": {
+      "source": "abudawud:3106",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 3106; Jami' at-Tirmidhi 2083; Hisn al-Muslim 128.",
+      "reviewedCandidate": "abudawud:3106"
+    },
+    "ir-ref-5a": {
+      "source": "bukhari:5017",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+      "reviewedCandidate": "bukhari:5017"
+    },
+    "ir-ref-5b": {
+      "source": "bukhari:5017",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+      "reviewedCandidate": "bukhari:5017"
+    },
+    "ir-ref-5c": {
+      "source": "bukhari:5017",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+      "reviewedCandidate": "bukhari:5017"
+    },
+    "ir-ref-6": {
+      "source": "muslim:2186",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2186; Hisn al-Muslim 133.",
+      "reviewedCandidate": "muslim:2186"
+    },
+    "ir-ref-7": {
+      "source": "muslim:916a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 916, 917; Sunan Abi Dawud 3116; Hisn al-Muslim 138.",
+      "reviewedCandidate": "muslim:916a"
+    },
+    "ir-baqarah": {
+      "source": "muslim:780",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 804, 780.",
+      "reviewedCandidate": "muslim:780"
+    },
+    "sc-ref-1": {
+      "source": "abudawud:5195",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
+      "reviewedCandidate": "abudawud:5195"
+    },
+    "sc-ref-2": {
+      "source": "bukhari:3217",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
+      "reviewedCandidate": "bukhari:3217"
+    },
+    "sc-ref-3": {
+      "source": "bukhari:6224",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
+      "reviewedCandidate": "bukhari:6224"
+    },
+    "sc-ref-4": {
+      "source": "bukhari:6224",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
+      "reviewedCandidate": "bukhari:6224"
+    },
+    "sc-ref-5": {
+      "source": "tirmidhi:2035",
+      "status": "verified",
+      "originalReference": "Jami' at-Tirmidhi 2035.",
+      "reviewedCandidate": "tirmidhi:2035"
+    },
+    "sc-ref-6": {
+      "source": "nasai-kubra:10062",
+      "status": "verified",
+      "originalReference": "Various Sahih narrations.",
+      "reviewedCandidate": "nasai-kubra:10062"
+    },
+    "sc-ref-7": {
+      "source": "abudawud:2130",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 2130; Jami' at-Tirmidhi 1091; Hisn al-Muslim 98.",
+      "reviewedCandidate": "abudawud:2130"
+    },
+    "sc-ref-8": {
+      "source": "muslim:918",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 918; Hisn al-Muslim 134.",
+      "reviewedCandidate": "muslim:918"
+    },
+    "sc-ref-9": {
+      "source": "muslim:920",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 920; Hisn al-Muslim 135.",
+      "reviewedCandidate": "muslim:920"
+    },
+    "sc-ref-10": {
+      "source": "tirmidhi:3433",
+      "status": "verified",
+      "originalReference": "Jami` at-Tirmidhi 3433; Sunan Abi Dawud 4859; Hisn al-Muslim 196.",
+      "reviewedCandidate": "tirmidhi:3433"
+    },
+    "sc-ref-11": {
+      "source": "bukhari:6388",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6388; Sahih Muslim 1434; Hisn al-Muslim 190.",
+      "reviewedCandidate": "bukhari:6388"
+    },
+    "sc-ref-12": {
+      "source": "bukhari:3371",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 3371; Hisn al-Muslim 146.",
+      "reviewedCandidate": "bukhari:3371"
+    },
+    "sc-ref-13": {
+      "source": "bukhari:6412",
+      "status": "replacement",
+      "originalReference": "Jami` at-Tirmidhi 3431; Hisn al-Muslim 198.",
+      "reviewedCandidate": "tirmidhi:3431",
+      "reason": "Darussalam grades this route weak; use authenticated reflection on health and free time, without promising immunity from illness.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3431"
+    },
+    "sc-ref-14": {
+      "source": "ibnmajah:3509",
+      "status": "verified",
+      "originalReference": "Muwatta Malik 1746; Musnad Ahmad 15700.",
+      "reviewedCandidate": "ibnmajah:3509"
+    },
+    "ne-ref-1": {
+      "source": "muslim:899b",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 899; Hisn al-Muslim 170.",
+      "reviewedCandidate": "muslim:899b"
+    },
+    "ne-ref-2": {
+      "source": "bukhari:1032",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 2/518; Hisn al-Muslim 171.",
+      "reviewedCandidate": "bukhari:1032"
+    },
+    "ne-ref-3": {
+      "source": "bukhari:846",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 846; Sahih Muslim 71; Hisn al-Muslim 172.",
+      "reviewedCandidate": "bukhari:846"
+    },
+    "ne-ref-4": {
+      "source": "adab:723",
+      "status": "verified",
+      "originalReference": "Muwatta Imam Malik 2/992; Hisn al-Muslim 173.",
+      "reviewedCandidate": "adab:723"
+    },
+    "ne-ref-5": {
+      "source": "muslim:2721a",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 3451; Hisn al-Muslim 168.",
+      "reviewedCandidate": "tirmidhi:3451",
+      "reason": "Darussalam grades this route weak; use an authenticated general supplication without claiming crescent-specific timing.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3451"
+    },
+    "ne-ref-6": {
+      "source": "abudawud:1191",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 1191; Sahih al-Bukhari 1044; Sahih Muslim 901.",
+      "reviewedCandidate": "abudawud:1191"
+    },
+    "ne-ref-7": {
+      "source": "bukhari:1014",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 1014; Sahih Muslim 897; Hisn al-Muslim 175.",
+      "reviewedCandidate": "bukhari:1014"
+    },
+    "misc-ref-1": {
+      "source": "muslim:2725a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2725; Hisn al-Muslim 127.",
+      "reviewedCandidate": "muslim:2725a"
+    },
+    "misc-ref-2": {
+      "source": "bukhari:3293",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 3293; Sahih Muslim 2691; Hisn al-Muslim 152.",
+      "reviewedCandidate": "bukhari:3293"
+    },
+    "misc-ref-3": {
+      "source": "bukhari:6405",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6042; Sahih Muslim 2691; Hisn al-Muslim 153.",
+      "reviewedCandidate": "bukhari:6405"
+    },
+    "misc-ref-4": {
+      "source": "bukhari:7563",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 7563; Sahih Muslim 2694; Hisn al-Muslim 154.",
+      "reviewedCandidate": "bukhari:7563"
+    },
+    "misc-ref-5": {
+      "source": "abudawud:5074",
+      "status": "verified",
+      "originalReference": "Sunan Ibn Majah 3871; Hisn al-Muslim 126.",
+      "reviewedCandidate": "abudawud:5074"
+    },
+    "misc-ref-6": {
+      "source": "bukhari:6384",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 4409; Sahih Muslim 2704; Hisn al-Muslim 155.",
+      "reviewedCandidate": "bukhari:6384"
+    },
+    "misc-ref-7": {
+      "source": "muslim:2697a",
+      "status": "verified",
+      "originalReference": "Sahih Muslim 2696; Hisn al-Muslim 156.",
+      "reviewedCandidate": "muslim:2697a"
+    },
+    "misc-ref-8": {
+      "source": "bukhari:6306",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6306; Hisn al-Muslim 69.",
+      "reviewedCandidate": "bukhari:6306"
+    },
+    "misc-ref-9": {
+      "source": "abudawud:5088",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 5088; Jami' at-Tirmidhi 3388; Hisn al-Muslim 70.",
+      "reviewedCandidate": "abudawud:5088"
+    },
+    "misc-ref-10": {
+      "source": "bukhari:1166",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 1162; Hisn al-Muslim 93.",
+      "reviewedCandidate": "bukhari:1166"
+    },
+    "misc-ref-11": {
+      "source": "bukhari:6405",
+      "status": "replacement",
+      "originalReference": "Jami` at-Tirmidhi 3428; Hisn al-Muslim 200.",
+      "reviewedCandidate": "tirmidhi:3428",
+      "reason": "Darussalam grades this route weak; use authenticated general remembrance without the market-specific million-fold promise.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3428"
+    },
+    "misc-ref-12": {
+      "source": "adab:716",
+      "status": "verified",
+      "originalReference": "Al-Adab Al-Mufrad 716; Musnad Ahmad 19606; Hisn al-Muslim 203.",
+      "reviewedCandidate": "adab:716"
+    },
+    "misc-ref-13": {
+      "source": "abudawud:1516",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 1516; Jami' at-Tirmidhi 3434; Hisn al-Muslim 208.",
+      "reviewedCandidate": "abudawud:1516"
+    },
+    "misc-ref-14": {
+      "source": "bukhari:6115",
+      "status": "verified",
+      "originalReference": "Sahih al-Bukhari 6115; Sahih Muslim 2610; Hisn al-Muslim 201.",
+      "reviewedCandidate": "bukhari:6115"
+    }
+  }
+}

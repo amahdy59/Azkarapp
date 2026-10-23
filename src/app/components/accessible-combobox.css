@@ -1,0 +1,19 @@
+.accessible-combobox-popup {
+  width: var(--radix-popover-trigger-width);
+  max-width: var(--radix-popover-content-available-width);
+  max-height: min(24rem, var(--radix-popover-content-available-height));
+}
+
+.accessible-combobox-search {
+  /* A native input needs a shrinkable intrinsic width inside a narrow popup. */
+  min-width: 0;
+}
+
+/* The popup owns protection; the scrolling list must not create a second
+   material/backdrop root between its search field and options. */
+html .accessible-combobox-options[role="listbox"] {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}

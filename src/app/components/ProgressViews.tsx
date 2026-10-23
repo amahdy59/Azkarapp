@@ -17,7 +17,7 @@ export interface QuranWirdTile {
   goal: number;
   complete: boolean;
   active: boolean;
-  onPress: () => void;
+  onPress?: () => void;
   onToggleComplete?: () => void;
 }
 
@@ -25,22 +25,22 @@ export interface QuranWirdTile {
 const WIRD_CARD_CONFIG = {
   morning: {
     subtitleKey: "progress.morningCardSubtitle",
-    image: "assets/cards/wird-morning.jpg",
+    image: "assets/cards/wird-morning-720.webp",
     badgeStyle: { backgroundColor: "#f59e0b", color: "#020617" },
   },
   evening: {
     subtitleKey: "progress.eveningCardSubtitle",
-    image: "assets/cards/wird-evening.jpg",
+    image: "assets/cards/wird-evening-720.webp",
     badgeStyle: { backgroundColor: "#6366f1", color: "#ffffff" },
   },
   before_sleep: {
     subtitleKey: "progress.sleepCardSubtitle",
-    image: "assets/cards/wird-sleep.jpg",
+    image: "assets/cards/wird-sleep-720.webp",
     badgeStyle: { backgroundColor: "#3b82f6", color: "#ffffff" },
   },
   quran: {
     subtitleKey: "progress.quranCardSubtitle",
-    image: "assets/cards/wird-quran.jpg",
+    image: "assets/cards/wird-quran-720.webp",
     badgeStyle: { backgroundColor: "#10b981", color: "#020617" },
   },
 } as const;
@@ -94,7 +94,7 @@ function WirdCategoryCard({
         src={imageSrc}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-slow ease-out group-hover:scale-105"
+        className="absolute inset-0 h-full w-full object-cover"
         loading="lazy"
       />
       {/* Translucent Glass Scrim & Ambient Overlay — inline style avoids generating new Tailwind gradient utilities */}
@@ -316,8 +316,10 @@ export function ProgressDayView({
   onOpenWirdBenefits,
   quranWird,
   onMedia = true,
+  readOnly = false,
 }: {
   summary: GardenSummary;
+  readOnly?: boolean;
   language: AppLanguage;
   dynamicSubtitle: string;
   onSelectCategory?: (categoryId: CategoryId) => void;
@@ -388,6 +390,44 @@ export function ProgressDayView({
     categories.filter((category) => completedToday.includes(category.id)).length + (quranWird?.complete ? 1 : 0);
   const totalCount = categories.length + (quranWird ? 1 : 0);
   const [isWirdInfoOpen, setIsWirdInfoOpen] = useState(false);
+
+  if (readOnly) {
+    const rows: { id: string; name: string; value: string }[] = displayCategories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      value: t(language, completedToday.includes(category.id) ? "progress.completed" : "prayerTracking.notRecorded"),
+    }));
+    if (quranWird)
+      rows.push({
+        id: "quran",
+        name: t(language, "progress.quranWird"),
+        value: quranWird.complete
+          ? t(language, "progress.completed")
+          : quranWird.active
+            ? `${formatRatio(quranWird.progress, quranWird.goal, language)} ${isArabic ? "صفحة" : "pages"}`
+            : t(language, "prayerTracking.notRecorded"),
+      });
+    return (
+      <HomeCard onGlass={false} className="flex-col">
+        <Heading data-testid="progress-primary-heading" className="text-lg font-bold text-foreground">
+          {t(language, "progress.dailyWirdRecords")}
+        </Heading>
+        <dl className="mt-3 divide-y divide-border">
+          {rows.map((row) => (
+            <div
+              key={row.id}
+              className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2 text-sm"
+            >
+              <dt className="font-semibold text-foreground">{row.name}</dt>
+              <dd className="text-muted-foreground">
+                <bdi>{row.value}</bdi>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </HomeCard>
+    );
+  }
 
   return (
     // h-full/flex-1 let Home stretch this card to the hero's height. On the

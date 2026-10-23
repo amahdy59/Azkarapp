@@ -30,9 +30,9 @@ const quranCandidate = (
 /** Review requirements only; these are not production assignments or playable assets. */
 export const QURAN_AUDIO_REVIEW_CANDIDATES = [
   quranCandidate("quran-002-255", ["m-hm-75", "e-hm-75", "s-hm-100", "ap-ref-9"], 2, 255, 255),
-  quranCandidate("quran-112", ["m-hm-76a", "e-hm-76a", "s-hm-99-ikhlas"], 112, 1, 4),
-  quranCandidate("quran-113", ["m-hm-76b", "e-hm-76b", "s-hm-99-falaq"], 113, 1, 5),
-  quranCandidate("quran-114", ["m-hm-76c", "e-hm-76c", "s-hm-99-nas"], 114, 1, 6),
+  quranCandidate("quran-112", ["m-hm-76a", "e-hm-76a", "s-hm-99-ikhlas", "ir-ref-5a"], 112, 1, 4),
+  quranCandidate("quran-113", ["m-hm-76b", "e-hm-76b", "s-hm-99-falaq", "ir-ref-5b"], 113, 1, 5),
+  quranCandidate("quran-114", ["m-hm-76c", "e-hm-76c", "s-hm-99-nas", "ir-ref-5c"], 114, 1, 6),
   quranCandidate("quran-002-285-286", ["s-hm-101"], 2, 285, 286),
   quranCandidate("quran-109", ["s-hm-109a"], 109, 1, 6),
   quranCandidate("quran-032", ["s-hm-110a"], 32, 1, 30),

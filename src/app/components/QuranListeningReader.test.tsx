@@ -227,7 +227,8 @@ describe("read-only listening controls", () => {
     expect(container.querySelector('[data-playback-word="true"]')).toBeNull();
     fireEvent.click(words);
     expect(container.querySelector('[data-playback-word="true"]')).not.toBeNull();
-    expect(container.querySelector("[data-playback-line]")).not.toBeNull();
+    expect(container.querySelector("[data-playback-line]")).toBeNull();
+    expect(container.querySelector('[data-current-ayah-marker="true"]')).not.toBeNull();
     expect(container.querySelector('[aria-current="true"]')).not.toBeNull();
     vi.mocked(timings.resolveQuranTiming).mockReturnValue(null);
     rerender(
@@ -272,6 +273,57 @@ describe("read-only listening controls", () => {
 });
 
 describe("continuous surah listening", () => {
+  it("keeps following when focus moves to controls but pauses for manual reading", () => {
+    const { container } = render(
+      <div>
+        <button type="button">Audio options</button>
+        <div className="audio-expanded-text" tabIndex={-1}>
+          <ContinuousReader entry={entry} segment={null} currentTime={1} language="en" preferencesHost={null} />
+        </div>
+      </div>,
+    );
+    const viewport = container.querySelector<HTMLElement>(".audio-expanded-text")!;
+    viewport.focus();
+    screen.getByRole("button", { name: "Audio options" }).focus();
+    expect(screen.queryByRole("button", { name: "Return to current verse" })).toBeNull();
+    fireEvent.wheel(viewport);
+    expect(screen.getByRole("button", { name: "Return to current verse" })).toBeInTheDocument();
+  });
+
+  it("honors End across late page fitting until the user browses elsewhere", () => {
+    const callbacks: ResizeObserverCallback[] = [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: ResizeObserverCallback) {
+          callbacks.push(callback);
+        }
+        observe = vi.fn();
+        disconnect = vi.fn();
+      },
+    );
+    const { container, unmount } = render(
+      <div className="audio-expanded-text" tabIndex={-1} role="region" aria-label="Test reading">
+        <ContinuousReader entry={entry} segment={null} currentTime={1} language="ar" preferencesHost={null} />
+      </div>,
+    );
+    const viewport = container.querySelector<HTMLElement>(".audio-expanded-text")!;
+    const scroll = vi.fn();
+    viewport.scrollTo = scroll;
+    Object.defineProperty(viewport, "scrollHeight", { configurable: true, value: 1000 });
+    viewport.focus();
+    fireEvent.keyDown(viewport, { key: "End" });
+    expect(scroll).toHaveBeenLastCalledWith({ top: 1000, behavior: "instant" });
+    Object.defineProperty(viewport, "scrollHeight", { configurable: true, value: 1600 });
+    callbacks.forEach((callback) => callback([], {} as ResizeObserver));
+    expect(scroll).toHaveBeenLastCalledWith({ top: 1600, behavior: "instant" });
+    fireEvent.wheel(viewport);
+    scroll.mockClear();
+    callbacks.forEach((callback) => callback([], {} as ResizeObserver));
+    expect(scroll).not.toHaveBeenCalled();
+    unmount();
+    vi.unstubAllGlobals();
+  });
   beforeEach(() => {
     loader.error = false;
     vi.spyOn(timings, "resolveQuranTiming").mockReturnValue(annotation);

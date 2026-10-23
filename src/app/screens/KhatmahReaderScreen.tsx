@@ -16,9 +16,12 @@ import type {
 } from "../types";
 import type { AudioController } from "../audio/AudioProvider";
 import { useMushafPlayback } from "../hooks/useMushafPlayback";
+import { useMushafMeaningsReady } from "../hooks/useMushafMeaningsReady";
 import {
   ArrowPrevious,
   ArrowNext,
+  ArrowLeft,
+  ArrowRight,
   CheckCircle2,
   ChevronDown,
   X,
@@ -28,7 +31,7 @@ import {
   MoreVertical,
 } from "../components/icons";
 import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "../components/mushafShell";
-import { vibrateIfEnabled } from "../motionPreferences";
+import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafLoadingPlaceholder } from "../components/MushafLoadingPlaceholder";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
@@ -67,8 +70,8 @@ import { reportError } from "../../lib/observability";
 const LAST_PAGE = 604;
 /** Past this many pixels of horizontal travel a drag is a page turn. */
 const SWIPE_THRESHOLD = 60;
-/** Settling a released drag, and the only transform animation on this screen. */
-const PAPER_SETTLE = "transform 160ms ease-out";
+/** Only incomplete drags settle; committed turns use the viewer's animation. */
+const PAPER_SETTLE = "transform var(--motion-duration-fast) var(--motion-ease-standard)";
 const FONT_WAIT_MS = 1200;
 
 const COMPLETION_NOTICE_MS = 4000;
@@ -100,31 +103,21 @@ interface ResolvedPage {
   qcf: boolean;
 }
 
-function warmGlossesWhenIdle(surahs: string[]) {
-  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-  if (connection?.saveData) return;
-  const warm = () => void Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
-  const idleWindow = window as Window & { requestIdleCallback?: (callback: () => void) => number };
-  if (typeof idleWindow.requestIdleCallback === "function") {
-    idleWindow.requestIdleCallback(warm);
-  } else {
-    window.setTimeout(warm, 0);
-  }
-}
-
-async function resolveMushafPage(page: number, waitForMeanings: boolean): Promise<ResolvedPage> {
+async function resolveMushafPage(page: number): Promise<ResolvedPage> {
+  // Start the only cold reading resource before waiting for local page data.
+  const font = isQcfFontReady(page) ? Promise.resolve(true) : loadQcfFont(page);
   const data = await loadMushafPage(page);
-  const surahs = [...new Set(data.map((verse) => verse.k.split(":")[0] ?? ""))].filter(Boolean);
-  if (waitForMeanings) await Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
-  else warmGlossesWhenIdle(surahs);
-
+  let timer: number | undefined;
   const qcf =
     pageHasQcfGlyphs(data) &&
     (isQcfFontReady(page) ||
       (await Promise.race([
-        loadQcfFont(page),
-        new Promise<boolean>((resolve) => window.setTimeout(() => resolve(false), FONT_WAIT_MS)),
+        font,
+        new Promise<boolean>((resolve) => {
+          timer = window.setTimeout(() => resolve(false), FONT_WAIT_MS);
+        }),
       ])));
+  window.clearTimeout(timer);
   return { page, data, qcf };
 }
 
@@ -135,6 +128,8 @@ export function KhatmahReaderScreen({
   khatmahPage,
   setKhatmahPage,
   mushafTheme: initialTheme = "follow-app",
+  colorGestures = true,
+  onSelectColorGestures,
   appTheme = "midnight",
   setMushafTheme: onUpdateTheme,
   mushafLayout = "auto",
@@ -166,6 +161,8 @@ export function KhatmahReaderScreen({
   khatmahPage: number;
   setKhatmahPage: (page: number) => void;
   mushafTheme?: MushafTheme;
+  colorGestures?: boolean;
+  onSelectColorGestures?: (enabled: boolean) => void;
   appTheme?: ThemeMode;
   setMushafTheme?: (theme: MushafTheme) => void;
   baqarahAudio?: SurahAudioControl;
@@ -223,10 +220,6 @@ export function KhatmahReaderScreen({
   const [showWordMeanings, setShowWordMeanings] = useState(false);
   const [isLoadingWordMeanings, setIsLoadingWordMeanings] = useState(false);
   const [completionSeen, setCompletionSeen] = useState<string | null>(null);
-  /** Read inside the loader without making the switch a dependency of it —
-   *  flipping it must not re-fetch the page. */
-  const showMeaningsRef = useRef(showWordMeanings);
-  showMeaningsRef.current = showWordMeanings;
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
   );
@@ -379,7 +372,7 @@ export function KhatmahReaderScreen({
     if (targetBounds.top < paperBounds.top + topMargin || targetBounds.bottom > paperBounds.bottom - bottomMargin) {
       paper.scrollTo({
         top: Math.max(0, paper.scrollTop + targetBounds.top - paperBounds.top - topMargin),
-        behavior: "smooth",
+        behavior: "instant",
       });
     }
   }, [playback.follow, playback.cue.verseKey, playback.cue.word?.position, pageMagnification]);
@@ -433,16 +426,19 @@ export function KhatmahReaderScreen({
   const [themeHud, setThemeHud] = useState<ThemeMode | null>(null);
   const themeHudTimer = useRef<number | null>(null);
 
-  const cycleTheme = useCallback(() => {
-    const nextTheme = getNextMushafTheme(theme, appTheme);
-    handleSelectTheme(nextTheme);
-    vibrateIfEnabled(hapticFeedback, 10);
-    setThemeHud(nextTheme);
-    if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
-    themeHudTimer.current = window.setTimeout(() => {
-      setThemeHud(null);
-    }, 1400);
-  }, [appTheme, handleSelectTheme, hapticFeedback, theme]);
+  const cycleTheme = useCallback(
+    (step: 1 | -1 = 1) => {
+      const nextTheme = getNextMushafTheme(theme, appTheme, step);
+      handleSelectTheme(nextTheme);
+      vibrateIfEnabled(hapticFeedback, 10);
+      setThemeHud(nextTheme);
+      if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
+      themeHudTimer.current = window.setTimeout(() => {
+        setThemeHud(null);
+      }, 1400);
+    },
+    [appTheme, handleSelectTheme, hapticFeedback, theme],
+  );
 
   useEffect(() => {
     return () => {
@@ -489,13 +485,13 @@ export function KhatmahReaderScreen({
     void (async () => {
       // Settle both halves together.
       const [next, facing] = await Promise.all([
-        resolveMushafPage(currentPage, showMeaningsRef.current).catch((reason) => {
+        resolveMushafPage(currentPage).catch((reason) => {
           reportError(reason, "mushaf-page-load");
           return null;
         }),
         facingPage === null
           ? Promise.resolve(null)
-          : resolveMushafPage(facingPage, showMeaningsRef.current).catch((reason) => {
+          : resolveMushafPage(facingPage).catch((reason) => {
               reportError(reason, "mushaf-facing-page-load");
               return null;
             }),
@@ -561,6 +557,7 @@ export function KhatmahReaderScreen({
 
   const displayPage = resolved?.page ?? currentPage;
   const pageData = resolved?.data ?? null;
+  const wordMeaningsReady = useMushafMeaningsReady(pageData, other?.data, showWordMeanings);
 
   const isPageBookmarked = initialBookmarks.includes(displayPage);
   const togglePageBookmark = useCallback(() => {
@@ -774,19 +771,15 @@ export function KhatmahReaderScreen({
   // spring through component state on every frame.
   const drag = useRef({ pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false, vertical: false });
 
-  /** A tap is short and still. Anything slower or further is a gesture the
-   *  reader was making, and must not be read as one they were not. */
-  const TAP_MS = 400;
-  const TAP_SLOP = 8;
-
   const endDrag = useCallback(
-    (clientX: number | null, clientY: number | null, target?: EventTarget | null, cancelled = false) => {
+    (clientX: number | null, clientY: number | null, cancelled = false) => {
+      const { engaged, startX, startY } = drag.current;
+      const commits = !cancelled && engaged && clientX !== null && Math.abs(clientX - startX) >= SWIPE_THRESHOLD;
       const paper = paperRef.current;
       if (paper) {
-        paper.style.transition = PAPER_SETTLE;
+        paper.style.transition = engaged && !commits && !shouldReduceMotion(reduceMotion) ? PAPER_SETTLE : "none";
         paper.style.transform = "";
       }
-      const { engaged, startX, startY, startedAt } = drag.current;
       drag.current = { pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false, vertical: false };
       // The browser cancels the pointer when it takes the gesture over for
       // scrolling. Committing a page turn on that would turn a scroll into a
@@ -802,26 +795,19 @@ export function KhatmahReaderScreen({
 
       if (clientX === null || clientY === null) return;
       const offsetY = clientY - startY;
+      if (!colorGestures) return;
       if (offsetY <= -SWIPE_THRESHOLD) {
         cycleTheme();
         return;
       }
       if (offsetY >= SWIPE_THRESHOLD) {
-        setIsFocusMode((prev) => !prev);
+        cycleTheme(-1);
         return;
       }
-      const moved = Math.hypot(clientX - startX, clientY - startY);
-      const heldFor = performance.now() - startedAt;
-      if (moved > TAP_SLOP || heldFor > TAP_MS) return;
-      if (
-        target instanceof Element &&
-        target.closest("button, a, input, label, select, textarea, [role='button'], [role='switch']")
-      )
-        return;
-      // Center / page tap toggles focus mode (hiding or revealing chrome and floating audio)
-      setIsFocusMode((prev) => !prev);
+      // MushafPageViewer owns ordinary edge/centre taps. This ancestor owns
+      // swipes only; toggling here too reversed a centre tap a second time.
     },
-    [cycleTheme, paginate],
+    [colorGestures, cycleTheme, paginate, reduceMotion],
   );
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -854,7 +840,7 @@ export function KhatmahReaderScreen({
       }
     }
     const paper = paperRef.current;
-    if (paper) {
+    if (paper && !shouldReduceMotion(reduceMotion)) {
       paper.style.transition = "none";
       paper.style.transform = `translateX(${offset.toFixed(1)}px)`;
     }
@@ -862,15 +848,16 @@ export function KhatmahReaderScreen({
 
   const onPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current.pointerId !== event.pointerId) return;
-    endDrag(event.clientX, event.clientY, event.target);
+    endDrag(event.clientX, event.clientY);
   };
 
   const onPointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current.pointerId !== event.pointerId) return;
-    endDrag(null, null, null, true);
+    endDrag(null, null, true);
   };
 
   const isRtl = direction === "rtl";
+  const MobileBackIcon = isRtl ? ArrowRight : ArrowLeft;
 
   const mobileBack =
     (!useRail || compactTranslation) && !isFocusMode ? (
@@ -892,7 +879,7 @@ export function KhatmahReaderScreen({
               : "inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted"
           }
         >
-          <ArrowPrevious size={16} aria-hidden="true" />
+          <MobileBackIcon size={16} aria-hidden="true" />
         </span>
       </button>
     ) : undefined;
@@ -1257,7 +1244,7 @@ export function KhatmahReaderScreen({
               theme={resolvedTheme}
               isBookmarked={isPageBookmarked}
               useQcfGlyphs={spreadReady && rightSide ? (spreadRoom ? spreadQcf : rightSide.qcf) : useQcfGlyphs}
-              showWordMeanings={showWordMeanings}
+              showWordMeanings={wordMeaningsReady}
               highlightedVerseKey={playback.cue.verseKey ?? highlightedVerseKey}
               highlightedWord={playback.cue.word}
               facingPage={
@@ -1312,7 +1299,7 @@ export function KhatmahReaderScreen({
               onNext={() => paginate(1)}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
-              verticalGestures={pageMagnification === 100}
+              verticalGestures={pageMagnification === 100 && colorGestures}
               magnification={pageMagnification}
               showFloatingPageIndicator={!isFocusMode}
               pageTransitionDirection={pageTransitionDirection}
@@ -1373,7 +1360,7 @@ export function KhatmahReaderScreen({
           data-testid="mushaf-theme-hud"
           className="pointer-events-none absolute inset-x-0 top-16 z-30 flex justify-center px-4"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-popover px-4 py-2 text-xs font-bold text-popover-foreground shadow-overlay">
+          <div className="mushaf-theme-hud-surface inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-border px-4 py-2 text-xs font-bold text-popover-foreground shadow-overlay">
             <span
               className="size-3 rounded-full border border-border"
               style={{
@@ -1381,6 +1368,7 @@ export function KhatmahReaderScreen({
               }}
               aria-hidden="true"
             />
+            <span className="mushaf-material-hint hidden">{t(language, "mushaf.glassActive")}</span>
             <span>
               {themeHud === "light"
                 ? t(language, "mushaf.themeLight")
@@ -1429,6 +1417,8 @@ export function KhatmahReaderScreen({
         language={language}
         direction={direction}
         theme={theme}
+        colorGestures={colorGestures}
+        onSelectColorGestures={onSelectColorGestures}
         appTheme={appTheme}
         onSelectTheme={handleSelectTheme}
         mushafLayout={internalLayout}

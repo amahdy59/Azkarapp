@@ -84,7 +84,7 @@ function PracticeRow({
     >
       <span
         className={`flex size-6 shrink-0 items-center justify-center rounded-lg border transition-colors ${
-          checked ? "border-success bg-success text-white" : "border-border bg-background text-transparent"
+          checked ? "border-success bg-success text-success-foreground" : "border-border bg-background text-transparent"
         }`}
         aria-hidden="true"
       >

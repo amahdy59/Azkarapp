@@ -1,0 +1,11 @@
+# Home sharing, selection and audio refinement — 2026-10-16
+
+Owner-approved plan: replace the hourglass with matching selected-card underline/detail top edge; add one-action Home routine sharing of existing approved card packs (native files, one ZIP when unsupported, no download after cancellation/error); default audio continuation on while preserving an explicit saved choice; unify option rows/indicators and remove the redundant visible expanded zikr title; place Play all alongside desktop transport with narrow-layout recovery. Preserve reviewed content, recordings, counting, prayer data and all accessibility preferences. Reuse existing services, shared player and semantic tokens. Add focused preference/controller/share/browser regressions, inspect phone/desktop evidence, then run intact release gates.
+
+The owner additionally requests visible card photos and current background delivery through Cloudflare. Diagnose opacity overlays and deployed versions before changing assets; optimize existing imagery without altering reviewed sharing-card text, use versioned R2 paths and retain packaged offline/native assets. Reduced transparency keeps opaque captions while leaving a photo band visible; high contrast/forced colors retain legibility. Verify normal/reduced appearance, load failure, actual decodes, and deployed SHA.
+
+## Full-card photograph correction — supersedes the photo-band approach
+
+The owner rejects the partial photograph strip. Keep full-card object-fit: cover artwork and a fixed contrast gradient for every ordinary transparency preference, including reduced transparency and when Home glass is off. These are shaded photographs, with no backdrop blur or transparent window onto the Home scenery. High contrast strengthens the gradient; forced colors retains Canvas/CanvasText recovery. Remove the separate solid caption region and preserve full-size image/caption bounds. Verify both transparency preferences at phone/desktop widths and replace partial-photo screenshots with full-card evidence.
+
+The owner explicitly authorizes inclusion of the other session's verified sticky prayer work. Its final behavior pins the original full row below the header, with a measured short-viewport fallback; it does not add a compact replacement bar.

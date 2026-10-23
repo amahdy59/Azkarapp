@@ -1,9 +1,9 @@
 import { progressFillStyle } from "./progressFillStyle";
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ArrowPrevious, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
+import { ArrowLeft, ArrowRight, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "./mushafShell";
-import { vibrateIfEnabled } from "../motionPreferences";
+import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
 import { MushafNavigationModal } from "./MushafNavigationModal";
 import { MushafSettingsSheet } from "./MushafSettingsSheet";
@@ -41,7 +41,7 @@ import {
   getSurahShortName,
 } from "../content/surahInfo";
 import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
-import { loadSurahWordMeanings, type QuranWordMeaning, type WordMeaningSelection } from "../content/quranWordMeanings";
+import { type QuranWordMeaning, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { MushafPageViewer } from "./MushafPageViewer";
 import { MushafLoadingPlaceholder } from "./MushafLoadingPlaceholder";
@@ -49,6 +49,7 @@ import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { reportError } from "../../lib/observability";
 import type { AudioController } from "../audio/AudioProvider";
 import { useMushafPlayback } from "../hooks/useMushafPlayback";
+import { useMushafMeaningsReady } from "../hooks/useMushafMeaningsReady";
 export type { SurahAudioControl } from "./MushafToolRail";
 
 const FONT_WAIT_MS = 1200;
@@ -77,22 +78,24 @@ interface ResolvedPage {
   qcf: boolean;
 }
 
-async function resolveMushafPage(page: number, waitForMeanings: boolean): Promise<ResolvedPage> {
+async function resolveMushafPage(page: number): Promise<ResolvedPage> {
+  const font = isQcfFontReady(page) ? Promise.resolve(true) : loadQcfFont(page);
   const data = await loadMushafPage(page);
-  const surahs = [...new Set(data.map((verse) => verse.k.split(":")[0] ?? ""))].filter(Boolean);
-  if (waitForMeanings) await Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
-
+  let timer: number | undefined;
   let qcf = false;
   if (pageHasQcfGlyphs(data)) {
     if (isQcfFontReady(page)) {
       qcf = true;
     } else {
       qcf = await Promise.race([
-        loadQcfFont(page),
-        new Promise<boolean>((resolve) => setTimeout(() => resolve(false), FONT_WAIT_MS)),
+        font,
+        new Promise<boolean>((resolve) => {
+          timer = window.setTimeout(() => resolve(false), FONT_WAIT_MS);
+        }),
       ]);
     }
   }
+  window.clearTimeout(timer);
   return { page, data, qcf };
 }
 
@@ -102,6 +105,8 @@ async function resolveMushafPage(page: number, waitForMeanings: boolean): Promis
  */
 export interface MushafSurahSettings {
   theme: MushafTheme;
+  colorGestures?: boolean;
+  onSelectColorGestures?: (enabled: boolean) => void;
   appTheme: ThemeMode;
   onSelectTheme: (theme: MushafTheme) => void;
   layout: MushafLayout;
@@ -209,22 +214,25 @@ export function MushafImmersiveReader({
       : mushafSettings.theme
     : localTheme;
 
-  const handleThemeSwipe = useCallback(() => {
-    const currentTheme = mushafSettings ? mushafSettings.theme : localTheme;
-    const currentAppTheme = mushafSettings ? mushafSettings.appTheme : "midnight";
-    const nextTheme = getNextMushafTheme(currentTheme, currentAppTheme);
-    if (mushafSettings) {
-      mushafSettings.onSelectTheme(nextTheme);
-    } else {
-      setLocalTheme(nextTheme);
-    }
-    vibrateIfEnabled(hapticFeedback, 10);
-    setThemeHud(nextTheme);
-    if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
-    themeHudTimer.current = window.setTimeout(() => {
-      setThemeHud(null);
-    }, 1400);
-  }, [hapticFeedback, localTheme, mushafSettings]);
+  const handleThemeSwipe = useCallback(
+    (step: 1 | -1 = 1) => {
+      const currentTheme = mushafSettings ? mushafSettings.theme : localTheme;
+      const currentAppTheme = mushafSettings ? mushafSettings.appTheme : "midnight";
+      const nextTheme = getNextMushafTheme(currentTheme, currentAppTheme, step);
+      if (mushafSettings) {
+        mushafSettings.onSelectTheme(nextTheme);
+      } else {
+        setLocalTheme(nextTheme);
+      }
+      vibrateIfEnabled(hapticFeedback, 10);
+      setThemeHud(nextTheme);
+      if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
+      themeHudTimer.current = window.setTimeout(() => {
+        setThemeHud(null);
+      }, 1400);
+    },
+    [hapticFeedback, localTheme, mushafSettings],
+  );
 
   useEffect(() => {
     return () => {
@@ -274,7 +282,7 @@ export function MushafImmersiveReader({
     if (targetBounds.top < paperBounds.top + topMargin || targetBounds.bottom > paperBounds.bottom - bottomMargin) {
       paper.scrollTo({
         top: Math.max(0, paper.scrollTop + targetBounds.top - paperBounds.top - topMargin),
-        behavior: "smooth",
+        behavior: "instant",
       });
     }
   }, [playback.follow, playback.cue.verseKey, playback.cue.word?.position, pageMagnification]);
@@ -332,6 +340,7 @@ export function MushafImmersiveReader({
 
   const displayPage = rightResolved?.page ?? (hasSpread ? rightNumber : (resolved?.page ?? currentPage));
   const pageData = rightResolved?.data ?? resolved?.data ?? null;
+  const wordMeaningsReady = useMushafMeaningsReady(pageData, facing?.data, showWordMeanings);
   const useQcfGlyphs = rightResolved?.qcf ?? resolved?.qcf ?? false;
   const spreadQcf =
     hasSpread && rightResolved && leftResolved
@@ -345,8 +354,8 @@ export function MushafImmersiveReader({
         // Both halves settle together, so a spread never shows one page of a
         // pair while the other is still resolving.
         const [next, other] = await Promise.all([
-          resolveMushafPage(currentPage, showWordMeanings),
-          facingNumber === null ? Promise.resolve(null) : resolveMushafPage(facingNumber, showWordMeanings),
+          resolveMushafPage(currentPage),
+          facingNumber === null ? Promise.resolve(null) : resolveMushafPage(facingNumber),
         ]);
         if (!active) return;
         if (next) setResolved(next);
@@ -359,17 +368,33 @@ export function MushafImmersiveReader({
     return () => {
       active = false;
     };
-  }, [currentPage, facingNumber, showWordMeanings, fontRevision]);
+  }, [currentPage, facingNumber, fontRevision]);
 
-  // Aggressive prefetching of adjacent pages
+  // Start immediate neighbours first. Farther fonts wait for the visible page
+  // so a cold surah opening never competes with six speculative downloads.
   useEffect(() => {
-    for (let i = 1; i <= 3; i++) {
-      const nextP = pageNumbers[pageIndex + i];
-      if (nextP) prefetchMushafPage(nextP);
-      const prevP = pageNumbers[pageIndex - i];
-      if (prevP) prefetchMushafPage(prevP);
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+    for (const offset of [-1, 1]) {
+      const page = pageNumbers[pageIndex + offset];
+      if (page) prefetchMushafPage(page);
     }
   }, [pageIndex, pageNumbers]);
+
+  useEffect(() => {
+    if (resolved?.page !== currentPage) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+    const timer = window.setTimeout(() => {
+      for (const offset of [2, 3]) {
+        const next = pageNumbers[pageIndex + offset];
+        const previous = pageNumbers[pageIndex - offset];
+        if (next) prefetchMushafPage(next);
+        if (previous) prefetchMushafPage(previous);
+      }
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [currentPage, pageIndex, pageNumbers, resolved?.page]);
 
   const paginate = useCallback(
     (delta: number) => {
@@ -470,9 +495,10 @@ export function MushafImmersiveReader({
     direction,
     onNext: () => paginate(1),
     onPrev: () => paginate(-1),
-    onSwipeUp: handleThemeSwipe,
-    onSwipeDown: () => setIsFocusMode((prev) => !prev),
-    reduceMotion: reducedMotion,
+    onSwipeUp: mushafSettings?.colorGestures === false ? undefined : handleThemeSwipe,
+    onSwipeDown: mushafSettings?.colorGestures === false ? undefined : () => handleThemeSwipe(-1),
+    reduceMotion: shouldReduceMotion(reducedMotion),
+    animateCommittedTurn: true,
   });
 
   const handleAyahAction = useCallback((verseKey: string, pageNum: number) => {
@@ -581,6 +607,7 @@ export function MushafImmersiveReader({
   const isPageBookmarked = bookmarkedPages.includes(displayPage);
 
   const isRtl = direction === "rtl";
+  const MobileBackIcon = isRtl ? ArrowRight : ArrowLeft;
 
   const mobileBack =
     !shell.rail && !isFocusMode ? (
@@ -592,7 +619,7 @@ export function MushafImmersiveReader({
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground  backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
-          <ArrowPrevious size={16} aria-hidden="true" />
+          <MobileBackIcon size={16} aria-hidden="true" />
         </span>
       </button>
     ) : undefined;
@@ -798,7 +825,7 @@ export function MushafImmersiveReader({
             theme={resolvedTheme}
             isBookmarked={isPageBookmarked}
             useQcfGlyphs={spreadQcf}
-            showWordMeanings={showWordMeanings}
+            showWordMeanings={wordMeaningsReady}
             highlightedVerseKey={playback.cue.verseKey}
             highlightedWord={playback.cue.word}
             {...(shell.rail && !isFocusMode ? { railContent: toolRail, railSide: "right" as const } : {})}
@@ -827,7 +854,7 @@ export function MushafImmersiveReader({
             onCenterTap={() => setIsFocusMode((prev) => !prev)}
             progressBar={progressBar}
             paperRef={paperRef}
-            verticalGestures={pageMagnification === 100}
+            verticalGestures={pageMagnification === 100 && mushafSettings?.colorGestures !== false}
             magnification={pageMagnification}
             showFloatingPageIndicator={!isFocusMode}
             reduceMotion={reducedMotion}
@@ -855,7 +882,7 @@ export function MushafImmersiveReader({
           data-testid="mushaf-theme-hud"
           className="pointer-events-none absolute inset-x-0 top-16 z-30 flex justify-center px-4"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-popover px-4 py-2 text-xs font-bold text-popover-foreground shadow-md">
+          <div className="mushaf-theme-hud-surface inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-border px-4 py-2 text-xs font-bold text-popover-foreground shadow-md">
             <span
               className="size-3 rounded-full border border-border"
               style={{
@@ -863,6 +890,7 @@ export function MushafImmersiveReader({
               }}
               aria-hidden="true"
             />
+            <span className="mushaf-material-hint hidden">{t(language, "mushaf.glassActive")}</span>
             <span>
               {themeHud === "light"
                 ? t(language, "mushaf.themeLight")
@@ -966,6 +994,8 @@ export function MushafImmersiveReader({
           language={language}
           direction={direction}
           theme={mushafSettings.theme}
+          colorGestures={mushafSettings.colorGestures}
+          onSelectColorGestures={mushafSettings.onSelectColorGestures}
           appTheme={mushafSettings.appTheme}
           onSelectTheme={mushafSettings.onSelectTheme}
           mushafLayout={mushafSettings.layout}

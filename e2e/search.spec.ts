@@ -77,6 +77,7 @@ test("Library search and responsive section controls stay bounded at every tier"
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(tabs).toBeVisible();
+  await page.getByTestId("library-filter-disclosure").locator("summary").click();
   await expect(async () => {
     const mobileInput = await input.boundingBox();
     const mobileTabs = await tabs.boundingBox();

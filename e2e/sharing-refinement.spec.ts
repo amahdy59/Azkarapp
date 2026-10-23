@@ -1,4 +1,6 @@
+import { sharingStep, sharingContent, sharingCaption, sharingReadingLink, sharingScope } from "./helpers/sharing";
 import { getAzkarForMode } from "../src/app/content/azkar";
+import { t } from "../src/app/i18n";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -168,16 +170,12 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
         .click();
   }
   await expect(modal.getByRole("img").first()).toBeVisible();
+  await sharingStep(modal, "share");
   return modal;
 }
 
-async function revealImageSettings(modal: ReturnType<Page["getByTestId"]>, language = "en") {
-  const details = modal
-    .getByText(language === "ar" ? "إعدادات الصورة" : "Image settings", { exact: true })
-    .locator("xpath=ancestor::details[1]");
-  if (!(await details.evaluate((element) => (element as HTMLDetailsElement).open))) {
-    await details.locator("summary").click();
-  }
+async function revealImageSettings(modal: ReturnType<Page["getByTestId"]>) {
+  await sharingStep(modal, "design");
 }
 
 for (const language of ["ar", "en"] as const) {
@@ -192,18 +190,19 @@ for (const language of ["ar", "en"] as const) {
     ).toHaveCount(0);
     for (const width of [1280, 320]) {
       await page.setViewportSize({ width, height: 900 });
-      // matchMedia-driven React state can settle after WebKit's viewport promise.
+      // The actual dialog container, rather than the viewport shell, owns columns.
       await expect
         .poll(() =>
           modal
             .getByTestId("sharing-preview")
-            .evaluate((element) => Boolean((element.parentElement as HTMLElement).style.gridTemplateColumns)),
+            .evaluate((element) => getComputedStyle(element.parentElement!).gridTemplateColumns.split(" ").length),
         )
-        .toBe(width >= 900);
-      await revealImageSettings(modal, language);
-      for (const name of language === "ar"
-        ? ["صورة", "هذه البطاقة", "بنفسجي · ليلي"]
-        : ["Image", "This card", "Lavender · Night"]) {
+        .toBe(width >= 900 ? 2 : 1);
+      await revealImageSettings(modal);
+      for (const name of language === "ar" ? ["بنفسجي · ليلي"] : ["Lavender · Night"]) {
+        if (/^(Image|صورة)$/u.test(name)) await sharingStep(modal, "content");
+        if (/^(This card|هذه البطاقة)$/u.test(name)) await sharingStep(modal, "share");
+        else if (/Lavender|بنفسجي/u.test(name)) await sharingStep(modal, "design");
         const choice = modal.getByRole("button", { name, exact: true });
         await choice.scrollIntoViewIfNeeded();
         const marker = (await choice.locator('svg[aria-hidden="true"]').boundingBox())!;
@@ -214,27 +213,23 @@ for (const language of ["ar", "en"] as const) {
         expect(await choice.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
       }
     }
-    const method = modal.getByRole("group", {
-      name: language === "ar" ? "طريقة المشاركة" : "Sharing method",
-      exact: true,
-    });
-    const text = method.getByRole("button", { name: language === "ar" ? "نص" : "Text", exact: true });
-    await text.scrollIntoViewIfNeeded();
-    const labelOffset = () =>
-      text.evaluate((element) => {
-        const label = element.querySelector('span[dir="auto"]')!.getBoundingClientRect();
-        const button = element.getBoundingClientRect();
-        return { x: label.x - button.x, y: label.y - button.y };
+    await sharingStep(modal, "share");
+    const method = modal.locator(".sharing-caption");
+    const caption = method.getByRole("checkbox", { name: t(language, "shareStudio.includeCaption"), exact: true });
+    await caption.scrollIntoViewIfNeeded();
+    const markerOffset = () =>
+      caption.evaluate((element) => {
+        const label = element.parentElement!.getBoundingClientRect();
+        const box = element.getBoundingClientRect();
+        return { x: box.x - label.x, y: box.y - label.y };
       });
-    const before = await labelOffset();
-    await expect(text.locator('svg[aria-hidden="true"]')).toBeHidden();
-    await text.click();
-    const after = await labelOffset();
-    // Read both rectangles atomically: changing mode can recenter the shorter dialog.
+    const before = await markerOffset();
+    await expect(caption).not.toBeChecked();
+    await caption.check();
+    const after = await markerOffset();
     expect(after.x).toBeCloseTo(before.x, 1);
     expect(after.y).toBeCloseTo(before.y, 1);
-    await expect(text.locator('svg[aria-hidden="true"]')).toBeVisible();
-    await modal.getByRole("button", { name: language === "ar" ? "صورة" : "Image", exact: true }).click();
+    await expect(caption).toBeChecked();
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";
     });
@@ -258,11 +253,10 @@ test("sharing layout mirrors wide previews and keeps mobile recovery and focus r
   const previewBox = (await preview.boundingBox())!;
   const settingsBox = (await settings.boundingBox())!;
   expect(previewBox.x + previewBox.width).toBeLessThanOrEqual(settingsBox.x);
-  await revealImageSettings(modal, "ar");
+  await revealImageSettings(modal);
   await modal.getByRole("combobox", { name: "مقاس الصورة" }).click();
-  const unavailable = page.getByRole("option", { name: "مربع · ١:١", exact: true });
-  await expect(unavailable).toBeDisabled();
-  await expect(unavailable).toContainText("غير متاح: لا يتسع للنص الكامل والإضافات.");
+  const square = page.getByRole("option", { name: "مربع · ١:١", exact: true });
+  await expect(square).toBeEnabled();
   await page.keyboard.press("Escape");
   await expect(modal).toBeVisible();
   await expect(modal.getByRole("combobox", { name: "مقاس الصورة" })).toBeFocused();
@@ -290,6 +284,7 @@ test("sharing layout mirrors wide previews and keeps mobile recovery and focus r
   await page.screenshot({ path: testInfo.outputPath("sharing-phone-ar.png") });
   await page.setViewportSize({ width: 568, height: 320 });
   await expect(modal.getByTestId("modal-close-button")).toBeVisible();
+  await modal.getByTestId("sharing-actions").scrollIntoViewIfNeeded();
   const footer = (await modal.getByTestId("sharing-actions").boundingBox())!;
   expect(footer.y + footer.height).toBeLessThanOrEqual(320);
   expect(await modal.getByTestId("sharing-scroll").evaluate((element) => element.clientHeight)).toBeGreaterThan(0);
@@ -301,8 +296,10 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
   const modal = await openSharing(page);
   await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
   const imageDownload = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("olive-collection.png"));
+  await sharingStep(modal, "share");
   await modal.getByText("قراءة نص هذه البطاقة", { exact: true }).click();
   await expect(modal.locator('[lang="ar"][dir="rtl"]')).not.toHaveCount(0);
   const measures = await page.evaluate(
@@ -352,8 +349,8 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
   for (const line of ink) {
     expect(line.text).not.toMatch(/[0-9۰-۹]/u);
     expect(line.text).not.toBe("المصدر");
-    expect(line.left).toBeGreaterThanOrEqual(110);
-    expect(line.right).toBeLessThanOrEqual(975);
+    expect(line.left, line.text).toBeGreaterThanOrEqual(110);
+    expect(line.right, line.text).toBeLessThanOrEqual(975);
     expect(line.top).toBeGreaterThanOrEqual(line.panelTop + 23);
     expect(line.bottom).toBeLessThanOrEqual(line.panelBottom - 23);
   }
@@ -404,14 +401,17 @@ test("compact sources are optional and never exceed two image lines @cross-brows
     ),
   );
   expect(sourceLines.length).toBeGreaterThan(0);
-  expect(sourceLines.some((line) => line.text.includes("٢٠٨٨"))).toBe(true);
+  // Verified bilingual citations now identify the narration, rather than the
+  // legacy collection's volume/page locator.
+  expect(sourceLines.some((line) => line.text.includes("٢٧٢٣") && line.text.includes("مسلم"))).toBe(true);
   expect(sourceLines[0]!.text).not.toContain("حصن المسلم");
   for (const id of new Set(sourceLines.map((line) => line.panelId)))
     expect(sourceLines.filter((line) => line.panelId === id).length).toBeLessThanOrEqual(2);
   const download = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await download).saveAs(testInfo.outputPath("compact-sources.png"));
-  await modal.getByText("تخصيص المحتوى", { exact: true }).click();
+  await sharingContent(modal);
   const checkbox = modal.getByRole("checkbox", { name: "إضافة المصادر", exact: true });
   await expect(checkbox).toBeChecked();
   const previous = await modal.getByRole("img").first().getAttribute("src");
@@ -427,37 +427,43 @@ test("compact sources are optional and never exceed two image lines @cross-brows
     ),
   ).toBe(false);
   const withoutSources = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await withoutSources).saveAs(testInfo.outputPath("compact-no-sources.png"));
-  await modal.getByRole("button", { name: "نص", exact: true }).click();
+  await sharingCaption(modal);
+  await sharingCaption(modal);
   await expect(modal.getByRole("textbox")).not.toHaveValue(/مسلم|حصن المسلم/u);
+  await sharingContent(modal);
   await checkbox.check();
-  await expect(modal.getByRole("textbox")).toHaveValue(/حصن المسلم/u);
+  await sharingCaption(modal);
+  await expect(modal.getByRole("textbox")).toHaveValue(/صحيح مسلم ٢٧٢٣ب/u);
 });
 
 test("sharing works offline with English meaning and exact text/link alternatives @cross-browser", async ({ page }) => {
   const modal = await openSharing(page, "en");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
   await page.context().setOffline(true);
-  await modal.getByRole("button", { name: "Text", exact: true }).click();
+  await sharingCaption(modal);
+  await sharingCaption(modal);
   await expect(modal.getByRole("textbox")).toContainText(/entered the morning|morning/u);
-  await modal.getByRole("button", { name: "Link", exact: true }).click();
-  await expect(modal.getByRole("textbox")).toHaveValue(/#\/azkar\/morning\?mode=complete$/u);
-  await modal.getByRole("button", { name: "Image", exact: true }).click();
+  expect(await sharingReadingLink(modal)).toMatch(/#\/azkar\/morning\?mode=complete$/u);
+  await sharingStep(modal, "content");
   await revealImageSettings(modal);
   await modal.getByRole("combobox", { name: "Image size" }).click();
-  await expect(page.getByRole("option", { name: "Square · 1:1", exact: true })).toBeDisabled();
+  await expect(page.getByRole("option", { name: "Square · 1:1", exact: true })).toBeEnabled();
   await page.getByRole("option", { name: "Tall reading image", exact: true }).click();
   await expect(modal.getByRole("img").first()).toHaveAttribute("height", "2920");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
-  await modal.getByText("Customize content", { exact: true }).click();
+  await sharingContent(modal);
   await modal.getByRole("checkbox", { name: "Include reviewed English translation" }).check();
   await expect(modal.getByRole("img").first()).toBeVisible();
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
-  await modal.getByRole("button", { name: "Text", exact: true }).click();
+  await sharingCaption(modal);
+  await sharingCaption(modal);
   await expect(modal.getByRole("textbox")).toHaveValue(/We have entered the morning/u);
-  await modal.getByRole("button", { name: "Image", exact: true }).click();
+  await sharingStep(modal, "content");
   const download = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "Save", exact: true }).click();
   expect((await download).suggestedFilename()).toMatch(/tall-001-of-\d+/u);
   await page.context().setOffline(false);
@@ -466,20 +472,27 @@ test("sharing works offline with English meaning and exact text/link alternative
 test("sharing presets separate English translation and Arabic word meanings", async ({ page }) => {
   const modal = await openSharing(page, "ar", "morning", true);
   await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
-  await modal.getByRole("button", { name: "المجموعة كاملة", exact: true }).click();
-  await modal.getByRole("button", { name: "نص", exact: true }).click();
-  await modal.getByText("تخصيص المحتوى", { exact: true }).click();
+  await sharingStep(modal, "share");
+  await sharingScope(modal, "all");
+  await sharingCaption(modal);
+  await sharingContent(modal);
   const preset = modal.getByRole("combobox", { name: "محتوى البطاقة" });
+  await sharingContent(modal);
   await preset.click();
   await page.getByRole("option", { name: "النص العربي والترجمة الإنجليزية", exact: true }).click();
   await expect(modal.getByRole("checkbox", { name: "إضافة الترجمة الإنجليزية المراجعة" })).toBeChecked();
   await expect(modal.getByRole("checkbox", { name: "معاني الكلمات", exact: true })).not.toBeChecked();
+  await sharingCaption(modal);
   await expect(modal.getByRole("textbox")).toHaveValue(/الترجمة الإنجليزية/u);
+  await sharingContent(modal);
   await preset.click();
   await page.getByRole("option", { name: "التفاصيل كاملة", exact: true }).click();
+  await sharingCaption(modal);
   await expect(modal.getByRole("textbox")).toHaveValue(/معاني الكلمات[\s\S]*الميسر في غريب القرآن/u);
+  await sharingContent(modal);
   await preset.click();
   await page.getByRole("option", { name: "النص العربي فقط", exact: true }).click();
+  await sharingCaption(modal);
   await expect(modal.getByRole("textbox")).not.toHaveValue(/معاني الكلمات|الترجمة الإنجليزية/u);
 });
 
@@ -495,10 +508,10 @@ test("single zikr shares through the same preview without affecting its counter 
   const modal = page.getByTestId("collection-share-modal");
   await expect(modal).toHaveAccessibleName("مشاركة هذا الذكر");
   await expect(modal.getByRole("img").first()).toBeVisible();
-  await modal.getByRole("button", { name: "رابط", exact: true }).click();
-  await expect(modal.getByRole("textbox")).toHaveValue(/#\/azkar\/morning\/4\?mode=complete$/u);
-  await modal.getByRole("button", { name: "صورة", exact: true }).click();
+  expect(await sharingReadingLink(modal)).toMatch(/#\/azkar\/morning\/4\?mode=complete$/u);
+  await sharingStep(modal, "content");
   const imageDownload = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("single-zikr.png"));
   await modal.evaluate((element) => {
@@ -518,17 +531,19 @@ test("single Morning card keeps its contextual title and complete selected detai
   await page.goto(`./#/azkar/morning/${index + 1}`);
   await page.getByTestId("reader-share-dock-button").click();
   await expect(modal.getByRole("img").first()).toBeVisible();
-  await modal.getByText("تخصيص المحتوى", { exact: true }).click();
+  await sharingContent(modal);
   await modal.getByRole("combobox", { name: "محتوى البطاقة" }).click();
   await page.getByRole("option", { name: "التفاصيل كاملة", exact: true }).click();
   await expect(modal.getByRole("img").first().or(modal.getByRole("alert")).first()).toBeVisible();
   if (await modal.getByRole("alert").isVisible())
     await modal.getByRole("button", { name: "استخدام صورة قراءة طويلة", exact: true }).click();
   await expect(modal.getByRole("img").first()).toBeVisible();
+  await sharingStep(modal, "share");
   await modal.getByText("قراءة نص هذه البطاقة", { exact: true }).click();
   await expect(modal.getByRole("heading", { name: "من أذكار الصباح", exact: true })).toBeVisible();
   await expect(modal.getByText("الترجمة الإنجليزية", { exact: true }).first()).toBeVisible();
   const download = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await download).saveAs(testInfo.outputPath("morning-single-full.png"));
   await expectDividerClearance(page);
@@ -537,36 +552,29 @@ test("single Morning card keeps its contextual title and complete selected detai
 test("complete cards, compatible formats and ZIP saving are usable on a narrow screen", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 700 });
   const modal = await openSharing(page, "ar", "before-sleep", true);
-  await revealImageSettings(modal, "ar");
+  await revealImageSettings(modal);
   await expect(modal.getByRole("button", { name: "بنفسجي · ليلي" })).toHaveAttribute("aria-pressed", "true");
   for (const [option, height] of [
     ["صورة قراءة طويلة", 2920],
     ["حالة · ٩:١٦", 1920],
   ] as const) {
     await modal.getByRole("combobox", { name: "مقاس الصورة" }).click();
-    await expect(page.getByRole("option", { name: "مربع · ١:١", exact: true })).toBeDisabled();
+    await expect(page.getByRole("option", { name: "مربع · ١:١", exact: true })).toBeEnabled();
     const choice = page.getByRole("option", { name: option, exact: true });
-    if (await choice.isDisabled()) {
-      await expect(choice).toBeDisabled();
-      await page.keyboard.press("Escape");
-      await expect(modal.getByRole("img").first()).toHaveAttribute("height", "2920");
-      await expect(
-        modal.getByText("المقاسات غير المتاحة لا تتسع للمحتوى كاملًا. اختر الصورة الطويلة أو النص أو الرابط.", {
-          exact: true,
-        }),
-      ).toBeVisible();
-      continue;
-    }
+    await expect(choice).toBeEnabled();
     await choice.click();
     await expect(modal.getByRole("img").first()).toHaveAttribute("height", String(height));
     await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
   }
   const imageDownload = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("lavender-collection.png"));
   await expectDividerClearance(page);
   const download = page.waitForEvent("download");
-  await modal.getByRole("button", { name: "المجموعة كاملة", exact: true }).click();
+  await sharingStep(modal, "share");
+  await sharingScope(modal, "all");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   expect((await download).suggestedFilename()).toBe("azkar-cards.zip");
   const overflow = await modal.evaluate((element) => element.scrollWidth > element.clientWidth + 1);
@@ -580,7 +588,7 @@ test("complete cards, compatible formats and ZIP saving are usable on a narrow s
 test("gold cards support QR, keyboard navigation and enlarged text", async ({ page }, testInfo) => {
   const modal = await openSharing(page, "en", "evening");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
-  await modal.getByText("Customize content", { exact: true }).click();
+  await sharingContent(modal);
   const previousImage = await modal.getByRole("img").first().getAttribute("src");
   await modal.getByRole("checkbox", { name: "Add a QR link" }).check();
   await expect(modal.getByRole("img").first()).not.toHaveAttribute("src", previousImage!);
@@ -610,6 +618,7 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
     });
   expect(websiteInk).toBeGreaterThan(100);
   const imageDownload = page.waitForEvent("download");
+  await sharingStep(modal, "share");
   await modal.getByRole("button", { name: "Save", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("gold-collection-qr.png"));
   await page.evaluate(() => {
@@ -641,19 +650,20 @@ test("long surahs share sourced reminders with exact Mushaf links", async ({ pag
     const modal = page.getByTestId("collection-share-modal");
     await expect(modal.getByRole("img").first()).toBeVisible();
     await expect(modal.getByRole("img").first()).toHaveJSProperty("naturalHeight", 1350);
+    await sharingStep(modal, "share");
     await modal.getByText("Read the text on this card", { exact: true }).click();
     await expect(modal.getByRole("heading", { name: item.surahNameEnglish, exact: true })).toBeVisible();
     const download = page.waitForEvent("download");
+    await sharingStep(modal, "share");
     await modal.getByRole("button", { name: "Save", exact: true }).click();
     await (await download).saveAs(testInfo.outputPath(`${id}-reminder.png`));
-    await modal.getByRole("button", { name: "Text", exact: true }).click();
+    await sharingCaption(modal);
     const text = await modal.getByRole("textbox").inputValue();
     expect(text).toContain(item.surahNameEnglish);
     expect(text).toContain("Read the complete surah in the Mushaf");
     expect(text).not.toContain(item.arabicText);
     expect(text).not.toContain(item.arabicText.slice(0, 80));
-    await modal.getByRole("button", { name: "Link", exact: true }).click();
-    await expect(modal.getByRole("textbox")).toHaveValue(new RegExp(`#/quran/${item.mushafPages![0]!.page}$`, "u"));
+    expect(await sharingReadingLink(modal)).toMatch(new RegExp(`#/quran/${item.mushafPages![0]!.page}$`, "u"));
   }
 });
 
@@ -668,9 +678,10 @@ test("selection, theme changes and persistent actions preserve user control @cro
   await modal.getByRole("button", { name: "Olive · Daylight", exact: true }).click();
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
   await expect(modal.getByRole("img").first()).toHaveAttribute("alt", previousAlt!);
-  await modal.getByRole("button", { name: "Selected cards", exact: true }).click();
+  await sharingStep(modal, "share");
+  await sharingScope(modal, "selected");
   const actions = modal.getByTestId("sharing-actions");
-  await expect(actions.getByRole("button").first()).toBeDisabled();
+  await expect(actions.getByRole("button", { name: "Share", exact: true })).toBeDisabled();
   await modal.getByRole("checkbox", { name: "Select card 2", exact: true }).check();
   const download = page.waitForEvent("download");
   await actions.getByRole("button", { name: "Save", exact: true }).click();
@@ -679,6 +690,7 @@ test("selection, theme changes and persistent actions preserve user control @cro
   await page.evaluate(() => {
     document.documentElement.style.fontSize = "200%";
   });
+  await actions.scrollIntoViewIfNeeded();
   const box = await actions.boundingBox();
   expect(box!.y).toBeGreaterThanOrEqual(0);
   expect(box!.y + box!.height).toBeLessThanOrEqual(700);
@@ -688,6 +700,7 @@ test("selection, theme changes and persistent actions preserve user control @cro
     await actions.evaluate(async () => {
       await document.fonts.ready;
     });
+    await actions.scrollIntoViewIfNeeded();
     const geometry = await actions.boundingBox();
     expect(geometry!.y).toBeGreaterThanOrEqual(0);
     expect(geometry!.y + geometry!.height).toBeLessThanOrEqual(height);
@@ -697,7 +710,7 @@ test("selection, theme changes and persistent actions preserve user control @cro
     const label = checkbox.locator("..");
     expect(await label.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
   }
-  for (const name of ["Image", "Text", "Link"]) {
+  for (const name of ["Copy text", "Copy reading link"]) {
     const button = modal.getByRole("button", { name, exact: true });
     const dimensions = await button.evaluate((element) => ({
       content: element.scrollWidth,
@@ -725,8 +738,7 @@ test("shared reader links preserve content across recipient routine preferences"
   const expectedId = await reader.getAttribute("data-zikr-id");
   await reader.getByTestId("reader-share-dock-button").click();
   const modal = page.getByTestId("collection-share-modal");
-  await modal.getByRole("button", { name: "Link", exact: true }).click();
-  const url = await modal.getByRole("textbox").inputValue();
+  const url = await sharingReadingLink(modal);
   const recipient = await browser.newContext();
   try {
     await recipient.addInitScript(() => {
@@ -762,6 +774,7 @@ test("shared reader links preserve content across recipient routine preferences"
     // recipient identity/completion checks at the project's supplied width,
     // then expose that sidebar for the explicit preference-change assertion.
     await destination.setViewportSize({ width: 1440, height: 900 });
+    await destination.getByTestId("reader-sidebar-toggle").click();
     await destination.getByTestId("routine-mode-filter").click();
     await destination.getByRole("menuitemradio", { name: /^Core/u }).click();
     await expect(destination.getByTestId("reader-screen")).toBeVisible();
@@ -778,20 +791,25 @@ for (const language of ["ar", "en"] as const) {
   test(`sharing footer stays concise with icons in ${language}`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 320, height: 700 });
     const modal = await openSharing(page, language, "before-sleep", true);
-    const actions = modal.getByTestId("sharing-actions");
-    await expect(actions.locator("p")).toHaveCount(0);
-    const labels = language === "ar" ? ["مشاركة", "حفظ", "نسخ"] : ["Share", "Save", "Copy"];
+    const actions = modal.getByTestId("sharing-export-actions");
+    const labels = language === "ar" ? ["مشاركة", "حفظ", "نسخ الصورة"] : ["Share", "Save", "Copy image"];
     await expect(actions.getByRole("button")).toHaveText(labels);
+    await expect(
+      actions.getByRole("button", { name: t(language, "shareStudio.previousStep"), exact: true }),
+    ).toHaveCount(0);
     await expect(
       modal.getByText(language === "ar" ? "خيارات الحفظ والنسخ" : "Save and copy options", { exact: true }),
     ).toHaveCount(0);
     const normal = await actions.getByRole("button").evaluateAll((buttons) =>
       buttons.map((button) => {
         const bounds = button.getBoundingClientRect();
-        return { top: bounds.top, height: bounds.height, width: bounds.width };
+        return { top: bounds.top, height: bounds.height, width: bounds.width, left: bounds.left, right: bounds.right };
       }),
     );
-    expect(new Set(normal.map((button) => button.top)).size).toBe(1);
+    expect(new Set(normal.slice(0, 2).map((button) => button.top)).size).toBe(1);
+    expect(normal[2]!.top).toBeGreaterThanOrEqual(normal[1]!.top + normal[1]!.height);
+    expect(normal[2]!.left).toBeCloseTo(Math.min(normal[0]!.left, normal[1]!.left), 0);
+    expect(normal[2]!.right).toBeCloseTo(Math.max(normal[0]!.right, normal[1]!.right), 0);
     for (const button of normal) {
       expect(button.height).toBeGreaterThanOrEqual(44);
       expect(button.width).toBeGreaterThanOrEqual(44);

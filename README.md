@@ -1,20 +1,32 @@
 # Azkarapp
 
+Home prayer times are larger inside the same expanded cards and return to their original size when collapsed. Share, Refresh, routine/Wird and shortcut actions have consistent keyboard/pointer feedback, with immediate still alternatives under Reduce Motion.
+
+Mushaf colour swipes can be switched off in Reading Settings; the device remembers the choice. Progress keeps the chosen date first, with secondary calendar settings and a clearer exact-records surface.
+
+Mushaf reading tools hide/show with one centre tap; tap the same highlighted word or its explanation to close it. Vertical swipes move forwards/backwards through Mushaf-only page colours, with visible choices and Follow app available in Reading options. Progress separates Overview, Trends and Records while retaining one selected date range; tap a summary card to inspect its trend.
+
+## Isolated browser backend
+
+The browser test server forcibly builds with a loopback Cloudflare API namespace (`/__browser-test-api`) on its own preview port. General local/CI UI tests must never write visitor heartbeats, device registrations or snapshots to production. Feature specs supply deliberate route fixtures when a successful response is needed. Real production smoke is a separate, limited verification step. Production/Pages builds keep their normal API configuration.
+
 Azkarapp is an Arabic/English, offline-capable Progressive Web App for reading daily azkar, tracking quiet routine progress, and showing location-aware prayer times. The application is built with React, TypeScript, Vite, Tailwind CSS, and optional Supabase account synchronization.
 
 Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkarapp/)
 
 ## Product capabilities
 
-- Reviewed azkar collections with Arabic-first reading and optional English translation/transliteration
-- Preview and share individual azkar or collections as complete image cards, text or contextual links, with selectable artwork/formats, explicit card selection, long-surah Mushaf reminders and one-file ZIP saving
+- Reviewed azkar collections with Arabic-first reading and optional English translation/transliteration and a remembered on-device English main-text choice
+- Preview and share individual azkar or collections as complete image cards, text or contextual links, with full-screen phone sharing, a This zikr / Entire collection choice, selectable artwork/formats, explicit card selection, long-surah Mushaf reminders and one-file ZIP saving
 - Time-aware Home recommendations, next-prayer countdown, and Hijri date
 - Private on-device astronomical prayer timings with selectable calculation methods and manual minute adjustments
 - Automatic geolocation, device IANA timezone detection, and DST handling without sending coordinates to a third party
 - Local progress, saved zikr, sessions, configurable prayer/routine reminders, accessibility preferences, and theme persistence
+- Prayer, routine and newly recorded individual-zikr patterns with interactive charts, matched-period comparisons and JSON downloads
 - Optional Supabase Google, email OTP, and feature-flagged Apple authentication with cross-device synchronization
 - Installable PWA, offline app shell, update prompts, and quick actions
 - Responsive RTL/LTR layouts with WCAG-oriented automated checks
+- Compact phone Library/date filters retain their applied context; listening protection includes visible two-second unlock progress and optional device-pinning guidance
 
 ## Prayer times and daylight saving
 
@@ -42,6 +54,8 @@ pnpm build:live-update
 ```
 
 `build:live-update` creates `.live-update-build/` with the Android-mode web assets, then writes `dist/live-updates/manifest.json` and its checksum-verified ZIP. The native app uses `https://amahdy59.github.io/Azkarapp/live-updates/manifest.json` by default. Override the manifest or bundle host at native build/deployment time with `VITE_NATIVE_LIVE_UPDATE_MANIFEST_URL` or `VITE_NATIVE_LIVE_UPDATE_BASE_URL`. Before deploying, update `public/release-notes.json` with the new release stamp and current user-facing notes.
+
+The [Android developer handoff](docs/ANDROID_DEVELOPER_HANDOFF.md) maps the shared code and native adapters, identifies the remaining persistent native-file storage work, and defines the device/Play acceptance sequence.
 
 ## Technology
 

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const language of ["ar", "en"] as const) {
-  test(`combined Reader guidance preserves text and focus in ${language} @cross-browser`, async ({ page }) => {
+  test(`Reader without tap guidance preserves text and focus in ${language} @cross-browser`, async ({ page }) => {
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
       localStorage.setItem(
@@ -19,12 +19,12 @@ for (const language of ["ar", "en"] as const) {
     for (const width of [390, 820, 1200, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await expect(page.getByTestId("counter-surface")).toBeVisible();
-      await expect(hint).toBeVisible();
+      await expect(hint).toHaveCount(0);
+      await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
       await expect(page.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
       await expect(page.getByTestId("reader-side-navigation")).toHaveCount(0);
       if (width >= 768) {
         await expect(help).toBeVisible();
-        await expect(hint).toContainText(language === "ar" ? "المسافة" : "Space");
         await help.click();
         const dialog = page.getByRole("dialog");
         await expect(dialog).toBeVisible();
@@ -47,9 +47,13 @@ for (const language of ["ar", "en"] as const) {
       expect(text!.y + text!.height).toBeLessThanOrEqual(counter!.y);
       if (width >= 1200) {
         const panel = page.getByTestId("reader-collection-navigator");
-        await expect(panel).toBeVisible();
-        const panelBox = (await panel.boundingBox())!;
         const toggle = page.getByTestId("reader-sidebar-toggle");
+        if (await toggle.isVisible()) await toggle.click();
+        await expect(panel).toBeVisible();
+        const dockedText = (await page
+          .getByRole("region", { name: language === "ar" ? "نص الذكر" : "Zikr reading text" })
+          .boundingBox())!;
+        const panelBox = (await panel.boundingBox())!;
         const toolbar = page.getByTestId("reader-header-toolbar");
         await expect(toolbar.getByTestId("reader-sidebar-toggle")).toBeHidden();
         const menu = page.getByRole("button", {
@@ -60,11 +64,15 @@ for (const language of ["ar", "en"] as const) {
           toolbar.boundingBox(),
           page.getByRole("heading", { level: 1 }).boundingBox(),
         ]);
-        expect(toolbarBox!.y + toolbarBox!.height).toBeLessThanOrEqual(headingBox!.y);
-        expect(text!.width).toBeGreaterThanOrEqual(350);
-        expect(language === "ar" ? panelBox.x + panelBox.width <= text!.x : text!.x + text!.width <= panelBox.x).toBe(
-          true,
-        );
+        expect(
+          Math.abs(toolbarBox!.y + toolbarBox!.height / 2 - headingBox!.y - headingBox!.height / 2),
+        ).toBeLessThanOrEqual(1);
+        expect(dockedText.width).toBeGreaterThanOrEqual(350);
+        expect(
+          language === "ar"
+            ? panelBox.x + panelBox.width <= dockedText.x
+            : dockedText.x + dockedText.width <= panelBox.x,
+        ).toBe(true);
         await page.getByTestId("reader-sidebar-close").click();
         await expect(panel).not.toBeVisible();
         await expect(toggle).toBeFocused();

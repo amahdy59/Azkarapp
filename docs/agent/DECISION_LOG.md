@@ -1,4 +1,171 @@
+## 2026-10-21 — Larger prayer times and Home microinteractions
+
+The owner also requests matching gloss and then matching the routine button's color on the “Now” indicator, slightly larger remaining-time digits and a clearer interval indicator. Use the CTA's semantic primary/foreground tokens with a quiet static highlight, unchanged dimensions and flat high-contrast/forced-color alternatives. Increase countdown digits to 15px expanded/13px condensed at the default root size, retaining the compact line footprint. Simplify the small ring with a thicker arc and no clock hands. Keep its existing clockwise fill as the next prayer approaches and numeric countdown primary; no new clock, loop or calculation change.
+
+The owner approves larger prayer-time digits within the existing expanded Home cards, unchanged collapsed typography/dimensions, proper reversible expand/collapse motion and stronger action feedback throughout Home, particularly Share and Refresh. Fit 40% larger digits into the original line footprint, keep period labels small and retain enlarged-text reflow. This supersedes the historical identical-type-size contract only; reuse the existing 220ms inherited handoff, scroll ownership, focus holds, countdown semantics and both reduced-motion alternatives. Share receives a finite focus/hover cue and shared press response; Refresh acknowledges actual activation once with a brief icon half-turn/fade, a bounded exception to the general rotation restriction. Retain native focus, truthful busy/disabled states and immediate actions. No devotional-text/photo motion, new dependency/timer, content/persistence change or weakened quality gate. See phases/HOME_PRAYER_TIME_AND_ACTIONS_2026_10_21.md.
+
+## 2026-10-20 — Universal Progress date selection and focused detail topics
+
+The owner expands Progress polish and then explicitly rejects the Records date-search box and verbose descriptive text. Remove that secondary filter and use the shared selected period for every view, including exact records and exports. The displayed date becomes an obvious picker action; Today and existing presets remain, and its reversible editor offers one date, a Gregorian month or an inclusive range, with native date controls and existing protected selectors. Month entry explicitly uses Gregorian labels and selects Gregorian month navigation; Hijri display/presets remain available. Keep scope/denominator explanations in Help rather than stacked prose. This supersedes prior table-search requirements and always-stacked detail context. Use one selected topic (Prayer, Azkar/Quran, Friday, day-only Reflection), concise card labels with full accessible names, truthful empty-period navigation and a direct Week action for one-day Trends. No record mutation, new persistence or religious-content changes. All original assertions about exact data, export scope, accessibility and release gates remain required.
+
+## 2026-10-20 — Predictable Mushaf interactions and focused Progress tabs
+
+Owner follow-up: ensure Back points outward. Both phone Mushaf hosts select physical left/right arrows from their actual leading edge, independent of the printed page's RTL ancestor. Desktop rail arrows already follow their physical edge and retain that behavior. Verify actual SVG geometry in both languages and both rail positions.
+
+The owner approves all six recommendations from the three-screen review and requests implementation. A paper tap has one visibility/navigation owner; word and gloss actions do not fall through into reading gestures. The same word or the gloss closes its explanation, preserving All meanings and keyboard/outside recovery. Upward/downward swipes advance/reverse the same three-colour Mushaf cycle, superseding downward focus-mode toggling; only explicit Follow app inherits application appearance. Current fonts and page data start concurrently; meanings decorate a ready page independently, with stale work cancelled and speculative fonts deferred. Keep a single brief, cancellable paper turn, stationary tools and both reduced-motion preferences. Short mobile reading options use shared bottom sheets with visible close actions; larger canvases keep dialogs/side panels, contextual glosses stay anchored, and sharing stays full-screen on phones. Progress uses shared-range Overview/Trends/Records tabs, independent icon-labelled metrics, truthful denominator bars and direct card-to-trend navigation. Filter disclosures show their purpose, selected context and explicit expand/collapse cues. This supersedes always-stacked overview/chart/records presentation without changing statistics, content, persistence or exports. Complete direct-main release authority and every existing gate apply. See phases/MUSHAF_INTERACTIONS_PROGRESS_TABS_2026_10_20.md.
+
+## 2026-10-20 — Mobile sharing, compact filters and protected listening release
+
+The owner approves every recommendation from the screenshot review and explicitly requests implementation and pushing changes. This supersedes earlier local-only holds for the current work and includes the committed integration repair. Compact sharing fills the available screen with stable chrome, larger previews and safe scrolling; individual Reader sharing can switch to its actual collection while retaining design. This supersedes ordinary-phone no-settings-scroll expectations and top alignment for short single readings only. Progress/Library use native compact disclosures with applied context visible, completed choices auto-collapse, typing/Custom drafts stay open and focus returns predictably. Add factual two-second hold progress, background/pointer cancellation and internal navigation protection while preserving Escape and playback. Do not simulate OS confinement or push synthetic history: explain device pinning through official Android/iPhone help. Preserve all content, data, quality gates and complete exact-commit release verification. See phases/MOBILE_SHARING_FILTERS_LOCK_2026_10_20.md.
+
+## 2026-10-18 — Actionable Progress charts, local only
+
+The owner asks for relevant patterns and actions instead of numerical tables, unclear aggregate bars and large dropdowns. Apply locally; no commit, push or deployment. Supersede the earlier daily-table and historical chart/selector presentation with read-only daily statuses, strongest/needs-attention comparisons, explicit chart units, approximate weekly rhythm and separate routine trend lines. Exact data belongs in explicit JSON downloads. Preserve prayer, Quran, reviewed content and normalized persistence contracts. Exclude the unfinished progress day from historical rankings and state the denominator; missing records never establish missed worship. Explain that individual zikr history is unavailable rather than deriving false per-zikr rankings from collection completions. Preserve all other pending work.
+
+## 2026-10-18 — Home card alignment, local only
+
+The owner requests matching all Home cards to the top prayer-card alignment on desktop and tablet. Use the existing 52rem prayer measure plus responsive gutters for the shared frame, accounting for the prayer row's 4px inset in content. This supersedes the older 64rem outer Home measure at 600px and wider. Preserve phone layout, material, reviewed content, prayer calculations and persistence. No commit, push or deployment.
+
+## 2026-10-18 — Titles aligned with devotional toolbar controls, local only
+
+The owner again highlights the separate collection-title row and requests titles level with the top controls, raised progress and shorter heroes globally, including Masbaha and Salawat. Supersede the still-separate h1 row with a shared centered toolbar implementation across Reader and ReadingScreenChrome. Retain responsive wrapping, control sizes, mobile chrome and reviewed content. This is explicitly local; do not commit, push or deploy. Preserve all pending workspace changes.
+
 # Decision Log
+
+## Protected dropdown surfaces — 2026-10-20
+
+The owner supplies the overlapping Quran Juz picker screenshot and requests a local fix with a durable rule for every layout and color mode. Searchable pickers move to the existing Radix portalled/collision-aware primitive; all shared dropdowns explicitly own an opaque protected surface. This supersedes ordinary card/80% Glass overlay material for dropdowns only. Preserve surrounding Glass, source content, saved plans, keyboard control and pending concurrent work. Record geometry/hit testing and theme/accessibility coverage. No commit, push or deployment. See phases/DROPDOWN_PROTECTION_2026_10_20.md.
+
+## 2026-10-19 — Complete sharing, common sizes and Home attribution, local only
+
+The owner requests complete Benefits sharing through multiple images, approved Mushaf lettering for Quran sharing, a Home share action beside Reload and explicit prophetic attribution where omitted. This supersedes the old indivisible-single-image restriction. Continue complete readings and selected additions at existing readable sizes; repeat title/source and preserve original semantic text, item order and long-surah Mushaf reminders. Share the full Benefits section independently of its visible batch. Reuse QCF evidence mappings; add attribution as presentation text without editing reviewed narrations, retaining Companion/action distinctions.
+
+Follow-ups require identical size options across dialogs with one or two platform tags, and Share styled like Reload with slight emphasis. Use a shared Story/Square/Portrait/Tall selector, common dimensions and two localized destination suggestions each. Match Home's borderless circular target/icon/focus anatomy with accent ink. Preserve unrelated pending work. No commit, push, R2 upload or application deployment this session.
+
+The owner's numeral correction supersedes the earlier Arabic-Indic-in-both-languages export rule: English card/page/part/repetition labels use Western digits, while Arabic uses Arabic-Indic digits. Reading/source display follows its own language and canonical religious text, URLs and filenames remain byte-preserving. Both image studios and readable previews follow this policy.
+
+The owner rejects a continuation ending mid-sentence in the Ayat al-Kursi narration. Prefer complete sentence boundaries, move a sentence to a fresh card before splitting it, and explicitly label previous/next continuation in both languages. Oversized sentences prefer existing clause/pause punctuation; no new punctuation or religious wording is authored. Keep the selected image dimensions and readable type. Preserve the complete ayah-fit contract and provide matching cues for ayah sharing.
+
+## 2026-10-18 — Rounded Reader surface and collapsed collection panel, local only
+
+The owner highlights the abrupt rectangular desktop reading surface and requests a local repair plus a sidebar collapsed by default. Apply shared 16px card corners while retaining its reading material, gap and content geometry. Initialize the visit-local collection panel closed; preserve explicit open/close, resizing, focus recovery and responsive drawer behavior. This supersedes the earlier initially expanded desktop panel. Preserve unrelated pending changes. No push or deployment is authorized.
+
+## 2026-10-18 — Routine-card frost benchmark, local only
+
+The owner requests using the supplied morning-routine card as the reference for cards throughout Glass mode and applying the result locally without pushing. Share its 24% navy/22px/135% material and 5.5%/1.2% reflection through semantic tokens, replacing the brighter ordinary interface sheen. Preserve stronger reading/overlay contrast, header scroll frost, selected prayer emphasis, flat elevation, nested filter suppression and independent Home/App fallbacks. No commit, push or deployment; preserve all pending local refinements.
+
+## 2026-10-18 — Localized prayer selection connection, local only
+
+The owner approves the recommendation to replace the full-width glowing detail edge with a short selected-card underline, a slightly wider fading receiving highlight aligned beneath that card, contained inner warmth and 16–20px breathing room. The receiving light follows the visible selection through resizing/horizontal scrolling and fades when its card leaves view. This explicitly supersedes the earlier matching full-width edges/no-geometry-observer constraint. Preserve current compact cards, glass, reviewed content and state behavior. Provide actual image evidence during development; do not commit, push or deploy.
+
+## 2026-10-18 — Compact prayer cards, local only
+
+The owner initially requests compact mobile/desktop cards, then explicitly prefers the previous design after reviewing the preview. The follow-up screenshot supersedes the small-badge/context-line experiment: restore the earlier full-width status pills, icon tiles, copy and rounded glass anatomy. Tighten highlighted space through a 52rem row cap, smaller header insets and 52px footer minimum; preserve shared material, current/next visibility, accessible saved context, free scrolling, tracking/calculation boundaries and coordinated sticky handoff. The owner separately authorizes repairing the existing Progress scroll-elevation failure. Preserve other pending changes. No commit, push or deployment. See phases/COMPACT_PRAYER_CARDS_2026_10_18.md.
+
+## 2026-10-18 — Consistent interface header material, owner correction
+
+The owner rejects the solid scrolling backgrounds in Library, Progress and Settings, then explicitly requests stronger frost when content flows behind headers, imitating Home prayer cards. Keep 36% navy tint/sheen unchanged; use 22px/135% frost at rest and 32px/135% while scrolled with a quiet separating edge/shadow. No blur interpolation or frame-driven state. Disable the named app-content route capture in Glass because actual browser evidence shows it blocks descendant backdrop sampling; Opaque retains that transition. Progress retains content beneath its sticky controls, native scrolling and existing focus recovery; this supersedes the interim clipped records viewport. Solid, high contrast, reduced transparency and forced colors remain authoritative. Preserve accepted Home cards and local-only scope. No publication.
+
+## 2026-10-18 — Owner live-preview Home motion correction
+
+The owner approves the smaller scrolling cards but rejects the abrupt shell-only transition and the shared backing behind the prayer row. Use one inherited 280ms CSS expansion value to coordinate natural footer height/opacity, icon size, card spacing and row clearance. Do not scale devotional text or synthesize scroll inertia. Restore/retarget from the currently interpolated state; OS/app reduced motion applies the final state immediately. Home's 96px/8px hysteresis remains.
+
+The owner subsequently removes the compact next-prayer countdown and requests visible frost on the scrolled header/cards with no horizontal scrollbar. The full expanded footer retains its countdown and accessible description; compact cards show prayer identity/time only. Keep native swipe/keyboard access and individual card/header frost, with no full-row background/filter. Remove the prayer row's retained opacity entrance, which isolated descendant backdrop sampling from moving content in the browser evidence. This supersedes the shared Home scrolling ground and shell-only handoff; other screens retain their approved protected headers. Preserve all local-only authority and accessibility fallbacks.
+
+## 2026-10-18 — Balanced glass and scrolling, local preview only
+
+The owner asks to apply all code-review recommendations locally with image evidence throughout, and selects “Keep this balanced frost” after the first phone preview. Use shared 24% navy card tint, 36% reading tint and stationary 22px/135% frost. Quiet secondary elevation and explicit shared-card ownership replace class-substring glass matching. Overlays retain 80%/28px. Preserve the later complete-text-occlusion header decision: use an opaque slate ground with subtle sheen, immediate coverage and no invisible backdrop-filter work. This supersedes the older translucent 42%/36px header note and the 36%/48% card proposal for this bounded preview.
+
+Headers observe their actual vertical viewport, initialize restored position and use 8px-enter/2px-exit hysteresis. Nested horizontal/reading scrolls do not alter elevation. Home retains its 96px-collapse/8px-restore contract, with one 180ms outer-shell height transition and detail opacity rather than per-card layout effects. OS/app reduced-motion cancellation remains. Do not commit, push or deploy this phase. Physical-device performance and human assistive technology remain separate acceptance.
+
+## 2026-10-17 — Header scroll occlusion and glassmorphic clarity
+
+The owner requested that headers completely occlude scrolling text across all pages (specifically Progress, Settings root and subpanels, and Azkar Library) so that content gliding beneath headers does not show or bleed through. In Settings, the search input was pinned directly to the sticky header container so settings items glide under both the header and search input seamlessly.
+
+- Scrolled headers across Progress (`.progress-screen-controls[data-scrolled="true"]`), Settings root and subpanels (`.settings-subpanel-header[data-scrolled="true"]`), and Azkar Library receive an opaque `#0a1228` visor with subtle ambient gradient and elevation shadow, eliminating text bleed-through while preserving ambient warmth.
+- SubHeader in `SettingsPrimitives.tsx` tracks scroll state via capture scroll listener, ensuring all 15 settings subpanels elevate consistently.
+- Search input in `SettingsRootPanel.tsx` is pinned to the header block for unified gliding.
+- AppearancePanel bilingual strings were localized cleanly via `t(language, ...)` in `src/app/i18n/ar.ts` and `src/app/i18n/en.ts`.
+- High contrast, prefers-reduced-motion, and WCAG 2.2 AA accessibility baselines are fully preserved.
+
+## 2026-10-17 — Frostness visual benchmark
+
+The owner supplied the canonical visual reference for "frostness" (frosted glass / glassmorphic devotional style), captured in `docs/agent/evidence/design-references/frostness-reference.png`. All future sessions and UI tasks referring to "frostness" or glass surfaces follow this specification:
+
+- Deep translucent navy/slate wash (~18%–35%) with rich backdrop blur (`blur(16px - 24px) saturate(130% - 150%)`).
+- Fine 1px beveled border with directional top-edge highlight and inner top rim reflection (`box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20)`).
+- Nested squircle sub-elements (e.g. icon tiles) with their own frosted container (`rounded-xl` / `rounded-2xl`, subtle dark wash, hairline border) for tactile glass layering without extra active GPU filter layers.
+- Soft ambient warm glow behind active focal points (such as current/next prayer).
+- High-contrast, calm devotional typography (`#f8fafc` / `#fff0bd`) with prominent Arabic-Indic numerals.
+- Graceful solid theme fallback under high-contrast, forced-colors, and reduced-transparency modes.
+
+## 2026-10-17 — Complete global image-first entry points
+
+The owner's global sharing scope includes session completion and the ayah menu, discovered during the final entry-point audit. Bring completion into the existing lazy studio with its unchanged localized phrase/category link and no added private metrics. Give the existing ayah-image action visual and DOM priority over text while retaining text/copy/bookmark and focus recovery. This is a separate bounded follow-up to the shared-studio commit; preserve Quran rendering and full release gates.
+
+## 2026-10-17 — Image sharing takes priority
+
+The owner requests global sharing/visual organization with image export weighted above Text/Link and authorizes thoughtful improvements. Keep the generated studio as the existing default and supplied artwork unchanged. Increase the image preview, move artwork controls below it on phones, quiet secondary methods/Copy, show only applicable settings, and fetch alternate packs only on selection. Explicit Image copying must not silently send words; Text remains available. Milestone sharing joins the existing image studio with unchanged localized metrics/date, no devotional repetition metadata and explicit-only export. Preserve source/content policy, native cancellation, offline files, accessibility and release gates.
+
+## 2026-10-16 — Owner simplifies appearance and requests visible locked learning
+
+The owner requests two visible appearance choices, Opaque/Glass for all, the current Home photograph on Glass pages, and unobscured text/audio while touch controls are locked. This supersedes the earlier visible Follow device and four-way Home selector: retain stored compatibility and place independent Home appearance behind optional customization. Global selection applies to Home too, even if reselected; Home can subsequently override. Keep solid reading, automatic contrast/device fallbacks and no extra animated blur. Retain the approved two-second hold, focus restoration and Escape recovery for the transparent touch shield. Full existing main release gates and production verification remain required.
+
+## App-wide appearance, performance and complete release — 2026-10-16
+
+The owner accepts app-wide Follow device/Glass/Solid plus Home Same as app/independent override, then explicitly requests applying all remaining work and pushing all changes. This chat owns implementation and the release; the previous release chat acknowledges a source/build/commit freeze. The owner additionally requests efficient, accessible behavior on older devices/slow networks and removal of the sluggish scroll feel. Use static translucent interface cards, bounded shared-chrome blur, dense reading surfaces, a shorter 180ms Home handoff, threshold-only header state, paused hidden-screen clocks, immediate automatic reader positioning and Save-Data decorative fallback. Preserve explicit existing preferences, religious content/counts and offline data. Add desktop brand Home navigation and repair outstanding CI cases without loosening assertions or coverage. Verify both GitHub Pages and the separately Git-integrated Cloudflare custom domain after exact-commit CI succeeds.
+
+## Coordinated local verification hold — 2026-10-16
+
+The owner authorized coordination between the reminder and Home refinement chats. The latest direct instruction reported by the Home chat is “Coordinate; keep these changes local.” Complete the combined local implementation, source review and quality checks; do not commit, push or publish the shared snapshot. Earlier release authorizations do not override this current hold.
+
+## Owner-approved authenticated reminders and Home scrolling — 2026-10-16
+
+In this chat the owner first requested an editable content-review pack, then explicitly authorized inclusion of authenticated hadith/dua and successful implementation of both existing and expanded relevance plans. This supersedes the workbook approval gate. Use Sahih evidence plus specifically named Hasan grading, separate editorial suggestions, canonical existing dua text, deferred/precached offline data and selected-timezone scheduling. Preserve narrow devotional contexts, add daily-shifted topic rotation and a short Wednesday/Sunday advance fasting window with conservative calendar exclusions. Do not introduce counts, remote publication, bulk Dorar imports or notifications.
+
+The owner additionally requests stationary next-prayer copy, appropriate scroll transitions and restoration of the missing visitor estimate. Stabilize summary columns/header spacing, keep the original compact row, use finite cancelable transform/opacity motion honoring both reduced-motion preferences, and restore the existing VisitorCount/provider composition. See phases/HOME_PRAYER_SCROLL_AND_PRESENCE_2026_10_16.md and phases/HOME_RELEVANT_REMINDERS_2026_10_16.md. Earlier independently approved appearance/audio/Qibla changes remain subject to their intact verification before publication.
+
+## Qibla desktop shortcuts — 2026-10-16
+
+The owner requests hiding Qibla on desktop and explicitly says not to push changes yet. Use the established compact/medium versus expanded/large layout boundary at 900px: omit Qibla entry points on desktop layouts, including Home, the legacy More destination and the sidebar. Preserve existing Qibla deep links and an already-open screen across resize. Masbaha remains available and fills Home's remaining utility row. Width determines layout rather than device detection; wider tablets use their selected shell tier. This supersedes earlier all-tier shortcut guidance while preserving route compatibility. No publication is authorized.
+
+## Friday content and Home follow-up — 2026-10-16
+
+The owner explicitly approved the sourced Friday approach: noon uses Jumu‘ah attendance, after-prayer adhkar and one Sunnah-after-Jumu‘ah action. Its information sheet explains four rak‘ahs (Muslim 881a) and two at home (Muslim 882a); the benefit uses Muslim 857a. This supersedes the earlier display-only Friday restriction. Product-owner approval is not an independent scholarly review. Keep the Dhuhr key, dates, times and existing stored fields; hide the weekday before-Sunnah action without deleting previous records.
+
+The owner requests full-card Wird photos at the current grid sizes, restored completion/fruit badges, authorized upload of the optimized backgrounds to R2, and an opaque themed fallback on failed background loading without changing normal glass. The latest connector request supersedes paired notches: one symmetric Bézier neck with the joining segments of both card borders removed, a shared theme accent, stationary layout and no motion or hit target. The owner then approved the fused-silhouette revision. The Friday illustration is requested eagerly with an icon fallback after a blank lazy-loading capture. Inspect local images before the authorized release.
+
+## Home background selection and release — 2026-10-16
+
+The owner approved the generated Home background set after seeing phone and desktop composites, including the calmer blue Friday-morning choice, and authorized implementation and push. Use ordinary dawn, subdued evening, night, Friday morning, and later-Friday courtyard scenes. Friday morning is visual only and runs from Fajr until Dhuhr; existing Friday daytime content continues through Maghrib. Keep the established photo scrim and opaque reduced-transparency fallbacks. Serve each scene as responsive AVIF with WebP fallback and a small blurred placeholder. Verify in-app screenshots, accessibility, exact-commit CI and deployed production before reporting release completion.
+
+## Home grid measure and mobile notch refinement — 2026-10-16
+
+The owner rejects empty visual space around a selected compact prayer and requests the paired notch remain visible while small-card gaps stay identical across phone and desktop. The owner also requests consistent widths across Home. Use one centered 64rem outer Home measure with existing page gutters, yielding a 60rem inner content grid on desktop for the prayer strip, disclosure, contextual pair, Wird row and lower sections. Keep the five summary tracks equal with an 8px gap, reveal a selected compact summary fully while retaining a visible neighbor, and position both decorative tips on the same screen-space anchor on first paint. Preserve vertical scroll, keyboard order, reduced motion/transparency and accessibility.
+
+## Stable full-width prayer disclosure approved — 2026-10-16
+
+The owner accepts the recommendation to replace the side-swapping desktop prayer panel with a full-width disclosure directly beneath the summary row. Keep contextual cards in fixed horizontal positions for Fajr through Isha, using two columns inside the expanded panel on wider screens and stacked content on phones. Verify every available checkbox by pointer and keyboard, independent saved fields after reload, and existing future-recording restrictions. The owner also asks about removing header strokes; apply the recommended borderless Home utility header for local visual review, retaining tint/contrast, safe areas and focus. This supersedes the previous selected-half alignment correction, with no new commit/push authorization.
+
+## Home prayer notch alignment — 2026-10-16
+
+The owner requests the paired notches line up. Use a shared measured horizontal anchor that follows selection, native horizontal scrolling and responsive resize. On desktop the expanded panel follows the selected prayer's half of the existing composition; tips remain within both surfaces and hide together when the selected summary is off-screen. Preserve semantics, focus, user scrolling, prayer state and the local screenshot review gate. No publication is authorized for this follow-up.
+
+## Final reading and offline polish — 2026-10-15
+
+Latest screenshot correction: the owner rejects the reserved right column, requests equal left/right paragraph padding and increases the old 12px left inset by 2px. Use equal calc(0.75rem + 2px) padding and absolute corner placement without a number-only row; a chip overlay is explicitly permitted. This supersedes the earlier no-overlap/inline-clearance recommendation.
+
+The owner approves all six final recommendations: calmer current-ayah emphasis, English reading clearance/chip, offline download discoverability, explicit reset guidance, shared interaction consistency, evidence-supported WebKit repairs and available Android acceptance. The subsequent screenshot correction explicitly supersedes the chip's own-row implementation: absolute bottom-right, bottom padding exactly 2px greater than top, remove English furniture rules. Overlay compact Mushaf playback without shrinking pages, with an explicit Hide/Show affordance and unchanged playback. Show actual images before pushing. Existing canonical text/fonts/line identity, progress history, permission restrictions and full release gates remain intact. Physical phone/TalkBack/store signing evidence cannot be substituted with browser tests. See phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md.
+
+## Evidence sharing and palm explanation placement — 2026-10-15
+
+The owner requests that Share on the importance-of-Wird evidence page open the existing studio with image/text/link options and applicable existing customization, rather than a direct WhatsApp destination. Preserve all original evidence text, source URLs, translations and salaf attribution. Reuse CollectionShareModal with typed bilingual custom evidence and explicit source-link support; options without source data remain honestly unavailable. Move the existing palm explanation into the collapsed Progress reflection section. The owner also explicitly removes the floating Benefit pill during compact playback; normal reading controls return when audio closes. Existing immersive Mushaf reading help remains in its reading context. See phases/WIRD_EVIDENCE_SHARING_2026_10_15.md.
+
+## Cards, explicit situational sessions and usable compact seeking — 2026-10-15
+
+The owner approves the preceding recommendations: smaller shortcut/tool vertical padding, the Arabic food shortcut “أذكار الطعام”, a reserved completion badge at the top left in Arabic (mirrored in English) and an inset outline. Preserve completion text, contrast and touch targets. Home/travel/distress/mosque/food/illness collections retain unfinished progress across exits and midnight; completed collections offer Done and Start new session. Starting again clears only current collection counters, never session history; manual reset remains confirmed. Daily/Friday cycle behavior remains unchanged. The owner also requests compact-player click/drag seeking and separation of Close/Expand controls. Implement native range semantics, keyboard support, visible thumb/time labels and independent hit regions without dependencies. See phases/CARDS_AND_COMPACT_AUDIO_2026_10_15.md.
+
+The owner further clarifies that the two محمد الشرع recordings were supplied directly by their author for noncommercial listening/sharing, with no separate license document. Record this as owner-reported provenance, not an independently verified public license. The earlier Android exclusion remains pending traceable permission; web downloads remain available.
 
 ## Android build tools and audio release policy — 2026-10-15
 
@@ -4612,3 +4779,365 @@ The owner requests all five prayers side by side in one mobile row, a two-by-two
 ## Home card density and compact disclosure — 2026-10-15
 
 The owner explicitly selects the recommended combined benefits/palm help entry, then requests less vertical space in the image-free wird cards and a smaller mobile prayer disclosure alternative. Reduce block padding and reserved card height while preserving natural wrapped-text growth; retain photo-card geometry. Use one trailing 44px List/All or ChevronUp/Less control with visible localized short label and full accessible name. Preserve one-row native prayer scrolling and existing keyboard/data contracts. Supersede the full-width disclosure action. The prior workflow is cancelled as superseded by these follow-ups; verify the final commit with all normal release gates.
+
+## Ruqyah identity compatibility approved — 2026-10-15
+
+During the pre-push review, the owner explicitly approved migrating the former combined ir-ref-5 bookmark and completion to all three new surah IDs (ir-ref-5a/b/c). Apply the same compatibility at local-load, backup and sync-merge normalization boundaries. Preserve recorded session history, migrate partial repetitions without overwriting explicit new-surah tallies, retain legacy numeric completion identities, and make repeated normalization idempotent. Publication remains on hold for the requested review report.
+
+## Home material correction approved — 2026-10-15
+
+After release 2e93b36c, the owner explicitly requests restoring visible photographic translucency on mobile and desktop while retaining the improved Home layout and applying Apple's material principles. This supersedes the 48%/58% Home tints and 18px blur with measured lighter materials, stronger reading/scrolled-header variants, a contrast-bounded page scrim, restrained edge/shadow depth and intact application/system accessibility fallbacks. No native Liquid Glass rendering, new dependency, reviewed-content change or persistence change is implied. Actual previews and the normal release gates remain required.
+
+## Desktop prayer overview and remaining interval approved — 2026-10-15
+
+The owner requests at least three Home prayer timings on desktop and a remaining-time progress indicator. Use current/next/following from 900px, retain two on phones and five under All. The next prayer alone shows a shrinking remaining-time bar and localized countdown. Use dated selected-location occurrences, actual elapsed instants across midnight/DST, existing minute updates and native progress semantics without repeated live announcements. Keep next-day preview separate from today's recording state; no prayer formula, tracking schema or reminder behavior change.
+
+### 2026-10-15 — Prayer overview fit-or-scroll and two-column cards
+
+Owner explicitly replaces the focused two/three-card plus All/Less layout with all five prayers, two columns per compact card, extra space above the next-prayer bar and bounded widths/default height. Use the full Home width above the existing desktop columns; scroll only on actual overflow, show a partial card and localized hint, and retain keyboard access, chronological order, text enlargement and today's tracking. This supersedes the focused/following-preview presentation from this same phase without changing content or saved state.
+
+### 2026-10-16 — Bounded compact prayer cards and preview gate
+
+The owner requests implementation of the supplied grouping/hierarchy recommendations: five clearly bounded glass cards, aligned prayer names/times, contained next-prayer countdown/footer, compact natural height, current/next initial mobile visibility where possible, explicit temporal labels and a quieter viewed indicator. Preserve 44px actions, enlarged text, visible unavailable-action explanations, keyboard scrolling/focus and transparency fallbacks. This supersedes the preceding card size and next-only scroll alignment. Show actual images before pushing; this continuation remains local for review.
+
+## Owner density and alignment correction — 2026-10-16
+
+The owner removes the 30-minute availability explanation and rejects unused space below ordinary cards. Supersede the prior 7rem minimum/equal-height stretching: cards align at the top and end immediately after their content; next alone extends for its compact countdown footer. Every icon, name and time occupies the same shared row position across prayers at normal text sizes, independently of temporal/selected status. Keep existing openability logic and disabled semantics, natural enlarged-text growth and the screenshot-before-publication gate.
+
+### Owner spacing and icon polish — 2026-10-16
+
+Balance the compact summary header with 0.625rem top/inline and 0.5rem bottom padding. Use one 1.75rem icon badge per prayer, with the existing icon, a subtle current-color tint and border, and no additional blur. Every badge and identity/time row stays consistently positioned; natural text growth and existing focus/contrast fallbacks remain. The next footer is the only additional card height. This is the owner's follow-up visual refinement, still local for image review.
+
+### Owner closer identity/timing groups — 2026-10-16
+
+Center the two content-sized columns with a consistent 0.5rem gap instead of stretching them toward the card edges. Retain balanced header padding, icon badges, shared vertical positions and natural enlarged-text wrapping. The normal minimum width is 9.75rem to retain readable English times while keeping current and next together at 390px.
+
+### Owner removes horizontal-scroll copy — 2026-10-16
+
+Remove the visible horizontal-scroll hint in both languages and its obsolete described-by reference. Retain the named, keyboard-focusable native scroll region, scrollbar and partial neighboring card. No change to prayer availability or tracking.
+
+### Owner tighter side padding and card widths — 2026-10-16
+
+Use 0.5rem equal side padding, 0.625rem top padding and 0.5rem column gap. Bound ordinary cards to 9.75–10.5rem rather than allowing them to grow to 15rem. Bound the centered overview to 57rem above the existing desktop columns, keeping mobile width/scrolling and shell breakpoints intact. This removes the large empty margins created when a compact centered group sits inside an overly wide card.
+
+### Owner final spacing values — 2026-10-16
+
+The owner clarifies that the extra whitespace belongs between the two columns. Use a 0.625rem (10px default) column gap, up 2px, with 0.375rem (6px default) equal side padding. Keep top padding 0.625rem and bottom 0.5rem. Cards now span 9.5–10rem, with a centered 54.5rem overview. All row alignment, readability, scroll and enlargement checks remain.
+
+### Owner 4px top and side padding — 2026-10-16
+
+Set summary-header top and both side insets to 0.25rem (4px at normal text size); retain the 10px column gap and 8px bottom inset. The owner asks for recommendations about removing the outer surface and small-card outlines; those structural/material changes are recommendations only in this continuation, not implemented. Keep visible prayer boundaries until a proposed alternative has been previewed and tested.
+
+## Owner approves standalone cards and responsive spacing — 2026-10-16
+
+Remove the outer prayer surface, preserving a plain layout/scroll wrapper. Each glass prayer card now owns its single material layer and all existing opacity/contrast fallbacks. Quiet 12% white edges define ordinary cards; next alone retains the accent edge/countdown. Icon badges retain their faint tint but no border. Cards expand equally to fill available wide-screen width; the compact 9.5rem minimum and native overflow remain on phones. Supersede the 54.5rem overview and 10rem card ceilings.
+
+The owner correctly observes that centered content made the visible insets larger than CSS padding. Distribute identity/timing columns toward the two actual 4px header insets: icons/titles start at the logical leading edge and times/status end at the trailing edge. Space-between absorbs extra wide-card width between the columns, over a 10px minimum gap. The existing enlarged-text container fallback remains. Tests measure actual content-to-card insets (4px plus 1px border), wide-row fill, larger actual column separation and no outer surface, rather than checking CSS padding alone. Preserve source content, timing, recording, keyboard focus and the preview-before-push gate.
+
+### Owner increases visible insets to 8px — 2026-10-16
+
+Increase all summary-header insets to 0.5rem (8px at normal root size), including top and both sides, and match footer side insets. This supersedes the 4px values. Use a 10rem readable minimum so English labels/times fit the larger padding. Keep full-row wide-screen growth, space-between column expansion, standalone materials and quiet edges. Actual inset tests now require 8px plus the 1px border.
+
+## Owner concise matching footers and clearer expanded record — 2026-10-16
+
+Give every summary a useful muted footer, aligned with the next-prayer countdown footer: saved At home/At mosque, Not recorded for an unrecorded current/past prayer, or Later today for later prayers. Legacy mosque booleans resolve through the existing trackedLocation boundary. Only next has accented countdown/progress; never add fake progress to other cards or infer missed prayer. Shared 3rem footer minimum and equal-height cards preserve aligned tops/footers; enlarged text grows naturally. This supersedes the earlier natural shorter-card-bottom decision. Preserve 8px actual header insets.
+
+For the larger shared panel, remove the screenshot-highlighted temporal status/minute countdown and separate completion tally. Replace those with an explicit localized Record for weekday/date line from the exact supplied tracking dayKey, using dateFromProgressDayKey; keep the native time datetime value. This is the saved record date, not a new claim about civil/prayer-day boundaries. Retain Fajr sunrise context, the reviewed virtue/source, all checklist items, info action and primary adhkar action. No prayer calculation, tracking date assignment, midnight boundary, openability or persisted schema changes. The earlier temporal summary compared selected-location HH:MM with device-local hours; removing it avoids repeating an inconsistent countdown in this action panel, without claiming the independent leading-prayer calculation is repaired. Broader panel restructuring remains a recommendation pending owner review. Keep previews local before pushing.
+
+## Owner checkbox affordance, reviewed Sunnah footers and equal mobile widths — 2026-10-16
+
+Independent tracking actions retain native checkbox semantics but now use rounded-square indicators, gold checkmarks and the existing visible focus/disabled behavior. The shared prayer tracker/action checkmark changes; noninteractive Today’s path status marks keep their round form explicitly. Other inspected multi-select controls already use native/square checkbox affordances. Single-choice radios remain unchanged.
+
+Replace Later today in future-prayer footers with compact before/after counts derived from the existing reviewed getPrayerSunnah data. Label confirmed entries Rawatib and optional entries Optional/mustahabb, keeping their rank distinction. Use localized counts and plain interface labels without editing reviewed source text, references or counts. Recorded/unrecorded footers and next-prayer countdown remain.
+
+All five mobile cards must keep equal widths; wide-screen cards also grow equally. Content never determines individual card width. Long footer summaries wrap completely without truncation, ellipsis or font shrinking. A shared CSS subgrid aligns both header and footer rows to the tallest content across every card; the existing 3rem footer minimum remains. All card heights and footer dividers stay aligned at normal and 200% text. Browser checks explicitly compare all widths, heights, footer tops and text bounds at 320/390/1440px in both languages. Keep the native horizontal scroller, 8px visible insets and no outer surface.
+
+### Owner concise single-footer correction — 2026-10-16
+
+The owner requires equal width AND height on every small card, with concise relevant copy that fits. Show only one reviewed Sunnah summary on future cards: prefer a confirmed before entry, otherwise a confirmed after entry, otherwise the available optional entry. This is an overview, not an exhaustive source summary; all before/after items and their evidence remain in the larger card/info view. Keep explicit Rawatib/Optional rank and counts; Maghrib therefore shows its confirmed after pair instead of two footer lines. Do not add a second footer line at normal text size or widen one card for text. All card and footer dimensions match, including on mobile. At accessibility text enlargement, preserve complete text and equal dimensions across the row.
+
+The attempted shared subgrid failed the 320px/200% text check by constraining natural footer content. It is removed. Reuse the existing ResizeObserver to measure natural footer child heights plus padding/progress margins and apply one shared minimum footer height. Observe content size as well as card size; measure natural children rather than synchronized boxes to avoid a growth feedback loop. Default concise labels fit the shared 3rem footer. This also preserves consistent geometry when font size changes or selection/recording changes.
+
+## Owner approves one-purpose footers with Home glass preserved — 2026-10-16
+
+Every prayer footer now contains the same kind of short reviewed Sunnah overview, regardless of temporal/recording state. Keep the exact established count/rank selection (confirmed before, then confirmed after, otherwise optional). Recording state moves into the main timing/status area. Temporal Now/Next/Passed/Not yet due labels sit above the time; next has its countdown below the time and one real interval bar above the footer boundary, outside the open button and outside the footer. All headers share fixed icon/name row geometry and equal card/footer dimensions. Increase only the bottom header clearance to 12px for the 4px progress bar and visible text gap; top and side insets remain 8px.
+
+Preserve Home glass throughout: each standalone prayer card retains hero-glass/home-glass-surface and its existing tint, blur, saturation, edge highlight and opacity/contrast fallbacks. The plain row wrapper remains unboxed. Do not replace other Home materials, add nested blur or flatten the larger action/reading surfaces. Test every time-of-day scene, conservative bright-photo contrast, reduced transparency/high contrast and all summary/header/footer bounds alongside checkbox/focus/selection behavior. Native progress remains outside a button and is not a live announcement. Complete reviewed evidence and recording/openability/date contracts remain unchanged.
+
+## Owner calendar consistency correction — 2026-10-16
+
+Prayer record dates must follow the user's selected Hijri or Gregorian calendar, including the configured Hijri adjustment. Forward both settings through Home and the dedicated prayer screen into the shared panel and use formatDisplayDate, matching the Home header. Derive the displayed date from the supplied tracking dayKey; retain that original key in time datetime and all record writes, including across midnight. No calendar migration, prayer calculation or reviewed content change. Verify Arabic/English, both calendars, adjustment changes and unchanged record ownership; retain local image review before publication.
+
+## Owner statistics interpretation note — 2026-10-16
+
+The owner clarified: leave the existing checkboxes and card labels unchanged. For prayer-location statistics, an unchecked mosque option is to be interpreted as home, without requiring an explicit home confirmation; it must not be interpreted as a missed obligatory prayer. Preserve raw saved records and independent Sunnah/adhkar observations. This note records the rule for statistics work; the current Home/calendar refinement does not change statistical calculations, backfill records or modify controls.
+
+## Owner final Home header and glass polish — 2026-10-16
+
+On narrow phones the full selected calendar date takes priority over the palm and streak counters. A 44px Today’s path button opens the same sheet, which now displays both counts; the date can wrap rather than truncate. Desktop keeps its existing counter arrangement. The small prayer cards retain the approved 20% Home tint, 12px blur and 3.5% maximum highlight. Their card-specific override had reduced the edge to 12% white and removed the shared shallow outer shadow, making an otherwise active backdrop filter read as a flat dark rectangle against the dark upper sky. Restore an 18% quiet edge and the existing Home glass inset/outer shadow, keeping the next-prayer accent edge and all reduced-transparency/high-contrast fallbacks. Do not change the photo scrim, reviewed content, prayer timings or card anatomy.
+
+## Owner balanced Home header — 2026-10-16
+
+Keep the palm and streak counts visible in the Home header. Place the full selected-calendar date on the reading side and group the two indicators on the opposite side, following RTL/LTR direction. The two indicators share one 44px+ Today’s path action, a quiet inset glass pill and accessible count/name; this replaces the phone's palm-only button and the separate desktop counters/action. Strengthen the existing palm vector's stroke at its compact size without changing the icon system. Preserve the existing Today’s path sheet with full counts and status. Allow date wrapping on narrow screens, keep both indicators visible at 320px, and use the normal opaque fallback when transparency is reduced. Do not change the prayer cards or content.
+
+## Owner clearer Home glass across views — 2026-10-16
+
+The owner again requests visible glassmorphism and translucency on Home, on desktop and mobile in every view. Refine the shared Home material only: 16px blur, 135% saturation, a 5.5% maximum directional white sheen, 26% ordinary/24% prayer edges, brighter inset reflection and a shallow 14% shadow. Supersede earlier frost/highlight/edge values; preserve tint hierarchy, photo scrim, one material layer, next-prayer accent, card anatomy and all reading/recording behavior. The owner explicitly confirms: preserve device preference and improve normal glass. Preserve device/application reduced transparency and high-contrast fallbacks. The supplied image resembles the solid fallback, while explicit normal-preference captures show scenery through cards; this resemblance does not establish the user's actual device preference. Local screenshot review still precedes publication.
+
+## Owner next-prayer priority and contextual footers — 2026-10-16
+
+Notch/width continuation: the owner now requests the previously proposed connection effect. Implement paired stationary rounded tips on selected summary/expanded panel, with no connector crossing other columns, pointer interception or nested blur. Cap the centered row at 60rem and use equal tracks with 9.75rem compact minimum, reducing desktop/compact widths consistently. Increase top/inline header and footer inline insets by 2px to 14px; retain 12px header bottom. Preserve full-size time digits, using secondary 12px period labels to fit English without clipping or unequal widths. All existing source/timing/recording/accessibility boundaries and the local image-review-before-push gate remain.
+
+Latest owner correction: make the whole small card clickable through the existing native button, preserve progress outside button semantics and existing future disabled rules, increase header and matching footer insets to 12px, and remove Viewing/معروضة copy. Retain aria-expanded and a quiet inset selected outline. Once next is inside the final 30-minute approach, current's decorative emphasis is zero rather than 50%; next retains its gradual gain. Preserve all readable text, data/content/timing and preferences. A full-card focus outline remains visible. Correct CI's status-row offset by reserving equal minimum status height. The owner requires local images before another push, superseding release authority for this follow-up. A glass tab plus matching panel notch is proposed for the water-drop relationship; connection implementation remains a recommendation pending owner choice.
+
+Release approval: after accepting the completed visual previews, the owner explicitly authorizes applying and pushing all pending changes. Supersede the current Home continuation's local-only holds; preserve all changes and execute the full existing main-branch release authority, fresh release notes/history, hook gates, exact-commit Quality/Pages monitoring and production smoke verification. This release does not authorize unrelated content, state or dependency changes.
+
+Subsequent owner-approved current-to-next surface priority supersedes next-only emphasis: current starts strongest, next grows from 15% to 100% in the final 30 minutes as current softens to 50%. Previous/later cards retain full text/card opacity with quieter borders/reflections. Derive strength from the existing dated prayer timeline and minute clock; no extra polling, pulsing, moving gradient, blur animation or persisted state. At adhan the new current takes full emphasis. Preserve countdown readability and all recording/openability rules. Reduced transparency/high contrast remain opaque without glow; reduced motion retains static minute updates. This is decorative and defines no religious prayer-window boundary. Keep local screenshot review before publication.
+
+Alignment continuation approved by the owner: enlarge the remaining-time footer to the shared 14px step, use tabular numerals and align its text with the time column (Arabic left/English right). Keep a full-width bar underneath rather than compressing it beside the text, sharing 8px header/footer insets. Retain the existing aligned icon/status row and name/time baseline, equal dimensions and next-only strong accent. This supersedes the prior proposal-only status of these alignment recommendations; publication remains local-preview first.
+
+The owner explicitly replaces the earlier uniform small-card Sunnah summaries. Remove Rawatib/Optional text from the overview, accent the next prayer's name/time and label while preserving glass, and group remaining time with its one native interval bar inside its footer. Other cards show saved mosque/home, independently completed adhkar when no location exists, Not recorded for current/past unrecorded prayers, or After {previous prayer} for later prayers. Do not infer missing prayer, home attendance or invented progress. Preserve equal card/footer geometry and natural enlargement.
+
+Use الجمعة/Jumu‘ah instead of الظهر/Dhuhr for the noon overview on Friday, derived from the supplied civil record dayKey. Preserve internal prayer ID, callbacks, route, times and record ownership. This requested display substitution does not authorize rewriting religious source text or treating Dhuhr-specific educational evidence as newly reviewed Friday evidence. Existing expanded evidence/checklists remain unchanged. Preserve device transparency preferences and local preview-before-publication.
+
+## Owner all-card Home glass follow-up — 2026-10-16
+
+The owner requests visible glassmorphism and translucency for prayer and all other Home cards across mobile and desktop. The shared normal material uses an 18% navy tint, 16px/135% frost, a 5.5% directional sheen, 30% white edges and stronger inset reflections; prayer summaries use a 3.5–7% focus-weighted sheen. Reviewed long-text evidence keeps a 28% tint, and optional photographic Wird tiles keep full-opacity artwork with one glass caption. This supersedes earlier standard/reading tint and edge values without changing the page scrim, layout, source content or interaction. All material remains subject to the unchanged 4.5:1 bright-source contrast check and opaque reduced-transparency/high-contrast fallbacks. Review local screenshots before any push.
+
+## Owner-approved Home and audio follow-up — 2026-10-16
+
+The owner selects matching accent edges instead of the hourglass connection, direct Home routine sharing using the existing approved cards, persistent Play all default, consistent audio binary options, removal of the redundant visible expanded zikr title and a left-side desktop Play all indicator. Narrow players retain centered transport and put the indicator below at the left. Preserve manual continuation choice across new plans and reloads. A missing legacy preference defaults true; no playback mode/count or completion rule is changed.
+
+The owner additionally requests visible Home card photos and compressed Cloudflare delivery. Opaque full-height photo captions were concealing the image under reduced transparency: retain solid text captions but expose a 4rem image band. Normal photo captions keep the contrast gradient. Deliver 360/720px AVIF with WebP fallback from versioned R2 URLs on hosted web builds, preserving local/native packaged assets. Allow only the exact existing R2 image origin in CSP. Preserve reviewed approved sharing-card bytes. Original decorative JPEG masters move to design-sources; Reader/Progress reuse the smaller WebP assets. The owner authorizes including the concurrent scrolling prayer summary after verification. Earlier preview-only constraints are superseded by the current explicit apply/release request.
+
+### Owner correction: full-card artwork under reduced transparency
+
+The owner explicitly rejects the partial-photo/opaque-caption split. Supersede the 4rem visible-band decision above: the whole card remains photographic, shaded by a fixed readable gradient with no backdrop filter. Apply this in ordinary, device/app reduced-transparency and Home-glass-off modes. High contrast uses a stronger fixed gradient; forced colors retains native Canvas fallback. Keep decorative artwork independent of the background-glass preference.
+
+## Owner-approved desktop material and audio protection — 2026-10-16
+
+The owner selects persistent Home appearance choices: Glass / Follow device / Solid. Follow device is the legacy default; explicit Glass overrides device and app reduced transparency on Home, while high contrast and forced colors always remain opaque. Decorative card imagery remains independent. The owner selects audio controls lock only: playback continues under a modal cover, short taps cannot unlock, a two-second hold unlocks and Escape provides keyboard recovery. Do not change religious repetition counts or introduce child practice completion.
+
+The owner reports Arabic audio for اللهم اهدني وسددني speaking اللهم باعد بيني وبين خطاياي. Quarantine comprehensive-dua-39-abdullah-muhammad-v1, preserve the same bytes for the correctly matched friday-dua-25, remove the two mismatched owner-preview transcript annotations and rejected variant IDs, and retain approved English coverage. A reviewed replacement is required before restoring Arabic playback. Sacred text and exact assignments remain unchanged.
+
+The owner explicitly approves inclusion of verified concurrent Qibla shortcut edits in this release, superseding their separate chat's earlier no-push instruction.
+
+## Owner local-only automatic path and Home polish — 2026-10-16
+
+The owner requests a local-only follow-up and explicitly approves cross-chat coordination while keeping these edits local. This supersedes earlier release authority for the shared snapshot. From policy-activated days on 2026-10-16 onward, three main zikr groups plus a completed Quran wird earn a regular palm; three distinct mosque prayers upgrade it to filled gold and five add an oasis. Remove chosen mosque targets and checkbox-shaped status indicators from Today's path. Preserve prior award policies and records. The bar continues to mean remaining time, decreasing to zero at adhan with native RTL/LTR direction; move the selected edge 7px below the small card. The requested smoother scroll handoff supersedes the earlier transform-only implementation: use bounded 260ms card/sticky height interpolation without scale or blur, preserving enlarged footer alignment and all reduced-motion rules. Preserve the shared glass material; the scrolled strip owns one frosted translucent ground while child card/header filters are suppressed in that state. Keep all preference and contrast fallbacks. Mark three embedded recitations on the comprehensive-dua-42 Arabic recording; keep the separate 100-count assignment's prescribed count and safe playback fallback. Incompatible one-occurrence timing previews are quarantined, not invented. See phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md.
+
+## Owner authorization to release all pending changes — 2026-10-16
+
+The owner now explicitly instructs “push all changes.” This supersedes the local-only hold for every current pending Home, automatic-path, sourced-reminder, audio-protection/timing, Qibla and accompanying documentation/test change. The coordinating release chat owns one combined verified release: preserve the frozen snapshot, refresh notes/history for changes since the last successful Pages deployment, run the intact tracked hook gates, commit/push main, monitor exact-commit Quality and Pages build/deploy, inspect any failed jobs, and verify the deployed commit plus browser smoke. No force push, hook bypass, relaxed assertions or religious-count/source shortcuts are authorized. Prior local-only reports remain historical evidence; this decision is current authority.
+
+## Independent App and Home appearance — 2026-10-17
+
+The owner now requires genuine App/Home independence: choosing or reselecting App appearance must not write Home's preference. Both Glass/Opaque groups are directly visible in Settings → Appearance. Same as app remains optional; inherited Home resolves to App while explicit Home overrides survive every App change. Glass interface pages reuse the existing current Home scene; reading and playback protection, legacy values, contrast fallbacks and chrome-only blur remain unchanged. See docs/agent/phases/INDEPENDENT_GLASS_CONTROLS_2026_10_17.md.
+
+## Home glass across all layouts — 2026-10-17
+
+The owner rejects the dense Library/interface material shown beside Home and explicitly requests Home's translucency and glassmorphism for all Glass-mode screens, cards and layouts. This supersedes the 88% interface fill, extra 78% scene veil, chrome-only blur and exclusion of reading layouts. Share Home's scene/scrim, 18% ordinary tint, 28% long-reading tint and 16px/135% frost with directional sheen and inset edges; avoid nested blur. Preserve printed Mushaf glyphs/geometry, semantic contrast, independent App/Home choices, Solid/high-contrast/forced-color/unsupported-filter and failed-photo fallbacks. See phases/UNIFIED_HOME_GLASS_2026_10_17.md.
+
+## Owner-approved frosted prayer hierarchy — 2026-10-17
+
+The owner supplies a blue/gold prayer-row reference and approves comfortable horizontal cards that initially show current/next together, then scroll freely. Summary cards use icon tiles/dividers, larger times, temporal status pills and the existing native countdown interval bar; stored record facts remain in the button description and expanded action panel. Narrow rows rotate the overnight cyclic sequence to Isha then following Fajr so the pair can fit initially; wide rows keep ordinary chronological order. Reposition only on prayer/layout changes or keyboard/selected-card reveal, not during manual browsing. Current's pill is static gold with a quiet dot; no pulse or new clock. The earlier identity/time-on-one-row and saved-state-footer presentation rules are superseded. Calculations, record/openability rules, sacred text, outside selected edge and reduced-motion sticky behavior remain. See docs/agent/phases/PRAYER_GLASS_HIERARCHY_2026_10_17.md.
+
+## Calm prayer and overlay separation — 2026-10-17
+
+The owner's screenshot review supersedes the icon divider, bright blue/white summary outlines, next-prayer interval bar and 28% overlay tint. Prayer summaries use quieter boundaries and a text countdown, without vertical dividers or a progress bar. Keep current/next initial visibility, native free scrolling, recorded-state descriptions, full-card targets and stable name/time geometry through collapse. Expanded actions precede supporting evidence on phone; desktop retains separate evidence and tracking columns. Reviewed sources and tracking/calculation behavior are unchanged.
+
+Text-over-text overlays require a denser material than cards: dialogs, menus, listboxes and expanded audio use 80% navy with stationary 28px/135% frost. Ordinary cards and reading tint retain their existing values. Expanded AudioPlayerSurface visually hides its covered main-canvas siblings using a reversible attribute, in addition to inert/aria-hidden, and restores them on collapse. The shared shell scene remains visible; transparent backgrounds cannot reveal duplicate Reader text. Native focus, Escape, touch lock, Solid/high-contrast/forced-color recovery and offline state remain. See docs/agent/phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md.
+
+## Frost clarity and compact headers — 2026-10-17
+
+The owner's eight-screenshot review supersedes the earlier 18% ordinary/28% reading material. Shared ordinary cards now use 36% navy and long reading surfaces 48%, with stationary 22px/135% frost; overlays retain 80%/28px. Sticky page headers and the whole Progress tab/date group use 98% navy/28px to obscure passing text. Nested controls borrow outer frost; no blur animation is added. App/Home choices and opaque/high-contrast/forced-color fallbacks remain independent.
+
+Glass palettes set light success ink with matching dark foreground for filled status marks, rather than inheriting light-theme dark green. Home sharing uses explicit on-media ink and a stable button ground. Shared headers omit decorative border/shadow; Settings rows omit separators by default. Reader and standalone-counter desktop titles share their control row (96px Reader hero versus127px before); compact headers retain56px and may grow for wrapped/enlarged text. Remove standalone bottom instruction banners while preserving phone introductory guidance and header keyboard help. Religious text/counts, state and audio ownership remain unchanged. See agent/phases/FROST_CLARITY_COMPACT_HEADERS_2026_10_17.md.
+
+Owner screenshot selection: retain the open scene-backed Masbaha/Salawat canvas without an extra dark reading panel. Frost remains on their controls/menus; compact shared titles and removed bottom banners remain. This specifically supersedes applying long-reading tint to the standalone counter canvas.
+
+Owner frost correction: replace the near-opaque navy header shade with a lighter slate glass (42% tint), soft white sheen and stationary36px/135% frost. Extend Progress's sticky material across the page gutters, add16px lower breathing room and rounded lower corners. This supersedes98% header shade; maintain44px controls, focus scroll clearance, opaque accessibility recovery and the owner-selected open counter canvas. Test foreground contrast and moving-content separation against actual screenshots.
+
+## Compact Progress prayer tracking — 2026-10-18
+
+The owner supersedes the initial input-panel interpretation: Progress must show statistics rather than let users record. Implement concise read-only daily prayer/practice totals, an optional per-prayer breakdown and plain daily-wird records. Remove prayer-entry links and mutation controls from every daily statistics group; retain meaningful period/chart controls. Friday statistics read the cycle associated with the selected date. Preserve Home, normalized persistence, calendar rules, optional-practice independence and historical analytics. See phases/PROGRESS_COMPACT_TRACKING_2026_10_18.md. No commit, push or deployment.
+
+## Combined release authority — 2026-10-18
+
+The owner explicitly requests continuing and pushing all changes. This supersedes local-only publication holds for the pending Home, glass/scroll, prayer, Reader/header/sidebar and read-only Progress work. Preserve intact local hooks, full exact-commit Quality, Pages build/deploy and production smoke verification.
+
+## Shared chrome and explicit mosque recording — 2026-10-18
+
+Owner requests the same sidebar/header look and frost and replaces ambiguous Prayed wording with صليتها في المسجد. Reuse one fixed 32px chrome frost and header tint/sheen, render the scene behind Home navigation, keep mosque-only checks distinct from home records and retain general read-only statistics. Supersedes variable-strength header frost only; no persisted-data or content change. Existing release authority continues.
+
+## Adjacent after-prayer reading action — 2026-10-18, local only
+
+The owner approves the mobile/desktop card concept while requiring existing mode colors, Glass material and responsive contracts. PrayerActionsCard groups each native checkbox with its label at logical start, and places a separate compact Read / قراءة button as a sibling in the after-prayer adhkar row. Reading never toggles completion and remains available for completed records and non-recordable previews. Retain the subsequently approved mosque wording صليتها في المسجد. Remove the standalone full-width CTA.
+
+PrayerMomentPanel retains HomeCard and shared theme/on-media tokens without a new tint, frost or palette. After the owner rejected unused desktop space, the title and checklist use the first logical column; record context fills the upper second column and complete evidence aligns with the checklist below it. This removes a dedicated full-width metadata row and shortens the panel. Record date remains explicit and sunrise gets its own line. A card-width container query at 40rem enables this composition. The reading button immediately follows its intrinsic-width checkbox/label group with an 8px gap instead of being pushed across the column. Below that available measure, evidence is a keyboard-operated disclosure following the checklist. Enlarged text can return to one column. This supersedes the former viewport-768px two-column arrangement and always-visible narrow evidence, preserving source wording, dates, tracking fields, future restrictions, offline behavior and shared fallbacks. Scoped checkbox styling removes decorative glow while retaining visible keyboard focus. No publication is authorized.
+
+Owner alignment follow-up: Fajr sunrise moves directly beneath the prayer title in the same text column, with identical logical text edges in RTL/LTR. The record date remains over the evidence column at wide card widths. Read has a 112px minimum width with the same 44px minimum height and 8px label gap; labels wrap naturally on narrow/enlarged layouts. Existing modes, material and tracking remain.
+
+## Prayer evidence alignment and secondary record context — 2026-10-18, local only
+
+The owner requests removing the visible record line, aligning virtue with the title and keeping its citation inline. Move the same explicit time/dayKey/date label into the existing information sheet; no date assignment or calculation change. On wide cards, align the evidence heading at the prayer title top edge and span its column alongside the title/checklist. Fajr sunrise remains directly beneath its title. Append the unchanged source as a smaller inline span after the complete quotation; allow natural wrapping when the final line has insufficient room, never truncate or alter devotional text. Keep the established narrow disclosure, reading button, semantic colors, Glass/fallbacks and keyboard targets. This supersedes the earlier upper evidence-column record line. No push.
+
+Owner typography/alignment follow-up — 2026-10-18: prayer and virtue headings share the existing 17px title step and normal line height. The attribution increases from 12px to 13px and uses the same line metrics and 4px heading gap as Fajr sunrise. Both columns therefore align their heading and secondary text rows with matching logical edges in RTL/LTR. The source remains inline; no religious wording, theme, glass or responsive breakpoint changes. Local only.
+
+## 2026-10-18 — Preserve prominent temporal charts in Progress
+
+Owner correction: line charts are relevant for change over time and must remain prominent; add charting where useful while retaining meaningful comparisons. Apply locally. A large selectable remembrance line replaces the repeated miniature routine plots, preserving every routine series; add a prayer line for each independent practice and selectable prayer. Keep categorical bars and strongest/attention summaries because they answer which practice needs attention. Explain axes, denominators, complete days and partial buckets; show dated values without large dropdowns or in-page numeric tables. No persistence/content changes or publication. See phases/PROGRESS_TIME_SERIES_2026_10_18.md.
+
+## 2026-10-18 — Apply all remaining Progress recommendations, locally
+
+Owner approves concise mobile writing, direct chart interaction, fair elapsed-period comparisons and new individual-zikr tracking. Preserve prominent line charts and useful categorical comparisons. Use native disclosures for detail, tap/keyboard date exploration, equal complete-day comparison windows, and additive observed-day item history with deterministic normalization/merge and private-data ownership. No legacy backfill, religious-content interpretation or publication. See phases/PROGRESS_REFINEMENTS_2026_10_18.md.
+
+## 2026-10-18 — Full Home reminder readings, authorized R2 content upload
+
+The owner selects Reading flow and requests full authentic text for all rotating content, with ellipsis/expansion beyond four rendered lines and an independently expandable brief meaning. The owner explicitly asks to review and make all 185 older fallback entries usable. Source comparison yields 165 verified-reading mappings and 20 authenticated alternatives where old routes, promises or attribution cannot safely be retained. Preserve canonical collection text, counts, IDs and persistence. Record alternatives and their reasons; clear the old benefit/target on an alternative Home card. Keep meanings, Quran translations, editorial guidance and Companion attribution distinct. Preserve local reviewable sources.
+
+The owner's subsequent instruction, “we can upload content to R2. you can do that to avoide hitting the ceiling,” explicitly authorizes publishing the immutable content package. Upload to the existing Azkar bucket, pin its URL/size/checksum in a small manifest and retain verified bytes for offline Home reading. The binary is excluded from site output. Preserve core service-worker installation independently of R2 availability. Existing wa-zaker.com/Pages CORS origins are retained; add only the local verification origin 4897. The bucket currently has no attached custom domain; use its existing public endpoint without DNS changes. Application changes remain local; no commit, push or application deployment in this phase.
+
+## 2026-10-18 — Consistent devotional footer and complete labels, local only
+
+The owner requests footer consistency across all azkar including Masbaha and Salawat, with text-hugging desktop/mobile layouts. Reuse shared footer/action components; replace equal-width clipped tool cells with content-sized controls and balanced compact reflow. Preserve screen-specific actions, sacred content, counts, persistence and focus recovery. Keep all changes local; no commit, push or deployment. See phases/DEVOTIONAL_FOOTER_TEXT_FIT_2026_10_18.md.
+
+### Owner correction — single tool row and no counting guidance
+
+The owner explicitly requires tools to stay on one row and the tap-to-count information to be removed globally. Use content-sized labels on wide footers and consistent named icon controls on compact footers. Remove first-use instructions and hand/reopen controls from Reader, Masbaha and Salawat, including their unused component/hook. Preserve header keyboard help and counting behavior. This supersedes the initial wrapped/two-column implementation. Local only.
+
+## 2026-10-18 — Seamless headers, unhighlighted text and app discovery
+
+The owner explicitly requests local application only and prohibits pushing. Remove the Reader text-area pointer highlight; verify Home Glass across independent App/Home choices. Resting page headers blend into their content canvas; existing scroll thresholds enable protected shared frost only when content passes underneath. This supersedes always-frosted resting page headers while preserving stationary navigation and accessibility fallbacks. Include https://wa-zaker.com/ in native image captions and quick-pack download text while preserving approved artwork and reviewed devotional wording. See phases/SEAMLESS_HEADERS_AND_CARD_LINKS_2026_10_18.md. No commit, push or deployment.
+
+## 2026-10-18 — Stationary Library photograph
+
+Owner requests local application of an unchanged image-backed header with content scrolling below it and no frost. Apply to the pictured Azkar Library first: bounded list viewport, stationary transparent header, native short-height control recovery. Other headers retain existing contracts. No commit, push or deployment; preserve unrelated pending work.
+
+## 2026-10-18 — Session gaps and direct hadith meanings, local only
+
+The owner requests implementing the remaining session-review gaps and explicitly rejects distracting app/methodological caveats inside brief meanings. Add a visible website footer outside supplied card artwork, precise bilingual citation metadata for verified originals, and move editorial cautions to reference evidence. Preserve original narration, counts, timing and identities. Do not turn a Home alternative into evidence for its original collection item. Keep physical-device, human assistive-technology and independent source acceptance distinct from automated results. Application publication remains withheld; the revised immutable reminder content uses the existing authorized R2 workflow.
+
+## 2026-10-18 — Combined release .4 authorization
+
+The owner explicitly authorizes verifying all pending hadith/rotating reminder content on Cloudflare R2, pushing all changes and completing deployment with intact quality gates. This supersedes earlier local-only holds. The header chat owns integration, release notes, commit/push, exact-commit CI/Pages and production verification; other sessions freeze edits. See phases/COMBINED_RELEASE_2026_10_18_4.md.
+
+## Mobile Reader surface repair and combined release — 2026-10-18
+
+The owner requests fixing the marked mobile progress area, checking similar issues and pushing all changes. Apply one compact Reader material across title/progress/body and visible muted progress tracks in the shared compact counters. Preserve pending approved changes and complete the intact release cycle. Reuse valid prior checks, run only necessary affected regressions and required release gates. This publication instruction supersedes pending local-only holds. See phases/MOBILE_READER_SURFACE_2026_10_18.md.
+
+## Mushaf clarity, remaining source comparison and timed CI — 2026-10-18
+
+Owner requests a fresh review of the remaining 20 original collection identities before expansion, timing-based CI shard balancing preserving all 2,098 existing cases/projects, protected Mushaf glosses and explicit Glass-mode identification in appearance controls. Plan: three bounded scopes with separate commits; no new planning gate. Complete source comparison and document unresolved scholarly decisions without changing reviewed religious content. Separate page color from material, reuse the approved dense overlay treatment and retain all release gates. Standing direct-main release authority applies. See phases/MUSHAF_CLARITY_SOURCE_REVIEW_CI_2026_10_18.md and BROWSER_SCHEDULING.md.
+
+Owner clarification: check grading disagreements against Dorar and retain the resource already shown within the card. Treat a documented named scholarly view as attributed evidence, not a blanket blocker merely because another scholar differs. Separate concrete wording/citation/narrator mismatches from grading disagreement. All 20 entries receive a Dorar follow-up; reviewed devotional wording remains unchanged in this release.
+
+## Home width parity — 2026-10-18
+
+Owner requests expanding Home to match Azkar's responsive grid width, margins and padding. Reuse max-w-7xl and px-page across Home's three aligned frames, remove its narrower CSS cap and redundant desktop inset, preserve card breakpoints and mobile scrolling. Extend existing alignment cases with actual Library geometry; retain every existing browser case. Include this follow-up in the authorized release and supersede the running older-commit CI.
+
+## Complete Benefits hadith narrations — 2026-10-18
+
+Owner explicitly requests full hadith text in the pictured Benefits cards, applied locally and coordinated with other sessions. Replace all 21 reward summaries with complete selected matn and bilingual meaning, preserving citations, derived benefits and stable IDs. Prepare externally during release freeze and integrate after coordination; no commit, push or publication. See phases/BENEFITS_FULL_HADITH_2026_10_18.md.
+
+## Final refinements and combined release — 2026-10-18
+
+The owner explicitly instructs: apply recommendations, push all changes, and ensure proper testing and deployment. This supersedes the pending Benefits and stable prayer-scroll publication holds. Include the final documentation reconciliation, fresh bilingual release notes/history and all pending approved application/test/content evidence. Use the intact local hook and exact-commit Quality/Pages gates, then production smoke. The separate eight original collection corrections remain subject to content review; this release does not reinterpret reviewed sacred content. See phases/FINAL_PENDING_RELEASE_2026_10_18.md.
+
+## Home frost/motion and Android developer preparation — 2026-10-19
+
+The owner rejects the dark backing behind Home header/prayer cards while scrolling and requests smooth, accurate motion. Supersede the 88% shared ground/stacked header tint with one 60% on-media surface, existing stationary 32px frost and restrained sheen. Synchronize the expansion value to the shared 220ms standard transition with no initial hold, coordinating footer/countdown fades within the same duration. Preserve independent appearance, opacity fallbacks, stable text/flow, interaction holds and reduced motion. Also inspect/rebuild the existing Capacitor Android host and prepare a developer handoff: shared screens/domain logic, current native permissions/reminders/widgets/export and the explicit remaining persistent native-file storage/device/signing/Play work. No destructive storage migration or religious-content interpretation. See phases/FROST_MOTION_ANDROID_HANDOFF_2026_10_19.md.
+
+Owner follow-up: website caching must remain; recommend separate native-file storage through a platform adapter for the Android developer. The owner's latest explicit instruction is to complete local work and return before pushing. This supersedes standing release authority for this phase: no push or deployment pending owner review.
+
+## Sharing steps, trustworthy additions and explicit menus — 2026-10-19
+
+The owner requests implementation of a clean multi-step sharing form with visible steps, Previous/Next controls and live preview, and asks that dropdowns unmistakably look like menus rather than pill icons. Apply the existing app design system and export artwork, shared step navigation, labelled rectangular dropdown fields, complete continuation-card selection, explicit capability recovery and preserved choices. Skip inapplicable steps.
+
+Expose existing source-compared English meanings omitted by the Home/Quran Benefits sharing adapters; audit canonical translation coverage and constrain presets/additions to actual renderer-eligible content, with partial coverage descriptions. No new religious content, interpretation or dependency is required. Preserve data, offline reading and exact complete exports. See phases/SHARING_STEPS_AND_AVAILABILITY_2026_10_19.md. This is a new sharing phase under the repository's standing release authority; older isolated draft worktrees are outside its scope.
+
+The owner's subsequent follow-up prioritizes minimizing scrolling and asks for research-backed input selection. Use compact primary dropdown fields, visible small theme choices and native independent checkboxes in optional disclosures; remove repeated help, oversized theme samples and the separate final review block. Verify measured common-phone bounds as well as enlarged/narrow recovery. Do not claim that removing all scrolling is possible without compromising enlarged text or complete readable content.
+
+The owner supplied an English preview with inward arrows spread across the panel. Keep the card navigation grouped beside its preview, explicitly resolve arrows from the dialog language and verify both pointer and keyboard movement for generated and approved cards. Reserve room so the complete controls remain visible above the footer.
+
+## Sharing geometry and Quran wird adaptation — 2026-10-19
+
+Owner supplies phone screenshots of unnecessary preview whitespace and asks for explicit expand/collapse, modern progress, full-width content/language dropdowns and responsive refinement. Apply intrinsic preview sizing, compact spacing and an accessible native step-progress indicator. Also improve the Quran wird overview on tablets/desktops while preserving its phone layout. The owner asks for a Progress review and good plan for unified date ranges/custom metrics; document that separately for review before the broader implementation. Standing release authority applies to the bounded sharing/wird changes.
+
+Owner correction: combine the duplicate progress bar/count and numbered steps into one connected numbered stepper. Keep editable stages, accessible position labels and aria-current; remove the separate bar/count.
+
+Owner explicitly approves one image-first flow: final-step Include text with image and exact caption preview, secondary Copy text, and Copy reading link only for a meaningful reading/collection. Remove ordinary Text/Link modes. Preserve manual clipboard recovery and text saving; approved artwork captions use existing title/link metadata, never invented transcription.
+
+## Owner publication hold and single-line action follow-up
+
+The owner explicitly requires confirmation before any further push. This supersedes standing release authority for all pending changes: do not push until the owner confirms the concrete reviewed result. Replace the cramped cards-to-share row with one full-width labelled select and give image-copy its own wide footer row on phones; ordinary labels stay one line without truncation or smaller text. Enlarged text retains accessible reflow. Quran wird layout is implemented locally; Progress remains the separate documented proposal only.
+
+## Compact Quran wird planning — 2026-10-19
+
+The owner explicitly approves all recommendations following the six-card screenshot: four Reading plan choices, a subordinate Hijri/Gregorian/custom-duration schedule, selected-only fields/help, searchable Juz/Surah choices, numeric page/day controls, one compact live summary and explicit Save/Cancel. Replace the section-scope button row with a labelled select; retain compact duration shortcuts. Reuse select primitives and preserve canonical plan kinds, adaptive calculations, day boundaries, saved progress, offline behavior and normalization. This supersedes Phase 72 presentation only. No extra wizard, dependency, religious-content or persisted-schema change. Keep all work local under the current publication hold. See phases/WIRD_COMPACT_PLAN_FORM_2026_10_19.md.
+
+## Sharing board adaptation — 2026-10-19
+
+The owner approves the reviewed combination of board 2 desktop proportions and board 1 control grouping: balance settings and actual preview, use container-width reflow and a compact expandable phone preview, keep one stepper and add an explicit optional Design skip that preserves the current choices. Label artwork as supported approved/custom image designs; rename Interactive studio to Custom design to avoid implying a hosted experience. Remove redundant approved-card pagination dots. Show atomic visible copy/download/share-handoff feedback and clear it when moving stages. Source continues to mean reference/citation, distinct from Arabic text, meaning and label language. No new hosted link permissions/expiry, embeds, interactive mode, alternate output style, decorative phone frame or celebration page. Preserve exact images/captions/reading links, all source content and persistence. Latest publication hold remains. See phases/SHARING_BOARD_ADAPTATION_2026_10_19.md.
+
+Owner visual clarification: both supplied boards govern the complete look and feel, including the illustrated choice icons, header, buttons and panels. Apply the existing icon family and theme materials, retaining supported image-first behavior and actual exported images. Illustrate the two artwork choices with document/brush icons and descriptions; keep menu chevrons clear alongside globe/translation icons. Preserve all reading content and explicit publication hold. At enlarged text, keep device-share recovery in the Share settings so the action footer remains reachable.
+
+Owner stepper follow-up: enlarge the 1/2/3 circles to 2rem and color the same connected indicator as stages change. Completed lines fill fully, current outgoing lines fill halfway, upcoming lines remain neutral, and RTL uses the correct fill origin. Keep circle/label/connector clearance derived from one size token, 44px minimum action targets, responsive wrapping, and compact outer padding. Preserve the single indicator and existing focus/state semantics.
+
+## Combined publication authorization — 2026-10-20
+
+The owner's subsequent "push all changes" instruction explicitly confirms publication of all pending changes and supersedes the sharing-board and compact-wird publication holds above. Preserve the separate Progress proposal as documentation only. Verify the pending sharing and Quran planning work, refresh and archive the newest-only bilingual release notes, commit and push to main through the intact hook, then monitor exact-commit Quality, Pages build/deploy and production smoke. Record results in the combined release report; do not infer deployment from a successful push.
+
+## Performance, stability and header review — 2026-10-20
+
+The owner asks for performance/stability enhancements, review of Progress improvements and correct content behind header backgrounds during upward scrolling. Diagnose and repair demonstrated defects without a planning gate. Stabilize Progress date/empty-record identities, retain record/clock invalidation and use an opaque base controls surface when frost is unavailable; supported Glass, 8px/2px hysteresis and stationary Library behavior stay unchanged. Shared select options use 48px targets matching compact form fields. Keep the larger Progress composition/custom-range/preferences proposal separate from this bounded repair. Continue the authorized release; exact-commit CI findings require remediation without reducing assertions, timeouts or inventory.
+
+The owner clarifies that the overlap happens mostly in Progress, then explicitly requests continuing fixes/performance locally without pushing while other changes are in progress. This supersedes publication authority for further work: no new push or deployment trigger. Reproduced title/tab overlap at 320×480 with 200% text during independent controls scrolling. The always-transparent inner Glass header policy needs a narrow exception: use the existing opaque on-media surface only while its own controls scroll, with the existing 8px/2px thresholds and no second blur. Keep outer frost and the 60% viewport cap. Preserve concurrent work; do not include unrelated changes in this phase.
+
+Owner correction after reviewing images: the background color must not change or darken while scrolling; stronger frost is allowed. This explicitly supersedes the opaque inner-title repair above for supported Glass. Preserve the existing visible canvas with transparent Progress chrome at rest and during record/filter scrolling. Use stationary frost at each independently scrolling boundary when needed, rather than a dark fill; retain solid/accessibility/unsupported-filter fallbacks, original thresholds and keyboard clearance. Keep all work local. The broader Progress layout/date-range proposal is still unimplemented; answer that status explicitly rather than treating a status question as approval to implement it.
+
+The owner's next message explicitly authorizes implementing the focused Progress layout and date-range redesign with meaningful, accessible analytics, charts and smart tables. This supersedes the proposal-only disposition above. Follow phases/PROGRESS_FOCUSED_DASHBOARD_2026_10_20.md: shared validated ranges including Custom, independent overview metrics, one selected trend and progressively disclosed exact comparisons/records. Preserve civil/devotional date semantics, known-versus-unavailable history, offline data and all quality assertions. Keep preferences visit-local and all changes uncommitted/unpushed during the owner's publication hold.
+
+## Footer labels, sharing geometry and control feedback — 2026-10-20
+
+Owner requests larger targets plus icons-only/icons-with-text settings, consistent sharing actions, removal of redundant Back, non-overlapping phone previews and an app-wide microinteraction review. Default devotional tools to labels, with 52px minimum targets and a normalized/synchronized readerToolLabels preference in Reading settings; compact labels may sit below icons and enlarged text may reflow. This supersedes automatic compact label hiding. Keep previews in normal flow on single-column layouts; only wide two-column forms retain sticky preview. Final exports use three named equal-height actions and the persistent stepper for earlier stages; no unavailable first-step Previous. Share entry controls use the compact press token; keyboard activation and range/selection engagement share finite feedback, with still OS/app reduced motion. The owner's English-reader follow-up adds a visit-local button replacing Arabic with existing English meaning and back, preserving item/count and original payloads. No new content or database schema. All changes local: no commit/push/deployment.
+
+## Local reliability and performance — 2026-10-20
+
+The owner explicitly requests applying all five review recommendations locally. Protect the only saved snapshot during failed preference recovery; reuse exact Quran glyph preparation within each cancelled/replaced export generation; retain immediate single-key counter persistence while reusing only immutable unchanged normalized fields; reuse boot normalization only while exact stored bytes and devotional day agree; group historical daily-path inputs and judge each garden day once without changing historic policy or recording semantics. No storage migration, runtime dependency, reviewed-content change, commit, push or deployment. Measure actual work and preserve concurrent Progress, reading and sharing changes. See phases/LOCAL_RELIABILITY_PERFORMANCE_2026_10_20.md.
+
+## Remembered English reading and live footer preview — 2026-10-20
+
+Owner approves all follow-up recommendations and requests further animation/microinteraction polish: remember main English meaning on this device, keep its action reachable outside scrolling text, and preview footer styles in Reading settings. readerMeaningOnly is a normalized device-only preference, omitted and forbidden from remote snapshots; account merges preserve the local value. This supersedes the prior visit-local-only language decision. A stationary toolbar uses the existing language action, reserved label geometry, existing translations and unchanged count/selection/Mushaf ownership. The readonly example reuses actual action anatomy/styles. Refine finite shared color/press feedback, cancellation and semantic disabled/reduced-motion behavior without adding ambient effects. Short ordinary Reader windows may scroll natively to recover all enlarged controls. Preserve concurrent Progress work. The owner's latest instruction explicitly reserves pushing for themselves: no commit, push or deployment.
+
+## App-matched Progress dropdowns — 2026-10-20
+
+The owner requests polished, robust dropdowns consistent with the application and reiterates local-only continuation. Replace the new generic Progress selectors with the existing shared Select primitives, preserving metric/range meaning, keyboard control and reversible Custom date drafts. Use full wrapping labels, logical RTL alignment, selected indicators, app tokens and viewport-constrained portalled menus. Preserve all concurrent edits; no commit, push or deployment.
+
+## Focused chart controls and honest flat trends — 2026-10-20
+
+The owner supplies screenshots rejecting the prayer chart's two button clusters and stretched, space-heavy line. Replace the nine always-visible choices with two app-matched fields (Practice and Prayer, All prayers by default); use one Routine selector for routine detail. Retain existing series and exact export/inspection semantics. Compact flat series and explain their unchanged values without inventing variation. Markers stay circular in screen space, the plot keeps its zero-based scale and missing-data gaps, and only exact equal rates/counts qualify for the steady-value summary. Keep focus on the selected control when practice changes. This supersedes the prior always-visible series-button presentation and large empty flat-plot treatment. Local only; no commit or push.
+
+## Purposeful animation and next-prayer seconds — 2026-10-20
+
+The owner approves the reference's small progress ring and requests one-line mobile digits without “left”. They welcome beautiful, functional animation and microinteractions as a default product quality, with the existing Reduce Motion setting and OS preference providing a calmer alternative. This supersedes the earlier prayer-summary no-progress-indicator restriction for the small interval ring and a blanket interpretation that recurring functional updates are disallowed. Actual data-driven progress may use short finite transitions while visible; hidden/offscreen work pauses. Decorative loops, flashing, sacred-text distraction, layout/blur interpolation and expensive screen-wide updates remain prohibited. Keep all quality gates, prayer calculation/record/persistence contracts, and no new dependencies. Implement an isolated next-card seconds clock, stable localized digits, actual dated interval arc and immediate still updates with reduced motion. Local application only; no commit/push/deployment. See phases/PRAYER_SECONDS_AND_PURPOSEFUL_MOTION_2026_10_20.md.
+
+## Single-line mobile Progress controls and language-directed charts — 2026-10-20
+
+The owner rejects two-line button/dropdown values and explicitly requires Arabic charts/diagrams to progress right to left, English left to right. This supersedes the earlier left-to-right-in-both-languages time-series decision. Preserve ascending source records, exact counts, exports, Home/End chronological endpoints and semantic DOM order; mirror time coordinates, date labels, pointer hit testing, the range control and physical Left/Right navigation together. Adjacent progress/partition bars use the application language direction. Stack labelled fields and actions at full available width on phones, omit redundant leading icons there and use concise localized values while keeping full definitions in nearby prose. Do not shrink text or truncate values to satisfy the one-line preference. The owner also authorizes coordination with existing sessions to avoid duplicated work; Progress remains owned here, shared popup protection and prayer seconds stay with their existing sessions. No commit or push.
+
+## Prayer-card restoration after native browsing focus — 2026-10-20
+
+The owner explicitly approves repairing the independently reproduced WebKit prayer-card scrolling failure locally. Native horizontal-list focus is browsing context, not an active prayer control: keep keyboard focusability and native scrolling, but hold card geometry only for actual focused prayer buttons or open details. Reconcile on closing against the current scroll position; release when focus leaves a prayer button, including when it enters the browsing region. Preserve 96px/8px hysteresis, all existing assertions and the approved seconds/motion work. No timer, synthetic scroll/focus movement, commit, push or deployment. See phases/PRAYER_SECONDS_AND_PURPOSEFUL_MOTION_2026_10_20.md and its report.
+
+## Local motion/control audit — 2026-10-20
+
+The owner asks whether motion and microinteraction practices cover all controls/content, requests recommendations and instructs local application. Retain the positive purposeful-motion policy and existing reading/state contracts. Complete keyboard/pointer cancellation and existing Home icon-cue parity, still OS/app reduced-motion recovery, stationary routine photos and immediate native-slider engagement. No new dependency, content/state change, commit, push or deployment. Existing broad shared coverage does not establish exhaustive control-state or physical-device acceptance. See phases/MOTION_CONTROL_POLISH_2026_10_20.md for scope, evidence and prioritized follow-up.
+
+## 2026-10-20 — Final Progress/Mushaf polish and publish all changes
+
+The owner approves the final recommendations and requests pushing all changes, superseding the coordinated publication hold. This chat owns integration and exact-commit release verification. Preserve purposeful default animation, with quieter behavior only when app/OS Reduce Motion requests it. Selected dates precede secondary period/calendar settings. Exact Records gets a stable stronger reading tint within existing Glass, and compact date headers reclaim spacing while retaining enlarged text and 48px Close. Keep matched complete-day comparisons explicit. Both Mushaf hosts offer a remembered device-only colour-swipe switch and reversible gesture guide; explicit colours and ordinary scrolling remain available. Existing visible recovery handles, independent meanings, task-based overlays, old-paper loading retention and latest-request cancellation stay intact. Physical-device/assistive-technology checks remain unverified and are not inferred from browser evidence.
+
+## 2026-10-21 — Counter footer and longer menu previews
+
+The owner requests repairing the Masbaha footer and checking Salawat, including longer, more uniform zikr menu labels, and asks whether a full release is needed. This is a focused patch using the existing footer preference and protected dropdown primitives. Restore the missing Benefit label marker in both hosts; display existing full localized text for abbreviations with responsive two-line previews rather than authoring religious text or imposing a character budget. Preserve named short titles, counts and concise closed triggers. Reflow the paired fields and retain native scroll recovery at enlarged text; menus remain keyboard accessible and collision-height bounded. All normal local/exact-commit CI/Pages/production gates still apply to publishing; no major redesign or dependency is needed.

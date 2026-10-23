@@ -1,0 +1,571 @@
+.sharing-steps {
+  --sharing-step-size: 2rem;
+}
+.sharing-steps ol {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sharing-steps li {
+  position: relative;
+  min-width: 0;
+}
+.sharing-steps li:not(:last-child)::before,
+.sharing-steps li:not(:last-child)::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset-block-start: calc(4px + var(--sharing-step-size) / 2 - 1px);
+  inset-inline-start: calc(50% + var(--sharing-step-size) / 2 + 6px);
+  width: calc(100% - var(--sharing-step-size) - 12px);
+  height: 2px;
+  background: var(--border-control);
+}
+.sharing-steps li:not(:last-child)::after {
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.sharing-steps:dir(rtl) li::after {
+  transform-origin: right;
+}
+.sharing-steps li[data-state="past"]::after {
+  transform: scaleX(1);
+}
+.sharing-steps li[data-state="current"]::after {
+  transform: scaleX(0.5);
+}
+.sharing-steps button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px;
+  border-radius: var(--ds-radius-control);
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  cursor: pointer;
+}
+.sharing-steps button[aria-current="step"] {
+  color: var(--foreground);
+  font-weight: 700;
+}
+.sharing-steps button > span:last-child {
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+}
+@media (hover: hover) and (pointer: fine) {
+  .sharing-steps button:hover:not(:disabled) {
+    color: var(--foreground);
+  }
+}
+.sharing-steps button:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+.sharing-steps button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.sharing-step-number {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--sharing-step-size);
+  height: var(--sharing-step-size);
+  font-size: 1rem;
+  font-weight: 700;
+  border: 1px solid var(--border-control);
+  border-radius: 50%;
+  background: var(--card);
+}
+.sharing-steps [data-state="past"] .sharing-step-number {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.sharing-steps [aria-current="step"] .sharing-step-number {
+  border: 2px solid var(--primary);
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+.sharing-step-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+.sharing-step-navigation button {
+  min-height: 44px;
+  height: auto;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  border-radius: var(--ds-radius-control);
+}
+.sharing-step-navigation button:last-child:not(:first-child) {
+  margin-inline-start: auto;
+}
+.sharing-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--ds-radius-control);
+  cursor: pointer;
+}
+.sharing-select-trigger[data-slot="select-trigger"] {
+  min-height: 48px;
+  height: auto;
+  border-radius: var(--ds-radius-control);
+  border: 1px solid var(--border-control);
+  background: var(--background);
+  padding: 8px 12px;
+  text-align: start;
+  white-space: normal;
+}
+.sharing-select-trigger [data-slot="select-value"] {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: unset;
+}
+.sharing-select-trigger > svg:last-child {
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+  color: var(--foreground);
+}
+.sharing-select-trigger[data-state="open"] {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+.sharing-select-trigger[data-state="open"] > svg:last-child {
+  transform: rotate(180deg);
+}
+.sharing-layout {
+  align-items: start;
+  gap: 0.5rem;
+}
+.sharing-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.sharing-settings > * {
+  margin-block: 0 !important;
+}
+.sharing-content-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: 0.75rem;
+}
+.sharing-additions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.5rem;
+}
+.sharing-size-guide > summary:focus-visible,
+.sharing-typography > summary:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-control);
+}
+.sharing-export-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sharing-export-actions button {
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-inline: 4px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.sharing-preview {
+  align-self: start;
+}
+.sharing-card-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0.5rem auto 0;
+}
+.sharing-card-navigation > span,
+.sharing-card-navigation > div {
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.sharing-card-navigation button {
+  flex-shrink: 1;
+  min-width: 44px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+/* A sticky thumbnail only makes sense beside, never above, the form. */
+.sharing-layout > .sharing-preview {
+  position: static;
+}
+@media (min-height: 38rem) {
+  @container sharing (min-width: 44rem) {
+    .sharing-layout:not([data-inspect]) > .sharing-preview:not(:has(details[open])) {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--card);
+      border-radius: var(--ds-radius-control);
+    }
+  }
+}
+.sharing-surface {
+  container: sharing / inline-size;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.sharing-surface [data-sharing-body] {
+  min-height: 180px;
+}
+.sharing-surface[data-scroll-whole] {
+  overflow-y: auto;
+}
+.sharing-surface[data-scroll-whole] [data-testid="sharing-scroll"] {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+/* Intrinsic image dimensions keep the frame flush with the artwork. */
+.sharing-preview-image {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  margin-inline: auto;
+  border-radius: var(--ds-radius-control);
+  cursor: zoom-in;
+}
+.sharing-preview-image img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: clamp(160px, calc(100dvh - 480px), 440px);
+  object-fit: contain;
+}
+.sharing-layout[data-inspect] .sharing-preview-image {
+  cursor: zoom-out;
+}
+.sharing-layout[data-inspect] .sharing-preview-image img {
+  max-height: min(60dvh, 800px);
+}
+@media (max-width: 767px) {
+  .sharing-content-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+  .sharing-layout:not([data-inspect]) .sharing-preview > [role="group"]:has(> button):has(> div) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .sharing-layout:not([data-inspect]) .sharing-preview-image img {
+    max-height: clamp(160px, 24dvh, 240px);
+  }
+  .sharing-layout:not([data-inspect]) .sharing-preview > [role="group"] > div {
+    margin-top: 0;
+  }
+}
+.sharing-collection-dialog {
+  max-height: calc(100dvh - 16px);
+  width: calc(100% - 16px);
+}
+@media (max-width: 599px) {
+  .sharing-fullscreen {
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    translate: none !important;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+  .sharing-fullscreen > [data-slot="drawer-handle"] {
+    display: none;
+  }
+}
+@media (max-height: 28rem) {
+  .sharing-surface {
+    overflow-y: auto;
+  }
+  .sharing-surface [data-testid="sharing-scroll"] {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+}
+.sharing-choice:has(:checked) {
+  border-color: var(--primary);
+  background: var(--muted);
+}
+.sharing-choice:has(:focus-visible) {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (forced-colors: active) {
+  .sharing-steps button[aria-current="step"],
+  .sharing-choice:has(:checked) {
+    outline: 2px solid Highlight;
+  }
+}
+
+.sharing-caption textarea:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+.sharing-caption input {
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* Keep the thumbnail beside caption work, but never pin a long text/gallery
+   disclosure or consume the reading area at narrow/enlarged text widths. */
+.sharing-surface[data-scroll-whole] .sharing-preview {
+  position: static;
+}
+@container sharing (max-width: 20em) {
+  .sharing-layout > .sharing-preview {
+    position: static;
+  }
+}
+
+.sharing-export-actions > button:last-child {
+  grid-column: 1 / -1;
+}
+.sharing-export-actions button {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.sharing-export-actions button > span {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+/* Match the usable dialog width, including text enlargement, rather than the
+   viewport's navigation-shell tier. DOM order keeps preview context first. */
+@container sharing (min-width: 44rem) {
+  .sharing-collection .sharing-layout.grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas: "settings preview";
+    gap: 1.5rem;
+    padding-block: 0.5rem;
+  }
+  .sharing-collection .sharing-settings {
+    grid-area: settings;
+    gap: 0.75rem;
+    padding-block: 0.25rem;
+  }
+  .sharing-collection .sharing-layout.grid > .sharing-preview,
+  .sharing-collection .sharing-layout.grid:not([data-inspect]) > .sharing-preview {
+    grid-area: preview;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--ds-radius-card);
+    background: color-mix(in srgb, var(--muted) 35%, var(--card));
+  }
+  .sharing-collection .sharing-preview-image img {
+    max-height: min(44dvh, 380px);
+  }
+  .sharing-collection .sharing-layout[data-inspect] .sharing-preview-image img {
+    max-height: min(70dvh, 800px);
+  }
+  .sharing-collection .sharing-content-fields {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  }
+}
+
+/* The boards' illustrated controls use the app's existing icons and materials. */
+.sharing-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.sharing-header-icon,
+.sharing-choice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--ds-radius-control);
+  background: var(--muted);
+  color: var(--foreground);
+}
+.sharing-header-icon {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+}
+.sharing-header-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.sharing-artwork-choice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+  gap: 0.5rem;
+  width: 100%;
+  height: auto;
+  min-height: 44px;
+  padding: 0.75rem;
+  border-color: var(--border-control);
+  background: color-mix(in srgb, var(--muted) 20%, var(--card));
+  white-space: normal;
+  text-align: start;
+}
+.sharing-artwork-choice[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: var(--muted);
+}
+.sharing-artwork-choice:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--muted);
+}
+.sharing-choice-icon {
+  width: 32px;
+  height: 32px;
+}
+.sharing-choice-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.sharing-artwork-choice[aria-pressed="true"] .sharing-choice-icon {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 15%, var(--card));
+}
+.sharing-choice-copy {
+  display: block;
+  min-width: 0;
+}
+.sharing-choice-title {
+  display: block;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.sharing-choice-description {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.sharing-choice-check {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+.sharing-artwork-choice[aria-pressed="true"] .sharing-choice-check {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+.sharing-collection .sharing-disclosure {
+  background: color-mix(in srgb, var(--muted) 20%, var(--card));
+}
+.sharing-collection .sharing-additions {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+}
+@container sharing (min-width: 44rem) {
+  .sharing-dialog-header {
+    padding-block: 0.875rem;
+    padding-inline-start: 1.25rem;
+  }
+  .sharing-artwork-choice {
+    flex-direction: row;
+    align-items: center;
+    min-height: 88px;
+    gap: 0.75rem;
+    padding-inline-end: 1.5rem;
+  }
+  .sharing-choice-icon {
+    width: 40px;
+    height: 44px;
+  }
+  .sharing-choice-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+@container sharing (min-width: 30em) {
+  .sharing-export-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sharing-export-actions > button:last-child {
+    grid-column: auto;
+  }
+}
+/* Text enlargement needs reflow, never truncation or smaller labels. */
+@container sharing (max-width: 14em) {
+  .sharing-export-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sharing-export-actions button {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+  .sharing-export-actions button > span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+.sharing-export-actions button,
+.sharing-step-navigation button,
+.sharing-final-actions button {
+  min-height: 48px;
+  border: 1px solid var(--border-control);
+  padding: 10px 12px;
+}
+.sharing-export-actions button {
+  flex-direction: row;
+}
+.sharing-final-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 8px;
+}

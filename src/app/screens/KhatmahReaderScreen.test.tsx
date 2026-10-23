@@ -135,6 +135,26 @@ describe("KhatmahReaderScreen navigation", () => {
     expect(setMushafTheme).toHaveBeenLastCalledWith("light");
   });
 
+  it("leaves colour unchanged when swipes are disabled while horizontal turns remain available", async () => {
+    setViewport(390, 844);
+    const setMushafTheme = vi.fn();
+    const { setKhatmahPage } = renderReader({ colorGestures: false, mushafTheme: "light", setMushafTheme });
+    await screen.findByRole("article", { name: /صفحة ٤٢/ });
+    const paper = document.querySelector(".mushaf-paper")!;
+    for (const [id, x, y] of [
+      [11, 180, 300],
+      [12, 180, 500],
+      [13, 280, 400],
+    ]) {
+      fireEvent.pointerDown(paper, { pointerId: id, button: 0, clientX: 180, clientY: 400 });
+      fireEvent.pointerMove(paper, { pointerId: id, clientX: x, clientY: y });
+      fireEvent.pointerUp(paper, { pointerId: id, clientX: x, clientY: y });
+    }
+    expect(setMushafTheme).not.toHaveBeenCalled();
+    expect(setKhatmahPage).toHaveBeenCalledWith(43);
+    expect(screen.queryByTestId("mushaf-theme-hud")).not.toBeInTheDocument();
+  });
+
   it("keeps semantic next and previous controls aligned with physical direction", async () => {
     const user = userEvent.setup();
     const { setKhatmahPage } = renderReader();
@@ -296,7 +316,7 @@ describe("KhatmahReaderScreen wird progress", () => {
     expect(backSvg).toBeInTheDocument();
     // Exit follows the interface Back convention; physical page-turn controls
     // retain their separate Quran navigation contract.
-    expect(backSvg).toHaveAttribute("data-rtl-flip", "");
+    expect(backSvg).not.toHaveAttribute("data-rtl-flip", "");
     expect(backBtn.closest("[data-testid='mushaf-corner-top-right']")).not.toBeNull();
     expect(moreBtn.closest("[data-testid='mushaf-corner-top-left']")).not.toBeNull();
 
@@ -358,7 +378,7 @@ describe("KhatmahReaderScreen difficult words", () => {
     expect(toggle).toHaveAttribute("aria-checked", "true");
     const word = await screen.findByRole("button", { name: /معنى كلمة/ });
     await user.click(word);
-    const popover = await screen.findByRole("tooltip");
+    const popover = await screen.findByTestId("quran-word-popover");
     expect(popover).toHaveTextContent("المعنى");
     expect(popover).toHaveTextContent("آية ٢٥٥");
     expect(popover).not.toHaveTextContent("مجمع الملك فهد");
@@ -649,6 +669,65 @@ describe("KhatmahReaderScreen wird completion notice", () => {
     expect(screen.queryByTestId("mushaf-top-left-back")).toBeNull();
     fireEvent.keyDown(document.body, { key: "Escape" });
     expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+  });
+
+  it("toggles tools once per centre tap and reverses colours without changing focus mode", async () => {
+    setViewport(390, 844);
+    const setMushafTheme = vi.fn();
+    renderReader({ mushafTheme: "light", appTheme: "light", setMushafTheme });
+    await screen.findByRole("article", { name: "صفحة ٤٢" });
+    const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;
+    vi.spyOn(paper, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 390,
+      height: 700,
+      right: 390,
+      bottom: 700,
+    } as DOMRect);
+    const tap = () => {
+      fireEvent.pointerDown(paper, { pointerId: 71, button: 0, clientX: 195, clientY: 350 });
+      fireEvent.pointerUp(paper, { pointerId: 71, button: 0, clientX: 195, clientY: 350 });
+    };
+    tap();
+    expect(screen.getByTestId("mushaf-focus-exit")).toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-top-left-back")).not.toBeInTheDocument();
+    tap();
+    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+    for (const [id, from, to] of [
+      [72, 450, 350],
+      [73, 350, 450],
+    ]) {
+      fireEvent.pointerDown(paper, { pointerId: id, button: 0, clientX: 195, clientY: from });
+      fireEvent.pointerMove(paper, { pointerId: id, clientX: 195, clientY: to });
+      fireEvent.pointerUp(paper, { pointerId: id, clientX: 195, clientY: to });
+    }
+    expect(setMushafTheme).toHaveBeenNthCalledWith(1, "midnight");
+    expect(setMushafTheme).toHaveBeenLastCalledWith("light");
+    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+  });
+
+  it("respects OS reduced motion during a drag while still turning on release", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({
+        matches: true,
+        media: "(prefers-reduced-motion: reduce)",
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    setViewport(390, 844);
+    const { setKhatmahPage } = renderReader({ reduceMotion: false });
+    await screen.findByRole("article", { name: "صفحة ٤٢" });
+    const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;
+    fireEvent.pointerDown(paper, { pointerId: 81, button: 0, clientX: 100, clientY: 350 });
+    fireEvent.pointerMove(paper, { pointerId: 81, clientX: 200, clientY: 350 });
+    expect(paper.style.transform).toBe("");
+    fireEvent.pointerUp(paper, { pointerId: 81, clientX: 200, clientY: 350 });
+    expect(setKhatmahPage).toHaveBeenCalledWith(43);
   });
 
   it("toggles between mushaf page mode and bilingual stream view via the options menu", async () => {

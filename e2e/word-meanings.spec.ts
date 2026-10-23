@@ -25,6 +25,32 @@ async function openAyatAlKursi(page: Page) {
 }
 
 test.describe("Quran word meanings", () => {
+  test("closes the gloss on its body or the same word without changing the reading @cross-browser", async ({
+    page,
+  }) => {
+    await openAyatAlKursi(page);
+    const word = page.getByTestId("quran-word-help").first();
+    // A late QCF font may add aria-hidden glyphs to textContent. The semantic
+    // reading must stay byte-for-byte unchanged through dismissal instead.
+    const reading = await page.getByTestId("zikr-text").ariaSnapshot();
+    await word.click();
+    const gloss = page.getByTestId("quran-word-popover");
+    await expect(gloss).toBeVisible();
+    await word.click();
+    await expect(gloss).toBeHidden();
+    await expect(word).not.toHaveAttribute("data-word-active", "true");
+    await word.press("Enter");
+    await expect(gloss).toBeVisible();
+    await page.getByTestId("quran-word-popover-dismiss").click();
+    await expect(gloss).toBeHidden();
+    await word.click();
+    await gloss.click({ position: { x: 16, y: 6 } });
+    await expect(gloss).toBeHidden();
+    expect(await page.getByTestId("zikr-text").ariaSnapshot()).toBe(reading);
+    await word.click();
+    await page.getByTestId("quran-word-popover-all").click();
+    await expect(page.getByTestId("quran-word-meaning-sheet")).toBeVisible();
+  });
   test("steps from one word to the next without reopening the sheet", async ({ page }) => {
     await openAyatAlKursi(page);
 

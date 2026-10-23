@@ -11,6 +11,7 @@ import {
 } from "../app/progress";
 import { mergePrayerTracking, mergeQuranWirdDailyGoals, mergeWirdHistory, recentDayKeys } from "../app/syncMerge";
 import { getAuthCallbackUrl, getSupabaseClient, isSupabaseConfigured } from "./supabase";
+import { mergeZikrHistory, normalizeZikrHistory } from "../app/zikrHistory";
 
 export const REMOTE_SESSION_PAGE_SIZE = 100;
 const REMOTE_DAILY_COMPLETION_PAGE_SIZE = 500;
@@ -146,6 +147,7 @@ type RemoteProfileRow = {
 type RemoteSettingsJson = Partial<AppStateSnapshot["settings"]> & {
   savedZikrIds?: AppStateSnapshot["savedZikrIds"];
   dailyCompletions?: AppStateSnapshot["dailyCompletions"];
+  zikrHistory?: AppStateSnapshot["zikrHistory"];
   /**
    * State, not settings, and optional because rows written before this shipped
    * do not carry it. Reading one of those is the ordinary case for a while: the
@@ -169,6 +171,7 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     highContrast: state.settings.highContrast,
     boldText: state.settings.boldText,
     reduceMotion: state.settings.reduceMotion,
+    readerToolLabels: state.settings.readerToolLabels,
     reduceTransparency: state.settings.reduceTransparency,
     homeWirdImages: state.settings.homeWirdImages,
     hapticFeedback: state.settings.hapticFeedback,
@@ -183,6 +186,7 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     routineModes: state.settings.routineModes,
     savedZikrIds: state.savedZikrIds,
     dailyCompletions: state.dailyCompletions,
+    zikrHistory: recentZikrHistory(state.zikrHistory),
     /* Prayer tracking and the wird were device-local until now, so two of the
        three things a day is derived from stopped at whichever device recorded
        them. They ride in settings_json rather than in tables of their own: it
@@ -204,6 +208,11 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
 function recentTracking(records: PrayerTrackingRecord[] = []): PrayerTrackingRecord[] {
   const keep = new Set(recentDayKeys([...new Set(records.map((record) => record.dayKey))]));
   return records.filter((record) => keep.has(record.dayKey));
+}
+function recentZikrHistory(records: AppStateSnapshot["zikrHistory"] = []) {
+  const safe = normalizeZikrHistory(records);
+  const keep = new Set(recentDayKeys([...new Set(safe.map((record) => record.dayKey))]));
+  return safe.filter((record) => keep.has(record.dayKey));
 }
 
 /** The same window over the wird. */
@@ -393,6 +402,10 @@ export async function loadRemoteState(
           highContrast: settings?.settings_json?.highContrast ?? localState.settings.highContrast,
           boldText: settings?.settings_json?.boldText ?? localState.settings.boldText,
           reduceMotion: settings?.settings_json?.reduceMotion ?? localState.settings.reduceMotion,
+          readerToolLabels:
+            typeof settings?.settings_json?.readerToolLabels === "boolean"
+              ? settings.settings_json.readerToolLabels
+              : localState.settings.readerToolLabels,
           reduceTransparency: settings?.settings_json?.reduceTransparency ?? localState.settings.reduceTransparency,
           homeWirdImages:
             typeof settings?.settings_json?.homeWirdImages === "boolean"
@@ -433,6 +446,7 @@ export async function loadRemoteState(
       isComplete: item.is_complete,
     })),
     ...(remoteDailyCompletions.length > 0 ? { dailyCompletions: remoteDailyCompletions } : {}),
+    zikrHistory: mergeZikrHistory(localState.zikrHistory, settings?.settings_json?.zikrHistory),
     savedZikrIds: savedZikrTableMissing
       ? (settings?.settings_json?.savedZikrIds ?? localState.savedZikrIds)
       : (savedZikrResult.data ?? []).map((row) => row.zikr_id),

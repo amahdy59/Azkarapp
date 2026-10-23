@@ -1,14 +1,14 @@
 # Generated audio mapping report
 
-Generated: 2026-10-12T06:36:51.191Z
+Generated: 2026-10-16T14:37:36.417Z
 
 | Metric                    | Count |
 | ------------------------- | ----: |
-| Zikr instances            |   254 |
-| Total canonical zikrs     |   199 |
-| Approved audio mappings   |   196 |
+| Zikr instances            |   256 |
+| Total canonical zikrs     |   198 |
+| Approved audio mappings   |   199 |
 | Pending assets            |     0 |
-| Unmatched zikrs           |    58 |
+| Unmatched zikrs           |    57 |
 | Duplicate asset paths     |     7 |
 | Shared canonical groups   |    34 |
 | Qur'anic range errors     |     0 |
@@ -19,9 +19,9 @@ Generated: 2026-10-12T06:36:51.191Z
 
 - `zikr:collection-opening`: `m-hm-75a`, `e-hm-75a`
 - `quran-002-255`: `m-hm-75`, `e-hm-75`, `s-hm-100`, `ap-ref-9`
-- `quran-112`: `m-hm-76a`, `e-hm-76a`, `s-hm-99-ikhlas`, `ap-ref-12a`
-- `quran-113`: `m-hm-76b`, `e-hm-76b`, `s-hm-99-falaq`, `ap-ref-12b`
-- `quran-114`: `m-hm-76c`, `e-hm-76c`, `s-hm-99-nas`, `ap-ref-12c`
+- `quran-112`: `m-hm-76a`, `e-hm-76a`, `s-hm-99-ikhlas`, `ap-ref-12a`, `ir-ref-5a`
+- `quran-113`: `m-hm-76b`, `e-hm-76b`, `s-hm-99-falaq`, `ap-ref-12b`, `ir-ref-5b`
+- `quran-114`: `m-hm-76c`, `e-hm-76c`, `s-hm-99-nas`, `ap-ref-12c`, `ir-ref-5c`
 - `zikr:sayyid-al-istighfar`: `m-hm-79`, `e-hm-79`, `misc-ref-8`, `friday-dua-02`
 - `zikr:daily-wellbeing`: `m-hm-82`, `e-hm-82`, `friday-dua-32`
 - `quran-009-129-excerpt`: `m-hm-83`, `e-hm-83`, `da-ref-5`
@@ -60,9 +60,9 @@ Record one file per canonical row, not one file per screen instance. The filenam
 | ---------------------------------------------------- | ----------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `zikr:collection-opening`                            | `m-hm-75a`                                | `m-hm-75a.mp3`                                | `dua/m-hm-75a/<voice-id>/v1/m-hm-75a.mp3`                                                               | `m-hm-75a`, `e-hm-75a`                                              |
 | `quran-002-255`                                      | `m-hm-75`                                 | `m-hm-75.mp3`                                 | `quran/m-hm-75/<voice-id>/v1/m-hm-75.mp3`                                                               | `m-hm-75`, `e-hm-75`, `s-hm-100`, `ap-ref-9`                        |
-| `quran-112`                                          | `m-hm-76a`                                | `m-hm-76a.mp3`                                | `quran/m-hm-76a/<voice-id>/v1/m-hm-76a.mp3`                                                             | `m-hm-76a`, `e-hm-76a`, `s-hm-99-ikhlas`, `ap-ref-12a`              |
-| `quran-113`                                          | `m-hm-76b`                                | `m-hm-76b.mp3`                                | `quran/m-hm-76b/<voice-id>/v1/m-hm-76b.mp3`                                                             | `m-hm-76b`, `e-hm-76b`, `s-hm-99-falaq`, `ap-ref-12b`               |
-| `quran-114`                                          | `m-hm-76c`                                | `m-hm-76c.mp3`                                | `quran/m-hm-76c/<voice-id>/v1/m-hm-76c.mp3`                                                             | `m-hm-76c`, `e-hm-76c`, `s-hm-99-nas`, `ap-ref-12c`                 |
+| `quran-112`                                          | `m-hm-76a`                                | `m-hm-76a.mp3`                                | `quran/m-hm-76a/<voice-id>/v1/m-hm-76a.mp3`                                                             | `m-hm-76a`, `e-hm-76a`, `s-hm-99-ikhlas`, `ap-ref-12a`, `ir-ref-5a` |
+| `quran-113`                                          | `m-hm-76b`                                | `m-hm-76b.mp3`                                | `quran/m-hm-76b/<voice-id>/v1/m-hm-76b.mp3`                                                             | `m-hm-76b`, `e-hm-76b`, `s-hm-99-falaq`, `ap-ref-12b`, `ir-ref-5b`  |
+| `quran-114`                                          | `m-hm-76c`                                | `m-hm-76c.mp3`                                | `quran/m-hm-76c/<voice-id>/v1/m-hm-76c.mp3`                                                             | `m-hm-76c`, `e-hm-76c`, `s-hm-99-nas`, `ap-ref-12c`, `ir-ref-5c`    |
 | `zikr:m-hm-77m`                                      | `m-hm-77m`                                | `m-hm-77m.mp3`                                | `dua/m-hm-77m/<voice-id>/v1/m-hm-77m.mp3`                                                               | `m-hm-77m`                                                          |
 | `zikr:m-hm-78m`                                      | `m-hm-78m`                                | `m-hm-78m.mp3`                                | `dua/m-hm-78m/<voice-id>/v1/m-hm-78m.mp3`                                                               | `m-hm-78m`                                                          |
 | `zikr:sayyid-al-istighfar`                           | `m-hm-79`                                 | `m-hm-79.mp3`                                 | `dua/m-hm-79/<voice-id>/v1/m-hm-79.mp3`                                                                 | `m-hm-79`, `e-hm-79`, `misc-ref-8`, `friday-dua-02`                 |
@@ -187,7 +187,6 @@ Record one file per canonical row, not one file per screen instance. The filenam
 | `zikr:ir-ref-2`                                      | `ir-ref-2`                                | `ir-ref-2.mp3`                                | `dua/ir-ref-2/<voice-id>/v1/ir-ref-2.mp3`                                                               | `ir-ref-2`                                                          |
 | `zikr:ir-ref-3`                                      | `ir-ref-3`                                | `ir-ref-3.mp3`                                | `dua/ir-ref-3/<voice-id>/v1/ir-ref-3.mp3`                                                               | `ir-ref-3`                                                          |
 | `zikr:ir-ref-4`                                      | `ir-ref-4`                                | `ir-ref-4.mp3`                                | `dua/ir-ref-4/<voice-id>/v1/ir-ref-4.mp3`                                                               | `ir-ref-4`                                                          |
-| `zikr:ir-ref-5`                                      | `ir-ref-5`                                | `ir-ref-5.mp3`                                | `dua/ir-ref-5/<voice-id>/v1/ir-ref-5.mp3`                                                               | `ir-ref-5`                                                          |
 | `zikr:ir-ref-6`                                      | `ir-ref-6`                                | `ir-ref-6.mp3`                                | `dua/ir-ref-6/<voice-id>/v1/ir-ref-6.mp3`                                                               | `ir-ref-6`                                                          |
 | `zikr:ir-ref-7`                                      | `ir-ref-7`                                | `ir-ref-7.mp3`                                | `dua/ir-ref-7/<voice-id>/v1/ir-ref-7.mp3`                                                               | `ir-ref-7`                                                          |
 | `quran-002`                                          | `ir-baqarah`                              | `ir-baqarah.mp3`                              | `quran/ir-baqarah/<voice-id>/v1/ir-baqarah.mp3`                                                         | `ir-baqarah`                                                        |
@@ -305,7 +304,6 @@ Record one file per canonical row, not one file per screen instance. The filenam
 - `tr-ref-9` — `zikr:tr-ref-9`
 - `da-ref-1` — `zikr:da-ref-1`
 - `da-ref-8` — `zikr:da-ref-8`
-- `ir-ref-5` — `zikr:ir-ref-5`
 - `ir-ref-6` — `zikr:ir-ref-6`
 - `ir-ref-7` — `zikr:ir-ref-7`
 - `sc-ref-11` — `zikr:sc-ref-11`

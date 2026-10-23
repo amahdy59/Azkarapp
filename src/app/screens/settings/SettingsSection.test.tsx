@@ -1,14 +1,32 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { SettingsSection, SubHeader } from "./SettingsPrimitives";
 
 describe("SubHeader focus", () => {
-  it("focuses the newly mounted panel after an outgoing header is removed", async () => {
+  afterEach(() => vi.restoreAllMocks());
+  it("focuses the newly mounted panel after an outgoing header is removed", () => {
+    const frames = new Map<number, FrameRequestCallback>();
+    let nextFrame = 0;
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      frames.set(++nextFrame, callback);
+      return nextFrame;
+    });
+    vi.spyOn(window, "cancelAnimationFrame").mockImplementation((id) => {
+      frames.delete(id);
+    });
+    const flushFrame = () =>
+      act(() => {
+        const pending = [...frames.values()];
+        frames.clear();
+        pending.forEach((callback) => callback(0));
+      });
     const { rerender } = render(<SubHeader key="old" title="Previous panel" onBack={() => undefined} />);
-    await waitFor(() => expect(screen.getByRole("heading", { name: "Previous panel" })).toHaveFocus());
+    flushFrame();
+    expect(screen.getByRole("heading", { name: "Previous panel" })).toHaveFocus();
     rerender(<div>Outgoing panel</div>);
     rerender(<SubHeader key="new" title="Reading & Typography" onBack={() => undefined} />);
-    await waitFor(() => expect(screen.getByRole("heading", { name: "Reading & Typography" })).toHaveFocus());
+    flushFrame();
+    expect(screen.getByRole("heading", { name: "Reading & Typography" })).toHaveFocus();
   });
 });
 

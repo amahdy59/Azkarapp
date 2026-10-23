@@ -48,6 +48,23 @@ export interface DailyEvidence {
   authenticityLevel?: Zikr["authenticityLevel"];
   /** The collection the zikr belongs to, when this came from one. */
   categoryId?: Zikr["category"];
+  sourceUrl?: string;
+  title?: string;
+  excerpt?: boolean;
+  reportedAction?: boolean;
+  evidenceId?: string;
+  narrator?: string;
+  meaning?: string;
+  meaningSourceUrl?: string;
+  meaningSourceName?: "hadeethenc" | "dorar" | "source";
+  companionReport?: boolean;
+  /** A Quran rendering stays separate from editorial guidance. */
+  translation?: string;
+  /** Existing reviewed English quotation, available on demand in the sharing studio. */
+  translationForSharing?: string;
+  takeaway?: string;
+  /** Original reference for exact source matching, independent of UI language. */
+  sourceReferenceEnglish?: string;
 }
 
 /**
@@ -56,7 +73,14 @@ export interface DailyEvidence {
  * the app making a claim it could not support.
  */
 function isEligible(zikr: Zikr): boolean {
-  return Boolean(zikr.hadithText && zikr.authenticityNote && zikr.benefit);
+  const grading = zikr.authenticityNote ?? "";
+  return Boolean(
+    zikr.hadithText &&
+    zikr.benefit &&
+    /sahih|hasan|authenticated|صحيح|حسن/i.test(grading) &&
+    !/weak|da[‘’'ʿ-]?if|disputed|differ|ضعيف/i.test(grading) &&
+    zikr.authenticityLevel !== "weak",
+  );
 }
 
 const POOL: readonly Zikr[] = ALL_AZKAR.filter(isEligible);
@@ -105,6 +129,13 @@ function shapeEvidence(zikr: Zikr, language: AppLanguage): DailyEvidence {
         : zikr.sourceReference,
     authenticityLevel: zikr.authenticityLevel,
     categoryId: zikr.category,
+    sourceUrl: zikr.sourceUrl,
+    sourceReferenceEnglish: zikr.sourceReference,
+    meaning: (language === "ar" ? zikr.benefitArabic || toArabicBenefit(zikr.benefit) : zikr.benefit)!,
+    meaningSourceUrl: zikr.sourceUrl,
+    // Supporting corpus fields include selected quotations and descriptions.
+    // Completeness is asserted only by the separately verified reading catalogue.
+    excerpt: true,
   };
 }
 
@@ -199,7 +230,8 @@ export function getContextualEvidence(
   for (const context of contexts) {
     const pool = context === "general" ? POOL : POOL.filter((zikr) => zikr.category === context);
     if (pool.length === 0) continue;
-    const baseIndex = hashDayKey(`${dayKey}|${context}`);
+    const rotation = /-plan-(\d+)$/.exec(dayKey);
+    const baseIndex = rotation ? Number(rotation[1]) : hashDayKey(`${dayKey}|${context}`);
     const zikr = pool[(baseIndex + offset) % pool.length]!;
     // One shaping function, so the Arabic fallbacks cannot diverge between the
     // daily card and this one.
@@ -229,15 +261,25 @@ export function selectLibraryEvidence(
   contexts: readonly ReminderContext[],
   offset = 0,
 ): { evidence: DailyEvidence; context: ReminderContext } | null {
+  const choices: { evidence: DailyEvidence; context: ReminderContext }[] = [];
+  const seen = new Set<string>();
   for (const context of contexts) {
     const pool = library.filter((source) => source.contexts.includes(context));
     if (pool.length === 0) continue;
-    const baseIndex = hashDayKey(`${dayKey}|${context}`);
-    const source = pool[(baseIndex + offset) % pool.length]!;
-    const evidence = shapeLibrarySource(source, verses, language);
-    if (evidence) return { evidence, context };
+    const rotation = /-plan-(\d+)$/.exec(dayKey);
+    const baseIndex = rotation ? Number(rotation[1]) : hashDayKey(`${dayKey}|${context}`);
+    for (let index = 0; index < pool.length; index++) {
+      const source = pool[(baseIndex + index) % pool.length]!;
+      const identity = source.evidenceId ?? source.zikrId ?? source.id;
+      if (seen.has(identity)) continue;
+      const evidence = shapeLibrarySource(source, verses, language);
+      if (evidence) {
+        seen.add(identity);
+        choices.push({ evidence, context });
+      }
+    }
   }
-  return null;
+  return choices.length ? choices[Math.max(0, offset) % choices.length]! : null;
 }
 
 /** One library source in the shape the card already renders. */
@@ -263,7 +305,11 @@ function shapeLibrarySource(
       authenticity: isArabic
         ? `${verse.referenceArabic} — ${verse.surahArabic}`
         : `${verse.reference} — ${verse.surahEnglish}`,
-      benefit: isArabic ? benefit : `${verse.english} — ${benefit}`,
+      benefit,
+      takeaway: benefit,
+      translation: isArabic ? undefined : verse.english,
+      evidenceId: source.id,
+      sourceUrl: `https://quran.com/${verse.reference.replace("Qur'an ", "").replace(":", "/")}`,
     };
   }
 
@@ -273,7 +319,7 @@ function shapeLibrarySource(
     const zikr =
       POOL.find((entry) => entry.id === source.zikrId) ?? ALL_AZKAR.find((entry) => entry.id === source.zikrId);
     if (!zikr) return null;
-    return { ...shapeEvidence(zikr, language), benefit };
+    return { ...shapeEvidence(zikr, language), benefit, takeaway: benefit, evidenceId: source.id };
   }
 
   const inArabic = isArabic || !source.english;
@@ -281,7 +327,18 @@ function shapeLibrarySource(
   return {
     hadith: inArabic ? source.arabic : source.english!,
     hadithInArabic: inArabic,
-    authenticity: (isArabic ? source.referenceArabic : source.reference) ?? "",
+    authenticity: [
+      isArabic ? source.referenceArabic : source.reference,
+      isArabic ? source.authenticityArabic : source.authenticity,
+    ]
+      .filter(Boolean)
+      .join(" — "),
     benefit,
+    takeaway: benefit,
+    sourceUrl: source.sourceUrl,
+    title: isArabic ? source.title : undefined,
+    excerpt: source.excerpt,
+    reportedAction: source.attribution === "reported_action",
+    evidenceId: source.evidenceId ?? source.id,
   };
 }

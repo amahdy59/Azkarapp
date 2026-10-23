@@ -1,4 +1,6 @@
+import { useControlFeedback } from "./hooks/useControlFeedback";
 import { useNativeServices } from "./hooks/useNativeServices";
+import "../styles/theme/materials.css";
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   fromCompletedSets,
@@ -56,7 +58,7 @@ const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
 import { useAppRouting, isLazyRouteCategory } from "./hooks/useAppRouting";
 
-import { BottomNav, NavRail, NavSidebar } from "./components/LayoutShells";
+import { BottomNav, NavRail, NavSidebar, type NavTab } from "./components/LayoutShells";
 import { useLayoutMode } from "./hooks/useLayoutMode";
 import { useViewFocus } from "./hooks/useScreenFocus";
 
@@ -80,10 +82,12 @@ import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useFo
 import { useAuthHandlers, type ConfirmDialogOptions, type GuestMigrationDecision } from "./hooks/useAuthHandlers";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { useSessionHandlers } from "./hooks/useSessionHandlers";
+import { mergeZikrHistory } from "./zikrHistory";
 import { usePwaLifecycle } from "./hooks/usePwaLifecycle";
 import { useAppStatePersistence } from "./hooks/useAppStatePersistence";
 import {
   getPalmStreakSummary,
+  SITUATIONAL_SESSION_CATEGORY_IDS,
   getFirstIncompleteZikrIndex,
   getNextIncompleteZikrIndex,
   millisecondsUntilNextProgressDay,
@@ -108,6 +112,9 @@ const ReaderScreen = retryableScreen(() =>
 );
 const FloatingAudioPlayer = lazy(() =>
   import("./components/FloatingAudioPlayer").then((module) => ({ default: module.FloatingAudioPlayer })),
+);
+const AppSceneBackground = lazy(() =>
+  import("./components/AppSceneBackground").then((module) => ({ default: module.AppSceneBackground })),
 );
 const PrayerMomentScreen = retryableScreen(() =>
   import("./screens/PrayerMomentScreen").then((module) => ({ default: module.PrayerMomentScreen })),
@@ -196,12 +203,14 @@ const ProfileCompletionScreen = lazy(() =>
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function AppContent({
+  loadStartupState,
   audioController,
   audioModuleLoading,
   requestAudioModule,
   buildPlaybackPlan,
   getAudioCoverage,
 }: {
+  loadStartupState?: () => AppStateSnapshot;
   /** `null` until the lazily-loaded audio chunk reports its controller. */
   audioController: AudioController | null;
   audioModuleLoading: boolean;
@@ -209,7 +218,7 @@ function AppContent({
   buildPlaybackPlan: AudioModule["buildPlaybackPlan"] | null;
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
 }) {
-  const [initialState] = useState(loadAppState);
+  const [initialState] = useState(loadStartupState ?? loadAppState);
   useEffect(scheduleStartupMaintenance, []);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
@@ -224,6 +233,9 @@ function AppContent({
   );
   const [routineModes, setRoutineModes] = useState(initialState.settings.routineModes);
   const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
+  useControlFeedback();
+  const [readerToolLabels, setReaderToolLabels] = useState(initialState.settings.readerToolLabels ?? true);
+  const [readerMeaningOnly, setReaderMeaningOnly] = useState(initialState.settings.readerMeaningOnly ?? false);
 
   const {
     view,
@@ -294,6 +306,7 @@ function AppContent({
     setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
   };
   const layoutMode = useLayoutMode();
+  const showQiblaShortcut = layoutMode === "compact" || layoutMode === "medium";
   useViewFocus(view);
   const previousAudioViewRef = useRef(view);
 
@@ -359,6 +372,9 @@ function AppContent({
   const [zikrFont, setZikrFont] = useState<ZikrFontOption>(initialState.settings.zikrFont ?? "humanist");
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
+  const [appMaterial, setAppMaterial] = useState(initialState.settings.appMaterial ?? "solid");
+  const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "inherit");
+  const resolvedHomeMaterial = homeMaterial === "inherit" ? appMaterial : homeMaterial;
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
   const [homeWirdImages, setHomeWirdImages] = useState(initialState.settings.homeWirdImages);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
@@ -387,6 +403,7 @@ function AppContent({
   const [hijriDateOffset, setHijriDateOffset] = useState<number>(initialState.settings.hijriDateOffset ?? 0);
   const [masbahaState, setMasbahaState] = useState(initialState.masbahaState);
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
+  const [zikrHistory, setZikrHistory] = useState(initialState.zikrHistory ?? []);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [dailyHabits, setDailyHabits] = useState(initialState.dailyHabits ?? []);
   const [khatmahPage, setKhatmahPage] = useState(() => quranPage ?? initialState.khatmahPage ?? 1);
@@ -408,6 +425,7 @@ function AppContent({
     [setQuranPage],
   );
   const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
+  const [mushafColorGestures, setMushafColorGestures] = useState(initialState.mushafColorGestures !== false);
   const [mushafLayout, setMushafLayout] = useState<MushafLayout>(initialState.mushafLayout ?? "auto");
   const [mushafToolbarSide, setMushafToolbarSide] = useState<MushafToolbarSide>(
     initialState.mushafToolbarSide ?? "right",
@@ -725,7 +743,7 @@ function AppContent({
   const isArabic = selectedLang === "ar";
   const layoutDirection = isArabic || forceRtl ? "rtl" : "ltr";
 
-  const appStateSnapshot = useMemo<AppStateSnapshot>(
+  const appStateBase = useMemo<Omit<AppStateSnapshot, "partialZikrCounts" | "masbahaState">>(
     () => ({
       settings: {
         language: selectedLang,
@@ -738,8 +756,12 @@ function AppContent({
         highContrast,
         boldText,
         reduceMotion,
+        readerToolLabels,
+        readerMeaningOnly,
         reduceTransparency,
         homeWirdImages,
+        appMaterial,
+        homeMaterial,
         hapticFeedback,
         forceRtl,
         colorBlindSupport,
@@ -758,11 +780,13 @@ function AppContent({
       completed: fromCompletedSets(completed),
       sessions,
       dailyCompletions,
+      zikrHistory,
       prayerTracking,
       dailyHabits,
       savedZikrIds: [...savedZikrIds].sort(),
       khatmahPage,
       mushafTheme,
+      mushafColorGestures,
       mushafLayout,
       mushafToolbarSide,
       mushafTextScale,
@@ -777,8 +801,6 @@ function AppContent({
       quranReadingPosition,
       quranWirdPlan,
       fridayProgress,
-      partialZikrCounts,
-      masbahaState,
     }),
     [
       boldText,
@@ -794,9 +816,13 @@ function AppContent({
       highContrast,
       isGuest,
       homeWirdImages,
+      appMaterial,
+      homeMaterial,
       phone,
       avatarUrl,
       reduceMotion,
+      readerToolLabels,
+      readerMeaningOnly,
       reduceTransparency,
       reminders,
       locationSettings,
@@ -809,11 +835,13 @@ function AppContent({
       selectedLang,
       sessions,
       dailyCompletions,
+      zikrHistory,
       prayerTracking,
       dailyHabits,
       savedZikrIds,
       khatmahPage,
       mushafTheme,
+      mushafColorGestures,
       mushafLayout,
       mushafToolbarSide,
       mushafTextScale,
@@ -833,10 +861,13 @@ function AppContent({
       zikrFont,
       themeMode,
       fridayProgress,
-      partialZikrCounts,
       hijriDateOffset,
-      masbahaState,
     ],
+  );
+
+  const appStateSnapshot = useMemo<AppStateSnapshot>(
+    () => ({ ...appStateBase, partialZikrCounts, masbahaState }),
+    [appStateBase, partialZikrCounts, masbahaState],
   );
 
   // Hook modules
@@ -849,6 +880,7 @@ function AppContent({
     openReader,
     resumeCategory,
     repeatCategory,
+    startNewSession,
     leaveReader,
     viewAllAzkar,
     toggleSavedZikr,
@@ -857,6 +889,10 @@ function AppContent({
     advanceAfterCompletion,
     goHome,
   } = useSessionHandlers({
+    onRecordZikrDay: (category, offeredIds, completedIds) => {
+      const dayKey = getProgressDayKey(new Date(), progressDayStartHour);
+      setZikrHistory((previous) => mergeZikrHistory(previous, [{ dayKey, category, offeredIds, completedIds }]));
+    },
     activeCat,
     activeRoutineMode,
     setActiveCat,
@@ -1134,7 +1170,11 @@ function AppContent({
     setHighContrast(state.settings.highContrast);
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
+    setReaderToolLabels(state.settings.readerToolLabels ?? true);
+    setReaderMeaningOnly(state.settings.readerMeaningOnly ?? false);
     setReduceTransparency(state.settings.reduceTransparency);
+    setAppMaterial(state.settings.appMaterial ?? "solid");
+    setHomeMaterial(state.settings.homeMaterial ?? "inherit");
     setHomeWirdImages(state.settings.homeWirdImages);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
@@ -1156,6 +1196,7 @@ function AppContent({
     setIsGuest(state.profile.isGuest);
     setAccountUserId(state.profile.accountUserId);
     setDailyCompletions(state.dailyCompletions);
+    setZikrHistory(state.zikrHistory ?? []);
     // Any snapshot written before this field existed — which is every stored
     // or synced state from an earlier version — has no prayerTracking. The
     // type says otherwise, but restore data does not obey the type.
@@ -1173,6 +1214,7 @@ function AppContent({
     setSavedZikrIds(new Set(state.savedZikrIds));
     setKhatmahPage(state.khatmahPage ?? 1);
     setMushafTheme(state.mushafTheme ?? "follow-app");
+    setMushafColorGestures(state.mushafColorGestures !== false);
     setMushafLayout(state.mushafLayout ?? "auto");
     setMushafToolbarSide(state.mushafToolbarSide ?? "right");
     setMushafTextScale(state.mushafTextScale ?? "medium");
@@ -1317,18 +1359,25 @@ function AppContent({
   }, [progressDayStartHour, reconcileDailyProgress]);
 
   useEffect(() => {
-    applyAppAppearance({
-      themeMode,
-      language: selectedLang,
-      textSize,
-      zikrFont,
-      highContrast,
-      boldText,
-      reduceMotion,
-      reduceTransparency,
-      forceRtl,
-      colorBlindSupport,
-    });
+    const apply = () =>
+      applyAppAppearance({
+        themeMode,
+        language: selectedLang,
+        textSize,
+        zikrFont,
+        highContrast,
+        boldText,
+        reduceMotion,
+        readerToolLabels,
+        reduceTransparency,
+        appMaterial,
+        forceRtl,
+        colorBlindSupport,
+      });
+    apply();
+    const media = window.matchMedia("(prefers-reduced-transparency: reduce)");
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
   }, [
     boldText,
     colorBlindSupport,
@@ -1336,7 +1385,9 @@ function AppContent({
     themeMode,
     highContrast,
     reduceMotion,
+    readerToolLabels,
     reduceTransparency,
+    appMaterial,
     selectedLang,
     textSize,
     zikrFont,
@@ -1607,14 +1658,48 @@ function AppContent({
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
 
+  const handleNavigationTab = (tab: NavTab) => {
+    setFridayDuaFlow(false);
+    if (tab === "home" && view === "home") {
+      const scrollRegion = document.querySelector(".home-content-scroll");
+      if (scrollRegion && scrollRegion.scrollTop > 0) {
+        scrollRegion.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+      }
+    }
+    handleNavTab(tab);
+  };
+
   return (
     <div className="app-viewport flex items-center justify-center">
       <div
         // No elevation utility here: theme.css sets `box-shadow: none` on
         // .app-shell both at <=599px and at >=600px, so the shadow-2xl that used
         // to sit here never rendered at any viewport width (DEC-067 / F11).
-        className={`app-shell relative overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
+        data-material-reading={view === "reader" || view === "khatmah" || readerInMushafMode ? "true" : undefined}
+        className={`app-shell relative isolate overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
+        {![
+          "splash",
+          "onboard1",
+          "ar_onboard1",
+          "language",
+          "login",
+          "email",
+          "otp",
+          "auth-callback",
+          "profile-completion",
+        ].includes(view) &&
+          appMaterial !== "solid" &&
+          !highContrast && (
+            <Suspense fallback={null}>
+              <AppSceneBackground
+                navigationOnly={view === "home"}
+                location={locationSettings}
+                material={appMaterial}
+                reduceTransparency={reduceTransparency}
+              />
+            </Suspense>
+          )}
         {/* Both banners share one grid area, so they stack across the full shell
             width instead of being auto-placed into an implicit row — which put
             them underneath the rail on the expanded and large tiers. */}
@@ -1636,24 +1721,12 @@ function AppContent({
         </div>
 
         {/* Adaptive navigation — only one renders at a time */}
-        {showRail && (
-          <NavRail
-            active={activeTab}
-            onChange={(tab) => {
-              setFridayDuaFlow(false);
-              handleNavTab(tab);
-            }}
-            isArabic={isArabic}
-          />
-        )}
+        {showRail && <NavRail active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />}
         {showSidebar && (
           <NavSidebar
             active={activeTab}
             activeUtility={view === "custom_counter" ? "masbaha" : view === "qibla" ? "qibla" : undefined}
-            onChange={(tab) => {
-              setFridayDuaFlow(false);
-              handleNavTab(tab);
-            }}
+            onChange={handleNavigationTab}
             onOpenQuran={() => {
               setFridayDuaFlow(false);
               push("khatmah_overview");
@@ -1665,10 +1738,6 @@ function AppContent({
             onOpenSettings={() => {
               setFridayDuaFlow(false);
               push("settings");
-            }}
-            onOpenQibla={() => {
-              setFridayDuaFlow(false);
-              push("qibla");
             }}
             isArabic={isArabic}
             themeMode={themeMode}
@@ -1682,6 +1751,8 @@ function AppContent({
             id="main-content"
             data-view={view}
             tabIndex={-1}
+            data-app-page={view}
+            data-material-ui={view !== "home" || undefined}
             className="app-main-view flex-1 overflow-hidden flex flex-col"
           >
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
@@ -1813,7 +1884,11 @@ function AppContent({
                   completed={completed}
                   dailyCompletions={dailyCompletions}
                   quietProgressEnabled={true}
-                  homeVisualEffects={!reduceTransparency}
+                  homeVisualEffects={
+                    resolvedHomeMaterial === "glass" || (resolvedHomeMaterial === "system" && !reduceTransparency)
+                  }
+                  homeMaterial={resolvedHomeMaterial}
+                  reduceMotion={reduceMotion}
                   homeWirdImages={homeWirdImages}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
@@ -1852,7 +1927,7 @@ function AppContent({
                   onOpenWirdBenefits={() => push("wird_benefits")}
                   onOpenKhatmah={() => push("khatmah_overview")}
                   onOpenProgress={() => push("progress")}
-                  onOpenQibla={() => push("qibla")}
+                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
                   onOpenMasbaha={() => push("custom_counter")}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
@@ -1862,7 +1937,7 @@ function AppContent({
                 <MoreScreen
                   language={selectedLang}
                   direction={layoutDirection}
-                  onOpenQibla={() => push("qibla")}
+                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
                   onOpenMasbaha={() => push("custom_counter")}
                   onOpenSettings={() => push("settings")}
                 />
@@ -1907,6 +1982,7 @@ function AppContent({
               )}
               {view === "progress" && (
                 <ProgressScreen
+                  zikrHistory={zikrHistory}
                   dailyCompletions={dailyCompletions}
                   progressDayStartHour={progressDayStartHour}
                   calendarType={calendarType}
@@ -1914,6 +1990,7 @@ function AppContent({
                   direction={layoutDirection}
                   onOpenShareModal={() => setShowShareModal(true)}
                   onSelectCategory={openCategory}
+                  onOpenHome={() => push("home")}
                   locationSettings={locationSettings}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
@@ -2066,7 +2143,8 @@ function AppContent({
                       openReader(activeCat, 0);
                       return;
                     }
-                    repeatCategory(activeCat);
+                    if (SITUATIONAL_SESSION_CATEGORY_IDS.includes(activeCat)) startNewSession(activeCat);
+                    else repeatCategory(activeCat);
                   }}
                   onBack={pop}
                   onPlayAllAudio={
@@ -2107,6 +2185,8 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   showTranslation={showTranslation}
                   showTransliteration={showTransliteration}
+                  readerMeaningOnly={readerMeaningOnly}
+                  onReaderMeaningOnlyChange={setReaderMeaningOnly}
                   textSize={textSize}
                   onTextSizeChange={setTextSize}
                   savedZikrIds={savedZikrIds}
@@ -2133,14 +2213,7 @@ function AppContent({
                         true,
                       );
                     } else {
-                      showConfirm(
-                        t(selectedLang, "category.resetConfirmTitle"),
-                        t(selectedLang, "category.resetConfirm"),
-                        t(selectedLang, "common.reset"),
-                        t(selectedLang, "common.cancel"),
-                        () => handleResetCategory(activeCat, activeSubCategory),
-                        true,
-                      );
+                      handleResetCategory(activeCat, activeSubCategory);
                     }
                   }}
                   onRepeat={() => {
@@ -2149,7 +2222,8 @@ function AppContent({
                       openReader(activeCat, 0);
                       return;
                     }
-                    repeatCategory(activeCat);
+                    if (SITUATIONAL_SESSION_CATEGORY_IDS.includes(activeCat)) startNewSession(activeCat);
+                    else repeatCategory(activeCat);
                   }}
                   onUncomplete={(i) => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {
@@ -2212,6 +2286,8 @@ function AppContent({
                   onMushafModeChange={setReaderInMushafMode}
                   mushafSettings={{
                     theme: mushafTheme,
+                    colorGestures: mushafColorGestures,
+                    onSelectColorGestures: setMushafColorGestures,
                     appTheme: themeMode,
                     onSelectTheme: setMushafTheme,
                     layout: mushafLayout,
@@ -2277,6 +2353,8 @@ function AppContent({
                   direction={layoutDirection}
                   records={prayerTracking}
                   dayKey={getProgressDayKey(new Date(), progressDayStartHour)}
+                  calendarType={calendarType}
+                  hijriDateOffset={hijriDateOffset}
                   locationSettings={locationSettings}
                   onBack={pop}
                   onToggle={(prayer, field, value) =>
@@ -2295,6 +2373,9 @@ function AppContent({
                   quietProgressEnabled={quietProgressEnabled}
                   progressDayStartHour={progressDayStartHour}
                   onHome={goHome}
+                  onNewSession={
+                    SITUATIONAL_SESSION_CATEGORY_IDS.includes(activeCat) ? () => startNewSession(activeCat) : undefined
+                  }
                   language={selectedLang}
                   direction={layoutDirection}
                   completionLevel={activeRoutineMode}
@@ -2335,6 +2416,10 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   reduceTransparency={reduceTransparency}
                   homeWirdImages={homeWirdImages}
+                  homeMaterial={homeMaterial}
+                  appMaterial={appMaterial}
+                  onAppMaterialChange={setAppMaterial}
+                  onHomeMaterialChange={setHomeMaterial}
                   hapticFeedback={hapticFeedback}
                   forceRtl={forceRtl}
                   colorBlindSupport={colorBlindSupport}
@@ -2355,6 +2440,8 @@ function AppContent({
                   onShowTransliterationChange={setShowTransliteration}
                   onHighContrastChange={setHighContrast}
                   onBoldTextChange={setBoldText}
+                  readerToolLabels={readerToolLabels}
+                  onReaderToolLabelsChange={setReaderToolLabels}
                   onReduceMotionChange={setReduceMotion}
                   onReduceTransparencyChange={setReduceTransparency}
                   onHomeWirdImagesChange={setHomeWirdImages}
@@ -2444,6 +2531,8 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   hapticFeedback={hapticFeedback}
                   mushafTheme={mushafTheme}
+                  colorGestures={mushafColorGestures}
+                  onSelectColorGestures={setMushafColorGestures}
                   appTheme={themeMode}
                   setMushafTheme={setMushafTheme}
                   mushafLayout={mushafLayout}
@@ -2591,14 +2680,7 @@ function AppContent({
         {/* Bottom nav — compact and medium only, shown in its own grid area */}
         {showBottomNavArea && (
           <div className="app-bottom-nav">
-            <BottomNav
-              active={activeTab}
-              onChange={(tab) => {
-                setFridayDuaFlow(false);
-                handleNavTab(tab);
-              }}
-              isArabic={isArabic}
-            />
+            <BottomNav active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />
           </div>
         )}
       </div>
@@ -2606,7 +2688,7 @@ function AppContent({
   );
 }
 
-export default function App() {
+export default function App({ loadStartupState }: { loadStartupState?: () => AppStateSnapshot } = {}) {
   const [audioModule, setAudioModule] = useState<AudioModule | null>(null);
   const [audioController, setAudioController] = useState<AudioController | null>(null);
   const [audioModuleLoading, setAudioModuleLoading] = useState(false);
@@ -2637,6 +2719,7 @@ export default function App() {
   return (
     <ActiveVisitorPresence>
       <AppContent
+        loadStartupState={loadStartupState}
         audioController={audioController}
         audioModuleLoading={audioModuleLoading}
         requestAudioModule={requestAudioModule}

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { chooseWirdOption } from "./helpers/wird";
 
 test.beforeEach(async ({ page }) => {
   // The reader no longer talks to api.quran.com at all; blocking the remote
@@ -55,8 +56,10 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   const pageNavigation = page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" });
   await expect(mushafPage).toBeVisible();
   const backIcon = page.getByTestId("mushaf-top-left-back").locator("svg");
-  await expect(backIcon).toHaveAttribute("data-rtl-flip", "");
-  await expect(backIcon).toHaveCSS("transform", "matrix(-1, 0, 0, 1, 0, 0)");
+  // The Arabic back control sits on the right edge and uses a physical right
+  // arrow, independent of the printed page's always-RTL text direction.
+  await expect(backIcon).not.toHaveAttribute("data-rtl-flip", "");
+  await expect(backIcon).toHaveCSS("transform", "none");
   await expect(pageNavigation).toBeAttached();
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toHaveCount(0);
   const initialBox = await mushafPage.boundingBox();
@@ -135,7 +138,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
 
   // QCF draws private-use glyphs, so ayah actions must expose the canonical
   // Unicode text rather than relying on selection-copy from the paper.
-  await page.getByRole("button", { name: "فتح إجراءات الآية ٢٥٥" }).click();
+  await page.getByRole("button", { name: "فتح إجراءات الآية ٢٥٥" }).click({ button: "right" });
   const ayahSheet = page.getByTestId("ayah-interaction-sheet");
   await expect(ayahSheet).toBeVisible();
   if ((await page.viewportSize())!.width < 768) {
@@ -190,35 +193,54 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
 
 test("offers clear RTL reading choices and free reading without progress tracking", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
+  // Glass must preserve the reading planner's selected/unselected control states.
+  await page.getByTestId("nav-settings").click();
+  await page.getByRole("button", { name: /المظهر واللغة/ }).click();
+  await page
+    .getByRole("radiogroup", { name: "مظهر التطبيق", exact: true })
+    .getByRole("radio", { name: "زجاجي", exact: true })
+    .click();
+  await page.getByTestId("nav-quran").click();
   await page.getByRole("button", { name: "تعديل" }).click();
 
-  const radios = page.getByRole("radio");
-  await expect(radios).toHaveCount(6);
-  await expect(page.getByRole("combobox")).toHaveCount(0);
-  await expect(page.getByRole("radio", { name: /صفحات كل يوم/ })).toBeChecked();
-
-  const optionState = await radios.evaluateAll((elements) =>
-    elements.map((radio) => {
-      const label = radio.closest("label");
-      const text = label?.querySelector("span");
-      const box = label?.getBoundingClientRect();
-      const styles = label ? getComputedStyle(label) : null;
+  const planSelect = page.getByRole("combobox", { name: "خطة القراءة", exact: true });
+  await expect(page.getByRole("radio")).toHaveCount(0);
+  await expect(page.getByRole("combobox")).toHaveCount(1);
+  await expect(planSelect).toContainText("صفحات كل يوم");
+  expect((await planSelect.boundingBox())!.height).toBeGreaterThanOrEqual(48);
+  await planSelect.click();
+  const options = page.getByRole("option");
+  await expect(options).toHaveCount(4);
+  const optionState = await options.evaluateAll((elements) =>
+    elements.map((option) => {
+      const styles = getComputedStyle(option);
       return {
-        direction: label ? getComputedStyle(label).direction : "",
-        textAlign: text ? getComputedStyle(text).textAlign : "",
-        minHeight: box?.height ?? 0,
-        backgroundColor: styles?.backgroundColor ?? "",
-        borderColor: styles?.borderColor ?? "",
+        direction: styles.direction,
+        textAlign:
+          getComputedStyle(option.querySelector("span")!).textAlign === "start"
+            ? styles.direction === "rtl"
+              ? "right"
+              : "left"
+            : getComputedStyle(option.querySelector("span")!).textAlign,
+        minHeight: option.getBoundingClientRect().height,
+        backgroundColor: styles.backgroundColor,
+        selected: option.getAttribute("aria-selected"),
+        check: option.querySelectorAll("svg").length,
       };
     }),
   );
   expect(
     optionState.every(
-      ({ direction, textAlign, minHeight }) => direction === "rtl" && textAlign === "right" && minHeight >= 64,
+      ({ direction, textAlign, minHeight }) => direction === "rtl" && textAlign === "right" && minHeight >= 44,
     ),
+    JSON.stringify(optionState),
   ).toBe(true);
+  expect(optionState[0]?.selected).toBe("true");
+  expect(optionState[0]?.check).toBe(1);
+  expect(optionState[1]?.check).toBe(0);
   expect(optionState[0]?.backgroundColor).not.toBe(optionState[1]?.backgroundColor);
-  expect(optionState[0]?.borderColor).not.toBe(optionState[1]?.borderColor);
+  await page.keyboard.press("Escape");
+  await expect(planSelect).toBeFocused();
 
   const accessibility = await new AxeBuilder({ page })
     .include('[data-testid="quran-wird-content"]')
@@ -227,7 +249,8 @@ test("offers clear RTL reading choices and free reading without progress trackin
     .analyze();
   expect(accessibility.violations).toEqual([]);
 
-  await page.getByRole("radio", { name: /ختمة في شهر هجري/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "scheduled");
+  await chooseWirdOption(page, "ar", "schedule", "hijriMonth");
   await page.getByRole("button", { name: "حفظ الخطة" }).click();
   await expect(page.getByText("تقدم هذا الشهر")).toBeVisible();
   await expect(page.getByRole("progressbar", { name: /صفحة في خطة/ })).toBeVisible();
@@ -235,7 +258,7 @@ test("offers clear RTL reading choices and free reading without progress trackin
   await expect(page.getByRole("region", { name: "هذا الأسبوع" })).toHaveCount(0);
 
   await page.getByRole("button", { name: "تعديل" }).click();
-  await page.getByRole("radio", { name: /قراءة حرة/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "free");
   await expect(page.getByText(/سيُحفظ موضعك/)).toBeVisible();
   await page.getByRole("button", { name: "حفظ الخطة" }).click();
   await expect(page.getByText("القراءة الحرة مفعّلة")).toBeVisible();
@@ -261,7 +284,8 @@ test("offers clear RTL reading choices and free reading without progress trackin
 test("custom plan presets and section search remain keyboard usable with 44px targets", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.getByRole("button", { name: "تعديل" }).click();
-  await page.getByRole("radio", { name: /ختمة مخصصة/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "scheduled");
+  await chooseWirdOption(page, "ar", "schedule", "custom");
   const presets = page.getByRole("button", { name: /^[٣٦٩١][٠٨]+ أيام الإتمام$/ });
   await expect(presets).toHaveCount(4);
   for (const preset of await presets.all()) {
@@ -273,7 +297,7 @@ test("custom plan presets and section search remain keyboard usable with 44px ta
   await page.keyboard.press("Enter");
   await expect(page.getByLabel("أيام الإتمام", { exact: true })).toHaveValue("30");
 
-  await page.getByRole("radio", { name: /وِرد يومي ثابت/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "repeating");
   const choice = page.getByRole("combobox", { name: /^اختر الجزء/ });
   await choice.focus();
   await page.keyboard.press("Enter");
@@ -282,8 +306,8 @@ test("custom plan presets and section search remain keyboard usable with 44px ta
   await search.fill("1");
   const clear = page.getByRole("button", { name: "مسح", exact: true });
   const bounds = await clear.boundingBox();
-  expect(bounds!.width).toBeGreaterThanOrEqual(44);
-  expect(bounds!.height).toBeGreaterThanOrEqual(44);
+  expect(Math.round(bounds!.width)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(bounds!.height)).toBeGreaterThanOrEqual(44);
   await clear.focus();
   await page.keyboard.press("Enter");
   await expect(search).toHaveValue("");
@@ -522,11 +546,14 @@ test("turns pages by swipe without hiding the permanent controls", async ({ page
   await expect(page.getByTestId("mushaf-page-bookmark")).toBeVisible();
 });
 
-test("touch swipes cycle themes and toggle focus mode while short pages retain native scrolling", async ({ page }) => {
+test("touch swipes reverse themes and taps toggle focus mode while short pages retain native scrolling", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   const paper = page.locator(".mushaf-paper");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+  const initialTheme = await page.getByRole("article").getAttribute("data-theme");
   await expect.poll(() => paper.evaluate((element) => getComputedStyle(element).touchAction)).toBe("pinch-zoom");
   const client = await page.context().newCDPSession(page);
   await client.send("Emulation.setTouchEmulationEnabled", { enabled: true });
@@ -545,7 +572,16 @@ test("touch swipes cycle themes and toggle focus mode while short pages retain n
   };
   await swipe(-140);
   await expect(page.getByTestId("mushaf-theme-hud")).toBeVisible();
+  await expect(page.getByRole("article")).not.toHaveAttribute("data-theme", initialTheme!);
   await swipe(140);
+  await expect(page.getByRole("article")).toHaveAttribute("data-theme", initialTheme!);
+  await expect(page.getByTestId("mushaf-focus-exit")).toBeHidden();
+  const box = (await paper.boundingBox())!;
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+  });
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
   await expect(page.getByTestId("mushaf-focus-exit")).toBeVisible();
   await page.getByTestId("mushaf-focus-exit").click();
   await page.setViewportSize({ width: 643, height: 275 });

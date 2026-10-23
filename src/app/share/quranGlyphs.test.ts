@@ -22,7 +22,7 @@ it("draws verified glyphs while leaving its reviewed source string unchanged", a
   ]);
   mocks.font.mockResolvedValue(true);
   const text = "قُلْ هُوَ ﴿١﴾";
-  expect(await prepareQuranGlyphs(text, "quran-112")).toEqual({
+  expect(await prepareQuranGlyphs(text, "quran-112")).toMatchObject({
     text: "A B C",
     fontFamily: '"qcf-v2-page-604", "Amiri Quran", serif',
   });
@@ -31,6 +31,29 @@ it("draws verified glyphs while leaving its reviewed source string unchanged", a
   expect(await prepareQuranGlyphs("قُلْ غير", "quran-112")).toBeUndefined();
   mocks.font.mockResolvedValue(false);
   expect(await prepareQuranGlyphs(text, "quran-112")).toBeUndefined();
+});
+
+it("uses the approved Mushaf font for partial Benefits and Home evidence with exact source offsets", async () => {
+  vi.stubGlobal("FontFace", class {});
+  mocks.load.mockResolvedValue([
+    {
+      k: "2:152",
+      w: [
+        [1, 1, 0, "فَاذْكُرُونِي", "A"],
+        [2, 1, 0, "أَذْكُرْكُمْ", "B"],
+        [3, 1, 0, "وَاشْكُرُوا", "C"],
+      ],
+    },
+  ]);
+  mocks.font.mockResolvedValue(true);
+  const text = "فَاذْكُرُونِي أَذْكُرْكُمْ";
+  for (const key of ["quran-2-152", "home-quran-Q06"]) {
+    const prepared = await prepareQuranGlyphs(text, key);
+    expect(prepared?.text).toBe("A B");
+    expect(prepared?.fontFamily).toContain("qcf-v2-page-23");
+    expect(prepared?.sourceOffsets).toEqual([0, "فَاذْكُرُونِي".length, "فَاذْكُرُونِي ".length, text.length]);
+    expect(mocks.font).toHaveBeenCalledWith(23);
+  }
 });
 
 it("keeps unreferenced passages on the bundled readable font without a request", async () => {

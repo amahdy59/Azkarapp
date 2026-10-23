@@ -79,6 +79,7 @@ export function DownloadsPanel({
   const mountedRef = useRef(true);
   const statusRequestRef = useRef(0);
   const audioPreferences = useMemo(loadAudioPreferences, []);
+  const allAudioZikrs = useMemo(() => collections.flatMap((resource) => resource.zikrs), [collections]);
   // Optional Quran corpora load only when this panel is opened.
   const resourcePromise = useMemo(
     () =>
@@ -365,7 +366,11 @@ export function DownloadsPanel({
               {failedId === resource.id && <p className="text-destructive">{errorMessage}</p>}
             </>
           }
-          size={numeric(saved?.remainingBytes)}
+          size={
+            <>
+              {t(language, "downloads.remainingSize")} {numeric(saved?.remainingBytes)}
+            </>
+          }
           completed={completed}
           total={total}
           language={language}
@@ -420,6 +425,13 @@ export function DownloadsPanel({
         }}
       >
         <p className="text-sm text-muted-foreground">{t(language, "downloads.includedText")}</p>
+        <AudioFileExports
+          zikrs={allAudioZikrs}
+          preferences={audioPreferences}
+          language={language}
+          disabled={isLoading || isAnyJobActive}
+          revision={status}
+        />
         <details className="rounded-xl border border-border bg-card px-3">
           <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
             {t(language, "downloads.offlineHelp")}
@@ -550,13 +562,6 @@ export function DownloadsPanel({
               <div className="divide-y divide-border/40">
                 {audioRows(index === 0 ? collections.slice(0, 4) : collections.slice(4))}
               </div>
-              <AudioFileExports
-                zikrs={resource.zikrs}
-                preferences={audioPreferences}
-                language={language}
-                disabled={isLoading || isAnyJobActive}
-                revision={status}
-              />
             </details>
           </Card>
         ))}

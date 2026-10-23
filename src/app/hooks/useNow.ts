@@ -24,12 +24,13 @@ export function useNow(): Date {
 
     const msUntilNextMinute = () => 60_050 - (Date.now() % 60_000);
     const tick = () => {
+      if (document.visibilityState === "hidden") return;
       setNow(new Date());
       timer = setTimeout(tick, msUntilNextMinute());
     };
     const resync = () => {
-      if (document.visibilityState !== "visible") return;
       clearTimeout(timer);
+      if (document.visibilityState !== "visible") return;
       setNow(new Date());
       timer = setTimeout(tick, msUntilNextMinute());
     };

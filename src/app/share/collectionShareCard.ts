@@ -18,7 +18,7 @@ import {
   SHARE_DIMENSIONS,
   defaultShareAppearance,
   layoutSharePages,
-  getShareRepetitionLabel,
+  getShareItemRepetitionLabel,
   shareGeometry,
   SHARE_PILL,
   SHARE_SECTION_GAP,
@@ -33,9 +33,26 @@ import {
   type ShareLayoutPage,
 } from "./shareLayout";
 import { centeredInkBaseline, drawInkTop, drawShareBrand, drawWebsiteText } from "./shareCardBrand";
+import { SHARE_CONTINUATION_HEIGHT } from "./shareContinuation";
 
 export const COLLECTION_STORY_WIDTH = 1080;
 export const COLLECTION_STORY_HEIGHT = 1920;
+
+/** Owned by one generation, never retained globally or across changed content. */
+export function createCollectionSharePreparation() {
+  const glyphs = new Map<string, ReturnType<typeof prepareQuranGlyphs>>();
+  return {
+    prepareGlyphs(text: string, canonicalKey?: string) {
+      const key = JSON.stringify([canonicalKey, text]);
+      if (!glyphs.has(key)) glyphs.set(key, prepareQuranGlyphs(text, canonicalKey));
+      return glyphs.get(key)!;
+    },
+  };
+}
+
+function assertShareActive(signal?: AbortSignal) {
+  if (signal?.aborted) throw new DOMException("Cancelled", "AbortError");
+}
 export interface StoryCardItem extends ShareItem {
   benefitArabic?: string;
   surahNameArabic?: string;
@@ -57,6 +74,8 @@ export interface CollectionStoryPageInput {
   url?: string;
   qr?: boolean;
   layout?: ShareLayoutPage;
+  /** Short single readings balance within the frame; long readings keep their top anchor. */
+  contentAlignment?: "start" | "center" | "balanced";
 }
 export interface GeneratedCollectionStoryCard {
   pageNumber: number;
@@ -160,20 +179,27 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   let titleSize = geometry.titleSize;
   do {
     ctx.font = `700 ${titleSize}px ${SHARE_ARABIC_FONT}`;
-    if (ctx.measureText(shareDisplayDigits(input.collectionTitle)).width <= 940) break;
+    if (ctx.measureText(shareDisplayDigits(input.collectionTitle, language)).width <= 940) break;
     titleSize -= 2;
   } while (titleSize > 32);
   ctx.fillStyle = palette.text;
-  if (!input.single) drawInkTop(ctx, shareDisplayDigits(input.collectionTitle), 540, geometry.titleY);
+  if (!input.single) drawInkTop(ctx, shareDisplayDigits(input.collectionTitle, language), 540, geometry.titleY);
   ctx.font = `500 32px ${SHARE_ARABIC_FONT}`;
   ctx.fillStyle = palette.secondary;
   if (!input.single && input.content?.subtitle && input.collectionSubtitle)
-    drawInkTop(ctx, shareDisplayDigits(input.collectionSubtitle), 540, geometry.titleY + titleSize + 12);
+    drawInkTop(ctx, shareDisplayDigits(input.collectionSubtitle, language), 540, geometry.titleY + titleSize + 12);
   else if (input.single) drawOrnateFlourish(ctx, 540, geometry.top - 20, 112, palette.accent);
   const totalHeight =
     layout.fragments.reduce((sum, fragment) => sum + fragment.height, 0) +
     (layout.fragments.length - 1) * SHARE_COMPACT.panelGap;
-  let y = geometry.top + Math.min(24, Math.max(0, (geometry.bottom - geometry.top - totalHeight) / 2));
+  const freeSpace = Math.max(0, geometry.bottom - geometry.top - totalHeight);
+  const balanced =
+    (input.contentAlignment ?? "balanced") === "balanced" &&
+    input.single &&
+    layout.fragments.length === 1 &&
+    totalHeight < (geometry.bottom - geometry.top) * 0.7;
+  let y =
+    geometry.top + (input.contentAlignment === "center" || balanced ? freeSpace / 2 : Math.min(24, freeSpace / 2));
   for (const fragment of layout.fragments) {
     const x = 64;
     fillRoundedRect(ctx, x, y, geometry.width, fragment.height, 28, palette.surface);
@@ -186,18 +212,16 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       fragment.heading.lines.forEach((line, index) =>
         drawInkTop(
           ctx,
-          shareDisplayDigits(line.trim()),
+          shareDisplayDigits(line.trim(), language),
           540,
           y + (input.single ? SHARE_PILL.top : SHARE_COMPACT.top) + index * fragment.heading!.lineHeight,
         ),
       );
     }
     const utilityY = y + (fragment.heading?.height ?? 0);
-    const repetition = fragment.item.reminder
-      ? t(language, "shareStudio.reminder")
-      : getShareRepetitionLabel(fragment.item.repetitionCount ?? 1, language);
+    const repetition = getShareItemRepetitionLabel(fragment.item, language);
     ctx.font = `600 30px ${SHARE_ARABIC_FONT}`;
-    if (input.single) {
+    if (input.single && repetition) {
       const pillWidth = ctx.measureText(repetition).width + 32;
       fillRoundedRect(
         ctx,
@@ -218,9 +242,19 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         centeredInkBaseline(ctx, repetition, utilityY + SHARE_PILL.top + SHARE_PILL.height / 2),
       );
     }
-    let sectionY = utilityY + (input.single ? SHARE_PILL.textTop : SHARE_COMPACT.top);
+    let sectionY = utilityY + (input.single && !fragment.item.hideRepetition ? SHARE_PILL.textTop : SHARE_COMPACT.top);
+    const continuation = (key: "continuedBefore" | "continuedAfter") => {
+      ctx.font = `500 30px ${SHARE_UI_FONT}`;
+      ctx.fillStyle = palette.accent;
+      ctx.direction = language === "ar" ? "rtl" : "ltr";
+      ctx.textAlign = "center";
+      drawInkTop(ctx, t(language, `shareStudio.${key}`), 540, sectionY);
+      sectionY += SHARE_CONTINUATION_HEIGHT;
+    };
+    if (fragment.part > 1) continuation("continuedBefore");
     const sections = [...fragment.sections, ...(input.single && fragment.citation ? [fragment.citation] : [])];
     sections.forEach((section, sectionIndex) => {
+      if (section.key === "source" && fragment.part < fragment.parts) continuation("continuedAfter");
       if (sectionIndex > 0) sectionY += input.single ? SHARE_SECTION_GAP : SHARE_COMPACT.sectionGap;
       if (sectionIndex > 0) {
         ctx.beginPath();
@@ -233,7 +267,8 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       ctx.direction = section.direction;
       const centered = section.key === "arabic" && section.lines.length <= 2;
       ctx.textAlign = centered ? "center" : section.direction === "rtl" ? "right" : "left";
-      const textX = centered ? 540 : section.direction === "rtl" ? textRight : textLeft;
+      const inset = section.quranText ? 8 : 0;
+      const textX = centered ? 540 : section.direction === "rtl" ? textRight - inset : textLeft + inset;
       if (section.key !== "arabic" && section.key !== "source") {
         ctx.font = `600 28px ${language === "ar" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
         ctx.fillStyle = palette.accent;
@@ -246,13 +281,15 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         // Isolate reference numbers without changing the reviewed text payload.
         const displayLine =
           section.key === "source" && section.direction === "rtl"
-            ? shareDisplayDigits(line.trim()).replace(/[٠-٩]+(?:[/:٫٬.][٠-٩]+)*/gu, "\u2066$&\u2069")
-            : shareDisplayDigits(line.trim());
+            ? shareDisplayDigits(line.trim(), "ar").replace(/[٠-٩]+(?:[/:٫٬.][٠-٩]+)*/gu, "\u2066$&\u2069")
+            : shareDisplayDigits(line.trim(), section.direction === "rtl" ? "ar" : "en");
         drawInkTop(ctx, displayLine, textX, sectionY);
         sectionY += section.lineHeight;
       }
     });
+    if (input.single && !fragment.citation && fragment.part < fragment.parts) continuation("continuedAfter");
     if (!input.single) {
+      if (fragment.part < fragment.parts) continuation("continuedAfter");
       if (sections.length) sectionY += SHARE_COMPACT.sectionGap;
       ctx.beginPath();
       ctx.strokeStyle = palette.border;
@@ -272,7 +309,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         ctx.direction = citation.direction;
         ctx.textAlign = language === "ar" ? "right" : "left";
         citation.lines.forEach((line, index) => {
-          const text = shareDisplayDigits(line.trim());
+          const text = shareDisplayDigits(line.trim(), citation.direction === "rtl" ? "ar" : "en");
           drawInkTop(
             ctx,
             citation.direction === "rtl" ? text.replace(/[٠-٩]+(?:[/:٫٬.][٠-٩]+)*/gu, "\u2066$&\u2069") : text,
@@ -293,8 +330,8 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
     drawInkTop(
       ctx,
       t(language, "shareStoryPack.pageCount", {
-        current: formatShareNumber(input.pageNumber),
-        total: formatShareNumber(input.totalPages),
+        current: formatShareNumber(input.pageNumber, language),
+        total: formatShareNumber(input.totalPages, language),
       }),
       540,
       geometry.footer - (hasQr ? 120 : 48),
@@ -375,7 +412,7 @@ export async function generateCollectionStoryPage(
     totalPages: input.totalPages,
     width: canvas.width,
     height: canvas.height,
-    altText: `${shareDisplayDigits(input.collectionTitle)}. ${t(language, "shareStoryPack.pageCount", { current: formatShareNumber(input.pageNumber), total: formatShareNumber(input.totalPages) })}`,
+    altText: `${shareDisplayDigits(input.collectionTitle, language)}. ${t(language, "shareStoryPack.pageCount", { current: formatShareNumber(input.pageNumber, language), total: formatShareNumber(input.totalPages, language) })}`,
   };
 }
 
@@ -384,11 +421,13 @@ export async function generateAllCollectionStoryPages(
     allItems: StoryCardItem[];
     targetPages?: number;
     signal?: AbortSignal;
+    preparation?: ReturnType<typeof createCollectionSharePreparation>;
     onPage?: (page: GeneratedCollectionStoryCard) => void;
   },
 ): Promise<GeneratedCollectionStoryCard[]> {
   const pages: GeneratedCollectionStoryCard[] = [];
   try {
+    if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
     if (typeof document !== "undefined" && document.fonts)
       await Promise.all([
         document.fonts.load(`500 52px ${SHARE_ARABIC_FONT}`, "اللَّهُمَّ"),
@@ -400,16 +439,20 @@ export async function generateAllCollectionStoryPages(
         document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "WA ZAKER wa-zaker.com"),
         document.fonts.ready,
       ]);
-    const { ctx } = createCanvas();
+    if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
     const items = await Promise.all(
       options.allItems.map(async (item) => ({
         ...item,
         language: item.language ?? options.language ?? "ar",
         benefit: item.benefit ?? item.benefitArabic,
         title: item.title ?? item.surahNameArabic ?? (options.single ? options.collectionTitle : undefined),
-        quranRendering: item.quranText ? await prepareQuranGlyphs(item.arabicText, item.canonicalKey) : undefined,
+        quranRendering: item.quranText
+          ? await (options.preparation?.prepareGlyphs ?? prepareQuranGlyphs)(item.arabicText, item.canonicalKey)
+          : undefined,
       })),
     );
+    if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
+    const { ctx } = createCanvas();
     const layouts = layoutSharePages(ctx, items, options.format ?? "story", options.content, options.single);
     for (const layout of layouts) {
       if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
@@ -436,7 +479,9 @@ export async function getCompatibleShareFormats(
   items: ShareItem[],
   content: ShareContentOptions,
   single: boolean,
+  options: { signal?: AbortSignal; preparation?: ReturnType<typeof createCollectionSharePreparation> } = {},
 ): Promise<ShareFormat[]> {
+  assertShareActive(options.signal);
   if (document.fonts) {
     await Promise.all([
       document.fonts.load(`500 64px ${SHARE_ARABIC_FONT}`, "اللَّهُمَّ"),
@@ -448,14 +493,19 @@ export async function getCompatibleShareFormats(
       document.fonts.ready,
     ]);
   }
-  const { ctx } = createCanvas();
+  assertShareActive(options.signal);
   const prepared = await Promise.all(
     items.map(async (item) => ({
       ...item,
-      quranRendering: item.quranText ? await prepareQuranGlyphs(item.arabicText, item.canonicalKey) : undefined,
+      quranRendering: item.quranText
+        ? await (options.preparation?.prepareGlyphs ?? prepareQuranGlyphs)(item.arabicText, item.canonicalKey)
+        : undefined,
     })),
   );
+  assertShareActive(options.signal);
+  const { ctx } = createCanvas();
   return (Object.keys(SHARE_DIMENSIONS) as ShareFormat[]).filter((format) => {
+    assertShareActive(options.signal);
     try {
       layoutSharePages(ctx, prepared, format, content, single);
       return true;

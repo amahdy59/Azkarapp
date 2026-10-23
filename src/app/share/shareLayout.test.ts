@@ -4,7 +4,6 @@ import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content
 import {
   getShareText,
   toShareItem,
-  ShareFitError,
   getShareUrl,
   layoutSharePages,
   shareGeometry,
@@ -45,6 +44,61 @@ function context() {
   } as CanvasRenderingContext2D;
 }
 describe("complete share layouts", () => {
+  it.each(["ar", "en"] as const)("ends narration continuations on complete sentences in %s", (language) => {
+    const sentence = language === "ar" ? "هذه جملة كاملة تنتهي هنا. " : "This is a complete sentence that ends here. ";
+    const text = sentence.repeat(65);
+    const pages = layoutSharePages(
+      context(),
+      [
+        {
+          id: "sentences",
+          arabicText: text,
+          textDirection: language === "ar" ? "rtl" : "ltr",
+          language,
+          hideRepetition: true,
+        },
+      ],
+      "square",
+    );
+    expect(pages.length).toBeGreaterThan(1);
+    const fragments = pages.flatMap((page) => page.fragments);
+    expect(
+      fragments
+        .flatMap((fragment) => fragment.sections)
+        .map((section) => section.text)
+        .join(""),
+    ).toBe(text);
+    for (const fragment of fragments) expect(fragment.sections.at(-1)!.text.trim()).toMatch(/\.$/u);
+    expect(fragments[0]!.heading!.text).toContain(language === "en" ? "Part 1" : "الجزء ١");
+  });
+  it("continues Quran glyphs with exact semantic source slices", () => {
+    const word = "اللَّهُمَّ ";
+    const text = word.repeat(200);
+    const sourceOffsets = Array.from(
+      { length: 401 },
+      (_, index) => Math.floor(index / 2) * word.length + (index % 2 ? word.length - 1 : 0),
+    );
+    const pages = layoutSharePages(
+      context(),
+      [
+        {
+          id: "quran",
+          arabicText: text,
+          quranText: true,
+          hideRepetition: true,
+          quranRendering: { text: "A ".repeat(200), fontFamily: "qcf-v2-page-23", sourceOffsets },
+        },
+      ],
+      "square",
+      {},
+      true,
+    );
+    expect(pages.length).toBeGreaterThan(1);
+    const sections = pages.flatMap((page) => page.fragments.flatMap((fragment) => fragment.sections));
+    expect(sections.map((section) => section.text).join("")).toBe(text);
+    expect(sections.flatMap((section) => section.lines).join("")).toBe("A ".repeat(200));
+    expect(sections.every((section) => section.quranRendering?.fontFamily === "qcf-v2-page-23")).toBe(true);
+  });
   it("reserves actual diacritic height before advancing a row", () => {
     const ctx = context();
     ctx.measureText = () => ({ width: 120, actualBoundingBoxAscent: 90, actualBoundingBoxDescent: 22 }) as TextMetrics;
@@ -56,7 +110,9 @@ describe("complete share layouts", () => {
   it("uses Arabic-Indic display digits without changing reviewed lines or URLs", () => {
     expect(shareDisplayDigits("0123456789 · ۰۱۲۳۴۵۶۷۸۹ · ٠١٢٣٤٥٦٧٨٩")).toBe("٠١٢٣٤٥٦٧٨٩ · ٠١٢٣٤٥٦٧٨٩ · ٠١٢٣٤٥٦٧٨٩");
     expect(formatShareNumber(13)).toBe("١٣");
-    expect(getShareRepetitionLabel(100, "en")).toContain("١٠٠");
+    expect(getShareRepetitionLabel(100, "en")).toContain("100");
+    expect(formatShareNumber(13, "en")).toBe("13");
+    expect(shareDisplayDigits("٠١٢٣ · ۰۱۲۳ · 0123", "en")).toBe("0123 · 0123 · 0123");
     const item = {
       id: "digits",
       arabicText: "سبحان الله",
@@ -181,43 +237,44 @@ describe("complete share layouts", () => {
     expect(lines.some((line) => /^\p{Mark}/u.test(line))).toBe(false);
   });
   for (const format of Object.keys(SHARE_DIMENSIONS) as ShareFormat[]) {
-    it(`keeps each reviewed item complete or explicitly rejects ${format}`, () => {
+    it(`preserves every reviewed item across measured cards in ${format}`, () => {
       let fit = 0;
       for (const zikr of ALL_AZKAR.filter((item) => !item.isCollectionIntroduction)) {
         const item = toShareItem(zikr, "ar", "https://example.com/Azkarapp/");
         const original = JSON.stringify(zikr);
         const geometry = shareGeometry(format);
-        try {
-          const pages = layoutSharePages(context(), [item], format, { benefit: true });
-          expect(pages).toHaveLength(1);
-          const fragment = pages[0]!.fragments[0]!;
-          expect(fragment.parts).toBe(1);
+        const pages = layoutSharePages(context(), [item], format, { benefit: true });
+        const fragments = pages.flatMap((page) => page.fragments);
+        const arabicSections = fragments
+          .flatMap((fragment) => fragment.sections)
+          .filter((section) => section.key === "arabic");
+        for (const fragment of fragments) {
           expect(fragment.height).toBeLessThanOrEqual(geometry.bottom - geometry.top);
           expect(fragment.citation?.text).toBe(item.sourceReference);
           if (fragment.citation) expect(fragment.citation.lines.length).toBeLessThanOrEqual(2);
           if (!item.reminder) {
-            const arabic = fragment.sections.find((section) => section.key === "arabic")!;
-            expect(arabic.text).toBe(zikr.arabicText);
-            expect(arabic.lines.join("")).toBe(zikr.arabicText);
-            expect(arabic.direction).toBe("rtl");
-            expect(arabic.fontSize).toBeGreaterThanOrEqual(52);
+            for (const arabic of arabicSections) {
+              expect(arabic.direction).toBe("rtl");
+              expect(arabic.fontSize).toBeGreaterThanOrEqual(52);
+            }
           } else {
             expect(fragment.sections.some((section) => section.key === "arabic")).toBe(false);
-            expect(fragment.sections.find((section) => section.key === "benefit")?.text).toBe(
-              getLocalizedZikrBenefit(zikr, "ar"),
-            );
           }
-          fit++;
-        } catch (error) {
-          expect(error).toBeInstanceOf(ShareFitError);
-          expect((error as ShareFitError).itemId).toBe(zikr.id);
-          expect((error as ShareFitError).format).toBe(format);
         }
+        expect(arabicSections.map((section) => section.text).join("")).toBe(item.reminder ? "" : zikr.arabicText);
+        expect(arabicSections.flatMap((section) => section.lines).join("")).toBe(item.reminder ? "" : zikr.arabicText);
+        const benefit = fragments
+          .flatMap((fragment) => fragment.sections)
+          .filter((section) => section.key === "benefit")
+          .map((section) => section.text)
+          .join("");
+        expect(benefit).toBe(getLocalizedZikrBenefit(zikr, "ar") ?? "");
+        fit++;
         expect(JSON.stringify(zikr)).toBe(original);
       }
       expect(fit).toBeGreaterThan(0);
     });
-    it(`rejects excessive selected content in ${format} without losing the text alternative`, () => {
+    it(`continues every selected section in ${format} without losing any characters`, () => {
       const item = {
         id: "long",
         arabicText: "اللَّهُمَّ اغفر لنا ".repeat(80),
@@ -228,7 +285,31 @@ describe("complete share layouts", () => {
         repetitionCount: 3,
       };
       const options = { meaning: true, pronunciation: true, benefit: true };
-      expect(() => layoutSharePages(context(), [item], format, options, true)).toThrow(ShareFitError);
+      const pages = layoutSharePages(context(), [item], format, options, true);
+      expect(pages.length).toBeGreaterThan(1);
+      const fragments = pages.flatMap((page) => page.fragments);
+      for (const [key, value] of Object.entries({
+        arabic: item.arabicText,
+        translation: item.translation,
+        transliteration: item.transliteration,
+        benefit: item.benefit,
+      })) {
+        expect(
+          fragments
+            .flatMap((fragment) => fragment.sections)
+            .filter((section) => section.key === key)
+            .map((section) => section.text)
+            .join(""),
+        ).toBe(value);
+      }
+      fragments.forEach((fragment, index) => {
+        expect(fragment.part).toBe(index + 1);
+        expect(fragment.parts).toBe(pages.length);
+        expect(fragment.citation?.text).toBe(item.sourceReference);
+        expect(fragment.height).toBeLessThanOrEqual(
+          shareGeometry(format, false, true).bottom - shareGeometry(format, false, true).top,
+        );
+      });
       const text = getShareText([item], "en", options, "Zikr");
       for (const value of [item.arabicText, item.translation, item.transliteration, item.benefit, item.sourceReference])
         expect(text).toContain(value);
@@ -316,4 +397,10 @@ describe("complete share layouts", () => {
     expect(text).toContain("سُبْحَانَ اللَّهِ");
     expect(text).toContain("#/azkar/morning/1");
   });
+});
+
+it("includes an identical reading/source link only once in complete share text", () => {
+  const url = "https://quran.com/2/255";
+  const value = getShareText([{ id: "verse", arabicText: "نص", readingUrl: url }], "en", {}, "Reading", url);
+  expect(value.split(url)).toHaveLength(2);
 });

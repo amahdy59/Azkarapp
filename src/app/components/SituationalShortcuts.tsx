@@ -67,17 +67,23 @@ export function SituationalShortcuts({
           return (
             <a
               key={id}
-              aria-label={language === "ar" ? category.nameArabic : category.name}
+              aria-label={
+                id === "food_drink"
+                  ? t(language, SHORTCUT_LABELS[id])
+                  : language === "ar"
+                    ? category.nameArabic
+                    : category.name
+              }
               title={language === "ar" ? category.nameArabic : category.name}
               href={routeToHash({ view: "reader", categoryId: id, index: 0 })!}
-              className={`${onGlass ? "home-glass-inset" : "bg-card hover:bg-muted"} flex min-h-12 items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] ${onGlass ? "focus-visible:ring-on-media" : "focus-visible:ring-ring"}`}
+              className={`${onGlass ? "home-glass-inset" : "bg-card hover:bg-muted"} flex min-h-11 items-center gap-2 rounded-xl border border-border px-3 py-1.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] ${onGlass ? "focus-visible:ring-on-media" : "focus-visible:ring-ring"}`}
               onClick={(event) => {
                 if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
                 event.preventDefault();
                 onOpen(id);
               }}
             >
-              <Icon size={20} className="shrink-0" aria-hidden="true" />
+              <Icon size={20} className="control-cue shrink-0" aria-hidden="true" />
               <span className="min-w-0">{t(language, SHORTCUT_LABELS[id])}</span>
             </a>
           );

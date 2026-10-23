@@ -1,0 +1,71 @@
+.quran-wird-overview > section {
+  min-width: 0;
+  padding: clamp(16px, 2vw, 24px);
+}
+.quran-wird-overview > section > div:first-child {
+  flex-wrap: wrap;
+}
+/* The viewport and usable card width both need room for two readable columns.
+   rem follows text enlargement; the phone's established reading order remains. */
+@media (min-width: 48rem) {
+  .quran-wird-overview {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(20rem, calc(50% - 0.5rem))), 1fr));
+    align-items: start;
+  }
+  .quran-wird-week {
+    grid-column: 1 / -1;
+  }
+  .quran-wird-week-days {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr));
+  }
+  .quran-wird-week-days > [role="listitem"] {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.quran-wird-totals {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+}
+.quran-wird-page-fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+}
+.quran-wird-plan-actions {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr));
+}
+.quran-wird-plan-form input,
+.quran-wird-plan-actions button {
+  min-width: 0;
+}
+.quran-wird-number-stepper > button {
+  width: 48px;
+  height: auto;
+  min-height: 48px;
+}
+.quran-wird-number-stepper > input {
+  padding-inline: 8px;
+}
+.quran-wird-plan-form [role="combobox"] > span:first-child {
+  flex-wrap: wrap;
+  white-space: normal;
+  overflow: visible;
+}
+.quran-wird-plan-form [role="combobox"] {
+  padding-inline: 12px;
+  gap: 12px;
+}
+.quran-wird-plan-form [role="combobox"] span {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.quran-wird-plan-form [role="combobox"] .truncate {
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+}
+.quran-wird-overview p,
+.quran-wird-overview span {
+  overflow-wrap: anywhere;
+}

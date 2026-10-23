@@ -3509,7 +3509,7 @@ export const DUA_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fre
             byteSize: 956160,
             sha256: "3886962f8c000afa8b68c3721b03bc32b119f65d3d3c1282d34b25e5d5cc97d1",
             sourceId: "internal-upload-abdullah-muhammad",
-            reviewStatus: "approved",
+            reviewStatus: "rejected",
           },
           {
             id: "misc-ref-1-english-george-v1",
@@ -3526,11 +3526,12 @@ export const DUA_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fre
         ],
       },
     ],
-    defaultVoiceId: "abdullah-muhammad",
+    defaultVoiceId: "english-george",
     reviewStatus: "approved",
     reviewedBy: "Ahmed Mahdy",
     reviewedAt: "2026-09-30T00:00:00.000Z",
-    reviewNotes: "Owner-supplied recording.",
+    reviewNotes:
+      "Arabic v1 rejected after owner reported different spoken supplication on 2026-10-16. Retain English; matching Arabic replacement requires independent recording review.",
     version: 1,
   },
 
@@ -4348,6 +4349,7 @@ export const DUA_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fre
             sha256: "1939f47c759e250fe43cda11640d495c0faa286a49c7f521fa706863a0289a56",
             sourceId: "internal-upload-abdullah-muhammad",
             reviewStatus: "approved",
+            embeddedRepetitions: 3,
           },
           {
             id: "comprehensive-dua-42-english-george-v1",

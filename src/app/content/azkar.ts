@@ -2981,17 +2981,83 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
-    id: "ir-ref-5",
+    id: "ir-ref-5a",
     category: "illness_ruqyah",
     orderIndex: 4,
+    isSurah: true,
+    surahNameArabic: "الإِخْلَاص",
+    surahNameEnglish: "Al-Ikhlas",
+    surahType: "مكية",
+    verseCount: 4,
+    hasBasmalah: true,
     arabicText:
-      "﴿قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ﴾\n\n﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِن شَرِّ مَا خَلَقَ ۝ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾\n\n﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَٰهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ﴾",
-    transliteration: "Surah Al-Ikhlas, Surah Al-Falaq, and Surah An-Nas.",
+      "﴿قُلْ هُوَ اللَّهُ أَحَدٌ ﴿١﴾ اللَّهُ الصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ﴿٤﴾﴾",
+    transliteration: "Qul huwallahu ahad. Allahus-samad. Lam yalid wa lam yulad. Wa lam yakul-lahu kufuwan ahad.",
     translation:
-      "The Three Quls (Surahs 112, 113, 114) — recited into cupped hands and wiped over the body for Ruqyah.",
+      "Say: He is Allah, [who is] One. Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.",
     benefit:
-      "Prophetic practice before sleep or when feeling ill: reciting the Three Quls into hands and wiping over the body.",
-    benefitArabic: "سنة نبوية قبل النوم وعند المرض بجمع الكفين والنفث فيهما بالمعوذات ومسح الجسد.",
+      "Prophetic practice when ill: reciting the Three Quls into hands, blowing into them, and wiping over the body, three times.",
+    benefitArabic: "رقية نبوية عند المرض بجمع الكفين والنفث فيهما بالمعوذات ومسح الجسد ثلاث مرات.",
+    repetitionCount: 3,
+    countLabel: "3",
+    sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+    sourceReferenceArabic: "صحيح البخاري ٥٠١٧؛ صحيح مسلم ٢١٩٢؛ حصن المسلم ١٣٢.",
+    hadithText:
+      "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما: قل هو الله أحد وقل أعوذ برب الفلق وقل أعوذ برب الناس، ثم يمسح بهما ما استطاع من جسده، يبدأ بهما على رأسه ووجهه وما أقبل من جسده، يفعل ذلك ثلاث مرات.",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Prophet ﷺ went to his bed each night, he would cup his hands together, breathe into them, and recite into them: “Say: He is Allah, One”, “Say: I seek refuge in the Lord of daybreak”, and “Say: I seek refuge in the Lord of mankind”. Then he would wipe with them as much of his body as he could, beginning with his head, his face and the front of his body, doing that three times.",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A5017",
+  },
+  {
+    id: "ir-ref-5b",
+    category: "illness_ruqyah",
+    orderIndex: 5,
+    isSurah: true,
+    surahNameArabic: "الفَلَق",
+    surahNameEnglish: "Al-Falaq",
+    surahType: "مكية",
+    verseCount: 5,
+    hasBasmalah: true,
+    arabicText:
+      "﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾﴾",
+    transliteration:
+      "Qul a'udhu birabbil-falaq. Min sharri ma khalaq. Wa min sharri ghasiqin idha waqab. Wa min sharrin-naffathati fil-'uqad. Wa min sharri hasidin idha hasad.",
+    translation:
+      "Say: I seek refuge in the Lord of daybreak from the evil of that which He created, and from the evil of darkness when it settles, and from the evil of the blowers in knots, and from the evil of an envier when he envies.",
+    benefit:
+      "Prophetic practice when ill: reciting the Three Quls into hands, blowing into them, and wiping over the body, three times.",
+    benefitArabic: "رقية نبوية عند المرض بجمع الكفين والنفث فيهما بالمعوذات ومسح الجسد ثلاث مرات.",
+    repetitionCount: 3,
+    countLabel: "3",
+    sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+    sourceReferenceArabic: "صحيح البخاري ٥٠١٧؛ صحيح مسلم ٢١٩٢؛ حصن المسلم ١٣٢.",
+    hadithText:
+      "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما: قل هو الله أحد وقل أعوذ برب الفلق وقل أعوذ برب الناس، ثم يمسح بهما ما استطاع من جسده، يبدأ بهما على رأسه ووجهه وما أقبل من جسده، يفعل ذلك ثلاث مرات.",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Prophet ﷺ went to his bed each night, he would cup his hands together, breathe into them, and recite into them: “Say: He is Allah, One”, “Say: I seek refuge in the Lord of daybreak”, and “Say: I seek refuge in the Lord of mankind”. Then he would wipe with them as much of his body as he could, beginning with his head, his face and the front of his body, doing that three times.",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A5017",
+  },
+  {
+    id: "ir-ref-5c",
+    category: "illness_ruqyah",
+    orderIndex: 6,
+    isSurah: true,
+    surahNameArabic: "النَّاس",
+    surahNameEnglish: "An-Nas",
+    surahType: "مكية",
+    verseCount: 6,
+    hasBasmalah: true,
+    arabicText:
+      "﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿١﴾ مَلِكِ النَّاسِ ﴿٢﴾ إِلَٰهِ النَّاسِ ﴿٣﴾ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ﴿٤﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿٥﴾ مِنَ الْجِنَّةِ وَالنَّاسِ ﴿٦﴾﴾",
+    transliteration:
+      "Qul a'udhu birabbin-nas. Malikin-nas. Ilahin-nas. Min sharril-waswasil-khannas. Alladhi yuwaswisu fi sudurin-nas. Minal-jinnati wan-nas.",
+    translation:
+      "Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer who whispers into the breasts of mankind, from among the jinn and mankind.",
+    benefit:
+      "Prophetic practice when ill: reciting the Three Quls into hands, blowing into them, and wiping over the body, three times.",
+    benefitArabic: "رقية نبوية عند المرض بجمع الكفين والنفث فيهما بالمعوذات ومسح الجسد ثلاث مرات.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
@@ -3006,7 +3072,7 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
   {
     id: "ir-ref-6",
     category: "illness_ruqyah",
-    orderIndex: 5,
+    orderIndex: 7,
     arabicText:
       "بِسمِ اللَّهِ أَرقِيكَ مِن كُلِّ شَيءٍ يُؤذِيكَ مِن شَرِّ كُلِّ نَفسٍ أَو عَينٍ حَاسِدٍ اللَّهُ يَشفِيكَ بِسمِ اللَّهِ أَرقِيكَ",
     transliteration:
@@ -3028,7 +3094,7 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
   {
     id: "ir-ref-7",
     category: "illness_ruqyah",
-    orderIndex: 6,
+    orderIndex: 8,
     arabicText: "لَا إِلَهَ إِلَّا اللَّهُ",
     transliteration: "La ilaha illallah.",
     translation: "There is no god but Allah.",

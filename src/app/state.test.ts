@@ -18,6 +18,59 @@ import {
 import { getProgressDayKey, shiftProgressDayKey } from "./progress";
 
 describe("app state persistence", () => {
+  it("migrates the combined Ruqyah bookmark and completion to all three surahs without changing history", () => {
+    const session = {
+      id: "before-ruqyah-split",
+      category: "illness_ruqyah",
+      completedAt: "2026-10-14T12:00:00.000Z",
+      completedCount: 8,
+      totalCount: 8,
+      durationSeconds: 120,
+      isComplete: true,
+    };
+    const old = {
+      savedZikrIds: ["ir-ref-5", "ir-ref-5a", "ir-ref-6"],
+      completed: { illness_ruqyah: ["ir-ref-5", "ir-ref-5b"] },
+      sessions: [session],
+    };
+    const state = normalizeAppState(old);
+    expect(state.savedZikrIds).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c", "ir-ref-6"]);
+    expect(state.completed.illness_ruqyah).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"]);
+    expect(state.sessions).toEqual([session]);
+    expect(normalizeAppState(state)).toEqual(state);
+    expect(old.savedZikrIds).toContain("ir-ref-5");
+  });
+
+  it("migrates older synced Ruqyah identities through the same merge boundary", () => {
+    const incoming = {
+      ...DEFAULT_APP_STATE,
+      savedZikrIds: ["ir-ref-5"],
+      completed: { ...DEFAULT_APP_STATE.completed, illness_ruqyah: ["ir-ref-5"] },
+    };
+    const merged = mergeAppStates(DEFAULT_APP_STATE, incoming);
+    expect(merged.savedZikrIds).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"]);
+    expect(merged.completed.illness_ruqyah).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"]);
+    expect(mergeAppStates(merged, incoming)).toEqual(merged);
+  });
+
+  it("preserves legacy numeric Ruqyah completion identities after the split", () => {
+    const state = normalizeAppState({ completed: { illness_ruqyah: [4, 5, 7, 99] } });
+    expect(state.completed.illness_ruqyah).toEqual(["ir-baqarah", "ir-ref-5a", "ir-ref-5b", "ir-ref-5c", "ir-ref-6"]);
+  });
+
+  it("preserves partial Ruqyah repetitions and gives explicit new-surah counts precedence", () => {
+    const state = normalizeAppState({
+      partialZikrCounts: { "ir-ref-5": 1, "ir-ref-5a": 2, unrelated: 4 },
+    });
+    expect(state.partialZikrCounts).toEqual({
+      "ir-ref-5a": 2,
+      "ir-ref-5b": 1,
+      "ir-ref-5c": 1,
+      unrelated: 4,
+    });
+    expect(normalizeAppState(state)).toEqual(state);
+  });
+
   beforeEach(() => window.localStorage.clear());
 
   it("normalizes, merges and reloads the independent Home image preference", () => {
@@ -188,6 +241,15 @@ describe("app state persistence", () => {
     const legacy = normalizeAppState({ mushafReadingMode: "comfort", mushafKeepControlsVisible: false });
     expect(legacy).not.toHaveProperty("mushafReadingMode");
     expect(legacy).not.toHaveProperty("mushafKeepControlsVisible");
+  });
+
+  it("remembers disabled Mushaf colour swipes locally without remote snapshots replacing them", () => {
+    expect(normalizeAppState({}).mushafColorGestures).toBe(true);
+    expect(normalizeAppState({ mushafColorGestures: "false" }).mushafColorGestures).toBe(true);
+    const base = normalizeAppState({ mushafColorGestures: false });
+    expect(base.mushafColorGestures).toBe(false);
+    expect(mergeAppStates(base, normalizeAppState({})).mushafColorGestures).toBe(false);
+    expect(mergeAppStates(normalizeAppState({}), base).mushafColorGestures).toBe(true);
   });
 
   it("keeps a place in each multi-page surah and drops impossible pages", () => {
@@ -767,4 +829,70 @@ describe("prayer tracking persistence", () => {
     expect(sameDayReset.count).toBe(33);
     expect(sameDayReset.items?.item1).toBeDefined();
   });
+});
+
+describe("explicit Home material", () => {
+  it("starts a new installation with one opaque app appearance while retaining legacy snapshots", () => {
+    localStorage.removeItem("azkarapp.state.v1");
+    expect(loadAppState().settings).toMatchObject({ appMaterial: "solid", homeMaterial: "inherit" });
+    expect(normalizeAppState({ settings: { homeMaterial: "glass" } }).settings.homeMaterial).toBe("glass");
+    expect(normalizeAppState({ settings: {} }).settings.homeMaterial).toBe("system");
+  });
+  it("retains global and inherited Home choices across normalization and partial sync", () => {
+    expect(normalizeAppState({}).settings.appMaterial).toBe("solid");
+    for (const appMaterial of ["system", "glass", "solid"] as const) {
+      const state = normalizeAppState({ settings: { appMaterial, homeMaterial: "inherit" } });
+      expect(state.settings.appMaterial).toBe(appMaterial);
+      expect(state.settings.homeMaterial).toBe("inherit");
+      expect(mergeAppStates(state, { settings: { showTranslation: true } }).settings).toMatchObject({
+        appMaterial,
+        homeMaterial: "inherit",
+      });
+    }
+    expect(normalizeAppState({ settings: { appMaterial: "invalid", homeMaterial: "glass" } }).settings).toMatchObject({
+      appMaterial: "solid",
+      homeMaterial: "glass",
+    });
+  });
+  it("normalizes old/invalid preferences and preserves explicit choices through merges", () => {
+    expect(normalizeAppState({}).settings.homeMaterial).toBe("system");
+    expect(normalizeAppState({ settings: { homeMaterial: "invalid" } }).settings.homeMaterial).toBe("system");
+    for (const homeMaterial of ["system", "glass", "solid"] as const) {
+      const state = normalizeAppState({ settings: { homeMaterial } });
+      expect(state.settings.homeMaterial).toBe(homeMaterial);
+      expect(mergeAppStates(state, { settings: { homeMaterial } }).settings.homeMaterial).toBe(homeMaterial);
+    }
+  });
+});
+
+describe("reader footer label preference", () => {
+  it("defaults legacy and invalid values to labelled controls and retains icons-only", () => {
+    expect(normalizeAppState({}).settings.readerToolLabels).toBe(true);
+    expect(normalizeAppState({ settings: { readerToolLabels: "false" } }).settings.readerToolLabels).toBe(true);
+    const icons = normalizeAppState({ settings: { readerToolLabels: false } });
+    expect(icons.settings.readerToolLabels).toBe(false);
+    expect(
+      mergeAppStates(icons, { settings: { ...DEFAULT_APP_STATE.settings, readerToolLabels: true } }).settings
+        .readerToolLabels,
+    ).toBe(true);
+    const legacy = { ...DEFAULT_APP_STATE.settings };
+    delete legacy.readerToolLabels;
+    expect(mergeAppStates(icons, { settings: legacy }).settings.readerToolLabels).toBe(false);
+    expect(
+      mergeAppStates(DEFAULT_APP_STATE, { settings: { ...legacy, readerToolLabels: false } }).settings.readerToolLabels,
+    ).toBe(false);
+    saveAppState(icons);
+    expect(loadAppState().settings.readerToolLabels).toBe(false);
+  });
+});
+
+it("remembers English main text locally without accepting another device's preference", () => {
+  expect(normalizeAppState({}).settings.readerMeaningOnly).toBe(false);
+  expect(normalizeAppState({ settings: { readerMeaningOnly: "true" } }).settings.readerMeaningOnly).toBe(false);
+  const local = normalizeAppState({ settings: { readerMeaningOnly: true } });
+  expect(saveAppState(local)).toBe(true);
+  expect(loadAppState().settings.readerMeaningOnly).toBe(true);
+  expect(mergeAppStates(local, DEFAULT_APP_STATE).settings.readerMeaningOnly).toBe(true);
+  expect(mergeAppStates(DEFAULT_APP_STATE, local).settings.readerMeaningOnly).toBe(false);
+  expect(local.settings.readerMeaningOnly).toBe(true);
 });

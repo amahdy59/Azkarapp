@@ -1,19 +1,21 @@
-import { useId, useMemo, useState } from "react";
+import { useState } from "react";
 import type { AppLanguage, PrayerTrackingRecord } from "../types";
-import { getElapsedPeriod } from "../elapsedPeriod";
-import { getCalendarMonthPeriod, getPeriodRange, type CalendarType } from "../calendarPeriods";
+import type { CalendarType } from "../calendarPeriods";
+import { getPrayerInsights, getMatchedInsightPeriods } from "../progressInsights";
 import { getPrayerPeriodStats } from "../prayerPeriodStats";
-import { formatNumerals, formatRatio, formatPercentage } from "../formatting";
+import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { RecordedComparisonBar } from "./RecordedComparisonBar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { progressText } from "../i18n/progressInsights";
+import { saveFileToDevice } from "../share/shareDispatcher";
+import { RecordingInsights } from "./RecordingInsights";
+import { BarChart3 } from "./icons";
+import { ProgressSelectField } from "./ProgressSelectField";
+import { RecordingTimeline } from "./RecordingTimeline";
+import { PeriodComparison } from "./PeriodComparison";
 
-const METRICS = ["fard", "location", "mosque", "rawatib", "adhkar"] as const;
-type Metric = (typeof METRICS)[number];
+const METRICS = ["fard", "rawatib", "adhkar"] as const;
 const LABELS = {
   fard: "prayerTracking.fard",
-  location: "progress.prayerLocationBreakdown",
-  mosque: "prayerTracking.atMosque",
   rawatib: "prayerTracking.rawatib",
   adhkar: "prayerTracking.adhkar",
 } as const;
@@ -33,172 +35,155 @@ export function PrayerTrackerStats({
   calendarType: CalendarType;
   now?: Date;
 }) {
-  const id = useId();
-  const [metric, setMetric] = useState<Metric>("fard");
-  const period = getPeriodRange(activeTab, displayDate, language, calendarType);
-  const elapsed = getElapsedPeriod(period.startKey, period.endKey, now);
-  const { startKey, endKey, days } = elapsed;
-  const monthDays =
-    activeTab === "month" ? getCalendarMonthPeriod(displayDate, calendarType, language).dates.length : 0;
-  const stats = useMemo(() => getPrayerPeriodStats(records, startKey, endKey, days), [records, startKey, endKey, days]);
-  const pct = (count: number, possible: number) =>
-    possible ? formatPercentage(Math.round((count / possible) * 100), language) : "—";
-  const ratio = (count: number, possible: number) => (possible ? formatRatio(count, possible, language) : "—");
-  const recordedCount = (count: number, possible: number) =>
-    possible
-      ? t(language, "progress.recordedCount", {
-          done: formatNumerals(count, language),
-          total: formatNumerals(possible, language),
-        })
-      : "—";
-  const name = (prayer: (typeof stats.rows)[number]["prayer"]) => t(language, `notifications.${prayer}`);
-  const metricLabel = t(language, LABELS[metric]);
-  const total = stats.totals[metric === "location" ? "fard" : metric];
-  const possible = metric === "rawatib" ? days * 4 : stats.possible;
+  const [metric, setMetric] = useState<(typeof METRICS)[number]>("fard");
+  const [exportState, setExportState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  // Prayer records use civil dates, independently of the devotional-day rollover.
+  const stats = getPrayerInsights(records, activeTab, displayDate, now, language, calendarType);
+  const range = { startKey: stats.startKey, endKey: stats.endKey, days: stats.days };
+  const matched = getMatchedInsightPeriods(activeTab, displayDate, now, language, calendarType);
+  const matchCounts = (value: typeof matched.current) =>
+    getPrayerPeriodStats(records, value.startKey, value.endKey, value.days).totals[metric];
+  const rows = stats.rows
+    .filter((row) => metric !== "rawatib" || row.prayer !== "asr")
+    .map((row) => ({ id: row.prayer, count: row[metric] }));
+  const timelineSeries = [
+    {
+      id: "all",
+      label: progressText(language, "insights.allPrayers"),
+      measure: progressText(
+        language,
+        metric === "rawatib" ? "insights.allRawatibMeasure" : "insights.allPrayersMeasure",
+      ),
+      points: stats.trend.map((point) => ({
+        ...point,
+        recorded: point.totals[metric],
+        possible: point.days * (metric === "rawatib" ? 4 : 5),
+      })),
+    },
+    ...rows.map((row) => ({
+      id: row.id,
+      label: t(language, `notifications.${row.id}`),
+      measure: progressText(language, "insights.singlePrayerMeasure"),
+      points: stats.trend.map((point) => ({
+        ...point,
+        recorded: point.rows.find((item) => item.prayer === row.id)![metric],
+        possible: point.days,
+      })),
+    })),
+  ];
+  async function download() {
+    setExportState("saving");
+    try {
+      await saveFileToDevice(
+        new File(
+          [
+            JSON.stringify(
+              {
+                measure: "days_with_practice_recorded",
+                calendarType,
+                dayBoundary: "civil",
+                rawatibExcludes: ["asr"],
+                matchedPeriods: matched,
+                matchedPractice: metric,
+                matchedCounts: {
+                  current: matchCounts(matched.current),
+                  previous: matchCounts(matched.previous),
+                  possible: matched.days * (metric === "rawatib" ? 4 : 5),
+                },
+                ...range,
+                ...stats,
+              },
+              null,
+              2,
+            ),
+          ],
+          `prayer-patterns-${range.startKey}.json`,
+          { type: "application/json" },
+        ),
+      );
+      setExportState("saved");
+    } catch {
+      setExportState("error");
+    }
+  }
   return (
-    <div className="space-y-4 px-4 pb-4 sm:px-5" data-testid="prayer-comparison">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-sm font-bold text-foreground">{t(language, "progress.prayerRecordingRate")}</span>
-        <p className="text-foreground">
-          <bdi className="text-xl font-black">{recordedCount(stats.totals.fard, stats.possible)}</bdi>
-          <bdi className="ms-2 text-sm text-muted-foreground">{pct(stats.totals.fard, stats.possible)}</bdi>
-        </p>
-      </div>
-      <p className="text-xs leading-relaxed text-muted-foreground" data-testid="prayer-coverage-hint">
-        {t(language, days > 0 && days < monthDays ? "progress.monthCoverageHint" : "progress.recordingCoverageHint", {
-          days: formatNumerals(days, language),
-          total: formatNumerals(monthDays, language),
-        })}
+    <div className="space-y-5 px-4 pb-4 sm:px-5" data-testid="prayer-comparison">
+      <p className="progress-help" data-testid="prayer-coverage-hint">
+        {progressText(language, "insights.coverage", { days: formatNumerals(range.days, language) })}
       </p>
-      <div className="border-t border-border pt-4">
-        <label htmlFor={`${id}-metric`} className="mb-2 block text-sm font-bold">
-          {t(language, "progress.comparePrayerMetric")}
-        </label>
-        <Select
-          dir={language === "ar" ? "rtl" : "ltr"}
-          value={metric}
-          onValueChange={(value) => setMetric(value as Metric)}
-        >
-          <SelectTrigger id={`${id}-metric`}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {METRICS.map((value) => (
-              <SelectItem key={value} value={value}>
-                {t(language, LABELS[value])}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p
-          className={metric === "fard" ? "sr-only" : "mt-3 flex flex-wrap justify-between gap-2 text-sm"}
-          role="status"
-          aria-atomic="true"
-        >
-          <span className="sr-only">{metricLabel}</span>
-          <bdi>{recordedCount(total, possible)}</bdi>
-        </p>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          {t(language, metric === "location" ? "progress.locationStackHint" : "progress.prayerComparisonHint")}
-        </p>
+      <div role="status" aria-atomic="true" className="sr-only">
+        {t(language, LABELS[metric])}
       </div>
-      <ul className="divide-y divide-border" aria-label={metricLabel}>
-        {stats.rows.map((row) => {
-          const applicable = metric !== "rawatib" || row.prayer !== "asr";
-          const count = row[metric === "location" ? "fard" : metric];
-          const segments =
-            metric === "location"
-              ? [
-                  { label: t(language, "prayerTracking.atMosque"), value: row.mosque, color: "var(--primary)" },
-                  { label: t(language, "prayerTracking.atHome"), value: row.home, color: "var(--info)" },
-                  {
-                    label: t(language, "progress.missed"),
-                    value: Math.max(0, days - row.fard),
-                    color: "var(--border-control)",
-                  },
-                ]
-              : [{ label: metricLabel, value: count, color: "var(--primary)" }];
-          const chartLabel = `${name(row.prayer)} · ${metricLabel}: ${ratio(count, days)}${metric === "location" ? `; ${segments.map((segment) => `${segment.label}: ${formatNumerals(segment.value, language)}`).join("; ")}` : ""}`;
-          return (
-            <li key={row.prayer} className="py-3" data-testid={`prayer-comparison-${row.prayer}`}>
-              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 text-sm">
-                <span className="font-bold">{name(row.prayer)}</span>
-                <bdi className="text-muted-foreground">
-                  {applicable
-                    ? days
-                      ? t(language, "progressTrend.recordedDays", {
-                          done: formatNumerals(count, language),
-                          total: formatNumerals(days, language),
-                        })
-                      : "—"
-                    : t(language, "progress.notApplicable")}
-                </bdi>
-              </div>
-              {applicable && (
-                <RecordedComparisonBar label={chartLabel} segments={segments} max={days} language={language} />
-              )}
-            </li>
-          );
-        })}
-      </ul>
-      <details className="border-t border-border">
-        <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-          {t(language, "progress.prayerExactRecords")}
+      <RecordingTimeline
+        series={timelineSeries}
+        language={language}
+        period={activeTab}
+        title={progressText(language, "insights.prayerTimeline")}
+        seriesLabel={progressText(language, "insights.prayerFilter")}
+        leadingControl={
+          <ProgressSelectField
+            label={progressText(language, "insights.practiceFilter")}
+            language={language}
+            icon={BarChart3}
+            className="max-w-xs"
+            value={metric}
+            onChange={setMetric}
+            options={METRICS.map((value) => ({
+              value,
+              label: progressText(
+                language,
+                value === "fard"
+                  ? "insights.practiceFard"
+                  : value === "rawatib"
+                    ? "insights.practiceRawatib"
+                    : "insights.practiceAdhkar",
+              ),
+            }))}
+          />
+        }
+        testId="prayer-trends"
+      />
+      <PeriodComparison
+        label={`${progressText(language, "insights.allPrayers")} · ${t(language, LABELS[metric])}`}
+        current={matchCounts(matched.current)}
+        previous={matchCounts(matched.previous)}
+        possible={matched.days * (metric === "rawatib" ? 4 : 5)}
+        days={matched.days}
+        language={language}
+        period={activeTab}
+      />
+      <h3 className="border-t border-border pt-5 text-base font-bold">
+        {progressText(language, "insights.comparePrayers")}
+      </h3>
+      <RecordingInsights
+        rows={rows}
+        days={range.days}
+        language={language}
+        name={(id) => t(language, `notifications.${id}`)}
+        practice="prayer"
+      />
+      <details className="text-xs text-muted-foreground">
+        <summary className="min-h-11 cursor-pointer py-3 progress-focus">
+          {progressText(language, "insights.aboutRecords")}
         </summary>
-        <div
-          role="region"
-          aria-label={t(language, "progress.prayerExactRecords")}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Named native table scroll region needs keyboard access.
-          tabIndex={0}
-          className="overflow-x-auto rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <table className="w-full text-sm text-start">
-            <caption className="sr-only">{t(language, "progress.prayerExactRecords")}</caption>
-            <thead>
-              <tr className="border-b border-border">
-                <th scope="col" className="p-2 text-start">
-                  {t(language, "dailyPath.prayer")}
-                </th>
-                {(["fard", "mosque", "rawatib", "adhkar"] as const).map((value) => (
-                  <th scope="col" key={value} className="p-2 text-start">
-                    {t(language, LABELS[value])}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {stats.rows.map((row) => (
-                <tr key={row.prayer} className="border-b border-border">
-                  <th scope="row" className="p-2 text-start font-medium">
-                    {name(row.prayer)}
-                  </th>
-                  {(["fard", "mosque", "rawatib", "adhkar"] as const).map((value) => (
-                    <td key={value} className="whitespace-nowrap p-2">
-                      <bdi dir="ltr">
-                        {value === "rawatib" && row.prayer === "asr"
-                          ? t(language, "progress.notApplicable")
-                          : ratio(row[value], days)}
-                      </bdi>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <th scope="row" className="p-2 text-start">
-                  {t(language, "progress.totalCompleted")}
-                </th>
-                {(["fard", "mosque", "rawatib", "adhkar"] as const).map((value) => (
-                  <td key={value} className="whitespace-nowrap p-2">
-                    <bdi dir="ltr">{ratio(stats.totals[value], days * (value === "rawatib" ? 4 : 5))}</bdi>
-                  </td>
-                ))}
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+        <p>
+          {progressText(language, metric === "fard" ? "insights.fardHint" : "insights.optionalHint")}{" "}
+          {progressText(language, "insights.noRecord")}
+        </p>
       </details>
+      <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
+        <button
+          type="button"
+          disabled={exportState === "saving"}
+          onClick={() => void download()}
+          className="progress-export"
+        >
+          {progressText(language, "insights.exportPrayers")}
+        </button>
+        <span role="status" className="text-xs text-muted-foreground">
+          {exportState === "idle" ? "" : progressText(language, `insights.${exportState}`)}
+        </span>
+      </div>
     </div>
   );
 }

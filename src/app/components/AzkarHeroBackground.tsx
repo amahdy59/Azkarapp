@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { azkarBackgrounds, toSrcSet, type AzkarBackgroundKey } from "./azkar-backgrounds";
+import { azkarBackgrounds, backgroundAssetUrl, toSrcSet, type AzkarBackgroundKey } from "./azkar-backgrounds";
 import "./azkar-hero-background.css";
 
-const getAssetUrl = (path: string) => {
-  const base = import.meta.env.BASE_URL || "/";
-  const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
-  return `${cleanBase}${path}`;
-};
+const getAssetUrl = backgroundAssetUrl;
 
 interface AzkarHeroBackgroundProps {
   kind: AzkarBackgroundKey;
   priority?: boolean;
   className?: string;
+  onFailure?: () => void;
 }
 
-export function AzkarHeroBackground({ kind, priority = false, className = "" }: AzkarHeroBackgroundProps) {
+export function AzkarHeroBackground({ kind, priority = false, className = "", onFailure }: AzkarHeroBackgroundProps) {
   const asset = azkarBackgrounds[kind];
+  const saveData =
+    typeof navigator !== "undefined" &&
+    (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
   // If the photograph cannot be fetched — offline before it was cached, a
   // blocked request, a corrupt file — the hero must still be a dark ground,
   // because everything drawn on it is light-on-media text. Falling back to
@@ -23,6 +23,14 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
   const [failedKind, setFailedKind] = useState<AzkarBackgroundKey | null>(null);
   const [decodedKind, setDecodedKind] = useState<AzkarBackgroundKey | null>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    if (failedKind === kind || saveData) onFailure?.();
+  }, [failedKind, kind, onFailure, saveData]);
+  useEffect(() => {
+    if (!onFailure || decodedKind === kind || failedKind === kind || saveData) return;
+    const timer = window.setTimeout(() => setFailedKind(kind), 15_000);
+    return () => window.clearTimeout(timer);
+  }, [kind, decodedKind, failedKind, onFailure, saveData]);
   const revealDecodedImage = useCallback(
     async (image: HTMLImageElement) => {
       try {
@@ -44,7 +52,7 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
     "--azkar-bg-position-wide": asset.objectPositionWide,
   } as CSSProperties;
 
-  if (failedKind === kind) {
+  if (failedKind === kind || saveData) {
     return (
       <div
         data-testid="azkar-hero-fallback"

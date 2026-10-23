@@ -182,11 +182,16 @@ describe("quiet garden progress", () => {
       ...emptyCompletedSets,
       morning: fullProgress("morning"),
       evening: new Set(["e-hm-75a", "e-hm-75"]),
+      travel: fullProgress("travel"),
+      home: fullProgress("home"),
     };
     const reset = resetStaleCompletedCollections(completed, [], new Date(2026, 6, 18, 12), 4);
 
     expect(reset.morning.size).toBe(0);
     expect([...reset.evening]).toEqual(["e-hm-75a", "e-hm-75"]);
+    expect(reset.travel.size).toBeGreaterThan(0);
+    expect(reset.travel).toEqual(completed.travel);
+    expect(reset.home).toEqual(completed.home);
   });
 
   it("starts a new day with empty daily routines while preserving situational progress", () => {

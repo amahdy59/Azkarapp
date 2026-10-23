@@ -1,11 +1,32 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { t } from "../i18n";
 import { __resetQuranTranslationsCacheForTesting } from "../content/quranTranslations";
+import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 
 describe("AyahInteractionSheet", () => {
+  it("puts the emphasized image action before text sharing while keeping both available", () => {
+    render(
+      <AyahInteractionSheet
+        isOpen
+        onClose={vi.fn()}
+        verseKey="2:255"
+        text="ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ"
+        language="en"
+        isBookmarked={false}
+        onBookmark={vi.fn()}
+      />,
+    );
+    const image = screen.getByRole("button", { name: t("en", "reader.shareAyahImage"), exact: true });
+    const text = screen.getByRole("button", { name: t("en", "reader.shareAyah"), exact: true });
+    expect(image.compareDocumentPosition(text) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(image.style.backgroundColor).toBe("var(--primary)");
+    expect(image.style.color).toBe("var(--primary-foreground)");
+    expect(image).toBeEnabled();
+    expect(text).toBeEnabled();
+  });
   beforeEach(() => {
     __resetQuranTranslationsCacheForTesting();
   });
@@ -90,7 +111,11 @@ describe("AyahInteractionSheet", () => {
       />,
     );
 
-    expect(await screen.findByTestId("ayah-meanings-container")).toBeInTheDocument();
+    // Await the actual shared data boundary instead of racing the default DOM polling deadline.
+    await act(async () => {
+      await loadSurahWordMeanings(2);
+    });
+    expect(screen.getByTestId("ayah-meanings-container")).toBeInTheDocument();
     expect(screen.getByText(t("ar", "reader.wordMeaningsTitle"))).toBeInTheDocument();
   });
 

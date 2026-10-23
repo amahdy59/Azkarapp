@@ -217,6 +217,33 @@ describe("AudioProvider integration", () => {
     expect(match).toHaveBeenCalledWith("https://audio.example.test/segment.mp3");
   });
 
+  it("defaults a single-entry start to Play all and retains manual choice across new plans and remount", () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    let controller!: ReturnType<typeof useAudioController>;
+    function PreferencesHarness() {
+      controller = useAudioController();
+      return null;
+    }
+    const mounted = render(
+      <AudioProvider>
+        <PreferencesHarness />
+      </AudioProvider>,
+    );
+    act(() => controller.startPlan(plan));
+    expect(controller.autoAdvance).toBe(true);
+    act(() => controller.setAutoAdvance(false));
+    act(() => controller.startPlan({ ...plan, context: { ...plan.context, source: "full-session" } }));
+    expect(controller.autoAdvance).toBe(false);
+    mounted.unmount();
+    render(
+      <AudioProvider>
+        <PreferencesHarness />
+      </AudioProvider>,
+    );
+    expect(controller.autoAdvance).toBe(false);
+    act(() => controller.startPlan(plan));
+    expect(controller.autoAdvance).toBe(false);
+  });
   it("rejects an unavailable voice without changing playback or saved voice preferences", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     let controller!: ReturnType<typeof useAudioController>;
@@ -312,6 +339,7 @@ describe("AudioProvider integration", () => {
       </AudioProvider>,
     );
     fireEvent.click(screen.getByText("Start queue"));
+    fireEvent.click(screen.getByText("Disable automatic continuation"));
     act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
     expect(screen.getByTestId("queue-state")).toHaveTextContent("playing:0:1:0");
     expect(screen.getByTestId("queue-completions")).toHaveTextContent("0");
@@ -434,12 +462,12 @@ describe("AudioProvider integration", () => {
     expect(await screen.findByRole("region", { name: "Audio player" })).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Expand player" })).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "Listening progress" })).toHaveAttribute("aria-valuenow", "0");
+    expect(screen.getByRole("slider", { name: "Seek audio" })).toHaveValue("0");
 
     // Playback starts compact so it does not obscure the screen.
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.getByRole("button", { name: "Minimize player" })).toBeInTheDocument();
-    expect(screen.queryByRole("progressbar", { name: "Listening progress" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("audio-compact-progress")).not.toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Seek audio" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Forward 10 seconds" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Rewind 10 seconds" })).toBeInTheDocument();

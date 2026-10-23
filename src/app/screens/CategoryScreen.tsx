@@ -29,6 +29,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { AzkarListLayout } from "../components/AzkarListLayout";
 import { AzkarListItem } from "../components/AzkarListItem";
 import { isPrayerName } from "../content/prayerTimes";
+import { SITUATIONAL_SESSION_CATEGORY_IDS } from "../progress";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -149,7 +150,14 @@ export function CategoryScreen({
 
         <div className="shrink-0 border-b border-border px-5 py-4">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-label font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
+            <p className="text-label font-bold text-muted-foreground">
+              {t(
+                language,
+                SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)
+                  ? "category.sessionProgress"
+                  : "category.dailyProgress",
+              )}
+            </p>
             <p
               className="text-label font-bold text-muted-foreground"
               dir="auto"
@@ -168,8 +176,16 @@ export function CategoryScreen({
             trackColor="var(--card)"
             fillColor="var(--primary)"
             direction={direction}
-            aria-label={t(language, "category.dailyProgress")}
+            aria-label={t(
+              language,
+              SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId) ? "category.sessionProgress" : "category.dailyProgress",
+            )}
           />
+          {SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId) && (
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground" data-testid="session-reset-guidance">
+              {t(language, "category.situationalResetHint")}
+            </p>
+          )}
 
           {isMainRoutine && routineMode === "core" && completedItemCount === azkar.length && (
             <button
@@ -273,13 +289,27 @@ export function CategoryScreen({
                 >
                   {isArabic ? (
                     <>
-                      <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
+                      <span className="text-subtitle font-bold leading-none">
+                        {t(
+                          language,
+                          SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)
+                            ? "completion.newSession"
+                            : "category.readAgain",
+                        )}
+                      </span>
                       <RefreshCw size={18} className="shrink-0" aria-hidden="true" />
                     </>
                   ) : (
                     <>
                       <RefreshCw size={18} className="shrink-0" aria-hidden="true" />
-                      <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
+                      <span className="text-subtitle font-bold leading-none">
+                        {t(
+                          language,
+                          SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)
+                            ? "completion.newSession"
+                            : "category.readAgain",
+                        )}
+                      </span>
                     </>
                   )}
                 </button>
@@ -405,7 +435,7 @@ export function CategoryScreen({
                   className="celebration-pop mt-3 flex items-center gap-3 rounded-2xl border border-success/30 bg-success/10 p-3 text-start"
                   data-testid="sleep-preparation-complete"
                 >
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-success text-white dark:bg-success dark:text-primary-foreground">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-success text-success-foreground">
                     <Check size={19} strokeWidth={3} aria-hidden="true" />
                   </span>
                   <span>

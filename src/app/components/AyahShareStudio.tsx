@@ -1,4 +1,7 @@
-import { NATIVE_RADIO } from "./ui/controlStyles";
+import { SharingCaption } from "./SharingCaption";
+import { getImageCaption } from "../share/shareCaption";
+import { ShareFormatSelect } from "./ShareFormatSelect";
+import { SharingArrow, SharingSteps, SharingStepNavigation, type SharingStep } from "./SharingSteps";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { AppLanguage } from "../types";
@@ -11,7 +14,7 @@ import { canShareMultipleFiles, downloadFile, shareMultipleFiles } from "../shar
 import { createShareArchive } from "../share/shareArchive";
 import { reportError } from "../../lib/observability";
 import { Button } from "./ui/button";
-import { ArrowPrevious, Copy, Download, Share2, X } from "./icons";
+import { Download, Share2, X, Maximize, Minimize } from "./icons";
 import "./ayah-share-studio.css";
 import { AyahMushafText } from "./AyahMushafText";
 
@@ -45,6 +48,15 @@ export default function AyahShareStudio({
   options?: AyahShareOptions;
   onOptionsChange?: (options: AyahShareOptions) => void;
 }) {
+  const [step, setStep] = useState<SharingStep>("content");
+  const [inspect, setInspect] = useState(false);
+  const [includeCaption, setIncludeCaption] = useState(false);
+  const steps = ["content", "design", "share"] as const;
+  const stepHeading = useRef<HTMLHeadingElement>(null);
+  const changeStep = (next: SharingStep) => {
+    setStep(next);
+    requestAnimationFrame(() => stepHeading.current?.focus());
+  };
   const [selection, setSelection] = useState(options);
   const { format, includeTranslation, includeMeanings, textScale = 1, fitAyah = true } = selection;
   const update = (patch: Partial<AyahShareOptions>) => {
@@ -123,6 +135,7 @@ export default function AyahShareStudio({
   const input = useMemo<AyahCardInput>(
     () => ({
       verseKey,
+      language,
       pageNumber,
       text,
       title,
@@ -212,13 +225,19 @@ export default function AyahShareStudio({
     !generationFailed &&
     (!includeTranslation || Boolean(translation));
   const files = pages.map((page) => page.file);
+  const readingLink = /^\d+:\d+$/u.test(verseKey) ? `https://quran.com/${verseKey.replace(":", "/")}` : undefined;
+  const captionText = getImageCaption([completeText, readingLink].filter(Boolean).join("\n\n"));
   const nativeShare = pages.length > 0 && canShareMultipleFiles(files);
   const share = async () => {
     if (!ready || !nativeShare) return;
     setBusy(true);
     setError(false);
     try {
-      const result = await shareMultipleFiles(files, { title, text: completeText, downloadFallback: false });
+      const result = await shareMultipleFiles(files, {
+        title,
+        text: includeCaption ? captionText : undefined,
+        downloadFallback: false,
+      });
       setStatus(
         t(
           language,
@@ -267,22 +286,39 @@ export default function AyahShareStudio({
     >
       <header className="ayah-share-header">
         <Button variant="ghost" size="icon" onClick={onBack} aria-label={t(language, "common.back")}>
-          <ArrowPrevious aria-hidden="true" />
+          <SharingArrow language={language} action="previous" />
         </Button>
         <div className="min-w-0 flex-1">
           <h2 ref={heading} tabIndex={-1} className="text-lg font-semibold text-foreground">
             {t(language, "reader.ayahCardTitle")}
           </h2>
-          <p className="text-sm text-muted-foreground" dir="auto">
-            {title}
-          </p>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose} aria-label={t(language, "common.close")}>
           <X aria-hidden="true" />
         </Button>
+        <div className="ayah-share-step-header">
+          <SharingSteps steps={steps} step={step} onChange={changeStep} language={language} disabled={busy} />
+        </div>
       </header>
       <div className="ayah-share-body" data-vaul-no-drag>
-        <div className="ayah-share-preview" aria-busy={generating}>
+        <div className="ayah-share-preview" data-inspect={inspect || undefined} aria-busy={generating}>
+          {current && (
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-bold">{t(language, "shareStudio.previewHeading")}</span>
+              <Button
+                variant="outline"
+                className="min-h-11 h-auto whitespace-normal"
+                aria-expanded={inspect}
+                onClick={() => setInspect((value) => !value)}
+              >
+                {inspect ? <Minimize aria-hidden="true" /> : <Maximize aria-hidden="true" />}
+                {t(language, inspect ? "shareStudio.closeInspect" : "shareStudio.inspect")}
+              </Button>
+            </div>
+          )}
+          <p className="mb-2 text-sm text-muted-foreground" dir="auto">
+            {title}
+          </p>
           {current ? (
             <figure>
               <img
@@ -306,12 +342,13 @@ export default function AyahShareStudio({
             <div className="ayah-share-placeholder" aria-hidden="true" />
           )}
           {pages.length > 1 && (
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="sharing-card-navigation">
               <Button
                 variant="outline"
                 disabled={active === 0 || generating || busy}
                 onClick={() => setActive((value) => value - 1)}
               >
+                <SharingArrow language={language} action="previous" />
                 {t(language, "common.previous")}
               </Button>
               <Button
@@ -320,151 +357,198 @@ export default function AyahShareStudio({
                 onClick={() => setActive((value) => value + 1)}
               >
                 {t(language, "common.next")}
+                <SharingArrow language={language} action="next" />
               </Button>
             </div>
           )}
         </div>
-        <div className="space-y-4 min-w-0">
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-semibold">{t(language, "reader.ayahCardFormat")}</legend>
-            <div className="flex flex-wrap gap-2">
-              {(["portrait", "square"] as const).map((value) => (
-                <label key={value} className="ayah-share-option">
-                  <input
-                    type="radio"
-                    className={NATIVE_RADIO}
-                    name="ayah-card-format"
-                    value={value}
-                    checked={format === value}
-                    onChange={() => update({ format: value })}
-                    disabled={busy}
-                  />
-                  {t(language, value === "portrait" ? "reader.ayahCardPortrait" : "reader.ayahCardSquare")}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-semibold">{t(language, "reader.ayahCardContent")}</legend>
-            <label className="ayah-share-option">
-              <input
-                type="checkbox"
-                checked={includeTranslation}
-                disabled={(!translation && !includeTranslation) || busy}
-                onChange={(event) => update({ includeTranslation: event.target.checked })}
-              />
-              {t(language, "reader.ayahCardTranslation")}
-            </label>
-            {!translationLoaded ? (
-              <p className="text-sm text-muted-foreground">{t(language, "reader.ayahCardTranslationLoading")}</p>
-            ) : (
-              !translation && (
-                <div className="text-sm text-muted-foreground">
-                  <p>{t(language, "reader.ayahCardTranslationUnavailable")}</p>
-                  <Button variant="outline" disabled={busy} onClick={() => setTranslationRetry((value) => value + 1)}>
-                    {t(language, "common.tryAgain")}
-                  </Button>
-                </div>
-              )
+        <div className="ayah-share-settings space-y-4 min-w-0">
+          <div>
+            <h3
+              ref={stepHeading}
+              tabIndex={-1}
+              className="text-lg font-bold rounded focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {t(language, `shareStudio.step${step}`)}
+            </h3>
+            <p className="sr-only">{t(language, `shareStudio.step${step}Hint`)}</p>
+            {step === "design" && (
+              <p className="mt-1 text-xs text-muted-foreground">{t(language, "shareStudio.designOptional")}</p>
             )}
-            <label className="ayah-share-option">
-              <input
-                type="checkbox"
-                checked={includeMeanings}
-                disabled={!meanings.length || busy}
-                onChange={(event) => update({ includeMeanings: event.target.checked })}
-              />
-              {t(language, "reader.ayahCardMeanings")}
-            </label>
-            {!meanings.length && (
-              <p className="text-sm text-muted-foreground">{t(language, "reader.ayahCardMeaningsUnavailable")}</p>
-            )}
-          </fieldset>
-          {pages.length > 1 && (
+          </div>
+          {step === "design" && (
+            <ShareFormatSelect
+              value={format}
+              onChange={(format) => update({ format })}
+              language={language}
+              disabled={busy}
+            />
+          )}
+          {step === "content" && (
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-semibold">{t(language, "reader.ayahCardContent")}</legend>
+              <label className="ayah-share-option">
+                <input
+                  type="checkbox"
+                  checked={includeTranslation}
+                  disabled={(!translation && !includeTranslation) || busy}
+                  onChange={(event) => update({ includeTranslation: event.target.checked })}
+                />
+                {t(language, "reader.ayahCardTranslation")}
+              </label>
+              {!translationLoaded ? (
+                <p className="text-sm text-muted-foreground">{t(language, "reader.ayahCardTranslationLoading")}</p>
+              ) : (
+                !translation && (
+                  <div className="text-sm text-muted-foreground">
+                    <p>{t(language, "reader.ayahCardTranslationUnavailable")}</p>
+                    <Button variant="outline" disabled={busy} onClick={() => setTranslationRetry((value) => value + 1)}>
+                      {t(language, "common.tryAgain")}
+                    </Button>
+                  </div>
+                )
+              )}
+              <label className="ayah-share-option">
+                <input
+                  type="checkbox"
+                  checked={includeMeanings}
+                  disabled={!meanings.length || busy}
+                  onChange={(event) => update({ includeMeanings: event.target.checked })}
+                />
+                {t(language, "reader.ayahCardMeanings")}
+              </label>
+              {!meanings.length && (
+                <p className="text-sm text-muted-foreground">{t(language, "reader.ayahCardMeaningsUnavailable")}</p>
+              )}
+            </fieldset>
+          )}
+          {step === "share" && pages.length > 1 && (
             <p className="text-sm text-muted-foreground">{t(language, "reader.ayahCardComplete")}</p>
           )}
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-semibold">{t(language, "reader.ayahCardTypography")}</legend>
-            <label className="block text-sm" htmlFor="ayah-card-text-size">
-              {t(language, "reader.ayahCardTextSize")} · {formatNumerals(Math.round(textScale * 100), language)}%
-            </label>
-            <input
-              id="ayah-card-text-size"
-              type="range"
-              min={0.75}
-              max={1.125}
-              step={0.125}
-              value={textScale}
-              aria-valuetext={`${formatNumerals(Math.round(textScale * 100), language)}%`}
-              onChange={(event) => update({ textScale: Number(event.target.value) })}
-              disabled={busy}
-              className="min-h-11 w-full accent-primary rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
-            />
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>{t(language, "reader.ayahCardSmaller")}</span>
-              <span>{t(language, "reader.ayahCardLarger")}</span>
-            </div>
-            <label className="ayah-share-option">
-              <input
-                type="checkbox"
-                checked={fitAyah}
-                aria-describedby="ayah-card-fit-hint"
-                disabled={busy}
-                onChange={(event) => update({ fitAyah: event.target.checked })}
-              />
-              {t(language, "reader.ayahCardFitAyah")}
-            </label>
-            <p id="ayah-card-fit-hint" className="text-sm text-muted-foreground">
-              {t(language, "reader.ayahCardFitHint")}
-            </p>
-          </fieldset>
-          <details className="rounded-xl border border-border p-3 text-center">
-            <summary className="min-h-11 cursor-pointer text-sm font-semibold">
-              {t(language, "reader.ayahCardText")}
-            </summary>
-            <p className="text-sm font-semibold" dir="auto">
-              {title}
-            </p>
-            <p lang="ar" dir="rtl" className="zikr-text text-xl leading-[1.7]" style={QURAN_TEXT_STYLE}>
-              <AyahMushafText text={text} verseKey={verseKey} pageNumber={pageNumber} language={language} />
-            </p>
-            {input.translation && (
-              <div lang="en" dir="ltr" className="mt-3 text-sm leading-relaxed">
-                <p className="font-semibold">Saheeh International</p>
-                <p>{input.translation.text}</p>
-              </div>
-            )}
-            {input.meanings && (
-              <div lang="ar" dir="rtl" className="mt-3 whitespace-pre-line text-sm leading-relaxed">
-                <p className="font-semibold">{input.meanings.label}</p>
-                <p>{input.meanings.text}</p>
-              </div>
-            )}
-            <Button
-              variant="outline"
-              className="mt-3"
-              disabled={busy || (includeTranslation && !translationLoaded)}
-              onClick={() => {
-                void Promise.resolve()
-                  .then(() => navigator.clipboard.writeText(completeText))
-                  .then(() => {
-                    setError(false);
-                    setStatus(t(language, "reader.ayahCopied"));
-                  })
-                  .catch((cause) => {
-                    reportError(cause, "ayah-card-copy");
-                    setError(true);
-                    setStatus(t(language, "reader.copyError"));
-                  });
+          {step === "design" && (
+            <details className="sharing-typography">
+              <summary className="min-h-11 cursor-pointer text-sm font-semibold">
+                {t(language, "reader.ayahCardTypography")}
+              </summary>
+              <fieldset className="space-y-2">
+                <legend className="sr-only">{t(language, "reader.ayahCardTypography")}</legend>
+                <label className="block text-sm" htmlFor="ayah-card-text-size">
+                  {t(language, "reader.ayahCardTextSize")} · {formatNumerals(Math.round(textScale * 100), language)}%
+                </label>
+                <input
+                  id="ayah-card-text-size"
+                  type="range"
+                  min={0.75}
+                  max={1.125}
+                  step={0.125}
+                  value={textScale}
+                  aria-valuetext={`${formatNumerals(Math.round(textScale * 100), language)}%`}
+                  onChange={(event) => update({ textScale: Number(event.target.value) })}
+                  disabled={busy}
+                  className="min-h-11 w-full accent-primary rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{t(language, "reader.ayahCardSmaller")}</span>
+                  <span>{t(language, "reader.ayahCardLarger")}</span>
+                </div>
+                <label className="ayah-share-option">
+                  <input
+                    type="checkbox"
+                    checked={fitAyah}
+                    aria-describedby="ayah-card-fit-hint"
+                    disabled={busy}
+                    onChange={(event) => update({ fitAyah: event.target.checked })}
+                  />
+                  {t(language, "reader.ayahCardFitAyah")}
+                </label>
+                <p id="ayah-card-fit-hint" className="text-sm text-muted-foreground">
+                  {t(language, "reader.ayahCardFitHint")}
+                </p>
+              </fieldset>
+            </details>
+          )}
+          {step === "share" && (
+            <SharingCaption
+              language={language}
+              included={includeCaption}
+              onIncludedChange={setIncludeCaption}
+              text={captionText}
+              readingLink={readingLink}
+              busy={busy}
+              disabled={includeTranslation && !translationLoaded}
+              canCopy={typeof navigator.clipboard?.writeText === "function"}
+              onSaveText={(value) => {
+                try {
+                  downloadFile(
+                    new File([value], `ayah-${verseKey.replace(":", "-")}.txt`, { type: "text/plain;charset=utf-8" }),
+                  );
+                  setError(false);
+                  setStatus(t(language, "reader.ayahCardDownloadStarted"));
+                } catch (cause) {
+                  reportError(cause, "ayah-card-save-text");
+                  setError(true);
+                  setStatus(t(language, "reader.shareError"));
+                }
               }}
-            >
-              <Copy aria-hidden="true" />
-              {t(language, "shareStudio.copyText")}
-            </Button>
-          </details>
+              onCopy={async (value) => {
+                try {
+                  await navigator.clipboard.writeText(value);
+                  setError(false);
+                  setStatus(
+                    t(language, value === readingLink ? "shareStudio.readingLinkCopied" : "shareStudio.textCopied"),
+                  );
+                  return true;
+                } catch (cause) {
+                  reportError(cause, "ayah-card-copy");
+                  setError(true);
+                  setStatus(t(language, "reader.copyError"));
+                  return false;
+                }
+              }}
+            />
+          )}
+          {step === "share" && (
+            <details className="rounded-xl border border-border p-3 text-center">
+              <summary className="min-h-11 cursor-pointer text-sm font-semibold">
+                {t(language, "reader.ayahCardText")}
+              </summary>
+              <p className="text-sm font-semibold" dir="auto">
+                {title}
+              </p>
+              <p lang="ar" dir="rtl" className="zikr-text text-xl leading-[1.7]" style={QURAN_TEXT_STYLE}>
+                <AyahMushafText text={text} verseKey={verseKey} pageNumber={pageNumber} language={language} />
+              </p>
+              {input.translation && (
+                <div lang="en" dir="ltr" className="mt-3 text-sm leading-relaxed">
+                  <p className="font-semibold">Saheeh International</p>
+                  <p>{input.translation.text}</p>
+                </div>
+              )}
+              {input.meanings && (
+                <div lang="ar" dir="rtl" className="mt-3 whitespace-pre-line text-sm leading-relaxed">
+                  <p className="font-semibold">{input.meanings.label}</p>
+                  <p>{input.meanings.text}</p>
+                </div>
+              )}
+
+              {typeof navigator.clipboard?.writeText !== "function" && (
+                <p className="mt-2 text-sm text-muted-foreground">{t(language, "shareStudio.copyTextUnavailable")}</p>
+              )}
+            </details>
+          )}
         </div>
       </div>
       <footer className="ayah-share-footer">
+        {step !== "share" && (
+          <SharingStepNavigation
+            steps={steps}
+            step={step}
+            onChange={changeStep}
+            language={language}
+            disabled={busy}
+            onSkipDesign={() => changeStep("share")}
+          />
+        )}
         <p
           role={error ? "alert" : "status"}
           className={`text-sm ${error ? "text-destructive" : "text-muted-foreground"}`}
@@ -485,47 +569,49 @@ export default function AyahShareStudio({
             {t(language, "common.tryAgain")}
           </Button>
         )}
-        <div className="flex flex-wrap gap-2">
-          <Button
-            disabled={!ready}
-            onClick={() => {
-              if (nativeShare) void share();
-              else if (pages.length > 1) void saveAll();
-              else if (current) {
-                downloadFile(current.file);
-                setStatus(t(language, "reader.ayahCardDownloadStarted"));
-              }
-            }}
-          >
-            {nativeShare ? <Share2 aria-hidden="true" /> : <Download aria-hidden="true" />}
-            {t(
-              language,
-              nativeShare
-                ? pages.length > 1
-                  ? "reader.ayahCardShareAll"
-                  : "reader.ayahCardShare"
-                : pages.length > 1
-                  ? "reader.ayahCardSaveAll"
-                  : "reader.ayahCardDownload",
-              { total: formatNumerals(pages.length, language) },
-            )}
-          </Button>
-          {nativeShare || pages.length > 1 ? (
+        {step === "share" && (
+          <div className="sharing-final-actions">
             <Button
-              variant="outline"
-              disabled={!ready || !current}
+              disabled={!ready}
               onClick={() => {
-                if (current) {
+                if (nativeShare) void share();
+                else if (pages.length > 1) void saveAll();
+                else if (current) {
                   downloadFile(current.file);
                   setStatus(t(language, "reader.ayahCardDownloadStarted"));
                 }
               }}
             >
-              <Download aria-hidden="true" />
-              {t(language, "reader.ayahCardDownload")}
+              {nativeShare ? <Share2 aria-hidden="true" /> : <Download aria-hidden="true" />}
+              {t(
+                language,
+                nativeShare
+                  ? pages.length > 1
+                    ? "reader.ayahCardShareAll"
+                    : "reader.ayahCardShare"
+                  : pages.length > 1
+                    ? "reader.ayahCardSaveAll"
+                    : "reader.ayahCardDownload",
+                { total: formatNumerals(pages.length, language) },
+              )}
             </Button>
-          ) : null}
-        </div>
+            {nativeShare || pages.length > 1 ? (
+              <Button
+                variant="outline"
+                disabled={!ready || !current}
+                onClick={() => {
+                  if (current) {
+                    downloadFile(current.file);
+                    setStatus(t(language, "reader.ayahCardDownloadStarted"));
+                  }
+                }}
+              >
+                <Download aria-hidden="true" />
+                {t(language, "reader.ayahCardDownload")}
+              </Button>
+            ) : null}
+          </div>
+        )}
       </footer>
     </div>
   );

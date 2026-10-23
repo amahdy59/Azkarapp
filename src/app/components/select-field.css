@@ -1,0 +1,21 @@
+.select-field-trigger[data-slot="select-trigger"] {
+  height: auto;
+  min-height: 48px;
+  white-space: normal;
+  text-align: start;
+}
+.select-field-trigger [data-slot="select-value"] {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: unset;
+}
+.select-field-trigger > svg:last-child {
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+  color: var(--foreground);
+}
+.select-field-trigger[data-state="open"] > svg:last-child {
+  transform: rotate(180deg);
+}

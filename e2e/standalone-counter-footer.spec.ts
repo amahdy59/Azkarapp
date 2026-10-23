@@ -23,7 +23,7 @@ for (const route of ["/counter", "/friday/salawat"]) {
         await expect(counter).toBeVisible();
         await expect(tools).toBeVisible();
         const before = (await counter.boundingBox())!;
-        const actions = (await tools.boundingBox())!;
+        const actions = (await page.locator(".reader-tools-row").boundingBox())!;
         expect(before.y - actions.y - actions.height).toBeGreaterThanOrEqual(16);
         if (width === 1440) {
           const cells = await tools.getByRole("button").evaluateAll((buttons) =>
@@ -36,8 +36,7 @@ for (const route of ["/counter", "/friday/salawat"]) {
           const grid = [...cells, { x: disclosure.x, right: disclosure.x + disclosure.width }].sort(
             (a, b) => a.x - b.x,
           );
-          expect(Math.abs(before.x - grid[1].x)).toBeLessThanOrEqual(1);
-          expect(Math.abs(before.x + before.width - grid[2].right)).toBeLessThanOrEqual(1);
+          expect(Math.abs(before.x + before.width / 2 - (grid[0].x + grid.at(-1)!.right) / 2)).toBeLessThanOrEqual(1);
         }
         await counter.click();
         const count = await counter.getAttribute("aria-label");

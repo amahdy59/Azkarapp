@@ -1,3 +1,4 @@
+import type { PalmTier } from "../dailyPath";
 /**
  * Leaf and palm marks for the garden.
  *
@@ -131,12 +132,14 @@ export function PalmTreeMark({
   size = 32,
   color,
   strokeWidth = 2,
+  solid = false,
 }: {
   filled?: boolean;
   className?: string;
   size?: number;
   color?: string;
   strokeWidth?: number;
+  solid?: boolean;
 }) {
   return (
     <svg
@@ -145,6 +148,8 @@ export function PalmTreeMark({
       width={size}
       height={size}
       fill="none"
+      style={{ fill: solid ? color || "currentColor" : "none" }}
+      fillOpacity={solid ? 0.85 : 0}
       stroke={color || "currentColor"}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
@@ -307,5 +312,17 @@ export function OasisMark({
         />
       </svg>
     </div>
+  );
+}
+
+export function PathRewardMark({ tier, size = 32 }: { tier: PalmTier; size?: number }) {
+  if (tier === "oasis") return <OasisMark size={size} />;
+  return (
+    <PalmTreeMark
+      size={size}
+      filled={tier !== "none"}
+      solid={tier === "golden"}
+      color={tier === "golden" ? "var(--garden-gold)" : "var(--garden-palm)"}
+    />
   );
 }

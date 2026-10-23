@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext, List, ChevronUp } from "./icons";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext, Clock } from "./icons";
 import { t } from "../i18n";
 import { PrayerVirtueModal } from "./PrayerVirtueModal";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { trackedLocation } from "../prayerMoment";
-import { HomeCard } from "./HomeCard";
+import { prayerDisplayName } from "../prayerPresentation";
+import { usePrayerCountdown } from "../hooks/usePrayerCountdown";
+import type { PrayerCountdownInterval } from "../prayerCountdown";
+import { PrayerCountdown } from "./PrayerCountdown";
 
 /**
  * The five after-prayer cards.
@@ -49,6 +52,10 @@ export interface PrayerCardModel {
   isRecordable: boolean;
   /** Only present on the next prayer. */
   countdown?: string;
+  remainingPercent?: number;
+  countdownInterval?: PrayerCountdownInterval;
+  /** Decorative surface emphasis, independent of recording and prayer validity. */
+  emphasis?: number;
 }
 
 /** The independent fields a prayer card or actions card tracks. */
@@ -68,13 +75,13 @@ function statusLabel(language: AppLanguage, state: PrayerTemporalState) {
 }
 
 /**
- * A native checkbox wearing a circle.
+ * A native checkbox with a rounded-square check indicator.
  *
  * The control stays an `<input type="checkbox">` because the two rows are
  * independent — a prayer can be both prayed at the mosque and followed by its
  * adhkar — which is exactly what radios cannot express. The input is the whole
  * row so the 48px target and the label come free, and `peer` drives the visual
- * circle from real checked/focus/disabled state rather than from React.
+ * indicator from real checked/focus/disabled state rather than from React.
  */
 /**
  * The tick itself, shared with the prayer screen so a recorded deed looks the
@@ -88,16 +95,19 @@ export function TrackingCheckMark({
   checked,
   onGlass = false,
   compact = false,
+  statusOnly = false,
 }: {
   checked: boolean;
   onGlass?: boolean;
   compact?: boolean;
+  /** Noninteractive completion marks retain their circular status shape. */
+  statusOnly?: boolean;
 }) {
   return (
     <span
       aria-hidden="true"
       data-checked={checked ? "true" : undefined}
-      className={`tracking-check pointer-events-none flex ${compact ? "size-5" : "size-6"} shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
+      className={`tracking-check pointer-events-none flex ${compact ? "size-5" : "size-6"} shrink-0 items-center justify-center ${statusOnly ? "rounded-full" : "rounded-md"} border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
         checked
           ? "border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-2px_var(--primary)]"
           : onGlass
@@ -148,7 +158,7 @@ function TrackingCheckbox({
           something the size of the target it represents — an sr-only input
           reads as a clipped control to auditing tools, and its hit area no
           longer matches what the eye is aiming at. Transparent, not hidden,
-          so the visual circle beneath stays the only thing drawn. */}
+          so the visible checkbox beneath stays the only thing drawn. */}
       <input
         id={id}
         type="checkbox"
@@ -169,14 +179,14 @@ function TrackingCheckbox({
           </span>
         )}
       </span>
-      {/* Keyboard focus is drawn on this visible circle. The transparent input
+      {/* Keyboard focus is drawn on this visible checkbox. The transparent input
           still owns the full row-sized pointer target without painting a
           rectangular outline around an invisible box. */}
       {/* Gold, matching the rest of the theme. The earlier rule reserved gold
           for temporal status and gave completion blue; that is overridden here
           by an explicit product decision. The two never collide in practice —
           status is a filled pill of text in the section above, completion is a
-          24px circle in the tracking rows.
+          24px checkbox in the tracking rows.
 
           Checked styling comes from React rather than a `peer-checked:` variant.
           The sibling selector matched and even drove the pop animation, yet the
@@ -197,6 +207,7 @@ function PrayerCard({
   onGlass,
   summaryOnly,
   selected,
+  dayKey,
 }: {
   model: PrayerCardModel;
   language: AppLanguage;
@@ -206,18 +217,38 @@ function PrayerCard({
   onOpen?: (prayer: PrayerName | null) => void;
   summaryOnly?: boolean;
   selected?: boolean;
+  dayKey: string;
 }) {
   const { prayer, time, state, countdown, isOpenable, isRecordable } = model;
+  const cardRef = useRef<HTMLElement>(null);
+  const countdownInterval = summaryOnly && state === "next" ? model.countdownInterval : undefined;
+  const countdownNow = usePrayerCountdown(cardRef, countdownInterval);
   const Icon = PRAYER_ICON[prayer];
-  const name = t(language, `notifications.${prayer}`);
+  const name = prayerDisplayName(prayer, language, dayKey);
+  const timeLabel = formatPrayerTimeLabel(time, language === "ar");
+  const periodStart = timeLabel.lastIndexOf(" ");
   // Future prayers show their controls so the card keeps its shape, but they
   // cannot be marked: nothing has happened yet to record.
   const disabled = !isRecordable;
   const isCurrent = state === "current";
+  const previousPrayer = PRAYER_ORDER[(PRAYER_ORDER.indexOf(prayer) + PRAYER_ORDER.length - 1) % PRAYER_ORDER.length]!;
+  const footerText =
+    state === "next"
+      ? (countdown ?? t(language, "prayerTracking.next"))
+      : state === "upcoming"
+        ? t(language, "prayerTracking.afterPrayer", { prayer: prayerDisplayName(previousPrayer, language, dayKey) })
+        : tracking.location === "mosque"
+          ? t(language, "prayerTracking.atMosque")
+          : tracking.location === "home"
+            ? t(language, "prayerTracking.atHome")
+            : tracking.adhkar
+              ? t(language, "prayerTracking.adhkarRecorded")
+              : t(language, "prayerTracking.notRecorded");
 
   if (summaryOnly) {
     return (
       <article
+        ref={cardRef}
         aria-labelledby={`prayer-card-heading-${prayer}`}
         data-testid={`prayer-card-${prayer}`}
         data-prayer={prayer}
@@ -225,18 +256,13 @@ function PrayerCard({
         data-density="summary"
         aria-current={isCurrent ? "step" : undefined}
         data-selected={selected ? "true" : undefined}
-        className={`relative flex min-w-0 flex-col rounded-xl border text-center transition-colors duration-standard ease-standard ${
-          isCurrent
-            ? onGlass
-              ? "border-on-media-accent home-glass-inset text-on-media"
-              : "border-primary bg-primary/15 text-foreground"
-            : selected
-              ? onGlass
-                ? "border-white/40 bg-white/5 text-on-media"
-                : "border-border bg-muted text-foreground"
-              : onGlass
-                ? "border-transparent bg-transparent hover:border-white/20 hover:bg-on-media-surface/60"
-                : "border-transparent bg-transparent hover:border-border hover:bg-muted"
+        style={{ "--prayer-focus": model.emphasis ?? (isCurrent ? 1 : state === "next" ? 0.15 : 0) } as CSSProperties}
+        className={`home-prayer-summary-card relative grid min-w-0 rounded-xl border text-center transition-colors duration-standard ease-standard ${
+          onGlass
+            ? "hero-glass home-glass-surface text-on-media"
+            : state === "next"
+              ? "border-primary bg-primary/15 text-foreground"
+              : "border-border bg-muted/40 text-foreground hover:bg-muted"
         }`}
       >
         <button
@@ -249,74 +275,113 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer}`}
-          className="relative z-10 flex min-h-24 min-w-0 flex-1 flex-col items-center justify-start gap-1.5 rounded-xl px-0 py-2 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:px-2"
+          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-detail-${prayer}${state !== "next" ? ` prayer-summary-record-${prayer}` : ""}`}
+          className="home-prayer-summary-button no-press grid min-h-16 min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,max-content)] justify-between gap-x-2.5 gap-y-1 rounded-xl outline-none transition-colors"
         >
-          <span
-            aria-hidden="true"
-            data-prayer-icon
-            className={`flex size-5 shrink-0 items-center justify-center ${
-              isCurrent
-                ? onGlass
-                  ? "text-on-media-accent"
-                  : "text-primary"
-                : onGlass
-                  ? "text-on-media-muted"
-                  : "text-muted-foreground"
-            }`}
-          >
-            <Icon size={19} />
-          </span>
-          <h3
-            id={`prayer-card-heading-${prayer}`}
-            className={`min-w-0 max-w-full whitespace-nowrap text-micro font-bold leading-tight min-[360px]:text-xs sm:text-subtitle ${
-              onGlass
-                ? isCurrent
-                  ? "text-on-media-accent"
-                  : "text-on-media"
-                : isCurrent
-                  ? "text-primary"
-                  : "text-foreground"
-            }`}
-            dir="auto"
-          >
-            {name}
-          </h3>
-          <p
-            id={`prayer-summary-time-${prayer}`}
-            data-testid={state === "next" ? "next-prayer-time" : undefined}
-            className={`max-w-full whitespace-nowrap text-base font-extrabold tabular-nums sm:text-subtitle ${
-              onGlass
-                ? isCurrent
-                  ? "text-on-media-accent"
-                  : "text-on-media"
-                : isCurrent
-                  ? "text-primary"
-                  : "text-foreground"
-            }`}
-            dir="auto"
-          >
-            {formatPrayerTimeLabel(time, language === "ar")}
-          </p>
-          <span
-            id={`prayer-summary-status-${prayer}`}
-            data-testid={countdown && state === "next" ? "next-prayer" : undefined}
-            className={`min-h-4 max-w-full whitespace-nowrap text-micro font-semibold ${
-              isCurrent
-                ? onGlass
-                  ? "text-on-media-accent"
-                  : "text-primary"
-                : onGlass
-                  ? "text-on-media-muted"
-                  : "text-muted-foreground"
-            }`}
-            dir="auto"
-          >
-            <span className={!isCurrent && state !== "next" ? "sr-only" : undefined}>
+          <div className="home-prayer-identity min-w-0 text-start" data-prayer-identity>
+            <span
+              aria-hidden="true"
+              data-prayer-icon
+              className={`home-prayer-icon flex size-7 shrink-0 items-center justify-center ${
+                isCurrent || state === "next"
+                  ? onGlass
+                    ? "text-on-media-accent"
+                    : "text-primary"
+                  : onGlass
+                    ? "text-on-media-muted"
+                    : "text-muted-foreground"
+              }`}
+            >
+              <Icon size={19} />
+            </span>
+            <h3
+              id={`prayer-card-heading-${prayer}`}
+              className={`min-w-0 max-w-full text-sm font-bold leading-tight [overflow-wrap:anywhere] ${state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media" : "text-foreground"}`}
+              dir="auto"
+            >
+              {name}
+            </h3>
+          </div>
+          <div className="home-prayer-timing min-w-0 text-end" data-prayer-timing>
+            <span
+              id={`prayer-summary-status-${prayer}`}
+              data-prayer-state-label
+              data-testid={countdown && state === "next" ? "next-prayer" : undefined}
+              className="sr-only"
+              dir="auto"
+            >
               {state === "next" ? t(language, "prayerTracking.nextShort") : statusLabel(language, state)}
             </span>
-          </span>
+            <p
+              id={`prayer-summary-time-${prayer}`}
+              data-testid={state === "next" ? "next-prayer-time" : undefined}
+              className={`max-w-full text-base font-extrabold tabular-nums [overflow-wrap:anywhere] ${state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media" : "text-foreground"}`}
+              dir="auto"
+            >
+              {periodStart > 0 ? (
+                <>
+                  <span data-prayer-time-digits>{timeLabel.slice(0, periodStart)}</span>{" "}
+                  <span className="text-xs font-semibold">{timeLabel.slice(periodStart + 1)}</span>
+                </>
+              ) : (
+                <span data-prayer-time-digits>{timeLabel}</span>
+              )}
+            </p>
+          </div>
+          {state === "next" && countdown && (
+            <span data-prayer-compact-countdown className="home-prayer-compact-countdown" aria-hidden="true" dir="auto">
+              {countdownInterval && countdownNow !== null ? (
+                <PrayerCountdown
+                  interval={countdownInterval}
+                  now={countdownNow}
+                  language={language}
+                  prayerName={name}
+                  decorative
+                />
+              ) : (
+                footerText
+              )}
+            </span>
+          )}
         </button>
+        <div
+          data-prayer-footer
+          className={`home-prayer-footer w-full border-t px-2 py-1.5 text-center text-xs font-semibold ${state === "next" ? (onGlass ? "border-white/20 text-on-media-accent" : "border-primary/30 text-primary") : onGlass ? "border-white/10 text-on-media-muted" : "border-border text-muted-foreground"}`}
+        >
+          <div className="home-prayer-footer-content">
+            <span
+              id={`prayer-summary-detail-${prayer}`}
+              data-prayer-detail
+              dir="auto"
+              className="home-prayer-status-pill min-w-0 text-sm tabular-nums [overflow-wrap:anywhere]"
+            >
+              {state === "next" && countdownInterval && countdownNow !== null ? (
+                <PrayerCountdown
+                  interval={countdownInterval}
+                  now={countdownNow}
+                  language={language}
+                  prayerName={name}
+                />
+              ) : isCurrent ? (
+                <span className="home-prayer-now-dot" aria-hidden="true" />
+              ) : (
+                <Clock size={17} aria-hidden="true" />
+              )}
+              {state === "next"
+                ? countdownInterval && countdownNow !== null
+                  ? null
+                  : footerText
+                : isCurrent
+                  ? t(language, "prayerTracking.nowPill")
+                  : statusLabel(language, state)}
+            </span>
+            {state !== "next" && (
+              <span id={`prayer-summary-record-${prayer}`} className="sr-only">
+                {footerText}
+              </span>
+            )}
+          </div>
+        </div>
       </article>
     );
   }
@@ -445,14 +510,7 @@ function PrayerCard({
           otherwise repeats the same two labels with no context. */}
       <fieldset className="mt-1.5 flex flex-col border-0 p-0">
         <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
-        {/* "Prayed", not "prayed at the mosque".
-            The prayer screen records where — mosque or home — while this row
-            only knew the mosque, so a prayer recorded at home showed here as an
-            empty box: the two surfaces disagreed about the same fact, and the
-            empty box read as "not recorded", which is the ambiguity the place
-            model exists to end. This ticks for either answer and names the
-            place beside it; ticking it here still means the mosque, because
-            that is the only answer a single box can give. */}
+        {/* Mosque attendance is independent of a saved prayer at home. */}
         <TrackingCheckbox
           id={`prayer-${prayer}-mosque`}
           label={t(language, "prayerTracking.prayed")}
@@ -461,7 +519,7 @@ function PrayerCard({
               ? t(language, tracking.location === "mosque" ? "prayerTracking.atMosque" : "prayerTracking.atHome")
               : undefined
           }
-          checked={tracking.location !== null}
+          checked={tracking.location === "mosque"}
           disabled={disabled}
           onChange={(next) => onToggle(prayer, "mosque", next)}
           onGlass={onGlass}
@@ -516,18 +574,21 @@ export function PrayerTrackerCards({
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
-  const [showAll, setShowAll] = useState(false);
+  const [summaryOverflows, setSummaryOverflows] = useState(false);
+  const summaryRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
+  const chronological = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
     (model): model is PrayerCardModel => Boolean(model),
   );
-
-  const focused = [
-    ...ordered.filter((model) => model.state === "current"),
-    ...ordered.filter((model) => model.state === "next"),
-  ];
-  const visible = compactSummary && !showAll ? (focused.length ? focused : ordered.slice(-1)) : ordered;
+  // At night the adjacent pair crosses midnight. Rotate the narrow strip's
+  // cyclic order so Isha and the following Fajr can appear together.
+  const nightPair =
+    compactSummary &&
+    summaryOverflows &&
+    chronological.some((model) => model.prayer === "isha" && model.state === "current") &&
+    chronological.some((model) => model.prayer === "fajr" && model.state === "next");
+  const ordered = nightPair ? [...chronological.slice(-1), ...chronological.slice(0, -1)] : chronological;
 
   const focusIndex = Math.max(
     0,
@@ -553,38 +614,125 @@ export function PrayerTrackerCards({
     }
   }, [focusIndex, direction, compactSummary]);
 
+  useEffect(() => {
+    const row = summaryRef.current;
+    if (!row || !compactSummary) return;
+    const measure = () => {
+      setSummaryOverflows(row.scrollWidth > row.clientWidth + 1);
+      // Measure natural content, not the synchronized footer box, so wrapped
+      // labels can grow or shrink the shared row without a sizing feedback loop.
+      const heights = [...row.querySelectorAll<HTMLElement>("[data-prayer-footer]")].map((footer) => {
+        const style = getComputedStyle(footer);
+        const content = [...footer.children].reduce((height, child) => {
+          const childStyle = getComputedStyle(child);
+          return (
+            height +
+            child.getBoundingClientRect().height +
+            parseFloat(childStyle.marginTop) +
+            parseFloat(childStyle.marginBottom)
+          );
+        }, 0);
+        return (
+          content +
+          parseFloat(style.paddingTop) +
+          parseFloat(style.paddingBottom) +
+          parseFloat(style.borderTopWidth) +
+          parseFloat(style.borderBottomWidth)
+        );
+      });
+      const height = `${Math.ceil(Math.max(0, ...heights))}px`;
+      if (row.style.getPropertyValue("--prayer-footer-height") !== height)
+        row.style.setProperty("--prayer-footer-height", height);
+    };
+    measure();
+    let previousWidth = row.clientWidth;
+    const observer = new ResizeObserver((entries) => {
+      const width = row.clientWidth;
+      // The handoff changes row height every frame. Remeasure only width or
+      // natural footer content, never feed animation geometry back into sizing.
+      if (width !== previousWidth || entries.some((entry) => entry.target.matches("[data-prayer-footer] > *"))) {
+        previousWidth = width;
+        measure();
+      }
+    });
+    observer.observe(row);
+    for (const content of row.querySelectorAll("[data-prayer-footer] > *")) observer.observe(content);
+    return () => observer.disconnect();
+  }, [compactSummary]);
+
+  // Keep current and next together where they fit; otherwise retain a visible
+  // portion of the preceding card while revealing next. Never move the page.
+  const nextPrayer = ordered.find((model) => model.state === "next")?.prayer;
+  useEffect(() => {
+    const row = summaryRef.current;
+    if (!row || !compactSummary || !summaryOverflows) return;
+    const card = row.querySelector<HTMLElement>(`[data-prayer="${nextPrayer}"]`);
+    if (!card) return;
+    const frame = row.getBoundingClientRect();
+    const target = card.getBoundingClientRect();
+    const current = row.querySelector<HTMLElement>('[data-prayer-state="current"]');
+    const previous = current?.getBoundingClientRect();
+    const pairFits =
+      previous && Math.max(target.right, previous.right) - Math.min(target.left, previous.left) <= frame.width - 8;
+    const anchor = pairFits ? previous : target;
+    const delta = pairFits
+      ? direction === "rtl"
+        ? anchor.right - frame.right + 4
+        : anchor.left - frame.left - 4
+      : direction === "rtl"
+        ? target.left - frame.left - 4
+        : target.right - frame.right + 4;
+    row.scrollLeft += delta;
+  }, [compactSummary, direction, nextPrayer, summaryOverflows]);
+
+  // A selected summary is the disclosure's visual anchor. Keep it fully in
+  // view after selection without moving the vertical page or changing card gaps.
+  useEffect(() => {
+    const row = summaryRef.current;
+    if (!row || !compactSummary || !selectedPrayer) return;
+    const card = row.querySelector<HTMLElement>(`[data-prayer="${selectedPrayer}"]`);
+    if (!card) return;
+    const frame = row.getBoundingClientRect();
+    const bounds = card.getBoundingClientRect();
+    const offset =
+      bounds.left < frame.left + 4
+        ? bounds.left - frame.left - 4
+        : bounds.right > frame.right - 4
+          ? bounds.right - frame.right + 4
+          : 0;
+    if (offset) row.scrollLeft += offset;
+  }, [compactSummary, selectedPrayer]);
+
   return (
     <div className="flex flex-col gap-3">
       {summaryOnly ? (
-        <HomeCard
-          as="div"
-          ref={scrollRef as unknown as React.Ref<HTMLElement>}
+        <div
+          ref={scrollRef}
           dir={direction}
           data-testid="prayer-tracker-cards"
-          onGlass={onGlass}
-          elevation="raised"
-          padding="sm"
-          className={`stagger-in grid gap-2 overflow-visible ${compactSummary ? "home-prayer-summary" : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
+          className={`grid gap-1 overflow-visible ${compactSummary ? "home-prayer-overview grid-cols-1" : "stagger-in grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
           style={{ ["--prayer-columns" as string]: "5" }}
           id="home-prayer-overview"
         >
           <div
-            data-testid={compactSummary && showAll ? "home-all-prayers-row" : undefined}
+            ref={summaryRef}
+            data-testid={compactSummary ? "home-all-prayers-row" : undefined}
             className={
               compactSummary
-                ? `home-all-prayers-row ${showAll ? "" : "home-focused-prayers-row"} grid min-w-0 gap-2 overflow-x-auto rounded-xl p-1 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring`
+                ? "home-all-prayers-row grid min-w-0 gap-2 overflow-x-auto rounded-xl p-1 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
                 : "contents"
             }
             role={compactSummary ? "region" : undefined}
             aria-label={compactSummary ? t(language, "prayerMoment.dayTitle") : undefined}
-            tabIndex={compactSummary ? 0 : undefined}
+            tabIndex={compactSummary && summaryOverflows ? 0 : undefined}
           >
-            {visible.map((model) => {
+            {ordered.map((model) => {
               const record = byPrayer.get(model.prayer);
               return (
                 <PrayerCard
                   key={model.prayer}
                   model={model}
+                  dayKey={dayKey}
                   language={language}
                   onGlass={onGlass}
                   tracking={{
@@ -604,21 +752,7 @@ export function PrayerTrackerCards({
               );
             })}
           </div>
-          {compactSummary && (
-            <button
-              type="button"
-              aria-label={t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
-              title={t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
-              aria-expanded={showAll}
-              aria-controls="home-prayer-overview"
-              onClick={() => setShowAll((value) => !value)}
-              className={`flex size-11 flex-col items-center justify-center gap-0.5 rounded-xl border text-xs font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "border-white/20 home-glass-inset text-on-media" : "border-border bg-muted"}`}
-            >
-              {showAll ? <ChevronUp size={16} aria-hidden="true" /> : <List size={16} aria-hidden="true" />}
-              <span>{t(language, showAll ? "settings.fewerPrayersShort" : "settings.allPrayersShort")}</span>
-            </button>
-          )}
-        </HomeCard>
+        </div>
       ) : (
         <div
           ref={scrollRef}
@@ -633,6 +767,7 @@ export function PrayerTrackerCards({
               <PrayerCard
                 key={model.prayer}
                 model={model}
+                dayKey={dayKey}
                 language={language}
                 onGlass={onGlass}
                 tracking={{

@@ -16,17 +16,14 @@ export const MUSHAF_THEME_CYCLE: readonly ThemeMode[] = ["light", "midnight", "d
  * Returns the next theme in the 3-theme reading cycle:
  * Light (عاجي دافئ) -> Midnight (كحلي ليلي) -> Charcoal Dark (فحمي هادئ) -> Light.
  */
-export function getNextMushafTheme(current: MushafTheme, appTheme: ThemeMode = "midnight"): ThemeMode {
+export function getNextMushafTheme(
+  current: MushafTheme,
+  appTheme: ThemeMode = "midnight",
+  step: 1 | -1 = 1,
+): ThemeMode {
   const resolved = current === "follow-app" ? appTheme : current === "oled" ? "dark" : current;
-  switch (resolved) {
-    case "light":
-      return "midnight";
-    case "midnight":
-      return "dark";
-    case "dark":
-    default:
-      return "light";
-  }
+  const index = MUSHAF_THEME_CYCLE.indexOf(resolved);
+  return MUSHAF_THEME_CYCLE[(index + step + MUSHAF_THEME_CYCLE.length) % MUSHAF_THEME_CYCLE.length]!;
 }
 
 /**

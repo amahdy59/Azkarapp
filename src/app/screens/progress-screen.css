@@ -6,19 +6,305 @@
 }
 
 .progress-screen-controls {
+  /* Start with a protected surface. Supported Glass overrides it in the
+     material feature query; unavailable frost must never expose moving text. */
+  background: var(--background);
   position: sticky;
   inset-block-start: 0;
   z-index: 40;
   flex-shrink: 0;
   margin-block-end: 1.5rem;
   padding-block-start: env(safe-area-inset-top);
-  background: var(--background);
   max-block-size: var(--progress-controls-max-height, 60dvh);
   overflow-y: auto;
+  scroll-padding-block-start: var(--progress-title-height, 0px);
   overscroll-behavior: contain;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    border-color 150ms ease;
+}
+
+html:not([data-app-material-resolved="glass"]) .progress-screen-controls[data-scrolled="true"],
+html.high-contrast .progress-screen-controls[data-scrolled="true"] {
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
 }
 
 .progress-screen-controls .shared-screen-header {
   position: sticky;
   inset-block-start: 0;
+  /* The shared minimum and action target already reserve title height. Avoid
+     extra rem padding consuming the short viewport at 200% text. */
+  padding-block: 0;
+}
+
+.progress-range-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.75rem;
+}
+
+.progress-range-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  gap: 8px;
+}
+
+/* Reclaim header chrome at enlarged text while preserving the reader's size
+   and the shared 48px Close target. Fields keep their independent scroll. */
+.progress-date-sheet-header {
+  padding: 8px 16px;
+  gap: 8px;
+}
+.progress-date-sheet-header [data-testid="sheet-header-title"] {
+  font-size: var(--text-base);
+}
+
+/* The same control anatomy as Settings and Sharing, with room for translated
+   labels. Menus escape the sticky scroll container through the shared portal. */
+.progress-select-trigger[data-slot="select-trigger"] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-block-size: 48px;
+  gap: 0.625rem;
+  background: var(--card);
+  color: var(--foreground);
+  text-align: start;
+}
+
+.progress-select-trigger [data-slot="select-value"] {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  -webkit-line-clamp: unset;
+}
+
+.progress-select-leading {
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+}
+
+.progress-select-trigger[data-state="open"] {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.progress-select-trigger[data-state="open"] > svg {
+  transform: rotate(180deg);
+}
+
+.progress-select-content[data-slot="select-content"] {
+  /* Popper's explicit offset includes the gap. A second CSS translation would
+     move a collision-constrained menu beyond the viewport at enlarged text. */
+  translate: none;
+  inline-size: var(--radix-select-trigger-width);
+  max-inline-size: calc(100vw - 24px);
+  max-block-size: min(24rem, var(--radix-select-content-available-height));
+}
+
+.progress-select-content [data-slot="select-item"] {
+  min-block-size: 48px;
+  line-height: 1.6;
+}
+
+.progress-dashboard {
+  container: progress-dashboard / inline-size;
+}
+
+.progress-overview-grid,
+.progress-metric-choices {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.progress-metric-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-xl);
+}
+
+.progress-metric-link:focus-visible {
+  outline: none;
+}
+
+.progress-metric-link:focus-visible::after {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@container progress-dashboard (min-width: 18rem) {
+  .progress-overview-grid,
+  .progress-metric-choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container progress-dashboard (min-width: 52rem) {
+  .progress-overview-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .progress-range-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    align-items: end;
+    gap: 0.75rem;
+  }
+
+  .progress-range-navigation {
+    margin-block-start: 0;
+    align-self: center;
+  }
+
+  .progress-range-toolbar > form {
+    grid-column: 1 / -1;
+  }
+}
+
+.recording-timeline-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  gap: 0.75rem;
+  max-inline-size: 36rem;
+}
+
+/* Short localized control values stay on one line; prose and field labels may
+   reflow. On phones the labelled field gets the complete available width. */
+.progress-select-content [data-slot="select-item"] {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.progress-select-content [data-slot="select-item"] {
+  padding: 8px 36px 8px 12px;
+  padding-inline: 12px 36px;
+}
+
+.progress-select-content [data-slot="select-item"] > span:last-child {
+  inset-inline-end: 12px;
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+.progress-select-content [data-slot="select-item"] > span:last-child svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.progress-dashboard-action,
+.progress-export {
+  white-space: nowrap;
+}
+
+@media (max-width: 47.999rem) {
+  .progress-range-fields,
+  .recording-timeline-filters {
+    grid-template-columns: minmax(0, 1fr);
+    max-inline-size: none;
+  }
+
+  .progress-select-field {
+    inline-size: 100%;
+    max-inline-size: none;
+  }
+
+  .progress-select-trigger[data-slot="select-trigger"] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .progress-select-leading {
+    display: none;
+  }
+
+  .progress-select-trigger > svg {
+    inline-size: 16px;
+    block-size: 16px;
+  }
+
+  .progress-dashboard-action,
+  .progress-records-pagination {
+    inline-size: 100%;
+  }
+
+  .progress-records-pagination {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .progress-screen-content {
+    padding-inline: max(16px, env(safe-area-inset-left), env(safe-area-inset-right));
+  }
+  .progress-trend-card {
+    padding: 16px;
+  }
+  /* Nested detail cards must not spend most of a 320px viewport on rem-sized
+     gutters when the reader enlarges text. Keep text enlarged, reclaim space. */
+  [data-testid="progress-detailed-context"],
+  [data-testid="progress-detailed-context"] [data-testid="prayer-comparison"] {
+    padding-inline: 16px;
+  }
+  [data-testid="progress-detailed-context"] [data-testid="today-garden-card"] {
+    padding: 16px;
+  }
+  .progress-export {
+    inline-size: 100%;
+  }
+}
+
+/* Shared Progress recipes use the same app tokens as the replaced utilities. */
+.progress-focus:focus-visible,
+.progress-export:focus-visible,
+.progress-disclosure:focus-visible {
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.progress-help {
+  font-size: var(--text-xs);
+  line-height: 1.625;
+  color: var(--muted-foreground);
+}
+.progress-export,
+.progress-disclosure {
+  min-height: calc(var(--spacing) * 11);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+}
+.progress-export {
+  border-radius: var(--ds-radius-control);
+  padding-inline: calc(var(--spacing) * 3);
+  font-weight: 600;
+  color: var(--foreground);
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+}
+.progress-export:disabled {
+  opacity: 0.5;
+}
+.progress-disclosure {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 3);
+  padding-block: calc(var(--spacing) * 3);
+  font-weight: 700;
+}
+@media (forced-colors: active) {
+  .progress-focus:focus-visible,
+  .progress-export:focus-visible,
+  .progress-disclosure:focus-visible {
+    outline-color: Highlight;
+  }
 }

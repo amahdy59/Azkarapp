@@ -2,6 +2,16 @@ import { afterEach, describe, expect, it } from "vitest";
 import { applyAppAppearance } from "./theme";
 
 describe("app appearance", () => {
+  it("resolves global materials with independent accessibility precedence", () => {
+    applyAppAppearance({ themeMode: "midnight", appMaterial: "glass", reduceTransparency: true });
+    expect(document.documentElement.dataset.appMaterialResolved).toBe("glass");
+    applyAppAppearance({ themeMode: "light", appMaterial: "glass", highContrast: true });
+    expect(document.documentElement.dataset.appMaterialResolved).toBe("solid");
+    applyAppAppearance({ themeMode: "dark", appMaterial: "system", reduceTransparency: true });
+    expect(document.documentElement.dataset.appMaterialResolved).toBe("solid");
+    applyAppAppearance({ themeMode: "dark", appMaterial: "solid" });
+    expect(document.documentElement.dataset.appMaterialResolved).toBe("solid");
+  });
   it("applies Quran size independently of the chosen zikr family", () => {
     for (const textSize of ["small", "medium", "large"] as const) {
       applyAppAppearance({ themeMode: "midnight", textSize, zikrFont: "clear" });
@@ -47,4 +57,11 @@ describe("app appearance", () => {
     expect(document.documentElement.style.colorScheme).toBe("dark");
     expect(document.documentElement.style.getPropertyValue("--font-size")).toBe("18px");
   });
+});
+
+it("applies and restores the footer label presentation", () => {
+  applyAppAppearance({ themeMode: "midnight", readerToolLabels: false });
+  expect(document.documentElement.dataset.readerToolLabels).toBe("false");
+  applyAppAppearance({ themeMode: "midnight" });
+  expect(document.documentElement.dataset.readerToolLabels).toBe("true");
 });

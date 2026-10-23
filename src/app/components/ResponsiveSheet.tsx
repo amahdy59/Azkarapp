@@ -1,5 +1,13 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { useEffect, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  type ReactNode,
+  type MutableRefObject,
+  type CSSProperties,
+} from "react";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 import { X } from "./icons";
@@ -9,22 +17,35 @@ import type { AppLanguage } from "../types";
 /**
  * Returns focus to whatever was focused before the surface opened.
  *
- * Radix and Vaul both restore focus on close, but only while their root stays
- * mounted. Callers here conditionally render (`if (!open) return null`), so the
- * root is torn down in the same commit and the built-in restore is lost —
- * focus falls back to `<body>`. Restoring from an effect cleanup runs after
- * React has committed the removal, which works for both mount patterns.
+ * Capture at the focus-scope boundary, before Radix/Vaul moves focus inside.
+ * A passive mount effect can run after autofocus and capture the dialog itself.
+ * Restore in the scope's close event, after the trap is released, including
+ * conditionally unmounted roots. No guessed timeout or competing cleanup.
  */
-function useRestoreFocusOnClose(open: boolean) {
-  useEffect(() => {
-    if (!open) return;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    return () => {
-      if (previouslyFocused?.isConnected) {
-        previouslyFocused.focus();
-      }
-    };
-  }, [open]);
+function useRestoreFocusOnClose(shared?: MutableRefObject<HTMLElement | null>, sharedScopeId?: string) {
+  const local = useRef<HTMLElement | null>(null);
+  const localScopeId = useId();
+  const scopeId = sharedScopeId ?? localScopeId;
+  const previous = shared ?? local;
+  const onOpenAutoFocus = useCallback(() => {
+    const active = document.activeElement;
+    // A responsive branch switch opens a replacement scope while the old
+    // dialog still owns focus. Keep the original external opener across it.
+    if (
+      active instanceof HTMLElement &&
+      active.closest("[data-return-focus-scope]")?.getAttribute("data-return-focus-scope") !== scopeId
+    )
+      previous.current = active;
+  }, [previous, scopeId]);
+  const onCloseAutoFocus = useCallback(
+    (event: Event) => {
+      if (!previous.current?.isConnected) return;
+      event.preventDefault();
+      previous.current.focus({ preventScroll: true });
+    },
+    [previous],
+  );
+  return { onOpenAutoFocus, onCloseAutoFocus, "data-return-focus-scope": scopeId };
 }
 
 export interface SheetHeaderProps {
@@ -137,6 +158,11 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  /** Explicit recovery when the opener unmounts or becomes hidden. */
+  onCloseAutoFocus?: (event: Event) => void;
+  preventOutsideDismiss?: boolean;
+  returnFocusRef?: MutableRefObject<HTMLElement | null>;
+  returnFocusScopeId?: string;
   open: boolean;
   onClose: () => void;
   /** Required accessible name. Rendered visually hidden — content supplies its own visible heading. */
@@ -149,6 +175,7 @@ interface ModalProps {
   /** Defaults to the DEC-004 reading measure. */
   maxWidthClassName?: string;
   className?: string;
+  style?: CSSProperties;
   /**
    * Overrides the scrim. A surface whose controls change what is behind it —
    * the Mushaf's reading settings — wants the page legible while it is open,
@@ -171,6 +198,9 @@ interface ModalProps {
  * that — see DEC-025.
  */
 export function Modal({
+  onCloseAutoFocus,
+  returnFocusRef,
+  returnFocusScopeId,
   open,
   onClose,
   title,
@@ -181,11 +211,13 @@ export function Modal({
   describedById,
   maxWidthClassName = "max-w-[var(--content-reading)]",
   className = "",
+  style,
   overlayClassName,
   onGlass = false,
   showCloseButton = true,
+  preventOutsideDismiss = false,
 }: ModalProps) {
-  useRestoreFocusOnClose(open);
+  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
   const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
 
   return (
@@ -204,6 +236,13 @@ export function Modal({
           }
         />
         <DialogPrimitive.Content
+          {...focusScope}
+          onCloseAutoFocus={(event) => {
+            onCloseAutoFocus?.(event);
+            if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
+          }}
+          style={style}
+          onInteractOutside={preventOutsideDismiss ? (event) => event.preventDefault() : undefined}
           data-testid={testId}
           data-prevent-count="true"
           aria-describedby={describedById}
@@ -278,7 +317,7 @@ export function SidePanel({
   className = "",
   onCloseAutoFocus,
 }: SidePanelProps) {
-  useRestoreFocusOnClose(open);
+  const focusScope = useRestoreFocusOnClose();
 
   return (
     <DialogPrimitive.Root
@@ -290,6 +329,7 @@ export function SidePanel({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="animate-in fade-in-0 fixed inset-0 z-[100] bg-black/25 duration-standard" />
         <DialogPrimitive.Content
+          onOpenAutoFocus={focusScope.onOpenAutoFocus}
           data-testid={testId}
           data-prevent-count="true"
           data-side={side}
@@ -298,7 +338,10 @@ export function SidePanel({
           // See Modal: a modal consumes Escape so it never also reaches the
           // reader's own shortcut handlers underneath.
           onEscapeKeyDown={(event) => event.stopPropagation()}
-          onCloseAutoFocus={onCloseAutoFocus}
+          onCloseAutoFocus={(event) => {
+            onCloseAutoFocus?.(event);
+            if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
+          }}
           style={inset > 0 ? { [side]: `${inset}px` } : undefined}
           className={`animate-in fixed inset-y-0 z-[100] flex w-[22rem] max-w-[calc(100%-3rem)] flex-col overflow-y-auto bg-card shadow-overlay duration-standard outline-none ${
             side === "right" ? "right-0 border-l slide-in-from-right" : "left-0 border-r slide-in-from-left"
@@ -327,6 +370,7 @@ export interface ResponsiveSheetProps extends Omit<ModalProps, "className"> {
  * provide focus containment, focus restore, Escape dismissal, and scroll lock.
  */
 export function ResponsiveSheet({
+  onCloseAutoFocus,
   open,
   onClose,
   title,
@@ -349,7 +393,9 @@ export function ResponsiveSheet({
   // Vaul's dialog behavior option enables its focus scope, rather than DOM input autofocus.
   const drawerFocusBehavior = { autoFocus: focusOnOpen };
   // Modal runs this itself; only the drawer branch needs it here.
-  useRestoreFocusOnClose(isCompact && open);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const returnFocusScopeId = useId();
+  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
 
   useEffect(() => {
     if (!open) return;
@@ -366,6 +412,9 @@ export function ResponsiveSheet({
   if (!isCompact) {
     return (
       <Modal
+        onCloseAutoFocus={onCloseAutoFocus}
+        returnFocusRef={returnFocusRef}
+        returnFocusScopeId={returnFocusScopeId}
         open={open}
         onClose={onClose}
         title={title}
@@ -393,6 +442,11 @@ export function ResponsiveSheet({
       }}
     >
       <DrawerContent
+        {...focusScope}
+        onCloseAutoFocus={(event) => {
+          onCloseAutoFocus?.(event);
+          if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
+        }}
         data-testid={testId}
         data-prevent-count="true"
         aria-describedby={describedById}

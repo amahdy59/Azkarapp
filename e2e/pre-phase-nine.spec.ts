@@ -1,5 +1,7 @@
+import { sharingStep, sharingCaption } from "./helpers/sharing";
 import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import benefitsHadithReadings from "../src/app/content/benefitsHadithReadings.json" with { type: "json" };
 
 test("onboarding offers a visible skip action for pointer and keyboard users", async ({ page }) => {
   await page.goto("/");
@@ -105,16 +107,17 @@ test("Home utility status stays on one line without horizontal overflow", async 
     expect(geometry.hero.y, `Home hero follows the unobscured header at ${viewport.width}px`).toBeGreaterThanOrEqual(
       geometry.header.height,
     );
-    expect(geometry.routineSummary.height, `Today’s path is desktop-only at ${viewport.width}px`).toBe(
-      viewport.width >= 900 ? geometry.routineSummary.height : 0,
-    );
-    if (viewport.width >= 900) expect(geometry.routineSummary.height).toBeGreaterThan(0);
+    expect(
+      geometry.routineSummary.height,
+      `Today’s path indicators are visible from 600px at ${viewport.width}px`,
+    ).toBe(viewport.width >= 600 ? geometry.routineSummary.height : 0);
+    if (viewport.width >= 600) expect(geometry.routineSummary.height).toBeGreaterThan(0);
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);
     await expect(page.getByTestId("today-garden-card").getByTestId("routine-garden-summary")).toHaveCount(0);
 
     await page.evaluate(() => {
       const scroller = document.querySelector<HTMLElement>('[role="region"][aria-label]');
-      if (scroller) scroller.scrollTop = 8;
+      if (scroller) scroller.scrollTop = 12;
     });
     await expect(page.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
   }
@@ -138,22 +141,59 @@ test("Library Benefits entry shares complete evidence and attribution through th
   await expect(page.getByTestId("benefits-list").locator("article")).toHaveCount(21);
   await expect(page.locator("details")).toHaveCount(0);
 
+  const fatimah = page
+    .getByRole("article")
+    .filter({ has: page.getByRole("heading", { name: "Tasbih Fatimah at bedtime: 33, 33, 34", exact: true }) });
+  await expect(fatimah.locator("p")).toHaveText(benefitsHadithReadings["h-fatima"].en);
+  await expect(
+    page
+      .getByRole("article")
+      .filter({ has: page.getByRole("heading", { name: "Ayat al-Kursi at bedtime", exact: true }) })
+      .locator("p"),
+  ).toHaveText(benefitsHadithReadings["h-kursi"].en);
+  await fatimah.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: "output/playwright/benefits-full-hadith-en.png" });
+
   const evidence = page.getByTestId("benefits-list").locator("article").first();
   const body = await evidence.locator("p").first().innerText();
   const source = await evidence.getByRole("link").innerText();
   await evidence.getByRole("button", { name: /^Share .+ benefit$/ }).click();
   const studio = page.getByTestId("collection-share-modal");
   await expect(studio).toBeVisible();
-  await studio.getByRole("button", { name: "Text", exact: true }).click();
+  await sharingCaption(studio);
   const payload = await studio.getByRole("textbox").inputValue();
   expect(payload).toContain(body);
   expect(payload).toContain(source);
   expect(payload).toContain("\n");
+  await sharingStep(studio, "share");
   const download = page.waitForEvent("download");
-  await studio.getByRole("button", { name: "Save", exact: true }).click();
+  await studio.getByRole("button", { name: "Save text", exact: true }).click();
   const saved = await download;
   expect(saved.suggestedFilename()).toBe("azkar.txt");
   expect(await readFile((await saved.path())!, "utf8")).toBe(payload);
+});
+
+test("complete Arabic hadith remains readable at 320px and shares its complete story @cross-browser", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await openReturningGuest(page, [], [], "ar");
+  await page.goto("/#/benefits");
+  await page.getByRole("tab").nth(1).click();
+  await page.getByTestId("benefits-load-more").click();
+  const fatimah = page
+    .getByRole("article")
+    .filter({ has: page.getByRole("heading", { name: "تسبيح فاطمة عند النوم: ٣٣، ٣٣، ٣٤", exact: true }) });
+  await expect(fatimah.locator("p")).toHaveText(benefitsHadithReadings["h-fatima"].ar);
+  await fatimah.scrollIntoViewIfNeeded();
+  expect(await fatimah.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: "output/playwright/benefits-full-hadith-ar-320.png" });
+  await fatimah.getByRole("button").click();
+  const studio = page.getByTestId("collection-share-modal");
+  await expect(studio).toBeVisible();
+  await sharingCaption(studio);
+  expect(await studio.getByRole("textbox").inputValue()).toContain(benefitsHadithReadings["h-fatima"].ar);
 });
 
 test("the Library exposes the full Saved state", async ({ page }) => {

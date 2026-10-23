@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AccessibleCombobox } from "./AccessibleCombobox";
 
@@ -48,6 +48,18 @@ describe("AccessibleCombobox", () => {
     expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
+  it("portals the protected popup outside its card and names it for the field", () => {
+    const { container } = render(
+      <AccessibleCombobox label="Select Surah" options={testOptions} value={1} onChange={vi.fn()} />,
+    );
+    fireEvent.click(screen.getByRole("combobox"));
+    const popup = screen.getByRole("dialog", { name: "Select Surah" });
+    expect(container).not.toContainElement(popup);
+    expect(popup).toHaveAttribute("data-dropdown-surface");
+    expect(popup).toContainElement(screen.getByRole("listbox"));
+    expect(screen.getByRole("textbox")).toHaveFocus();
+  });
+
   it("filters options via search input", () => {
     const onChange = vi.fn();
     render(<AccessibleCombobox label="Select Surah" options={testOptions} value={1} onChange={onChange} />);
@@ -83,6 +95,14 @@ describe("AccessibleCombobox", () => {
 
     fireEvent.keyDown(combobox, { key: "Escape" });
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("restores the trigger when the popup layer handles Escape before React", async () => {
+    render(<AccessibleCombobox label="Select Surah" options={testOptions} value={1} onChange={vi.fn()} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.keyDown(document, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("combobox")).toHaveFocus());
   });
 
   it("announces the active option through the search field and preserves text editing keys", () => {

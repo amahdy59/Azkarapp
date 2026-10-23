@@ -10,8 +10,7 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
 }, testInfo) => {
   const player = await openListeningPage(page, listeningCases[0], "en");
   await page.setViewportSize({ width: 1440, height: 900 });
-  if (await page.getByTestId("reader-sidebar-close").isVisible())
-    await page.getByTestId("reader-sidebar-close").click();
+  await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
   const annotation = listeningTiming(listeningCases[0]);
   const playVerse = async (key: string) => {
     const verse = annotation.verses.find((verse) => verse.verseKey === key)!;
@@ -52,6 +51,31 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
   expect(layoutCheck.beside).toBe(true);
   expect(layoutCheck.diffTop).toBeLessThanOrEqual(1);
   expect(layoutCheck.fontSize).toBeGreaterThanOrEqual(14);
+  const verseGeometry = await meaning.locator('[aria-current="true"]').evaluate((verse) => {
+    const marker = verse.querySelector(".audio-translation-marker")!.getBoundingClientRect();
+    const bounds = verse.getBoundingClientRect();
+    const pane = getComputedStyle(verse.closest(".quran-meaning-text")!);
+    const style = getComputedStyle(verse);
+    return {
+      absolute: getComputedStyle(verse.querySelector(".audio-translation-marker")!).position,
+      paragraphLeft: parseFloat(style.paddingLeft),
+      paragraphRight: parseFloat(style.paddingRight),
+      paddingDifference: parseFloat(style.paddingBottom) - parseFloat(style.paddingTop),
+      right: bounds.right - marker.right,
+      leftPadding: parseFloat(pane.paddingLeft),
+      rightPadding: parseFloat(pane.paddingRight),
+    };
+  });
+  expect(verseGeometry.absolute).toBe("absolute");
+  expect(verseGeometry.paragraphLeft).toBe(verseGeometry.paragraphRight);
+  expect(verseGeometry.paragraphLeft).toBeGreaterThanOrEqual(14);
+  expect(verseGeometry.paddingDifference).toBe(2);
+  expect(verseGeometry.right).toBeGreaterThanOrEqual(8);
+  expect(verseGeometry.right).toBeLessThanOrEqual(24);
+  expect(verseGeometry.leftPadding).toBeGreaterThanOrEqual(12);
+  expect(verseGeometry.rightPadding).toBeGreaterThanOrEqual(12);
+  await expect(page.locator("[data-playback-line]")).toHaveCount(0);
+  await expect(page.locator('.mushaf-paper [data-current-ayah-marker="true"]').first()).toBeVisible();
   await playVerse("2:16");
   await expect(meaning.locator('[aria-current="true"]')).toHaveAttribute("data-translation-verse", "2:16");
   await page.getByTestId("mushaf-rail-next").click();
@@ -69,13 +93,24 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
   await page.getByTestId("mushaf-playback-follow").click();
   await expect(page.getByTestId("mushaf-playback-follow")).toHaveAttribute("aria-checked", "true");
   await expect(player).toHaveAttribute("data-variant", "compact");
+  const paperHeight = await meaning.evaluate(
+    (element) => element.closest(".mushaf-paper")!.getBoundingClientRect().height,
+  );
+  await page.screenshot({ path: testInfo.outputPath("mushaf-overlay-visible.png") });
+  await player.getByRole("button", { name: t("en", "audioPlayer.hidePlayer"), exact: true }).click();
+  const show = player.getByRole("button", { name: t("en", "audioPlayer.showPlayer"), exact: true });
+  await expect(show).toBeFocused();
+  await expect(player.getByRole("slider")).toHaveCount(0);
   expect(
-    await meaning.evaluate((element) => {
-      const dock = document.querySelector('[data-variant="compact"][role="region"]')!.getBoundingClientRect();
-      const paper = element.closest(".mushaf-paper")!.getBoundingClientRect();
-      return paper.bottom <= dock.top - 7;
-    }),
-  ).toBe(true);
+    await meaning.evaluate((element) => element.closest(".mushaf-paper")!.getBoundingClientRect().height),
+  ).toBeCloseTo(paperHeight, 0);
+  await page.screenshot({ path: testInfo.outputPath("mushaf-overlay-hidden.png") });
+  await show.click();
+  await expect(player.getByRole("button", { name: t("en", "audioPlayer.hidePlayer"), exact: true })).toBeFocused();
+  await expect(player.getByRole("slider")).toBeVisible();
+  expect(
+    await meaning.evaluate((element) => element.closest(".mushaf-paper")!.getBoundingClientRect().height),
+  ).toBeCloseTo(paperHeight, 0);
   expect(
     await page.evaluate(() => (window as unknown as { __listeningAudioCount: number }).__listeningAudioCount),
   ).toBe(1);
@@ -91,7 +126,7 @@ for (const item of listeningCases) {
       player.locator(`[${continuous ? "data-listening-passage" : "data-mushaf-page"}="${pageNumber}"]`);
     await expect(passage(item.first)).toBeVisible();
     await page.setViewportSize({ width: 1440, height: 1100 });
-    await page.getByTestId("reader-sidebar-close").click();
+    await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
     if ((await player.getAttribute("data-variant")) === "compact") {
       await player.getByRole("button", { name: t("en", "audioPlayer.expand"), exact: true }).click();
     }
@@ -192,7 +227,7 @@ test("Enlarged paired Mushaf stays inside a keyboard-scrollable Arabic pane @cro
   const player = await openListeningPage(page, listeningCases[0], "en");
   await expect(player.locator('[data-mushaf-page="2"]')).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 1100 });
-  await page.getByTestId("reader-sidebar-close").click();
+  await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
   if ((await player.getAttribute("data-variant")) === "compact") {
     await player.getByRole("button", { name: t("en", "audioPlayer.expand"), exact: true }).click();
   }

@@ -171,6 +171,36 @@ describe("the reader applies the gesture on every layout", () => {
 });
 
 describe("one gesture across both reading surfaces", () => {
+  it("never commits a cancelled pointer and leaves committed Mushaf turns to the viewer", () => {
+    const onNext = vi.fn();
+    function PointerSurface() {
+      const { pointerProps, dragStyle } = useSwipeGestures({
+        direction: "rtl",
+        onNext,
+        onPrev: vi.fn(),
+        animateCommittedTurn: true,
+      });
+      return (
+        <div data-testid="surface" {...pointerProps}>
+          <div data-testid="page" style={dragStyle} />
+        </div>
+      );
+    }
+    render(<PointerSurface />);
+    const surface = screen.getByTestId("surface");
+    const drag = (id: number) => {
+      fireEvent.pointerDown(surface, { pointerId: id, button: 0, clientX: 200, clientY: 300 });
+      fireEvent.pointerMove(surface, { pointerId: id, clientX: 300, clientY: 300 });
+    };
+    drag(1);
+    fireEvent.pointerCancel(surface, { pointerId: 1, clientX: 300, clientY: 300 });
+    expect(onNext).not.toHaveBeenCalled();
+    expect(screen.getByTestId("page").style.transform).toBe("");
+    drag(2);
+    fireEvent.pointerUp(surface, { pointerId: 2, clientX: 300, clientY: 300 });
+    expect(onNext).toHaveBeenCalledOnce();
+    expect(screen.getByTestId("page").style.transition).toBe("none");
+  });
   it("leaves the Mushaf view no drag physics of its own", () => {
     const immersive = readFileSync("src/app/components/MushafImmersiveReader.tsx", "utf8");
     // It had a 1:1 unbounded translation with no cap and no axis lock, settled

@@ -8,23 +8,59 @@ import { expect, test, type Page } from "@playwright/test";
  * the next adhan — Fajr is `now` until Dhuhr — so a card keyed on the phase
  * alone would sit on Home all day.
  */
-async function openHomeAt(page: Page, isoTime: string, language: "ar" | "en" = "en") {
+async function openHomeAt(
+  page: Page,
+  isoTime: string,
+  language: "ar" | "en" = "en",
+  calendarType: "hijri" | "gregorian" = "hijri",
+  hijriDateOffset = 0,
+) {
   // Append +03:00 to ensure the time evaluates correctly relative to Africa/Cairo (the playwright timezoneId).
   await page.clock.setFixedTime(new Date(`${isoTime}+03:00`));
-  await page.addInitScript((selectedLanguage) => {
-    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    window.localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({
-        settings: { language: selectedLanguage, themeMode: "midnight" },
-        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
-        completed: { morning: [], evening: [], before_sleep: [] },
-        sessions: [],
-      }),
-    );
-  }, language);
+  await page.addInitScript(
+    ({ selectedLanguage, calendar, offset }) => {
+      window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      window.localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: {
+            language: selectedLanguage,
+            themeMode: "midnight",
+            calendarType: calendar,
+            hijriDateOffset: offset,
+          },
+          profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+          completed: { morning: [], evening: [], before_sleep: [] },
+          sessions: [],
+        }),
+      );
+    },
+    { selectedLanguage: language, calendar: calendarType, offset: hijriDateOffset },
+  );
   await page.goto("/");
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 15000 });
+}
+
+for (const language of ["ar", "en"] as const) {
+  for (const calendar of ["hijri", "gregorian"] as const) {
+    test(`prayer record respects ${calendar} calendar in ${language} @cross-browser`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await openHomeAt(page, "2026-09-05T13:20:00", language, calendar, 1);
+      await page.getByTestId("prayer-actions-more-info").click();
+      const record = page.getByTestId("prayer-record-date");
+      await expect(record).toHaveAttribute("datetime", "2026-09-05");
+      // The header and checklist name the same civil day using one preference.
+      const dateLabel = await page.locator("time[datetime='2026-09-05']").allTextContents();
+      expect(dateLabel).toHaveLength(1);
+      const recordText = await record.innerText();
+      expect(recordText).toContain(
+        calendar === "hijri" ? (language === "ar" ? "هـ" : "AH") : language === "ar" ? "م" : "AD",
+      );
+      const label = recordText.replace(language === "ar" ? "تسجيل يوم " : "Record for ", "");
+      await expect(page.getByText(label, { exact: true })).toBeVisible();
+      await page.screenshot({ path: testInfo.outputPath(`${language}-${calendar}-date.png`), fullPage: true });
+    });
+  }
 }
 
 test("the prayer card is on Home inside the window, and gone outside it", async ({ page }) => {
@@ -34,7 +70,7 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
   await expect(card).toHaveAttribute("data-prayer", "dhuhr");
 
   // Its parts are the prayer screen's, not a second copy of them.
-  await expect(card.getByTestId("prayer-moment-status")).toBeVisible();
+  await expect(card.getByTestId("prayer-moment-status")).toHaveCount(0);
   await expect(card.getByTestId("prayer-action-location")).toBeVisible();
 
   const strip = page.getByTestId("home-prayer-strip");
@@ -62,6 +98,12 @@ test("recording the prayer as congregational works without leaving Home", async 
 
   await mosque.check();
 
+  await expect(mosque).toBeChecked();
+  const adhkar = card.getByTestId("prayer-action-dhuhr-adhkar").locator('input[type="checkbox"]');
+  await adhkar.check();
+  await expect(mosque).toBeChecked();
+  await expect(adhkar).toBeChecked();
+  await adhkar.uncheck();
   await expect(mosque).toBeChecked();
   await expect(card.getByTestId("prayer-location-home")).toHaveCount(0);
   // Offered on the spot, and no longer only once something has been recorded:
@@ -98,7 +140,7 @@ test("each Home prayer expands its shared properties under an aligned notch", as
   await expect(page).toHaveURL(/\/?$/);
   const expanded = page.getByTestId("home-prayer-moment");
   await expect(expanded).toHaveAttribute("data-prayer", "dhuhr");
-  await expect(expanded.getByTestId("prayer-moment-status")).toBeVisible();
+  await expect(expanded.getByTestId("prayer-moment-status")).toHaveCount(0);
   await expect(expanded.getByTestId("prayer-action-location")).toBeVisible();
 
   const selected = page.getByTestId("prayer-card-dhuhr");
@@ -108,7 +150,6 @@ test("each Home prayer expands its shared properties under an aligned notch", as
 
 test("the selected prayer card reflects selection in RTL visual order", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00", "ar");
-  await page.getByRole("button", { name: "عرض جميع الصلوات" }).click();
   const fajrCard = page.getByTestId("prayer-card-fajr");
   await fajrCard.getByRole("button").click();
   await expect(fajrCard).toHaveAttribute("data-selected", "true");
@@ -132,7 +173,9 @@ test("each control on the card owns its own centre", async ({ page }) => {
   await expect(card).toBeVisible();
 
   const obscured = await card.evaluate((root) => {
-    const controls = [...root.querySelectorAll<HTMLElement>("input, button, [role='radio']")];
+    const controls = [...root.querySelectorAll<HTMLElement>("input, button, [role='radio']")].filter(
+      (element) => element.getClientRects().length > 0,
+    );
     return controls
       .map((element) => {
         // elementFromPoint reads viewport coordinates, so a control still below
@@ -168,11 +211,17 @@ test("the virtue is in English for an English reader, and marked as English", as
   await expect(narration).toContainText(/congregation|prayers|mosque|Paradise/i);
 });
 
-test("tracking uses a circular keyboard focus indicator and mirrors in RTL", async ({ page }) => {
+test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00", "ar");
   const row = page.getByTestId("prayer-action-location");
   const input = row.locator("input[type=checkbox]");
   const indicator = row.locator(".tracking-check");
+  const shape = await indicator.evaluate((element) => ({
+    radius: parseFloat(getComputedStyle(element).borderTopLeftRadius),
+    width: element.getBoundingClientRect().width,
+  }));
+  expect(shape.radius).toBeGreaterThan(0);
+  expect(shape.radius).toBeLessThan(shape.width / 2);
   const copy = row.locator("div").first();
 
   await input.click();
@@ -220,7 +269,7 @@ test("tracking uses a circular keyboard focus indicator and mirrors in RTL", asy
   const copyBox = await copy.boundingBox();
   expect(indicatorBox).not.toBeNull();
   expect(copyBox).not.toBeNull();
-  expect(indicatorBox!.x).toBeLessThan(copyBox!.x);
+  expect(indicatorBox!.x).toBeGreaterThan(copyBox!.x + copyBox!.width);
 
   const infoButton = page.getByTestId("prayer-actions-more-info");
   const infoCircle = infoButton.locator("span[aria-hidden='true']");
@@ -233,5 +282,29 @@ test("tracking uses a circular keyboard focus indicator and mirrors in RTL", asy
 
   const infoCenterX = infoCircleBox!.x + infoCircleBox!.width / 2;
   const indicatorCenterX = indicatorBox!.x + indicatorBox!.width / 2;
-  expect(Math.abs(infoCenterX - indicatorCenterX)).toBeLessThanOrEqual(1);
+  const actions = page.getByTestId("prayer-actions-card");
+  const headingBox = await actions.locator(":scope > div:first-child").boundingBox();
+  const listBox = await actions.locator(":scope > ol").boundingBox();
+  expect(headingBox).not.toBeNull();
+  expect(listBox).not.toBeNull();
+  // At desktop widths the approved disclosure places the heading/virtue and
+  // checkboxes in separate grid columns. Keep both controls in their own
+  // columns with a real gap instead of comparing their screen x coordinates.
+  expect(infoCenterX).toBeGreaterThan(headingBox!.x);
+  expect(infoCenterX).toBeLessThan(headingBox!.x + headingBox!.width);
+  expect(indicatorCenterX).toBeGreaterThan(listBox!.x);
+  expect(indicatorCenterX).toBeLessThan(listBox!.x + listBox!.width);
+  // Identity and checklist share one logical column beside the evidence.
+  expect(headingBox!.x).toBeCloseTo(listBox!.x, 0);
+  expect(headingBox!.width).toBeCloseTo(listBox!.width, 0);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const phoneInfo = await infoCircle.boundingBox();
+  const phoneIndicator = await indicator.boundingBox();
+  expect(phoneInfo).not.toBeNull();
+  expect(phoneIndicator).not.toBeNull();
+  const phoneCopy = (await copy.boundingBox())!;
+  expect(phoneIndicator!.x).toBeGreaterThan(phoneCopy.x + phoneCopy.width);
+  expect(phoneIndicator!.x - (phoneCopy.x + phoneCopy.width)).toBeCloseTo(12, 0);
+  expect(phoneInfo!.x + phoneInfo!.width).toBeLessThan(phoneIndicator!.x);
 });

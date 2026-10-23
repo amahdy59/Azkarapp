@@ -4,6 +4,12 @@ This file maps the supplied July 2026 design specification to implementation evi
 
 ## Implemented
 
+- Counter footer/picker repair (2026-10-21): both standalone Benefit labels follow the shared icons/labels preference; longer existing-text previews, consistent row spacing/saved-count placement, keyboard scrolling, collision height and paired-field/reading-canvas reflow. Regression: e2e/counter-footer-pickers.spec.ts plus existing standalone-counter-footer cases. See docs/agent/phases/COUNTER_FOOTER_PICKERS_2026_10_21.md; physical-device acceptance remains separate.
+
+- Owner-approved Mushaf/Progress continuation (2026-10-20): single-owner tap visibility, dismissible named word glosses, reversible Mushaf-only colours, concurrent critical font/data preparation with independent meanings, shared responsive reading sheets and explicit close actions; labelled filter disclosures, Overview/Trends/Records navigation and independent icon/progress cards. Evidence and release acceptance: docs/agent/phases/MUSHAF_INTERACTIONS_PROGRESS_TABS_2026_10_20.md and output/mushaf-progress-release-2026-10-20/PHASE_REPORT.md. Physical-device speed/touch and human assistive-technology checks remain distinct from automated evidence.
+
+- Owner-approved mobile refinement: stable full-screen sharing, selectable zikr/collection content, larger previews and balanced short readings; native compact Library/Progress filters with visible applied context; factual hold-to-unlock feedback and protected in-app navigation. Native OS pinning and human screen-reader/device acceptance remain separate.
+
 - Splash → language → login/guest → localized onboarding → Home flow.
 - Morning, Evening, and Sleep session cards with not-started, partial, and complete progress states.
 - Category browsing, zikr reader/counter, audio controls, completion summary, search, settings, and download/notification panels.

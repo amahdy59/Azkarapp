@@ -1,10 +1,14 @@
 # Android host and release verification
 
+Start with the [Android developer handoff](ANDROID_DEVELOPER_HANDOFF.md) for the shared-code map, existing native services, missing persistent native-file download backend and implementation/acceptance sequence. Current offline audio uses device-local WebView Cache Storage; native document export does not make it an app-private file repository.
+
 The owner approved Capacitor 8 on 2026-10-15, retaining the React/PWA application. The host uses Android API 36, minimum API 24, Java 21, a checksum-pinned Gradle wrapper and the package version for `versionName`. `versionCode` begins at 1 and must increase for each Play upload. The application ID is `com.wazaker.app`; confirm it before the first Play registration because it becomes permanent there.
 
 ## Build
 
 Install Java 21 and Android SDK platform 36, platform-tools and build-tools. Set `JAVA_HOME` and `ANDROID_HOME` in your environment. Never commit `local.properties`, credentials, keystores or generated web assets.
+
+The web development watcher excludes the native Android tree, including Gradle intermediates. Native edits use the Android sync/build workflow rather than triggering web hot reloads for thousands of build outputs.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -47,6 +51,8 @@ Native widget preferences and WebView state are excluded from cloud backup/devic
 - Confirm release contents, native-library page-size compatibility if future plugins add `.so` files, Play pre-launch report, required testing-track eligibility and staged rollout.
 
 These are acceptance requirements, not passed checks. No physical device was connected during initial implementation, and virtualization was unavailable on the audit machine. Code/build verification does not replace device, signing or Play Console evidence.
+
+Final-polish acceptance check (2026-10-15): platform-tools `adb devices -l` still lists no connected device. Physical Android Back, TalkBack, cutout/large-system-text, cold offline playback/export, reminder reboot/idle and placed/resized widget checks therefore remain pending. Browser keyboard/offline/RTL evidence and native CI compilation remain separate; no device pass has been inferred.
 
 ## Startup budget accounting
 

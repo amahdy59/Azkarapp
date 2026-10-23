@@ -3,11 +3,13 @@ import type { AppLanguage } from "../types";
 import { t } from "../i18n";
 import { DevotionalAction, DevotionalFooter } from "./DevotionalControls";
 import { ReaderFooterTools } from "./ReaderFooterTools";
+import { CounterKeyboardHelp } from "./CounterKeyboardHelp";
 import { RotateCcw, Share2, Volume2, VolumeX } from "./icons";
 
 /** The Reader's footer anatomy with the standalone counter's own actions. */
 export function StandaloneCounterFooter({
   language,
+  direction,
   benefit,
   counter,
   soundEnabled,
@@ -22,6 +24,7 @@ export function StandaloneCounterFooter({
   next,
 }: {
   language: AppLanguage;
+  direction: "rtl" | "ltr";
   benefit: ReactNode;
   counter: ReactNode;
   soundEnabled: boolean;
@@ -61,6 +64,16 @@ export function StandaloneCounterFooter({
       >
         <div data-testid="reader-support-actions">
           {benefit}
+          <CounterKeyboardHelp
+            compact
+            language={language}
+            direction={direction}
+            shortcuts={[
+              { keys: ["Space"], label: t(language, "reader.shortcutCount") },
+              { keys: ["R"], label: t(language, "reader.shortcutReset") },
+              { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
+            ]}
+          />
           {onShare && (
             <DevotionalAction
               type="button"
@@ -73,7 +86,7 @@ export function StandaloneCounterFooter({
               data-testid="counter-share-button"
             >
               <Share2 size={20} aria-hidden="true" />
-              <span className="min-w-0 truncate text-label font-semibold">{t(language, "reader.shareAction")}</span>
+              <span className="reader-tool-label text-label font-semibold">{t(language, "reader.shareAction")}</span>
             </DevotionalAction>
           )}
           <DevotionalAction
@@ -86,7 +99,7 @@ export function StandaloneCounterFooter({
             }}
           >
             {soundEnabled ? <Volume2 size={20} aria-hidden="true" /> : <VolumeX size={20} aria-hidden="true" />}
-            <span className="min-w-0 truncate text-label font-semibold">{t(language, "counter.sound")}</span>
+            <span className="reader-tool-label text-label font-semibold">{t(language, "counter.sound")}</span>
           </DevotionalAction>
           {!onShare && (
             <DevotionalAction
@@ -100,7 +113,7 @@ export function StandaloneCounterFooter({
               }}
             >
               <RotateCcw size={20} aria-hidden="true" />
-              <span className="min-w-0 truncate text-label font-semibold">{t(language, "counter.reset")}</span>
+              <span className="reader-tool-label text-label font-semibold">{t(language, "counter.reset")}</span>
             </DevotionalAction>
           )}
         </div>

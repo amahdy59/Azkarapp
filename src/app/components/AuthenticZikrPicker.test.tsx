@@ -7,6 +7,32 @@ import { AUTHENTIC_AZKAR_COLLECTION } from "../content/authenticAzkar";
 describe("AuthenticZikrPicker", () => {
   const defaultItems = AUTHENTIC_AZKAR_COLLECTION;
 
+  for (const language of ["ar", "en"] as const) {
+    it(`expands abbreviated options from existing text without cutting characters in ${language}`, async () => {
+      const user = userEvent.setup();
+      const selected = defaultItems[2]!;
+      const onSelect = vi.fn();
+      const fullText = language === "ar" ? selected.textAr : selected.textEn;
+      render(
+        <AuthenticZikrPicker
+          items={defaultItems}
+          selected={defaultItems[0]!}
+          language={language}
+          direction={language === "ar" ? "rtl" : "ltr"}
+          onSelect={onSelect}
+          savedItems={{ [selected.id]: { count: 16, target: 100 } }}
+        />,
+      );
+      await user.click(screen.getByTestId("counter-zikr-filter"));
+      const option = screen.getByTestId(`zikr-option-${selected.id}`);
+      expect(option).toHaveTextContent(fullText);
+      expect(option).toHaveAttribute("title", fullText);
+      expect(option).toHaveTextContent(language === "ar" ? "١٦ / ١٠٠" : "16 / 100");
+      await user.click(option);
+      expect(onSelect).toHaveBeenCalledExactlyOnceWith(selected);
+    });
+  }
+
   it("renders trigger button with short name and accessible legend in Arabic", () => {
     const onSelect = vi.fn();
     render(

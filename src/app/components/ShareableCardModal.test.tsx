@@ -1,73 +1,60 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { CollectionShareModalProps } from "./CollectionShareModal";
 import { ShareableCardModal } from "./ShareableCardModal";
+
+const { studio } = vi.hoisted(() => ({ studio: vi.fn() }));
+vi.mock("./CollectionShareModal", () => ({
+  CollectionShareModal: (props: CollectionShareModalProps) => {
+    studio(props);
+    return <button onClick={props.onClose}>Close image studio</button>;
+  },
+}));
 
 describe("ShareableCardModal", () => {
   afterEach(() => {
-    vi.restoreAllMocks();
     vi.unstubAllEnvs();
+    studio.mockClear();
   });
 
-  it("reports a cancelled native share without presenting it as an error", async () => {
-    Object.defineProperty(navigator, "share", {
-      configurable: true,
-      value: vi.fn().mockRejectedValue(new DOMException("cancelled", "AbortError")),
+  it("opens the image studio with the exact localized counts and date, without devotional repetitions", () => {
+    render(<ShareableCardModal palms={12} golden={2} green={3} dateStr="17 October" language="en" onClose={vi.fn()} />);
+    const props = studio.mock.lastCall![0] as CollectionShareModalProps;
+    expect(props).toMatchObject({
+      open: true,
+      single: true,
+      language: "en",
+      items: [],
+      dialogTitle: "Achievement Share Card",
     });
-    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="12 August" language="en" onClose={vi.fn()} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Share Milestone" }));
-    expect(await screen.findByRole("status")).toHaveTextContent("Sharing cancelled");
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-  });
-
-  it("announces clipboard failure and restores the action", async () => {
-    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: { writeText: vi.fn().mockRejectedValue(new Error("clipboard denied")) },
+    const item = props.shareItemsByLanguage!.en[0]!;
+    expect(item.arabicText).toBe("Palm days: 12\nDaily routines: 2\nAdditional: 3\n17 October");
+    expect(item).toMatchObject({ hideRepetition: true, language: "en", textDirection: "ltr" });
+    expect(item.repetitionCount).toBeUndefined();
+    expect(props.shareItemsByLanguage!.ar[0]!).toMatchObject({
+      language: "ar",
+      textDirection: "rtl",
+      hideRepetition: true,
     });
-    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="12 August" language="en" onClose={vi.fn()} />);
-
-    const action = screen.getByRole("button", { name: "Share Milestone" });
-    fireEvent.click(action);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Could not share this achievement");
-    expect(action).not.toBeDisabled();
+    expect(props.shareItemsByLanguage!.ar[0]!.arabicText).toContain("أيام النخيل: ١٢");
   });
 
-  it("shares the deployed application base rather than only the hosting origin", async () => {
+  it("preserves zero counts and uses the deployed base for the optional link", () => {
     vi.stubEnv("BASE_URL", "/Azkarapp/");
-    const share = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, "share", { configurable: true, value: share });
-    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="12 August" language="en" onClose={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Share Milestone" }));
-    expect(share).toHaveBeenCalledWith(
-      expect.objectContaining({ url: new URL("/Azkarapp/", window.location.origin).href }),
-    );
+    render(<ShareableCardModal palms={0} golden={0} green={0} dateStr="Date" language="ar" onClose={vi.fn()} />);
+    const props = studio.mock.lastCall![0] as CollectionShareModalProps;
+    expect(props.shareUrl).toBe(new URL("/Azkarapp/", location.origin).href);
+    expect(props.shareItemsByLanguage!.en[0]!.arabicText).toContain("Daily routines: 0");
+    expect(props.shareItemsByLanguage!.ar[0]!.arabicText).toContain("إضافية: ٠");
+    expect(props.collectionTitleArabic).toBe("تقبل الله منا ومنكم");
+    expect(props.collectionTitleEnglish).toBe("May Allah Accept Our Good Deeds");
   });
 
-  it("copies the same summary and application link when native sharing is unavailable", async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
-    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
-    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="12 August" language="en" onClose={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Share Milestone" }));
-    expect(writeText).toHaveBeenCalledWith(
-      expect.stringContaining("2 daily routines and 3 additional practices. Palm days: 1."),
-    );
-    expect(writeText).toHaveBeenCalledWith(
-      expect.stringContaining(new URL(import.meta.env.BASE_URL, window.location.origin).href),
-    );
-    expect(await screen.findByRole("status")).toHaveTextContent(/copied/i);
-  });
-
-  it("uses RTL semantics and labelled statistics for Arabic", () => {
-    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="١٢ شعبان" language="ar" onClose={vi.fn()} />);
-
-    const dialog = screen.getByRole("dialog", { name: "بطاقة مشاركة الإنجاز" });
-    expect(dialog).toHaveAttribute("dir", "rtl");
-    expect(screen.getByText("أيام النخيل").tagName).toBe("DT");
-    expect(screen.getByText("الأوراد اليومية").tagName).toBe("DT");
-    expect(screen.getByText("إضافية").tagName).toBe("DT");
-    expect(screen.getByRole("button", { name: "إلغاء" })).toHaveClass("end-3");
+  it("returns the same close action to the shared dialog without sending anything", () => {
+    const onClose = vi.fn();
+    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="Date" language="en" onClose={onClose} />);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Close image studio" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

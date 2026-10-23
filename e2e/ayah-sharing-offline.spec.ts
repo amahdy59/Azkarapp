@@ -1,3 +1,4 @@
+import { sharingStep } from "./helpers/sharing";
 import { expect, test } from "@playwright/test";
 
 test("cached ayah cards and the reader translation remain available after an offline reload", async ({
@@ -16,11 +17,12 @@ test("cached ayah cards and the reader translation remain available after an off
   });
   await page.goto("/#/quran/42");
   const openStudio = async () => {
-    await page.getByRole("button", { name: "Open actions for ayah 255", exact: true }).click();
+    await page.getByRole("button", { name: "Open actions for ayah 255", exact: true }).click({ button: "right" });
     await page.getByRole("button", { name: "Share ayah as an image", exact: true }).click();
     const studio = page.getByTestId("ayah-share-studio");
     await expect(studio.getByRole("checkbox", { name: "Include English translation" })).toBeEnabled();
     await studio.getByRole("checkbox", { name: "Include English translation" }).check();
+    await sharingStep(studio, "share");
     await expect(studio.getByRole("button", { name: "Save this card", exact: true })).toBeEnabled();
     return studio;
   };

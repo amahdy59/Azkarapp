@@ -2,6 +2,7 @@ import type { Zikr, ZikrAudioBehavior, ZikrDraft } from "../types";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "../audio/audioAssignments";
 import { QURAN_PASSAGES } from "./quranPassages";
 import { QURAN_IMRAN_PASSAGE } from "./quranImranPassage";
+import reviewedCitations from "./reviewedCollectionCitations.json" with { type: "json" };
 
 const QURAN_CONTENT_BY_ID = {
   "wu-hm-4": QURAN_IMRAN_PASSAGE,
@@ -25,6 +26,9 @@ const QURAN_CONTENT_BY_ID = {
   "s-hm-109a": QURAN_PASSAGES.alKafirun,
   "s-hm-110a": QURAN_PASSAGES.asSajdah,
   "s-hm-110b": QURAN_PASSAGES.alMulk,
+  "ir-ref-5a": QURAN_PASSAGES.alIkhlas,
+  "ir-ref-5b": QURAN_PASSAGES.alFalaq,
+  "ir-ref-5c": QURAN_PASSAGES.anNas,
 } as const;
 
 /** Repeated non-Qur'anic wording has one canonical source item. Context-specific benefits and counts stay local. */
@@ -79,6 +83,9 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "s-hm-110b": "quran-067",
   "friday-kahf": "quran-018",
   "ir-baqarah": "quran-002",
+  "ir-ref-5a": "quran-112",
+  "ir-ref-5b": "quran-113",
+  "ir-ref-5c": "quran-114",
   "m-hm-75a": "zikr:collection-opening",
   "e-hm-75a": "zikr:collection-opening",
   "m-hm-79": "zikr:sayyid-al-istighfar",
@@ -327,6 +334,18 @@ export function applyContentReview(items: ZikrDraft[]): Zikr[] {
   return items
     .filter((item) => item.id !== "ap-ref-11")
     .map((item) => {
+      const citation = reviewedCitations[item.id as keyof typeof reviewedCitations];
+      if (citation) {
+        item.sourceUrl = citation.url;
+        if (!item.sourceReferenceArabic?.includes(citation.referenceArabic)) {
+          item.sourceReferenceArabic = [citation.referenceArabic, item.sourceReferenceArabic]
+            .filter(Boolean)
+            .join("؛ ");
+        }
+        if (!item.sourceReference.includes(citation.reference)) {
+          item.sourceReference = `${citation.reference}; ${item.sourceReference}`;
+        }
+      }
       const audioAssetId = APPROVED_AUDIO_ASSIGNMENTS[item.id];
       return Object.assign(item, {
         canonicalKey:

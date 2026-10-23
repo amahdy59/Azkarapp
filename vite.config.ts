@@ -6,6 +6,8 @@ import { VitePWA } from "vite-plugin-pwa";
 import { readFileSync } from "node:fs";
 import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
 import { ignoreGeneratedWatchPath } from "./scripts/generated-watch-paths";
+import { compactBuildManifest } from "./scripts/compact-build-manifest";
+import reminderManifest from "./src/app/content/homeReminderManifest.json";
 
 /**
  * The release this build is, stamped in at build time.
@@ -121,6 +123,7 @@ function unwrapColorMixGuards(): Plugin {
  * be a permission granted for nothing.
  */
 function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string) {
+  const imageOrigin = "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev";
   const audioOrigin = audioBaseUrl ? new URL(audioBaseUrl).origin : undefined;
   const cloudflareApiOrigin = cloudflareApiUrl
     ? new URL(cloudflareApiUrl).origin
@@ -135,11 +138,18 @@ function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string)
     // Tailwind 4 and the inline critical styles in index.html both need this.
     ["style-src", ["'self'", "'unsafe-inline'"]],
     // `blob:` covers the generated share card; `data:` the inlined icons.
-    ["img-src", ["'self'", "data:", "blob:"]],
+    ["img-src", ["'self'", "data:", "blob:", imageOrigin]],
     ["font-src", ["'self'", ...quranFonts]],
     [
       "connect-src",
-      ["'self'", ...quranFonts, "https://*.supabase.co", cloudflareApiOrigin, ...(audioOrigin ? [audioOrigin] : [])],
+      [
+        "'self'",
+        ...quranFonts,
+        "https://*.supabase.co",
+        cloudflareApiOrigin,
+        new URL(reminderManifest.url).origin,
+        ...(audioOrigin ? [audioOrigin] : []),
+      ],
     ],
     ["media-src", ["'self'", "blob:", ...(audioOrigin ? [audioOrigin] : [])]],
     ["worker-src", ["'self'"]],
@@ -188,6 +198,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       unwrapColorMixGuards(),
+      compactBuildManifest(),
       contentSecurityPolicy(audioBaseUrl, cloudflareApiUrl),
       VitePWA({
         registerType: "prompt",
@@ -266,6 +277,13 @@ export default defineConfig(({ mode }) => {
             "**/QiblaScreen-*.js",
           ],
           runtimeCaching: [
+            {
+              // The loader owns checksum-verified offline storage. Do not let
+              // the broad R2/audio rule cache an unverified response first.
+              urlPattern: new RegExp(`^${reminderManifest.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`),
+              handler: "NetworkOnly" as const,
+              method: "GET" as const,
+            },
             {
               urlPattern:
                 /\/data\/listening-timings\/(?:(?:listening|quran)-[a-f0-9]{64}-[a-f0-9]{64}\.json|owner-[a-f0-9]{64}\.bin)$/,

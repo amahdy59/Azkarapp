@@ -95,13 +95,17 @@ export function AudioProvider({
   onControllerReady?: (controller: AudioController) => void;
 }) {
   const [preferences, setPreferences] = useState(loadAudioPreferences);
-  const [autoAdvance, setAutoAdvanceState] = useState(true);
-  const autoAdvanceRef = useRef(true);
+  const preferencesRef = useRef(preferences);
+  const [autoAdvance, setAutoAdvanceState] = useState(preferences.autoAdvance ?? true);
+  const autoAdvanceRef = useRef(preferences.autoAdvance ?? true);
   const setAutoAdvance = useCallback((enabled: boolean) => {
     autoAdvanceRef.current = enabled;
     setAutoAdvanceState(enabled);
+    const next = { ...preferencesRef.current, autoAdvance: enabled };
+    preferencesRef.current = next;
+    setPreferences(next);
+    saveAudioPreferences(next);
   }, []);
-  const preferencesRef = useRef(preferences);
   const [state, rawDispatch] = useReducer(audioReducer, preferences.playbackRate, createInitialAudioState);
   const stateRef = useRef(state);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -365,14 +369,13 @@ export function AudioProvider({
   const startPlan = useCallback(
     (plan: PlaybackPlan, options?: { initialEntryIndex?: number; autoPlay?: boolean }) => {
       if (plan.entries.length === 0) return false;
-      setAutoAdvance(plan.context.source !== "single");
       const rawIndex = options?.initialEntryIndex ?? 0;
       const entryIndex = rawIndex >= 0 && rawIndex < plan.entries.length ? rawIndex : 0;
       const autoPlay = options?.autoPlay ?? true;
       loadAt(plan, entryIndex, 0, 0, autoPlay);
       return true;
     },
-    [loadAt, setAutoAdvance],
+    [loadAt],
   );
 
   const selectEntry = useCallback(

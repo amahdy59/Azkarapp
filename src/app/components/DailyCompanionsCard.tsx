@@ -35,6 +35,7 @@ export function DailyCompanionsCard({
 
   return (
     <section
+      data-material-card
       data-testid="daily-companions-card"
       dir={isArabic ? "rtl" : "ltr"}
       aria-labelledby="daily-companions-heading"

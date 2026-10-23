@@ -27,6 +27,17 @@ describe("MushafQuickMenu", () => {
     expect(screen.getByRole("heading", { name: "Reading View & Options" })).toBeInTheDocument();
   });
 
+  it("keeps Follow app explicit and offers keyboard colour selection independently", async () => {
+    const onSelectTheme = vi.fn();
+    render(<MushafQuickMenu {...defaultProps} theme="follow-app" appTheme="light" onSelectTheme={onSelectTheme} />);
+    const follow = screen.getByTestId("quick-theme-follow-app");
+    expect(follow).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("quick-theme-light")).toHaveAttribute("aria-checked", "false");
+    await userEvent.setup().type(follow, "{arrowleft}");
+    expect(screen.getByTestId("quick-theme-oled")).toHaveFocus();
+    expect(onSelectTheme).toHaveBeenLastCalledWith("oled");
+  });
+
   it("opens the surah benefit from options when provided", async () => {
     const onOpenBenefit = vi.fn();
     render(<MushafQuickMenu {...defaultProps} onOpenBenefit={onOpenBenefit} />);

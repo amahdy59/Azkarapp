@@ -1,3 +1,4 @@
+import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -22,6 +23,8 @@ async function openProgress(page: Page) {
     );
   });
   await page.goto("/#/progress");
+  await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
 }
 
@@ -45,7 +48,10 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
     await page.setViewportSize({ width: 375, height: 812 });
     await openProgress(page);
 
-    await page.getByRole("tab", { name: tab, exact: true }).click();
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true }),
+      { يوم: "day", أسبوع: "week", شهر: "month", سنة: "year" }[tab]!,
+    );
     // The chart is the slowest thing to settle; wait on the panel, not a timer.
     await expect(page.getByTestId("today-garden-card")).toBeVisible();
 
@@ -58,17 +64,21 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
   });
 }
 
-test("longer Progress periods compare five prayers and disclose exact records", async ({ page }) => {
+test("longer Progress periods compare five prayers with exact data available as a file", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await openProgress(page);
 
   await expect(page.getByText(/أَحَبُّ الأَعْمَالِ/)).toBeHidden();
-  await page.getByRole("tab", { name: "أسبوع", exact: true }).click();
+  await chooseProgressOption(page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true }), "week");
 
-  await expect(page.getByTestId("prayer-comparison").getByRole("img")).toHaveCount(5);
-  const disclosure = page.locator("details").filter({ hasText: "عرض سجلات الصلاة بالتفصيل" });
-  await expect(disclosure).not.toHaveAttribute("open", "");
-  await disclosure.locator("summary").click();
-  await expect(disclosure).toHaveAttribute("open", "");
-  await expect(disclosure.getByText("الفجر", { exact: true })).toBeVisible();
+  await chooseProgressDetail(page, "prayers");
+  await expect(page.getByTestId("prayer-comparison").getByRole("list").getByRole("img")).toHaveCount(5);
+  await expect(page.getByRole("table")).toHaveCount(0);
+  await page.getByTestId("progress-range-disclosure").locator("summary").click();
+  // The main trend selector now belongs to the separate Trends tab.
+  await expect(page.getByRole("combobox")).toHaveCount(5);
+  const download = page.getByTestId("prayer-comparison").getByRole("button", { name: "تصدير الصلاة" });
+  await download.focus();
+  await expect(download).toBeFocused();
+  await expect(page.getByTestId("prayer-comparison").getByTestId("insight-fajr")).toBeVisible();
 });

@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-15-3",
+  "release": "2026-10-21.3",
   "ar": [
-    "يفتح إكمال آخر ذكر ملخص الجلسة مباشرة، وتظل بياناتك قابلة للوصول عند تقييد تخزين المتصفح.",
-    "تعرض مزامنة الأجهزة حالة الحفظ الفعلية مع إعادة المحاولة عند تعذر الاتصال.",
-    "تُعرض نتائج البحث الطويلة على دفعات لتسهيل التصفح دون إخفاء بقية النتائج.",
-    "أصبحت معلومات الخصوصية والحذف أوضح بالعربية والإنجليزية، وصُحّح مصدر تسجيلات عبد الله محمد."
+    "شاهد أوقات الصلاة بأرقام أكبر داخل البطاقات نفسها، مع الحفاظ على حجم العرض المطوي ومسافات واضحة حول النص.",
+    "اقرأ العدّ التنازلي بسهولة أكبر، مع حلقة بسيطة تزداد امتلاءً كلما اقترب موعد الصلاة.",
+    "تفاعل مع أدوات الرئيسية والمشاركة والتحديث باستجابة أوضح، أو اختر تقليل الحركة لعرض أهدأ.",
+    "تعرّف إلى الصلاة الحالية من مؤشر «الآن» المتناسق مع لون الزر الرئيسي، بلمعة خفيفة وبدائل واضحة لتسهيل الاستخدام."
   ],
   "en": [
-    "Completing the final zikr now opens the session summary, and account data handles restricted browser storage.",
-    "Device sync shows its actual save status and offers retry when a connection fails.",
-    "Long search results load in batches, with more results available on request.",
-    "Privacy and deletion details are clearer in Arabic and English, and Abdullah Muhammad recording sources are corrected."
+    "See larger prayer times in the same cards, with familiar collapsed sizing and clear space around the text.",
+    "Read the countdown more easily, with a simple ring that fills as the next prayer gets closer.",
+    "Enjoy clearer feedback from Home tools, sharing and refresh, or choose Reduce Motion for a calmer view.",
+    "Recognize the current prayer with a Now pill that matches the main button, with a soft gloss and clear accessibility alternatives."
   ]
 }

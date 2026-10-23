@@ -4,14 +4,15 @@ import { resetStoredSettings } from "../state";
 
 interface ErrorBoundaryState {
   hasError: boolean;
+  recoveryFailed: boolean;
 }
 
 /** Keeps a damaged preference or unexpected render error from leaving users on a blank screen. */
 export class AppErrorBoundary extends React.Component<React.PropsWithChildren, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false };
+  state: ErrorBoundaryState = { hasError: false, recoveryFailed: false };
 
   static getDerivedStateFromError(): ErrorBoundaryState {
-    return { hasError: true };
+    return { hasError: true, recoveryFailed: false };
   }
 
   componentDidCatch(error: Error) {
@@ -20,8 +21,8 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, E
   }
 
   private resetPreferences = () => {
-    resetStoredSettings();
-    window.location.reload();
+    if (resetStoredSettings()) window.location.reload();
+    else this.setState({ recoveryFailed: true });
   };
 
   private retry = () => {
@@ -75,6 +76,13 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, E
               {isArabic ? "استعادة الإعدادات الافتراضية" : "Restore default preferences"}
             </button>
           </div>
+          {this.state.recoveryFailed && (
+            <p role="status" className="mt-4 text-sm text-foreground">
+              {isArabic
+                ? "تعذر حفظ الإعدادات. لم تُحذف بياناتك المحفوظة. أتح مساحة تخزين ثم حاول مجددًا."
+                : "Preferences could not be saved. Your saved data was not deleted. Free some storage and try again."}
+            </p>
+          )}
         </section>
       </main>
     );

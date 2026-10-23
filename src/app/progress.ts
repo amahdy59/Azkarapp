@@ -3,6 +3,15 @@ import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type Sto
 
 export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
+/** Event-based collections start again explicitly, independently of the daily/Friday clocks. */
+export const SITUATIONAL_SESSION_CATEGORY_IDS: readonly CategoryId[] = [
+  "home",
+  "travel",
+  "distress_anxiety",
+  "mosque",
+  "food_drink",
+  "illness_ruqyah",
+];
 /**
  * Collections whose reset is governed by their own cycle, not the day boundary.
  *
@@ -424,10 +433,17 @@ export function getGardenSummary(
   const todayKey = getProgressDayKey(now, boundaryHour);
   const normalized = normalizeDailyCompletions(records).filter((record) => record.dayKey <= todayKey);
   const byDay = categoryMap(normalized);
+  // A day participates in several summaries, but its domain verdict is identical
+  // throughout this calculation. Do not retain verdicts across record revisions.
+  const verdicts = new Map<string, ReturnType<DayVerdict>>();
+  const verdict = (key: string) => {
+    if (!verdicts.has(key)) verdicts.set(key, judgeDay!(key));
+    return verdicts.get(key)!;
+  };
   const days = Array.from({ length: 7 }, (_, index) => {
     const key = shiftProgressDayKey(todayKey, index - 6);
     const day = gardenDay(key, todayKey, byDay.get(key));
-    return judgeDay ? { ...day, isPalm: judgeDay(key).palm } : day;
+    return judgeDay ? { ...day, isPalm: verdict(key).palm } : day;
   });
   const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay.get(todayKey));
   const yesterday = days.at(-2);
@@ -442,8 +458,8 @@ export function getGardenSummary(
      policy each day is held to, since old days keep the rules they were lived
      under. */
   const judgedKeys = judgeDay ? [...byDay.keys()].filter((dayKey) => dayKey <= todayKey).sort() : [];
-  const palmKeys = judgeDay ? judgedKeys.filter((dayKey) => judgeDay(dayKey).palm) : [];
-  const qualifyingKeys = judgeDay ? judgedKeys.filter((dayKey) => judgeDay(dayKey).qualifies) : [];
+  const palmKeys = judgeDay ? judgedKeys.filter((dayKey) => verdict(dayKey).palm) : [];
+  const qualifyingKeys = judgeDay ? judgedKeys.filter((dayKey) => verdict(dayKey).qualifies) : [];
 
   const lifetimePalms = judgeDay
     ? palmKeys.length
@@ -499,7 +515,7 @@ export function getGardenSummary(
   };
 }
 
-/** Clears only fully completed collections from an older progress day; partial reading progress remains resumable. */
+/** Clears stale full collections, except explicit-session and Friday-cycle progress; partial reading remains resumable. */
 export function resetStaleCompletedCollections(
   completed: Record<CategoryId, Set<string>>,
   records: DailyCollectionCompletion[],
@@ -510,8 +526,8 @@ export function resetStaleCompletedCollections(
 
   return Object.fromEntries(
     CATEGORY_IDS.map((category) => {
-      // Its own cycle owns it; the day boundary must not also clear it.
-      if (CYCLE_GOVERNED_CATEGORY_IDS.includes(category)) {
+      // Its own cycle or an explicit new-session action owns this progress.
+      if (CYCLE_GOVERNED_CATEGORY_IDS.includes(category) || SITUATIONAL_SESSION_CATEGORY_IDS.includes(category)) {
         return [category, new Set(completed[category] ?? [])];
       }
       const catDayKey = getProgressDayKey(now, boundaryHour, category);

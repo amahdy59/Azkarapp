@@ -95,11 +95,11 @@ export function ProgressTrendChart({
       </div>
       {points.length > 0 && (
         <div ref={canvas} className="min-w-0">
-          <p id={`${id}-interaction`} className="mb-2 text-xs leading-relaxed text-muted-foreground">
+          <p id={`${id}-interaction`} className="mb-2 progress-help">
             {t(language, "progressTrend.interactionHint")}
           </p>
           <div
-            className="overflow-x-auto rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="overflow-x-auto rounded-lg progress-focus"
             role="region"
             aria-label={t(language, "progressTrend.chartRegion")}
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Named native chart scroll region remains keyboard-scrollable at enlarged text.
@@ -218,7 +218,7 @@ export function ProgressTrendChart({
                     aria-label={`${point.label}: ${value(point)}${point.partial ? ` · ${t(language, "progressTrend.soFar")}` : ""}`}
                     aria-pressed={selected?.key === point.key}
                     onClick={() => setSelectedKey(point.key)}
-                    className="absolute size-11 rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="absolute size-11 rounded-lg progress-focus"
                     style={{ left: x(index) - 22, top: y(point.rate ?? 0) - 22, width: 44, height: 44 }}
                   >
                     <span className="sr-only">{point.label}</span>
@@ -267,7 +267,7 @@ export function ProgressTrendChart({
                     onClick={() => {
                       if (selected.dates[0]) onExplore(selected.dates[0]);
                     }}
-                    className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold text-primary progress-focus"
                   >
                     {t(language, "progressTrend.openMonth")}
                     <ChevronNext size={16} aria-hidden="true" />
@@ -301,11 +301,11 @@ export function ProgressTrendChart({
       <details className="mt-4 border-t border-border pt-1">
         <summary
           id={`${id}-data-hint`}
-          className="min-h-11 cursor-pointer py-3 text-sm font-bold text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="min-h-11 cursor-pointer py-3 text-sm font-bold text-muted-foreground progress-focus"
         >
           {t(language, "progressTrend.viewData")}
         </summary>
-        <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{t(language, "progressTrend.calculation")}</p>
+        <p className="mb-3 progress-help">{t(language, "progressTrend.calculation")}</p>
         <table className="w-full text-start text-sm">
           <caption className="sr-only">{t(language, "progressTrend.title")}</caption>
           <thead>

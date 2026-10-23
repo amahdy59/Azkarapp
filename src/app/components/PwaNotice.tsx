@@ -30,6 +30,7 @@ export function PwaNotice({
 
   return (
     <aside
+      data-material-surface=""
       /* A measure, not the whole width. This is fixed to the bottom of the
          viewport, so on a desk screen it stretched the full 1900px: the notes
          hugged one edge, the buttons the other, and a metre of empty card sat

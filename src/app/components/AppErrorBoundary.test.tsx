@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { resetStoredSettings } from "../state";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppErrorBoundary } from "./AppErrorBoundary";
 
@@ -19,6 +20,20 @@ afterEach(() => {
 });
 
 describe("AppErrorBoundary", () => {
+  it.each(["en", "ar"])("announces failed recovery in %s without deleting data or reloading", (language) => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    document.documentElement.lang = language;
+    vi.mocked(resetStoredSettings).mockReturnValue(false);
+    render(
+      <AppErrorBoundary>
+        <BrokenChild />
+      </AppErrorBoundary>,
+    );
+    fireEvent.click(screen.getAllByRole("button")[1]!);
+    expect(resetStoredSettings).toHaveBeenCalled();
+    expect(screen.getByRole("status")).toHaveTextContent(language === "ar" ? "لم تُحذف" : "was not deleted");
+    expect(screen.getAllByRole("button")).toHaveLength(2);
+  });
   it("shows an actionable English recovery surface instead of a blank screen", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     render(

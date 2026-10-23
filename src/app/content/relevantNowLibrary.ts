@@ -27,6 +27,16 @@ export interface RelevantNowSource {
   /** The editorial line that says why this is what to read now. */
   message: string;
   messageArabic: string;
+  /** Authenticated extension metadata; editorial fields never replace the quotation. */
+  evidenceId?: string;
+  sourceUrl?: string;
+  authenticity?: string;
+  authenticityArabic?: string;
+  title?: string;
+  titleEnglish?: string;
+  excerpt?: boolean;
+  textZikrId?: string;
+  attribution?: "prophetic_saying" | "prophetic_dua" | "reported_action";
 }
 
 export const RELEVANT_NOW_LIBRARY: readonly RelevantNowSource[] = [

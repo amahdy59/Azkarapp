@@ -4,6 +4,34 @@ import type { AppStateSnapshot, StoredSession } from "../app/types";
 import { assertNoForbiddenSyncFields, buildRemoteSyncSnapshot, FORBIDDEN_SYNC_KEYS } from "./remoteSyncSnapshot";
 
 describe("remoteSyncSnapshot privacy boundary", () => {
+  it("omits the device-only main reading language", () => {
+    const snapshot = buildRemoteSyncSnapshot({
+      ...DEFAULT_APP_STATE,
+      settings: { ...DEFAULT_APP_STATE.settings, readerMeaningOnly: true },
+    });
+    expect(snapshot.settings).not.toHaveProperty("readerMeaningOnly");
+    expect(() => assertNoForbiddenSyncFields({ settings: { readerMeaningOnly: true } })).toThrow();
+  });
+  it("includes the footer label choice in the existing safe settings payload", () => {
+    const snapshot = buildRemoteSyncSnapshot({
+      ...DEFAULT_APP_STATE,
+      settings: { ...DEFAULT_APP_STATE.settings, readerToolLabels: false },
+    });
+    expect(snapshot.settings.readerToolLabels).toBe(false);
+    expect(() => assertNoForbiddenSyncFields(snapshot)).not.toThrow();
+  });
+  it("bounds item history uploads without trimming on-device records", () => {
+    const zikrHistory = Array.from({ length: 125 }, (_, index) => ({
+      dayKey: new Date(2026, 0, index + 1, 12).toISOString().slice(0, 10),
+      category: "morning" as const,
+      offeredIds: ["m-hm-77m"],
+      completedIds: [],
+    }));
+    const result = buildRemoteSyncSnapshot({ ...DEFAULT_APP_STATE, zikrHistory });
+    expect(result.zikrHistory).toHaveLength(120);
+    expect(zikrHistory).toHaveLength(125);
+    expect(result.zikrHistory?.[0]?.dayKey).toBe(zikrHistory[5]?.dayKey);
+  });
   it("preserves prayer attendance without allowing device coordinates", () => {
     const snapshot = buildRemoteSyncSnapshot({
       ...DEFAULT_APP_STATE,
