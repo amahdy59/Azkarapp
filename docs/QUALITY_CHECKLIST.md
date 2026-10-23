@@ -170,7 +170,7 @@ Export rows reserve the measured alphabetic ascent and descent of their actual d
 
 ### Android release acceptance
 
-Follow [docs/ANDROID.md](ANDROID.md). Require Android compilation, lint and native unit tasks in Quality in addition to the unchanged web matrix. Preserve signed-build, physical-device/TalkBack, offline audio/external export, widgets, permission/reboot/timezone and Play Console evidence separately from automated web checks. Verify that only the two permission-pending Muhammad Al-Shara recordings are excluded from Android and that Abdullah Muhammad/English downloads and exports remain available.
+Follow [docs/ANDROID.md](ANDROID.md). Require Android compilation, lint and native unit tasks in Quality in addition to the unchanged web matrix. Preserve signed-build, physical-device/TalkBack, offline audio/external export, widgets, permission/reboot/timezone and Play Console evidence separately from automated web checks. Verify that the owner-authorized Muhammad Al-Shara, Abdullah Muhammad and English recordings are eligible for Android downloads and exports.
 
 ## Sharing steps and option integrity — 2026-10-19
 

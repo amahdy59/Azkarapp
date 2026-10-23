@@ -4,7 +4,6 @@ import type { AudioPreferences, AudioVariant } from "./audioTypes";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
 import { isAudioSourceAllowed } from "./platformAudioPolicy";
 import { AudioDownloadError, transferAudio, type AudioDownloadPhase } from "./audioDownloadTransfer";
-import { isNativeAndroid } from "../native/capacitorPlatform";
 
 export interface AudioDownloadProgress {
   phase: AudioDownloadPhase;
