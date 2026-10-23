@@ -588,7 +588,7 @@ HomeWirdSection derives presentation only from existing routine/Quran progress. 
 
 ## Android local-service boundary — 2026-10-15
 
-The approved Capacitor host composes the same React application. `native/` owns platform detection, reminder-plan projection, queued native scheduling, widget projection and file export; `useNativeServices` connects normalized app state to those boundaries. Native plugins own RemoteViews and user-selected documents. Screens retain no direct storage/remote service orchestration for device pairing. See [Android](ANDROID.md) for contracts and acceptance limits. Synchronous application persistence remains authoritative; widget publication is a separate read-only projection.
+The approved Capacitor host composes the same React application. `native/` owns platform detection, reminder-plan projection, queued native scheduling, widget projection, file export and the self-hosted live-update boundary; `useNativeServices` connects normalized app state to those boundaries. Native plugins own RemoteViews, user-selected documents and binary-compatible web bundle staging. Screens retain no direct storage/remote service orchestration for device pairing or updates. See [Android](ANDROID.md) for contracts and acceptance limits. Synchronous application persistence remains authoritative; widget publication is a separate read-only projection. Native startup calls the live-update readiness acknowledgement before any update check, and a static checksum-verified manifest published alongside GitHub Pages can stage a new Android-mode web bundle for a later reload. Native code and plugin contracts remain store-release-only.
 
 ### Ruqyah identity compatibility — 2026-10-15
 

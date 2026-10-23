@@ -71,6 +71,11 @@ jobs:
           VITE_APPLE_AUTH_ENABLED: ${{ vars.VITE_APPLE_AUTH_ENABLED }}
           VITE_AUDIO_BASE_URL: ${{ vars.VITE_AUDIO_BASE_URL }}
 
+      - name: Build self-hosted Android live update bundle
+        run: pnpm build:live-update
+        env:
+          VITE_NATIVE_LIVE_UPDATE_BASE_URL: https://amahdy59.github.io/Azkarapp
+
       - name: Generate deployment metadata
         run: |
           node -e "

@@ -2,6 +2,13 @@
   "appId": "com.wazaker.app",
   "appName": "وَذَكِّرْ",
   "webDir": "dist",
+  "plugins": {
+    "LiveUpdate": {
+      "autoBlockRolledBackBundles": true,
+      "autoDeleteBundles": true,
+      "readyTimeout": 15000
+    }
+  },
   "server": { "androidScheme": "https" },
   "android": { "allowMixedContent": false }
 }
