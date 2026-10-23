@@ -1,10 +1,10 @@
-import { Capacitor } from "@capacitor/core";
 import type { Zikr } from "../types";
 import { AUDIO_CATALOG, AUDIO_MANIFEST_VERSION } from "./audioManifest";
 import type { AudioPreferences, AudioVariant } from "./audioTypes";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
 import { isAudioSourceAllowed } from "./platformAudioPolicy";
 import { AudioDownloadError, transferAudio, type AudioDownloadPhase } from "./audioDownloadTransfer";
+import { isNativeAndroid } from "../native/capacitorPlatform";
 
 export interface AudioDownloadProgress {
   phase: AudioDownloadPhase;
@@ -18,10 +18,6 @@ export interface AudioDownloadProgress {
 
 export const AUDIO_CACHE_NAME = `azkar-audio-v${AUDIO_MANIFEST_VERSION}`;
 const REGISTRY_KEY = "azkar.audio-downloads.v1";
-
-function isNativeAndroid() {
-  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
-}
 
 interface DownloadedAssetRecord {
   assetId: string;

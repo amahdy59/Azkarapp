@@ -173,8 +173,9 @@ function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string)
   };
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const isGithubPages = mode === "github-pages";
+  const isBrowserBuild = command === "build" && mode !== "android";
   const appBase = isGithubPages ? "/Azkarapp/" : "/";
   const envBaseUrl = loadEnv(mode, process.cwd(), "").VITE_AUDIO_BASE_URL;
   const cloudflareApiUrl = loadEnv(mode, process.cwd(), "").VITE_CLOUDFLARE_API_URL;
@@ -341,6 +342,11 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
+        "@capacitor/local-notifications": path.resolve(
+          mode === "android"
+            ? "node_modules/@capacitor/local-notifications"
+            : "src/app/native/localNotifications.browser.ts",
+        ),
         "@": path.resolve(__dirname, "./src"),
         "@azkar/native-mushaf-download": path.resolve(
           isGithubPages ? "src/app/content/nativeMushafDownload.browser.ts" : "src/app/content/nativeMushafDownload.ts",
@@ -352,6 +358,18 @@ export default defineConfig(({ mode }) => {
           isGithubPages
             ? "src/app/hooks/nativeReminderScheduling.browser.ts"
             : "src/app/hooks/nativeReminderScheduling.ts",
+        ),
+        [path.resolve("src/app/hooks/useNativeServices.ts")]: path.resolve(
+          isBrowserBuild ? "src/app/hooks/useNativeServices.browser.ts" : "src/app/hooks/useNativeServices.ts",
+        ),
+        [path.resolve("src/app/native/platform.ts")]: path.resolve(
+          isBrowserBuild ? "src/app/native/platform.browser.ts" : "src/app/native/platform.ts",
+        ),
+        [path.resolve("src/app/native/reminders.ts")]: path.resolve(
+          isBrowserBuild ? "src/app/native/reminders.browser.ts" : "src/app/native/reminders.ts",
+        ),
+        [path.resolve("src/app/native/capacitorPlatform.ts")]: path.resolve(
+          isBrowserBuild ? "src/app/native/capacitorPlatform.browser.ts" : "src/app/native/capacitorPlatform.ts",
         ),
       },
     },

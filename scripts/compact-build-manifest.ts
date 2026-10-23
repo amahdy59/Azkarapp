@@ -41,8 +41,14 @@ export function compactBuildManifest(): Plugin {
           if (!value || typeof value !== "object") continue;
           const entry: ManifestChunk = { file: value.file };
           if (value.isEntry) entry.isEntry = true;
-          if (Array.isArray(value.imports) && value.imports.length > 0)
-            entry.imports = value.imports.map((key) => keys.get(key) ?? key);
+          if (Array.isArray(value.imports) && value.imports.length > 0) {
+            // Vite repeats the HTML entry as an import of nearly every lazy
+            // chunk. The budget walker already includes index.html explicitly,
+            // so retaining these redundant edges only bloats the deployed
+            // manifest without changing the dependency graph used by checks.
+            const imports = value.imports.filter((key) => key !== "index.html");
+            if (imports.length > 0) entry.imports = imports.map((key) => keys.get(key) ?? key);
+          }
           if (Array.isArray(value.css) && value.css.length > 0) entry.css = value.css;
           compacted[keys.get(key) ?? key] = entry;
         }

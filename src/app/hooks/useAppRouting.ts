@@ -1,7 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { flushSync } from "react-dom";
-import { App } from "@capacitor/app";
-import { Capacitor } from "@capacitor/core";
 import { parseLocation, routeToHash } from "../routing";
 import type { LibraryRouteSection, ProgressRoutePeriod, RouteState, SettingsRoutePanel } from "../routing";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkar";
@@ -9,6 +7,7 @@ import { reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
 import { isAudioControlLocked } from "../audioControlLock";
+import { isNativeAndroid } from "../native/platform";
 
 function categoryFromShortcutUrl(): CategoryId | null {
   const category = new URLSearchParams(window.location.search).get("category");
@@ -289,23 +288,28 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   }, [applyRouteFromLocation, hasCompletedOnboarding, reduceMotion]);
 
   useEffect(() => {
-    if (Capacitor.getPlatform() !== "android") return;
+    if (!isNativeAndroid()) return;
 
     let removeListener: (() => void) | undefined;
     let cancelled = false;
-    void App.addListener("backButton", () => {
-      if (view === "home") {
-        void App.exitApp();
-      } else if (inAppHistoryDepth.current > 0) {
-        window.history.back();
-      } else {
-        setActiveTab("home");
-        replace("home");
-      }
-    }).then((listener) => {
-      if (cancelled) void listener.remove();
-      else removeListener = () => void listener.remove();
-    });
+    void import("@capacitor/app")
+      .then(({ App }) =>
+        App.addListener("backButton", () => {
+          if (view === "home") {
+            void App.exitApp();
+          } else if (inAppHistoryDepth.current > 0) {
+            window.history.back();
+          } else {
+            setActiveTab("home");
+            replace("home");
+          }
+        }),
+      )
+      .then((listener) => {
+        if (cancelled) void listener.remove();
+        else removeListener = () => void listener.remove();
+      })
+      .catch((error) => reportError(error, "android-back-navigation"));
 
     return () => {
       cancelled = true;

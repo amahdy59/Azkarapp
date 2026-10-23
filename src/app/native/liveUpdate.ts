@@ -1,5 +1,11 @@
-import { LiveUpdate } from "@capawesome/capacitor-live-update";
+import { registerPlugin } from "@capacitor/core";
+import type { LiveUpdatePlugin } from "@capawesome/capacitor-live-update";
 import { isNativeAndroid } from "./platform";
+
+// The Android implementation is discovered by Capacitor at runtime. Keeping
+// the package import type-only prevents native-only code from entering the web
+// bundle while preserving the same plugin contract on Android.
+const LiveUpdate = registerPlugin<LiveUpdatePlugin>("LiveUpdate");
 
 const DEFAULT_MANIFEST_URL = "https://amahdy59.github.io/Azkarapp/live-updates/manifest.json";
 const REQUEST_TIMEOUT_MS = 15_000;

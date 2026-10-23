@@ -36,6 +36,21 @@ test("does nothing when the build has no manifest", () => {
   expect(() => compactBuildManifest().generateBundle.handler({}, {})).not.toThrow();
 });
 
+test("removes redundant index entry imports while retaining the entry", () => {
+  const data = {
+    "index.html": { file: "assets/index.js", isEntry: true },
+    "src/main.tsx": { file: "assets/main.js", imports: ["index.html", "vendor"] },
+    vendor: { file: "assets/vendor.js" },
+  };
+  const asset = { type: "asset", source: JSON.stringify(data) };
+
+  compactBuildManifest().generateBundle.handler({}, { ".vite/manifest.json": asset });
+
+  const compacted = JSON.parse(asset.source);
+  expect(compacted["index.html"]).toEqual(data["index.html"]);
+  expect(compacted["src/main.tsx"].imports).toEqual(["vendor"]);
+});
+
 test("interns generated keys without changing the complete file dependency graph or source entries", () => {
   const generated = "_a-very-long-generated-chunk-name-abc123.js";
   const data = {
