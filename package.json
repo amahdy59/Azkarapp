@@ -11,6 +11,7 @@
   "scripts": {
     "audit:prod": "pnpm audit --prod",
     "build:pages": "vite build --mode github-pages && node scripts/check-bundle-budget.mjs && node scripts/check-css-utilities.mjs",
+    "build:live-update": "vite build --mode android --outDir .live-update-build && node scripts/package-live-update.mjs",
     "build": "vite build",
     "check": "node scripts/run-checks.mjs",
     "check:serial": "node scripts/run-checks.mjs --serial",
@@ -52,10 +53,11 @@
     "android:bundle": "node scripts/build-android.mjs bundleRelease"
   },
   "dependencies": {
-    "@capacitor/app": "8.1.0",
     "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.0",
     "@capacitor/core": "8.5.3",
     "@capacitor/local-notifications": "8.0.0",
+    "@capawesome/capacitor-live-update": "8.6.0",
     "@fontsource-variable/noto-sans-arabic": "5.3.0",
     "@fontsource/amiri-quran": "^5.3.0",
     "@fontsource/ibm-plex-sans-arabic": "5.3.0",

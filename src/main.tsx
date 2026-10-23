@@ -1,5 +1,6 @@
 import { isNativeAndroid } from "./app/native/platform";
 import { initializeNativeNotifications } from "./app/native/reminders";
+import { applyNativeLiveUpdate, initializeNativeLiveUpdate } from "./app/native/liveUpdate";
 import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
@@ -52,7 +53,10 @@ createRoot(document.getElementById("root")!).render(
 
 const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
-if (isNativeAndroid()) void initializeNativeNotifications().catch((error) => reportError(error, "native-startup"));
+if (isNativeAndroid()) {
+  void initializeNativeLiveUpdate().catch((error) => reportError(error, "native-live-update-startup"));
+  void initializeNativeNotifications().catch((error) => reportError(error, "native-startup"));
+}
 
 const updateServiceWorker = isNativeAndroid()
   ? async () => {}
@@ -94,6 +98,13 @@ const updateServiceWorker = isNativeAndroid()
     });
 
 window.addEventListener("azkar-apply-update", () => {
+  if (isNativeAndroid()) {
+    void applyNativeLiveUpdate().catch((error) => {
+      reportError(error, "native-live-update-apply");
+      window.dispatchEvent(new Event("azkar-update-failed"));
+    });
+    return;
+  }
   let timeoutId = 0;
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = window.setTimeout(() => reject(new Error("Service worker update timed out")), 15_000);
