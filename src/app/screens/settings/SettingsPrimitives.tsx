@@ -43,7 +43,7 @@ export function SubHeader({
     // heading owned by the mounted panel, rather than querying the old panel.
     const frame = requestAnimationFrame(() => headingRef.current?.focus());
     return () => cancelAnimationFrame(frame);
-  }, [isTwoPane]);
+  }, [isTwoPane, title]);
 
   if (isTwoPane) {
     return (

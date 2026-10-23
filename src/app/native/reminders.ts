@@ -2,7 +2,12 @@ import { isNativeAndroid } from "./platform";
 import type { NativeReminder } from "./reminderPlan";
 
 let permission: NotificationPermission = "default";
+const FIRST_LAUNCH_PERMISSION_KEY = "azkarapp.native-notification-permission-requested.v1";
+const FIRST_LAUNCH_EXACT_ALARM_KEY = "azkarapp.native-exact-alarm-permission-requested.v1";
 export const nativeNotificationPermission = () => permission;
+
+let exactAlarmPermission: NotificationPermission = "default";
+export const nativeExactAlarmPermission = () => exactAlarmPermission;
 
 export async function refreshNativeNotificationPermission(request = false): Promise<NotificationPermission> {
   const { LocalNotifications } = await import("@capacitor/local-notifications");
@@ -13,6 +18,19 @@ export async function refreshNativeNotificationPermission(request = false): Prom
     window.dispatchEvent(new Event("azkar-notification-permission"));
   }
   return permission;
+}
+
+export async function refreshNativeExactAlarmPermission(request = false): Promise<NotificationPermission> {
+  const { LocalNotifications } = await import("@capacitor/local-notifications");
+  const result = await (request
+    ? LocalNotifications.changeExactNotificationSetting()
+    : LocalNotifications.checkExactNotificationSetting());
+  const next = result.exact_alarm === "granted" ? "granted" : result.exact_alarm === "denied" ? "denied" : "default";
+  if (next !== exactAlarmPermission) {
+    exactAlarmPermission = next;
+    window.dispatchEvent(new Event("azkar-exact-alarm-permission"));
+  }
+  return exactAlarmPermission;
 }
 
 let queue = Promise.resolve();
@@ -46,5 +64,31 @@ export async function initializeNativeNotifications() {
     const route: unknown = notification.extra?.route;
     if (typeof route === "string" && /^#\/(azkar|settings|quran)(\/|$)/.test(route)) window.location.hash = route;
   });
+  let requestedOnFirstLaunch = false;
+  let requestedExactAlarmOnFirstLaunch = false;
+  try {
+    requestedOnFirstLaunch = window.localStorage.getItem(FIRST_LAUNCH_PERMISSION_KEY) === "1";
+    requestedExactAlarmOnFirstLaunch = window.localStorage.getItem(FIRST_LAUNCH_EXACT_ALARM_KEY) === "1";
+  } catch {
+    // Permission prompting should still work when storage is unavailable.
+  }
+  if (!requestedOnFirstLaunch) {
+    await refreshNativeNotificationPermission(true);
+    try {
+      window.localStorage.setItem(FIRST_LAUNCH_PERMISSION_KEY, "1");
+    } catch {
+      // A later launch will retry if storage is unavailable.
+    }
+  }
+  if (!requestedExactAlarmOnFirstLaunch) {
+    await refreshNativeExactAlarmPermission(true);
+    try {
+      window.localStorage.setItem(FIRST_LAUNCH_EXACT_ALARM_KEY, "1");
+    } catch {
+      // A later launch will retry if storage is unavailable.
+    }
+    return;
+  }
   await refreshNativeNotificationPermission();
+  await refreshNativeExactAlarmPermission();
 }

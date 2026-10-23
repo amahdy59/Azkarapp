@@ -1,4 +1,5 @@
 import type { AudioVariant } from "./audioTypes";
+import { fetchNativeBinaryResource } from "@azkar/native-mushaf-download";
 
 export type AudioDownloadPhase = "receiving" | "retrying" | "verifying" | "saved";
 export type AudioDownloadFailure = "network" | "server" | "integrity" | "unsupported";
@@ -33,7 +34,10 @@ async function receiveAudio(
   };
   keepAlive();
   try {
-    const response = await fetch(url, { cache: "no-store", credentials: "omit", signal: controller.signal });
+    const response = await fetchNativeBinaryResource(url, controller.signal, {
+      cache: "no-store",
+      credentials: "omit",
+    });
     if (response.status !== 200 || !response.ok) {
       const retryAfter = response.headers.get("retry-after");
       const seconds = retryAfter === null ? NaN : Number(retryAfter);
