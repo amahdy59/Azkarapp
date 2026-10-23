@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-23.1",
+    "ar": [
+      "تنزيل البقرة والكهف على أندرويد.",
+      "أذونات الإشعارات والمنبّهات عند البدء.",
+      "تحديثات واجهة ومحتوى واستماع بلا اتصال."
+    ],
+    "en": [
+      "Download Al-Baqarah and Al-Kahf on Android.",
+      "Request notifications and alarms at startup.",
+      "Get UI and content updates and listen offline."
+    ]
+  },
+  {
     "release": "2026-10-21.3",
     "ar": [
       "شاهد أوقات الصلاة بأرقام أكبر داخل البطاقات نفسها، مع الحفاظ على حجم العرض المطوي ومسافات واضحة حول النص.",

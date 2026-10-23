@@ -23,7 +23,7 @@ On Windows MSIX hosts, Java may fail in its Unix-domain socket temporary directo
 
 ## Local native boundaries
 
-The app shell ships in the package and does not register the PWA update worker. Android audio playback resolves complete downloaded responses from the existing audio cache to temporary object URLs, releasing them on source replacement. Eligible recordings retain the checksum-verified downloader, single-file export and complete ZIP export. The system document picker saves files to the user's chosen provider; bounded chunks avoid a single base64 bridge payload. No broad storage permission is requested. Cancelled/failed writes attempt to remove the partial user-created document. Device acceptance must cover large ZIPs and provider-specific failures.
+The app shell ships in the package and does not register the PWA update worker. Android audio playback resolves complete downloaded responses from the existing audio cache to temporary object URLs, releasing them on source replacement. Eligible recordings retain the checksum-verified downloader, single-file export and complete ZIP export. Large hosted audio downloads use bounded native HTTP range requests so progress can stream through the WebView without putting an entire surah in one bridge payload; the final bytes are still verified before caching. The system document picker saves files to the user's chosen provider; bounded chunks avoid a single base64 bridge payload. No broad storage permission is requested. Cancelled/failed writes attempt to remove the partial user-created document. Device acceptance must cover large ZIPs and provider-specific failures.
 
 ### Free self-hosted UI updates
 

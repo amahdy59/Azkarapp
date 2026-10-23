@@ -46,16 +46,35 @@ describe("native Mushaf downloads", () => {
     expect(native.get).not.toHaveBeenCalled();
   });
 
-  it("uses the native bridge for hosted audio downloads on Android", async () => {
+  it("streams hosted audio through bounded native range requests on Android", async () => {
     native.isNativePlatform.mockReturnValue(true);
     native.getPlatform.mockReturnValue("android");
-    native.get.mockResolvedValue({ status: 200, headers: { "content-type": "audio/mpeg" }, data: btoa("audio") });
+    native.get.mockImplementation(({ headers }: { headers: { Range: string } }) => {
+      if (headers.Range === "bytes=0-1048575")
+        return Promise.resolve({
+          status: 206,
+          headers: { "content-type": "audio/mpeg", "content-range": "bytes 0-4/7" },
+          data: btoa("audio"),
+        });
+      return Promise.resolve({
+        status: 206,
+        headers: { "content-type": "audio/mpeg", "content-range": "bytes 5-6/7" },
+        data: btoa("!!"),
+      });
+    });
 
-    await expect(
-      fetchMushafResource("https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/duas/morning-core.mp3?sha256=test"),
-    ).resolves.toMatchObject({ status: 200 });
-    expect(native.get).toHaveBeenCalledWith({
+    const response = await fetchMushafResource(
+      "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/duas/morning-core.mp3?sha256=test",
+    );
+    await expect(response.arrayBuffer()).resolves.toEqual(new TextEncoder().encode("audio!!").buffer);
+    expect(native.get).toHaveBeenNthCalledWith(1, {
       url: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/duas/morning-core.mp3?sha256=test",
+      headers: { Range: "bytes=0-1048575" },
+      responseType: "arraybuffer",
+    });
+    expect(native.get).toHaveBeenNthCalledWith(2, {
+      url: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/duas/morning-core.mp3?sha256=test",
+      headers: { Range: "bytes=5-1048580" },
       responseType: "arraybuffer",
     });
   });
