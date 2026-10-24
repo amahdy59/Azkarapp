@@ -1,4 +1,4 @@
-package com.azkarapp.app;
+package m.azkar.com;
 
 import android.app.Activity;
 import android.content.ClipData;

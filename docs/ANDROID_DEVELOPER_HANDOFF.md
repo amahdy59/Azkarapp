@@ -4,7 +4,7 @@
 
 Keep one React/TypeScript application. The website builds with `pnpm build:pages`; the installed Android application packages the same screens/domain logic using the existing Capacitor 8 host. Open `android/` in Android Studio after `pnpm android:sync`. Do not wrap the production website URL or copy a Pages build into Android. The packaged shell must launch without networking. Native changes belong in `src/app/native/` and the Android host, with web behavior retained at each boundary.
 
-The host already exists; do not run `cap add android` again or regenerate it over the custom plugins. The application ID is `com.wazaker.app`. Confirm the permanent Play identity before the first upload. The current versionCode is 1; subsequent Play uploads need a higher code.
+The host already exists; do not run `cap add android` again or regenerate it over the custom plugins. The application ID is `m.azkar.com`, matching the existing Google Play listing. The current versionCode is 1; subsequent Play uploads need a higher code.
 
 ## Build and verification
 

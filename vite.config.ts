@@ -122,12 +122,13 @@ function unwrapColorMixGuards(): Plugin {
  * recordings published there is no host to allow, and allowing one anyway would
  * be a permission granted for nothing.
  */
-function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string) {
+function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string, liveUpdateManifestUrl?: string) {
   const imageOrigin = "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev";
   const audioOrigin = audioBaseUrl ? new URL(audioBaseUrl).origin : undefined;
   const cloudflareApiOrigin = cloudflareApiUrl
     ? new URL(cloudflareApiUrl).origin
     : "https://azkarapp-api.amahdy59.workers.dev";
+  const liveUpdateOrigin = liveUpdateManifestUrl ? new URL(liveUpdateManifestUrl).origin : undefined;
   const quranFonts = ["https://verses.quran.foundation", "https://quran.com"];
   const directives = [
     ["default-src", ["'self'"]],
@@ -148,6 +149,7 @@ function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string)
         "https://*.supabase.co",
         cloudflareApiOrigin,
         new URL(reminderManifest.url).origin,
+        ...(liveUpdateOrigin ? [liveUpdateOrigin] : []),
         ...(audioOrigin ? [audioOrigin] : []),
       ],
     ],
@@ -179,6 +181,9 @@ export default defineConfig(({ mode, command }) => {
   const appBase = isGithubPages ? "/Azkarapp/" : "/";
   const envBaseUrl = loadEnv(mode, process.cwd(), "").VITE_AUDIO_BASE_URL;
   const cloudflareApiUrl = loadEnv(mode, process.cwd(), "").VITE_CLOUDFLARE_API_URL;
+  const liveUpdateManifestUrl =
+    loadEnv(mode, process.cwd(), "").VITE_NATIVE_LIVE_UPDATE_MANIFEST_URL ||
+    "https://amahdy59.github.io/Azkarapp/live-updates/manifest.json";
   const audioBaseUrl = (envBaseUrl || "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev").replace(/\/+$/, "");
   const audioUrlPattern = audioBaseUrl
     ? new RegExp(`^${audioBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/`)
@@ -200,7 +205,7 @@ export default defineConfig(({ mode, command }) => {
       tailwindcss(),
       unwrapColorMixGuards(),
       compactBuildManifest(),
-      contentSecurityPolicy(audioBaseUrl, cloudflareApiUrl),
+      contentSecurityPolicy(audioBaseUrl, cloudflareApiUrl, liveUpdateManifestUrl),
       VitePWA({
         registerType: "prompt",
         includeAssets: ["**/*.svg"],

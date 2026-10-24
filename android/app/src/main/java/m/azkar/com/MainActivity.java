@@ -1,8 +1,8 @@
-package com.azkarapp.app;
+package m.azkar.com;
 
-import android.os.Bundle;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -13,9 +13,10 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(AzkarWidgetsPlugin.class);
+        registerPlugin(AzkarFilesPlugin.class);
         registerPlugin(NativeSharingPlugin.class);
         super.onCreate(savedInstanceState);
-
         configureSystemBars();
     }
 
@@ -38,7 +39,6 @@ public class MainActivity extends BridgeActivity {
                 controller.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
             }
         }
-        // Keep the app's dark-shell status icons light on pre-R devices too.
         window.getDecorView().setSystemUiVisibility(
                 window.getDecorView().getSystemUiVisibility()
                         & ~(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN

@@ -1,4 +1,4 @@
-package com.wazaker.app;
+package m.azkar.com;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
