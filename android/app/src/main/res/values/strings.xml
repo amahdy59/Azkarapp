@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">وَذَكِّرْ</string>
     <string name="title_activity_main">وَذَكِّرْ</string>
-    <string name="package_name" translatable="false">com.wazaker.app</string>
-    <string name="custom_url_scheme" translatable="false">com.wazaker.app</string>
+    <string name="package_name" translatable="false">m.azkar.com</string>
+    <string name="custom_url_scheme" translatable="false">m.azkar.com</string>
 </resources>

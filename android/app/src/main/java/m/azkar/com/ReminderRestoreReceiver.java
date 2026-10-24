@@ -1,4 +1,4 @@
-package com.wazaker.app;
+package m.azkar.com;
 
 import android.content.Context;
 import android.content.Intent;

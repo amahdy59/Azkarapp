@@ -2,7 +2,7 @@
 
 Start with the [Android developer handoff](ANDROID_DEVELOPER_HANDOFF.md) for the shared-code map, existing native services, missing persistent native-file download backend and implementation/acceptance sequence. Current offline audio uses device-local WebView Cache Storage; native document export does not make it an app-private file repository.
 
-The owner approved Capacitor 8 on 2026-10-15, retaining the React/PWA application. The host uses Android API 36, minimum API 24, Java 21, a checksum-pinned Gradle wrapper and the package version for `versionName`. `versionCode` begins at 1 and must increase for each Play upload. The application ID is `com.wazaker.app`; confirm it before the first Play registration because it becomes permanent there.
+The owner approved Capacitor 8 on 2026-10-15, retaining the React/PWA application. The host uses Android API 36, minimum API 24, Java 21, a checksum-pinned Gradle wrapper and the package version for `versionName`. `versionCode` begins at 1 and must increase for each Play upload. The application ID is `m.azkar.com`, matching the existing Google Play listing.
 
 ## Build
 

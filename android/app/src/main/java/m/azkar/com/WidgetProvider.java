@@ -1,4 +1,4 @@
-package com.wazaker.app;
+package m.azkar.com;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
