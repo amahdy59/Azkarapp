@@ -29,6 +29,7 @@ public class MainActivity extends BridgeActivity {
     private void configureSystemBars() {
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        window.getDecorView().setBackgroundColor(Color.rgb(7, 17, 41));
         window.setStatusBarColor(Color.rgb(7, 17, 41));
         window.setNavigationBarColor(Color.rgb(15, 29, 59));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
