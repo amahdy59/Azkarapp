@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-29.6",
+  "release": "2026-10-29.7",
   "ar": [
+    "تظهر أذكار الصباح والمساء والنوم في عنوان الإشعار بوضوح.",
+    "تبدأ رسالة إشعار الأذكار بكلمة تذكير لتوضيح الغرض منها.",
     "تصل إشعارات الأذان والأذكار مرة واحدة فقط دون تكرار.",
-    "استخدم شعار الهلال والنجمة الجديد كتطبيق وكأيقونة للإشعارات.",
-    "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
-    "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد."
+    "استخدم شعار الهلال والنجمة الجديد كتطبيق وكأيقونة للإشعارات."
   ],
   "en": [
+    "Morning, evening and sleep Azkar names now appear clearly in notification titles.",
+    "Azkar notification messages now begin with Reminder for clearer intent.",
     "Prayer and Azkar notifications now arrive once instead of being duplicated.",
-    "Use the new crescent-and-star artwork for the app and notification branding.",
-    "Continue Azkar downloads through WAV recordings instead of stopping partway.",
-    "Home, Progress and Mushaf screens now start below the status bar without an extra top gap."
+    "Use the new crescent-and-star artwork for the app and notification branding."
   ]
 }

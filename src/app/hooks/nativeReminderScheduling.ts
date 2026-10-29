@@ -83,10 +83,11 @@ export function getUpcomingNativeReminders(
         continue;
       const at = scheduledTime(date, reminders[kind].time);
       if (at <= now) continue;
+      const title = t(language, `notifications.${kind}Title`);
       upcoming.push({
         id: nativeNotificationId(kind, at),
-        title: "Azkar",
-        body: t(language, `notifications.${kind}`),
+        title,
+        body: `${t(language, "notifications.reminderPrefix")} ${title}`,
         at,
         kind,
         dayKey,

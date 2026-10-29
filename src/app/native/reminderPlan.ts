@@ -60,8 +60,8 @@ export function buildNativeReminderPlan(state: AppStateSnapshot, now = new Date(
         continue;
       add(
         local.getTime(),
-        t(language, "notifications.testTitle"),
-        t(language, `notifications.${kind}`),
+        t(language, `notifications.${kind}Title`),
+        `${t(language, "notifications.reminderPrefix")} ${t(language, `notifications.${kind}Title`)}`,
         `#/azkar/${kind.replaceAll("_", "-")}`,
       );
     }
