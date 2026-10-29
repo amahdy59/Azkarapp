@@ -66,5 +66,4 @@ export function useNativeServices(state: AppStateSnapshot) {
     }, 250);
     return () => clearTimeout(timer);
   }, [widgetState, generation]);
-
 }

@@ -1600,10 +1600,7 @@ export function MushafPageViewer({
       ) : (
         /* Focus mode: no chrome at all, and the progress hairline is the last
            thing to go — it is the only thing on screen that is not the page. */
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-30"
-          style={{ top: 0 }}
-        >
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30" style={{ top: 0 }}>
           {progressBar}
         </div>
       )}

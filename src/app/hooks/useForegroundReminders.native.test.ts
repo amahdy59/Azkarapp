@@ -71,8 +71,6 @@ describe("native reminder delivery", () => {
       }),
     );
 
-    await waitFor(() =>
-      expect(nativeNotifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 10_001 }] }),
-    );
+    await waitFor(() => expect(nativeNotifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 10_001 }] }));
   });
 });
