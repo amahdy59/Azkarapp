@@ -626,7 +626,7 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full pt-[max(0.5rem,env(safe-area-inset-top))] pb-1 sm:pt-3 sm:pb-2 transition-[background-color,box-shadow] duration-standard ${
+            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full pt-2 pb-1 sm:pt-3 sm:pb-2 transition-[background-color,box-shadow] duration-standard ${
               homeVisualEffects
                 ? hasScrolledHomeContent
                   ? "shadow-none"

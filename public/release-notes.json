@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-23.1",
+  "release": "2026-10-29.2",
   "ar": [
-    "تنزيل البقرة والكهف على أندرويد.",
-    "أذونات الإشعارات والمنبّهات عند البدء.",
-    "تحديثات واجهة ومحتوى واستماع بلا اتصال."
+    "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد.",
+    "تتناسق المسافات العلوية على أجهزة أندرويد المختلفة.",
+    "اقرأ المصحف وتابع التقدم مع شريط أدوات واضح ومثبت في مكانه."
   ],
   "en": [
-    "Download Al-Baqarah and Al-Kahf on Android.",
-    "Request notifications and alarms at startup.",
-    "Get UI and content updates and listen offline."
+    "Home, Progress and Mushaf screens now start below the status bar without an extra top gap.",
+    "Keep top spacing consistent across Android devices.",
+    "Read the Mushaf and review progress with correctly positioned top chrome."
   ]
 }
