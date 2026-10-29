@@ -57,4 +57,21 @@ describe("native reminder delivery", () => {
     });
     expect(nativeNotifications.createChannel).toHaveBeenCalledOnce();
   });
+
+  it("cancels legacy native reminder IDs before replacing the schedule", async () => {
+    nativeNotifications.getPending.mockResolvedValueOnce({ notifications: [{ id: 10_001 }, { id: 42 }] });
+    const { useForegroundReminders } = await import("./useForegroundReminders");
+    renderHook(() =>
+      useForegroundReminders({
+        reminders: DEFAULT_APP_STATE.settings.reminders,
+        dailyCompletions: [],
+        progressDayStartHour: 4,
+        language: "en",
+      }),
+    );
+
+    await waitFor(() =>
+      expect(nativeNotifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 10_001 }] }),
+    );
+  });
 });

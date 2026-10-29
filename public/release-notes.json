@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-29.5",
+  "release": "2026-10-29.6",
   "ar": [
+    "تصل إشعارات الأذان والأذكار مرة واحدة فقط دون تكرار.",
     "استخدم شعار الهلال والنجمة الجديد كتطبيق وكأيقونة للإشعارات.",
     "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
-    "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد.",
-    "تتناسق المسافات العلوية والمسارات الصوتية على أجهزة أندرويد المختلفة."
+    "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد."
   ],
   "en": [
+    "Prayer and Azkar notifications now arrive once instead of being duplicated.",
     "Use the new crescent-and-star artwork for the app and notification branding.",
     "Continue Azkar downloads through WAV recordings instead of stopping partway.",
-    "Home, Progress and Mushaf screens now start below the status bar without an extra top gap.",
-    "Keep top spacing and offline audio paths consistent across Android devices."
+    "Home, Progress and Mushaf screens now start below the status bar without an extra top gap."
   ]
 }
