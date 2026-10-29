@@ -16,6 +16,14 @@ function isAudioUrl(url: string) {
   return url.startsWith(AUDIO_ORIGIN);
 }
 
+function audioContentType(url: string) {
+  const pathname = new URL(url).pathname.toLowerCase();
+  if (pathname.endsWith(".wav")) return "audio/wav";
+  if (pathname.endsWith(".ogg") || pathname.endsWith(".oga")) return "audio/ogg";
+  if (pathname.endsWith(".m4a")) return "audio/mp4";
+  return "audio/mpeg";
+}
+
 function decodeBase64(value: string) {
   const binary = atob(value);
   const bytes = new Uint8Array(binary.length);
@@ -38,7 +46,10 @@ function headerValue(headers: Record<string, string>, name: string) {
 async function fetchNativeAudioStream(url: string, signal?: AbortSignal) {
   let nextByte = 0;
   let totalBytes: number | undefined;
-  let contentType = "audio/mpeg";
+  // The Response is created before the first range request is pulled. Infer
+  // the type up front so WAV/OGG recordings are not rejected by the transfer
+  // verifier as audio/mpeg before the native headers arrive.
+  let contentType = audioContentType(url);
   const stream = new ReadableStream<Uint8Array>({
     async pull(controller) {
       if (signal?.aborted) {

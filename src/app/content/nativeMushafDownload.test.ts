@@ -78,4 +78,21 @@ describe("native Mushaf downloads", () => {
       responseType: "arraybuffer",
     });
   });
+
+  it("preserves the native recording MIME for WAV Azkar downloads", async () => {
+    native.isNativePlatform.mockReturnValue(true);
+    native.getPlatform.mockReturnValue("android");
+    native.get.mockResolvedValue({
+      status: 206,
+      headers: { "content-type": "audio/wav", "content-range": "bytes 0-3/4" },
+      data: btoa("WAVE"),
+    });
+
+    const response = await fetchMushafResource(
+      "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/azkar/morning/example.wav?sha256=test",
+    );
+
+    expect(response.headers.get("content-type")).toBe("audio/wav");
+    await expect(response.arrayBuffer()).resolves.toEqual(new TextEncoder().encode("WAVE").buffer);
+  });
 });
