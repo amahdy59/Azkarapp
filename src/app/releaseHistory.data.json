@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-29.4",
+    "ar": [
+      "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
+      "تحقق من التسجيلات المحفوظة بنوعها الصحيح للاستخدام دون اتصال.",
+      "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد.",
+      "تتناسق المسافات العلوية والمسارات الصوتية على أجهزة أندرويد المختلفة."
+    ],
+    "en": [
+      "Continue Azkar downloads through WAV recordings instead of stopping partway.",
+      "Verify saved recordings with their correct media type for offline use.",
+      "Home, Progress and Mushaf screens now start below the status bar without an extra top gap.",
+      "Keep top spacing and offline audio paths consistent across Android devices."
+    ]
+  },
+  {
     "release": "2026-10-29.3",
     "ar": [
       "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
