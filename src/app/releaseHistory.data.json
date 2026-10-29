@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-29.1",
+    "ar": [
+      "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
+      "تحقق من التسجيلات المحفوظة بنوعها الصحيح للاستخدام دون اتصال.",
+      "استمع إلى تسجيلات الأذكار المحفوظة دون اتصال بموثوقية أكبر."
+    ],
+    "en": [
+      "Continue Azkar downloads through WAV recordings instead of stopping partway.",
+      "Verify saved recordings with their correct media type for offline use.",
+      "Play saved Azkar recordings offline more reliably."
+    ]
+  },
+  {
     "release": "2026-10-23.1",
     "ar": [
       "تنزيل البقرة والكهف على أندرويد.",
