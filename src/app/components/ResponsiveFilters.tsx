@@ -39,9 +39,9 @@ export function ResponsiveFilters({
         className={`${compact ? "flex" : "hidden"} min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-xl border border-border-control bg-card px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring [&::-webkit-details-marker]:hidden`}
       >
         <SlidersHorizontal className="size-5 shrink-0 text-primary" aria-hidden="true" />
-        <span className="min-w-0 flex-1 break-words">
-          <span className="block text-xs text-muted-foreground">{label}</span>
-          <span className="block font-semibold">{summary}</span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-xs text-muted-foreground">{label}</span>
+          <span className="block truncate font-semibold">{summary}</span>
         </span>
         <span className="flex shrink-0 items-center gap-1 text-micro font-semibold text-primary">
           <span className="group-open:hidden">{t(language, "common.expand")}</span>

@@ -14,7 +14,6 @@
    while enlarged labels get real columns instead of splitting Arabic words. */
 @container compact-navigation (max-width: 18rem) {
   .bottom-nav {
-    min-height: calc(8.5rem + env(safe-area-inset-bottom));
     height: auto;
   }
 

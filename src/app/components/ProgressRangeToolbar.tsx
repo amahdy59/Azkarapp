@@ -96,14 +96,14 @@ export function ProgressRangeToolbar({
         className="progress-range-navigation mt-2 flex min-w-0 flex-wrap items-center gap-1"
         data-testid="progress-period-navigation"
       >
-        <div className="flex min-w-[min(100%,14rem)] flex-1 items-center gap-1">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-1">
           <IconButton label={text(language, "previous")} onClick={onPrevious}>
             <ChevronPrevious size={18} aria-hidden="true" />
           </IconButton>
           <button
             ref={datesTrigger}
             type="button"
-            className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-1 text-center text-sm font-semibold leading-relaxed progress-focus"
+            className="flex min-h-11 min-w-full order-first items-center justify-center gap-2 rounded-lg px-1 text-center text-sm font-semibold leading-relaxed progress-focus min-[420px]:order-none min-[420px]:min-w-0 min-[420px]:flex-1"
             aria-label={`${text(language, "pickDates")}: ${formatProgressRange(range, language, calendar)}`}
             aria-expanded={editing}
             aria-controls={editing ? `${id}-date-editor` : undefined}
@@ -114,7 +114,7 @@ export function ProgressRangeToolbar({
             }}
           >
             <Calendar className="size-4 shrink-0" aria-hidden="true" />
-            <span className="min-w-0 break-words" role="status" aria-atomic="true" data-testid="garden-view-date">
+            <span className="min-w-0 truncate" role="status" aria-atomic="true" data-testid="garden-view-date">
               {formatProgressRange(range, language, calendar)}
             </span>
           </button>

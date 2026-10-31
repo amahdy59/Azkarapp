@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-31.2",
+  "release": "2026-10-31.3",
   "ar": [
     "إصلاح تنزيل ملفات الصوت المضغوطة لتفتح بسلاسة على ويندوز وكافة الأجهزة.",
     "استقرار حفظ التنزيلات الصوتية والمصحف والتحقق من اكتمالها بعد تحديث الصفحة.",
-    "تحسين ملاءمة شريط التنقل السفلي تلقائياً عند تكبير الخط والشاشات الصغيرة.",
+    "تحسين تجاوب شريط فترات الإنجاز وقوائم التصفية عند تكبير الخط والشاشات الصغيرة.",
     "ضبط دقة أبعاد أزرار الوصول السريع وتجاوبها السلس مع اللمس والتنقل."
   ],
   "en": [
     "Fixed audio ZIP downloads so archives open smoothly on Windows and all platforms.",
     "Reliable offline audio and Mushaf caching that persists verification after page reload.",
-    "Improved bottom navigation layout under enlarged text sizes and narrow screens.",
-    "Refined shortcut touch target dimensions for smooth touch and keyboard navigation."
+    "Enhanced progress range toolbar and responsive filters under enlarged text and narrow screens.",
+    "Refined shortcut touch target dimensions and navigation layout for seamless accessibility."
   ]
 }
