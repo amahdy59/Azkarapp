@@ -3,6 +3,19 @@ import { describe, expect, it, vi } from "vitest";
 import { ZikrCounterSurface } from "./ZikrComponents";
 
 describe("ZikrCounterSurface", () => {
+  it("retains focus on completion without counting again", () => {
+    const onTap = vi.fn();
+    const { rerender } = render(<ZikrCounterSurface count={0} total={1} onTap={onTap} language="en" />);
+    const button = screen.getByRole("button");
+    button.focus();
+    rerender(<ZikrCounterSurface count={1} total={1} complete onTap={onTap} language="en" />);
+    expect(button).toHaveFocus();
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).not.toHaveAttribute("disabled");
+    fireEvent.click(button);
+    fireEvent.keyDown(button, { key: " " });
+    expect(onTap).not.toHaveBeenCalled();
+  });
   it.each(["ar", "en"] as const)("keeps the current-to-target tally in %s reading order", (language) => {
     const { container } = render(
       <ZikrCounterSurface count={12} total={100} onTap={() => undefined} language={language} />,

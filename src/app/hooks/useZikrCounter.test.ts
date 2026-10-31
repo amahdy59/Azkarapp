@@ -44,6 +44,13 @@ function tapEventOn(target: Element) {
 }
 
 describe("useZikrCounter", () => {
+  it("speaks every intermediate count for a short zikr", () => {
+    const { result } = setup({ z: makeZikr({ repetitionCount: 7 }) });
+    for (let count = 1; count < 7; count++) {
+      act(() => result.current.handleTap());
+      expect(result.current.readerAnnouncement).toBe(String(count));
+    }
+  });
   it("counts a burst exactly once per tap, with a single stronger completion cue", () => {
     const onCount = vi.fn();
     const { result, onComplete, vibrate } = setup({ hapticFeedback: true, onCount });

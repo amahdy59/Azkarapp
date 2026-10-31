@@ -350,7 +350,7 @@ test("wide Reader keeps a bounded RTL collection navigator and supports direct j
   await expect(navigator).toBeHidden();
 });
 
-test("Space counts without outlining the full Reader text region", async ({ page }) => {
+test("Space counts with an inset reading focus cue rather than a clipped outline", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openFirstMorningZikr(page);
 
@@ -369,6 +369,7 @@ test("Space counts without outlining the full Reader text region", async ({ page
     await expect
       .poll(() => readingRegion.evaluate((element) => window.getComputedStyle(element).outlineStyle))
       .toBe("none");
+    await expect(readingRegion).toHaveCSS("box-shadow", /inset/);
   }
 });
 

@@ -140,13 +140,13 @@
     background-color 200ms ease;
 }
 
-.adaptive-counter-surface:hover:not(:disabled) {
+.adaptive-counter-surface:hover:not(:disabled, [aria-disabled="true"]) {
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
   box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .adaptive-counter-surface.is-pressed,
-.adaptive-counter-surface:active:not(:disabled) {
+.adaptive-counter-surface:active:not(:disabled, [aria-disabled="true"]) {
   transform: scale(var(--motion-scale-pressed));
   transition:
     transform var(--motion-duration-press) var(--motion-ease-standard),
@@ -164,7 +164,8 @@
     0 6px 24px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
-.adaptive-counter-surface:disabled {
+.adaptive-counter-surface:disabled,
+.adaptive-counter-surface[aria-disabled="true"] {
   cursor: default;
 }
 

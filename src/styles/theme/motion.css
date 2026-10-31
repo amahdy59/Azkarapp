@@ -118,10 +118,8 @@ button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):focus-
   animation-duration: var(--motion-duration-standard);
 }
 
-/* Both class names are in use for the same intent; they resolve to one
-   animation so the behaviour cannot diverge. */
-.favorite-pop,
-.element-pop {
+/* The save control's finite acknowledgement. */
+.favorite-pop {
   animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter) both;
 }
 

@@ -1,8 +1,37 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
+import { dismissTopOverlay } from "../hooks/useOverlayBack";
 import { describe, expect, it, vi } from "vitest";
-import { Modal, SheetHeader } from "./ResponsiveSheet";
+import { Modal, SheetHeader, SidePanel } from "./ResponsiveSheet";
 
 describe("Modal accessibility", () => {
+  it("native Back dismisses a nested modal before its parent and restores focus", async () => {
+    function Nested() {
+      const [parent, setParent] = useState(true),
+        [child, setChild] = useState(false);
+      return (
+        <>
+          <Modal open={parent} onClose={() => setParent(false)} title="Parent" direction="ltr">
+            <button onClick={() => setChild(true)}>Open child</button>
+          </Modal>
+          <Modal open={child} onClose={() => setChild(false)} title="Child" direction="ltr">
+            <button>Child action</button>
+          </Modal>
+        </>
+      );
+    }
+    render(<Nested />);
+    const opener = screen.getByRole("button", { name: "Open child" });
+    opener.focus();
+    act(() => opener.click());
+    await waitFor(() => expect(screen.getByRole("dialog", { name: "Child" })).toBeVisible());
+    act(() => dismissTopOverlay());
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Child" })).not.toBeInTheDocument());
+    expect(screen.getByRole("dialog", { name: "Parent" })).toBeVisible();
+    await waitFor(() => expect(opener).toHaveFocus());
+    act(() => dismissTopOverlay());
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  });
   it("allows explicit recovery when a menu opener becomes hidden", async () => {
     const recovery = document.createElement("button");
     recovery.textContent = "Selected dates";
@@ -161,5 +190,16 @@ describe("SheetHeader", () => {
     expect(screen.getByText("إعدادات القراءة")).toBeInTheDocument();
     expect(screen.getByText("سورة البقرة · صفحة ٢")).toBeInTheDocument();
     expect(screen.getByTestId("modal-close-button")).toHaveAccessibleName("إغلاق الإعدادات");
+  });
+
+  it("applies safe-area bounds to protect portalled side panel from system bars", () => {
+    render(
+      <SidePanel open onClose={vi.fn()} title="Drawer" direction="ltr" testId="test-side-panel">
+        <div>Drawer content</div>
+      </SidePanel>,
+    );
+
+    const panel = screen.getByTestId("test-side-panel");
+    expect(panel).toHaveClass("pt-[env(safe-area-inset-top)]", "pb-[env(safe-area-inset-bottom)]");
   });
 });

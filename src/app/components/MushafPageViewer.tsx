@@ -958,7 +958,7 @@ function MushafPageCanvas({
               // Reserve the new floating footer without taking space from the
               // existing fifteen-line minimum on short, scrolling viewports.
               minHeight: "calc(32rem + 2.65rem)",
-              paddingTop: "var(--mushaf-top-clearance, calc(3.25rem + env(safe-area-inset-top)))",
+              paddingTop: "var(--mushaf-top-clearance, 3.25rem)",
               paddingBottom: "calc(3.25rem + env(safe-area-inset-bottom))",
             }
           : {}),
@@ -1495,7 +1495,7 @@ export function MushafPageViewer({
         <div
           data-testid="mushaf-corner-top-left"
           className="pointer-events-auto absolute left-2.5 z-30 flex items-center justify-center"
-          style={{ top: "max(0.6rem, env(safe-area-inset-top))" }}
+          style={{ top: "0.6rem" }}
         >
           {topLeftControl}
         </div>
@@ -1507,7 +1507,7 @@ export function MushafPageViewer({
           dir="ltr"
           className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-1.5"
           style={{
-            top: "max(0.6rem, env(safe-area-inset-top))",
+            top: "0.6rem",
             maxWidth: "calc(100vw - 7.5rem)",
           }}
         >
@@ -1529,7 +1529,7 @@ export function MushafPageViewer({
         <div
           data-testid="mushaf-corner-top-right"
           className="pointer-events-auto absolute right-2.5 z-30 flex items-center justify-center"
-          style={{ top: "max(0.6rem, env(safe-area-inset-top))" }}
+          style={{ top: "0.6rem" }}
         >
           {topRightControl}
         </div>
@@ -1586,10 +1586,9 @@ export function MushafPageViewer({
       ) : headerContent ? (
         <div
           data-mushaf-chrome="header"
-          /* The screen runs to the physical edges, so the inset lives on the bar
-             rather than outside the paper. */
-          className={`relative flex h-14 shrink-0 items-center border-b px-2 pt-[env(safe-area-inset-top)] sm:px-3 ${chromeBgClass}`}
-          style={{ height: `calc(3.5rem + env(safe-area-inset-top))` }}
+          /* The screen chrome sits within the protected app shell. */
+          className={`relative flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
+          style={{ height: "3.5rem" }}
         >
           <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
             {headerContent}
@@ -1600,10 +1599,7 @@ export function MushafPageViewer({
       ) : (
         /* Focus mode: no chrome at all, and the progress hairline is the last
            thing to go — it is the only thing on screen that is not the page. */
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-30"
-          style={{ top: "env(safe-area-inset-top, 0px)" }}
-        >
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30" style={{ top: "0px" }}>
           {progressBar}
         </div>
       )}
@@ -1722,7 +1718,7 @@ export function MushafPageViewer({
                   ...(isFloatingLayout
                     ? {
                         minHeight: "calc(32rem + 2.65rem)",
-                        paddingTop: "calc(3.25rem + env(safe-area-inset-top))",
+                        paddingTop: "3.25rem",
                         paddingBottom: "calc(3.25rem + env(safe-area-inset-bottom))",
                       }
                     : {}),

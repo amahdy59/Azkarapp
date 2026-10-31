@@ -1,4 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { useOverlayBack, topOverlay } from "../hooks/useOverlayBack";
 import {
   useCallback,
   useEffect,
@@ -217,6 +218,7 @@ export function Modal({
   showCloseButton = true,
   preventOutsideDismiss = false,
 }: ModalProps) {
+  const backDismiss = useOverlayBack(open, onClose);
   const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
   const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
 
@@ -236,6 +238,7 @@ export function Modal({
           }
         />
         <DialogPrimitive.Content
+          data-back-dismiss={backDismiss}
           {...focusScope}
           onCloseAutoFocus={(event) => {
             onCloseAutoFocus?.(event);
@@ -317,6 +320,7 @@ export function SidePanel({
   className = "",
   onCloseAutoFocus,
 }: SidePanelProps) {
+  const backDismiss = useOverlayBack(open, onClose);
   const focusScope = useRestoreFocusOnClose();
 
   return (
@@ -329,6 +333,7 @@ export function SidePanel({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="animate-in fade-in-0 fixed inset-0 z-[100] bg-black/25 duration-standard" />
         <DialogPrimitive.Content
+          data-back-dismiss={backDismiss}
           onOpenAutoFocus={focusScope.onOpenAutoFocus}
           data-testid={testId}
           data-prevent-count="true"
@@ -343,7 +348,7 @@ export function SidePanel({
             if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
           }}
           style={inset > 0 ? { [side]: `${inset}px` } : undefined}
-          className={`animate-in fixed inset-y-0 z-[100] flex w-[22rem] max-w-[calc(100%-3rem)] flex-col overflow-y-auto bg-card shadow-overlay duration-standard outline-none ${
+          className={`animate-in fixed inset-y-0 z-[100] flex w-[22rem] max-w-[calc(100%-3rem)] flex-col overflow-y-auto bg-card shadow-overlay duration-standard outline-none pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] ${
             side === "right" ? "right-0 border-l slide-in-from-right" : "left-0 border-r slide-in-from-left"
           } border-border/60 ${className}`.trim()}
         >
@@ -387,6 +392,7 @@ export function ResponsiveSheet({
   drawerClassName = "",
   focusOnOpen = false,
 }: ResponsiveSheetProps) {
+  const backDismiss = useOverlayBack(open, onClose);
   const layoutMode = useLayoutMode();
   const isCompact = layoutMode === "compact";
   const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
@@ -401,13 +407,14 @@ export function ResponsiveSheet({
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (topOverlay()?.dataset.backDismiss !== backDismiss) return;
         event.stopPropagation();
         onClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [open, onClose]);
+  }, [open, onClose, backDismiss]);
 
   if (!isCompact) {
     return (
@@ -442,6 +449,7 @@ export function ResponsiveSheet({
       }}
     >
       <DrawerContent
+        data-back-dismiss={backDismiss}
         {...focusScope}
         onCloseAutoFocus={(event) => {
           onCloseAutoFocus?.(event);

@@ -180,9 +180,9 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
-      className="bottom-nav flex h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
+      className="bottom-nav flex min-h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
     >
-      <div className="flex min-h-0 flex-1 items-center justify-between px-1 min-[360px]:px-2 min-[390px]:px-4">
+      <div className="bottom-nav-items flex min-h-0 flex-1 items-center justify-between px-1 min-[360px]:px-2 min-[390px]:px-4">
         {tabs.map(({ id, label, Icon }) => {
           const on = active === id;
           return (
@@ -206,7 +206,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
                 <Icon size={22} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
-                className={`inline-flex min-h-[2em] max-w-full items-center justify-center px-0.5 text-center font-sans text-micro leading-normal whitespace-normal [overflow-wrap:anywhere] ${
+                className={`bottom-nav-label inline-flex min-h-[2em] max-w-full items-center justify-center px-0.5 text-center font-sans text-micro leading-normal whitespace-normal [overflow-wrap:anywhere] ${
                   on ? "font-extrabold text-primary" : "font-semibold text-muted-foreground"
                 }`}
                 dir="auto"

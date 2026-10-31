@@ -22,12 +22,13 @@ export function useCharacterShortcutsEnabled() {
   );
 }
 
-export function isCounterShortcutBlocked(event: KeyboardEvent) {
+export function isCounterShortcutBlocked(event: KeyboardEvent, allowFocusedCounter = false) {
   if (event.defaultPrevented || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return true;
   if (event.key.length === 1 && event.key !== " " && (!characterShortcutsEnabled || event.repeat)) return true;
   // Native controls and modal surfaces own all their keys, including Escape.
   if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return true;
   const active = document.activeElement;
+  if (allowFocusedCounter && active?.matches('[data-testid="counter-surface"]')) return false;
   return (
     active instanceof Element &&
     Boolean(

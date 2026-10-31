@@ -14,7 +14,7 @@
   z-index: 40;
   flex-shrink: 0;
   margin-block-end: 1.5rem;
-  padding-block-start: env(safe-area-inset-top);
+  padding-block-start: 0;
   max-block-size: var(--progress-controls-max-height, 60dvh);
   overflow-y: auto;
   scroll-padding-block-start: var(--progress-title-height, 0px);

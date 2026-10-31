@@ -169,7 +169,7 @@ describe("MushafNavigationModal", () => {
       />,
     );
 
-    // Quick jump grid shows page 1, multiples of 15 up to 600, and page 604 (42 buttons total).
+    // Keep shortcuts alongside the exact current page.
     const page1Btn = screen.getByRole("button", { name: "١" });
     const page15Btn = screen.getByRole("button", { name: "١٥" });
     const page570Btn = screen.getByRole("button", { name: "٥٧٠" });
@@ -179,6 +179,7 @@ describe("MushafNavigationModal", () => {
     expect(page15Btn).toBeInTheDocument();
     expect(page570Btn).toBeInTheDocument();
     expect(page604Btn).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "٥٦٢" })).toHaveAttribute("aria-current", "page");
 
     // Verify 565 is no longer in the grid (which was multiples of 5), but 570 is
     expect(screen.queryByRole("button", { name: "٥٦٥" })).not.toBeInTheDocument();
@@ -186,6 +187,25 @@ describe("MushafNavigationModal", () => {
     fireEvent.click(page570Btn);
     expect(handleSelectPage).toHaveBeenCalledWith(570);
     expect(handleClose).toHaveBeenCalled();
+  });
+
+  it.each([1, 9, 562, 604])("marks exact page %i in the English page grid without duplicate buttons", (currentPage) => {
+    render(
+      <MushafNavigationModal
+        isOpen
+        onClose={vi.fn()}
+        currentPage={currentPage}
+        onSelectPage={vi.fn()}
+        language="en"
+        direction="ltr"
+        initialTab="jump"
+      />,
+    );
+    expect(screen.getAllByRole("button", { name: String(currentPage), exact: true })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: String(currentPage), exact: true })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 
   it("scales quick jump step when viewing a constrained pageRange", () => {
@@ -292,5 +312,59 @@ describe("MushafNavigationModal", () => {
     fireEvent.click(toggleBtn);
     expect(toggleBtn).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText("الحزب ١")).toBeInTheDocument();
+  });
+
+  it("enforces 44px minimum target sizes for close button", () => {
+    render(
+      <MushafNavigationModal
+        isOpen={true}
+        onClose={vi.fn()}
+        currentPage={1}
+        onSelectPage={vi.fn()}
+        language="ar"
+        direction="rtl"
+      />,
+    );
+
+    const closeBtn = screen.getByTestId("modal-close-button");
+    expect(closeBtn).toHaveClass("min-h-[44px]", "min-w-[44px]");
+  });
+
+  it("enforces 44px minimum target sizes for search clear button", () => {
+    render(
+      <MushafNavigationModal
+        isOpen={true}
+        onClose={vi.fn()}
+        currentPage={1}
+        onSelectPage={vi.fn()}
+        language="ar"
+        direction="rtl"
+        initialTab="surahs"
+      />,
+    );
+
+    const searchInput = screen.getByPlaceholderText(/ابحث عن سورة/);
+    fireEvent.change(searchInput, { target: { value: "البقرة" } });
+
+    const clearBtn = screen.getByRole("button", { name: "مسح" });
+    expect(clearBtn).toHaveClass("min-h-[44px]", "min-w-[44px]");
+  });
+
+  it("marks the current juz header with aria-current='true'", () => {
+    render(
+      <MushafNavigationModal
+        isOpen={true}
+        onClose={vi.fn()}
+        currentPage={562} // Juz 29
+        onSelectPage={vi.fn()}
+        language="ar"
+        direction="rtl"
+        initialTab="juzs"
+      />,
+    );
+
+    const juz29Btn = screen.getByTitle("صفحة ٥٦٢");
+    expect(juz29Btn).toHaveAttribute("aria-current", "true");
+    expect(juz29Btn).toHaveTextContent("الجزء التاسع والعشرون");
   });
 });

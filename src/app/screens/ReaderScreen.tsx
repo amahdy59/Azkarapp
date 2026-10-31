@@ -612,7 +612,7 @@ export function ReaderScreen({
         setFocusMode(false);
         return;
       }
-      if (isCounterShortcutBlocked(e)) return;
+      if (isCounterShortcutBlocked(e, true)) return;
       const activeEl = document.activeElement;
       const focusedControl =
         activeEl instanceof Element &&
@@ -632,7 +632,9 @@ export function ReaderScreen({
       // Native controls own their keyboard semantics. Reader-wide shortcuts are
       // intentionally limited to the document surface, so Space still saves,
       // opens menus, and activates the focused action as expected.
-      if (focusedControl) return;
+      // The counter keeps focus on completion. Its own Enter/Space handler
+      // consumes activation; reading navigation/reset shortcuts remain usable.
+      if (focusedControl && !activeEl?.matches('[data-testid="counter-surface"]')) return;
 
       if (benefitOpen || wordMeaningSelection || immersiveOpen) {
         if (e.key === "Escape") {

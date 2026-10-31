@@ -162,7 +162,7 @@ export function ZikrCounterSurface({
       type="button"
       data-testid={testId}
       data-counter-shape="rectangle"
-      disabled={disabled || (complete && !onCompleteTap)}
+      disabled={disabled}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}

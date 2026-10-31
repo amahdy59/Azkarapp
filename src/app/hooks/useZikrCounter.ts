@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { COUNTER_ADVANCE_DELAY_MS } from "../constants/reader";
+import { shouldAnnounceCount } from "../counterAnnouncement";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { Zikr, AppLanguage } from "../types";
@@ -136,7 +137,7 @@ export function useZikrCounter({
       if (hapticFeedback) vibrate(15);
       partialCounts.current.set(z.id, next);
       onPartialCountChange?.(z.id, next);
-      if (next % 10 === 0 || next === Math.floor(z.repetitionCount / 2)) {
+      if (shouldAnnounceCount(next, z.repetitionCount)) {
         setReaderAnnouncement(`${formatNumerals(next, language)}`);
       }
     }

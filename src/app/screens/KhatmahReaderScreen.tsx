@@ -1140,7 +1140,7 @@ export function KhatmahReaderScreen({
             data-testid="mushaf-translation-toolbar"
             dir="ltr"
             className="absolute inset-x-0 top-0 z-30 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center bg-background px-1"
-            style={{ paddingTop: "calc(4px + env(safe-area-inset-top))", paddingBottom: 4 }}
+            style={{ paddingTop: 4, paddingBottom: 4 }}
           >
             <div className="flex justify-center">{mobileTopLeft}</div>
             <MushafTranslationControls

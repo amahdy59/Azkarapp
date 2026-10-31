@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useOverlayBack } from "../hooks/useOverlayBack";
 import * as Dialog from "@radix-ui/react-dialog";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import type { AppLanguage, QuranVerseBookmark } from "../types";
@@ -13,7 +14,7 @@ import {
   getSurahDisplayName,
   getHizbsForJuz,
 } from "../content/surahInfo";
-import { X, Search, Bookmark, BookOpen, ChevronDown, ChevronUp } from "./icons";
+import { X, Search, Bookmark, ChevronDown, ChevronUp } from "./icons";
 import { TabList, tabPanelProps, type TabDefinition } from "./Tabs";
 import { prefetchMushafPage } from "../content/qcfMushaf";
 
@@ -48,6 +49,7 @@ export function MushafNavigationModal({
    */
   pageRange?: { first: number; last: number };
 }) {
+  const backDismiss = useOverlayBack(isOpen, onClose);
   const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputPage, setInputPage] = useState(currentPage.toString());
@@ -90,6 +92,47 @@ export function MushafNavigationModal({
     }
   }, [isOpen, filteredSurahs]);
 
+  const tabContentRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) return;
+    // WebKit pointer activation does not necessarily focus a button. Remember
+    // the physical opener as well as the keyboard focus captured on opening.
+    const rememberOpener = (event: PointerEvent) => {
+      if (event.target instanceof Element) {
+        returnFocusRef.current = event.target.closest<HTMLElement>('button, [role="button"]');
+      }
+    };
+    const useKeyboardFocus = () => {
+      returnFocusRef.current = null;
+    };
+    document.addEventListener("pointerdown", rememberOpener, true);
+    document.addEventListener("keydown", useKeyboardFocus, true);
+    return () => {
+      document.removeEventListener("pointerdown", rememberOpener, true);
+      document.removeEventListener("keydown", useKeyboardFocus, true);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (searchQuery.trim() !== "") return;
+    const frame = requestAnimationFrame(() => {
+      const container = tabContentRef.current;
+      if (!container) return;
+      const target =
+        container.querySelector<HTMLElement>('[data-current-quarter="true"]') ??
+        container.querySelector<HTMLElement>('[aria-current="true"], [aria-current="page"]');
+      if (target) {
+        const bounds = container.getBoundingClientRect();
+        const current = target.getBoundingClientRect();
+        container.scrollTop += current.top - bounds.top - (container.clientHeight - current.height) / 2;
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen, activeTab, searchQuery, currentPage]);
+
   const handleJump = (page: number) => {
     const valid = Math.max(1, Math.min(604, Math.floor(page)));
     onSelectPage(valid);
@@ -114,8 +157,8 @@ export function MushafNavigationModal({
     const end = pageRange ? pageRange.last : 604;
     const span = end - start + 1;
     // Scale step dynamically: for the full 604-page Mushaf (or spans > 120 pages),
-    // use multiples of 15 (42 items total). In a 6-column grid, this produces
-    // exactly 7 full rows (6 × 7 = 42) that fit on one screen without scrolling.
+    // use multiples of 15 plus the exact current page, so position is visible
+    // without replacing the familiar shortcuts.
     // Smaller spans scale down (5, 2, 1) so the user gets meaningful jump targets.
     const step = span > 120 ? 15 : span > 40 ? 5 : span > 15 ? 2 : 1;
     const list: number[] = [];
@@ -123,8 +166,9 @@ export function MushafNavigationModal({
     const firstMultiple = Math.ceil(start / step) * step;
     for (let p = firstMultiple; p <= end; p += step) list.push(p);
     if (end % step !== 0 && !list.includes(end)) list.push(end);
-    return list;
-  }, [pageRange]);
+    if (currentPage >= start && currentPage <= end && !list.includes(currentPage)) list.push(currentPage);
+    return list.sort((a, b) => a - b);
+  }, [currentPage, pageRange]);
 
   const bookmarks = pageRange ? allBookmarks.filter(inRange) : allBookmarks;
   const verseBookmarks = pageRange ? allVerseBookmarks.filter((b) => inRange(b.page)) : allVerseBookmarks;
@@ -141,16 +185,29 @@ export function MushafNavigationModal({
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 animate-in fade-in" />
         <Dialog.Content
+          data-back-dismiss={backDismiss}
           dir={direction}
-          className="fixed inset-x-2 bottom-2 top-2 z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
+          data-dropdown-surface
+          style={{ maxWidth: "min(36rem, calc(100vw - 1rem))" }}
+          onOpenAutoFocus={() => {
+            if (returnFocusRef.current?.isConnected) return;
+            if (document.activeElement instanceof HTMLElement && document.activeElement !== document.body) {
+              returnFocusRef.current = document.activeElement;
+            }
+          }}
+          onCloseAutoFocus={(event) => {
+            const opener = returnFocusRef.current;
+            if (opener?.isConnected) {
+              event.preventDefault();
+              opener.focus({ preventScroll: true });
+            }
+          }}
+          className="fixed top-[max(0.5rem,env(safe-area-inset-top))] bottom-[max(0.5rem,env(safe-area-inset-bottom))] left-[max(0.5rem,env(safe-area-inset-left))] right-[max(0.5rem,env(safe-area-inset-right))] z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/40 bg-card px-4 py-2.5 sm:px-5 sm:py-3">
+          <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/40 bg-card px-[16px] py-2.5 sm:px-5 sm:py-3">
             <div className="flex min-w-0 flex-1 items-center gap-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <BookOpen size={17} aria-hidden="true" />
-              </div>
-              <Dialog.Title className="truncate text-base font-extrabold leading-snug text-foreground sm:text-lg">
+              <Dialog.Title className="break-words text-base font-extrabold leading-snug text-foreground sm:text-lg">
                 {t(language, "mushaf.indexTitle")}
               </Dialog.Title>
             </div>
@@ -158,11 +215,11 @@ export function MushafNavigationModal({
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="flex h-10 w-10 min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95"
+                className="flex size-[44px] min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95"
                 aria-label={t(language, "common.close")}
                 data-testid="modal-close-button"
               >
-                <X size={16} aria-hidden="true" />
+                <X size={18} aria-hidden="true" />
               </button>
             </Dialog.Close>
           </div>
@@ -175,9 +232,9 @@ export function MushafNavigationModal({
             direction={direction}
             idPrefix="mushaf-index"
             aria-label={t(language, "mushaf.indexTitle")}
-            className="flex border-b border-border bg-card px-1.5 sm:px-3"
+            className="grid shrink-0 grid-cols-[repeat(auto-fit,minmax(min(100%,3rem),1fr))] border-b border-border bg-card px-1.5 sm:px-3"
             itemClassName={(selected) =>
-              `flex min-h-10 min-w-0 flex-1 items-center justify-center whitespace-nowrap border-b-2 px-2 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:text-sm ${
+              `flex min-h-11 min-w-0 items-center justify-center whitespace-normal wrap-anywhere [&_span]:min-w-0 border-b-2 px-2 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:text-sm ${
                 selected
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -201,17 +258,17 @@ export function MushafNavigationModal({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t(language, "mushaf.searchSurahs")}
-                  className="h-9 min-h-9 w-full rounded-xl border border-border bg-input-background ps-9 pe-9 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring sm:text-sm"
+                  className="h-11 min-h-11 w-full rounded-xl border border-border bg-input-background ps-9 pe-11 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring sm:text-sm"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
                     aria-label={t(language, "common.clear")}
-                    className="absolute flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    style={{ insetInlineEnd: 4 }}
+                    className="absolute flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    style={{ insetInlineEnd: 0 }}
                   >
-                    <X size={13} />
+                    <X size={15} />
                   </button>
                 )}
               </div>
@@ -220,6 +277,7 @@ export function MushafNavigationModal({
 
           {/* Tab Content */}
           <div
+            ref={tabContentRef}
             {...tabPanelProps("mushaf-index", activeTab)}
             className="min-h-0 flex-1 overflow-y-auto p-2.5 sm:p-3.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
           >
@@ -238,7 +296,7 @@ export function MushafNavigationModal({
                       onMouseEnter={() => prefetchMushafPage(surah.startPage)}
                       onPointerDown={() => prefetchMushafPage(surah.startPage)}
                       aria-current={isCurrent ? "true" : undefined}
-                      className={`group flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
+                      className={`group flex min-h-11 min-w-0 flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
                         isCurrent
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border/60 bg-card hover:border-border hover:bg-muted/50 text-foreground"
@@ -253,7 +311,7 @@ export function MushafNavigationModal({
                         >
                           {formatNumerals(surah.number, language)}
                         </span>
-                        <span className="arabic-ui truncate text-sm font-bold leading-tight">
+                        <span className="arabic-ui break-words text-sm font-bold leading-tight">
                           {isArabic ? surah.nameArabic : surah.nameEnglish}
                         </span>
                       </div>
@@ -290,7 +348,8 @@ export function MushafNavigationModal({
                           onClick={() => handleJump(juz.startPage)}
                           onMouseEnter={() => prefetchMushafPage(juz.startPage)}
                           onPointerDown={() => prefetchMushafPage(juz.startPage)}
-                          className="group flex min-w-0 flex-1 items-center justify-between gap-2 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-lg cursor-pointer"
+                          aria-current={isCurrentJuz ? "true" : undefined}
+                          className="group flex min-h-11 min-w-0 flex-1 flex-wrap items-center justify-between gap-2 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-lg cursor-pointer"
                           title={t(language, "mushaf.pageLabel", { page: formatNumerals(juz.startPage, language) })}
                         >
                           <div className="flex min-w-0 items-center gap-2">
@@ -302,10 +361,10 @@ export function MushafNavigationModal({
                               {formatNumerals(juz.number, language)}
                             </span>
                             <div className="flex min-w-0 flex-col items-start text-start">
-                              <span className="arabic-ui truncate text-sm font-bold leading-tight text-foreground">
+                              <span className="arabic-ui break-words text-sm font-bold leading-tight text-foreground">
                                 {isArabic ? juz.nameArabic : juz.nameEnglish}
                               </span>
-                              <span className="mt-0.5 truncate text-xs text-muted-foreground">
+                              <span className="mt-0.5 break-words text-xs text-muted-foreground">
                                 <span>{surahName}</span>
                                 <span aria-hidden="true"> · </span>
                                 <span>
@@ -326,7 +385,7 @@ export function MushafNavigationModal({
                           onClick={() => toggleJuz(juz.number)}
                           aria-expanded={isExpanded}
                           aria-label={`${t(language, "mushaf.toggleQuarters")} - ${isArabic ? juz.nameArabic : juz.nameEnglish}`}
-                          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 cursor-pointer"
+                          className="flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 cursor-pointer"
                         >
                           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </button>
@@ -351,7 +410,7 @@ export function MushafNavigationModal({
                                   </span>
                                 </div>
 
-                                <div className="grid grid-cols-4 gap-1">
+                                <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,4rem),1fr))] gap-1">
                                   {hizb.quarters.map((q) => {
                                     const isCurrentQuarter =
                                       currentPage >= q.startPage &&
@@ -364,6 +423,7 @@ export function MushafNavigationModal({
                                         onMouseEnter={() => prefetchMushafPage(q.startPage)}
                                         onPointerDown={() => prefetchMushafPage(q.startPage)}
                                         aria-current={isCurrentQuarter ? "true" : undefined}
+                                        data-current-quarter={isCurrentQuarter ? "true" : undefined}
                                         title={`${t(language, "mushaf.quarterLabel", { number: formatNumerals(q.quarterNumber, language) })}${q.firstWord ? ` - ${q.firstWord}` : ""} - ${t(language, "mushaf.pageLabel", { page: formatNumerals(q.startPage, language) })}`}
                                         className={`flex flex-col items-center justify-center rounded-lg border px-1 py-1.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
                                           isCurrentQuarter
