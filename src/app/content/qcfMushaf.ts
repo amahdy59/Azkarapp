@@ -90,6 +90,31 @@ export function parseMushafPage(value: unknown): MushafVerseData[] | null {
   return parsed;
 }
 
+/** Validate derived offline resources before publishing or trusting a cache hit. */
+export async function readMushafPageResponse(response: Response): Promise<MushafVerseData[] | null> {
+  if (response.status !== 200) return null;
+  try {
+    return parseMushafPage(await response.clone().json());
+  } catch {
+    return null;
+  }
+}
+
+export async function readQcfFontResponse(response: Response): Promise<ArrayBuffer | null> {
+  if (response.status !== 200) return null;
+  try {
+    const bytes = await response.clone().arrayBuffer();
+    if (bytes.byteLength < 48) return null;
+    const header = new DataView(bytes);
+    // WOFF2 signature, complete declared file length and at least one table.
+    if (header.getUint32(0) !== 0x774f4632 || header.getUint32(8) !== bytes.byteLength || header.getUint16(12) === 0)
+      return null;
+    return bytes;
+  } catch {
+    return null;
+  }
+}
+
 /** A page renders in QCF only when every one of its words carries a glyph. A
  *  half-glyph page would mix two typefaces on the same line. */
 export function pageHasQcfGlyphs(page: readonly MushafVerseData[]): boolean {
@@ -133,32 +158,34 @@ export function loadMushafPage(page: number): Promise<MushafVerseData[]> {
 
   const request = (async () => {
     const url = getMushafPageUrl(page);
-    let response: Response | undefined;
+    let cache: Cache | undefined;
 
     if (typeof caches !== "undefined") {
       try {
-        const cache = await caches.open(MUSHAF_CACHE_NAME);
-        response = await cache.match(url);
-      } catch {
-        /* Fall back to fetch */
-      }
-    }
-
-    if (!response) {
-      response = await fetch(url);
-      if (response.ok && typeof caches !== "undefined") {
-        try {
-          const cache = await caches.open(MUSHAF_CACHE_NAME);
-          await cache.put(url, response.clone());
-        } catch {
-          /* ignore cache store errors */
+        cache = await caches.open(MUSHAF_CACHE_NAME);
+        const response = await cache.match(url);
+        if (response) {
+          const parsed = await readMushafPageResponse(response);
+          if (parsed) {
+            rememberPage(page, parsed);
+            return parsed;
+          }
+          await cache.delete(url);
         }
+      } catch {
+        /* Unavailable storage must not prevent a bounded online recovery. */
       }
     }
 
+    const response = await fetch(url);
     if (!response.ok) throw new Error(`Mushaf page ${page} request failed with HTTP ${response.status}`);
-    const parsed = parseMushafPage(await response.json());
+    const parsed = await readMushafPageResponse(response);
     if (!parsed) throw new Error(`Mushaf page ${page} did not match the expected shape`);
+    try {
+      await cache?.put(url, response);
+    } catch {
+      /* Reading remains available when storage is full. */
+    }
     rememberPage(page, parsed);
     return parsed;
   })().finally(() => {
@@ -258,14 +285,20 @@ async function createFontFace(page: number): Promise<FontFace> {
   if (cache) {
     try {
       let response = await cache.match(primaryUrl);
+      if (response) {
+        const bytes = await readQcfFontResponse(response);
+        if (bytes) return new FontFace(family, bytes);
+        await cache.delete(primaryUrl);
+        response = undefined;
+      }
       if (!response) {
         const network = await fetch(primaryUrl);
-        if (network.ok) {
-          await cache.put(primaryUrl, network.clone());
-          response = network;
+        const bytes = await readQcfFontResponse(network);
+        if (bytes) {
+          await cache.put(primaryUrl, network.clone()).catch(() => undefined);
+          return new FontFace(family, bytes);
         }
       }
-      if (response) return new FontFace(family, await response.arrayBuffer());
     } catch {
       /* Fall through to the plain URL source below. */
     }
@@ -312,6 +345,13 @@ export function loadQcfFont(page: number): Promise<boolean> {
       }
       return true;
     } catch {
+      // A structurally complete WOFF2 file can still fail browser decoding.
+      // Remove only that derived font so the next explicit attempt can recover.
+      try {
+        await (await openFontCache())?.delete(getQcfFontUrl(page));
+      } catch {
+        /* Storage failures must not hide the readable fallback. */
+      }
       return false;
     }
   })().finally(() => {

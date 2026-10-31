@@ -8,6 +8,7 @@ import {
   loadQcfFont,
   pageHasQcfGlyphs,
   parseMushafPage,
+  readQcfFontResponse,
   prepareMushafPage,
   resolveSpreadQcfMode,
 } from "./qcfMushaf";
@@ -118,6 +119,47 @@ describe("Mushaf page data", () => {
 
     expect(first).toBe(second);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("evicts invalid cached page data and validates its one online replacement before storing", async () => {
+    const json = [{ k: "5:1", w: [[1, 8, 0, "fixture", "glyph"]] }];
+    const cache = {
+      match: vi.fn(async () => new Response("<html>bad cache</html>")),
+      delete: vi.fn(async () => true),
+      put: vi.fn(async () => undefined),
+    };
+    vi.stubGlobal("caches", { open: vi.fn(async () => cache) });
+    const fetch = vi.fn(async () => new Response(JSON.stringify(json)));
+    vi.stubGlobal("fetch", fetch);
+    await expect(loadMushafPage(519)).resolves.toEqual(json);
+    expect(cache.delete).toHaveBeenCalledWith(getMushafPageUrl(519));
+    expect(cache.put).toHaveBeenCalledOnce();
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it("does not cache invalid online page data or loop on a failed recovery", async () => {
+    const cache = {
+      match: vi.fn(async () => new Response("invalid")),
+      delete: vi.fn(async () => true),
+      put: vi.fn(),
+    };
+    vi.stubGlobal("caches", { open: vi.fn(async () => cache) });
+    const fetch = vi.fn(async () => new Response("{}"));
+    vi.stubGlobal("fetch", fetch);
+    await expect(loadMushafPage(520)).rejects.toThrow("expected shape");
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(cache.put).not.toHaveBeenCalled();
+  });
+
+  it("rejects truncated, non-WOFF2 and invalid-length font responses", async () => {
+    await expect(readQcfFontResponse(new Response("not a font"))).resolves.toBeNull();
+    const bytes = new Uint8Array(48);
+    const header = new DataView(bytes.buffer);
+    header.setUint32(0, 0x774f4632);
+    header.setUint32(8, 100);
+    header.setUint16(12, 1);
+    await expect(readQcfFontResponse(new Response(bytes))).resolves.toBeNull();
+    await expect(readQcfFontResponse(new Response(null, { status: 503 }))).resolves.toBeNull();
   });
 
   it("shares one in-flight request between the reader and the neighbour prefetch", async () => {

@@ -1,5 +1,6 @@
 import { useControlFeedback } from "./hooks/useControlFeedback";
 import { useNativeServices } from "./hooks/useNativeServices";
+import { useQueuedAudioAction } from "./hooks/useQueuedAudioAction";
 import "../styles/theme/materials.css";
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
@@ -206,6 +207,7 @@ function AppContent({
   loadStartupState,
   audioController,
   audioModuleLoading,
+  audioModuleError,
   requestAudioModule,
   buildPlaybackPlan,
   getAudioCoverage,
@@ -214,6 +216,7 @@ function AppContent({
   /** `null` until the lazily-loaded audio chunk reports its controller. */
   audioController: AudioController | null;
   audioModuleLoading: boolean;
+  audioModuleError: boolean;
   requestAudioModule: () => void;
   buildPlaybackPlan: AudioModule["buildPlaybackPlan"] | null;
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
@@ -1433,6 +1436,16 @@ function AppContent({
     audioController?.state.plan?.context.category === activeCat &&
     (!audioController?.state.plan?.context.subCategory ||
       audioController?.state.plan?.context.subCategory === activeSubCategory);
+  const audioContext = JSON.stringify([
+    view,
+    activeCat,
+    activeRoutineMode,
+    activeSubCategory,
+    selectedLang,
+    activeZikr?.id,
+    fridayDuaFlow,
+  ]);
+  const [queuedAudioContext, setQueuedAudioContext] = useState<string | null>(null);
   const [queuedAudioZikrId, setQueuedAudioZikrId] = useState<string | null>(null);
   const [queuedAudioLanguage, setQueuedAudioLanguage] = useState<AppLanguage>("ar");
   /**
@@ -1505,20 +1518,29 @@ function AppContent({
 
   useEffect(() => {
     if (!queuedAudioZikrId) return;
-    if (!activeZikr || queuedAudioZikrId !== activeZikr.id) {
+    if (!activeZikr || queuedAudioZikrId !== activeZikr.id || queuedAudioContext !== audioContext) {
       setQueuedAudioZikrId(null);
       return;
     }
     if (!audioController || !buildPlaybackPlan) return;
     void startAudio([activeZikr], "single", true, queuedAudioLanguage);
     setQueuedAudioZikrId(null);
-  }, [activeZikr, audioController, buildPlaybackPlan, queuedAudioZikrId, queuedAudioLanguage, startAudio]);
+  }, [
+    activeZikr,
+    audioContext,
+    queuedAudioContext,
+    audioController,
+    buildPlaybackPlan,
+    queuedAudioZikrId,
+    queuedAudioLanguage,
+    startAudio,
+  ]);
 
   useEffect(() => {
-    if (queuedAudioZikrId && !audioModuleLoading && !audioController && !buildPlaybackPlan) {
+    if (queuedAudioZikrId && audioModuleError && !audioModuleLoading) {
       setQueuedAudioZikrId(null);
     }
-  }, [audioController, audioModuleLoading, buildPlaybackPlan, queuedAudioZikrId]);
+  }, [audioModuleError, audioModuleLoading, queuedAudioZikrId]);
 
   /**
    * One control for the whole listen cycle: start the surah the first time,
@@ -1530,6 +1552,7 @@ function AppContent({
     if (!activeZikr) return;
     if (!audioController || !buildPlaybackPlan) {
       setQueuedAudioLanguage(language);
+      setQueuedAudioContext(audioContext);
       setQueuedAudioZikrId(activeZikr.id);
       requestAudioModule();
       return;
@@ -1557,7 +1580,9 @@ function AppContent({
     () => getAzkarForMode("illness_ruqyah", "complete").find((item) => item.id === "ir-baqarah"),
     [],
   );
-  const [queuedBaqarahAudio, setQueuedBaqarahAudio] = useState(false);
+  const [queuedBaqarahContext, setQueuedBaqarahContext] = useState<string | null>(null);
+  const baqarahContext = JSON.stringify([view, selectedLang, khatmahPage]);
+  const queuedBaqarahAudio = queuedBaqarahContext !== null;
   const baqarahOwnsAudio =
     audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === "ir-baqarah";
   const baqarahAudioStatus = queuedBaqarahAudio ? "loading" : baqarahOwnsAudio ? audioController!.state.status : "idle";
@@ -1574,19 +1599,29 @@ function AppContent({
   }, [baqarahZikr, audioController, buildPlaybackPlan]);
   useEffect(() => {
     if (!queuedBaqarahAudio) return;
-    if (view !== "khatmah") {
-      setQueuedBaqarahAudio(false);
+    if (view !== "khatmah" || queuedBaqarahContext !== baqarahContext) {
+      setQueuedBaqarahContext(null);
       return;
     }
     if (audioController && buildPlaybackPlan) {
-      setQueuedBaqarahAudio(false);
+      setQueuedBaqarahContext(null);
       startBaqarahAudio();
-    } else if (!audioModuleLoading) setQueuedBaqarahAudio(false);
-  }, [queuedBaqarahAudio, view, audioController, buildPlaybackPlan, audioModuleLoading, startBaqarahAudio]);
+    } else if (audioModuleError && !audioModuleLoading) setQueuedBaqarahContext(null);
+  }, [
+    queuedBaqarahAudio,
+    queuedBaqarahContext,
+    baqarahContext,
+    view,
+    audioController,
+    buildPlaybackPlan,
+    audioModuleLoading,
+    audioModuleError,
+    startBaqarahAudio,
+  ]);
   const toggleBaqarahAudio = () => {
     if (!baqarahZikr) return;
     if (!audioController || !buildPlaybackPlan) {
-      setQueuedBaqarahAudio(true);
+      setQueuedBaqarahContext(baqarahContext);
       requestAudioModule();
     } else if (baqarahOwnsAudio && ["playing", "buffering"].includes(audioController.state.status))
       audioController.pause();
@@ -1594,9 +1629,10 @@ function AppContent({
     else startBaqarahAudio();
   };
 
-  const startPlayAllAudio = () => {
+  const performPlayAllAudio = useCallback(() => {
     if (!audioController || !buildPlaybackPlan) return;
     const playAvailable = () => {
+      audioController.setAutoAdvance(true);
       const plan = buildPlaybackPlan({
         zikrs: azkar,
         context: {
@@ -1606,7 +1642,7 @@ function AppContent({
           subCategory: activeSubCategory,
           fridayDuaFlow,
         },
-        preferences: audioController.preferences,
+        preferences: { ...audioController.preferences, autoAdvance: true },
         audioLanguage: selectedLang,
       });
       const currentZikrId = view === "reader" ? activeZikr?.id : undefined;
@@ -1643,7 +1679,38 @@ function AppContent({
       return;
     }
     playAvailable();
-  };
+  }, [
+    activeCat,
+    activeIdx,
+    activeRoutineMode,
+    activeSubCategory,
+    activeZikr,
+    audioController,
+    audioCoverage,
+    azkar,
+    buildPlaybackPlan,
+    fridayDuaFlow,
+    openReader,
+    selectedLang,
+    setActiveIdx,
+    showConfirm,
+    view,
+  ]);
+
+  const playAllAction = useQueuedAudioAction({
+    context: audioContext,
+    ready: Boolean(audioController && buildPlaybackPlan),
+    loading: audioModuleLoading,
+    error: audioModuleError,
+    requestLoad: requestAudioModule,
+    perform: performPlayAllAudio,
+  });
+  const startPlayAllAudio = playAllAction.start;
+  // An assignment exposes the action while the lazy manifest loads. Coverage
+  // counts and the confirmation always come from the loaded manifest.
+  const canRequestPlayAll = getAudioCoverage
+    ? audioCoverage.available > (view === "reader" ? 1 : 0)
+    : selectedLang === "ar" && azkar.filter((zikr) => zikr.audioAssetId).length > (view === "reader" ? 1 : 0);
 
   // All three nav variants share the same view whitelist, so splash, onboarding
   // and auth never render app navigation regardless of viewport.
@@ -1704,6 +1771,23 @@ function AppContent({
             width instead of being auto-placed into an implicit row — which put
             them underneath the rail on the expanded and large tiers. */}
         <div className="app-status">
+          {playAllAction.pending && (
+            <p className="sync-status" role="status">
+              {t(selectedLang, "audioPlayer.loading")}
+            </p>
+          )}
+          {(playAllAction.failed || audioModuleError) && (
+            <div className="sync-status" role="alert">
+              <span>{t(selectedLang, "audioPlayer.moduleLoadError")}</span>
+              <button
+                type="button"
+                className="min-h-11 px-3 rounded-lg focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={() => window.location.reload()}
+              >
+                {t(selectedLang, "audioPlayer.reload")}
+              </button>
+            </div>
+          )}
           {pwaStatus && (
             <p className="sync-status" role="status" aria-live="polite">
               {pwaStatus}
@@ -2148,7 +2232,7 @@ function AppContent({
                   }}
                   onBack={pop}
                   onPlayAllAudio={
-                    activeCat === "comprehensive_duas" || audioCoverage.available === 0 ? undefined : startPlayAllAudio
+                    activeCat === "comprehensive_duas" || !canRequestPlayAll ? undefined : startPlayAllAudio
                   }
                   audioCoverage={audioCoverage}
                   routineMode={activeRoutineMode}
@@ -2309,7 +2393,7 @@ function AppContent({
                     activeZikrHasEnglishAudio && activeZikr ? () => playActiveZikrAudio("en") : undefined
                   }
                   onPlayAllAudio={
-                    activeCat !== "comprehensive_duas" && audioCoverage.available > 1 ? startPlayAllAudio : undefined
+                    activeCat !== "comprehensive_duas" && canRequestPlayAll ? startPlayAllAudio : undefined
                   }
                   onRepeatAudio={
                     activeZikrHasArabicAudio &&
@@ -2692,6 +2776,7 @@ export default function App({ loadStartupState }: { loadStartupState?: () => App
   const [audioModule, setAudioModule] = useState<AudioModule | null>(null);
   const [audioController, setAudioController] = useState<AudioController | null>(null);
   const [audioModuleLoading, setAudioModuleLoading] = useState(false);
+  const [audioModuleError, setAudioModuleError] = useState(false);
   const [audioLoadAttempt, setAudioLoadAttempt] = useState(0);
 
   useEffect(() => {
@@ -2701,7 +2786,10 @@ export default function App({ loadStartupState }: { loadStartupState?: () => App
       .then((loaded) => {
         if (!cancelled) setAudioModule(loaded);
       })
-      .catch((error) => reportError(error, "audio-module-load"))
+      .catch((error) => {
+        reportError(error, "audio-module-load");
+        if (!cancelled) setAudioModuleError(true);
+      })
       .finally(() => {
         if (!cancelled) setAudioModuleLoading(false);
       });
@@ -2712,6 +2800,7 @@ export default function App({ loadStartupState }: { loadStartupState?: () => App
 
   const requestAudioModule = useCallback(() => {
     if (audioModule || audioModuleLoading) return;
+    setAudioModuleError(false);
     setAudioModuleLoading(true);
     setAudioLoadAttempt((attempt) => attempt + 1);
   }, [audioModule, audioModuleLoading]);
@@ -2722,6 +2811,7 @@ export default function App({ loadStartupState }: { loadStartupState?: () => App
         loadStartupState={loadStartupState}
         audioController={audioController}
         audioModuleLoading={audioModuleLoading}
+        audioModuleError={audioModuleError}
         requestAudioModule={requestAudioModule}
         buildPlaybackPlan={audioModule?.buildPlaybackPlan ?? null}
         getAudioCoverage={audioModule?.getAudioCoverage ?? null}

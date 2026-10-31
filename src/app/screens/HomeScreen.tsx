@@ -496,18 +496,27 @@ export function HomeScreen({
     // Keep native focus/scroll-into-view recovery below the full sticky cards,
     // including when text size, viewport width or safe-area insets change.
     let expandedHeight = sticky.getBoundingClientRect().height;
-    const measure = () => {
-      const height = sticky.getBoundingClientRect().height;
+    let viewportHeight = scroll.clientHeight;
+    const measure = (entries: ResizeObserverEntry[] = []) => {
+      const stickyEntry = entries.find((entry) => entry.target === sticky);
+      const height = stickyEntry?.borderBoxSize?.[0]?.blockSize ?? sticky.getBoundingClientRect().height;
+      if (entries.some((entry) => entry.target === scroll)) viewportHeight = scroll.clientHeight;
       const expansion = Number(getComputedStyle(sticky).getPropertyValue("--home-prayer-expansion"));
       if (expansion === 1) expandedHeight = height;
+      // Finish geometry reads before changing styles. A read after changing
+      // the reserved margin forced a second full layout on every motion frame.
+      const fits = height + 44 < viewportHeight;
+      const reserved = `${Math.max(0, expandedHeight - height)}px`;
+      const padding = `${fits ? height + 8 : 8}px`;
       // Keep the same content coordinates while the sticky footprint contracts.
       // This reserved flow space scrolls away normally, without scrollTop writes.
-      sticky.style.setProperty("--home-prayer-reserved-space", `${Math.max(0, expandedHeight - height)}px`);
+      if (sticky.style.getPropertyValue("--home-prayer-reserved-space") !== reserved)
+        sticky.style.setProperty("--home-prayer-reserved-space", reserved);
       // A short landscape or enlarged-text viewport must still expose the
       // content below the cards. Restore ordinary scrolling if it cannot.
-      const fits = height + 44 < scroll.clientHeight;
-      sticky.style.position = fits ? "" : "relative";
-      scroll.style.scrollPaddingTop = `${fits ? height + 8 : 8}px`;
+      const position = fits ? "" : "relative";
+      if (sticky.style.position !== position) sticky.style.position = position;
+      if (scroll.style.scrollPaddingTop !== padding) scroll.style.scrollPaddingTop = padding;
     };
     const observer = new ResizeObserver(measure);
     observer.observe(sticky);
@@ -597,6 +606,15 @@ export function HomeScreen({
         role="region"
         aria-label={t(language, "home.title")}
         className="home-content-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        onTouchStart={() => {
+          if (
+            expandedPrayer === null &&
+            document.activeElement instanceof HTMLElement &&
+            document.activeElement.closest(".home-prayer-sticky-row button")
+          ) {
+            document.activeElement.blur();
+          }
+        }}
         onScroll={(event) => {
           const top = event.currentTarget.scrollTop;
           const scrolled = top > (scrolledHomeRef.current ? 2 : 8);
@@ -626,7 +644,7 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full pt-[max(0.5rem,env(safe-area-inset-top))] pb-1 sm:pt-3 sm:pb-2 transition-[background-color,box-shadow] duration-standard ${
+            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full pt-2 pb-1 sm:pt-3 sm:pb-2 transition-[background-color,box-shadow] duration-standard ${
               homeVisualEffects
                 ? hasScrolledHomeContent
                   ? "shadow-none"

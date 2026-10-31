@@ -78,9 +78,13 @@ export function SubHeader({
       data-testid="shared-screen-header"
       data-scrolled={hasScrolled || undefined}
       className="shared-screen-header sticky top-0 z-40 flex items-center justify-between gap-2 bg-background px-4 pt-2 pb-1 shrink-0 transition-colors duration-standard"
-      style={{ minHeight: 56 }}
+      style={{ minHeight: 56, paddingInline: "min(1rem, 16px)", gap: 8 }}
     >
-      <IconButton onClick={onBack} label={t(language, "common.back")}>
+      <IconButton
+        onClick={onBack}
+        label={t(language, "common.back")}
+        style={{ width: 44, height: 44, minWidth: 44, minHeight: 44 }}
+      >
         <ArrowPrevious size={20} className="text-foreground" />
       </IconButton>
       <h1
@@ -91,9 +95,7 @@ export function SubHeader({
       >
         {title}
       </h1>
-      <div style={{ width: 44 }} className="flex justify-end items-center">
-        {right}
-      </div>
+      {right && <div className="flex shrink-0 justify-end items-center">{right}</div>}
     </div>
   );
 }

@@ -6,6 +6,33 @@
    between parts, or reordering the imports, can change which declaration wins. */
 
 /* App Shell Adaptive Grid */
+.bottom-nav {
+  container: compact-navigation / inline-size;
+}
+
+/* rem follows text enlargement here: ordinary phone navigation keeps one row,
+   while enlarged labels get real columns instead of splitting Arabic words. */
+@container compact-navigation (max-width: 18rem) {
+  .bottom-nav-items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .bottom-nav-items > a {
+    height: auto;
+    min-height: 64px;
+    padding-block: 4px;
+  }
+
+  .bottom-nav-label {
+    min-height: 0;
+    overflow-wrap: normal;
+  }
+}
+
 /* Keep mobile pinch gestures from magnifying navigation chrome. Browser/menu
    zoom and the app's text-size/Mushaf magnification controls remain available. */
 @media (hover: none) and (pointer: coarse) {

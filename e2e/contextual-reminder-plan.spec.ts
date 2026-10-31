@@ -65,6 +65,12 @@ for (const language of ["ar", "en"] as const) {
     await page.goto("/#/home");
     const card = page.getByTestId("home-daily-evidence");
     await expect(card).toHaveAttribute("data-evidence-id", "tirmidhi:747");
+    const reminderLabel = language === "ar" ? "تذكير لك الآن" : "Relevant now";
+    const label =
+      language === "ar"
+        ? card.getByTestId("daily-evidence-label")
+        : card.getByRole("heading", { name: reminderLabel, exact: true });
+    await expect(label).toHaveText(reminderLabel);
     await expect(card.getByTestId("daily-evidence-grading")).toContainText(language === "ar" ? "حسن غريب" : "Hasan");
     await expect(card.getByTestId("daily-evidence-source")).toHaveAttribute("href", "https://sunnah.com/tirmidhi:747");
     await expect(card.getByTestId("daily-evidence-hadith")).toContainText(
@@ -74,6 +80,25 @@ for (const language of ["ar", "en"] as const) {
     await page.screenshot({ path: testInfo.outputPath(`fasting-${language}.png`), scale: "css" });
     await card.getByTestId("daily-evidence-refresh").click();
     await expect(card).not.toHaveAttribute("data-evidence-id", "tirmidhi:747");
+    await page.clock.setFixedTime(new Date("2026-10-31T13:31:00+02:00"));
+    await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+    await expect(label).toHaveText(reminderLabel);
+    const titledId = await card.getAttribute("data-evidence-id");
+    await card.getByTestId("daily-evidence-refresh").click();
+    await expect(card).not.toHaveAttribute("data-evidence-id", titledId!);
+    await expect(label).toHaveText(reminderLabel);
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    for (const text of [label, card.getByRole("heading", { level: 2 })]) {
+      expect(await text.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+    }
+    const labelBounds = (await label.boundingBox())!,
+      titleBounds = (await card.getByRole("heading", { level: 2 }).boundingBox())!;
+    if (language === "ar") expect(labelBounds.y + labelBounds.height).toBeLessThanOrEqual(titleBounds.y + 1);
+    await card.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: testInfo.outputPath(`reminder-label-${language}-320-200.png`), scale: "css" });
     // A late loader or minute tick must not put an obsolete tomorrow card back.
     await page.clock.setFixedTime(advanceFastingTime("2026-10-15"));
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));

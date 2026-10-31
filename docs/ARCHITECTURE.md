@@ -1,5 +1,19 @@
 # Application architecture
 
+## Android interaction reliability — 2026-10-31
+
+Counter/accessibility continuation: `useOverlayBack` associates open shared modal/sheet content and the Mushaf index with their dismissal callbacks. Native routing resolves the foremost visible accessible overlay before history/exit; unregistered library menus/alerts retain their own Escape dismissal and busy guards. Nested sheet Escape handlers close only their own foremost surface. No synthetic history, persisted overlay state or dependency is introduced. `counterAnnouncement` supplies the small shared milestone policy; `useCounterAnnouncement` suppresses initial restored-state speech and clears stale context/reset messages. Reader retains its existing completion message and synchronous count ownership.
+
+Shared interaction feedback selects exactly one native-Android or browser path. The native plugin converts web on/off waveform timing, respects system settings, marks vibration as interaction sonification and cancels on pause/destruction; native changes require a new installed binary. Play-all pending intent belongs to its originating route, category, routine, language and current item. Lazy loading reports failure separately from provider readiness; navigation cancels obsolete intent. Failed module loading offers an explicit app reload, clearing the browser's failed import cache; the reader then chooses playback again. No saved-progress format changes.
+
+The build manifest retains entry/dependency/CSS graph records and referenced asset records. It omits unreferenced font/binary/CSS lookup records whose emitted URLs already live in CSS/JS. Redundant direct imports are removed only when another retained dependency still reaches them, excluding paths that cycle back through the current record. Tests preserve reachability from every record, cycle safety and stylesheet references. All actual files remain in the output and in the complete on-disk bundle budget. No budget ceiling changes.
+
+## Derived download recovery — 2026-10-31
+
+Mushaf readiness validates page JSON through the shared parser and checks WOFF2 headers/length before counting resources. Invalid entries are evicted individually and retried through the normal download path. Reading a damaged cached page attempts one online replacement and validates it before caching. The browser performs final font decoding; a decode failure clears that derived font for the next attempt. Structural checks are not cryptographic font integrity or religious-content review.
+
+Home sticky measurements finish geometry reads before style writes and reuse ResizeObserver border-box observations, avoiding a forced second layout during the existing prayer-card transition. Animation timing and reduced-motion endpoints remain unchanged.
+
 ## Universal Progress dates and focused detail topics — 2026-10-20
 
 One ProgressRangeToolbar owns the scope of Overview, Trends, Records and full export. The displayed date is an explicit picker button, retaining preset/Today/previous/next controls. Its native radio/date editor applies one civil date, an inclusive range or a Gregorian calendar month through screen callbacks; drafts never mutate applied scope. Month entry selects Gregorian month navigation explicitly. Existing Hijri display/presets retain their boundaries. Compact editing uses the shared ResponsiveSheet with a protected opaque fill, fixed close header and independent scroll body; desktop retains its bounded inline form. Explicit close-autofocus recovery returns to the visible date button when the preset-menu opener becomes hidden. Apply/Cancel/Escape restore focus and compact completed selections collapse. Records have no secondary search scope. Sorting and pagination remain presentation-only; calculation/export explanations live in Help.

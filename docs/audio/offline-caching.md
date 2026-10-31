@@ -1,5 +1,9 @@
 # Offline audio caching
 
+## Native transfer recovery — 2026-10-31
+
+Native audio exposes the first real HTTP response metadata before verification, preserving WAV/MP3/OGG/MP4 formats and server error/retry headers. Native HTTP calls have 30-second connection/read limits. Aborting immediately releases the JavaScript wait; the underlying bridge request may finish later, but its bytes cannot resume the cancelled transfer. Complete-file length/checksum checks and verified-file checkpoints are unchanged.
+
 ## Complete filesystem ZIP — 2026-10-12 (local only)
 
 Downloads offers a persistent Download all audio as ZIP action outside management. It includes all available approved adhkar/dua and Kahf/Baqarah recordings for the current selected voices. Missing files use the existing full-response downloader and checkpoints first; all selected bytes are reverified before packaging. An incomplete set fails rather than exporting a partial archive. The ZIP preserves original recording bytes and stable filenames. Packaging uses bounded chunk reads and yields for cancellation; completed app-private offline copies remain after save, cancellation or error. The action remains available after storage protection and completed downloads. Browser feedback describes save handoff rather than a completed filesystem write. No runtime dependency, cache-format or religious-content change. The owner prohibits pushing this application improvement.

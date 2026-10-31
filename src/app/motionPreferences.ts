@@ -11,6 +11,8 @@
  * are invisible to it — that is precisely why they need a single call path.
  */
 
+import { triggerNativeHaptics } from "./native/haptics";
+
 /** True when either the OS or the in-app setting asks for reduced motion. */
 export function shouldReduceMotion(appReduceMotion = false): boolean {
   if (appReduceMotion) return true;
@@ -21,8 +23,13 @@ export function shouldReduceMotion(appReduceMotion = false): boolean {
 /** Vibrate only when the user has left haptic feedback enabled. */
 export function vibrateIfEnabled(hapticFeedback: boolean, pattern: number | number[]): void {
   if (!hapticFeedback) return;
+  if (triggerNativeHaptics(pattern)) return;
   if (typeof navigator === "undefined" || !("vibrate" in navigator)) return;
-  navigator.vibrate(pattern);
+  try {
+    navigator.vibrate(pattern);
+  } catch {
+    // Non-blocking fallback
+  }
 }
 
 /** Scroll behaviour that collapses to an instant jump under reduced motion. */

@@ -47,6 +47,14 @@ function openManagement(id: string) {
 }
 
 describe("DownloadsPanel", () => {
+  it.each(["ar", "en"] as const)("uses page-specific offline status in %s", async (language) => {
+    render(<DownloadsPanel language={language} onBack={vi.fn()} />);
+    const row = screen.getByTestId("offline-resource-mushaf");
+    await waitFor(() =>
+      expect(row).toHaveTextContent(language === "ar" ? "صفحات متاحة عبر الإنترنت" : "Pages available online"),
+    );
+    expect(row).not.toHaveTextContent(language === "ar" ? "صوتيات عبر الإنترنت" : "Online audio");
+  });
   it("offers a persistent ZIP export outside management, including adhkar and both recitations", async () => {
     Object.defineProperty(navigator, "storage", {
       configurable: true,

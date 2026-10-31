@@ -1,4 +1,12 @@
-[Larger Home prayer times and action feedback](phases/HOME_PRAYER_TIME_AND_ACTIONS_2026_10_21.md) is the active owner-approved phase: enlarge expanded digits within the existing card dimensions, preserve collapsed typography and coordinated motion, and refine Home Share/Refresh and common action cues. Preserve unrelated work and complete the repository's release gates.
+[Recognizable Home reminder label](phases/HOME_REMINDER_LABEL_2026_10_31.md) is the current owner-approved phase. Retain the feature label above specific titles and validate refresh and enlarged bilingual layouts, preserving the production hold.
+
+[Counter accessibility, Android Back and release headroom](phases/COUNTER_ACCESSIBILITY_BACK_2026_10_31.md) records the preceding local implementation and checks.
+
+[Android reliability follow-up](phases/ANDROID_RELIABILITY_FOLLOWUP_2026_10_31.md) records the preceding local fixes and validation.
+
+[Download, layout and performance repair](phases/DOWNLOAD_LAYOUT_PERFORMANCE_REPAIR_2026_10_31.md) records the preceding native download/cancellation and Mushaf recovery repairs, Arabic enlarged-text layout and wording changes, and Home profiling. All pending work remains local.
+
+[Larger Home prayer times and action feedback](phases/HOME_PRAYER_TIME_AND_ACTIONS_2026_10_21.md) records the preceding owner-approved phase: enlarge expanded digits within the existing card dimensions, preserve collapsed typography and coordinated motion, and refine Home Share/Refresh and common action cues. Preserve unrelated work and complete the repository's release gates.
 
 [Motion and control polish](phases/MOTION_CONTROL_POLISH_2026_10_20.md) records the earlier motion foundation, keyboard/pointer cancellation, shared still-aware icon cues and native range engagement. Its prior publication hold was superseded by the final Progress/Mushaf release decision; retain its motion and cancellation contracts.
 

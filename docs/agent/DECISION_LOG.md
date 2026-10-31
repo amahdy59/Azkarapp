@@ -1,3 +1,24 @@
+## 2026-10-31 — Apply validated review recommendations
+
+The owner approves applying the reviewed recommendations and testing their accuracy. Restore a restrained visible keyboard cue for focusable reading regions, superseding DEC-062's full suppression there while avoiding the previous clipped exterior line. Preserve focus on counter completion, add bounded counter speech, close the foremost Android overlay before navigation and create measured build headroom without weakening ceilings. Investigate actual touch/contrast cases; retain approved colors, persistent Home completion tiles and typography roles where checks pass. Share focused behavior rather than replacing global state with unmeasured Context providers or rewriting counters. Existing production hold remains active: no commit, push or deployment. See `phases/COUNTER_ACCESSIBILITY_BACK_2026_10_31.md`.
+
+## 2026-10-31 — Android reliability plan (OnePlus Nord 4 / OxygenOS)
+
+The owner requested safe and precise execution of the Android reliability plan across five stages:
+
+1. Top spacing & overlay bounds: Eliminated duplicate top padding reservation inside `.app-shell` across HomeScreen, KhatmahReaderScreen, and MushafPageViewer; updated MushafNavigationModal compact bounds to use `top/bottom/left/right` with `env(safe-area-inset-*)` and bounded portalled SidePanel drawers.
+2. Continuous audio playback & cold-module queueing: Play All intent explicitly activates and persists `autoAdvance: true` and starts a session plan; cold-start triggers asynchronously request the audio module without silent drops.
+3. Android counting haptics: Added `android.permission.VIBRATE` to the Android manifest, created `AzkarHapticsPlugin` with native vibration and haptic feedback capabilities, and bridged via TypeScript with non-blocking browser stubs.
+4. Home motion touch-focus release: Added touch-start focus release on the Home content scroll container to prevent lingering pointer focus from pinning expanded prayer geometry.
+5. Mushaf index current position: Added automatic scrolling to current page/quarter/juz on opening or switching tabs, added `aria-current` to active Juz header, and ensured WCAG AA compliant 44×44px touch targets.
+   These are implementation decisions, not device acceptance results. The follow-up review found additional haptics, inset, index and queued-playback defects; see `phases/ANDROID_RELIABILITY_FOLLOWUP_2026_10_31.md` for fixes and exact verification. Android/OxygenOS version and hardware behavior remain unverified. Production hold remains strictly active: no commit, push, or deployment.
+
+## 2026-10-31 — Download, layout and performance repair
+
+The owner subsequently requests holding production while resolving and validating further items. Keep the repair local and finish local checks only. No commit, push or deployment until that hold is explicitly lifted.
+
+The owner requests fixing all findings from the current-main audit. Validate native audio using real HTTP metadata, release cancelled bridge waits promptly, and recover invalid derived Mushaf cache entries without touching verified downloads or user progress. Compact Settings headings/navigation must remain readable at Arabic 320px/200% text; page resources use page-specific status copy. Preserve reviewed content and purposeful motion while reducing measured Home layout work. Existing complete release authority and all gates apply; unrelated Android PR work and the untracked brief remain separate. See phases/DOWNLOAD_LAYOUT_PERFORMANCE_REPAIR_2026_10_31.md.
+
 ## 2026-10-21 — Larger prayer times and Home microinteractions
 
 The owner also requests matching gloss and then matching the routine button's color on the “Now” indicator, slightly larger remaining-time digits and a clearer interval indicator. Use the CTA's semantic primary/foreground tokens with a quiet static highlight, unchanged dimensions and flat high-contrast/forced-color alternatives. Increase countdown digits to 15px expanded/13px condensed at the default root size, retaining the compact line footprint. Simplify the small ring with a thicker arc and no clock hands. Keep its existing clockwise fill as the next prayer approaches and numeric countdown primary; no new clock, loop or calculation change.

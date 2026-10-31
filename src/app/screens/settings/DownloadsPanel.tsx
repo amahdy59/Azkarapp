@@ -268,7 +268,7 @@ export function DownloadsPanel({
   };
   const isAnyJobActive = job !== null || removing;
   const numeric = (bytes: number | undefined) => <bdi dir="ltr">{formatMegabytes(bytes, language)}</bdi>;
-  const collectionState = (info: AudioStatus | undefined) =>
+  const collectionState = (info: AudioStatus | undefined, pages = false) =>
     !info || isLoading
       ? t(language, "downloads.checking")
       : info.total === 0
@@ -279,7 +279,9 @@ export function DownloadsPanel({
               ? "downloads.downloaded"
               : info.completed > 0
                 ? "downloads.partial"
-                : "downloads.notDownloaded",
+                : pages
+                  ? "downloads.pagesNotDownloaded"
+                  : "downloads.notDownloaded",
           );
   const groupedResources: AudioCollection[] = useMemo(
     () => [
@@ -581,6 +583,7 @@ export function DownloadsPanel({
                     status
                       ? { completed: status.downloadedMushafPages, total: 604, remainingBytes: mushafBytes }
                       : undefined,
+                    true,
                   )
             }
             feedback={
