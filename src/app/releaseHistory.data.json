@@ -1,5 +1,50 @@
 [
   {
+    "release": "2026-10-31.2",
+    "ar": [
+      "يظهر شريط الحالة بوضوح مع ألوان التطبيق على أجهزة أندرويد والمحاكيات المختلفة.",
+      "تستخدم شاشة بدء التطبيق والشاشة الرئيسية شعار الهلال والنجمة الجديدين.",
+      "تصل إشعارات الأذكار والأذان مرة واحدة مع عناوين ورسائل أوضح.",
+      "تحسنت موثوقية تنزيل وتشغيل تسجيلات الأذكار والمصحف دون اتصال."
+    ],
+    "en": [
+      "The status bar now remains visible with the app colors across Android devices and emulators.",
+      "The startup screen and launcher now use the new crescent-and-star branding.",
+      "Azkar and prayer notifications arrive once with clearer titles and messages.",
+      "Offline Azkar recordings and Mushaf downloads and playback are more reliable."
+    ]
+  },
+  {
+    "release": "2026-10-31.1",
+    "ar": [
+      "إبراز موضع القراءة بلوحة المفاتيح واستمرار التركيز بعد اكتمال العد.",
+      "وسم أوضح لتذكيرات الرئيسية مع تحسين الالتفاف عند تكبير النص.",
+      "نطق معالم العد صوتياً وإغلاق النوافذ بالزر الخلفي قبل التنقل.",
+      "استعادة صفحات المصحف التالفة بلا اتصال ومتابعة تشغيل الصوت تلقائياً."
+    ],
+    "en": [
+      "Visible keyboard reading focus and seamless counting without losing position.",
+      "Clearer contextual reminder badge on Home with improved enlarged-text reflow.",
+      "Spoken counter milestone announcements and back navigation that closes overlays first.",
+      "Automatic recovery of corrupted offline Mushaf pages and continuous audio auto-advance."
+    ]
+  },
+  {
+    "release": "2026-10-31",
+    "ar": [
+      "إبراز موضع القراءة بلوحة المفاتيح واستمرار التركيز بعد اكتمال العد.",
+      "وسم أوضح لتذكيرات الرئيسية مع تحسين الالتفاف عند تكبير النص.",
+      "نطق معالم العد صوتياً وإغلاق النوافذ بالزر الخلفي قبل التنقل.",
+      "استعادة صفحات المصحف التالفة بلا اتصال ومتابعة تشغيل الصوت تلقائياً."
+    ],
+    "en": [
+      "Visible keyboard reading focus and seamless counting without losing position.",
+      "Clearer contextual reminder badge on Home with improved enlarged-text reflow.",
+      "Spoken counter milestone announcements and back navigation that closes overlays first.",
+      "Automatic recovery of corrupted offline Mushaf pages and continuous audio auto-advance."
+    ]
+  },
+  {
     "release": "2026-10-29.7",
     "ar": [
       "تظهر أذكار الصباح والمساء والنوم في عنوان الإشعار بوضوح.",
@@ -12,79 +57,6 @@
       "Azkar notification messages now begin with Reminder for clearer intent.",
       "Prayer and Azkar notifications now arrive once instead of being duplicated.",
       "Use the new crescent-and-star artwork for the app and notification branding."
-    ]
-  },
-  {
-    "release": "2026-10-29.6",
-    "ar": [
-      "تصل إشعارات الأذان والأذكار مرة واحدة فقط دون تكرار.",
-      "استخدم شعار الهلال والنجمة الجديد كتطبيق وكأيقونة للإشعارات.",
-      "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
-      "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد."
-    ],
-    "en": [
-      "Prayer and Azkar notifications now arrive once instead of being duplicated.",
-      "Use the new crescent-and-star artwork for the app and notification branding.",
-      "Continue Azkar downloads through WAV recordings instead of stopping partway.",
-      "Home, Progress and Mushaf screens now start below the status bar without an extra top gap."
-    ]
-  },
-  {
-    "release": "2026-10-29.5",
-    "ar": [
-      "استخدم شعار الهلال والنجمة الجديد كتطبيق وكأيقونة للإشعارات.",
-      "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
-      "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد.",
-      "تتناسق المسافات العلوية والمسارات الصوتية على أجهزة أندرويد المختلفة."
-    ],
-    "en": [
-      "Use the new crescent-and-star artwork for the app and notification branding.",
-      "Continue Azkar downloads through WAV recordings instead of stopping partway.",
-      "Home, Progress and Mushaf screens now start below the status bar without an extra top gap.",
-      "Keep top spacing and offline audio paths consistent across Android devices."
-    ]
-  },
-  {
-    "release": "2026-10-29.4",
-    "ar": [
-      "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
-      "تحقق من التسجيلات المحفوظة بنوعها الصحيح للاستخدام دون اتصال.",
-      "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد.",
-      "تتناسق المسافات العلوية والمسارات الصوتية على أجهزة أندرويد المختلفة."
-    ],
-    "en": [
-      "Continue Azkar downloads through WAV recordings instead of stopping partway.",
-      "Verify saved recordings with their correct media type for offline use.",
-      "Home, Progress and Mushaf screens now start below the status bar without an extra top gap.",
-      "Keep top spacing and offline audio paths consistent across Android devices."
-    ]
-  },
-  {
-    "release": "2026-10-29.3",
-    "ar": [
-      "استكمل تنزيل تسجيلات الأذكار دون توقف عند التسجيلات بصيغة WAV.",
-      "تحقق من التسجيلات المحفوظة بنوعها الصحيح للاستخدام دون اتصال.",
-      "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد.",
-      "تتناسق المسافات العلوية والمسارات الصوتية على أجهزة أندرويد المختلفة."
-    ],
-    "en": [
-      "Continue Azkar downloads through WAV recordings instead of stopping partway.",
-      "Verify saved recordings with their correct media type for offline use.",
-      "Home, Progress and Mushaf screens now start below the status bar without an extra top gap.",
-      "Keep top spacing and offline audio paths consistent across Android devices."
-    ]
-  },
-  {
-    "release": "2026-10-29.2",
-    "ar": [
-      "تظهر صفحات الرئيسية والتقدم والمصحف أسفل شريط الحالة دون فراغ علوي زائد.",
-      "تتناسق المسافات العلوية على أجهزة أندرويد المختلفة.",
-      "اقرأ المصحف وتابع التقدم مع شريط أدوات واضح ومثبت في مكانه."
-    ],
-    "en": [
-      "Home, Progress and Mushaf screens now start below the status bar without an extra top gap.",
-      "Keep top spacing consistent across Android devices.",
-      "Read the Mushaf and review progress with correctly positioned top chrome."
     ]
   },
   {

@@ -36,76 +36,109 @@ function toBytes(data: unknown) {
   if (data instanceof Uint8Array) return data;
   if (data instanceof ArrayBuffer) return new Uint8Array(data);
   if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
-  throw new TypeError("Native HTTP returned an unsupported binary payload");
+  throw new TypeError("Unsupported native binary data");
 }
 
 function headerValue(headers: Record<string, string>, name: string) {
   return headers[name] ?? headers[Object.keys(headers).find((key) => key.toLowerCase() === name.toLowerCase()) ?? ""];
 }
 
+/** The native request cannot be cancelled, but it must not retain the caller. */
+function nativeRequest(options: Parameters<typeof CapacitorHttp.get>[0], signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  return new Promise<Awaited<ReturnType<typeof CapacitorHttp.get>>>((resolve, reject) => {
+    const cancel = () => reject(signal?.reason ?? new DOMException("Download cancelled", "AbortError"));
+    signal?.addEventListener("abort", cancel, { once: true });
+    void CapacitorHttp.get({ ...options, connectTimeout: 30_000, readTimeout: 30_000 })
+      .then(resolve, reject)
+      .finally(() => signal?.removeEventListener("abort", cancel));
+  });
+}
+
 async function fetchNativeAudioStream(url: string, signal?: AbortSignal) {
+  const controller = new AbortController();
+  const cancel = () => controller.abort(signal?.reason);
+  signal?.throwIfAborted();
+  signal?.addEventListener("abort", cancel, { once: true });
+  const cleanup = () => signal?.removeEventListener("abort", cancel);
+  const request = (offset: number) =>
+    nativeRequest(
+      { url, headers: { Range: `bytes=${offset}-${offset + AUDIO_RANGE_BYTES - 1}` }, responseType: "arraybuffer" },
+      controller.signal,
+    );
+  let first: Awaited<ReturnType<typeof request>>;
+  try {
+    first = await request(0);
+  } catch (error) {
+    cleanup();
+    throw error;
+  }
+  const headers = new Headers(first.headers);
+  if (first.status !== 206 && first.status !== 200) {
+    cleanup();
+    return new Response(null, { status: first.status, headers });
+  }
   let nextByte = 0;
   let totalBytes: number | undefined;
   // The Response is created before the first range request is pulled. Infer
   // the type up front so WAV/OGG recordings are not rejected by the transfer
   // verifier as audio/mpeg before the native headers arrive.
-  let contentType = audioContentType(url);
+  const firstHeaders = (first.headers ?? {}) as Record<string, string>;
+  let contentType = headerValue(firstHeaders, "content-type") || audioContentType(url);
+  let pending: typeof first | undefined = first;
   const stream = new ReadableStream<Uint8Array>({
     async pull(controller) {
-      if (signal?.aborted) {
-        controller.error(new DOMException("Download cancelled", "AbortError"));
-        return;
-      }
       try {
-        const endByte = nextByte + AUDIO_RANGE_BYTES - 1;
-        const result = await CapacitorHttp.get({
-          url,
-          headers: { Range: `bytes=${nextByte}-${endByte}` },
-          responseType: "arraybuffer",
-        });
-        if (signal?.aborted) throw new DOMException("Download cancelled", "AbortError");
+        signal?.throwIfAborted();
+        const result = pending ?? (await request(nextByte));
+        pending = undefined;
         if (result.status !== 206 && result.status !== 200)
           throw new Error(`Native audio request failed: ${result.status}`);
 
         const headers = (result.headers ?? {}) as Record<string, string>;
-        contentType = headerValue(headers, "content-type") || contentType;
+        const responseContentType = headerValue(headers, "content-type");
+        if (responseContentType) contentType = responseContentType;
         const contentRange = headerValue(headers, "content-range");
         const rangeMatch = contentRange?.match(/bytes\s+(\d+)-(\d+)\/(\d+)/i);
         if (rangeMatch) {
           const rangeStart = Number(rangeMatch[1]);
           const rangeEnd = Number(rangeMatch[2]);
-          totalBytes = Number(rangeMatch[3]);
-          if (rangeStart !== nextByte) throw new Error("Native audio server returned an unexpected range");
-          if (rangeEnd < rangeStart) throw new Error("Native audio server returned an empty range");
+          const expectedTotal = Number(rangeMatch[3]);
+          if (totalBytes !== undefined && totalBytes !== expectedTotal) throw new Error("Audio resource changed");
+          totalBytes = expectedTotal;
+          if (rangeStart !== nextByte || rangeEnd < rangeStart) throw new Error("Invalid audio range");
         } else if (result.status === 200) {
           const length = Number(headerValue(headers, "content-length"));
-          if (!Number.isFinite(length) || nextByte !== 0)
-            throw new Error("Native audio server does not support ranges");
+          if (!Number.isFinite(length) || nextByte !== 0) throw new Error("Audio ranges unsupported");
           totalBytes = length;
         } else {
-          throw new Error("Native audio response omitted Content-Range");
+          throw new Error("Missing Content-Range");
         }
 
         const bytes = toBytes(result.data);
-        if (!bytes.byteLength || bytes.byteLength > AUDIO_RANGE_BYTES)
-          throw new Error("Native audio response was empty");
+        if (!bytes.byteLength || bytes.byteLength > AUDIO_RANGE_BYTES) throw new Error("Invalid audio range size");
         nextByte += bytes.byteLength;
         controller.enqueue(bytes);
-        if (nextByte >= totalBytes) controller.close();
+        if (nextByte >= totalBytes) {
+          cleanup();
+          controller.close();
+        }
       } catch (error) {
+        cleanup();
         controller.error(error);
       }
     },
     cancel() {
-      // CapacitorHttp does not expose a request cancellation handle; the signal
-      // still stops subsequent ranges and the transfer reader releases promptly.
+      controller.abort();
+      cleanup();
     },
   });
 
-  signal?.throwIfAborted();
+  // Metadata is available before the Response is exposed; do not invent MPEG
+  // headers for WAV recordings or hide a real HTTP error behind status 200.
   return new Response(stream, {
     status: 200,
-    headers: { "content-type": contentType, ...(totalBytes ? { "content-length": String(totalBytes) } : {}) },
+    headers: { "content-type": contentType },
   });
 }
 
@@ -124,7 +157,7 @@ export async function fetchNativeBinaryResource(
 
   if (isAudioUrl(url)) return fetchNativeAudioStream(url, signal);
 
-  const result = await CapacitorHttp.get({ url, responseType: "arraybuffer" });
+  const result = await nativeRequest({ url, responseType: "arraybuffer" }, signal);
   if (signal?.aborted) throw new DOMException("Download cancelled", "AbortError");
 
   const bytes = toBytes(result.data);

@@ -16,6 +16,35 @@ const savedItem: HomeSavedCardItem = {
 };
 
 describe("HomeCards", () => {
+  it.each(["ar", "en"] as const)(
+    "retains the reminder label above specific titles without duplicating untitled evidence in %s",
+    (language) => {
+      const label = language === "ar" ? "تذكير لك الآن" : "Relevant now";
+      const evidence = {
+        title: "Reminder title",
+        hadith: "Reviewed text",
+        benefit: "Meaning",
+        authenticity: "Source",
+        categoryId: "morning",
+        zikrId: "test",
+      };
+      const { rerender } = render(
+        <DailyEvidenceCard language={language} direction={language === "ar" ? "rtl" : "ltr"} evidence={evidence} />,
+      );
+      expect(screen.getByTestId("daily-evidence-label")).toHaveTextContent(label);
+      expect(screen.getByRole("heading", { name: "Reminder title" })).toBeInTheDocument();
+      expect(screen.getByTestId("home-daily-evidence")).toHaveAccessibleDescription(label);
+      rerender(
+        <DailyEvidenceCard
+          language={language}
+          direction={language === "ar" ? "rtl" : "ltr"}
+          evidence={{ ...evidence, title: undefined }}
+        />,
+      );
+      expect(screen.queryByTestId("daily-evidence-label")).not.toBeInTheDocument();
+      expect(screen.getAllByText(label)).toHaveLength(1);
+    },
+  );
   it("keeps the routine card focused on the zikr without redundant mode explanation", () => {
     render(
       <PrayerRoutineCard

@@ -546,12 +546,15 @@ function DailyEvidenceCardContent({
   const [sharingEvidence, setSharingEvidence] = useState<DailyEvidence | null>(null);
   const [refreshSequence, setRefreshSequence] = useState(0);
   const evidence = sharingEvidence ?? readingEvidence ?? focusedEvidence ?? incomingEvidence;
+  const reminderLabel = reminderText(language, "home.dailyEvidence");
+  const hasSpecificTitle = Boolean(evidence.title && evidence.title !== reminderLabel);
   return (
     <HomeCard
       as="section"
       onGlass={onGlass}
       elevation="raised"
       aria-labelledby="home-evidence-heading"
+      aria-describedby={hasSpecificTitle ? "home-evidence-label" : undefined}
       data-testid="home-daily-evidence"
       data-evidence-id={evidence.evidenceId}
       dir={direction}
@@ -561,8 +564,8 @@ function DailyEvidenceCardContent({
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusedEvidence(null);
       }}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-1 basis-40 flex-wrap items-center gap-2">
           <span
             className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
               onGlass
@@ -573,12 +576,23 @@ function DailyEvidenceCardContent({
           >
             <BookOpen size={18} />
           </span>
-          <h2
-            id="home-evidence-heading"
-            className={`min-w-0 text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
-          >
-            {evidence.title ?? reminderText(language, "home.dailyEvidence")}
-          </h2>
+          <div className="min-w-0 flex-1 basis-32">
+            {hasSpecificTitle && (
+              <p
+                id="home-evidence-label"
+                data-testid="daily-evidence-label"
+                className={`text-xs font-semibold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+              >
+                {reminderLabel}
+              </p>
+            )}
+            <h2
+              id="home-evidence-heading"
+              className={`min-w-0 text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
+            >
+              {evidence.title || reminderLabel}
+            </h2>
+          </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-1">

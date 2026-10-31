@@ -6,6 +6,7 @@
    between parts, or reordering the imports, can change which declaration wins. */
 
 /* App Shell Adaptive Grid */
+
 /* Keep mobile pinch gestures from magnifying navigation chrome. Browser/menu
    zoom and the app's text-size/Mushaf magnification controls remain available. */
 @media (hover: none) and (pointer: coarse) {

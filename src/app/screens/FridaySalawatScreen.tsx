@@ -3,6 +3,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
+import { useCounterAnnouncement } from "../hooks/useCounterAnnouncement";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
   ArrowPrevious,
@@ -264,6 +265,7 @@ export function FridaySalawatScreen({
   }, [complete, increment, onBack, reset, showBenefits, showCompletionModal, focusMode, setFocusMode]);
 
   const { pressStyle, surfaceProps } = useCountingSurface({ onCount: increment, reduceMotion });
+  const counterAnnouncement = useCounterAnnouncement(progress.count, progress.target, language, String(rounds));
 
   return (
     <ScreenContainer
@@ -350,7 +352,7 @@ export function FridaySalawatScreen({
           />
         </div>
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {complete ? t(language, "fridaySalawat.completed") : ""}
+          {counterAnnouncement}
         </p>
 
         <div className="counter-reading-canvas relative mx-4 mb-4 mt-4 flex flex-1 overflow-hidden bg-transparent">

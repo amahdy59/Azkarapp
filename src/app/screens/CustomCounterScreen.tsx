@@ -4,6 +4,7 @@ import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
+import { useCounterAnnouncement } from "../hooks/useCounterAnnouncement";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
   ArrowPrevious,
@@ -200,6 +201,7 @@ export function CustomCounterScreen({
 
   const activeText = selectedAuthentic.textAr;
   const isTargetComplete = count >= target;
+  const counterAnnouncement = useCounterAnnouncement(count, target, language, selectedAuthentic.id);
   const progressPercent = Math.min(100, Math.round((count / target) * 100));
 
   const handleTap = useCallback(() => {
@@ -479,6 +481,9 @@ export function CustomCounterScreen({
         </div>
 
         <div className="counter-reading-canvas relative mx-4 mb-4 mt-4 flex flex-1 overflow-hidden bg-transparent">
+          <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {counterAnnouncement}
+          </p>
           <div
             className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
             data-testid="reader-card"

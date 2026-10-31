@@ -1,3 +1,13 @@
+## Compact enlarged-text recovery — 2026-10-31
+
+Home reminder recognition: keep the existing localized “تذكير لك الآن” / “Relevant now” as a small wrapping label above a specific reminder title. The title remains the heading, the label describes the region, and generic untitled reminders show the label once as their heading. Preserve reminder selection, reading focus, refresh and source content.
+
+Keyboard reading follow-up (2026-10-31): focusable reading scroll regions show a quiet 2px inset semantic focus cue with rounded corners. Forced Colors uses an inset system-color outline. This supersedes DEC-062's complete suppression for those keyboard-operable regions while preserving the no-clipped-exterior-outline intention. Completed counters retain focus with `aria-disabled`, ignore further counting and recover normally on advance/reset; explicitly disabled unrelated controls retain native semantics. Short counts announce each accepted step; longer sessions announce bounded milestones and completion without interrupting devotional reading. Native Android Back dismisses the foremost sheet/menu before route navigation and respects listening protection.
+
+The app shell owns the top system inset; Home, Mushaf and Progress controls inside it add ordinary content spacing only. Portalled surfaces retain their own safe-area protection. The Mushaf index reveals the current part/quarter and exact page within its own scrolling panel and restores focus to its opener on dismissal. Part labels and tabs reflow at enlarged text, quarter columns adapt to available width, and expand controls retain 44px targets. Pending Play all has a localized status and actual loading failure offers a clearly labelled app reload; a context change discards the pending request.
+
+Compact Settings headers reserve a fixed 44px Back action, bound inline gutters to 16px, and omit an empty trailing action slot. Compact navigation uses three columns when its container is below 18rem, allowing enlarged Arabic/English labels to wrap at word boundaries with at least 44px actions. The ordinary one-row presentation remains at normal phone text sizes. Downloads uses page-specific offline status for Mushaf resources.
+
 ## Home prayer time fit and action feedback — 2026-10-21
 
 Keep the historical 10px minimum top inset on narrow prayer icons. The expanded narrow icon uses 30px within the existing header footprint (28px condensed), with the original enlarged-text fallback. Check the name-column gap separately from actual time-digit clearance: the expanded time line's transparent flex area can extend below the icon without representing visible overlap.
@@ -467,9 +477,9 @@ Their distinct targets, completion dialogs and shortcuts remain screen behavior.
 
 On portrait mobile viewports, the Mushaf reader integrates floating corner and center controls over the edge-to-edge canvas:
 
-- **Top header:** Sits at `top: max(0.6rem, env(safe-area-inset-top))`. In RTL, the Back button is at top-right (leading edge), Surah cartouche is at top-center, and More actions is at top-left (trailing edge). In LTR, Back is at top-left and More is at top-right.
+- **Top header:** Sits at `top: 0.6rem` within the app shell's protected top inset. In RTL, the Back button is at top-right (leading edge), Surah cartouche is at top-center, and More actions is at top-left (trailing edge). In LTR, Back is at top-left and More is at top-right.
 - **Bottom toolbar:** Sits at `bottom: max(0.6rem, env(safe-area-inset-bottom))`. The three controls — bookmark action (start), jump-to-page folio (center), and word meanings toggle (end) — share identical vertical positioning (`bottom: max(0.6rem, env(safe-area-inset-bottom))`), outer touch target height (`h-11` = 44px), and inner pill height (`h-8` = 32px). They maintain pixel-perfect horizontal alignment across the bottom of the viewport.
-- **Canvas clearance:** To prevent the sacred Quranic text from being obscured by floating chrome, `.mushaf-page-canvas` maintains symmetric clearance: `paddingTop: calc(3.25rem + env(safe-area-inset-top))` and `paddingBottom: calc(3.25rem + env(safe-area-inset-bottom))`. The 15 canonical line slots are completely protected between these clearances.
+- **Canvas clearance:** To prevent sacred Quranic text from being obscured by floating chrome, `.mushaf-page-canvas` uses `paddingTop: var(--mushaf-top-clearance, 3.25rem)` and `paddingBottom: calc(3.25rem + env(safe-area-inset-bottom))`. The host may reserve its actual toolbar height through the top-clearance variable; it never adds the shell's top inset again. The 15 canonical line slots remain protected between these clearances.
 
 ### Alignment and proximity
 

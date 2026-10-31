@@ -10,6 +10,7 @@ for (const scenario of [
   { language: "ar", width: 820, height: 1024, theme: "midnight", scale: 1 },
   { language: "en", width: 1440, height: 900, theme: "dark", scale: 1 },
   { language: "en", width: 390, height: 844, theme: "light", scale: 2 },
+  { language: "ar", width: 320, height: 844, theme: "midnight", scale: 2 },
   { language: "ar", width: 844, height: 390, theme: "midnight", scale: 1 },
 ] as const) {
   test(`offline downloads remain reachable with audio: ${scenario.language}/${scenario.width}/${scenario.scale} @cross-browser`, async ({
@@ -41,6 +42,18 @@ for (const scenario of [
         el.style.fontSize = "32px";
       });
     const player = page.getByRole("region", { name: t(scenario.language, "audioPlayer.region"), exact: true });
+    await expect(page.getByTestId("offline-resource-mushaf")).toContainText(
+      t(scenario.language, "downloads.pagesNotDownloaded"),
+    );
+    if (scenario.width === 320 && scenario.scale === 2) {
+      const heading = page.getByRole("heading", { level: 1, name: t(scenario.language, "downloads.title") });
+      expect((await heading.boundingBox())!.width).toBeGreaterThan(220);
+      expect((await heading.boundingBox())!.height).toBeLessThanOrEqual(110);
+      const links = page.locator(".bottom-nav a");
+      for (const link of await links.all()) {
+        expect((await link.boundingBox())!.width).toBeGreaterThanOrEqual(95);
+      }
+    }
     await expect(player).toHaveAttribute("data-variant", "compact");
     await page.getByTestId("download-category-recitations").locator(":scope > details > summary").click();
     await expect(page.getByTestId("offline-resource-baqarah")).toContainText(

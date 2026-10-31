@@ -36,6 +36,77 @@ test("does nothing when the build has no manifest", () => {
   expect(() => compactBuildManifest().generateBundle.handler({}, {})).not.toThrow();
 });
 
+test("reduces redundant dependency edges while preserving reachability, CSS and cycles from every entry", () => {
+  const data = {
+    "index.html": { file: "index.js", isEntry: true, imports: ["a", "b", "c"] },
+    a: { file: "a.js", imports: ["b", "c"], css: ["a.css"] },
+    b: { file: "b.js", imports: ["c"] },
+    c: { file: "c.js", imports: ["a"] },
+    root: { file: "root.js", imports: ["loop", "leaf"] },
+    loop: { file: "loop.js", imports: ["root"] },
+    leaf: { file: "leaf.js" },
+  };
+  const reachable = (manifest, start) => {
+    const seen = new Set();
+    const visit = (key) => {
+      if (seen.has(key)) return;
+      seen.add(key);
+      for (const dep of manifest[key]?.imports ?? []) visit(dep);
+    };
+    visit(start);
+    return [...seen].sort();
+  };
+  const asset = { type: "asset", source: JSON.stringify(data) };
+  compactBuildManifest().generateBundle.handler({}, { ".vite/manifest.json": asset });
+  const result = JSON.parse(asset.source);
+  for (const key of Object.keys(data)) expect(reachable(result, key)).toEqual(reachable(data, key));
+  expect(result.a.css).toEqual(["a.css"]);
+  expect(result.root.imports).toContain("leaf");
+  expect(asset.source.length).toBeLessThan(JSON.stringify(data).length);
+});
+
+test("omits only unreferenced font/binary lookup records, retaining files, entries and referenced assets", () => {
+  const data = {
+    "index.html": { file: "assets/index.js", isEntry: true, imports: ["used-font"], dynamicImports: ["dynamic-font"] },
+    "unused-font": { file: "assets/font.woff2" },
+    "unused-binary": { file: "assets/history.bin" },
+    "unused-css": { file: "assets/reader.css" },
+    "used-font": { file: "assets/used.woff2" },
+    "dynamic-font": { file: "assets/dynamic.woff2" },
+    "entry-font": { file: "assets/entry.woff2", isEntry: true },
+    reader: { file: "assets/reader.js" },
+  };
+  const asset = { type: "asset", source: JSON.stringify(data) };
+  const font = { type: "asset", source: "unchanged font bytes" };
+  const binary = { type: "asset", source: "unchanged history bytes" };
+  const bundle = { ".vite/manifest.json": asset, "assets/font.woff2": font, "assets/history.bin": binary };
+  compactBuildManifest().generateBundle.handler({}, bundle);
+  const result = JSON.parse(asset.source);
+  expect(result).not.toHaveProperty("unused-font");
+  expect(result).not.toHaveProperty("unused-binary");
+  expect(result).not.toHaveProperty("unused-css");
+  for (const key of ["used-font", "dynamic-font", "entry-font", "reader"]) expect(result[key]).toEqual(data[key]);
+  expect(result["index.html"].imports).toEqual(["used-font"]);
+  expect(bundle["assets/font.woff2"]).toBe(font);
+  expect(bundle["assets/history.bin"]).toBe(binary);
+});
+
+test("interns dependency installation paths while retaining every asset and import edge", () => {
+  const dependency = "node_modules/.pnpm/a-long-versioned-dependency/node_modules/package/index.js";
+  const data = {
+    "index.html": { file: "assets/index.js", isEntry: true, imports: [dependency] },
+    [dependency]: { file: "assets/dependency.js", css: ["assets/dependency.css"] },
+    "src/Reader.tsx": { file: "assets/reader.js", imports: [dependency] },
+  };
+  const asset = { type: "asset", source: JSON.stringify(data) };
+  compactBuildManifest().generateBundle.handler({}, { ".vite/manifest.json": asset });
+  const result = JSON.parse(asset.source);
+  expect(result["index.html"].imports).toEqual(["#0"]);
+  expect(result["src/Reader.tsx"].imports).toEqual(["#0"]);
+  expect(result["#0"]).toEqual(data[dependency]);
+  expect(Object.keys(result)).toHaveLength(3);
+});
+
 test("removes redundant index entry imports while retaining the entry", () => {
   const data = {
     "index.html": { file: "assets/index.js", isEntry: true },

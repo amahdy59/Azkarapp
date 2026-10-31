@@ -376,6 +376,9 @@ export default defineConfig(({ mode, command }) => {
         [path.resolve("src/app/native/capacitorPlatform.ts")]: path.resolve(
           isBrowserBuild ? "src/app/native/capacitorPlatform.browser.ts" : "src/app/native/capacitorPlatform.ts",
         ),
+        [path.resolve("src/app/native/haptics.ts")]: path.resolve(
+          isBrowserBuild ? "src/app/native/haptics.browser.ts" : "src/app/native/haptics.ts",
+        ),
       },
     },
     // File types to support raw imports. Never add .css, .tsx, or .ts files to this.

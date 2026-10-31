@@ -1,4 +1,11 @@
-import { FONT_CACHE_NAME, getMushafPageUrl, getQcfFontUrl, MUSHAF_CACHE_NAME } from "./qcfMushaf";
+import {
+  FONT_CACHE_NAME,
+  getMushafPageUrl,
+  getQcfFontUrl,
+  MUSHAF_CACHE_NAME,
+  readMushafPageResponse,
+  readQcfFontResponse,
+} from "./qcfMushaf";
 import { fetchNativeBinaryResource } from "@azkar/native-mushaf-download";
 
 const PAGE_COUNT = 604;
@@ -25,31 +32,42 @@ export async function getMushafDownloadStatus(): Promise<{
     const pageCache = await caches.open(MUSHAF_CACHE_NAME);
     const fontCache = await caches.open(FONT_CACHE_NAME);
     const [pageKeys, fontKeys] = await Promise.all([pageCache.keys(), fontCache.keys()]);
-    const pageSet = new Set<number>();
-    for (const request of pageKeys) {
-      const match = request.url.match(/\/data\/mushaf\/(\d+)\.json(?:\?.*)?$/);
-      if (match) pageSet.add(Number(match[1]));
-    }
-    const fontSet = new Set<number>();
-    for (const request of fontKeys) {
-      const match = request.url.match(/\/p(\d+)\.woff2$/);
-      if (match) fontSet.add(Number(match[1]));
-    }
+    const pageSet = new Set(pageKeys.map((key) => key.url));
+    const fontSet = new Set(fontKeys.map((key) => key.url));
     let trulyReadyPages = 0;
-    for (const page of pageSet) {
-      if (fontSet.has(page)) {
-        trulyReadyPages++;
-      }
+    let downloadedFonts = 0;
+    for (let first = 1; first <= PAGE_COUNT; first += CONCURRENCY_LIMIT) {
+      await Promise.all(
+        Array.from({ length: Math.min(CONCURRENCY_LIMIT, PAGE_COUNT - first + 1) }, async (_, offset) => {
+          const page = first + offset;
+          const pUrl = pageUrl(page);
+          const fUrl = new URL(fontUrl(page), window.location.href).href;
+          const [hasPage, hasFont] = await Promise.all([
+            pageSet.has(pUrl) && validCachedResource(pageCache, pUrl, readMushafPageResponse),
+            fontSet.has(fUrl) && validCachedResource(fontCache, fUrl, readQcfFontResponse),
+          ]);
+          if (hasFont) downloadedFonts++;
+          if (hasPage && hasFont) trulyReadyPages++;
+        }),
+      );
     }
     return {
       downloadedPages: trulyReadyPages,
-      downloadedFonts: fontSet.size,
+      downloadedFonts,
       totalPages: PAGE_COUNT,
       isComplete: trulyReadyPages >= PAGE_COUNT,
     };
   } catch {
     return { downloadedPages: 0, downloadedFonts: 0, totalPages: PAGE_COUNT, isComplete: false };
   }
+}
+
+async function validCachedResource(cache: Cache, url: string, read: (response: Response) => Promise<unknown>) {
+  const response = await cache.match(url);
+  if (!response) return false;
+  if (await read(response)) return true;
+  await cache.delete(url);
+  return false;
 }
 
 export async function removeDownloadedMushaf(): Promise<void> {
@@ -81,7 +99,10 @@ export async function downloadMushaf(
     const pUrl = pageUrl(page);
     const fUrl = fontUrl(page);
 
-    const [hasPage, hasFont] = await Promise.all([pageCache.match(pUrl), fontCache.match(fUrl)]);
+    const [hasPage, hasFont] = await Promise.all([
+      validCachedResource(pageCache, pUrl, readMushafPageResponse),
+      validCachedResource(fontCache, fUrl, readQcfFontResponse),
+    ]);
 
     const fetchTasks: Promise<void>[] = [];
 
@@ -90,6 +111,8 @@ export async function downloadMushaf(
         (async () => {
           const response = await fetchNativeBinaryResource(pUrl, controller.signal);
           if (!response.ok) throw new Error(`Mushaf page ${page} failed: ${response.status}`);
+          if (!(await readMushafPageResponse(response))) throw new Error(`Mushaf page ${page} was invalid`);
+          controller.signal.throwIfAborted();
           await pageCache.put(pUrl, response);
         })(),
       );
@@ -100,6 +123,8 @@ export async function downloadMushaf(
         (async () => {
           const fontResponse = await fetchNativeBinaryResource(fUrl, controller.signal);
           if (!fontResponse.ok) throw new Error(`Mushaf font ${page} failed: ${fontResponse.status}`);
+          if (!(await readQcfFontResponse(fontResponse))) throw new Error(`Mushaf font ${page} was invalid`);
+          controller.signal.throwIfAborted();
           await fontCache.put(fUrl, fontResponse);
         })(),
       );

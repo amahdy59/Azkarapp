@@ -161,6 +161,18 @@
   outline: none;
 }
 
+.reader-text-scroll:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ring);
+  border-radius: var(--radius-md);
+}
+
+@media (forced-colors: active) {
+  .reader-text-scroll:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 /* Composite fields: a borderless input sitting inside a rounded shell.
    The shell is the control the reader sees, so it carries the focus ring and
    the input inside carries none. Without this the fallback above draws its
@@ -222,37 +234,6 @@
 .app-shell {
   transition: var(--theme-transition);
 }
-
-@keyframes pulse-horizontal-ltr {
-  0%,
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(4px);
-    opacity: 0.65;
-  }
-}
-@keyframes pulse-horizontal-rtl {
-  0%,
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(-4px);
-    opacity: 0.65;
-  }
-}
-
-.animate-pulse-horizontal {
-  animation: pulse-horizontal-ltr 1.2s ease-in-out 3;
-}
-[dir="rtl"] .animate-pulse-horizontal {
-  animation: pulse-horizontal-rtl 1.2s ease-in-out 3;
-}
-/* .element-pop is declared with .favorite-pop above, on the motion tokens. */
 
 .zikr-text {
   font-family: var(--font-zikr);

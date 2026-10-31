@@ -59,5 +59,7 @@ export const ISOLATED_SUITES = [
   "src/app/screens/settings/WhatsNewPanel.test.tsx",
   "src/app/screens/settings/AccountDataPanel.test.tsx",
   "src/app/screens/settings/SettingsSection.test.tsx",
+  "src/app/native/haptics.test.ts",
+  "src/app/hooks/useAppRouting.native.test.tsx",
   "src/lib/auth.test.ts",
 ];
