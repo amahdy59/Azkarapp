@@ -19,6 +19,7 @@ import type { AppLanguage } from "../types";
 import type { CalendarType } from "../calendarPeriods";
 import { dashboardText as text } from "../i18n/progressDashboard";
 import { formatNumerals, formatPercentage } from "../formatting";
+import { getProgressDayKey } from "../progress";
 import {
   DEFAULT_PROGRESS_METRICS,
   compareProgressMetric,
@@ -29,6 +30,7 @@ import {
   metricProgressRange,
   summarizeProgressMetric,
   scopeProgressDailyRecords,
+  progressRecordingPattern,
   type ProgressDailyRecord,
   type ProgressMetric,
   type ProgressPreset,
@@ -36,6 +38,7 @@ import {
 } from "../progressDashboard";
 import { RecordingTimeline } from "./RecordingTimeline";
 import { ProgressRecordsTable } from "./ProgressRecordsTable";
+import { ProgressRecordingPattern } from "./ProgressRecordingPattern";
 import { IconButton } from "./LayoutShells";
 import { ChevronUp, ChevronDown } from "./icons";
 
@@ -149,6 +152,14 @@ export function ProgressDashboard({
           });
   };
   const hasActivity = scopedRows.some((row) => PROGRESS_METRICS.some((key) => (row[key] ?? 0) > 0));
+  const hasHistory = records.some(
+    (row) => row.dayKey <= getProgressDayKey(now, 0) && PROGRESS_METRICS.some((key) => (row[key] ?? 0) > 0),
+  );
+  const hasTargets = scopedRows.some((row) => row.quranGoal !== null);
+  const pattern = useMemo(
+    () => progressRecordingPattern(records, range, now, dayStart, currentDay),
+    [records, range, now, dayStart, currentDay],
+  );
   const move = (key: ProgressMetric, step: number) => {
     const next = [...draft];
     const index = next.indexOf(key);
@@ -195,7 +206,9 @@ export function ProgressDashboard({
           {!hasActivity && (
             <div className="my-3 rounded-xl border border-border bg-muted/30 p-3" data-testid="progress-empty-period">
               <p className="text-sm font-semibold">{text(language, "emptyPeriod")}</p>
-              <p className="mt-1 progress-help">{text(language, "emptyPeriodHelp")}</p>
+              <p className="mt-1 progress-help">
+                {text(language, hasTargets ? "targetOnlyHelp" : hasHistory ? "emptyPeriodHelp" : "noHistoryHelp")}
+              </p>
               {emptyActions && <div className="mt-2 flex flex-wrap gap-2">{emptyActions}</div>}
             </div>
           )}
@@ -309,7 +322,7 @@ export function ProgressDashboard({
                       <ChevronRight size={14} aria-hidden="true" className="shrink-0 rtl:rotate-180" />
                     </button>
                   </dt>
-                  <dd className="mt-1 break-words text-xl font-bold tabular-nums">
+                  <dd className="mt-1 break-words text-2xl font-bold tabular-nums">
                     <bdi>{quantity(key)}</bdi>
                   </dd>
                   {value.possible !== null && value.possible > 0 && (
@@ -344,8 +357,23 @@ export function ProgressDashboard({
               );
             })}
           </dl>
+          {hasActivity && values.morning.days >= 3 && values.morning.count !== values.evening.count && (
+            <aside
+              className="mt-4 rounded-xl border border-border bg-primary/10 p-3 sm:p-4"
+              aria-label={text(language, "insight")}
+            >
+              <h3 className="text-sm font-bold">{text(language, "insight")}</h3>
+              <p className="mt-1 text-sm leading-relaxed">
+                {text(language, "routineInsight", {
+                  morning: formatNumerals(values.morning.count, language),
+                  evening: formatNumerals(values.evening.count, language),
+                })}
+              </p>
+            </aside>
+          )}
         </section>
       )}
+      {view === "overview" && <ProgressRecordingPattern days={pattern} language={language} calendar={calendar} />}
       {view === "trends" && (
         <>
           <section

@@ -36,6 +36,41 @@ async function seed(page: Page, language: "ar" | "en", theme = "light", material
 }
 
 for (const language of ["ar", "en"] as const) {
+  test(`Progress overview and selected dates reflow across themes in ${language} @cross-browser`, async ({
+    page,
+  }, info) => {
+    await seed(page, language, "midnight", "glass");
+    await page.goto("/#/progress/month");
+    const pattern = page.getByTestId("progress-recording-pattern");
+    await expect(pattern.getByRole("listitem")).toHaveCount(7);
+    await expect(pattern.locator("time").first()).toHaveAttribute("datetime", "2026-10-14");
+    await expect(pattern.locator("time").last()).toHaveAttribute("datetime", "2026-10-20");
+    for (const width of [320, 390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const enlarged of [false, true]) {
+        await page.evaluate((enlarged) => {
+          document.documentElement.style.fontSize = enlarged ? "200%" : "100%";
+        }, enlarged);
+        const date = page.getByTestId("garden-view-date");
+        await expect(date).toBeVisible();
+        expect(
+          await date.evaluate(
+            (node) =>
+              node.scrollWidth <= node.clientWidth + 1 &&
+              getComputedStyle(node).overflow === "visible" &&
+              node.getBoundingClientRect().height <= node.parentElement!.getBoundingClientRect().height,
+          ),
+        ).toBe(true);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+        await pattern.scrollIntoViewIfNeeded();
+        expect(await pattern.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+        await page.screenshot({
+          path: info.outputPath(`progress-${language}-${width}-${enlarged ? "200" : "100"}.png`),
+          scale: "css",
+        });
+      }
+    }
+  });
   test(`Progress exact chart buckets and rate comparison stay coherent in ${language} @cross-browser`, async ({
     page,
   }, info) => {

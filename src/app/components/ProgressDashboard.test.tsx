@@ -47,8 +47,21 @@ describe("ProgressDashboard", () => {
     expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("No activity recorded");
     expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument();
     expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("0 of 1");
+    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("Saved Quran targets");
     rerender(<ProgressDashboard {...props()} />);
     expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
+  });
+  it("distinguishes first records from an empty selection and reports a factual routine insight", () => {
+    const { rerender } = render(<ProgressDashboard {...props()} records={[]} />);
+    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("Save a record from Home");
+    rerender(<ProgressDashboard {...props()} range={{ startKey: "2026-09-01", endKey: "2026-09-30" }} />);
+    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("Choose another period");
+    rerender(<ProgressDashboard {...props()} />);
+    expect(screen.getByRole("complementary", { name: "From your saved records" })).toHaveTextContent(
+      "Days with morning records: 19. Days with evening records: 0",
+    );
+    expect(within(screen.getByTestId("progress-recording-pattern")).getAllByRole("listitem")).toHaveLength(7);
+    expect(screen.getByTestId("progress-recording-pattern")).toHaveTextContent("Saved target");
   });
   it("offers a real week action from a one-day trend without drawing a misleading line", () => {
     const onChooseWeek = vi.fn();

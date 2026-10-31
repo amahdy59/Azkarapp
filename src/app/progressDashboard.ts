@@ -317,6 +317,40 @@ export function scopeProgressDailyRecords(
     });
 }
 
+/** Presence of saved activity, not a judgment about worship or an invented
+ * per-practice explicit-zero record. Apply civil/devotional windows first. */
+export function progressRecordingPattern(
+  records: readonly ProgressDailyRecord[],
+  range: ProgressRange,
+  now: Date,
+  dayStart: number,
+  currentDay: boolean,
+) {
+  const windows = PROGRESS_METRICS.map((metric) =>
+    metricProgressRange(range, metric, now, dayStart, false, currentDay),
+  ).filter((window) => progressRangeDays(window) > 0);
+  if (!windows.length) return [];
+  const start = windows.map((window) => window.startKey).sort()[0]!;
+  const end = windows
+    .map((window) => window.endKey)
+    .sort()
+    .at(-1)!;
+  const rows = new Map(
+    scopeProgressDailyRecords(records, range, now, dayStart, currentDay).map((row) => [row.dayKey, row]),
+  );
+  return Array.from({ length: Math.min(7, progressRangeDays({ startKey: start, endKey: end })) }, (_, index) => {
+    const dayKey = shiftProgressDayKey(end, -index);
+    const row = rows.get(dayKey);
+    const kind =
+      row && PROGRESS_METRICS.some((metric) => (row[metric] ?? 0) > 0)
+        ? "activity"
+        : row?.quranGoal
+          ? "target"
+          : "none";
+    return { dayKey, kind } as const;
+  }).reverse();
+}
+
 export function exportProgressDashboard(
   input: ProgressDashboardInput,
   records: readonly ProgressDailyRecord[],

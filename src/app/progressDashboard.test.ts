@@ -3,6 +3,7 @@ import { getProgressDayKey } from "./progress";
 import {
   dashboardProgressBuckets,
   compareProgressMetric,
+  progressRecordingPattern,
   exportProgressDashboard,
   scopeProgressDailyRecords,
   dashboardProgressTimeline,
@@ -26,6 +27,33 @@ const empty: ProgressDashboardInput = {
   quranWirdDailyGoals: {},
 };
 describe("focused Progress range and independent facts", () => {
+  it("shows recording presence only inside civil/devotional scopes and keeps target-only days distinct", () => {
+    const rows = indexProgressDashboard(
+      {
+        ...empty,
+        dailyCompletions: [{ dayKey: "2026-10-19", category: "morning", timeZone: "Africa/Cairo" }],
+        prayerTracking: [{ dayKey: "2026-10-20", prayer: "fajr", location: "home" }],
+        quranWirdDailyGoals: { "2026-10-18": 4 },
+        wirdHistory: { "2026-10-21": [1] },
+      },
+      "2026-10-19",
+    );
+    expect(progressRecordingPattern(rows, range, now, 3, false)).toEqual([
+      { dayKey: "2026-10-18", kind: "target" },
+      { dayKey: "2026-10-19", kind: "activity" },
+      { dayKey: "2026-10-20", kind: "activity" },
+    ]);
+    expect(
+      progressRecordingPattern(rows, { startKey: "2026-10-20", endKey: "2026-10-20" }, now, 3, true).map(
+        (day) => day.dayKey,
+      ),
+    ).toEqual(["2026-10-19", "2026-10-20"]);
+    const last = progressRecordingPattern(rows, { startKey: "2026-10-01", endKey: "2026-10-31" }, now, 3, false);
+    expect(last).toHaveLength(7);
+    expect(last[0]).toEqual({ dayKey: "2026-10-14", kind: "none" });
+    expect(progressRecordingPattern(rows, { startKey: "2026-10-21", endKey: "2026-10-31" }, now, 3, false)).toEqual([]);
+    expect(progressRecordingPattern([], range, now, 3, false).every((day) => day.kind === "none")).toBe(true);
+  });
   it("compares supported rates in percentage points while preserving page counts and known-goal restrictions", () => {
     const value = (count: number, possible: number | null, days = 7) => ({ count, possible, days, range });
     expect(compareProgressMetric(value(6, 10), value(12, 30), "routines")).toMatchObject({
