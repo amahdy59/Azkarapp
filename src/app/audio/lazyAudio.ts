@@ -1,8 +1,8 @@
 import type { AudioCoverage } from "./audioTypes";
 
-/** Shown until the audio module chunk has loaded: no zikr has audio yet, so
- *  coverage-gated UI (the "play all" button, the coverage dialog) stays off
- *  rather than lying about what is playable. */
+/** No verified coverage counts are available until the audio manifest loads.
+ *  Reviewed assignments may expose a loading action; counts and coverage
+ *  confirmation always wait for the actual manifest. */
 export const EMPTY_AUDIO_COVERAGE: AudioCoverage = {
   total: 0,
   available: 0,

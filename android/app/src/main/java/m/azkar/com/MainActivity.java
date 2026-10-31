@@ -16,6 +16,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(AzkarWidgetsPlugin.class);
         registerPlugin(AzkarFilesPlugin.class);
         registerPlugin(NativeSharingPlugin.class);
+        registerPlugin(AzkarHapticsPlugin.class);
         super.onCreate(savedInstanceState);
         configureSystemBars();
     }
