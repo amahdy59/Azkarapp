@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-31.1",
+  "release": "2026-10-31.2",
   "ar": [
-    "إبراز موضع القراءة بلوحة المفاتيح واستمرار التركيز بعد اكتمال العد.",
-    "وسم أوضح لتذكيرات الرئيسية مع تحسين الالتفاف عند تكبير النص.",
-    "نطق معالم العد صوتياً وإغلاق النوافذ بالزر الخلفي قبل التنقل.",
-    "استعادة صفحات المصحف التالفة بلا اتصال ومتابعة تشغيل الصوت تلقائياً."
+    "إصلاح تنزيل ملفات الصوت المضغوطة لتفتح بسلاسة على ويندوز وكافة الأجهزة.",
+    "استقرار حفظ التنزيلات الصوتية والمصحف والتحقق من اكتمالها بعد تحديث الصفحة.",
+    "تحسين ملاءمة شريط التنقل السفلي تلقائياً عند تكبير الخط والشاشات الصغيرة.",
+    "ضبط دقة أبعاد أزرار الوصول السريع وتجاوبها السلس مع اللمس والتنقل."
   ],
   "en": [
-    "Visible keyboard reading focus and seamless counting without losing position.",
-    "Clearer contextual reminder badge on Home with improved enlarged-text reflow.",
-    "Spoken counter milestone announcements and back navigation that closes overlays first.",
-    "Automatic recovery of corrupted offline Mushaf pages and continuous audio auto-advance."
+    "Fixed audio ZIP downloads so archives open smoothly on Windows and all platforms.",
+    "Reliable offline audio and Mushaf caching that persists verification after page reload.",
+    "Improved bottom navigation layout under enlarged text sizes and narrow screens.",
+    "Refined shortcut touch target dimensions for smooth touch and keyboard navigation."
   ]
 }

@@ -74,4 +74,30 @@ describe("buildArchiveEntryPath", () => {
     const path = buildArchiveEntryPath(problematicFile, 3, "en");
     expect(path).toBe("01 - Morning Azkar (أذكار الصباح)/03 - Dua- -Protection- - Refuge - Abdullah Muhammad.mp3");
   });
+
+  it("strips multi-line study notes, removes Arabic tashkeel, and bounds long titles for Windows MAX_PATH safety", () => {
+    const multilineFile: SavedAudioFile = {
+      ...azkarFile,
+      titleArabic: "الاستغفار من الذنوب كلها\n• دقّه وجلّه: صغيره وكبيره.\n• علانيته وسره: ما ظهر للناس وما خفي عنهم.",
+      category: "other",
+      fileName: "dua.mp3",
+    };
+    const path = buildArchiveEntryPath(multilineFile, 13, "ar");
+    expect(path).toBe(
+      "07 - Duas & Other Azkar (أدعية وأذكار متنوعة)/13 - الاستغفار من الذنوب كلها - عبد الله محمد.mp3",
+    );
+
+    const longTashkeelFile: SavedAudioFile = {
+      ...azkarFile,
+      titleArabic:
+        "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا كَثِيرًا مُبَارَكًا فِيهِ دَائِمًا",
+      category: "other",
+      fileName: "dua.mp3",
+    };
+    const longPath = buildArchiveEntryPath(longTashkeelFile, 9, "ar");
+    expect(longPath.includes("•")).toBe(false);
+    expect(/[\u064b-\u0652]/.test(longPath)).toBe(false);
+    // Relative path must comfortably stay below Windows MAX_PATH constraints
+    expect(longPath.length).toBeLessThanOrEqual(140);
+  });
 });

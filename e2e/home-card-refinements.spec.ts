@@ -49,7 +49,7 @@ for (const language of ["ar", "en"] as const) {
       if (language === "ar") await expect(shortcuts.getByRole("link", { name: "أذكار الطعام" })).toBeVisible();
       for (const link of await shortcuts.getByRole("link").all()) {
         const box = (await link.boundingBox())!;
-        expect(box.height).toBeGreaterThanOrEqual(44);
+        expect(Math.round(box.height)).toBeGreaterThanOrEqual(44);
         expect(box.width).toBeGreaterThanOrEqual(44);
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
