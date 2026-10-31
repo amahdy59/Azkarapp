@@ -1,0 +1,66 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Page } from "@playwright/test";
+import { chooseProgressOption } from "./helpers/progress";
+
+async function seed(page: Page, language: "ar" | "en", theme = "light", material = "solid") {
+  await page.clock.setFixedTime(new Date("2026-10-20T12:00:00+03:00"));
+  await page.addInitScript(
+    ({ language, theme, material }) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: {
+            language,
+            themeMode: theme,
+            appMaterial: material,
+            calendarType: "gregorian",
+            progressDayStartHour: 3,
+            reduceMotion: true,
+          },
+          profile: { isGuest: true },
+          dailyCompletions: ["2026-09-01", "2026-10-01", "2026-10-08", "2026-10-15"].map((dayKey) => ({
+            dayKey,
+            category: "morning",
+            timeZone: "Africa/Cairo",
+          })),
+          prayerTracking: [],
+          dailyHabits: [],
+          wirdHistory: { "2026-10-01": [1, 2], "2026-10-15": [3] },
+          quranWirdDailyGoals: { "2026-10-15": 4 },
+        }),
+      );
+    },
+    { language, theme, material },
+  );
+}
+
+for (const language of ["ar", "en"] as const) {
+  test(`Progress exact chart buckets and rate comparison stay coherent in ${language} @cross-browser`, async ({
+    page,
+  }, info) => {
+    const ar = language === "ar";
+    await seed(page, language);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/#/progress/month");
+    await page.getByTestId("progress-metric-routines").getByRole("button").click();
+    const chart = page.getByTestId("progress-main-trend");
+    await expect(page.getByTestId("progress-period-comparison")).toContainText(ar ? "نقطة مئوية" : "percentage points");
+    await chart.getByText(ar ? "بيانات الرسم الدقيقة" : "Exact chart data", { exact: true }).click();
+    const table = chart.getByRole("table");
+    await expect(table.getByRole("rowheader")).toHaveCount(3);
+    await expect(table.getByRole("row").nth(1)).toContainText(ar ? "٢١" : "21");
+    await expect(table.getByRole("row").nth(3)).toContainText(ar ? "١٥" : "15");
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true }),
+      "quranGoals",
+    );
+    await chart.getByText(ar ? "بيانات الرسم الدقيقة" : "Exact chart data", { exact: true }).click();
+    await expect(chart.getByRole("table")).toContainText(ar ? "غير متاح" : "Unavailable");
+    await expect(chart.getByTestId("recording-time-line")).toHaveCount(0);
+    await page.screenshot({ path: info.outputPath(`progress-${language}-chart-data.png`), fullPage: true });
+    expect(
+      (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations,
+    ).toEqual([]);
+  });
+}

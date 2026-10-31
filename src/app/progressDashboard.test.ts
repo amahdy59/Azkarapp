@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getProgressDayKey } from "./progress";
 import {
   dashboardProgressBuckets,
+  compareProgressMetric,
   exportProgressDashboard,
   scopeProgressDailyRecords,
   dashboardProgressTimeline,
@@ -25,6 +26,23 @@ const empty: ProgressDashboardInput = {
   quranWirdDailyGoals: {},
 };
 describe("focused Progress range and independent facts", () => {
+  it("compares supported rates in percentage points while preserving page counts and known-goal restrictions", () => {
+    const value = (count: number, possible: number | null, days = 7) => ({ count, possible, days, range });
+    expect(compareProgressMetric(value(6, 10), value(12, 30), "routines")).toMatchObject({
+      kind: "rate",
+      currentRate: 60,
+      previousRate: 40,
+      change: 20,
+    });
+    expect(compareProgressMetric(value(6, null), value(12, null), "pages")).toEqual({ kind: "count", change: -6 });
+    expect(compareProgressMetric(value(0, 21), value(7, 21), "routines")?.change).toBeCloseTo(-100 / 3);
+    expect(compareProgressMetric(value(1, 2), value(1, 3), "quranGoals")).toBeNull();
+    expect(compareProgressMetric(value(2, 3), value(1, 3), "quranGoals")).toMatchObject({ kind: "rate" });
+    expect(compareProgressMetric(value(0, 0), value(1, 3), "quranGoals")).toBeNull();
+    expect(compareProgressMetric(value(2, 3, 2), value(1, 3, 2), "routines")).toBeNull();
+    expect(compareProgressMetric(value(2, 3), value(1, 3, 6), "routines")).toBeNull();
+    expect(compareProgressMetric(value(2, 3), value(0, 3), "routines")).toBeNull();
+  });
   it("respects an explicit no-goal day rather than replacing it with a current plan", () => {
     const rows = indexProgressDashboard(
       {

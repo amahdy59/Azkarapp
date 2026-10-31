@@ -21,6 +21,7 @@ import { dashboardText as text } from "../i18n/progressDashboard";
 import { formatNumerals, formatPercentage } from "../formatting";
 import {
   DEFAULT_PROGRESS_METRICS,
+  compareProgressMetric,
   PROGRESS_METRICS,
   dashboardProgressTimeline,
   formatProgressRange,
@@ -123,10 +124,15 @@ export function ProgressDashboard({
   );
   const previous = summarizeProgressMetric(records, matched.previous, metric);
   const selected = summarizeProgressMetric(records, matched.current, metric);
-  const canCompare =
-    matched.days >= 3 &&
-    previous.count > 0 &&
-    (metric !== "quranGoals" || (selected.possible === previous.possible && Boolean(selected.possible)));
+  const comparison = compareProgressMetric(selected, previous, metric);
+  const comparisonValue = (value: typeof selected) =>
+    comparison?.kind === "rate"
+      ? text(language, "rateValue", {
+          rate: formatPercentage(Math.round((value.count / value.possible!) * 1000) / 10, language),
+          count: formatNumerals(value.count, language),
+          total: formatNumerals(value.possible!, language),
+        })
+      : `${formatNumerals(value.count, language)} ${text(language, "pagesUnit")}`;
   const scopedRows = useMemo(
     () => scopeProgressDailyRecords(records, range, now, dayStart, currentDay),
     [records, range, now, dayStart, currentDay],
@@ -399,17 +405,23 @@ export function ProgressDashboard({
                 </p>
                 <div className="mt-4 border-t border-border pt-4" data-testid="progress-period-comparison">
                   <h3 className="text-sm font-semibold">{text(language, "comparison")}</h3>
-                  {canCompare ? (
+                  {comparison ? (
                     <div className="mt-2 space-y-1">
                       <p className="text-sm font-bold">
                         {text(
                           language,
-                          selected.count > previous.count
-                            ? "more"
-                            : selected.count < previous.count
-                              ? "fewer"
-                              : "unchanged",
-                          { count: formatNumerals(Math.abs(selected.count - previous.count), language) },
+                          comparison.kind === "rate"
+                            ? Math.abs(comparison.change) < 0.05
+                              ? "rateUnchanged"
+                              : comparison.change > 0
+                                ? "rateHigher"
+                                : "rateLower"
+                            : comparison.change > 0
+                              ? "more"
+                              : comparison.change < 0
+                                ? "fewer"
+                                : "unchanged",
+                          { count: formatNumerals(Math.round(Math.abs(comparison.change) * 10) / 10, language) },
                         )}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -417,11 +429,11 @@ export function ProgressDashboard({
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatProgressRange(matched.previous, language, calendar)} ·{" "}
-                        {text(language, "previousValue", { count: formatNumerals(previous.count, language) })}
+                        <bdi>{text(language, "previousValue", { count: comparisonValue(previous) })}</bdi>
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatProgressRange(matched.current, language, calendar)} ·{" "}
-                        {text(language, "currentValue", { count: formatNumerals(selected.count, language) })}
+                        <bdi>{text(language, "currentValue", { count: comparisonValue(selected) })}</bdi>
                       </p>
                     </div>
                   ) : (

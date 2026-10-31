@@ -23,6 +23,33 @@ const series: RecordingTimelineSeries[] = [
   },
 ];
 describe("RecordingTimeline", () => {
+  it("discloses exact plotted buckets, including unavailable rates and partial dates, without fabricating zero rates", async () => {
+    render(
+      <RecordingTimeline
+        series={[
+          { ...series[0]!, points: [series[0]!.points[0]!, { ...series[0]!.points[2]!, recorded: 0, possible: 0 }] },
+        ]}
+        language="en"
+        period="month"
+        title="Exact rates"
+        testId="exact"
+      />,
+    );
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText("Exact chart data"));
+    const table = await screen.findByRole("table", { name: "Exact rates · Exact chart data" });
+    const rows = within(table).getAllByRole("row");
+    expect(rows).toHaveLength(3);
+    expect(rows[1]).toHaveTextContent("1–7 Oct");
+    expect(
+      within(rows[1]!)
+        .getAllByRole("cell")
+        .map((cell) => cell.textContent),
+    ).toEqual(["7", "21", "33%"]);
+    expect(rows[2]).toHaveTextContent("Unavailable");
+    expect(rows[2]).not.toHaveTextContent("0%");
+    expect(rows[2]).toHaveTextContent("Period in progress");
+  });
   it.each(["ar", "en"] as const)(
     "keeps coordinates, pointer selection and physical arrows coherent in %s",
     (language) => {

@@ -87,6 +87,21 @@ export type ProgressScopedDailyRecord = { dayKey: string; quranGoal: number | nu
   number | null
 >;
 
+/** Unknown historical goals are never evidence of a change in recording rate. */
+export function compareProgressMetric(
+  current: ProgressMetricValue,
+  previous: ProgressMetricValue,
+  metric: ProgressMetric,
+) {
+  if (current.days < 3 || current.days !== previous.days || previous.count <= 0) return null;
+  if (metric === "pages") return { kind: "count" as const, change: current.count - previous.count };
+  if (!current.possible || !previous.possible) return null;
+  if (metric === "quranGoals" && current.possible !== previous.possible) return null;
+  const currentRate = (current.count / current.possible) * 100;
+  const previousRate = (previous.count / previous.possible) * 100;
+  return { kind: "rate" as const, currentRate, previousRate, change: currentRate - previousRate };
+}
+
 /** Build sparse, normalized daily facts once per actual record revision. No
  * historical opportunities, goal changes or item records are reconstructed. */
 export function indexProgressDashboard(input: ProgressDashboardInput, devotionalToday: string): ProgressDailyRecord[] {

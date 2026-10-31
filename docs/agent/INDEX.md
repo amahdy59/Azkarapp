@@ -1,4 +1,6 @@
-[Recognizable Home reminder label](phases/HOME_REMINDER_LABEL_2026_10_31.md) is the current owner-approved phase. Retain the feature label above specific titles and validate refresh and enlarged bilingual layouts, preserving the production hold.
+[Progress vNext implementation and release](phases/PROGRESS_VNEXT_2026_10_31.md) is the current owner-approved phase. Apply the reviewed recommendations with the existing four metrics, repair the latest changes, and complete local gates, main push, exact-commit CI/Pages and production validation. The owner's explicit release request supersedes preceding production holds.
+
+[Recognizable Home reminder label](phases/HOME_REMINDER_LABEL_2026_10_31.md) records the preceding completed phase.
 
 [Counter accessibility, Android Back and release headroom](phases/COUNTER_ACCESSIBILITY_BACK_2026_10_31.md) records the preceding local implementation and checks.
 
