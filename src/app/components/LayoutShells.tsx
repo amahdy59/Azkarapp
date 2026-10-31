@@ -182,7 +182,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
       aria-label={t(language, "common.bottomNavigation")}
       className="bottom-nav flex min-h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
     >
-      <div className="bottom-nav-items flex min-h-0 flex-1 items-center justify-between px-1 min-[360px]:px-2 min-[390px]:px-4">
+      <div className="bottom-nav-items flex min-h-0 flex-1 items-center justify-start overflow-x-auto px-1 min-[360px]:justify-between min-[360px]:px-2 min-[390px]:px-4">
         {tabs.map(({ id, label, Icon }) => {
           const on = active === id;
           return (
@@ -193,7 +193,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
               onClick={(event) => followInAppLink(event, () => onChange(id))}
               aria-label={label}
               aria-current={on ? "page" : undefined}
-              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg no-underline transition-[opacity,transform] duration-fast active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="relative flex h-full min-h-11 min-w-[95px] shrink-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg no-underline transition-[opacity,transform] duration-fast active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {/* Persistent non-color active cue. The selected state must not be
                   conveyed by colour alone, and .nav-active-cue below is only a

@@ -16,6 +16,14 @@ function isAudioUrl(url: string) {
   return url.startsWith(AUDIO_ORIGIN);
 }
 
+function audioContentType(url: string) {
+  const pathname = new URL(url).pathname.toLowerCase();
+  if (pathname.endsWith(".wav")) return "audio/wav";
+  if (pathname.endsWith(".ogg") || pathname.endsWith(".oga")) return "audio/ogg";
+  if (pathname.endsWith(".m4a")) return "audio/mp4";
+  return "audio/mpeg";
+}
+
 function decodeBase64(value: string) {
   const binary = atob(value);
   const bytes = new Uint8Array(binary.length);
@@ -72,6 +80,11 @@ async function fetchNativeAudioStream(url: string, signal?: AbortSignal) {
   }
   let nextByte = 0;
   let totalBytes: number | undefined;
+  // The Response is created before the first range request is pulled. Infer
+  // the type up front so WAV/OGG recordings are not rejected by the transfer
+  // verifier as audio/mpeg before the native headers arrive.
+  const firstHeaders = (first.headers ?? {}) as Record<string, string>;
+  let contentType = headerValue(firstHeaders, "content-type") || audioContentType(url);
   let pending: typeof first | undefined = first;
   const stream = new ReadableStream<Uint8Array>({
     async pull(controller) {
@@ -83,6 +96,8 @@ async function fetchNativeAudioStream(url: string, signal?: AbortSignal) {
           throw new Error(`Native audio request failed: ${result.status}`);
 
         const headers = (result.headers ?? {}) as Record<string, string>;
+        const responseContentType = headerValue(headers, "content-type");
+        if (responseContentType) contentType = responseContentType;
         const contentRange = headerValue(headers, "content-range");
         const rangeMatch = contentRange?.match(/bytes\s+(\d+)-(\d+)\/(\d+)/i);
         if (rangeMatch) {
@@ -123,7 +138,7 @@ async function fetchNativeAudioStream(url: string, signal?: AbortSignal) {
   // headers for WAV recordings or hide a real HTTP error behind status 200.
   return new Response(stream, {
     status: 200,
-    headers: { "content-type": headers.get("content-type") ?? "application/octet-stream" },
+    headers: { "content-type": contentType },
   });
 }
 

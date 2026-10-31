@@ -83,10 +83,11 @@ export function getUpcomingNativeReminders(
         continue;
       const at = scheduledTime(date, reminders[kind].time);
       if (at <= now) continue;
+      const title = t(language, `notifications.${kind}Title`);
       upcoming.push({
         id: nativeNotificationId(kind, at),
-        title: "Azkar",
-        body: t(language, `notifications.${kind}`),
+        title,
+        body: `${t(language, "notifications.reminderPrefix")} ${title}`,
         at,
         kind,
         dayKey,
@@ -123,7 +124,12 @@ export async function rescheduleNativeReminders(
   if (!isNativeAndroid()) return;
   if ((await LocalNotifications.checkPermissions()).display !== "granted") return;
   const pending = await LocalNotifications.getPending();
-  const owned = pending.notifications.filter((item) => item.extra?.azkarappReminder === true);
+  // Older Android builds used the 10,000–19,999 ID range without ownership
+  // metadata. Remove those legacy alarms too, otherwise upgrading leaves the
+  // old schedule alongside this one and every prayer/Azkar reminder fires twice.
+  const owned = pending.notifications.filter(
+    (item) => item.extra?.azkarappReminder === true || (item.id >= 10_000 && item.id < 20_000),
+  );
   if (owned.length) await LocalNotifications.cancel({ notifications: owned.map(({ id }) => ({ id })) });
   const upcoming = getUpcomingNativeReminders(reminders, dailyCompletions, language, location);
   if (!upcoming.length) return;

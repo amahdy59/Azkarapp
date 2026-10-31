@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import { isNativeAndroid } from "../native/platform";
 import { buildWidgetSnapshot, type WidgetSnapshot } from "../native/widgetSnapshot";
-import { buildNativeReminderPlan } from "../native/reminderPlan";
-import { replaceNativeReminders } from "../native/reminders";
 import { reportError } from "../../lib/observability";
 import type { AppStateSnapshot } from "../types";
 
@@ -25,9 +23,6 @@ export function useNativeServices(state: AppStateSnapshot) {
         khatmahPage: state.khatmahPage,
         masbahaState: state.masbahaState,
       })
-    : "";
-  const reminderState = isNativeAndroid()
-    ? JSON.stringify({ settings: state.settings, dailyCompletions: state.dailyCompletions })
     : "";
 
   useEffect(() => {
@@ -71,11 +66,4 @@ export function useNativeServices(state: AppStateSnapshot) {
     }, 250);
     return () => clearTimeout(timer);
   }, [widgetState, generation]);
-
-  useEffect(() => {
-    if (!isNativeAndroid()) return;
-    void replaceNativeReminders(buildNativeReminderPlan(latest.current)).catch((error) =>
-      reportError(error, "native-reminders"),
-    );
-  }, [reminderState, generation]);
 }

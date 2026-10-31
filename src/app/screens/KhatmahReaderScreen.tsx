@@ -1140,6 +1140,9 @@ export function KhatmahReaderScreen({
             data-testid="mushaf-translation-toolbar"
             dir="ltr"
             className="absolute inset-x-0 top-0 z-30 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center bg-background px-1"
+            /* The app shell already reserves the status-bar inset. Adding it
+               here as well left an oversized blank band above the Mushaf
+               toolbar on devices with a reported top safe area. */
             style={{ paddingTop: 4, paddingBottom: 4 }}
           >
             <div className="flex justify-center">{mobileTopLeft}</div>

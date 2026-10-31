@@ -51,10 +51,26 @@ describe("native reminder delivery", () => {
     const request = nativeNotifications.schedule.mock.calls[0]![0];
     expect(request.notifications).toHaveLength(14);
     expect(request.notifications[0]).toMatchObject({
-      body: "Morning reminder",
+      title: "Morning Azkar",
+      body: "Reminder Morning Azkar",
       channelId: "azkarapp-reminders",
       schedule: { allowWhileIdle: true, isExactNotification: true },
     });
     expect(nativeNotifications.createChannel).toHaveBeenCalledOnce();
+  });
+
+  it("cancels legacy native reminder IDs before replacing the schedule", async () => {
+    nativeNotifications.getPending.mockResolvedValueOnce({ notifications: [{ id: 10_001 }, { id: 42 }] });
+    const { useForegroundReminders } = await import("./useForegroundReminders");
+    renderHook(() =>
+      useForegroundReminders({
+        reminders: DEFAULT_APP_STATE.settings.reminders,
+        dailyCompletions: [],
+        progressDayStartHour: 4,
+        language: "en",
+      }),
+    );
+
+    await waitFor(() => expect(nativeNotifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 10_001 }] }));
   });
 });
