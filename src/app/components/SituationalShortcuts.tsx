@@ -76,7 +76,7 @@ export function SituationalShortcuts({
               }
               title={language === "ar" ? category.nameArabic : category.name}
               href={routeToHash({ view: "reader", categoryId: id, index: 0 })!}
-              className={`${onGlass ? "home-glass-inset" : "bg-card hover:bg-muted"} flex min-h-11 items-center gap-2 rounded-xl border border-border px-3 py-1.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] ${onGlass ? "focus-visible:ring-on-media" : "focus-visible:ring-ring"}`}
+              className={`${onGlass ? "home-glass-inset" : "bg-card hover:bg-muted"} flex min-h-[44px] items-center gap-2 rounded-xl border border-border px-3 py-1.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] ${onGlass ? "focus-visible:ring-on-media" : "focus-visible:ring-ring"}`}
               onClick={(event) => {
                 if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
                 event.preventDefault();

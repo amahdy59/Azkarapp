@@ -25,20 +25,23 @@ export async function createFileArchive(
   for await (const file of entries) {
     options.signal?.throwIfAborted();
     if (++count > 65535 || file.size > 0xffffffff) throw new Error("ZIP size limit exceeded");
+    const isDir = file.name.endsWith("/");
     const name = new TextEncoder().encode(file.name);
     // Bounded reads and yielding keep cancellation responsive for large recitations.
     let checksum = 0xffffffff;
-    for (let start = 0; start < file.size; start += 1024 * 1024) {
-      options.signal?.throwIfAborted();
-      const chunk = new Uint8Array(await file.slice(start, start + 1024 * 1024).arrayBuffer());
-      for (const byte of chunk) {
-        checksum ^= byte;
-        for (let bit = 0; bit < 8; bit++) checksum = (checksum >>> 1) ^ (checksum & 1 ? 0xedb88320 : 0);
+    if (!isDir && file.size > 0) {
+      for (let start = 0; start < file.size; start += 1024 * 1024) {
+        options.signal?.throwIfAborted();
+        const chunk = new Uint8Array(await file.slice(start, start + 1024 * 1024).arrayBuffer());
+        for (const byte of chunk) {
+          checksum ^= byte;
+          for (let bit = 0; bit < 8; bit++) checksum = (checksum >>> 1) ^ (checksum & 1 ? 0xedb88320 : 0);
+        }
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
       }
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
     }
     options.signal?.throwIfAborted();
-    const crc = (checksum ^ 0xffffffff) >>> 0;
+    const crc = isDir ? 0 : (checksum ^ 0xffffffff) >>> 0;
     const local = new Uint8Array(30 + name.length);
     const view = new DataView(local.buffer);
     view.setUint32(0, 0x04034b50, true);
@@ -61,9 +64,14 @@ export async function createFileArchive(
     cv.setUint32(20, file.size, true);
     cv.setUint32(24, file.size, true);
     cv.setUint16(28, name.length, true);
+    cv.setUint32(38, isDir ? 0x10 : 0x20, true);
     cv.setUint32(42, offset, true);
     central.set(name, 46);
-    localParts.push(local, file);
+    if (isDir || file.size === 0) {
+      localParts.push(local);
+    } else {
+      localParts.push(local, file);
+    }
     centralParts.push(central);
     offset += local.length + file.size;
     if (offset > 0xffffffff) throw new Error("ZIP size limit exceeded");

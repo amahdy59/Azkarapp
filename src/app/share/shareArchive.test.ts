@@ -27,4 +27,25 @@ describe("share ZIP", () => {
     expect(decoded.indexOf("first")).toBeLessThan(decoded.indexOf("second"));
     expect(zip.type).toBe("application/zip");
   });
+  it("emits directory entries with 0x10 external attributes and files with 0x20", async () => {
+    const dir = new File([], "folder/", { type: "application/x-directory" });
+    const file = new File(["test"], "folder/track.mp3", { type: "audio/mpeg" });
+    const zip = await createFileArchive([dir, file], "archive.zip");
+    const bytes = new Uint8Array(await zip.arrayBuffer());
+    const view = new DataView(bytes.buffer);
+    // Find EOCD
+    const eocdOffset = bytes.length - 22;
+    expect(view.getUint32(eocdOffset, true)).toBe(0x06054b50);
+    const totalEntries = view.getUint16(eocdOffset + 10, true);
+    expect(totalEntries).toBe(2);
+    const cdOffset = view.getUint32(eocdOffset + 16, true);
+    // Central directory entry 0 (directory)
+    expect(view.getUint32(cdOffset, true)).toBe(0x02014b50);
+    expect(view.getUint32(cdOffset + 38, true)).toBe(0x10);
+    const nameLen0 = view.getUint16(cdOffset + 28, true);
+    // Central directory entry 1 (file)
+    const cdOffset1 = cdOffset + 46 + nameLen0;
+    expect(view.getUint32(cdOffset1, true)).toBe(0x02014b50);
+    expect(view.getUint32(cdOffset1 + 38, true)).toBe(0x20);
+  });
 });

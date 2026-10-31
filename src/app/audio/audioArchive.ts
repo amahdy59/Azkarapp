@@ -13,7 +13,9 @@ import { createFileArchive } from "../share/shareArchive";
 
 /** Sanitizes strings for safe cross-platform folder and file names (Windows, macOS, Linux, iOS, Android). */
 export function sanitizeArchiveName(text: string): string {
-  return text
+  // Strip tashkeel (Arabic diacritics) to avoid combining characters and Windows MAX_PATH failures
+  const withoutTashkeel = text.replace(/[\u0617-\u061a\u064b-\u0652\u0670]/g, "");
+  return withoutTashkeel
     .replace(/[\\/:*?"<>|]+/g, "-")
     .replace(/\s+/g, " ")
     .replace(/^-+|-+$/g, "")
@@ -55,7 +57,16 @@ export function buildArchiveEntryPath(
 
   const rawTitle =
     (language === "ar" ? file.titleArabic : file.titleEnglish) || file.titleArabic || file.titleEnglish || file.id;
-  const title = sanitizeArchiveName(rawTitle);
+  // Use first line only (strips multi-line study notes, bulleted explanations, and citation details)
+  const firstLineTitle = (rawTitle || "").split(/\r?\n/)[0]?.trim() || "";
+  let title = sanitizeArchiveName(firstLineTitle);
+  // Bounded title length prevents MAX_PATH (260 char) extraction failures on Windows
+  if (title.length > 60) {
+    title = title
+      .slice(0, 60)
+      .trim()
+      .replace(/[-.]+$/, "");
+  }
 
   const voiceLookup = file.voiceId ? getAudioVoiceName(file.voiceId, language) : undefined;
   const voice = sanitizeArchiveName(voiceLookup ?? file.voiceName);
