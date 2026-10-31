@@ -1,6 +1,6 @@
 [
   {
-    "release": "2026-10-31",
+    "release": "2026-10-31.1",
     "ar": [
       "إبراز موضع القراءة بلوحة المفاتيح واستمرار التركيز بعد اكتمال العد.",
       "وسم أوضح لتذكيرات الرئيسية مع تحسين الالتفاف عند تكبير النص.",
@@ -15,16 +15,18 @@
     ]
   },
   {
-    "en": [
-      "Fix Android audio downloads and cancellation.",
-      "Recover damaged Mushaf downloads.",
-      "Improve enlarged text and Home scrolling."
-    ],
-    "release": "2026-10-31.1",
+    "release": "2026-10-31",
     "ar": [
-      "إصلاح تنزيل الصوتيات وإلغائها على أندرويد.",
-      "استعادة صفحات المصحف التالفة.",
-      "تحسين تكبير النص وتمرير الرئيسية."
+      "إبراز موضع القراءة بلوحة المفاتيح واستمرار التركيز بعد اكتمال العد.",
+      "وسم أوضح لتذكيرات الرئيسية مع تحسين الالتفاف عند تكبير النص.",
+      "نطق معالم العد صوتياً وإغلاق النوافذ بالزر الخلفي قبل التنقل.",
+      "استعادة صفحات المصحف التالفة بلا اتصال ومتابعة تشغيل الصوت تلقائياً."
+    ],
+    "en": [
+      "Visible keyboard reading focus and seamless counting without losing position.",
+      "Clearer contextual reminder badge on Home with improved enlarged-text reflow.",
+      "Spoken counter milestone announcements and back navigation that closes overlays first.",
+      "Automatic recovery of corrupted offline Mushaf pages and continuous audio auto-advance."
     ]
   },
   {
