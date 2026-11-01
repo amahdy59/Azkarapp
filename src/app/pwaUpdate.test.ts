@@ -31,6 +31,39 @@ function deps(registration: Partial<ServiceWorkerRegistration> | undefined) {
 }
 
 describe("applying a service worker update", () => {
+  it("observes handover before messaging the actual waiting worker", async () => {
+    const order: string[] = [];
+    const postMessage = vi.fn(() => order.push("activate"));
+    const { args, updateServiceWorker, reload } = deps({ waiting: { postMessage } as unknown as ServiceWorker });
+    reload.mockImplementation(() => order.push("reload"));
+    await applyServiceWorkerUpdate({
+      ...args,
+      awaitHandover: async () => {
+        order.push("observe");
+        return true;
+      },
+    });
+    expect(postMessage).toHaveBeenCalledWith({ type: "SKIP_WAITING" });
+    expect(updateServiceWorker).not.toHaveBeenCalled();
+    expect(order).toEqual(["observe", "activate", "reload"]);
+  });
+
+  it("allows a slow install to finish and prevents an expired attempt from reloading later", async () => {
+    const installing = fakeWorker("installing");
+    const remove = vi.fn();
+    installing.worker.removeEventListener = remove;
+    const controller = new AbortController();
+    const { args, reload } = deps({ installing: installing.worker });
+    const attempt = applyServiceWorkerUpdate({ ...args, signal: controller.signal });
+    const rejected = expect(attempt).rejects.toThrow("expired");
+    await Promise.resolve();
+    await Promise.resolve();
+    controller.abort(new Error("expired"));
+    await rejected;
+    installing.finish("installed");
+    expect(reload).not.toHaveBeenCalled();
+    expect(remove).toHaveBeenCalledWith("statechange", expect.any(Function));
+  });
   it("hands over to a worker that is already waiting", async () => {
     const { args, updateServiceWorker, reload } = deps({
       update: vi.fn(async () => undefined),

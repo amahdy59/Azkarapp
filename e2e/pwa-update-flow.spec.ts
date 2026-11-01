@@ -80,6 +80,7 @@ function buildRelease(relativeDirectory: string, release: string) {
 /** Serves whichever directory `served` points at — flipping it is the deploy. */
 let served = join(ROOT, "v1");
 let server: Server | undefined;
+let delayedUpdateScript = false;
 
 function startServer() {
   server = createServer((request, response) => {
@@ -113,7 +114,12 @@ function startServer() {
       "Content-Type": TYPES[extname(target)] ?? "application/octet-stream",
       "Cache-Control": "no-store",
     });
-    createReadStream(target).pipe(response);
+    if (served === join(ROOT, "v2") && target.endsWith(`${sep}sw.js`) && !delayedUpdateScript) {
+      delayedUpdateScript = true;
+      // A mobile update may spend more than the former 15s allowance just
+      // downloading its worker. One click must still finish the real handover.
+      setTimeout(() => createReadStream(target).pipe(response), 20_000);
+    } else createReadStream(target).pipe(response);
   });
   return new Promise<void>((done, reject) => {
     server!.once("error", reject);
@@ -172,7 +178,7 @@ async function openApp(page: import("@playwright/test").Page) {
 const notice = (page: import("@playwright/test").Page) =>
   page.getByRole("complementary", { name: "An update is ready" });
 
-test("a published build replaces the running one when the reader asks for it", async ({ page }) => {
+test("one request replaces the running build even when its worker download exceeds 15 seconds", async ({ page }) => {
   test.setTimeout(300_000);
 
   await openApp(page);
@@ -201,6 +207,7 @@ test("a published build replaces the running one when the reader asks for it", a
      notice cannot come back, because the running release now matches the
      deployed one. */
   await expect(notice(page)).toBeHidden({ timeout: 120_000 });
+  expect(delayedUpdateScript).toBe(true);
 
   /* Cleared deliberately. Some 404s during the changeover are inherent to any
      deployment: publishing deletes the old hashed chunks, and a document still

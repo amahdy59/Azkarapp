@@ -1,3 +1,4 @@
+import "../components/ui/pill-controls.css";
 import { getTimeOfDayZikr, isDhuhaWindow, isFridayFeatureWindow, getHomeBackgroundCategory } from "../homeTime";
 export {
   getTimeOfDayZikr,
@@ -391,33 +392,54 @@ export function HomeScreen({
   > | null>(null);
   useEffect(() => {
     let cancelled = false;
+    let pending = false;
+    let failed = false;
     // Keep the current verified card until its replacement is ready. Clearing
     // it here briefly rotates through a contextual fallback on every refresh.
     const load = async () => {
-      const catalogue = await import("../content/reminderReadings");
-      if (cancelled) return;
-      const readings = await catalogue.loadReminderReadings();
-      if (cancelled) return;
-      setReadingCatalogue(readings);
-      setLibraryEvidence(
-        selectLibraryEvidence(
-          readings.library,
-          readings.verses,
-          reminderSlotKey,
-          language,
-          reminderContexts,
-          manualEvidenceOffset,
-        ),
-      );
+      if (cancelled || pending) return;
+      pending = true;
+      failed = false;
+      try {
+        const catalogue = await import("../content/reminderReadings");
+        if (cancelled) return;
+        const readings = await catalogue.loadReminderReadings();
+        if (cancelled) return;
+        setReadingCatalogue(readings);
+        setLibraryEvidence(
+          selectLibraryEvidence(
+            readings.library,
+            readings.verses,
+            reminderSlotKey,
+            language,
+            reminderContexts,
+            manualEvidenceOffset,
+          ),
+        );
+      } catch {
+        failed = true;
+      } finally {
+        pending = false;
+      }
     };
 
-    const cancelScheduled = scheduleIdleAfterPaint(() => void load().catch(() => undefined), {
+    // A failed first request used to hide the card until its next context slot.
+    // Retry on recovery intent, without a polling clock or overlapping requests.
+    const retry = () => {
+      if (failed && document.visibilityState === "visible") void load();
+    };
+    window.addEventListener("online", retry);
+    document.addEventListener("visibilitychange", retry);
+
+    const cancelScheduled = scheduleIdleAfterPaint(() => void load(), {
       timeout: 2000,
       fallbackDelay: 200,
     });
     return () => {
       cancelled = true;
       cancelScheduled();
+      window.removeEventListener("online", retry);
+      document.removeEventListener("visibilitychange", retry);
     };
   }, [language, manualEvidenceOffset, reminderContexts, reminderSlotKey]);
 
@@ -673,9 +695,12 @@ export function HomeScreen({
                 <button
                   type="button"
                   data-testid="home-header-routine-summary-mobile"
-                  onClick={() => setPathSheetOpen(true)}
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    setPathSheetOpen(true);
+                  }}
                   aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
-                  className="home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:hidden"
+                  className="choice-pill home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:hidden"
                 >
                   <span className="flex items-center gap-1" aria-hidden="true">
                     <PalmTreeMark size={20} className="control-cue" strokeWidth={3} />
@@ -690,9 +715,12 @@ export function HomeScreen({
                 <button
                   type="button"
                   data-testid="home-header-routine-summary"
-                  onClick={() => setPathSheetOpen(true)}
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    setPathSheetOpen(true);
+                  }}
                   aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
-                  className="home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:flex"
+                  className="choice-pill home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:flex"
                 >
                   <span className="hidden min-[900px]:inline" aria-hidden="true">
                     {t(language, "dailyPath.title")}

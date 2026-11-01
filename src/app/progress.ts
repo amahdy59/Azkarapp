@@ -3,7 +3,7 @@ import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type Sto
 
 export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
-/** Event-based collections start again explicitly, independently of the daily/Friday clocks. */
+/** Event-based collections also offer an explicit same-day New session action. */
 export const SITUATIONAL_SESSION_CATEGORY_IDS: readonly CategoryId[] = [
   "home",
   "travel",
@@ -24,13 +24,10 @@ export const SITUATIONAL_SESSION_CATEGORY_IDS: readonly CategoryId[] = [
  */
 export const CYCLE_GOVERNED_CATEGORY_IDS: readonly CategoryId[] = ["friday_kahf"];
 
-export const DAILY_ROUTINE_CATEGORY_IDS: readonly CategoryId[] = [
-  "morning",
-  "evening",
-  "before_sleep",
-  "waking_up",
-  "after_prayer",
-];
+/** Owner: every collection starts fresh daily; Al-Kahf retains its Friday cycle. */
+export const DAILY_ROUTINE_CATEGORY_IDS: readonly CategoryId[] = CATEGORY_IDS.filter(
+  (category) => !CYCLE_GOVERNED_CATEGORY_IDS.includes(category),
+);
 /**
  * The progress day always rolls at local midnight so the displayed calendar
  * date, prayer schedule, prayer tracking, and routine progress change together.
@@ -533,7 +530,10 @@ export function resetStaleCompletedCollections(
       const catDayKey = getProgressDayKey(now, boundaryHour, category);
       const isCompletedToday = normalized.some((r) => r.dayKey === catDayKey && r.category === category);
       const categoryProgress = completed[category] ?? new Set<string>();
-      const isFull = (CATEGORY_ZIKR_IDS[category] ?? []).every((zikrId) => categoryProgress.has(zikrId));
+      const knownIds = CATEGORY_ZIKR_IDS[category] ?? [];
+      // A lazy collection with no startup identity list is not a completed
+      // empty collection. Its daily rollover already owns tomorrow's tally.
+      const isFull = knownIds.length > 0 && knownIds.every((zikrId) => categoryProgress.has(zikrId));
       return [category, isFull && !isCompletedToday ? new Set<string>() : new Set(categoryProgress)];
     }),
   ) as Record<CategoryId, Set<string>>;

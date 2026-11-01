@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from "react";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 import { ChevronDown, SlidersHorizontal } from "./icons";
-import { t } from "../i18n";
+import "./responsive-filters.css";
 import type { AppLanguage } from "../types";
 
 /** Native disclosure: phones keep the applied context visible; wider layouts show the fields. */
@@ -10,7 +10,6 @@ export function ResponsiveFilters({
   summary,
   children,
   testId,
-  language = "en",
 }: {
   label: string;
   summary: ReactNode;
@@ -33,24 +32,26 @@ export function ResponsiveFilters({
     return true;
   };
   return (
-    <details ref={details} open={!compact} data-testid={testId} className="group">
+    <details ref={details} open={!compact} data-testid={testId} className="responsive-filters group">
       <summary
         ref={trigger}
-        className={`${compact ? "flex" : "hidden"} min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-xl border border-border-control bg-card px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring [&::-webkit-details-marker]:hidden`}
+        className={`${compact ? "grid" : "hidden"} responsive-filter-trigger cursor-pointer list-none items-center text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring`}
       >
-        <SlidersHorizontal className="size-5 shrink-0 text-primary" aria-hidden="true" />
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-xs text-muted-foreground">{label}</span>
-          <span className="block truncate font-semibold">{summary}</span>
+        <span
+          className="flex items-center justify-center rounded-xl bg-primary/10 text-primary"
+          style={{ width: 36, height: 36 }}
+          aria-hidden="true"
+        >
+          <SlidersHorizontal size={20} />
         </span>
-        <span className="flex shrink-0 items-center gap-1 text-micro font-semibold text-primary">
-          <span className="group-open:hidden">{t(language, "common.expand")}</span>
-          <span className="hidden group-open:inline">{t(language, "common.collapse")}</span>
-          <ChevronDown
-            className="size-5 shrink-0 transition-transform duration-fast motion-reduce:transition-none group-open:rotate-180"
-            aria-hidden="true"
-          />
+        <span className="responsive-filter-copy">
+          <span className="font-semibold leading-normal">{label}</span>
+          <span className="responsive-filter-context">{summary}</span>
         </span>
+        <ChevronDown
+          className="responsive-filter-chevron size-5 text-muted-foreground transition-transform duration-fast"
+          aria-hidden="true"
+        />
       </summary>
       <div className={compact ? "pt-3" : undefined}>
         {children({

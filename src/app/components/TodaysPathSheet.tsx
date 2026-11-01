@@ -1,5 +1,5 @@
-import { Modal } from "./ResponsiveSheet";
-import { Zap } from "./icons";
+import { Modal, SheetHeader } from "./ResponsiveSheet";
+import { Zap, ChevronDown } from "./icons";
 import { PathRewardMark } from "./GardenMarks";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -59,28 +59,37 @@ export function TodaysPathSheet({
       testId="todays-path-sheet"
       maxWidthClassName="max-w-[34rem]"
       onGlass={onGlass}
+      showCloseButton={false}
     >
-      <div className="flex flex-col gap-5 px-5 py-5">
+      <SheetHeader
+        title={t(language, "dailyPath.title")}
+        language={language}
+        onClose={onClose}
+        className="compact-sheet-header"
+      />
+      <div className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 py-4">
         <section
-          className="rounded-2xl border border-border bg-muted/40 p-4 text-center"
+          className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3"
           aria-label={t(language, "dailyPath.todayReward")}
         >
-          <div className="flex justify-center">
+          <div className="shrink-0">
             <PathRewardMark tier={tier} size={48} />
           </div>
-          <p className="mt-3 text-subtitle font-black">
-            {t(
-              language,
-              tier === "none"
-                ? "dailyPath.growing"
-                : tier === "palm"
-                  ? "dailyPath.regularPalm"
-                  : tier === "golden"
-                    ? "dailyPath.goldenPalm"
-                    : "dailyPath.oasisPalm",
-            )}
-          </p>
-          <p className="mt-1 text-label text-muted-foreground">{t(language, "dailyPath.autoTracked")}</p>
+          <div className="min-w-0">
+            <p className="text-subtitle font-black">
+              {t(
+                language,
+                tier === "none"
+                  ? "dailyPath.growing"
+                  : tier === "palm"
+                    ? "dailyPath.regularPalm"
+                    : tier === "golden"
+                      ? "dailyPath.goldenPalm"
+                      : "dailyPath.oasisPalm",
+              )}
+            </p>
+            <p className="mt-1 text-label text-muted-foreground">{t(language, "dailyPath.autoTracked")}</p>
+          </div>
         </section>
 
         <dl className="divide-y divide-border" aria-label={t(language, "dailyPath.recordedToday")}>
@@ -99,9 +108,21 @@ export function TodaysPathSheet({
           ))}
         </dl>
 
-        <section aria-label={t(language, "dailyPath.howItGrows")} className="rounded-2xl border border-border p-4">
-          <h3 className="mb-3 text-label font-black">{t(language, "dailyPath.howItGrows")}</h3>
-          <ol className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <Zap size={16} aria-hidden="true" />
+            {t(language, "progress.activeStreakSummary")}: {count(streakCount)}
+          </span>
+          <span>
+            {t(language, "progress.lifetimePalmsSummary")}: {count(palmCount)}
+          </span>
+        </div>
+        <details className="group rounded-2xl border border-border px-4" data-testid="path-growth-guide">
+          <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 py-3 text-label font-bold focus-visible:ring-[3px] focus-visible:ring-ring">
+            {t(language, "dailyPath.howItGrows")}
+            <ChevronDown size={18} aria-hidden="true" className="shrink-0 transition-transform group-open:rotate-180" />
+          </summary>
+          <ol className="flex flex-col gap-4 pb-4">
             {(["palm", "golden", "oasis"] as const).map((reward) => (
               <li
                 key={reward}
@@ -135,20 +156,11 @@ export function TodaysPathSheet({
               </li>
             ))}
           </ol>
-        </section>
+          <p className="text-xs leading-relaxed text-muted-foreground" data-testid="todays-path-summary">
+            {t(language, "dailyPath.recordingNote")}
+          </p>
+        </details>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <Zap size={16} aria-hidden="true" />
-            {t(language, "progress.activeStreakSummary")}: {count(streakCount)}
-          </span>
-          <span>
-            {t(language, "progress.lifetimePalmsSummary")}: {count(palmCount)}
-          </span>
-        </div>
-        <p className="text-xs leading-relaxed text-muted-foreground" data-testid="todays-path-summary">
-          {t(language, "dailyPath.recordingNote")}
-        </p>
         {onViewProgress && (
           <button
             type="button"

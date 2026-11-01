@@ -1,4 +1,3 @@
-import { PEER_TAB_SELECTED } from "../components/ui/controlStyles";
 import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
 import { QuranVerseText } from "../components/QuranVerseText";
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
@@ -233,7 +232,7 @@ export function AzkarLibraryScreen({
               direction={direction}
               idPrefix="library-sections"
               aria-label={t(language, "library.title")}
-              indicatorClassName="bg-primary/10"
+              indicatorClassName="bg-primary"
               className="library-section-tabs grid shrink-0 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs sm:min-w-64"
               tabs={(["collections", "saved"] as const).map((value) => {
                 const isCollections = value === "collections";
@@ -259,7 +258,9 @@ export function AzkarLibraryScreen({
                       {value === "saved" && count > 0 && (
                         <span
                           className={`library-saved-count inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold leading-none transition-colors ${
-                            section === "saved" ? "bg-primary/15 text-primary" : "bg-primary/15 text-primary"
+                            section === "saved"
+                              ? "bg-primary-foreground/15 text-primary-foreground"
+                              : "bg-primary/15 text-primary"
                           }`}
                           aria-hidden="true"
                         >
@@ -272,7 +273,7 @@ export function AzkarLibraryScreen({
               })}
               itemClassName={(selected) =>
                 `flex min-h-11 min-w-11 items-center justify-center rounded-2xl px-2.5 sm:rounded-xl sm:px-3 text-xs sm:text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  selected ? PEER_TAB_SELECTED : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  selected ? "text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`
               }
             />

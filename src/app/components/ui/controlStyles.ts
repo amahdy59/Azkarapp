@@ -1,4 +1,7 @@
 /** Shared paint/state recipes. Dimensions and alignment stay with each control. */
+import "./pill-controls.css";
+export const PILL_GROUP = "choice-pill p-1";
+export const PILL_OPTION = "choice-pill-option";
 export const MENU_OPTION_STATE =
   "focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary data-[state=checked]:font-semibold";
 

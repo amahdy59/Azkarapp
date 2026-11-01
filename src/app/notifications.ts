@@ -10,7 +10,9 @@ export function readNotificationPermission(): BrowserNotificationPermission {
 
 export async function requestNotificationPermission(): Promise<BrowserNotificationPermission> {
   if (isNativeAndroid()) return refreshNativeNotificationPermission(true);
-  return "Notification" in window ? Notification.requestPermission() : "unsupported";
+  const permission = "Notification" in window ? await Notification.requestPermission() : "unsupported";
+  window.dispatchEvent(new Event("azkar-notification-permission"));
+  return permission;
 }
 
 /** Use an already active worker; `ready` can remain pending forever on an unregistered page. */

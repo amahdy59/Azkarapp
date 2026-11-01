@@ -290,6 +290,11 @@ function normalizeSurahReadingPages(value: unknown): Record<string, number> {
   ) as Record<string, number>;
 }
 
+/** Collection reader positions follow daily tallies; the main Mushaf is independent. */
+export function resetDailySurahPages(pages: Record<string, number>): Record<string, number> {
+  return Object.fromEntries(Object.entries(pages).filter(([id]) => id === "friday-kahf"));
+}
+
 /** Owner-approved compatibility for the former combined Three Quls item. */
 const RUQYAH_SURAH_IDS = ["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"] as const;
 const expandLegacyZikrId = (id: string): readonly string[] => (id === "ir-ref-5" ? RUQYAH_SURAH_IDS : [id]);
@@ -310,10 +315,14 @@ function normalizePartialZikrCounts(value: unknown): Record<string, number> {
   return counts;
 }
 
-/** Match completed-state rollover: situational collections remain resumable. */
+/** Match daily collection-tally rollover, preserving the weekly Al-Kahf cycle. */
 export function resetDailyPartialCounts(counts: Record<string, number>): Record<string, number> {
   const dailyIds = new Set(DAILY_ROUTINE_CATEGORY_IDS.flatMap((category) => CATEGORY_ZIKR_IDS[category] ?? []));
-  return Object.fromEntries(Object.entries(counts).filter(([id]) => !dailyIds.has(id.split(":").at(-1)!)));
+  return Object.fromEntries(
+    Object.entries(counts).filter(
+      ([id]) => !dailyIds.has(id.split(":").at(-1)!) && !/^(comprehensive|friday)-dua-/.test(id),
+    ),
+  );
 }
 
 export function normalizeMasbahaState(value: unknown): AppStateSnapshot["masbahaState"] {
@@ -699,6 +708,23 @@ function normalizeReminders(
     time: isTime(fallback?.after_prayer?.time) ? fallback.after_prayer.time : defaultReminders.after_prayer.time,
   };
   return {
+    ...Object.fromEntries(
+      (["friday", "fridayDua", "beforeFajrDua"] as const).flatMap((key) =>
+        candidate?.[key] || fallback?.[key]
+          ? [
+              [
+                key,
+                {
+                  enabled:
+                    typeof candidate?.[key]?.enabled === "boolean"
+                      ? candidate[key]!.enabled
+                      : fallback?.[key]?.enabled === true,
+                },
+              ],
+            ]
+          : [],
+      ),
+    ),
     prayer: {
       enabled: typeof candidate?.prayer?.enabled === "boolean" ? candidate.prayer.enabled : prayerFallback.enabled,
       leadMinutes: [0, 5, 10, 15, 20, 30].includes(candidate?.prayer?.leadMinutes as number)
@@ -748,7 +774,8 @@ function normalizeCompletedIds(values: unknown, category: CategoryId) {
     return [];
   }
 
-  const zikrIds = [...(CATEGORY_ZIKR_IDS[category] ?? [])];
+  // Al-Kahf is lazy-loaded, but its stable reader id must survive a cold boot.
+  const zikrIds = category === "friday_kahf" ? ["friday-kahf"] : [...(CATEGORY_ZIKR_IDS[category] ?? [])];
   const acceptsLazyIds = zikrIds.length === 0;
   const legacyZikrIds = LEGACY_ROUTINE_ORDER[category] ?? zikrIds;
   const validIds = new Set(zikrIds);
@@ -1027,7 +1054,9 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ),
         )
       : [],
-    surahReadingPages: normalizeSurahReadingPages(parsed.surahReadingPages),
+    surahReadingPages: isNewDay
+      ? resetDailySurahPages(normalizeSurahReadingPages(parsed.surahReadingPages))
+      : normalizeSurahReadingPages(parsed.surahReadingPages),
     mushafVerseBookmarks: normalizeQuranVerseBookmarks(parsed.mushafVerseBookmarks),
     dailyWirdGoal:
       typeof parsed.dailyWirdGoal === "number" && parsed.dailyWirdGoal >= 1 && parsed.dailyWirdGoal <= 604
@@ -1230,6 +1259,7 @@ const OWNED_STORAGE_PREFIXES = [
 ];
 
 const PRIVATE_STORAGE_PREFIXES = [
+  "azkarapp.friday-dua-reading.v1",
   "azkarapp_recent_searches_",
   // These are legacy coordinate-bearing caches. Startup also removes them,
   // but sign-out must not depend on a later reload to protect a shared device.

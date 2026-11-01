@@ -94,6 +94,12 @@ describe("native reminder queue", () => {
     await replaceNativeReminders([]);
     expect(notifications.schedule).toHaveBeenCalledTimes(1);
   });
+  it("cancels a pending contextual reminder when its choice is switched off", async () => {
+    notifications.getPending.mockResolvedValue({ notifications: [{ id: 19_001 }, { id: 9999 }] });
+    await replaceNativeReminders([]);
+    expect(notifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 19_001 }] });
+    expect(notifications.schedule).not.toHaveBeenCalled();
+  });
 
   it("recovers after a failed native write and never schedules without permission", async () => {
     notifications.getPending.mockRejectedValueOnce(new Error("native failure"));

@@ -1,4 +1,5 @@
 import { useRef, type KeyboardEvent, type ReactNode } from "react";
+import { PILL_GROUP, PILL_OPTION } from "./ui/controlStyles";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 
 export interface TabDefinition<T extends string> {
@@ -34,9 +35,8 @@ export function tabPanelProps(idPrefix: string, activeValue: string) {
  * Tab list implementing the WAI-ARIA APG tabs pattern with automatic
  * activation: roving tabindex, RTL-aware Arrow keys, and Home/End.
  *
- * Owns semantics and keyboard behavior only — callers supply their own classes
- * and render their own panel (spreading `tabPanelProps`), so this stays a
- * semantics primitive rather than a configurable layout component.
+ * Owns semantics, keyboard behavior and shared pill paint. Callers supply
+ * layout and render their panel (spreading `tabPanelProps`).
  *
  * Hand-rolled rather than pulling in `@radix-ui/react-tabs`: the pattern needs
  * no portal, focus trap, or positioning, and both call sites keep their
@@ -98,7 +98,7 @@ export function TabList<T extends string>({
 
   return (
     <LayoutGroup id={idPrefix}>
-      <div role="tablist" aria-label={ariaLabel} aria-orientation="horizontal" className={className}>
+      <div role="tablist" aria-label={ariaLabel} aria-orientation="horizontal" className={`${PILL_GROUP} ${className}`}>
         {tabs.map((tab, index) => {
           const selected = tab.value === value;
           return (
@@ -118,7 +118,7 @@ export function TabList<T extends string>({
               data-testid={tab.testId}
               onClick={() => onChange(tab.value)}
               onKeyDown={(event) => handleKeyDown(event, index)}
-              className={`relative isolate overflow-hidden ${itemClassName(selected)}`}
+              className={`${PILL_OPTION} relative isolate overflow-hidden ${itemClassName(selected)}`}
             >
               {selected && indicatorClassName && (
                 <motion.span

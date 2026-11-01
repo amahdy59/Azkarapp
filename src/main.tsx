@@ -100,6 +100,7 @@ const updateServiceWorker =
         },
       });
 
+let updateAttempt: AbortController | undefined;
 window.addEventListener("azkar-apply-update", () => {
   if (import.meta.env.MODE === "android") {
     void import("./app/native/liveUpdate")
@@ -110,14 +111,24 @@ window.addEventListener("azkar-apply-update", () => {
       });
     return;
   }
+  updateAttempt?.abort();
+  const attempt = new AbortController();
+  updateAttempt = attempt;
   let timeoutId = 0;
   const timeout = new Promise<never>((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error("Service worker update timed out")), 15_000);
+    // Installation downloads the complete offline shell; mobile connections
+    // need more than the old 15s handover-only allowance.
+    timeoutId = window.setTimeout(() => {
+      const error = new Error("Service worker update timed out");
+      attempt.abort(error);
+      reject(error);
+    }, 120_000);
   });
   void Promise.race([
     applyServiceWorkerUpdate({
       getRegistration: () => navigator.serviceWorker.getRegistration(),
       updateServiceWorker,
+      signal: attempt.signal,
       reload: () => window.location.reload(),
       /* Four seconds is a handover, not a download: the new worker has already
          installed and precached by this point, and all that remains is for it
@@ -126,21 +137,34 @@ window.addEventListener("azkar-apply-update", () => {
       awaitHandover: () =>
         new Promise<boolean>((resolve) => {
           const timer = window.setTimeout(() => {
-            navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
-            resolve(false);
+            finish(false);
           }, 4000);
-          function onControllerChange() {
+          function finish(changed: boolean) {
             window.clearTimeout(timer);
-            resolve(true);
+            navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+            attempt.signal.removeEventListener("abort", onAbort);
+            resolve(changed);
+          }
+          function onAbort() {
+            finish(false);
+          }
+          function onControllerChange() {
+            finish(true);
           }
           navigator.serviceWorker.addEventListener("controllerchange", onControllerChange, { once: true });
+          attempt.signal.addEventListener("abort", onAbort, { once: true });
         }),
     }),
     timeout,
   ])
     .catch((error) => {
+      if (updateAttempt !== attempt) return;
       reportError(error, "pwa-update");
       window.dispatchEvent(new Event("azkar-update-failed"));
     })
-    .finally(() => window.clearTimeout(timeoutId));
+    .finally(() => {
+      window.clearTimeout(timeoutId);
+      attempt.abort();
+      if (updateAttempt === attempt) updateAttempt = undefined;
+    });
 });

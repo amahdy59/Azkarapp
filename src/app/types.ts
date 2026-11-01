@@ -139,6 +139,10 @@ export interface PrayerReminderSchedule {
 }
 
 export interface ReminderSettings {
+  /** Optional for backwards compatibility; legacy choices stay off until selected. */
+  friday?: { enabled: boolean };
+  fridayDua?: { enabled: boolean };
+  beforeFajrDua?: { enabled: boolean };
   prayer: PrayerReminderSchedule;
   morning: ReminderSchedule;
   evening: ReminderSchedule;

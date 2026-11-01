@@ -1,4 +1,5 @@
 import { useControlFeedback } from "./hooks/useControlFeedback";
+import { recommendedReminders } from "./contextReminders";
 import { useNativeServices } from "./hooks/useNativeServices";
 import { useQueuedAudioAction } from "./hooks/useQueuedAudioAction";
 import "../styles/theme/materials.css";
@@ -10,6 +11,7 @@ import {
   toCompletedSets,
   resetDailyPartialCounts,
   resetDailyMasbahaState,
+  resetDailySurahPages,
   type StoredSession,
 } from "./state";
 import { applyAppAppearance } from "./theme";
@@ -48,6 +50,8 @@ import {
   mergeFridayCycles,
   onFridayProgressChange,
   readFridayCycle,
+  readDailyFridayDuaProgress,
+  writeDailyFridayDuaProgress,
   writeFridayCycle,
   type FridayCycleProgress,
   getFridayCycleKey,
@@ -177,6 +181,9 @@ function warmMushafReader(page: number) {
 const SplashScreen = lazy(() =>
   import("./screens/onboarding/SplashScreen").then((module) => ({ default: module.SplashScreen })),
 );
+const FirstUseSetup = lazy(() =>
+  import("./screens/onboarding/FirstUseSetup").then((module) => ({ default: module.FirstUseSetup })),
+);
 const EnglishOnboarding1Screen = lazy(() =>
   import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding1Screen })),
 );
@@ -222,6 +229,14 @@ function AppContent({
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
 }) {
   const [initialState] = useState(loadStartupState ?? loadAppState);
+  const [isNewInstallation] = useState(() => {
+    try {
+      return window.localStorage.getItem("azkarapp.state.v1") === null;
+    } catch {
+      return true;
+    }
+  });
+  const [firstUseSetupOpen, setFirstUseSetupOpen] = useState(false);
   useEffect(scheduleStartupMaintenance, []);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
@@ -664,12 +679,10 @@ function AppContent({
     try {
       setIsFridayDuasLoading(true);
       setFridayDuasError(false);
-      const cycle = getFridayCycleKey();
       const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
       registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
       const duaIds = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction).map((dua) => dua.id);
-      const stored = readFridayDuaProgress(duaIds, cycle);
-      writeFridayDuaProgress(stored, cycle);
+      const stored = readDailyFridayDuaProgress(duaIds);
       setFridayDuaTotalCount(duaIds.length);
       setFridayDuaCompletedIds(stored);
       return true;
@@ -968,7 +981,10 @@ function AppContent({
       const next = new Set(previous);
       if (shouldComplete) next.add(zikrId);
       else next.delete(zikrId);
-      writeFridayDuaProgress(next);
+      writeDailyFridayDuaProgress(next);
+      // Starting/undoing today's reading must not erase earlier weekly activity.
+      const allIds = getAzkarForMode("comprehensive_duas").map((zikr) => zikr.id);
+      writeFridayDuaProgress(new Set([...readFridayDuaProgress(allIds), ...next]));
       return next;
     });
   }, []);
@@ -976,7 +992,7 @@ function AppContent({
   const resetFridayDuaProgress = useCallback(() => {
     const next = new Set<string>();
     setFridayDuaCompletedIds(next);
-    writeFridayDuaProgress(next);
+    writeDailyFridayDuaProgress(next);
   }, []);
 
   // The fridayDuaFlow state is cleared manually when navigating away (e.g. via nav tabs or back button)
@@ -1155,13 +1171,15 @@ function AppContent({
   }, [audioCompletionSequence]);
 
   const markOnboardingComplete = useCallback(() => {
+    if (isNewInstallation) setReminders((current) => recommendedReminders(current));
+    setFirstUseSetupOpen(true);
     setHasCompletedOnboarding(true);
     try {
       window.localStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
     } catch {
       // Storage failure non-fatal
     }
-  }, []);
+  }, [isNewInstallation]);
 
   const applyStateSnapshot = useCallback((state: AppStateSnapshot) => {
     setSelectedLang(state.settings.language);
@@ -1321,15 +1339,10 @@ function AppContent({
     activeProgressDayRef.current = currentDayKey;
     setActiveProgressDay(currentDayKey);
     setCompleted((previous) => resetDailyRoutineProgress(previous));
+    setFridayDuaCompletedIds(new Set());
     setPartialZikrCounts(resetDailyPartialCounts);
     setMasbahaState((previous) => (previous ? resetDailyMasbahaState(previous, currentDayKey) : previous));
-    setSurahReadingPages((current) => {
-      if (!current["s-hm-110a"] && !current["s-hm-110b"]) return current;
-      const next = { ...current };
-      delete next["s-hm-110a"];
-      delete next["s-hm-110b"];
-      return next;
-    });
+    setSurahReadingPages(resetDailySurahPages);
   }, [progressDayStartHour]);
 
   useEffect(() => {
@@ -1840,6 +1853,9 @@ function AppContent({
             className="app-main-view flex-1 overflow-hidden flex flex-col"
           >
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
+              {firstUseSetupOpen && view === "home" && (
+                <FirstUseSetup language={selectedLang} onClose={() => setFirstUseSetupOpen(false)} />
+              )}
               {/* Phase 2 — onboarding flow */}
               {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
               {view === "onboard1" && (

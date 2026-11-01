@@ -1,0 +1,62 @@
+.responsive-filter-trigger {
+  grid-template-columns: 36px minmax(0, 1fr) 20px;
+  min-block-size: 56px;
+  column-gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-control);
+  border-radius: var(--ds-radius-control);
+  background: var(--card);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.035);
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.responsive-filter-trigger::marker,
+.responsive-filter-trigger::-webkit-details-marker {
+  display: none;
+}
+.responsive-filter-copy {
+  display: flex;
+  min-inline-size: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  overflow-wrap: anywhere;
+}
+.responsive-filter-context {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+.responsive-filter-chevron {
+  inline-size: 20px;
+  block-size: 20px;
+}
+.responsive-filters[open] > .responsive-filter-trigger {
+  border-color: var(--primary);
+}
+.responsive-filters[open] .responsive-filter-chevron {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .responsive-filter-trigger,
+  .responsive-filter-chevron {
+    transition: none;
+  }
+}
+.reduce-motion .responsive-filter-trigger,
+.reduce-motion .responsive-filter-chevron {
+  transition: none;
+}
+@media (forced-colors: active) {
+  .responsive-filter-trigger {
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+  .responsive-filters[open] > .responsive-filter-trigger {
+    border: 2px solid Highlight;
+  }
+}

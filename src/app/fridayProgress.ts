@@ -1,4 +1,27 @@
+import { getProgressDayKey } from "./progress";
+
 export const FRIDAY_KAHF_WEEK_KEY = "azkarapp.friday-kahf-week.v1";
+const FRIDAY_DUA_READING_KEY = "azkarapp.friday-dua-reading.v1";
+
+/** A reading place is daily; the weekly activity below remains historical. */
+export function readDailyFridayDuaProgress(allowedIds: Iterable<string>, dayKey = getProgressDayKey()): Set<string> {
+  try {
+    const stored = JSON.parse(localStorage.getItem(FRIDAY_DUA_READING_KEY) ?? "null");
+    if (stored?.dayKey !== dayKey || !Array.isArray(stored.ids)) return new Set();
+    const allowed = new Set(allowedIds);
+    return new Set(stored.ids.filter((id: unknown): id is string => typeof id === "string" && allowed.has(id)));
+  } catch {
+    return new Set();
+  }
+}
+
+export function writeDailyFridayDuaProgress(ids: Iterable<string>, dayKey = getProgressDayKey()): void {
+  try {
+    localStorage.setItem(FRIDAY_DUA_READING_KEY, JSON.stringify({ dayKey, ids: [...new Set(ids)].sort() }));
+  } catch {
+    // The reading tally remains usable in memory when storage is unavailable.
+  }
+}
 
 /**
  * The sunan the Friday companion tracks, in the order its rows are numbered.

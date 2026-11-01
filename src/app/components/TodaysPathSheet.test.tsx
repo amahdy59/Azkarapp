@@ -37,6 +37,10 @@ describe("TodaysPathSheet", () => {
     expect(screen.getByText("Updates automatically from your recorded practice")).toBeInTheDocument();
     expect(screen.getByText(/plus 3 prayers at the mosque/)).toBeInTheDocument();
     expect(screen.getByText(/plus all 5 prayers at the mosque/)).toBeInTheDocument();
+    expect(screen.getByTestId("path-growth-guide")).not.toHaveAttribute("open");
+    expect(screen.getByText(/plus all 5 prayers at the mosque/)).not.toBeVisible();
+    fireEvent.click(screen.getByText("How your palm grows"));
+    expect(screen.getByTestId("path-growth-guide")).toHaveAttribute("open");
   });
 
   it.each(["palm", "golden", "oasis"] as const)("identifies the earned %s tier in text", (palmTier) => {

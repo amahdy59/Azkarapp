@@ -1,4 +1,5 @@
 import { handleRadioNavigation } from "./radioNavigation";
+import { PILL_GROUP, PILL_OPTION } from "./ui/controlStyles";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { useId, type ReactNode } from "react";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
@@ -12,10 +13,8 @@ export interface SegmentedControlOption<T extends string> {
 /**
  * Mutually exclusive choice control with correct radio-group semantics.
  *
- * Owns semantics and keyboard behavior only (Radix radio roles/roving tabindex
- * with shared immediate, direction-aware radio navigation). Callers own their
- * own visuals through `className`/`itemClassName`, so this stays a semantics
- * primitive rather than a configurable "god component".
+ * Owns radio semantics, direction-aware keyboard navigation and shared pill
+ * paint. Callers supply layout through `className`/`itemClassName`.
  *
  * Per docs/agent/ACCESSIBILITY_REQUIREMENTS.md §9, mutually exclusive
  * appearance/mode choices must use radio-group semantics — not
@@ -63,7 +62,7 @@ export function SegmentedControl<T extends string>({
         dir={direction}
         value={value}
         onValueChange={(next) => onChange(next as T)}
-        className={className}
+        className={`${PILL_GROUP} ${className}`}
         aria-label={ariaLabel}
         aria-describedby={ariaDescribedBy}
       >
@@ -76,7 +75,7 @@ export function SegmentedControl<T extends string>({
             }}
             onKeyDownCapture={handleRadioNavigation}
             data-testid={option.testId}
-            className={`relative isolate overflow-hidden ${resolveItemClass(value === option.value)}`}
+            className={`${PILL_OPTION} relative isolate overflow-hidden ${resolveItemClass(value === option.value)}`}
           >
             {value === option.value &&
               (motionReduced ? (

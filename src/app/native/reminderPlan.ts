@@ -5,6 +5,7 @@ import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import type { AppStateSnapshot } from "../types";
 import { locationTime, locationCalendarDate } from "../content/locationTime";
+import { contextReminderPlan } from "../contextReminders";
 
 export { locationTime, locationCalendarDate } from "../content/locationTime";
 
@@ -66,5 +67,15 @@ export function buildNativeReminderPlan(state: AppStateSnapshot, now = new Date(
       );
     }
   }
+  contextReminderPlan(reminders, location, now).forEach((event, index) => {
+    if (event.at > now.getTime() && event.at < now.getTime() + 7 * 86_400_000)
+      result.push({
+        id: 19_000 + index,
+        at: event.at,
+        route: event.route,
+        title: t(language, `notifications.${event.kind}`),
+        body: t(language, `notifications.${event.kind}Help`),
+      });
+  });
   return result.sort((a, b) => a.at - b.at);
 }

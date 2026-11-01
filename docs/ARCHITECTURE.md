@@ -1,5 +1,19 @@
 # Application architecture
 
+## Reliable updates and first-use setup — 2026-11-01
+
+Web update attempts allow 120 seconds for offline download/install, independently of the four-second activation handover. The controller observer starts before messaging the registration's current waiting worker. AbortController cancels expired/superseded attempts and removes listeners; late completions cannot activate or reload. Existing stale-worker recovery still preserves user-download caches and saved state.
+
+The production custom domain returned a four-hour HTTP cache lifetime for sw.js during diagnosis. Cloudflare Pages `_headers` now explicitly requires fresh worker/release-manifest responses; fingerprinted assets retain their existing delivery. Verify the actual custom-domain headers after publication. GitHub Pages does not interpret this Cloudflare-specific file.
+
+New installations preselect prayer, four routine reminders, Friday reading (09:00), Friday dua (60 minutes before Maghrib) and pre-Fajr dua (20 minutes before Fajr) when completing onboarding. Stored settings are never overwritten; missing new optional settings remain off. The deferred FirstUseSetup screen provides separate explicit notification/storage actions, location/notification Settings links and optional Continue/Close. Ordinary saving needs no browser permission. Context reminders use existing selected-location prayer/timezone helpers and browser timer/history boundaries plus the native seven-day queue. Native contextual IDs remain inside the existing cancellable 10000–19999 range. Browser closure limitations remain; no server push service is implied.
+
+Every zikr/dua collection joins daily current-tally rollover on boot, midnight and foreground reconciliation, including situational collections, lazy dua partial counts and collection-reader page positions. Same-day entries resume and event collections retain their explicit New session action. Al-Kahf alone retains its weekly cycle, including its lazy reader identity and page position. Saved IDs, sessions, historical daily records, bookmarks and the independent main Mushaf position remain unchanged. This is a reading convenience, not a new daily religious obligation.
+
+The Friday companion's dua reader uses one dated device-local current tally, cleared on sign-out and read as empty after midnight. Its independent weekly activity remains monotonic and synchronized: a fresh reading or tally undo does not erase the historical activity record. Friday practice records and Al-Kahf keep their existing cycle.
+
+Home retains the verified current reminder while a replacement loads. Failed first catalogue acquisition retries on online/visible recovery, guarded against overlapping work and removed on context change/unmount. Successful minute ticks reuse the existing verified promise/cache; there is no polling retry or additional clock. Reviewed source selection, timing, checksums and focus-pinned reading remain authoritative.
+
 ## Ordinary-page layout consistency — 2026-11-01
 
 The shared Header defaults to the ordinary 80rem page frame and responsive page gutter. A shared CSS title recipe reserves a 44px row with subtitles below it; Library and Settings reuse that recipe without replacing their scroll owners or heading hierarchy. Search now uses the same visible header and frame while preserving its native field label and deferred search/index logic. Progress keeps its full-scrollport opaque wrapper and moves the common measure/gutter onto its inner controls, matching its body. Utility content uses the same frame/gutter; Category keeps its narrower form body below an ordinary outer header. ReadingScreenChrome/Reader explicitly opt into compact devotional geometry; immersive Mushaf and Home prayer alignment remain separate intentional contracts. Layout checks compare measured coordinates and reflow across ordinary routes in both directions and enlarged text.

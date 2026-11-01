@@ -1,4 +1,23 @@
 const en = {
+  firstUse: {
+    title: "Make yourself at home",
+    intro:
+      "Reading and saving work straight away. These optional choices help with reminders and keeping data on this device.",
+    reminders:
+      "Prayer, daily adhkar, Friday and pre-Fajr reminders are selected for new readers. Your device still needs to allow notifications.",
+    reviewReminders: "Review reminder choices",
+    storage: "Keep data on this device",
+    storageHelp:
+      "Progress saves automatically. Storage protection helps prevent the browser clearing data when space is low; it is not a backup.",
+    storageGranted: "Storage protection is active.",
+    storageDenied: "The browser did not grant extra protection. Your data still saves; keep a backup in Settings.",
+    storageOptional: "Your data still saves. The browser decides whether extra protection is available.",
+    storageUnsupported: "Extra storage protection is unavailable here. You can still read, save and export a backup.",
+    protectStorage: "Request storage protection",
+    location: "Choose your city for accurate prayer times",
+    continue: "Continue to Home",
+    error: "That request could not finish. You can try again in Settings.",
+  },
   fridaySalawat: {
     title: "Salawat ﷺ",
     subtitle: "Choose a target and count with intention",
@@ -532,6 +551,13 @@ const en = {
     counterBody: "Open to continue counting",
   },
   notifications: {
+    specialReminders: "Friday and dua reminders",
+    friday: "Friday reading",
+    fridayHelp: "Friday at 9:00 in your selected prayer location. Opens Al-Kahf.",
+    fridayDua: "Friday dua",
+    fridayDuaHelp: "One hour before Friday Maghrib in your selected prayer location.",
+    beforeFajrDua: "Dua before Fajr",
+    beforeFajrDuaHelp: "20 minutes before Fajr in your selected prayer location.",
     nativeAvailabilityBody:
       "Android schedules the next seven days on this device. Open Azkar at least weekly and after a clock or timezone change to refresh them. Battery restrictions, approximate alarms and force-stop can delay or prevent delivery.",
     nativeActiveNotice:

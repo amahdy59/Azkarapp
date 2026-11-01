@@ -47,6 +47,28 @@ describe("reminder lifecycle", () => {
     expect(delivery.show).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
   });
+  it("schedules a selected pre-Fajr reminder after in-app permission is granted", async () => {
+    const now = new Date(2026, 9, 16, 0, 0);
+    const { contextReminderPlan } = await import("../contextReminders");
+    const reminders = { ...DEFAULT_APP_STATE.settings.reminders, beforeFajrDua: { enabled: true } };
+    const event = contextReminderPlan(reminders, undefined, now)[0]!;
+    vi.setSystemTime(new Date(event.at - 1000));
+    const { unmount } = renderHook(() => useForegroundReminders({ ...props, reminders }));
+    delivery.permission = "granted";
+    await act(async () => {
+      window.dispatchEvent(new Event("azkar-notification-permission"));
+      await vi.advanceTimersByTimeAsync(1200);
+    });
+    expect(delivery.show).toHaveBeenCalledOnce();
+    expect(delivery.show.mock.calls[0]![1].data.url).toContain("comprehensive_duas");
+    await act(async () => {
+      window.dispatchEvent(new Event("focus"));
+      await vi.advanceTimersByTimeAsync(300);
+    });
+    expect(delivery.show).toHaveBeenCalledOnce();
+    unmount();
+    expect(vi.getTimerCount()).toBe(0);
+  });
   it("invalidates pending delivery when leaving or changing schedules", async () => {
     delivery.permission = "granted";
     delivery.show.mockReturnValue(new Promise(() => {}));

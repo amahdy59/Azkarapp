@@ -83,6 +83,7 @@ test("the day's record is explained without loss or faith-scoring language", asy
   await openHome(page);
   await page.getByTestId("home-header-routine-summary").click();
   const summary = page.getByTestId("todays-path-summary");
+  await page.getByTestId("path-growth-guide").locator("summary").click();
   await expect(summary).toBeVisible();
 
   const text = (await summary.textContent()) ?? "";

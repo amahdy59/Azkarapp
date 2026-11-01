@@ -558,7 +558,7 @@ function DailyEvidenceCardContent({
       data-testid="home-daily-evidence"
       data-evidence-id={evidence.evidenceId}
       dir={direction}
-      className="home-glass-reading flex min-h-0 w-full flex-col gap-3"
+      className="home-glass-reading flex min-h-0 min-w-0 w-full flex-col gap-3 [overflow-wrap:anywhere]"
       onFocusCapture={() => setFocusedEvidence(evidence)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusedEvidence(null);

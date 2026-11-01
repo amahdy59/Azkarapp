@@ -1,5 +1,9 @@
 # Prayer times, location, timezone, and DST
 
+## First-use reminder selection — 2026-11-01
+
+New installations select prayer and main routine reminders during onboarding, with explicit OS/browser permission still required. Existing users retain saved choices. Optional Friday reading uses 09:00 on Friday, Friday dua 60 minutes before Maghrib, and pre-Fajr dua 20 minutes before Fajr, in the chosen prayer location's date-specific IANA timezone. These product reminder choices match existing contextual reading windows, not new religious-source interpretations. Taps open Al-Kahf or Comprehensive duas. Native contextual entries use the cancellable seven-day queue; web suspension/closure still requires a separate push service for dependable closed-app delivery.
+
 ## Larger expanded Home times — 2026-10-21
 
 Owner follow-ups: the Now pill shares the routine CTA's semantic primary/foreground colors with a static gloss. Remaining-time digits increase from 14px to 15px in the footer and from 12px to 13px in the condensed copy, with the same 18px compact line footprint. The ring becomes a clean, thicker arc without clock hands and retains clockwise elapsed-interval fill: empty at the interval start and full when the next prayer is due. This is decorative redundancy for the exact numeric countdown, not a new timer or completion signal.

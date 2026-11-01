@@ -37,26 +37,41 @@ export interface UpdateDeps {
    * dependency exists.
    */
   awaitHandover?: () => Promise<boolean>;
+  /** Cancels an obsolete/expired attempt before it can activate or reload. */
+  signal?: AbortSignal;
 }
 
 /**
  * Settles when an installing worker stops installing, however it ends.
  *
  * `redundant` counts as settled: the install failed, and a reload is still the
- * honest answer to someone who asked for the new version. Nothing here rejects
- * — every path has to end in either a handover or a reload, because a button
- * that reports success and changes nothing is worse than one that reloads to
- * the same place.
+ * honest answer to someone who asked for the new version. Only cancellation
+ * rejects: an expired attempt must never activate or reload later.
  */
-function waitForInstall(worker: ServiceWorker): Promise<void> {
-  return new Promise((resolve) => {
+function waitForInstall(worker: ServiceWorker, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    signal?.throwIfAborted();
     if (worker.state !== "installing") {
       resolve();
       return;
     }
-    worker.addEventListener("statechange", () => {
-      if (worker.state !== "installing") resolve();
-    });
+    const cleanup = () => {
+      worker.removeEventListener?.("statechange", changed);
+      signal?.removeEventListener("abort", aborted);
+    };
+    const changed = () => {
+      if (worker.state !== "installing") {
+        cleanup();
+        resolve();
+      }
+    };
+    const aborted = () => {
+      cleanup();
+      reject(signal!.reason);
+    };
+    worker.addEventListener("statechange", changed);
+    signal?.addEventListener("abort", aborted, { once: true });
+    changed();
   });
 }
 
@@ -65,14 +80,18 @@ export async function applyServiceWorkerUpdate({
   updateServiceWorker,
   reload,
   awaitHandover,
+  signal,
 }: UpdateDeps): Promise<void> {
+  signal?.throwIfAborted();
   const registration = await getRegistration();
+  signal?.throwIfAborted();
 
   if (registration) {
     await registration.update?.().catch(() => {
       // A failed check is not a failed update: fall through to the reload,
       // which is what the reader asked for.
     });
+    signal?.throwIfAborted();
 
     /* A worker that is still installing cannot be told to stand aside: there is
        nothing waiting yet, and `updateServiceWorker(true)` returns having done
@@ -81,11 +100,17 @@ export async function applyServiceWorkerUpdate({
        reader stayed on the build they pressed it to leave. Precaching 4 MB
        takes long enough for that to be the common case, not the rare one. */
     if (registration.installing) {
-      await waitForInstall(registration.installing);
+      await waitForInstall(registration.installing, signal);
     }
 
     if (registration.waiting) {
-      await updateServiceWorker(true);
+      // Subscribe before activation: a fast worker can claim the tab during
+      // postMessage. Address this registration's waiting worker directly;
+      // Workbox's updater may still refer to a superseded worker instance.
+      const handover = awaitHandover?.();
+      if (typeof registration.waiting.postMessage === "function")
+        registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      else await updateServiceWorker(true);
 
       /* Then reload — whether or not the handover reported success.
          `updateServiceWorker(true)` is documented as reloading once the new
@@ -101,12 +126,14 @@ export async function applyServiceWorkerUpdate({
          reload lands on the new worker rather than racing it. But the reload
          itself is not conditional on it. A second reload, if the updater does
          perform one, costs nothing — the page is already navigating. */
-      await awaitHandover?.();
+      await handover;
+      signal?.throwIfAborted();
       reload();
       return;
     }
   }
 
+  signal?.throwIfAborted();
   reload();
 }
 

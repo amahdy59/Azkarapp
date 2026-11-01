@@ -1,4 +1,5 @@
 import { isNativeAndroid } from "../../native/platform";
+import { CONTEXT_REMINDER_KINDS } from "../../contextReminders";
 import { refreshNativeNotificationPermission } from "../../native/reminders";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -220,7 +221,8 @@ export function NotificationsPanel({
     reminders.morning.enabled ||
     reminders.evening.enabled ||
     reminders.before_sleep.enabled ||
-    reminders.after_prayer.enabled;
+    reminders.after_prayer.enabled ||
+    CONTEXT_REMINDER_KINDS.some((kind) => reminders[kind]?.enabled);
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
@@ -444,6 +446,37 @@ export function NotificationsPanel({
               {t(language, isNativeAndroid() ? "notifications.nativeActiveNotice" : "notifications.activeNotice")}
             </p>
           )}
+        </section>
+        <section
+          className="rounded-3xl border border-border/40 bg-card p-4"
+          aria-label={t(language, "notifications.specialReminders")}
+        >
+          <h2 className="mb-2 text-title font-bold">{t(language, "notifications.specialReminders")}</h2>
+          {CONTEXT_REMINDER_KINDS.map((kind) => (
+            <div key={kind} className="flex items-center gap-3 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-bold">{t(language, `notifications.${kind}`)}</p>
+                <p className="text-sm text-muted-foreground">{t(language, `notifications.${kind}Help`)}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-label={t(language, `notifications.${kind}`)}
+                aria-checked={reminders[kind]?.enabled === true}
+                className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
+                onClick={async () => {
+                  const enabling = !reminders[kind]?.enabled;
+                  if (enabling && (permission === "default" ? await requestPermission() : permission) !== "granted") {
+                    setPermissionAttemptBlocked(true);
+                    return;
+                  }
+                  onRemindersChange({ ...reminders, [kind]: { enabled: enabling } });
+                }}
+              >
+                <ToggleTrack checked={reminders[kind]?.enabled === true} />
+              </button>
+            </div>
+          ))}
         </section>
         <details className="group border-t border-border/40">
           <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">

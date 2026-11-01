@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { contextReminderPlan, type ContextReminderKind } from "../contextReminders";
 import { isNativeAndroid, rescheduleNativeReminders } from "@azkar/native-reminders";
 import { readNotificationPermission, showBrowserNotification } from "../notifications";
 import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
@@ -22,9 +23,10 @@ const MAX_TIMEOUT_MS = 2_147_000_000;
 export { getUpcomingNativeReminders } from "@azkar/native-reminders";
 
 type RoutineReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
-type ReminderHistoryKey = RoutineReminderKind | `prayer:${PrayerName}`;
+type ReminderHistoryKey = RoutineReminderKind | ContextReminderKind | `prayer:${PrayerName}`;
 
 export type DueReminder =
+  | { kind: ContextReminderKind; category: "comprehensive_duas" | "friday_kahf" }
   | { kind: RoutineReminderKind; category: CategoryId }
   | { kind: "prayer"; prayer: PrayerName; leadMinutes: PrayerReminderLeadMinutes };
 
@@ -133,7 +135,9 @@ export function getNextReminderDelay(
   location: LocationSettings | undefined,
   now = new Date(),
 ): number | null {
-  const candidates: number[] = [];
+  const candidates: number[] = contextReminderPlan(reminders, location, now)
+    .filter((event) => event.at > now.getTime())
+    .map((event) => event.at);
   for (const kind of ["morning", "evening", "before_sleep", "after_prayer"] as const) {
     if (!reminders[kind].enabled) continue;
     for (const dayOffset of [0, 1]) {
@@ -251,9 +255,16 @@ export function useForegroundReminders({
       if (readNotificationPermission() !== "granted") return;
       const now = new Date();
       const wasAlreadyNotified = (key: ReminderHistoryKey) => hasAlreadyNotified(key, now, progressDayStartHour);
-      const due =
+      const context = contextReminderPlan(reminders, location, now).find(
+        (event) =>
+          now.getTime() >= event.at && now.getTime() - event.at < REMINDER_WINDOW_MS && !wasAlreadyNotified(event.kind),
+      );
+      const due: DueReminder | null =
         getDuePrayerReminder(reminders, location, now, wasAlreadyNotified) ??
-        getDueReminder(reminders, dailyCompletions, now, progressDayStartHour, wasAlreadyNotified);
+        getDueReminder(reminders, dailyCompletions, now, progressDayStartHour, wasAlreadyNotified) ??
+        (context
+          ? { kind: context.kind, category: context.kind === "friday" ? "friday_kahf" : "comprehensive_duas" }
+          : null);
       if (!due) return scheduleNextCheck();
 
       isDelivering = true;
@@ -283,11 +294,13 @@ export function useForegroundReminders({
     };
     document.addEventListener("visibilitychange", reconcileWhenVisible);
     window.addEventListener("focus", reconcileWhenVisible);
+    window.addEventListener("azkar-notification-permission", reconcileWhenVisible);
     return () => {
       cancelled = true;
       if (timerId !== undefined) window.clearTimeout(timerId);
       document.removeEventListener("visibilitychange", reconcileWhenVisible);
       window.removeEventListener("focus", reconcileWhenVisible);
+      window.removeEventListener("azkar-notification-permission", reconcileWhenVisible);
     };
   }, [dailyCompletions, language, location, progressDayStartHour, reminders]);
 }
