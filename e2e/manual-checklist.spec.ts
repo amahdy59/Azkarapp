@@ -190,15 +190,14 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
     await seedAndOpen(page);
     await page.getByTestId("nav-progress").click();
 
-    // The page title is the shared header h1, which now wraps rather than
-    // truncates. Day/Week stay on one line; the descriptive Month/Year chart
-    // heading may use two complete lines at narrow widths.
-    await expectUnclippedHeading(
-      page.getByRole("heading", { name: "Progress", exact: true, level: 1 }),
-      `${viewport.name} page title`,
-    );
+    // The approved compact header retains one semantic h1 without visible
+    // title chrome. Content headings still need full readable geometry.
+    const title = page.getByRole("heading", { name: "Progress", exact: true, level: 1 });
+    await expect(title).toHaveCount(1);
+    await expect(title).toHaveClass("sr-only");
+    await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
 
-    const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
+    const period = page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true });
     for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
       await chooseProgressOption(period, value);
       const heading = page.getByTestId("progress-primary-heading");
@@ -214,7 +213,7 @@ test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable with
   await seedAndOpen(page, { language: "ar" });
   await page.getByTestId("nav-progress").click();
 
-  const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
+  const period = page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true });
   for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
     await chooseProgressOption(period, value);
     const heading = page.getByTestId("progress-primary-heading");

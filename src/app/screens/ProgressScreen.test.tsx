@@ -20,14 +20,36 @@ async function choosePeriod(period: string) {
 }
 
 describe("ProgressScreen", () => {
-  it("uses a chosen calendar month including leap days and real empty-state navigation", () => {
+  it("defaults to the rolling range and leaves optional reflection calculations unmounted", () => {
+    const pathIndex = vi.spyOn(dailyPathDomain, "createDailyPathIndex");
+    try {
+      render(
+        <ProgressScreen
+          dailyCompletions={[]}
+          progressDayStartHour={3}
+          calendarType="gregorian"
+          language="en"
+          direction="ltr"
+          onOpenShareModal={vi.fn()}
+        />,
+      );
+      expect(screen.getByRole("combobox", { name: "Date range" })).toHaveAttribute("data-progress-value", "last30");
+      expect(screen.getByTestId("garden-view-date")).toHaveTextContent("Last 30 days");
+      expect(screen.getByTestId("progress-heatmap")).toBeInTheDocument();
+      expect(pathIndex).not.toHaveBeenCalled();
+    } finally {
+      pathIndex.mockRestore();
+    }
+  });
+  it("uses a chosen calendar month including leap days and real empty-state navigation", async () => {
     const onOpenHome = vi.fn();
     const onOpenKhatmah = vi.fn();
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={[]}
         progressDayStartHour={3}
-        calendarType="hijri"
+        calendarType="gregorian"
         language="en"
         direction="ltr"
         onOpenShareModal={vi.fn()}
@@ -39,19 +61,13 @@ describe("ProgressScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open Quran plan" }));
     expect(onOpenHome).toHaveBeenCalledOnce();
     expect(onOpenKhatmah).toHaveBeenCalledOnce();
-    fireEvent.click(screen.getByRole("button", { name: /Choose dates:/ }));
-    fireEvent.click(screen.getByRole("radio", { name: "Month" }));
-    fireEvent.change(screen.getByLabelText("Gregorian month"), { target: { value: "2024-02" } });
+    await choosePeriod("custom");
+    fireEvent.change(screen.getByLabelText("Start date"), { target: { value: "2024-02-01" } });
+    fireEvent.change(screen.getByLabelText("End date"), { target: { value: "2024-02-29" } });
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent(/1\s*–\s*29 Feb 2024/);
-    expect(screen.getByRole("combobox", { name: "Period", hidden: true })).toHaveAttribute(
-      "data-progress-value",
-      "month",
-    );
-    expect(screen.getByRole("combobox", { name: "Show dates in", hidden: true })).toHaveAttribute(
-      "data-progress-value",
-      "gregorian",
-    );
+    expect(screen.getByRole("combobox", { name: "Date range" })).toHaveAttribute("data-progress-value", "custom");
+    expect(screen.queryByRole("combobox", { name: "Show dates in" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("progress-tab-records"));
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
     expect(screen.getByText("No saved records in this period.")).toBeInTheDocument();
@@ -65,6 +81,7 @@ describe("ProgressScreen", () => {
     const cancel = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => undefined);
     const { container, unmount } = render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={[]}
         progressDayStartHour={3}
         calendarType="gregorian"
@@ -112,6 +129,7 @@ describe("ProgressScreen", () => {
     try {
       render(
         <ProgressScreen
+          initialPeriod="day"
           dailyCompletions={[]}
           progressDayStartHour={3}
           calendarType="gregorian"
@@ -120,6 +138,7 @@ describe("ProgressScreen", () => {
           onOpenShareModal={vi.fn()}
         />,
       );
+      openDetailedContext();
       const initialCalculations = summary.mock.calls.length;
       expect(summary.mock.results.at(-1)?.value.today.dayKey).toBe("2026-10-19");
       act(() => vi.advanceTimersByTime(30050));
@@ -148,17 +167,20 @@ describe("ProgressScreen", () => {
     fireEvent.resize(window);
     const initialCalculations = summary.mock.calls.length;
     const initialIndexes = index.mock.calls.length;
-    expect(pathIndex).toHaveBeenCalledTimes(1);
-    expect(initialCalculations).toBeGreaterThan(0);
+    expect(pathIndex).not.toHaveBeenCalled();
+    expect(initialCalculations).toBe(0);
     fireEvent.scroll(viewport, { target: { scrollTop: 120 } });
     expect(screen.getByTestId("progress-sticky-controls")).toHaveAttribute("data-scrolled", "true");
     fireEvent.scroll(viewport, { target: { scrollTop: 0 } });
     expect(screen.getByTestId("progress-sticky-controls")).not.toHaveAttribute("data-scrolled");
     expect(summary.mock.calls.length).toBe(initialCalculations);
     expect(index.mock.calls.length).toBe(initialIndexes);
+    expect(pathIndex).not.toHaveBeenCalled();
+    openDetailedContext();
     expect(pathIndex).toHaveBeenCalledTimes(1);
     rerender(
       <ProgressScreen
+        initialPeriod="day"
         {...props}
         dailyCompletions={[...props.dailyCompletions, { dayKey: "2026-08-01", category: "evening", timeZone: "UTC" }]}
       />,
@@ -185,6 +207,7 @@ describe("ProgressScreen", () => {
     const onOpenShareModal = vi.fn();
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={mockCompletions}
         dailyHabits={mockDailyHabits}
         progressDayStartHour={3}
@@ -215,11 +238,10 @@ describe("ProgressScreen", () => {
     expect(screen.getByText("أيام المواظبة المتتالية")).toBeInTheDocument();
     expect(screen.getByText("النخيل المثمر")).toBeInTheDocument();
 
-    // Share action in Header
-    const shareBtn = screen.getByRole("button", { name: "مشاركة بطاقة التقدم" });
-    expect(shareBtn).toBeInTheDocument();
-    fireEvent.click(shareBtn);
-    expect(onOpenShareModal).toHaveBeenCalledTimes(1);
+    // The owner removed the visible header actions; semantic title remains.
+    expect(screen.queryByRole("button", { name: "مشاركة بطاقة التقدم" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "التقدم", exact: true })).toHaveClass("sr-only");
+    expect(onOpenShareModal).not.toHaveBeenCalled();
 
     // 7-Day Rhythm Strip without star glyphs
     expect(screen.getByText("إيقاع الأيام السبعة")).toBeInTheDocument();
@@ -240,6 +262,7 @@ describe("ProgressScreen", () => {
     const onOpenShareModal = vi.fn();
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={mockCompletions}
         dailyHabits={mockDailyHabits}
         progressDayStartHour={3}
@@ -250,7 +273,7 @@ describe("ProgressScreen", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Your recorded progress" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your progress" })).toBeInTheDocument();
     openDetailedContext();
     await chooseDetail("reflection");
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
@@ -266,6 +289,7 @@ describe("ProgressScreen", () => {
     const onTogglePrayerTracking = vi.fn();
     const { container } = render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={mockCompletions}
         dailyHabits={mockDailyHabits}
         progressDayStartHour={3}
@@ -288,6 +312,7 @@ describe("ProgressScreen", () => {
   it("switches the shared range between Day, Week, Month, and Year", async () => {
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={mockCompletions}
         dailyHabits={mockDailyHabits}
         progressDayStartHour={3}
@@ -301,7 +326,7 @@ describe("ProgressScreen", () => {
     // Switch to Week tab
     openDetailedContext();
     await choosePeriod("week");
-    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "week");
+    expect(screen.getByRole("combobox", { name: "نطاق التاريخ" })).toHaveAttribute("data-progress-value", "week");
     // Oasis stage card is exclusive to Day view
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
     await chooseDetail("routines");
@@ -312,15 +337,15 @@ describe("ProgressScreen", () => {
 
     // Switch to Month tab
     await choosePeriod("month");
-    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "month");
+    expect(screen.getByRole("combobox", { name: "نطاق التاريخ" })).toHaveAttribute("data-progress-value", "month");
 
     // Switch to Year tab
     await choosePeriod("year");
-    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "year");
+    expect(screen.getByRole("combobox", { name: "نطاق التاريخ" })).toHaveAttribute("data-progress-value", "year");
 
     // Switch back to Day tab
     await choosePeriod("day");
-    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "day");
+    expect(screen.getByRole("combobox", { name: "نطاق التاريخ" })).toHaveAttribute("data-progress-value", "day");
     await chooseDetail("reflection");
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
   });
@@ -329,6 +354,7 @@ describe("ProgressScreen", () => {
     const onPrayerResume = vi.fn();
     const { container } = render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={[]}
         progressDayStartHour={3}
         calendarType="gregorian"
@@ -350,6 +376,7 @@ describe("ProgressScreen", () => {
   it("shows the configured weekly intention on the Week view", async () => {
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={mockCompletions}
         progressDayStartHour={3}
         calendarType="gregorian"
@@ -366,10 +393,11 @@ describe("ProgressScreen", () => {
     expect(await screen.findByText("Your seven-day intention")).toBeInTheDocument();
   });
 
-  it("keeps both today and past-day statistics read-only", () => {
+  it("keeps both today and past-day statistics read-only", async () => {
     const onTogglePrayerTracking = vi.fn();
     const { container } = render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={[]}
         progressDayStartHour={3}
         calendarType="gregorian"
@@ -380,10 +408,13 @@ describe("ProgressScreen", () => {
       />,
     );
     openDetailedContext();
-    fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
+    await choosePeriod("custom");
+    fireEvent.change(screen.getByLabelText("Start date"), { target: { value: "2024-02-01" } });
+    fireEvent.change(screen.getByLabelText("End date"), { target: { value: "2024-02-01" } });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
-    expect(screen.getByTestId("prayer-progress-summary")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Next period" }));
+    expect(screen.getByTestId("progress-metric-prayers")).toBeInTheDocument();
+    await choosePeriod("day");
     expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
     expect(onTogglePrayerTracking).not.toHaveBeenCalled();
   });

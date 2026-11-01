@@ -73,7 +73,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   const [librarySection, setLibrarySection] = useState<LibraryRouteSection>(
     initialRoute?.librarySection ?? "collections",
   );
-  const [progressPeriod, setProgressPeriod] = useState<ProgressRoutePeriod>(initialRoute?.progressPeriod ?? "day");
+  const [progressPeriod, setProgressPeriod] = useState<ProgressRoutePeriod>(initialRoute?.progressPeriod ?? "last30");
   const [settingsPanel, setSettingsPanel] = useState<SettingsRoutePanel>(initialRoute?.settingsPanel ?? "root");
 
   const [routeContentLoading, setRouteContentLoading] = useState(
@@ -248,7 +248,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
         if (route.index !== undefined) setActiveIdx(route.index);
         if (route.query !== undefined) setSearchQuery(route.query);
         if (route.view === "library") setLibrarySection(route.librarySection ?? "collections");
-        if (route.view === "progress") setProgressPeriod(route.progressPeriod ?? "day");
+        if (route.view === "progress") setProgressPeriod(route.progressPeriod ?? "last30");
         if (route.view === "settings") setSettingsPanel(route.settingsPanel ?? "root");
         setActiveTab(tabForView(route.view));
       });

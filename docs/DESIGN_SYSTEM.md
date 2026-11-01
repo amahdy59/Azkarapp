@@ -1,3 +1,11 @@
+## Progress calendar hierarchy — 2026-11-01
+
+The owner-approved heatmap refinement replaces the recording strip and duplicated latest-day card. Retain four compact independent summaries in the approved 2×2 group, a dominant selected-practice recording calendar with date details, compact same-scale routine bars and at most one subordinate factual insight. The optional routine doughnut partitions saved morning/evening/bedtime completions only. Never combine prayers, pages and routine counts into a score or pie.
+
+One range dropdown visibly identifies its preset and exact dates; unqualified visits select Last 30 days. Date filtering and Overview/Trends/Records share an aligned row when their content fits, in logical RTL/LTR order and at the dashboard's width. Phones/enlarged text wrap to separate rows and retain reachable scrollable tabs. Preserve the hidden semantic title, settings-owned calendar and protected portalled menu contract.
+
+Calendar dates have exact visible values, fixed intensity scales, 44px targets, roving keyboard focus and selected-date readouts. Unknown goals, absent saved activity and future/out-of-scope dates remain distinct. Page bands are 0, 1–4, 5–10, 11–20 and 21+. Long ranges explore a bounded month rather than shrinking a year of actions; narrow/enlarged calendars permit labelled native horizontal scrolling. Date detail is adjacent only where available width permits. Charts retain zero-based counts/0–100% rates, exact data alternatives, actual partial scopes and language-directed chronology. Reuse theme/material tokens and app/OS reduced-motion behavior.
+
 ## Compact enlarged-text recovery — 2026-10-31
 
 Home reminder recognition: keep the existing localized “تذكير لك الآن” / “Relevant now” as a small wrapping label above a specific reminder title. The title remains the heading, the label describes the region, and generic untitled reminders show the label once as their heading. Preserve reminder selection, reading focus, refresh and source content.
@@ -1305,3 +1313,7 @@ Progress leads with the selected-date action before secondary period/calendar di
 ## Counter footer and option previews — 2026-10-21
 
 Masbaha and Salawat Benefit actions use the same reader-tool-label marker as Share, Sound and Focus. Icons-only mode hides every visual label while retaining accessible names; labelled mode keeps shared wrapping and target geometry. Long Masbaha menu short names ending in an ellipsis are presented from their existing complete localized text, visually bounded to two lines rather than a fixed character budget. Concise named readings remain named. Shared option spacing, a separate saved-count column, larger-text count wrapping and complete DOM/title text preserve context without changing source records. Salawat uses the same preview anatomy. Both protected portalled menus provide direct keyboard focus for native scrolling.
+
+### Progress header continuation — 2026-10-31
+
+The owner supersedes the multi-control toolbar: Progress has one date-range dropdown with Day, Week, Month, Year and Custom dates. The selected dates stay visible and apply to every tab and export. Calendar type comes only from Settings. Remove local calendar selection, filter disclosure, Today link and previous/next arrows. Custom dates uses start/end fields (equal dates select one day), validated before applying, with shared sheet/dialog focus recovery. The page title is screen-reader-only; the compact range and view tabs remain protected and height-bounded. Narrow tabs scroll horizontally when enlarged labels need more room.

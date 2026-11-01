@@ -23,6 +23,31 @@ const series: RecordingTimelineSeries[] = [
   },
 ];
 describe("RecordingTimeline", () => {
+  it("renders columns with real gaps and preserves exact data and keyboard exploration", async () => {
+    render(
+      <RecordingTimeline
+        series={[
+          {
+            ...series[0]!,
+            points: [series[0]!.points[0]!, { ...series[0]!.points[1]!, possible: 0 }, series[0]!.points[2]!],
+          },
+        ]}
+        language="en"
+        period="month"
+        title="Columns"
+        testId="columns"
+        chartDisplay="columns"
+      />,
+    );
+    expect(screen.getAllByTestId("recording-time-column")).toHaveLength(2);
+    expect(screen.queryByTestId("recording-time-line")).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("slider"), { key: "Home" });
+    expect(screen.getByRole("slider")).toHaveValue("0");
+    fireEvent.keyDown(screen.getByRole("slider"), { key: "ArrowRight" });
+    expect(screen.getByTestId("timeline-readout")).toHaveTextContent("—");
+    fireEvent.click(screen.getByText("Exact chart data"));
+    expect(await screen.findByRole("table")).toHaveTextContent("Unavailable");
+  });
   it("discloses exact plotted buckets, including unavailable rates and partial dates, without fabricating zero rates", async () => {
     render(
       <RecordingTimeline

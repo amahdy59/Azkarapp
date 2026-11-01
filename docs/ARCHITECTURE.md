@@ -1,5 +1,17 @@
 # Application architecture
 
+## Progress recording calendar and rolling range — 2026-11-01
+
+The approved heatmap refinement supersedes the separate seven-day presence strip/latest-day list. Unqualified Progress visits default to the typed `last30` rolling range; explicit `day`, `week`, `month`, `year` and `last30` links round-trip. A selected range owns Overview, Trends, Records and JSON export; heatmap date/month exploration never changes it. Last 30 days is thirty inclusive civil dates, with existing per-practice devotional/civil clipping and complete-day comparison rules applied afterwards.
+
+ProgressHeatmap consumes the existing normalized daily index and uses pure fixed-band/weekday helpers in progressHeatmap.ts. It defaults to Daily azkar, exposes exact selected-date details, preserves unknown Quran goals and neutral absence/future states, and bounds long selections to one month of interactive cells with year/month exploration. ProgressRoutineComparison shows equal-scale routine recording bars and an optional composition of saved completions only. RecordingTimeline supports columns and lines with the same units, gaps, keyboard/pointer/RTL exploration and exact bucket tables. Month/Last30 use daily buckets; long custom/year aggregation remains bounded.
+
+ProgressScreen retains a date-clock identity until its civil/devotional boundary changes, so minute ticks do not invalidate range/history derivations. Optional ProgressDetails mounts its existing reflection calculations only when disclosed and preserves the visit-local topic choice. Memoized calendar/comparison presentation reuses stable inputs. No storage/schema, synchronization, content or dependency changes.
+
+## Progress single-range control — 2026-11-01
+
+The owner-approved compact Progress header supersedes the older multi-control date toolbar below. ProgressRangeToolbar exposes one protected shared selector for Day, Week, Month, Year and Custom dates. Calendar type comes from Settings; no local calendar override, period arrows, Today action or filter disclosure remains. Custom dates edits validated start/end drafts in ResponsiveSheet; equal boundaries select one day. Apply/Cancel/Escape restore focus to the selector. One applied range still owns Overview, Trends, Records and JSON export, with existing civil/devotional boundaries and complete-day comparisons. The h1 remains available to assistive technology without visible title/share chrome; detailed reflection retains sharing. No persisted or synchronized format changes.
+
 ## Android interaction reliability — 2026-10-31
 
 Counter/accessibility continuation: `useOverlayBack` associates open shared modal/sheet content and the Mushaf index with their dismissal callbacks. Native routing resolves the foremost visible accessible overlay before history/exit; unregistered library menus/alerts retain their own Escape dismissal and busy guards. Nested sheet Escape handlers close only their own foremost surface. No synthetic history, persisted overlay state or dependency is introduced. `counterAnnouncement` supplies the small shared milestone policy; `useCounterAnnouncement` suppresses initial restored-state speech and clears stale context/reset messages. Reader retains its existing completion message and synchronous count ownership.

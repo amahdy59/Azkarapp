@@ -1,7 +1,6 @@
 import { useScrollElevation } from "../hooks/useScrollElevation";
 import "./progress-screen.css";
 import { useState, useEffect, useMemo, useRef, useId } from "react";
-import { Header, IconButton } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { RoutineInsights } from "../components/RoutineInsights";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -22,10 +21,9 @@ import {
   indexProgressDashboard,
   metricProgressRange,
   progressPresetRange,
-  progressRangeDays,
   type ProgressRange,
+  type ProgressPreset,
 } from "../progressDashboard";
-import { shiftProgressDayKey } from "../progress";
 import { saveFileToDevice } from "../share/shareDispatcher";
 
 import { PrayerProgressSummary } from "../components/PrayerProgressSummary";
@@ -53,7 +51,7 @@ import {
   OasisMark,
   PathRewardMark,
 } from "../components/GardenMarks";
-import { ChevronDown, Share2, Sparkles, Zap, SlidersHorizontal } from "../components/icons";
+import { ChevronDown, Sparkles, Zap, SlidersHorizontal, BarChart3, Sprout, FileText } from "../components/icons";
 import type {
   AppLanguage,
   CategoryId,
@@ -99,27 +97,7 @@ function renderTierMark(level: GardenLevel, size = 32) {
   }
 }
 
-export function ProgressScreen({
-  dailyCompletions,
-  progressDayStartHour,
-  calendarType: initialCalendarType,
-  language,
-  direction,
-  onOpenShareModal,
-  prayerTracking = EMPTY_PRAYER_TRACKING,
-  dailyHabits = EMPTY_DAILY_HABITS,
-  wirdHistory,
-  quranWirdPlan,
-  quranWirdDailyGoals,
-  mosquePrayerGoal,
-  dailyPathStartDayKey,
-  weeklyGoalDays,
-  initialPeriod = "day",
-  onPeriodChange,
-  onOpenHome,
-  onOpenKhatmah,
-  zikrHistory = EMPTY_ZIKR_HISTORY,
-}: {
+type ProgressScreenProps = {
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
   calendarType: "hijri" | "gregorian";
@@ -143,19 +121,47 @@ export function ProgressScreen({
   onOpenFriday?: () => void;
   onOpenKhatmah?: () => void;
   onOpenHome?: () => void;
-  initialPeriod?: "day" | "week" | "month" | "year";
-  onPeriodChange?: (period: "day" | "week" | "month" | "year") => void;
+  initialPeriod?: ProgressPreset;
+  onPeriodChange?: (period: ProgressPreset) => void;
   zikrHistory?: readonly ZikrDayRecord[];
-}) {
-  const now = useNow();
+};
 
-  const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">(initialPeriod);
+export function ProgressScreen({
+  dailyCompletions,
+  progressDayStartHour,
+  calendarType: initialCalendarType,
+  language,
+  direction,
+  onOpenShareModal,
+  prayerTracking = EMPTY_PRAYER_TRACKING,
+  dailyHabits = EMPTY_DAILY_HABITS,
+  wirdHistory,
+  quranWirdPlan,
+  quranWirdDailyGoals,
+  mosquePrayerGoal,
+  dailyPathStartDayKey,
+  weeklyGoalDays,
+  initialPeriod = "last30",
+  onPeriodChange,
+  onOpenHome,
+  onOpenKhatmah,
+  zikrHistory = EMPTY_ZIKR_HISTORY,
+}: ProgressScreenProps) {
+  const clock = useNow();
+  const clockKey = `${progressDayStartHour}:${getProgressDayKey(clock, 0)}:${getProgressDayKey(clock, progressDayStartHour)}`;
+  const dayClock = useRef({ key: clockKey, value: clock });
+  if (dayClock.current.key !== clockKey) dayClock.current = { key: clockKey, value: clock };
+  // Statistics depend on civil/devotional dates, not each minute tick.
+  const now = dayClock.current.value;
+
+  const [activeTab, setActiveTab] = useState<ProgressPreset>(initialPeriod);
   const [offset, setOffset] = useState(0);
   const [calendarType, setCalendarType] = useState(initialCalendarType);
   const [customRange, setCustomRange] = useState<ProgressRange | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailChoice, setDetailChoice] = useState<"prayers" | "routines" | "friday" | "reflection">("prayers");
   const detailTopic = detailChoice === "reflection" && (customRange || activeTab !== "day") ? "prayers" : detailChoice;
+
   const [view, setView] = useState<ProgressDashboardView>("overview");
   const viewId = useId();
   useEffect(() => setCalendarType(initialCalendarType), [initialCalendarType]);
@@ -175,22 +181,18 @@ export function ProgressScreen({
     const controls = controlsRef.current;
     const scrollport = controls?.closest<HTMLElement>(".app-screen-surface");
     if (!controls || !scrollport) return;
-    const header = controls.querySelector<HTMLElement>(".shared-screen-header");
     const measure = () => {
       scrollport.style.setProperty("--progress-controls-max-height", `${scrollport.clientHeight * 0.6}px`);
       scrollport.style.setProperty("--progress-controls-height", `${controls.getBoundingClientRect().height}px`);
-      controls.style.setProperty("--progress-title-height", `${header?.getBoundingClientRect().height ?? 0}px`);
     };
     measure();
     const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measure);
     observer?.observe(controls);
     observer?.observe(scrollport);
-    if (header) observer?.observe(header);
     return () => {
       observer?.disconnect();
       scrollport.style.removeProperty("--progress-controls-height");
       scrollport.style.removeProperty("--progress-controls-max-height");
-      controls.style.removeProperty("--progress-title-height");
     };
   }, []);
   const activePeriodRef = useRef(initialPeriod);
@@ -202,11 +204,10 @@ export function ProgressScreen({
     setCustomRange(null);
   }, [initialPeriod]);
 
-  const isArabic = language === "ar";
   // Header elevation changes presentation only. Keep the date identity stable
   // so those scroll-state renders do not rebuild unchanged lifetime history.
   const displayDate = useMemo(
-    () => shiftCalendarDate(now, activeTab, offset, calendarType),
+    () => shiftCalendarDate(now, activeTab === "last30" ? "day" : activeTab, offset, calendarType),
     [now, activeTab, offset, calendarType],
   );
   const selectedRange = useMemo(
@@ -231,15 +232,6 @@ export function ProgressScreen({
     [dashboardInput, devotionalToday],
   );
   const isCurrentDay = !customRange && activeTab === "day" && offset === 0;
-  const customDays = customRange ? progressRangeDays(customRange) : 0;
-  const moveRange = (step: number) => {
-    if (customRange)
-      setCustomRange({
-        startKey: shiftProgressDayKey(customRange.startKey, customDays * step),
-        endKey: shiftProgressDayKey(customRange.endKey, customDays * step),
-      });
-    else setOffset((previous) => previous + step);
-  };
   const exportSelectedPeriod = async () => {
     const data = exportProgressDashboard(
       dashboardInput,
@@ -271,13 +263,261 @@ export function ProgressScreen({
     );
   };
 
-  const handleTabChange = (tab: "day" | "week" | "month" | "year") => {
+  const handleTabChange = (tab: ProgressPreset) => {
     activePeriodRef.current = tab;
     setActiveTab(tab);
     setOffset(0);
     setCustomRange(null);
     onPeriodChange?.(tab);
   };
+
+  return (
+    <ScreenContainer
+      dir={direction}
+      tabIndex={0}
+      className="progress-screen relative overflow-y-auto outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      onPointerDownCapture={(event) => {
+        pointerFocus.current = event.currentTarget.contains(event.target as Node);
+      }}
+      onPointerUpCapture={() => {
+        pointerFocus.current = false;
+      }}
+      onPointerCancelCapture={() => {
+        pointerFocus.current = false;
+      }}
+      onKeyDownCapture={() => {
+        pointerFocus.current = false;
+      }}
+      onFocusCapture={(event) => {
+        const controls = controlsRef.current;
+        const target = event.target;
+        if (
+          !controls ||
+          pointerFocus.current ||
+          !(target instanceof HTMLElement) ||
+          !event.currentTarget.contains(target) ||
+          target === event.currentTarget
+        )
+          return;
+        if (controls.contains(target)) return;
+        const viewport = event.currentTarget;
+        const reveal = () => {
+          const controlsBottom = controls.getBoundingClientRect().bottom;
+          const viewportBottom = viewport.getBoundingClientRect().bottom;
+          const context = target.closest<HTMLElement>("[data-progress-focus-context]");
+          const contextBounds = context?.getBoundingClientRect();
+          // Keep the chart's series, plot and readout together when they fit.
+          // Revealing only its lower scrubber can leave the series controls
+          // partially covered by the sticky filters on a wide screen.
+          if (contextBounds && contextBounds.height <= viewportBottom - controlsBottom - 32) {
+            if (contextBounds.top < controlsBottom + 16)
+              viewport.scrollTop = Math.max(0, viewport.scrollTop - (controlsBottom + 16 - contextBounds.top));
+            else if (contextBounds.bottom > viewportBottom - 16)
+              viewport.scrollTop += contextBounds.bottom - viewportBottom + 16;
+            return;
+          }
+          const covered = controlsBottom - target.getBoundingClientRect().top;
+          if (covered > 0) viewport.scrollTop = Math.max(0, viewport.scrollTop - covered - 16);
+        };
+        reveal();
+        // Native focus scrolling can finish after focus capture in WebKit.
+        // Reconcile once while the same control still owns focus, as above.
+        if (focusFrame.current !== undefined) cancelAnimationFrame(focusFrame.current);
+        focusFrame.current = requestAnimationFrame(() => {
+          focusFrame.current = undefined;
+          if (document.activeElement === target && viewport.contains(target)) reveal();
+        });
+      }}
+      screenName={t(language, "common.progress")}
+    >
+      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 max-w-7xl flex-col items-center px-page pb-8">
+        <h1 className="sr-only">{t(language, "common.progress")}</h1>
+        <div
+          ref={controlsRef}
+          data-scrolled={hasScrolledControls || undefined}
+          className="progress-screen-controls w-full"
+          data-testid="progress-sticky-controls"
+        >
+          <ProgressRangeToolbar
+            period={customRange ? "custom" : activeTab}
+            range={selectedRange}
+            today={civilToday}
+            language={language}
+            calendar={calendarType}
+            onPeriod={handleTabChange}
+            onCustom={setCustomRange}
+          />
+          <TabList
+            value={view}
+            onChange={(next) => {
+              if (next === view) return;
+              setView(next);
+              setDetailsOpen(false);
+              const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
+              if (viewport) viewport.scrollTop = 0;
+            }}
+            tabs={(["overview", "trends", "records"] as const).map((value) => ({
+              value,
+              label: (
+                <span
+                  className="flex items-center justify-center gap-2"
+                  style={{ color: value === view ? "var(--primary-foreground)" : "inherit" }}
+                >
+                  {value === "overview" ? (
+                    <BarChart3 size={18} className="progress-tab-icon" aria-hidden="true" />
+                  ) : value === "trends" ? (
+                    <Sprout size={18} className="progress-tab-icon" aria-hidden="true" />
+                  ) : (
+                    <FileText size={18} className="progress-tab-icon" aria-hidden="true" />
+                  )}
+                  {dashboardText(language, `view_${value}`)}
+                </span>
+              ),
+              testId: `progress-tab-${value}`,
+            }))}
+            direction={direction}
+            idPrefix={viewId}
+            aria-label={dashboardText(language, "views")}
+            className="progress-view-tabs mt-3 mb-1 grid grid-cols-3 gap-2"
+            itemClassName={(selected) =>
+              `min-h-11 min-w-0 rounded-xl border border-border-control px-2 py-2 text-xs font-bold progress-focus ${selected ? "text-primary-foreground" : "bg-card text-foreground"}`
+            }
+            indicatorClassName="rounded-xl bg-primary shadow-xs"
+          />
+        </div>
+
+        <div
+          className="w-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          {...tabPanelProps(viewId, view)}
+        >
+          <ProgressDashboard
+            view={view}
+            onChooseWeek={() => {
+              handleTabChange("week");
+              document.getElementById(tabId(viewId, "trends"))?.focus({ preventScroll: true });
+            }}
+            emptyActions={
+              <>
+                {onOpenHome && (
+                  <button
+                    type="button"
+                    className="min-h-11 rounded-lg border border-border-control px-3 text-sm font-semibold progress-focus"
+                    onClick={onOpenHome}
+                  >
+                    {dashboardText(language, "openHome")}
+                  </button>
+                )}
+                {onOpenKhatmah && (
+                  <button
+                    type="button"
+                    className="min-h-11 rounded-lg border border-border-control px-3 text-sm font-semibold progress-focus"
+                    onClick={onOpenKhatmah}
+                  >
+                    {dashboardText(language, "openQuran")}
+                  </button>
+                )}
+              </>
+            }
+            onShowTrend={() => {
+              setView("trends");
+              setDetailsOpen(false);
+              const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
+              if (viewport) viewport.scrollTop = 0;
+              document.getElementById(tabId(viewId, "trends"))?.focus({ preventScroll: true });
+            }}
+            records={dashboardRecords}
+            range={selectedRange}
+            period={customRange ? (customRange.startKey === customRange.endKey ? "day" : "custom") : activeTab}
+            displayDate={displayDate}
+            now={now}
+            dayStart={progressDayStartHour}
+            currentDay={isCurrentDay}
+            language={language}
+            calendar={calendarType}
+            onExport={exportSelectedPeriod}
+          />
+          {view === "overview" && (
+            <details
+              className="mt-5 w-full rounded-xl border border-border bg-card px-4 sm:px-5"
+              data-testid="progress-detailed-context"
+              onToggle={(event) => setDetailsOpen(event.currentTarget.open)}
+            >
+              <summary className="progress-disclosure">
+                {dashboardText(language, "details")}
+                <ChevronDown size={18} aria-hidden="true" />
+              </summary>
+              {detailsOpen && (
+                <ProgressDetails
+                  {...{
+                    dailyCompletions,
+                    progressDayStartHour,
+                    language,
+                    direction,
+                    onOpenShareModal,
+                    prayerTracking,
+                    dailyHabits,
+                    wirdHistory,
+                    quranWirdPlan,
+                    quranWirdDailyGoals,
+                    mosquePrayerGoal,
+                    dailyPathStartDayKey,
+                    weeklyGoalDays,
+                    zikrHistory,
+                    now,
+                    displayDate,
+                    activeTab,
+                    offset,
+                    customRange,
+                    selectedRange,
+                    calendarType,
+                    detailTopic,
+                    setDetailChoice,
+                  }}
+                />
+              )}
+            </details>
+          )}
+        </div>
+      </div>
+    </ScreenContainer>
+  );
+}
+
+function ProgressDetails({
+  dailyCompletions,
+  progressDayStartHour,
+  language,
+  direction,
+  onOpenShareModal,
+  prayerTracking = EMPTY_PRAYER_TRACKING,
+  dailyHabits = EMPTY_DAILY_HABITS,
+  wirdHistory,
+  quranWirdPlan,
+  quranWirdDailyGoals,
+  mosquePrayerGoal,
+  dailyPathStartDayKey,
+  weeklyGoalDays,
+  zikrHistory = EMPTY_ZIKR_HISTORY,
+  now,
+  displayDate,
+  activeTab,
+  offset,
+  customRange,
+  selectedRange,
+  calendarType,
+  detailTopic,
+  setDetailChoice,
+}: ProgressScreenProps & {
+  detailTopic: "prayers" | "routines" | "friday" | "reflection";
+  setDetailChoice: (topic: "prayers" | "routines" | "friday" | "reflection") => void;
+  now: Date;
+  displayDate: Date;
+  activeTab: ProgressPreset;
+  offset: number;
+  customRange: ProgressRange | null;
+  selectedRange: ProgressRange;
+}) {
+  const isArabic = language === "ar";
 
   const getDayPath = useMemo(
     () =>
@@ -461,607 +701,365 @@ export function ProgressScreen({
   ]);
 
   return (
-    <ScreenContainer
-      dir={direction}
-      tabIndex={0}
-      className="progress-screen relative overflow-y-auto outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
-      onPointerDownCapture={(event) => {
-        pointerFocus.current = event.currentTarget.contains(event.target as Node);
-      }}
-      onPointerUpCapture={() => {
-        pointerFocus.current = false;
-      }}
-      onPointerCancelCapture={() => {
-        pointerFocus.current = false;
-      }}
-      onKeyDownCapture={() => {
-        pointerFocus.current = false;
-      }}
-      onFocusCapture={(event) => {
-        const controls = controlsRef.current;
-        const target = event.target;
-        if (
-          !controls ||
-          pointerFocus.current ||
-          !(target instanceof HTMLElement) ||
-          !event.currentTarget.contains(target) ||
-          target === event.currentTarget
-        )
-          return;
-        if (controls.contains(target)) {
-          const header = controls.querySelector<HTMLElement>(".shared-screen-header");
-          if (!header || header.contains(target)) return;
-          const reveal = () => {
-            const headerBottom = header.getBoundingClientRect().bottom;
-            const targetBounds = target.getBoundingClientRect();
-            const covered = headerBottom - targetBounds.top;
-            if (covered > 0) {
-              // Reserve breathing room only when it fits the short viewport.
-              const gap = Math.max(
-                0,
-                Math.min(16, controls.getBoundingClientRect().bottom - headerBottom - targetBounds.height),
-              );
-              controls.scrollTop = Math.floor(Math.max(0, controls.scrollTop - covered - gap));
-            }
-          };
-          reveal();
-          // WebKit may finish native focus scrolling after the focus event.
-          // Recheck once after layout, only while this control still owns focus.
-          if (focusFrame.current !== undefined) cancelAnimationFrame(focusFrame.current);
-          focusFrame.current = requestAnimationFrame(() => {
-            focusFrame.current = undefined;
-            if (document.activeElement === target && controls.contains(target)) reveal();
-          });
-          return;
-        }
-        const viewport = event.currentTarget;
-        const reveal = () => {
-          const controlsBottom = controls.getBoundingClientRect().bottom;
-          const viewportBottom = viewport.getBoundingClientRect().bottom;
-          const context = target.closest<HTMLElement>("[data-progress-focus-context]");
-          const contextBounds = context?.getBoundingClientRect();
-          // Keep the chart's series, plot and readout together when they fit.
-          // Revealing only its lower scrubber can leave the series controls
-          // partially covered by the sticky filters on a wide screen.
-          if (contextBounds && contextBounds.height <= viewportBottom - controlsBottom - 32) {
-            if (contextBounds.top < controlsBottom + 16)
-              viewport.scrollTop = Math.max(0, viewport.scrollTop - (controlsBottom + 16 - contextBounds.top));
-            else if (contextBounds.bottom > viewportBottom - 16)
-              viewport.scrollTop += contextBounds.bottom - viewportBottom + 16;
-            return;
-          }
-          const covered = controlsBottom - target.getBoundingClientRect().top;
-          if (covered > 0) viewport.scrollTop = Math.max(0, viewport.scrollTop - covered - 16);
-        };
-        reveal();
-        // Native focus scrolling can finish after focus capture in WebKit.
-        // Reconcile once while the same control still owns focus, as above.
-        if (focusFrame.current !== undefined) cancelAnimationFrame(focusFrame.current);
-        focusFrame.current = requestAnimationFrame(() => {
-          focusFrame.current = undefined;
-          if (document.activeElement === target && viewport.contains(target)) reveal();
-        });
-      }}
-      screenName={t(language, "common.progress")}
-    >
-      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 max-w-7xl flex-col items-center px-page pb-8">
-        <div
-          ref={controlsRef}
-          data-scrolled={hasScrolledControls || undefined}
-          className="progress-screen-controls w-full"
-          data-testid="progress-sticky-controls"
-        >
-          <Header
-            title={t(language, "common.progress")}
-            language={language}
-            style={{ paddingInline: 0, marginBottom: "0.75rem" }}
-            right={
-              onOpenShareModal ? (
-                <IconButton onClick={onOpenShareModal} label={t(language, "progress.shareProgressCard")}>
-                  <Share2 size={20} className="text-foreground" />
-                </IconButton>
-              ) : undefined
-            }
-          />
+    <div className="pb-4">
+      <ProgressSelectField
+        label={dashboardText(language, "detailTopic")}
+        value={detailTopic}
+        options={(
+          [
+            "prayers",
+            "routines",
+            "friday",
+            ...(!customRange && activeTab === "day" ? ["reflection" as const] : []),
+          ] as const
+        ).map((value) => ({ value, label: dashboardText(language, `detail_${value}`) }))}
+        onChange={setDetailChoice}
+        language={language}
+        icon={SlidersHorizontal}
+      />
+      <p className="sr-only">{dashboardText(language, "detailHelp")}</p>
+      {!customRange && activeTab !== "last30" ? (
+        <>
+          {/* Supporting reflection stays inside optional context. */}
+          <div className="mb-3 hidden w-full items-start justify-center gap-2 px-2 text-center sm:flex">
+            <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden="true" />
+            <p className="text-xs font-semibold leading-relaxed text-muted-foreground" dir="auto">
+              <span>{t(language, "progress.constancyHadith")}</span>
+              <span className="ms-1.5 text-micro">— {t(language, "progress.constancyHadithSource")}</span>
+            </p>
+          </div>
 
-          <ProgressRangeToolbar
-            period={customRange ? "custom" : activeTab}
-            range={selectedRange}
-            today={civilToday}
-            language={language}
-            calendar={calendarType}
-            onPeriod={handleTabChange}
-            onCalendar={(calendar) => {
-              setCalendarType(calendar);
-              setOffset(0);
-            }}
-            onCustom={setCustomRange}
-            onMonth={(month) => {
-              handleTabChange("month");
-              setCalendarType("gregorian");
-              const [year, number] = month.split("-").map(Number);
-              setOffset((year! - now.getFullYear()) * 12 + number! - 1 - now.getMonth());
-            }}
-            onPrevious={() => moveRange(-1)}
-            onNext={() => moveRange(1)}
-            onToday={() => handleTabChange("day")}
-            nextDisabled={customRange ? shiftProgressDayKey(customRange.endKey, customDays) > civilToday : offset >= 0}
-          />
-          <TabList
-            value={view}
-            onChange={(next) => {
-              if (next === view) return;
-              setView(next);
-              setDetailsOpen(false);
-              const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
-              if (viewport) viewport.scrollTop = 0;
-            }}
-            tabs={(["overview", "trends", "records"] as const).map((value) => ({
-              value,
-              label: dashboardText(language, `view_${value}`),
-              testId: `progress-tab-${value}`,
-            }))}
-            direction={direction}
-            idPrefix={viewId}
-            aria-label={dashboardText(language, "views")}
-            className="mt-3 mb-1 grid grid-cols-3 gap-1 rounded-xl border border-border bg-muted/50 p-1"
-            itemClassName={(selected) =>
-              `min-h-11 min-w-0 rounded-lg px-2 py-2 text-xs font-bold progress-focus ${selected ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`
-            }
-            indicatorClassName="border border-border-control bg-card shadow-xs"
-          />
-        </div>
+          <div className="w-full">
+            {/* Prayer records lead; Home owns timing and devotional guidance. */}
+            {detailTopic === "prayers" && (
+              <section
+                data-testid="progress-prayer-group"
+                dir={direction}
+                className="mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground"
+              >
+                <div className="flex items-center justify-between gap-4 px-4 py-4 text-start sm:px-5">
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
+                      {t(language, "dailyPath.prayer")}
+                    </h2>
+                    {activeTab === "day" && (
+                      <p
+                        role="status"
+                        aria-atomic="true"
+                        className="mt-1 text-xs font-semibold text-muted-foreground"
+                        dir="auto"
+                      >
+                        {t(language, "dailyPath.prayerSummary", {
+                          recorded: formatNumerals(selectedDayPath.salah.recordedCount, language),
+                          congregation: formatNumerals(selectedDayPath.salah.mosqueCount, language),
+                        })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {activeTab === "day" ? (
+                  <PrayerProgressSummary language={language} records={prayerTracking} dayKey={selectedRange.startKey} />
+                ) : (
+                  <div className="border-t border-border py-4">
+                    <PrayerTrackerStats
+                      key={`${activeTab}-${offset}`}
+                      records={prayerTracking}
+                      activeTab={activeTab}
+                      now={now}
+                      displayDate={displayDate}
+                      language={language}
+                      calendarType={calendarType}
+                    />
+                  </div>
+                )}
+              </section>
+            )}
 
-        <div
-          className="w-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          {...tabPanelProps(viewId, view)}
-        >
-          <ProgressDashboard
-            view={view}
-            onChooseWeek={() => {
-              handleTabChange("week");
-              document.getElementById(tabId(viewId, "trends"))?.focus({ preventScroll: true });
-            }}
-            emptyActions={
-              <>
-                {onOpenHome && (
-                  <button
-                    type="button"
-                    className="min-h-11 rounded-lg border border-border-control px-3 text-sm font-semibold progress-focus"
-                    onClick={onOpenHome}
-                  >
-                    {dashboardText(language, "openHome")}
-                  </button>
-                )}
-                {onOpenKhatmah && (
-                  <button
-                    type="button"
-                    className="min-h-11 rounded-lg border border-border-control px-3 text-sm font-semibold progress-focus"
-                    onClick={onOpenKhatmah}
-                  >
-                    {dashboardText(language, "openQuran")}
-                  </button>
-                )}
-              </>
-            }
-            onShowTrend={() => {
-              setView("trends");
-              setDetailsOpen(false);
-              const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
-              if (viewport) viewport.scrollTop = 0;
-              document.getElementById(tabId(viewId, "trends"))?.focus({ preventScroll: true });
-            }}
-            records={dashboardRecords}
-            range={selectedRange}
-            period={customRange ? (customRange.startKey === customRange.endKey ? "day" : "custom") : activeTab}
-            displayDate={displayDate}
-            now={now}
-            dayStart={progressDayStartHour}
-            currentDay={isCurrentDay}
-            language={language}
-            calendar={calendarType}
-            onExport={exportSelectedPeriod}
-          />
-          {view === "overview" && (
-            <details
-              className="mt-5 w-full rounded-xl border border-border bg-card px-4 sm:px-5"
-              data-testid="progress-detailed-context"
-              onToggle={(event) => setDetailsOpen(event.currentTarget.open)}
-            >
-              <summary className="progress-disclosure">
-                {dashboardText(language, "details")}
-                <ChevronDown size={18} aria-hidden="true" />
-              </summary>
-              {detailsOpen && (
-                <div className="pb-4">
-                  <ProgressSelectField
-                    label={dashboardText(language, "detailTopic")}
-                    value={detailTopic}
-                    options={(
-                      [
-                        "prayers",
-                        "routines",
-                        "friday",
-                        ...(!customRange && activeTab === "day" ? ["reflection" as const] : []),
-                      ] as const
-                    ).map((value) => ({ value, label: dashboardText(language, `detail_${value}`) }))}
-                    onChange={setDetailChoice}
+            {/* The selected period's wird answer (Azkar + Quran) follows prayer. */}
+            {detailTopic === "routines" && (
+              <div className="mb-5 w-full">
+                {activeTab !== "day" ? (
+                  <RoutineInsights
+                    zikrHistory={zikrHistory}
+                    key={`${activeTab}-${offset}`}
+                    records={dailyCompletions}
+                    period={activeTab}
+                    displayDate={displayDate}
+                    now={now}
                     language={language}
-                    icon={SlidersHorizontal}
+                    calendarType={calendarType}
+                    progressDayStartHour={progressDayStartHour}
+                    weeklyGoalDays={weeklyGoalDays}
+                    isQuranDoneForDay={isQuranDoneForDay}
                   />
-                  <p className="sr-only">{dashboardText(language, "detailHelp")}</p>
-                  {!customRange ? (
-                    <>
-                      {/* Supporting reflection stays inside optional context. */}
-                      <div className="mb-3 hidden w-full items-start justify-center gap-2 px-2 text-center sm:flex">
-                        <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden="true" />
-                        <p className="text-xs font-semibold leading-relaxed text-muted-foreground" dir="auto">
-                          <span>{t(language, "progress.constancyHadith")}</span>
-                          <span className="ms-1.5 text-micro">— {t(language, "progress.constancyHadithSource")}</span>
-                        </p>
+                ) : (
+                  <TodayRoutineGarden
+                    readOnly
+                    now={now}
+                    progressDayStartHour={progressDayStartHour}
+                    summary={activeGardenSummary}
+                    language={language}
+                    hideTabs={true}
+                    calendarType={calendarType}
+                    dailyCompletions={dailyCompletions}
+                    onOpenShareModal={onOpenShareModal}
+                    visibleCategoryIds={WIRD_CATEGORY_IDS}
+                    quranWird={
+                      quranWirdPlan?.kind !== "free"
+                        ? {
+                            progress: selectedDayPath.quran.progress,
+                            goal: selectedDayPath.quran.goal,
+                            complete: quranWirdDone,
+                            active: selectedDayPath.quran.active,
+                          }
+                        : undefined
+                    }
+                    isQuranDoneForDay={isQuranDoneForDay}
+                    onMedia={false}
+                    activeTab={activeTab}
+                    displayDate={displayDate}
+                    weeklyGoalDays={weeklyGoalDays}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* The garden is reflective context, so it follows the day's answer and
+            stays collapsed until a reader asks for it. */}
+            {detailTopic === "reflection" && activeTab === "day" && (
+              <details
+                data-testid="oasis-stage-card"
+                className="group mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground transition-colors"
+                dir={isArabic ? "rtl" : "ltr"}
+              >
+                <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between px-4 py-3 text-start transition-colors hover:bg-muted/40 progress-focus">
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center" aria-hidden="true">
+                      {selectedDayPath.policyVersion === 3 && selectedDayPath.palmEarned ? (
+                        <PathRewardMark tier={selectedDayPath.palmTier} size={28} />
+                      ) : (
+                        renderTierMark(oasisLevel, 28)
+                      )}
+                    </span>
+                    <span className="min-w-0 text-start">
+                      <span className="block text-micro font-bold text-muted-foreground">
+                        {t(language, "progressTrend.reflection")}
+                      </span>
+                    </span>
+                  </span>
+                  <ChevronDown
+                    size={18}
+                    className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
+                    aria-hidden="true"
+                  />
+                </summary>
+                <div className="border-t border-border px-4 pb-4 pt-3 sm:px-5">
+                  <section aria-labelledby="progress-palm-help-heading" className="mb-4">
+                    <h2 id="progress-palm-help-heading" className="text-base font-bold">
+                      {t(language, "garden.explanationLabel")}
+                    </h2>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {t(language, "garden.explanationWithQuran")}
+                    </p>
+                  </section>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3.5">
+                      <div>
+                        <h2 id="oasis-stage-heading" className="text-title font-black text-foreground leading-tight">
+                          {selectedDayPath.policyVersion === 3 && selectedDayPath.palmEarned
+                            ? t(
+                                language,
+                                selectedDayPath.palmTier === "oasis"
+                                  ? "dailyPath.oasisPalm"
+                                  : selectedDayPath.palmTier === "golden"
+                                    ? "dailyPath.goldenPalm"
+                                    : "dailyPath.regularPalm",
+                              )
+                            : isArabic
+                              ? levelDetails.nameArabic
+                              : levelDetails.name}
+                        </h2>
                       </div>
+                    </div>
 
-                      <div className="w-full">
-                        {/* Prayer records lead; Home owns timing and devotional guidance. */}
-                        {detailTopic === "prayers" && (
-                          <section
-                            data-testid="progress-prayer-group"
-                            dir={direction}
-                            className="mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground"
-                          >
-                            <div className="flex items-center justify-between gap-4 px-4 py-4 text-start sm:px-5">
-                              <div className="min-w-0">
-                                <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
-                                  {t(language, "dailyPath.prayer")}
-                                </h2>
-                                {activeTab === "day" && (
-                                  <p
-                                    role="status"
-                                    aria-atomic="true"
-                                    className="mt-1 text-xs font-semibold text-muted-foreground"
-                                    dir="auto"
-                                  >
-                                    {t(language, "dailyPath.prayerSummary", {
-                                      recorded: formatNumerals(selectedDayPath.salah.recordedCount, language),
-                                      congregation: formatNumerals(selectedDayPath.salah.mosqueCount, language),
-                                    })}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            {activeTab === "day" ? (
-                              <PrayerProgressSummary
-                                language={language}
-                                records={prayerTracking}
-                                dayKey={selectedRange.startKey}
-                              />
-                            ) : (
-                              <div className="border-t border-border py-4">
-                                <PrayerTrackerStats
-                                  key={`${activeTab}-${offset}`}
-                                  records={prayerTracking}
-                                  activeTab={activeTab}
-                                  now={now}
-                                  displayDate={displayDate}
-                                  language={language}
-                                  calendarType={calendarType}
-                                />
-                              </div>
-                            )}
-                          </section>
-                        )}
+                    <div className="shrink-0 rounded-lg bg-primary/10 px-2.5 py-1 text-sm font-black text-primary">
+                      <span>
+                        {selectedDayPath.policyVersion === 3
+                          ? t(language, "dailyPath.recordedToday")
+                          : t(language, "progress.oasisLevelBadge", {
+                              level: formatNumerals(oasisLevel, language),
+                            })}
+                      </span>
+                    </div>
+                  </div>
 
-                        {/* The selected period's wird answer (Azkar + Quran) follows prayer. */}
-                        {detailTopic === "routines" && (
-                          <div className="mb-5 w-full">
-                            {activeTab !== "day" ? (
-                              <RoutineInsights
-                                zikrHistory={zikrHistory}
-                                key={`${activeTab}-${offset}`}
-                                records={dailyCompletions}
-                                period={activeTab}
-                                displayDate={displayDate}
-                                now={now}
-                                language={language}
-                                calendarType={calendarType}
-                                progressDayStartHour={progressDayStartHour}
-                                weeklyGoalDays={weeklyGoalDays}
-                                isQuranDoneForDay={isQuranDoneForDay}
-                              />
+                  <p className="mt-3 text-caption font-semibold leading-relaxed text-muted-foreground" dir="auto">
+                    {selectedDayPath.policyVersion === 3
+                      ? t(
+                          language,
+                          selectedDayPath.palmTier === "oasis"
+                            ? "dailyPath.oasisRule"
+                            : selectedDayPath.palmTier === "golden"
+                              ? "dailyPath.goldenRule"
+                              : "dailyPath.palmRule",
+                        )
+                      : isArabic
+                        ? levelDetails.descriptionArabic
+                        : levelDetails.description}
+                  </p>
+
+                  <div className="mt-3 flex items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs font-semibold text-foreground">
+                    <Sparkles className="size-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
+                    <span dir="auto">{t(language, "progress.recordedPracticeReflection")}</span>
+                  </div>
+                </div>
+                {/* 7-Day Rhythm Strip */}
+                <div className="border-t border-border px-4 py-3 sm:px-5">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground block">
+                      {t(language, "progress.sevenDayRhythm")}
+                    </span>
+                    <span className="text-micro font-semibold text-muted-foreground" dir={isArabic ? "rtl" : "ltr"}>
+                      {t(language, "progress.sevenDayRhythmDirection")}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center" role="list">
+                    {weekDaysStatus.map((day) => {
+                      const levelShortName = isArabic
+                        ? OASIS_LEVEL_DETAILS[day.level].nameArabic.split(" ")[0]
+                        : OASIS_LEVEL_DETAILS[day.level].name.split(" ")[0];
+                      return (
+                        <div
+                          key={day.dayKey}
+                          role="listitem"
+                          className={`flex flex-col items-center justify-center rounded-xl p-1.5 sm:p-2 transition-colors ${
+                            day.isToday
+                              ? "bg-primary/15 font-black text-primary ring-1 ring-primary/40 shadow-xs"
+                              : "bg-muted/30 hover:bg-muted/50 text-muted-foreground"
+                          }`}
+                        >
+                          <span className="text-micro font-bold text-muted-foreground">{day.dayLabel}</span>
+                          <div className="my-1 flex size-8 sm:size-9 items-center justify-center">
+                            {day.palmTier && day.palmTier !== "none" ? (
+                              <PathRewardMark tier={day.palmTier} size={24} />
                             ) : (
-                              <TodayRoutineGarden
-                                readOnly
-                                now={now}
-                                progressDayStartHour={progressDayStartHour}
-                                summary={activeGardenSummary}
-                                language={language}
-                                hideTabs={true}
-                                calendarType={calendarType}
-                                dailyCompletions={dailyCompletions}
-                                onOpenShareModal={onOpenShareModal}
-                                visibleCategoryIds={WIRD_CATEGORY_IDS}
-                                quranWird={
-                                  quranWirdPlan?.kind !== "free"
-                                    ? {
-                                        progress: selectedDayPath.quran.progress,
-                                        goal: selectedDayPath.quran.goal,
-                                        complete: quranWirdDone,
-                                        active: selectedDayPath.quran.active,
-                                      }
-                                    : undefined
-                                }
-                                isQuranDoneForDay={isQuranDoneForDay}
-                                onMedia={false}
-                                activeTab={activeTab}
-                                displayDate={displayDate}
-                                weeklyGoalDays={weeklyGoalDays}
-                              />
+                              renderTierMark(day.level, 24)
                             )}
                           </div>
-                        )}
-
-                        {/* The garden is reflective context, so it follows the day's answer and
-            stays collapsed until a reader asks for it. */}
-                        {detailTopic === "reflection" && activeTab === "day" && (
-                          <details
-                            data-testid="oasis-stage-card"
-                            className="group mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground transition-colors"
-                            dir={isArabic ? "rtl" : "ltr"}
-                          >
-                            <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between px-4 py-3 text-start transition-colors hover:bg-muted/40 progress-focus">
-                              <span className="flex min-w-0 items-center gap-3">
-                                <span className="flex size-9 shrink-0 items-center justify-center" aria-hidden="true">
-                                  {selectedDayPath.policyVersion === 3 && selectedDayPath.palmEarned ? (
-                                    <PathRewardMark tier={selectedDayPath.palmTier} size={28} />
-                                  ) : (
-                                    renderTierMark(oasisLevel, 28)
-                                  )}
-                                </span>
-                                <span className="min-w-0 text-start">
-                                  <span className="block text-micro font-bold text-muted-foreground">
-                                    {t(language, "progressTrend.reflection")}
-                                  </span>
-                                </span>
-                              </span>
-                              <ChevronDown
-                                size={18}
-                                className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
-                                aria-hidden="true"
-                              />
-                            </summary>
-                            <div className="border-t border-border px-4 pb-4 pt-3 sm:px-5">
-                              <section aria-labelledby="progress-palm-help-heading" className="mb-4">
-                                <h2 id="progress-palm-help-heading" className="text-base font-bold">
-                                  {t(language, "garden.explanationLabel")}
-                                </h2>
-                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                  {t(language, "garden.explanationWithQuran")}
-                                </p>
-                              </section>
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-3.5">
-                                  <div>
-                                    <h2
-                                      id="oasis-stage-heading"
-                                      className="text-title font-black text-foreground leading-tight"
-                                    >
-                                      {selectedDayPath.policyVersion === 3 && selectedDayPath.palmEarned
-                                        ? t(
-                                            language,
-                                            selectedDayPath.palmTier === "oasis"
-                                              ? "dailyPath.oasisPalm"
-                                              : selectedDayPath.palmTier === "golden"
-                                                ? "dailyPath.goldenPalm"
-                                                : "dailyPath.regularPalm",
-                                          )
-                                        : isArabic
-                                          ? levelDetails.nameArabic
-                                          : levelDetails.name}
-                                    </h2>
-                                  </div>
-                                </div>
-
-                                <div className="shrink-0 rounded-lg bg-primary/10 px-2.5 py-1 text-sm font-black text-primary">
-                                  <span>
-                                    {selectedDayPath.policyVersion === 3
-                                      ? t(language, "dailyPath.recordedToday")
-                                      : t(language, "progress.oasisLevelBadge", {
-                                          level: formatNumerals(oasisLevel, language),
-                                        })}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <p
-                                className="mt-3 text-caption font-semibold leading-relaxed text-muted-foreground"
-                                dir="auto"
-                              >
-                                {selectedDayPath.policyVersion === 3
-                                  ? t(
-                                      language,
-                                      selectedDayPath.palmTier === "oasis"
-                                        ? "dailyPath.oasisRule"
-                                        : selectedDayPath.palmTier === "golden"
-                                          ? "dailyPath.goldenRule"
-                                          : "dailyPath.palmRule",
-                                    )
-                                  : isArabic
-                                    ? levelDetails.descriptionArabic
-                                    : levelDetails.description}
-                              </p>
-
-                              <div className="mt-3 flex items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs font-semibold text-foreground">
-                                <Sparkles className="size-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
-                                <span dir="auto">{t(language, "progress.recordedPracticeReflection")}</span>
-                              </div>
-                            </div>
-                            {/* 7-Day Rhythm Strip */}
-                            <div className="border-t border-border px-4 py-3 sm:px-5">
-                              <div className="mb-2 flex items-center justify-between gap-2">
-                                <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground block">
-                                  {t(language, "progress.sevenDayRhythm")}
-                                </span>
-                                <span
-                                  className="text-micro font-semibold text-muted-foreground"
-                                  dir={isArabic ? "rtl" : "ltr"}
-                                >
-                                  {t(language, "progress.sevenDayRhythmDirection")}
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center" role="list">
-                                {weekDaysStatus.map((day) => {
-                                  const levelShortName = isArabic
-                                    ? OASIS_LEVEL_DETAILS[day.level].nameArabic.split(" ")[0]
-                                    : OASIS_LEVEL_DETAILS[day.level].name.split(" ")[0];
-                                  return (
-                                    <div
-                                      key={day.dayKey}
-                                      role="listitem"
-                                      className={`flex flex-col items-center justify-center rounded-xl p-1.5 sm:p-2 transition-colors ${
-                                        day.isToday
-                                          ? "bg-primary/15 font-black text-primary ring-1 ring-primary/40 shadow-xs"
-                                          : "bg-muted/30 hover:bg-muted/50 text-muted-foreground"
-                                      }`}
-                                    >
-                                      <span className="text-micro font-bold text-muted-foreground">{day.dayLabel}</span>
-                                      <div className="my-1 flex size-8 sm:size-9 items-center justify-center">
-                                        {day.palmTier && day.palmTier !== "none" ? (
-                                          <PathRewardMark tier={day.palmTier} size={24} />
-                                        ) : (
-                                          renderTierMark(day.level, 24)
-                                        )}
-                                      </div>
-                                      <span className="text-micro font-bold text-foreground truncate max-w-full">
-                                        {day.palmTier && day.palmTier !== "none"
-                                          ? t(
-                                              language,
-                                              day.palmTier === "oasis"
-                                                ? "dailyPath.oasisPalm"
-                                                : day.palmTier === "golden"
-                                                  ? "dailyPath.goldenPalm"
-                                                  : "dailyPath.regularPalm",
-                                            )
-                                          : day.level > 0
-                                            ? levelShortName
-                                            : "—"}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                              {/* Visual Legend for the 7-day icons */}
-                              <div className="mt-3 flex flex-wrap items-center justify-center gap-4 border-t border-border/40 pt-2 text-micro text-muted-foreground">
-                                <span className="inline-flex items-center gap-1">
-                                  <span className="font-bold text-primary">🌴 {t(language, "progress.palmLabel")}</span>
-                                  <span>{t(language, "progress.palmTreeLegend")}</span>
-                                </span>
-                                <span className="inline-flex items-center gap-1">
-                                  <span className="font-bold text-primary">
-                                    🌿 {t(language, "progress.branchLabel")}
-                                  </span>
-                                  <span>{t(language, "progress.branchLegend")}</span>
-                                </span>
-                              </div>
-                            </div>
-                            {/* Legacy rhythm and palm records remain available, seamlessly integrated as a divided strip without nested card borders */}
-                            <dl
-                              data-testid="progress-summary-strip"
-                              className="grid w-full grid-cols-2 border-t border-border bg-muted/20 divide-x rtl:divide-x-reverse divide-border"
-                            >
-                              <div className="flex min-w-0 items-center gap-2.5 p-3">
-                                <div className="flex size-8 shrink-0 items-center justify-center text-primary">
-                                  <Zap className="size-5" />
-                                </div>
-                                <div className="min-w-0">
-                                  <dt className="truncate text-micro font-bold text-muted-foreground">
-                                    {t(language, "progress.activeStreakSummary")}
-                                  </dt>
-                                  <dd className="text-sm font-black text-foreground">
-                                    {formatNumerals(activeGardenSummary.currentUsageStreak ?? 0, language)}{" "}
-                                    {t(language, "progress.days")}
-                                  </dd>
-                                </div>
-                              </div>
-
-                              <div className="flex min-w-0 items-center gap-2.5 p-3">
-                                <div className="flex size-8 shrink-0 items-center justify-center text-primary">
-                                  <PalmTreeMark size={22} className="text-primary" />
-                                </div>
-                                <div className="min-w-0">
-                                  <dt className="truncate text-micro font-bold text-muted-foreground">
-                                    {t(language, "progress.lifetimePalmsSummary")}
-                                  </dt>
-                                  <dd className="text-sm font-black text-foreground">
-                                    {formatNumerals(activeGardenSummary.lifetimePalms, language)}{" "}
-                                    {t(language, "progress.palmsUnit")}
-                                  </dd>
-                                </div>
-                              </div>
-                            </dl>
-                          </details>
-                        )}
-
-                        {/* Friday Card / Stats */}
-                        {detailTopic === "friday" &&
-                          (activeTab === "day" ? (
-                            <FridayProgressCard
-                              readOnly
-                              summary={fridaySummary}
-                              language={language}
-                              direction={direction}
-                            />
-                          ) : (
-                            <FridayProgressStats
-                              activeTab={activeTab}
-                              now={now}
-                              displayDate={displayDate}
-                              language={language}
-                              calendarType={calendarType}
-                              direction={direction}
-                            />
-                          ))}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {detailTopic === "prayers" && (
-                        <ProgressPrayerBreakdown
-                          records={prayerTracking}
-                          range={metricProgressRange(selectedRange, "prayers", now, progressDayStartHour, true)}
-                          language={language}
-                        />
-                      )}
-                      {detailTopic === "routines" && (
-                        <ZikrInsights
-                          records={zikrHistory}
-                          language={language}
-                          startKey={
-                            metricProgressRange(selectedRange, "routines", now, progressDayStartHour, true).startKey
-                          }
-                          endKey={
-                            metricProgressRange(selectedRange, "routines", now, progressDayStartHour, true).endKey
-                          }
-                        />
-                      )}
-                      {detailTopic === "friday" && (
-                        <FridayProgressStats
-                          activeTab="month"
-                          range={selectedRange}
-                          now={now}
-                          displayDate={displayDate}
-                          language={language}
-                          calendarType={calendarType}
-                          direction={direction}
-                        />
-                      )}
-                    </>
-                  )}
+                          <span className="text-micro font-bold text-foreground truncate max-w-full">
+                            {day.palmTier && day.palmTier !== "none"
+                              ? t(
+                                  language,
+                                  day.palmTier === "oasis"
+                                    ? "dailyPath.oasisPalm"
+                                    : day.palmTier === "golden"
+                                      ? "dailyPath.goldenPalm"
+                                      : "dailyPath.regularPalm",
+                                )
+                              : day.level > 0
+                                ? levelShortName
+                                : "—"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Visual Legend for the 7-day icons */}
+                  <div className="mt-3 flex flex-wrap items-center justify-center gap-4 border-t border-border/40 pt-2 text-micro text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <span className="font-bold text-primary">🌴 {t(language, "progress.palmLabel")}</span>
+                      <span>{t(language, "progress.palmTreeLegend")}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="font-bold text-primary">🌿 {t(language, "progress.branchLabel")}</span>
+                      <span>{t(language, "progress.branchLegend")}</span>
+                    </span>
+                  </div>
                 </div>
-              )}
-            </details>
+                {/* Legacy rhythm and palm records remain available, seamlessly integrated as a divided strip without nested card borders */}
+                <dl
+                  data-testid="progress-summary-strip"
+                  className="grid w-full grid-cols-2 border-t border-border bg-muted/20 divide-x rtl:divide-x-reverse divide-border"
+                >
+                  <div className="flex min-w-0 items-center gap-2.5 p-3">
+                    <div className="flex size-8 shrink-0 items-center justify-center text-primary">
+                      <Zap className="size-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <dt className="truncate text-micro font-bold text-muted-foreground">
+                        {t(language, "progress.activeStreakSummary")}
+                      </dt>
+                      <dd className="text-sm font-black text-foreground">
+                        {formatNumerals(activeGardenSummary.currentUsageStreak ?? 0, language)}{" "}
+                        {t(language, "progress.days")}
+                      </dd>
+                    </div>
+                  </div>
+
+                  <div className="flex min-w-0 items-center gap-2.5 p-3">
+                    <div className="flex size-8 shrink-0 items-center justify-center text-primary">
+                      <PalmTreeMark size={22} className="text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <dt className="truncate text-micro font-bold text-muted-foreground">
+                        {t(language, "progress.lifetimePalmsSummary")}
+                      </dt>
+                      <dd className="text-sm font-black text-foreground">
+                        {formatNumerals(activeGardenSummary.lifetimePalms, language)}{" "}
+                        {t(language, "progress.palmsUnit")}
+                      </dd>
+                    </div>
+                  </div>
+                </dl>
+              </details>
+            )}
+
+            {/* Friday Card / Stats */}
+            {detailTopic === "friday" &&
+              (activeTab === "day" ? (
+                <FridayProgressCard readOnly summary={fridaySummary} language={language} direction={direction} />
+              ) : (
+                <FridayProgressStats
+                  activeTab={activeTab}
+                  now={now}
+                  displayDate={displayDate}
+                  language={language}
+                  calendarType={calendarType}
+                  direction={direction}
+                />
+              ))}
+          </div>
+        </>
+      ) : (
+        <>
+          {detailTopic === "prayers" && (
+            <ProgressPrayerBreakdown
+              records={prayerTracking}
+              range={metricProgressRange(selectedRange, "prayers", now, progressDayStartHour, true)}
+              language={language}
+            />
           )}
-        </div>
-      </div>
-    </ScreenContainer>
+          {detailTopic === "routines" && (
+            <ZikrInsights
+              records={zikrHistory}
+              language={language}
+              startKey={metricProgressRange(selectedRange, "routines", now, progressDayStartHour, true).startKey}
+              endKey={metricProgressRange(selectedRange, "routines", now, progressDayStartHour, true).endKey}
+            />
+          )}
+          {detailTopic === "friday" && (
+            <FridayProgressStats
+              activeTab="month"
+              range={selectedRange}
+              now={now}
+              displayDate={displayDate}
+              language={language}
+              calendarType={calendarType}
+              direction={direction}
+            />
+          )}
+        </>
+      )}
+    </div>
   );
 }

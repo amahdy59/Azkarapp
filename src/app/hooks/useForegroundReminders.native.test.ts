@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_APP_STATE } from "../state";
 import type { ReminderSettings } from "../types";
 
@@ -12,7 +12,11 @@ const nativeNotifications = {
 };
 
 describe("native reminder delivery", () => {
+  afterEach(() => vi.useRealTimers());
   beforeEach(() => {
+    // Keep the next-hour reminder on the same date; 23:00 otherwise wraps to midnight.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 9, 20, 12, 0, 0));
     vi.resetModules();
     nativeNotifications.checkPermissions.mockResolvedValue({ display: "granted" });
     nativeNotifications.getPending.mockResolvedValue({ notifications: [] });

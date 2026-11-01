@@ -41,10 +41,10 @@ for (const language of ["ar", "en"] as const) {
   }, info) => {
     await seed(page, language, "midnight", "glass");
     await page.goto("/#/progress/month");
-    const pattern = page.getByTestId("progress-recording-pattern");
-    await expect(pattern.getByRole("listitem")).toHaveCount(7);
-    await expect(pattern.locator("time").first()).toHaveAttribute("datetime", "2026-10-14");
-    await expect(pattern.locator("time").last()).toHaveAttribute("datetime", "2026-10-20");
+    const pattern = page.getByTestId("progress-heatmap");
+    await expect(pattern.locator('[data-day="2026-10-15"]')).toHaveAttribute("data-kind", "recorded");
+    await expect(pattern.locator('[data-day="2026-10-20"]')).toHaveAttribute("data-kind", "none");
+    await expect(pattern.locator('[data-day="2026-10-21"]')).toBeDisabled();
     for (const width of [320, 390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       for (const enlarged of [false, true]) {
@@ -83,9 +83,9 @@ for (const language of ["ar", "en"] as const) {
     await expect(page.getByTestId("progress-period-comparison")).toContainText(ar ? "نقطة مئوية" : "percentage points");
     await chart.getByText(ar ? "بيانات الرسم الدقيقة" : "Exact chart data", { exact: true }).click();
     const table = chart.getByRole("table");
-    await expect(table.getByRole("rowheader")).toHaveCount(3);
-    await expect(table.getByRole("row").nth(1)).toContainText(ar ? "٢١" : "21");
-    await expect(table.getByRole("row").nth(3)).toContainText(ar ? "١٥" : "15");
+    await expect(table.getByRole("rowheader")).toHaveCount(19);
+    await expect(table.getByRole("row").nth(1)).toContainText(ar ? "٣" : "3");
+    await expect(table.getByRole("row").nth(15)).toContainText(ar ? "١٥" : "15");
     await chooseProgressOption(
       page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true }),
       "quranGoals",
@@ -97,5 +97,28 @@ for (const language of ["ar", "en"] as const) {
     expect(
       (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations,
     ).toEqual([]);
+  });
+}
+
+for (const language of ["ar", "en"] as const) {
+  test(`Progress reference visual review in ${language} @cross-browser`, async ({ page }, info) => {
+    await seed(page, language, "light", "solid");
+    for (const width of [390, 1280]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto("/#/progress/month");
+      await page.getByTestId("progress-tab-overview").click();
+      await expect(page.getByTestId("progress-overview")).toBeVisible();
+      await page.screenshot({ path: info.outputPath(`reference-${language}-${width}-overview.png`), fullPage: true });
+      await page.getByTestId("progress-tab-trends").click();
+      await chooseProgressOption(
+        page.getByRole("combobox", { name: language === "ar" ? "عرض اتجاه" : "Show trend for", exact: true }),
+        "routines",
+      );
+      await expect(page.getByTestId("recording-time-column").first()).toBeVisible();
+      await page.screenshot({ path: info.outputPath(`reference-${language}-${width}-trends.png`), fullPage: true });
+      await page.getByTestId("progress-tab-records").click();
+      await expect(page.getByRole("table")).toBeVisible();
+      await page.screenshot({ path: info.outputPath(`reference-${language}-${width}-records.png`), fullPage: true });
+    }
   });
 }

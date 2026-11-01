@@ -33,6 +33,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
   it("marks wird as incomplete when 0 pages of goal are read", async () => {
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={completions}
         dailyHabits={[]}
         wirdHistory={{}}
@@ -54,6 +55,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
   it("marks wird as incomplete and displays fractional progress when 1 of 4 pages is read", async () => {
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={completions}
         dailyHabits={[]}
         wirdHistory={{ [dayKey]: [42] }}
@@ -75,6 +77,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
   it("marks wird as completed when full goal of 4 pages is reached", async () => {
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={completions}
         dailyHabits={[]}
         wirdHistory={{ [dayKey]: [42, 43, 44, 45] }}
@@ -96,6 +99,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
   it("hides completion tracking in free reading even with existing history", async () => {
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={completions}
         dailyHabits={[]}
         wirdHistory={{ [dayKey]: [42] }}
@@ -117,6 +121,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
   it("honors manual habit tick even when pages read is 0", async () => {
     render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={completions}
         dailyHabits={[{ dayKey, habit: "quran_wird", timeZone: "UTC" }]}
         wirdHistory={{}}
@@ -148,6 +153,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
 
     const { rerender } = render(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={completions}
         dailyHabits={[]}
         wirdHistory={{ [dayKey]: [1, 2, 3] }}
@@ -168,6 +174,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
     const fullRange = Array.from({ length: 20 }, (_, i) => i + 1);
     rerender(
       <ProgressScreen
+        initialPeriod="day"
         dailyCompletions={completions}
         dailyHabits={[]}
         wirdHistory={{ [dayKey]: fullRange }}

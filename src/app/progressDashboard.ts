@@ -11,7 +11,7 @@ import type {
 } from "./types";
 import type { InsightBucket, InsightTimelinePoint } from "./progressInsights";
 
-export type ProgressPreset = "day" | "week" | "month" | "year";
+export type ProgressPreset = "day" | "week" | "month" | "year" | "last30";
 export type ProgressRange = { startKey: string; endKey: string };
 export type ProgressMetric =
   "prayers" | "routines" | "pages" | "quranGoals" | "mosque" | "rawatib" | "adhkar" | "morning" | "evening" | "sleep";
@@ -39,6 +39,10 @@ export function validateProgressRange(range: ProgressRange, today: string): "inv
   return null;
 }
 export function progressPresetRange(preset: ProgressPreset, date: Date, language: AppLanguage, calendar: CalendarType) {
+  if (preset === "last30") {
+    const endKey = getProgressDayKey(date, 0);
+    return { startKey: shiftProgressDayKey(endKey, -29), endKey };
+  }
   return getPeriodRange(preset, date, language, calendar);
 }
 export function formatProgressRange(range: ProgressRange, language: AppLanguage, calendar: CalendarType) {
@@ -213,7 +217,12 @@ export function dashboardProgressBuckets(
 ): InsightBucket[] {
   const days = progressRangeDays(range);
   if (!days) return [];
-  const size = preset === "week" || preset === "day" ? 1 : preset === "month" ? 7 : Math.max(1, Math.ceil(days / 24));
+  const size =
+    preset === "week" || preset === "day" || preset === "last30"
+      ? 1
+      : preset === "month"
+        ? 1
+        : Math.max(1, Math.ceil(days / 24));
   const ranges =
     preset === "year"
       ? getCalendarYearPeriods(displayDate, calendar, language).map((month) => ({
@@ -268,7 +277,7 @@ export function matchedDashboardRanges(
 ) {
   const days = progressRangeDays(range);
   const previous =
-    preset === "custom" || preset === "day"
+    preset === "custom" || preset === "day" || preset === "last30"
       ? {
           startKey: shiftProgressDayKey(range.startKey, -days),
           endKey: shiftProgressDayKey(range.startKey, -1),

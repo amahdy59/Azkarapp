@@ -78,10 +78,7 @@ for (const language of ["ar", "en"] as const) {
     );
     await expect(prayerTimeline.getByTestId("timeline-readout")).toContainText(ar ? "١٠٠٪" : "100%");
     await expect(page.getByRole("table")).toHaveCount(0);
-    const rangeFilters = page.getByTestId("progress-range-disclosure");
-    if (!(await rangeFilters.evaluate((node) => (node as HTMLDetailsElement).open)))
-      await rangeFilters.locator("summary").click();
-    // Range, topic and the two prayer selectors remain independently available.
+    // One range, detail topic and two prayer selectors.
     await expect(page.getByRole("combobox")).toHaveCount(5);
     await expect(page.getByTestId("prayer-coverage-hint")).toContainText(ar ? "١٧" : "17 complete days");
     await expect(prayers.getByTestId("insight-fajr").getByRole("img")).toHaveAccessibleName(
@@ -182,20 +179,40 @@ for (const language of ["ar", "en"] as const) {
     await page.screenshot({ path: `${directory}/${language}-zikr-phone.png` });
     await page.setViewportSize({ width: 1440, height: 1000 });
     await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
       "year",
     );
     await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(10);
-    await page.getByRole("button", { name: ar ? "الفترة السابقة" : "Previous period", exact: true }).click();
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true }),
+      "custom",
+    );
+    await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2025-01-01");
+    await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2025-12-31");
+    await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
     await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "٢٠٢٥" : "2025");
-    await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(12);
-    await expect(garden.getByTestId("recording-pattern-message")).toContainText(ar ? "لا توجد سجلات" : "No records");
-    await page.getByRole("button", { name: ar ? "الفترة التالية" : "Next period", exact: true }).click();
+    // Custom ranges use the dashboard timeline; historical detail widgets remain preset-only.
+    await page.getByTestId("progress-tab-trends").click();
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true }),
+      "routines",
+    );
+    const historical = page.getByTestId("progress-main-trend");
+    await expect(historical.getByTestId("recording-time-point")).toHaveCount(23);
+    await historical.getByRole("slider").press("Home");
+    await expect(historical.getByTestId("timeline-readout")).toContainText(ar ? "٠" : "0");
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true }),
+      "year",
+    );
+    await page.getByTestId("progress-tab-overview").click();
+    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+    await chooseProgressDetail(page, "routines");
     await garden.evaluate((node) => node.scrollIntoView({ block: "start" }));
     await page.screenshot({ path: `${directory}/${language}-year-desktop.png` });
     await page.context().setOffline(true);
     await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
       "month",
     );
     await expect(garden.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(ar ? /١٠٠٪/ : /100%/);
@@ -254,13 +271,19 @@ for (const language of ["ar", "en"] as const) {
       await scrollport.evaluate((node) => {
         node.scrollTop = 600;
       });
-      await expect.poll(() => controls.evaluate((node) => node.getBoundingClientRect().top)).toBeCloseTo(before!.y, 0);
+      await expect
+        .poll(() => controls.evaluate((node) => node.getBoundingClientRect().top))
+        .toBeLessThanOrEqual(before!.y);
       expect(await scrollport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
-      await expect(page.getByRole("heading", { name: ar ? "التقدم" : "Progress", exact: true })).toBeInViewport();
+      await expect(page.getByRole("heading", { name: ar ? "التقدم" : "Progress", exact: true })).not.toBeInViewport();
       const height = await scrollport.evaluate((node) => node.clientHeight);
       expect((await controls.boundingBox())!.height).toBeLessThanOrEqual(height * 0.7);
       for (const name of ar ? ["يوم", "أسبوع", "شهر", "سنة"] : ["Day", "Week", "Month", "Year"]) {
-        const period = page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true });
+        const period = page.getByRole("combobox", {
+          name: ar ? "نطاق التاريخ" : "Date range",
+          exact: true,
+          includeHidden: true,
+        });
         const value = (
           {
             يوم: "day",
@@ -361,7 +384,10 @@ test("installed Progress restores meaningful charts after an offline reload", as
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
-  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "month");
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "month",
+  );
   await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(3);
   await chooseProgressDetail(page, "prayers");
   await expect(page.getByTestId("prayer-trends").getByTestId("recording-time-line")).toBeVisible();

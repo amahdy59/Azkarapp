@@ -13,7 +13,7 @@ export async function expectProgressFilterFocus(control: Locator) {
   const disclosure = control.page().getByTestId("progress-range-disclosure");
   const inRange = await control.evaluate((node) => Boolean(node.closest('[data-testid="progress-range-disclosure"]')));
   if (inRange && !(await disclosure.evaluate((node) => (node as HTMLDetailsElement).open))) {
-    if ((await control.getAttribute("data-progress-value")) === "custom")
+    if ((await disclosure.count()) && (await control.getAttribute("data-progress-value")) === "custom")
       await expect(control.page().getByRole("button", { name: /Choose dates:|اختيار التواريخ:/ })).toBeFocused();
     else await expect(disclosure.locator("summary")).toBeFocused();
   } else await expect(control).toBeFocused();

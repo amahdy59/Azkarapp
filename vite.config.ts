@@ -404,6 +404,24 @@ export default defineConfig(({ mode, command }) => {
           // shared-chunk logic place their exclusive dependencies (the
           // manifest, the reducer) alongside them and keep genuinely shared
           // code out.
+          // Keep diagnostic names for the deferred application/audio contracts.
+          // Other lazy chunk URLs are opaque; short hashed names avoid repeating
+          // long component names across imports, preload lists and the offline manifest.
+          chunkFileNames: (chunk) =>
+            /^(App$|audio(?:-|$)|FridayModeScreen$|MarketingLanding$|AudioContentReviewScreen$|QiblaScreen$)/.test(
+              chunk.name,
+            )
+              ? "assets/[name]-[hash].js"
+              : "assets/[hash].js",
+          // Generated font and lazy stylesheet names repeat in CSS, preload graphs and manifests.
+          // Public font paths and the offline-excluded route names above remain stable.
+          // Retain the main index role used by the measured stylesheet budget.
+          assetFileNames: (asset) => {
+            const name = asset.names[0] ?? "";
+            return /\.(css|woff2)$/.test(name) && !["index.css", "style.css"].includes(name)
+              ? "assets/[hash][extname]"
+              : "assets/[name]-[hash][extname]";
+          },
           manualChunks(id) {
             // Platform detection is shared with startup. Do not let the lazy
             // audio owner's manual chunk absorb it and pull audio into Home.

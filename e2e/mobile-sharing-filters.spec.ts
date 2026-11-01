@@ -50,16 +50,16 @@ for (const language of ["ar", "en"] as const) {
       await library.getByRole("button", { name: t(language, "library.showResults"), exact: true }).click();
       await page.screenshot({ path: testInfo.outputPath(`library-compact-${language}.png`) });
       await page.goto("/#/progress");
-      const filters = page.getByTestId("progress-range-disclosure");
-      await expect(filters).not.toHaveAttribute("open");
+      const filters = page.locator(".progress-range-toolbar");
+      await expect(filters.getByRole("combobox")).toHaveCount(1);
       const period = filters.getByRole("combobox", {
-        name: ar ? "الفترة" : "Period",
+        name: ar ? "نطاق التاريخ" : "Date range",
         exact: true,
         includeHidden: true,
       });
       await chooseProgressOption(period, "week");
-      await expect(filters).not.toHaveAttribute("open");
-      await expect(filters.locator("summary")).toContainText(ar ? "أسبوع" : "Week");
+      await expect(filters.getByRole("combobox")).toHaveCount(1);
+      await expect(period).toHaveAttribute("data-progress-value", "week");
       await chooseProgressOption(period, "custom");
       const editor = page.getByTestId("progress-date-sheet");
       await expect(editor).toBeVisible();
@@ -67,10 +67,10 @@ for (const language of ["ar", "en"] as const) {
       const end = editor.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true });
       await start.fill("2026-10-01");
       await end.fill("2026-10-02");
-      await expect(filters).toHaveAttribute("open");
+      await expect(editor).toBeVisible();
       await editor.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
       await expect(editor).toBeHidden();
-      await expect(filters).not.toHaveAttribute("open");
+      await expect(filters.getByRole("combobox")).toHaveCount(1);
       await expectProgressFilterFocus(period);
       await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "١" : "1");
       for (const width of [320, 834, 1280]) {
@@ -78,7 +78,7 @@ for (const language of ["ar", "en"] as const) {
         await page.locator("html").evaluate((root, enlarged) => {
           root.style.fontSize = enlarged ? "200%" : "100%";
         }, width === 320);
-        if (width === 320) await expect(filters).not.toHaveAttribute("open");
+        if (width === 320) await expect(filters.getByRole("combobox")).toHaveCount(1);
         else await expect(period).toBeVisible();
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
         await page.screenshot({ path: testInfo.outputPath(`progress-filters-${language}-${width}.png`) });

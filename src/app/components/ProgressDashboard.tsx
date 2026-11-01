@@ -12,6 +12,9 @@ import {
   SlidersHorizontal,
   Sun,
   Sunrise,
+  Lightbulb,
+  Sprout,
+  Download,
 } from "./icons";
 import { ProgressBar } from "./ProgressBar";
 import { useId, useMemo, useRef, useState, type ReactNode } from "react";
@@ -30,7 +33,6 @@ import {
   metricProgressRange,
   summarizeProgressMetric,
   scopeProgressDailyRecords,
-  progressRecordingPattern,
   type ProgressDailyRecord,
   type ProgressMetric,
   type ProgressPreset,
@@ -38,7 +40,8 @@ import {
 } from "../progressDashboard";
 import { RecordingTimeline } from "./RecordingTimeline";
 import { ProgressRecordsTable } from "./ProgressRecordsTable";
-import { ProgressRecordingPattern } from "./ProgressRecordingPattern";
+import { ProgressHeatmap } from "./ProgressHeatmap";
+import { ProgressRoutineComparison } from "./ProgressRoutineComparison";
 import { IconButton } from "./LayoutShells";
 import { ChevronUp, ChevronDown } from "./icons";
 
@@ -96,7 +99,10 @@ export function ProgressDashboard({
   const [choosing, setChoosing] = useState(false);
   const chooseButton = useRef<HTMLButtonElement>(null);
   const [metric, setMetric] = useState<ProgressMetric>("prayers");
+  const [chartDisplay, setChartDisplay] = useState<"line" | "columns">("columns");
   const exportKey = `${range.startKey}:${range.endKey}:${currentDay}:${calendar}`;
+  const exportPending = useRef(false);
+  const [exportBusy, setExportBusy] = useState(false);
   const [exportState, setExportState] = useState<{ key: string; state: "idle" | "saving" | "saved" | "error" }>({
     key: exportKey,
     state: "idle",
@@ -156,10 +162,6 @@ export function ProgressDashboard({
     (row) => row.dayKey <= getProgressDayKey(now, 0) && PROGRESS_METRICS.some((key) => (row[key] ?? 0) > 0),
   );
   const hasTargets = scopedRows.some((row) => row.quranGoal !== null);
-  const pattern = useMemo(
-    () => progressRecordingPattern(records, range, now, dayStart, currentDay),
-    [records, range, now, dayStart, currentDay],
-  );
   const move = (key: ProgressMetric, step: number) => {
     const next = [...draft];
     const index = next.indexOf(key);
@@ -171,7 +173,7 @@ export function ProgressDashboard({
   return (
     <div className="progress-dashboard space-y-5" data-testid="progress-dashboard">
       {view === "overview" && (
-        <section aria-labelledby={`${id}-overview`}>
+        <section className="progress-summary-card" data-material-card aria-labelledby={`${id}-overview`}>
           <div className="flex flex-wrap items-start justify-between gap-2">
             <h2
               id={`${id}-overview`}
@@ -205,7 +207,14 @@ export function ProgressDashboard({
           </p>
           {!hasActivity && (
             <div className="my-3 rounded-xl border border-border bg-muted/30 p-3" data-testid="progress-empty-period">
-              <p className="text-sm font-semibold">{text(language, "emptyPeriod")}</p>
+              <img
+                src={`${import.meta.env.BASE_URL}assets/cards/wird-quran-720.webp`}
+                width={720}
+                height={540}
+                alt=""
+                className="progress-empty-art"
+              />
+              <p className="text-lg font-bold">{text(language, "emptyPeriod")}</p>
               <p className="mt-1 progress-help">
                 {text(language, hasTargets ? "targetOnlyHelp" : hasHistory ? "emptyPeriodHelp" : "noHistoryHelp")}
               </p>
@@ -301,8 +310,8 @@ export function ProgressDashboard({
               return (
                 <div
                   key={key}
-                  className="relative min-w-0 rounded-xl border border-border bg-card p-3 sm:p-4"
-                  data-material-card
+                  className="progress-metric-card relative min-w-0 rounded-xl border border-border p-3 sm:p-4"
+                  data-metric={key}
                   data-testid={`progress-metric-${key}`}
                 >
                   <dt className="text-xs font-semibold leading-relaxed text-muted-foreground">
@@ -315,15 +324,26 @@ export function ProgressDashboard({
                         onShowTrend?.();
                       }}
                     >
-                      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <Icon size={18} aria-hidden="true" />
+                      <span className="progress-practice-icon">
+                        <Icon size={26} aria-hidden="true" />
                       </span>
                       <span className="min-w-0 flex-1">{text(language, `short_${key}`)}</span>
                       <ChevronRight size={14} aria-hidden="true" className="shrink-0 rtl:rotate-180" />
                     </button>
                   </dt>
-                  <dd className="mt-1 break-words text-2xl font-bold tabular-nums">
-                    <bdi>{quantity(key)}</bdi>
+                  <dd className="progress-metric-quantity tabular-nums">
+                    <bdi>
+                      {value.possible !== null && value.possible > 0 ? (
+                        <>
+                          <span className="progress-metric-count">{formatNumerals(value.count, language)}</span>
+                          <span className="progress-metric-denominator">
+                            {text(language, "countOf", { count: "", total: formatNumerals(value.possible, language) })}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="progress-metric-count">{quantity(key)}</span>
+                      )}
+                    </bdi>
                   </dd>
                   {value.possible !== null && value.possible > 0 && (
                     <dd className="mt-3">
@@ -331,6 +351,7 @@ export function ProgressDashboard({
                         value={Math.min(value.count, value.possible)}
                         max={value.possible}
                         height={5}
+                        fillColor="var(--metric-accent, var(--primary))"
                         aria-label={text(language, key)}
                         aria-valuetext={quantity(key)}
                       />
@@ -357,23 +378,36 @@ export function ProgressDashboard({
               );
             })}
           </dl>
-          {hasActivity && values.morning.days >= 3 && values.morning.count !== values.evening.count && (
-            <aside
-              className="mt-4 rounded-xl border border-border bg-primary/10 p-3 sm:p-4"
-              aria-label={text(language, "insight")}
-            >
-              <h3 className="text-sm font-bold">{text(language, "insight")}</h3>
-              <p className="mt-1 text-sm leading-relaxed">
-                {text(language, "routineInsight", {
-                  morning: formatNumerals(values.morning.count, language),
-                  evening: formatNumerals(values.evening.count, language),
-                })}
-              </p>
-            </aside>
-          )}
         </section>
       )}
-      {view === "overview" && <ProgressRecordingPattern days={pattern} language={language} calendar={calendar} />}
+      {view === "overview" && (
+        <>
+          <ProgressHeatmap
+            key={`${range.startKey}:${range.endKey}:${currentDay}:${calendar}`}
+            {...{ records, range, now, dayStart, currentDay, language, calendar, period, displayDate }}
+          />
+          <div className="progress-overview-support">
+            <ProgressRoutineComparison values={values} language={language} />
+            {view === "overview" &&
+              hasActivity &&
+              values.morning.days >= 3 &&
+              values.morning.count !== values.evening.count && (
+                <aside className="progress-insight-card" data-material-card aria-label={text(language, "insight")}>
+                  <Lightbulb className="progress-practice-icon" aria-hidden="true" />
+                  <div>
+                    <h3 className="text-sm font-bold">{text(language, "insight")}</h3>
+                    <p className="mt-1 text-sm leading-relaxed">
+                      {text(language, "routineInsight", {
+                        morning: formatNumerals(values.morning.count, language),
+                        evening: formatNumerals(values.evening.count, language),
+                      })}
+                    </p>
+                  </div>
+                </aside>
+              )}
+          </div>
+        </>
+      )}
       {view === "trends" && (
         <>
           <section
@@ -395,6 +429,18 @@ export function ProgressDashboard({
                 options={PROGRESS_METRICS.map((key) => ({ value: key, label: text(language, `short_${key}`) }))}
               />
             </div>
+            {period !== "day" && (
+              <div className="progress-chart-display mb-3">
+                <ProgressSelectField
+                  label={text(language, "chartDisplay")}
+                  value={chartDisplay}
+                  onChange={setChartDisplay}
+                  language={language}
+                  icon={BarChart3}
+                  options={(["columns", "line"] as const).map((value) => ({ value, label: text(language, value) }))}
+                />
+              </div>
+            )}
             {period === "day" ? (
               <div className="space-y-3">
                 <p className="text-sm leading-relaxed text-muted-foreground">{text(language, "dayView")}</p>
@@ -418,10 +464,11 @@ export function ProgressDashboard({
                     },
                   ]}
                   language={language}
-                  period={period === "custom" ? "month" : period}
+                  period={period === "custom" || period === "last30" ? "month" : period}
                   title={text(language, metric)}
                   testId="progress-main-trend"
                   hideSeriesControls
+                  chartDisplay={chartDisplay}
                   valueKind={metric === "pages" ? "count" : "rate"}
                   countUnit={text(language, "pagesUnit")}
                   bucketDescription={text(language, metric === "pages" ? "countBuckets" : "rateBuckets")}
@@ -431,11 +478,15 @@ export function ProgressDashboard({
                     ? text(language, "completeRange", { range: formatProgressRange(complete, language, calendar) })
                     : text(language, "noComplete")}
                 </p>
-                <div className="mt-4 border-t border-border pt-4" data-testid="progress-period-comparison">
-                  <h3 className="text-sm font-semibold">{text(language, "comparison")}</h3>
+                <div className="progress-comparison-card" data-testid="progress-period-comparison">
+                  <h3 className="flex items-center gap-2 text-base font-bold">
+                    <BarChart3 size={22} className="text-primary" aria-hidden="true" />
+                    {text(language, "comparison")}
+                  </h3>
                   {comparison ? (
                     <div className="mt-2 space-y-1">
-                      <p className="text-sm font-bold">
+                      <p className="progress-comparison-change text-lg font-bold">
+                        <Sprout size={26} aria-hidden="true" />
                         {text(
                           language,
                           comparison.kind === "rate"
@@ -452,6 +503,27 @@ export function ProgressDashboard({
                           { count: formatNumerals(Math.round(Math.abs(comparison.change) * 10) / 10, language) },
                         )}
                       </p>
+                      {comparison.kind === "rate" && (
+                        <div className="progress-comparison-bars">
+                          {[
+                            { label: "currentPeriod" as const, value: comparison.currentRate },
+                            { label: "previousPeriod" as const, value: comparison.previousRate },
+                          ].map(({ label, value }) => (
+                            <div key={label}>
+                              <span>{text(language, label)}</span>
+                              <ProgressBar
+                                value={value}
+                                max={100}
+                                height={8}
+                                aria-label={text(language, label)}
+                                aria-valuetext={formatPercentage(Math.round(value * 10) / 10, language)}
+                                fillColor={label === "currentPeriod" ? "var(--primary)" : "var(--muted-foreground)"}
+                              />
+                              <bdi>{formatPercentage(Math.round(value * 10) / 10, language)}</bdi>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         {text(language, "matched", { days: formatNumerals(matched.days, language) })}
                       </p>
@@ -513,24 +585,37 @@ export function ProgressDashboard({
               <button
                 type="button"
                 className={action}
-                disabled={save === "saving"}
+                disabled={exportBusy}
                 onClick={async () => {
+                  if (exportPending.current) return;
+                  exportPending.current = true;
+                  setExportBusy(true);
                   setSave("saving");
                   try {
                     await onExport();
                     setSave("saved");
                   } catch {
                     setSave("error");
+                  } finally {
+                    exportPending.current = false;
+                    setExportBusy(false);
                   }
                 }}
               >
+                <Download className="me-2 inline-block" size={18} aria-hidden="true" />
                 {text(language, "export")}
               </button>
-              <span role="status" aria-atomic="true" className="text-xs text-muted-foreground">
+              <span
+                role={save === "error" ? "alert" : "status"}
+                aria-atomic="true"
+                className="text-xs text-muted-foreground"
+              >
                 {save === "idle" ? "" : text(language, save)}
+                {save === "saved" && <bdi className="block">{`progress-${range.startKey}-${range.endKey}.json`}</bdi>}
               </span>
             </div>
           </>
+          <p className="progress-help">{text(language, "exportPrivacy")}</p>
           <ProgressRecordsTable
             key={`${range.startKey}-${range.endKey}-${currentDay}`}
             records={scopedRows}

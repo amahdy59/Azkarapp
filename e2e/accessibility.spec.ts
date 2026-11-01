@@ -218,7 +218,7 @@ test("Progress tabs expose a logical level-two heading in every view", async ({ 
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-progress").click();
 
-  const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
+  const period = page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true });
   for (const value of ["day", "week", "month", "year"] as const) {
     await chooseProgressOption(period, value);
     await expect(page.getByTestId("progress-primary-heading")).toHaveRole("heading", { level: 2 });

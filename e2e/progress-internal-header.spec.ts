@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const language of ["ar", "en"] as const) {
-  test(`Progress title protects internally scrolling controls in ${language} @cross-browser`, async ({
+  test(`Progress title scrolls away while filters remain reachable in ${language} @cross-browser`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize({ width: 320, height: 480 });
@@ -16,79 +16,24 @@ for (const language of ["ar", "en"] as const) {
       );
     }, language);
     await page.goto("/#/progress");
-    await page.getByTestId("progress-range-disclosure").locator("summary").click();
     const controls = page.getByTestId("progress-sticky-controls");
-    const header = controls.getByTestId("shared-screen-header");
-    await expect(header).toBeVisible();
+    const header = page.getByRole("heading", { name: language === "ar" ? "التقدم" : "Progress", exact: true });
+    await expect(header).toHaveClass("sr-only");
+    await expect(controls.getByTestId("shared-screen-header")).toHaveCount(0);
     await page.locator("html").evaluate((node) => (node.style.fontSize = "200%"));
     await expect(page.locator("html")).toHaveCSS("font-size", "32px");
-    await expect.poll(() => controls.evaluate((node) => node.scrollHeight - node.clientHeight)).toBeGreaterThan(100);
-    await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    const bounds = await header.boundingBox();
-    const tabs = controls.getByTestId("progress-range-fields");
-    const originalTabs = await tabs.boundingBox();
-    const underTitle = Math.ceil(originalTabs!.y - (bounds!.y + bounds!.height) + 20);
-    await controls.evaluate((node, top) => (node.scrollTop = top), underTitle);
-    await expect.poll(() => controls.evaluate((node) => node.scrollTop)).toBe(underTitle);
-    expect((await tabs.boundingBox())!.y).toBeLessThan(bounds!.y + bounds!.height);
-    expect((await tabs.boundingBox())!.y).toBeLessThan(originalTabs!.y);
-    await expect(header).toHaveAttribute("data-scrolled", "true");
-    await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
-    expect(await header.boundingBox()).toEqual(bounds);
-    await page.screenshot({ path: testInfo.outputPath(`progress-${language}-internal-frost.png`), scale: "css" });
-    // The independent scroll owners frost their own passing content without
-    // adding a dark fill or changing the visible canvas color.
-    await page.locator(".progress-screen").evaluate((node) => (node.scrollTop = 180));
+    await page.locator(".progress-screen").evaluate((node) => (node.scrollTop = 250));
     await expect(controls).toHaveAttribute("data-scrolled", "true");
     await expect(controls).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
-    await expect(controls).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect(controls).toHaveCSS("background-image", "none");
-    await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    for (const top of [40, 12, 3]) {
-      await controls.evaluate((node, top) => (node.scrollTop = top), top);
-      await expect(header).toHaveAttribute("data-scrolled", "true");
-      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
-      expect(await header.boundingBox()).toEqual(bounds);
-    }
-    await page.screenshot({
-      path: testInfo.outputPath(`progress-${language}-internal-scroll-protected.png`),
-      scale: "css",
-    });
-    await controls.evaluate((node) => (node.scrollTop = 0));
-    await expect(header).not.toHaveAttribute("data-scrolled");
-    await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect(header).toHaveCSS("backdrop-filter", "none");
-    await expect(controls).toHaveAttribute("data-scrolled", "true");
-    await header.getByRole("button").focus();
-    await controls.evaluate((node) => (node.scrollTop = 70));
-    await page.keyboard.press("Tab");
-    await expect(
-      controls.getByRole("button", { name: language === "ar" ? "الفترة السابقة" : "Previous period", exact: true }),
-    ).toBeFocused();
-    await page.keyboard.press("Tab");
-    await expect(
-      controls.getByRole("button", { name: language === "ar" ? /^اختيار التواريخ:/ : /^Choose dates:/ }),
-    ).toBeFocused();
-    await page.keyboard.press("Tab");
-    await expect(
-      controls.getByRole("button", { name: language === "ar" ? "اليوم" : "Today", exact: true }),
-    ).toBeFocused();
-    await page.keyboard.press("Tab");
-    await expect(page.getByTestId("progress-range-disclosure").locator("summary")).toBeFocused();
-    await page.keyboard.press("Tab");
-    const selectedTab = controls.getByRole("combobox").first();
-    await expect(selectedTab).toBeFocused();
-    await expect
-      .poll(async () => {
-        const title = (await header.boundingBox())!;
-        return (await selectedTab.boundingBox())!.y - (title.y + title.height);
-      })
-      .toBeGreaterThanOrEqual(0);
-    const focused = (await selectedTab.boundingBox())!;
-    const controlBounds = (await controls.boundingBox())!;
-    expect(focused.y + focused.height).toBeLessThanOrEqual(controlBounds.y + controlBounds.height + 1);
+    await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
+    const period = controls.getByRole("combobox").first();
+    await period.focus();
+    await expect(period).toBeFocused();
+    const focused = (await period.boundingBox())!;
+    const bounds = (await controls.boundingBox())!;
+    expect(focused.y).toBeGreaterThanOrEqual(bounds.y - 1);
+    expect(focused.y + focused.height).toBeLessThanOrEqual(bounds.y + bounds.height + 1);
+    await page.screenshot({ path: testInfo.outputPath(`progress-${language}-compact-controls.png`), scale: "css" });
   });
 
   test(`Progress keeps its background color while scrolling in ${language} @cross-browser`, async ({
@@ -108,8 +53,8 @@ for (const language of ["ar", "en"] as const) {
     }, language);
     await page.goto("/#/progress");
     const controls = page.getByTestId("progress-sticky-controls");
-    const header = controls.getByTestId("shared-screen-header");
-    await expect(header).toBeVisible();
+    const header = page.getByRole("heading", { name: language === "ar" ? "التقدم" : "Progress", exact: true });
+    await expect(header).toHaveClass("sr-only");
     await page.evaluate(() => document.fonts.ready);
     const scene = page.getByTestId("time-of-day-scene-window").last().locator("img");
     await expect.poll(() => scene.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
@@ -123,7 +68,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(controls).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(controls).toHaveCSS("background-image", "none");
       await expect(controls).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
-      await expect(header).toHaveCSS("backdrop-filter", "none");
+      await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
     }
     await page.screenshot({ path: testInfo.outputPath(`progress-${language}-scroll-frost.png`), scale: "css" });
   });

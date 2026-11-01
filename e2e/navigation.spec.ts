@@ -217,7 +217,7 @@ test("secondary app state is deep-linkable and browser Back restores Settings ro
   await expect(page.getByTestId("settings-sub-audio")).toBeVisible();
 
   await page.goto("/#/progress/month");
-  await expect(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true })).toHaveAttribute(
+  await expect(page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true })).toHaveAttribute(
     "data-progress-value",
     "month",
   );

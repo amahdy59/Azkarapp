@@ -19,7 +19,7 @@ import { isPrayerName } from "./content/prayerTimes";
 import type { CategoryId, PrayerName, RoutineMode, View } from "./types";
 
 export type LibraryRouteSection = "collections" | "saved";
-export type ProgressRoutePeriod = "day" | "week" | "month" | "year";
+export type ProgressRoutePeriod = "day" | "week" | "month" | "year" | "last30";
 export type SettingsRoutePanel =
   | "root"
   | "appearance"
@@ -96,8 +96,7 @@ export function routeToHash(route: RouteState): string | null {
   const suffix = context.size ? `?${context}` : "";
 
   if (view === "library") return librarySection === "saved" ? "#/azkar/saved" : "#/azkar";
-  if (view === "progress")
-    return progressPeriod && progressPeriod !== "day" ? `#/progress/${progressPeriod}` : "#/progress";
+  if (view === "progress") return progressPeriod ? `#/progress/${progressPeriod}` : "#/progress";
   if (view === "settings")
     return settingsPanel && settingsPanel !== "root" ? `#/settings/${settingsPanel}` : "#/settings";
 
@@ -152,7 +151,7 @@ export function parseHash(hash: string): RouteState | null {
 
   if (segments[0] === "progress" && segments.length === 2) {
     const period = segments[1];
-    return period === "week" || period === "month" || period === "year"
+    return period === "day" || period === "week" || period === "month" || period === "year" || period === "last30"
       ? { view: "progress", progressPeriod: period }
       : null;
   }

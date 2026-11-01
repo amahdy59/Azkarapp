@@ -28,6 +28,7 @@ export function RecordingTimeline({
   valueKind = "rate",
   countUnit,
   bucketDescription,
+  chartDisplay = "line",
 }: {
   series: readonly RecordingTimelineSeries[];
   language: AppLanguage;
@@ -40,6 +41,7 @@ export function RecordingTimeline({
   valueKind?: "rate" | "count";
   countUnit?: string;
   bucketDescription?: string;
+  chartDisplay?: "line" | "columns";
 }) {
   const id = useId();
   const rtl = language === "ar";
@@ -77,7 +79,7 @@ export function RecordingTimeline({
           ? point.recorded === points[0]!.recorded
           : point.recorded * points[0]!.possible === points[0]!.recorded * point.possible),
     );
-  const plotHeight = flat || points.length <= 3 ? "7rem" : "11rem";
+  const plotHeight = flat ? "7rem" : points.length === 1 ? "9rem" : "13rem";
   const maximum =
     valueKind === "count" ? Math.max(4, Math.ceil(Math.max(0, ...points.map((point) => point.recorded)) / 4) * 4) : 100;
   const x = (index: number) => {
@@ -171,6 +173,12 @@ export function RecordingTimeline({
                     {title} · {active?.label}
                   </title>
                   <desc id={`${id}-chart-desc`}>{points.map(pointText).join("; ")}</desc>
+                  <defs>
+                    <linearGradient id={`${id}-area`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.24" />
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.02" />
+                    </linearGradient>
+                  </defs>
                   {[8, 96, 184].map((height, index) => (
                     <line
                       key={height}
@@ -184,19 +192,43 @@ export function RecordingTimeline({
                       vectorEffect="non-scaling-stroke"
                     />
                   ))}
-                  {segments
-                    .filter((segment) => segment.length > 1)
-                    .map((segment) => (
-                      <polyline
-                        key={segment[0]!.index}
-                        data-testid="recording-time-line"
-                        points={segment.map(({ point, index }) => `${x(index)},${y(point)}`).join(" ")}
-                        stroke="var(--primary)"
-                        fill="none"
-                        strokeWidth="2"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    ))}
+                  {chartDisplay === "line" &&
+                    segments
+                      .filter((segment) => segment.length > 1)
+                      .map((segment) => (
+                        <g key={segment[0]!.index}>
+                          <polygon
+                            aria-hidden="true"
+                            points={`${x(segment[0]!.index)},184 ${segment.map(({ point, index }) => `${x(index)},${y(point)}`).join(" ")} ${x(segment.at(-1)!.index)},184`}
+                            fill={`url(#${id}-area)`}
+                          />
+                          <polyline
+                            data-testid="recording-time-line"
+                            points={segment.map(({ point, index }) => `${x(index)},${y(point)}`).join(" ")}
+                            stroke="var(--primary)"
+                            fill="none"
+                            strokeWidth="3"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                        </g>
+                      ))}
+                  {chartDisplay === "columns" &&
+                    points.map(
+                      (point, index) =>
+                        !missing(point) && (
+                          <rect
+                            key={point.startKey}
+                            data-testid="recording-time-column"
+                            x={x(index) - Math.min(12, 180 / points.length) / 2}
+                            y={y(point)}
+                            width={Math.min(12, 180 / points.length)}
+                            height={Math.max(point.recorded > 0 ? 1 : 0, 184 - y(point))}
+                            rx="2"
+                            fill="var(--primary)"
+                            opacity={index === selectedIndex ? 1 : 0.7}
+                          />
+                        ),
+                    )}
                   <line
                     x1={x(selectedIndex)}
                     x2={x(selectedIndex)}
@@ -218,14 +250,32 @@ export function RecordingTimeline({
                         style={{
                           left: `${x(index) / 5}%`,
                           top: `${y(point) / 1.92}%`,
-                          width: index === selectedIndex ? 10 : 6,
-                          height: index === selectedIndex ? 10 : 6,
+                          width: index === selectedIndex ? 14 : 11,
+                          height: index === selectedIndex ? 14 : 11,
                           transform: "translate(-50%, -50%)",
                         }}
                       />
                     ),
                 )}
 
+                {points.length <= 7 &&
+                  points.map(
+                    (point, index) =>
+                      !missing(point) && (
+                        <span
+                          key={`label-${point.startKey}`}
+                          aria-hidden="true"
+                          className="recording-point-label"
+                          style={{
+                            left: `${x(index) / 5}%`,
+                            top: `${y(point) / 1.92}%`,
+                            transform: `translate(${index === 0 ? (rtl ? "-100%" : "0") : index === points.length - 1 ? (rtl ? "0" : "-100%") : "-50%"}, ${y(point) < 40 ? "60%" : "-160%"})`,
+                          }}
+                        >
+                          {value(point)}
+                        </span>
+                      ),
+                  )}
                 {points.length > 1 && (
                   <button
                     type="button"

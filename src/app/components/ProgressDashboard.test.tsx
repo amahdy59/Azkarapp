@@ -39,6 +39,26 @@ function props() {
   };
 }
 describe("ProgressDashboard", () => {
+  it("keeps one export in flight across date changes and reports the saved filename", async () => {
+    let finish!: () => void;
+    const properties = props();
+    properties.onExport.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const { rerender } = render(<ProgressDashboard {...properties} view="records" />);
+    fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
+    rerender(
+      <ProgressDashboard {...properties} view="records" range={{ startKey: "2026-09-01", endKey: "2026-09-30" }} />,
+    );
+    expect(screen.getByRole("button", { name: "Export JSON" })).toBeDisabled();
+    await act(async () => finish());
+    fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
+    await screen.findByText("progress-2026-09-01-2026-09-30.json");
+    expect(properties.onExport).toHaveBeenCalledTimes(2);
+  });
   it("explains empty and target-only periods without hiding known goals or inventing activity", () => {
     const empty = indexProgressDashboard({ ...input, dailyCompletions: [], wirdHistory: {} }, "2026-10-20");
     const { rerender } = render(
@@ -60,8 +80,10 @@ describe("ProgressDashboard", () => {
     expect(screen.getByRole("complementary", { name: "From your saved records" })).toHaveTextContent(
       "Days with morning records: 19. Days with evening records: 0",
     );
-    expect(within(screen.getByTestId("progress-recording-pattern")).getAllByRole("listitem")).toHaveLength(7);
-    expect(screen.getByTestId("progress-recording-pattern")).toHaveTextContent("Saved target");
+    const heatmap = screen.getByTestId("progress-heatmap");
+    expect(heatmap.querySelector('[data-day="2026-10-19"]')).toHaveAttribute("data-kind", "recorded");
+    expect(heatmap.querySelector('[data-day="2026-10-20"]')).toHaveAttribute("data-kind", "none");
+    expect(screen.getByTestId("progress-date-details")).toHaveTextContent("0 of 1");
   });
   it("offers a real week action from a one-day trend without drawing a misleading line", () => {
     const onChooseWeek = vi.fn();

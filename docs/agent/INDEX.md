@@ -1,4 +1,4 @@
-[Progress vNext implementation and release](phases/PROGRESS_VNEXT_2026_10_31.md) is the current owner-approved phase. Apply the reviewed recommendations with the existing four metrics, repair the latest changes, and complete local gates, main push, exact-commit CI/Pages and production validation. The owner's explicit release request supersedes preceding production holds.
+[Progress heatmap refinement and release](phases/PROGRESS_HEATMAP_REFINEMENT_2026_11_01.md) is the current owner-approved phase: implement all accepted visual/UX recommendations, preserve the four metrics and data contracts, integrate pending changes and complete main/CI/Pages/production verification. It supersedes the proposal-only review and the earlier recording-strip/latest-day presentation in [Progress vNext](phases/PROGRESS_VNEXT_2026_10_31.md).
 
 [Recognizable Home reminder label](phases/HOME_REMINDER_LABEL_2026_10_31.md) records the preceding completed phase.
 

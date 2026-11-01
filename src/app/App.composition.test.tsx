@@ -176,7 +176,7 @@ describe("App Composition and Routing", () => {
     await user.keyboard("{Alt>}{4}{/Alt}");
 
     expect(await screen.findByRole("heading", { name: /progress/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
-    expect(window.location.hash).toBe("#/progress");
+    expect(window.location.hash).toBe("#/progress/last30");
   });
 
   it("handles browser back/forward buttons (popstate)", async () => {

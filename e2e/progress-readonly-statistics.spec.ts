@@ -36,7 +36,7 @@ for (const language of ["ar", "en"] as const) {
         },
         { language, width },
       );
-      await page.goto("/#/progress");
+      await page.goto("/#/progress/day");
       await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
       const summary = page.getByTestId("prayer-progress-summary");
       await expect(summary).toBeVisible();
@@ -63,11 +63,17 @@ for (const language of ["ar", "en"] as const) {
       await page.screenshot({ path: `${directory}/${language}-${width}-statuses.png` });
       const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       expect(axe.violations).toEqual([]);
-      await page.getByRole("button", { name: ar ? "الفترة السابقة" : "Previous period", exact: true }).click();
-      await expect(summary.getByRole("listitem").first()).not.toContainText(
-        ar ? "أتممت أذكار الصلاة" : "Completed the azkar",
+      await chooseProgressOption(
+        page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true }),
+        "custom",
       );
-      await expect(summary.getByText(ar ? "في المسجد" : "At the mosque", { exact: true })).toBeVisible();
+      await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-17");
+      await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-17");
+      await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
+      await expect(page.getByTestId("progress-detailed-context")).toHaveAttribute("open");
+      const historical = page.getByRole("region", { name: ar ? "حسب الصلاة" : "By prayer", exact: true });
+      await expect(historical).not.toContainText(ar ? "أتممت أذكار الصلاة" : "Completed the azkar");
+      await expect(historical).toContainText(ar ? "في المسجد" : "At the mosque");
       await expect(page.locator(".progress-screen input[type=checkbox], .progress-screen textarea")).toHaveCount(0);
       const after = await page.evaluate(() => {
         const state = JSON.parse(localStorage.getItem("azkarapp.state.v1")!);
@@ -75,7 +81,7 @@ for (const language of ["ar", "en"] as const) {
       });
       expect(after).toEqual(before);
       await chooseProgressOption(
-        page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+        page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
         "week",
       );
       await expect(summary).toHaveCount(0);

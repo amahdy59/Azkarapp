@@ -22,7 +22,7 @@ async function openProgress(page: Page) {
       }),
     );
   });
-  await page.goto("/#/progress");
+  await page.goto("/#/progress/day");
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
@@ -49,7 +49,7 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
     await openProgress(page);
 
     await chooseProgressOption(
-      page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true }),
+      page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true }),
       { يوم: "day", أسبوع: "week", شهر: "month", سنة: "year" }[tab]!,
     );
     // The chart is the slowest thing to settle; wait on the panel, not a timer.
@@ -69,13 +69,15 @@ test("longer Progress periods compare five prayers with exact data available as 
   await openProgress(page);
 
   await expect(page.getByText(/أَحَبُّ الأَعْمَالِ/)).toBeHidden();
-  await chooseProgressOption(page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true }), "week");
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true }),
+    "week",
+  );
 
   await chooseProgressDetail(page, "prayers");
   await expect(page.getByTestId("prayer-comparison").getByRole("list").getByRole("img")).toHaveCount(5);
   await expect(page.getByRole("table")).toHaveCount(0);
-  await page.getByTestId("progress-range-disclosure").locator("summary").click();
-  // The main trend selector now belongs to the separate Trends tab.
+  // One range selector, detail topic and the two prayer selectors.
   await expect(page.getByRole("combobox")).toHaveCount(5);
   const download = page.getByTestId("prayer-comparison").getByRole("button", { name: "تصدير الصلاة" });
   await download.focus();

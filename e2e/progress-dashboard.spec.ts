@@ -55,13 +55,21 @@ for (const language of ["ar", "en"] as const) {
     await page.getByTestId("progress-tab-records").click();
     await expect(page.getByRole("searchbox")).toHaveCount(0);
     await expect(page.locator(".progress-records-surface")).toHaveCSS("background-color", /0\.82/);
-    const dateButton = page.getByRole("button", { name: ar ? /^اختيار التواريخ:/ : /^Choose dates:/ });
-    await dateButton.click();
+    const dateButton = page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true });
+    const openDates = async () => {
+      const current = await dateButton.getAttribute("data-progress-value");
+      await dateButton.click();
+      await page
+        .getByRole("option")
+        .and(page.locator(`[data-progress-value="${current === "custom" ? "editDates" : "custom"}"]`))
+        .click();
+    };
+    await openDates();
     await expect(page.getByTestId("progress-date-sheet").getByTestId("modal-close-button")).toBeFocused();
-    await page.getByRole("radio", { name: ar ? "تاريخ واحد" : "One date", exact: true }).check();
-    await page.getByLabel(ar ? "التاريخ الميلادي" : "Gregorian date", { exact: true }).fill("2026-10-03");
+    await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-03");
+    await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-03");
     await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
-    await expect(page.getByTestId("progress-range-disclosure")).not.toHaveAttribute("open");
+    await expect(page.getByTestId("progress-date-sheet")).not.toBeVisible();
     await expect(page.getByRole("table").getByRole("rowheader")).toHaveCount(1);
     await expect(page.getByRole("rowheader").locator("time")).toHaveAttribute("datetime", "2026-10-03");
     const selected = await page.getByTestId("garden-view-date").textContent();
@@ -71,22 +79,21 @@ for (const language of ["ar", "en"] as const) {
     await expect(page.getByTestId("progress-main-trend")).toHaveCount(0);
     await expect(page.getByRole("button", { name: ar ? "عرض هذا الأسبوع" : "View this week" })).toBeVisible();
     await expect(page.getByTestId("garden-view-date")).toHaveText(selected!);
-    await dateButton.click();
-    await page.getByRole("radio", { name: ar ? "شهر" : "Month", exact: true }).check();
-    await page.getByLabel(ar ? "الشهر الميلادي" : "Gregorian month", { exact: true }).fill("2026-09");
+    await openDates();
+    await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-09-01");
+    await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-09-30");
     await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
     await expect(
-      page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
-    ).toHaveAttribute("data-progress-value", "month");
+      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
+    ).toHaveAttribute("data-progress-value", "custom");
     await page.getByTestId("progress-tab-records").click();
     await expect(page.getByRole("rowheader")).toHaveCount(0);
     await expect(
       page.getByText(ar ? "لا توجد سجلات محفوظة في هذه الفترة." : "No saved records in this period."),
     ).toBeVisible();
-    await page.getByRole("button", { name: ar ? "اليوم" : "Today", exact: true }).click();
+    await chooseProgressOption(dateButton, "day");
     await expect(page.getByRole("rowheader").locator("time")).toHaveAttribute("datetime", "2026-10-20");
-    await dateButton.click();
-    await page.getByRole("radio", { name: ar ? "تواريخ مخصصة" : "Custom dates", exact: true }).check();
+    await openDates();
     await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-02");
     await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-08");
     await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
@@ -115,10 +122,9 @@ for (const language of ["ar", "en"] as const) {
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";
     });
-    await dateButton.click();
+    await openDates();
     await expect(page.getByTestId("progress-date-sheet").getByTestId("modal-close-button")).toBeFocused();
-    await page.getByRole("radio", { name: ar ? "تاريخ واحد" : "One date", exact: true }).check();
-    const enlargedDate = page.getByLabel(ar ? "التاريخ الميلادي" : "Gregorian date", { exact: true });
+    const enlargedDate = page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true });
     await enlargedDate.click();
     await enlargedDate.fill("2026-10-06");
     await expect(enlargedDate).toBeInViewport();
@@ -127,8 +133,8 @@ for (const language of ["ar", "en"] as const) {
     expect(
       (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations,
     ).toEqual([]);
-    await page.getByRole("radio", { checked: true }).press("Escape");
-    await expect(page.getByTestId("progress-range-disclosure")).not.toHaveAttribute("open");
+    await enlargedDate.press("Escape");
+    await expect(page.getByTestId("progress-date-sheet")).not.toBeVisible();
     await expect(dateButton).toBeFocused();
   });
   test(`Progress cards open their own trend and preserve the range across keyboard tabs in ${language} @cross-browser`, async ({
@@ -139,9 +145,10 @@ for (const language of ["ar", "en"] as const) {
     await page.goto("/#/progress/month");
     const date = page.getByTestId("garden-view-date");
     const included = await date.textContent();
-    const summary = page.getByTestId("progress-range-disclosure").locator("summary");
-    await expect(summary).toContainText(language === "ar" ? "الفترة والتقويم" : "Date range and calendar");
-    await expect(summary).toContainText(language === "ar" ? "توسيع" : "Expand");
+    await expect(
+      page.getByRole("combobox", { name: language === "ar" ? "نطاق التاريخ" : "Date range", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole("combobox", { name: /Show dates in|عرض التواريخ بالتقويم/ })).toHaveCount(0);
     await expect(page.getByTestId("progress-metric-pages").getByRole("progressbar")).toHaveCount(0);
     await expect(page.getByTestId("progress-metric-prayers").getByRole("progressbar")).toHaveAttribute(
       "aria-valuenow",
@@ -172,7 +179,11 @@ for (const language of ["ar", "en"] as const) {
     await seed(page, language);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/#/progress/month");
-    const period = page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true });
+    const period = page.getByRole("combobox", {
+      name: ar ? "نطاق التاريخ" : "Date range",
+      exact: true,
+      includeHidden: true,
+    });
     await expect(period).toHaveAttribute("data-progress-value", "month");
     await expect(page.getByTestId("progress-overview").locator(":scope > div")).toHaveCount(4);
     await expect(page.getByTestId("progress-metric-prayers")).toContainText(ar ? "٣٠ من ١٠٠" : "30 of 100");
@@ -250,14 +261,7 @@ for (const language of ["ar", "en"] as const) {
     expect(file.metrics.pages.count).toBe(22);
     expect(file.records.dailyCompletions).toHaveLength(11);
     expect(file.metrics.quranGoals).toMatchObject({ count: 4, possible: 7 });
-    await chooseProgressOption(
-      page.getByRole("combobox", {
-        name: ar ? "عرض التواريخ بالتقويم" : "Show dates in",
-        exact: true,
-        includeHidden: true,
-      }),
-      "hijri",
-    );
+    await expect(page.getByRole("combobox", { name: /Show dates in|عرض التواريخ بالتقويم/ })).toHaveCount(0);
     await page.getByTestId("progress-tab-overview").click();
     await expect(page.getByTestId("progress-metric-prayers")).toContainText(ar ? "١١ من ٣٥" : "11 of 35");
     await page.getByTestId("progress-tab-records").click();
@@ -279,9 +283,6 @@ for (const language of ["ar", "en"] as const) {
       await seed(page, language, width === 320 ? "light" : "midnight", width !== 320);
       await page.setViewportSize({ width, height: width === 320 ? 600 : 900 });
       await page.goto("/#/progress/month");
-      const disclosure = page.getByTestId("progress-range-disclosure");
-      if (!(await disclosure.evaluate((node) => (node as HTMLDetailsElement).open)))
-        await disclosure.locator("summary").click();
       if (width === 320) await page.locator("html").evaluate((root) => (root.style.fontSize = "200%"));
       await expect(page.getByTestId("progress-overview")).toBeVisible();
       const choose = page.getByRole("button", { name: ar ? "اختيار المقاييس" : "Choose metrics", exact: true });
@@ -352,20 +353,14 @@ for (const language of ["ar", "en"] as const) {
       await page.setViewportSize({ width, height: 700 });
       await page.goto("/#/progress/month");
       if (width === 320) await page.locator("html").evaluate((root) => (root.style.fontSize = "200%"));
-      if (width === 320) {
-        await page.getByTestId("progress-range-disclosure").locator("summary").click();
-        const fields = page.getByTestId("progress-range-fields");
-        const controls = fields.getByRole("combobox");
-        expect(await fields.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
-        const first = (await controls.nth(0).boundingBox())!;
-        const second = (await controls.nth(1).boundingBox())!;
-        expect(Math.abs(first.x - second.x)).toBeLessThan(1);
-        expect(Math.abs(first.width - second.width)).toBeLessThan(1);
-        expect(second.y).toBeGreaterThanOrEqual(first.y + first.height);
-      }
-      const period = page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true });
-      const panel = page.getByTestId("progress-range-disclosure");
-      if (!(await panel.evaluate((node) => (node as HTMLDetailsElement).open))) await panel.locator("summary").click();
+      const fields = page.locator(".progress-range-toolbar");
+      await expect(fields.getByRole("combobox")).toHaveCount(1);
+      expect(await fields.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+      const period = page.getByRole("combobox", {
+        name: ar ? "نطاق التاريخ" : "Date range",
+        exact: true,
+        includeHidden: true,
+      });
       await period.focus();
       const trigger = (await period.boundingBox())!;
       await page.keyboard.press("Enter");
@@ -385,11 +380,15 @@ for (const language of ["ar", "en"] as const) {
             const text = node.querySelector("[data-radix-select-item-text]") ?? node.querySelector("span > span");
             const range = document.createRange();
             if (text) range.selectNodeContents(text);
-            return (
-              node.clientHeight >= 44 &&
-              node.scrollWidth <= node.clientWidth &&
-              (!text || range.getClientRects().length === 1)
+            const bounds = node.getBoundingClientRect();
+            const fits = Array.from(range.getClientRects()).every(
+              (rect) =>
+                rect.left >= bounds.left - 1 &&
+                rect.right <= bounds.right + 1 &&
+                rect.top >= bounds.top - 1 &&
+                rect.bottom <= bounds.bottom + 1,
             );
+            return node.clientHeight >= 44 && node.scrollWidth <= node.clientWidth && (!text || fits);
           }),
         ),
       ).toBe(true);
