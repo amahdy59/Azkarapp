@@ -99,6 +99,17 @@ for (const language of ["ar", "en"] as const) {
     expect(box.height).toBeGreaterThanOrEqual(44);
     await target.click();
     await expect(target).toHaveAttribute("aria-pressed", "true");
+    // Native focus must reveal dates horizontally as well as beneath the
+    // sticky controls. A roving focus target cannot remain outside its viewport.
+    for (let step = 0; step < 3; step++) await page.keyboard.press(language === "ar" ? "ArrowRight" : "ArrowLeft");
+    const focused = heatmap.locator('[data-day="2026-10-16"]');
+    await expect(focused).toBeFocused();
+    const visible = await focused.evaluate((node) => {
+      const bounds = node.getBoundingClientRect();
+      const viewport = node.closest(".progress-heatmap-scroll")!.getBoundingClientRect();
+      return bounds.left >= viewport.left - 1 && bounds.right <= viewport.right + 1;
+    });
+    expect(visible).toBe(true);
     await page.screenshot({ path: info.outputPath(`heatmap-${language}-320-200.png`) });
   });
 }

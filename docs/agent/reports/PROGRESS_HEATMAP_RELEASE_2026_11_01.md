@@ -73,6 +73,12 @@ Architecture, Design System and Quality Checklist explain the new typed default/
 
 The owner explicitly approves all review recommendations and publication of all pending changes. This includes the new rolling preset and replacement of the old recording strip/latest-day composition. The optional doughnut is implemented as secondary disclosed detail and never combines incompatible metrics. No new persisted preference, schema, religious interpretation or runtime dependency is introduced.
 
+## Keyboard visibility follow-up before deployment
+
+A post-push 320px/200% keyboard diagnostic found a new roving-focus date outside the calendar's horizontal viewport (button x 297.6–343.3, viewport x 45–275). The agent canceled the still-running first CI candidate before deployment, restored native focus scrolling for calendar arrows and added exact horizontal-visibility assertions in both languages. The final release uses fresh notes stamp 2026-11-01.2 and must pass complete local/exact-commit gates again. This is a focused accessibility correction, not a reduced assertion or deployment-trigger-only push. The new focus assertions passed in Arabic/English across Chromium/Firefox/WebKit. A concurrent local rerun then exhausted available machine memory in unit/type/build processes and timed out one separate calendar case; verification uses the existing serial gate and an isolated reproduction without changing assertions, timeouts, coverage or limits.
+
+The small 4× CPU runtime lab is preserved in output/progress-heatmap-runtime-lab.json and .md. Thirty-day and 1,200-day synthetic histories showed similar tab-switch costs; date selection ranged 89–215ms and Overview remount about 606–609ms measured to a second animation frame. These are limited lab samples, not field INP or a before/after performance claim. Physical-device profiling remains outstanding.
+
 ## Known limitations or remaining risks
 
 Manual physical-device and assistive-technology acceptance remain outstanding. At 320px/200% an interactive seven-column calendar uses labelled horizontal scrolling to preserve full-size targets/text. Long history is explored by month; the selected page/export range remains unchanged. Synthetic browser data is not user research, and build/structural improvements do not establish field performance.

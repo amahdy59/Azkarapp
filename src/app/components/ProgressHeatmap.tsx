@@ -264,7 +264,7 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
                         if (target !== null && enabledKeys[target]) {
                           event.preventDefault();
                           setSelection(enabledKeys[target]);
-                          document.getElementById(`${id}-${enabledKeys[target]}`)?.focus({ preventScroll: true });
+                          document.getElementById(`${id}-${enabledKeys[target]}`)?.focus();
                         }
                       }}
                     >
