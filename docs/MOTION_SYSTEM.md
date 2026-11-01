@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Shared compact icon feedback — 2026-11-01
+
+Button's icon size and the shared sheet/modal/drawer Close actions use the existing ui-icon-button recipe, matching Header and Home icon controls. This removes independent close scale utilities and uses the established 0.92 compact press, delegated keyboard cancellation and finite release. Text actions retain the ordinary press; reading/no-press exceptions remain. Both reduced-motion preferences retain still opacity/focus feedback. No new listener, timer, dependency or animation is introduced.
+
 ## Progress filters and Settings export — 2026-11-01
 
 The app-wide follow-up narrows remaining broad transitions to actual color, background, border, shadow, opacity and press-transform changes. Friday fills reuse the shared transform-based ProgressBar, preserving exact ratios while removing layout animation and adding native progress semantics. Reader Undo feedback reuses one shared fade with the standard duration, without changing its lifetime or action. Metric cards use a brief border/shadow cue and shared native press response; text and card geometry remain still. Existing Home, devotional toolbar and Mushaf motion owners remain unchanged.

@@ -146,7 +146,7 @@ export function SheetHeader({
         onClick={onClose}
         aria-label={closeLabel}
         data-testid="modal-close-button"
-        className={`flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95 ${
+        className={`ui-icon-button flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
           onGlass
             ? "border border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
             : "bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -266,7 +266,7 @@ export function Modal({
               onClick={onClose}
               aria-label={t(lang, "common.close")}
               data-testid="modal-close-button"
-              className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 ${
+              className={`ui-icon-button absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                 onGlass
                   ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
                   : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
@@ -470,7 +470,7 @@ export function ResponsiveSheet({
             onClick={onClose}
             aria-label={t(lang, "common.close")}
             data-testid="modal-close-button"
-            className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 ${
+            className={`ui-icon-button absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               onGlass
                 ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
                 : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
