@@ -1,3 +1,7 @@
+import { getNextReminderDelay } from "../../hooks/useForegroundReminders";
+import { displayLocationName } from "../../content/prayerLocations";
+import { DEFAULT_LOCATION } from "../../content/prayerCalculation";
+import type { LocationSettings } from "../../types";
 import { isNativeAndroid } from "../../native/platform";
 import { CONTEXT_REMINDER_KINDS } from "../../contextReminders";
 import { refreshNativeNotificationPermission } from "../../native/reminders";
@@ -98,12 +102,40 @@ export function NotificationsPanel({
   reminders,
   onRemindersChange,
   onBack,
+  locationSettings,
+  onOpenLocation,
 }: {
+  locationSettings?: LocationSettings;
+  onOpenLocation?: () => void;
   language: AppLanguage;
   reminders: ReminderSettings;
   onRemindersChange: (value: ReminderSettings) => void;
   onBack: () => void;
 }) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible") setNow(new Date());
+    };
+    const timer = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
+  const timeZone = locationSettings?.timeZone || DEFAULT_LOCATION.timeZone;
+  const delay = getNextReminderDelay(reminders, locationSettings, now);
+  const nextReminder =
+    delay === null
+      ? t(language, "readiness.none")
+      : new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en", {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone,
+        }).format(new Date(now.getTime() + delay));
   const isArabic = language === "ar";
   const [permission, setPermission] = useState<BrowserNotificationPermission>(readNotificationPermission);
   const [isRequesting, setIsRequesting] = useState(false);
@@ -255,6 +287,44 @@ export function NotificationsPanel({
             </div>
           </div>
 
+          <h3 className="mt-4 font-semibold">{t(language, "readiness.title")}</h3>
+          <dl className="mt-3 space-y-3 text-sm" data-testid="reminder-readiness">
+            <div>
+              <dt className="text-muted-foreground">{t(language, "readiness.next")}</dt>
+              <dd className="font-semibold">{nextReminder}</dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">{t(language, "readiness.location")}</dt>
+              <dd className="break-words">
+                {displayLocationName(locationSettings, language)} · <bdi>{timeZone}</bdi>
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-label text-muted-foreground">
+            {t(language, isNativeAndroid() ? "readiness.native" : "readiness.browser")}
+          </p>
+          <p className="mt-2 text-label text-muted-foreground">{t(language, "readiness.testHelp")}</p>
+          {onOpenLocation && (
+            <Button type="button" variant="outline" className="mt-3 w-full" onClick={onOpenLocation}>
+              {t(language, "readiness.changeLocation")}
+            </Button>
+          )}
+          {permission === "granted" && (
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4 w-full"
+              disabled={isTesting}
+              onClick={() => void sendTestNotification()}
+            >
+              {t(language, isTesting ? "notifications.testSending" : "notifications.testNotification")}
+            </Button>
+          )}
+          {testStatus && (
+            <p className="mt-2 text-label text-muted-foreground" role="status">
+              {testStatus}
+            </p>
+          )}
           {permission === "default" && (
             <Button
               type="button"
@@ -384,22 +454,6 @@ export function NotificationsPanel({
               })}
             </div>
           </fieldset>
-          {permission === "granted" && (
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-4 w-full"
-              disabled={isTesting}
-              onClick={() => void sendTestNotification()}
-            >
-              {t(language, isTesting ? "notifications.testSending" : "notifications.testNotification")}
-            </Button>
-          )}
-          {testStatus && (
-            <p className="mt-2 text-label text-muted-foreground" role="status">
-              {testStatus}
-            </p>
-          )}
         </section>
 
         <section aria-labelledby="gentle-reminders-title">

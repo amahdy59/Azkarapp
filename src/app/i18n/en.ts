@@ -1,4 +1,47 @@
 const en = {
+  readiness: {
+    title: "Reminder readiness",
+    next: "Next configured reminder",
+    none: "No upcoming reminder selected",
+    location: "Prayer location and timezone",
+    changeLocation: "Review location and timezone",
+    native:
+      "Android schedules reminders on this device. Notification permission, exact-alarm access and power settings can affect delivery.",
+    browser:
+      "Keep the app open for scheduled browser reminders. Delivery after the browser closes is not supported here.",
+    testHelp:
+      "A test checks an immediate notification request, not future delivery. Completed routines may be skipped when “Only when incomplete” is on.",
+  },
+  dataSafety: {
+    title: "Your data at a glance",
+    local: "Saved on this device",
+    pending: "Checking the latest save.",
+    saved: "The latest save completed on this device.",
+    error: "The latest save failed. Keep the app open and export a backup before leaving.",
+    account: "Account synchronization",
+    localOnly: "You are using this device without an account.",
+    attention: "Sync needs attention. Changes on this device are not confirmed in your account.",
+    syncing: "Synchronizing changes…",
+    offline: "You are offline. Account synchronization will resume when connected.",
+    synced: "A successful account sync has been recorded.",
+    unconfirmed: "No successful account sync is confirmed yet.",
+    paired: "Paired-device synchronization",
+    deviceidle: "No completed transfer is confirmed in this session.",
+    devicesyncing: "Sending changes to paired devices…",
+    devicesaved: "The latest device transfer succeeded.",
+    deviceerror: "Device transfer failed. Previously saved local data is kept.",
+    offlineTitle: "Available offline",
+    shellchecking: "Checking this installation…",
+    shellready: "The app shell is installed for offline use.",
+    shellunknown: "Offline installation could not be confirmed. Open the app online before travelling.",
+    downloadsHelp:
+      "Audio and complete Mushaf pages have separate downloads. Check them in Downloads before going offline.",
+    backupHelp:
+      "A backup can restore your saved app data. Progress reports are for inspection and cannot restore the app. Clearing browser data can remove local copies.",
+    retrySave: "Save again",
+    backup: "Export a restorable backup",
+    downloads: "Check downloads",
+  },
   firstUse: {
     title: "Make yourself at home",
     intro:
@@ -654,6 +697,7 @@ const en = {
     prayerReminderBody: "{prayer} prayer is in {minutes} minutes.",
   },
   downloads: {
+    resumeDownload: "Resume download",
     downloadedAudioTitle: "Downloaded audio",
     exportFiles: "Save audio files to device",
     archiveAll: "Download all audio as ZIP",
@@ -891,7 +935,7 @@ const en = {
     qrSyncRetry: "Retry sync",
     qrSyncSaved: "Changes saved to paired devices",
     qrSyncWaiting: "Device linked · waiting to sync",
-    qrSyncError: "Device sync needs attention. Your changes are saved locally. Reconnect or retry.",
+    qrSyncError: "Device sync needs attention. Previously saved local data is kept. Reconnect or retry.",
     qrSyncRequired: "Enter a pairing code first.",
     qrSyncStatusNotLinked: "Not connected to other devices",
     qrSyncUnlinkConfirm:
@@ -1005,7 +1049,8 @@ const en = {
     install: "Install app",
     installing: "Opening the installation prompt…",
     updating: "Applying the update…",
-    updateError: "The update could not be applied. Try again or refresh the app.",
+    updateError:
+      "The update could not be applied. Your saved progress and completed downloads are kept. Retry the update when connected.",
     updatedTitle: "Azkar has been updated",
     updatedBody: "Here is what changed in this update.",
     installAccepted: "Installation started.",

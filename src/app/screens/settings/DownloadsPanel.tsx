@@ -385,7 +385,9 @@ export function DownloadsPanel({
           action={t(
             language,
             failedId === resource.id
-              ? "downloads.retry"
+              ? saved?.completed
+                ? "downloads.resumeDownload"
+                : "downloads.retry"
               : saved?.completed && saved.completed < saved.total
                 ? "downloads.resumeResource"
                 : saved?.total && saved.completed === saved.total
@@ -611,7 +613,9 @@ export function DownloadsPanel({
             action={t(
               language,
               failedId === "mushaf"
-                ? "downloads.retry"
+                ? status?.downloadedMushafPages
+                  ? "downloads.resumeDownload"
+                  : "downloads.retry"
                 : status?.downloadedMushafPages === 604
                   ? "downloads.downloaded"
                   : status?.downloadedMushafPages

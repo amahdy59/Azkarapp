@@ -29,6 +29,9 @@ import {
 } from "./SettingsPanels";
 
 export function SettingsScreen({
+  localSaveStatus,
+  onRetrySave,
+  onRetrySync,
   onReviewUpdate,
   audioController,
   themeMode,
@@ -378,6 +381,8 @@ export function SettingsScreen({
       case "notifications":
         return (
           <NotificationsPanel
+            locationSettings={locationSettings}
+            onOpenLocation={() => openSubPanel("location")}
             language={language}
             reminders={reminders}
             onRemindersChange={onRemindersChange}
@@ -402,6 +407,10 @@ export function SettingsScreen({
       case "account-data":
         return (
           <AccountDataPanel
+            localSaveStatus={localSaveStatus}
+            onRetrySave={onRetrySave}
+            onRetrySync={onRetrySync}
+            onOpenDownloads={() => openSubPanel("downloads")}
             language={language}
             isGuest={isGuest}
             isSyncing={isSyncing}

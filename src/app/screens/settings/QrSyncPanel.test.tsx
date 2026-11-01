@@ -17,7 +17,7 @@ describe("QrSyncPanel", () => {
     window.addEventListener(DEVICE_SYNC_RETRY_EVENT, retry);
     const view = render(<QrSyncPanel language="en" />);
     act(() => publishDeviceSyncStatus("error"));
-    expect(screen.getByRole("status")).toHaveTextContent("Your changes are saved locally");
+    expect(screen.getByRole("status")).toHaveTextContent("Previously saved local data is kept");
     fireEvent.click(screen.getByRole("button", { name: "Retry sync" }));
     expect(retry).toHaveBeenCalledOnce();
     view.unmount();

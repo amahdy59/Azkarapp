@@ -3,7 +3,11 @@ import { createAppStateWriter } from "../state";
 import type { AppStateSnapshot } from "../types";
 
 /** Coalesce rapid changes, but save before the browser can freeze the page. */
-export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (saved: boolean) => void) {
+export function useAppStatePersistence(
+  snapshot: AppStateSnapshot,
+  onResult: (saved: boolean) => void,
+  onPending?: () => void,
+) {
   const writer = useRef<ReturnType<typeof createAppStateWriter> | null>(null);
   if (!writer.current) writer.current = createAppStateWriter();
   const pending = useRef(false);
@@ -15,6 +19,7 @@ export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (sa
     // snapshot available to pagehide before passive effects can be deferred.
     latest.current = { snapshot, onResult };
     pending.current = true;
+    onPending?.();
     // A displayed tally must survive even a reload that skips lifecycle events.
     // Keep other snapshot changes coalesced, using the same normalized save boundary.
     if (previousPartialCounts.current !== snapshot.partialZikrCounts) {
@@ -29,7 +34,7 @@ export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (sa
       onResult(writer.current!(snapshot));
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [snapshot, onResult]);
+  }, [snapshot, onResult, onPending]);
 
   useEffect(() => {
     const flush = () => {

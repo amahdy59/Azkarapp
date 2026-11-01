@@ -17,6 +17,23 @@ describe("debounced application persistence", () => {
   });
   afterEach(() => vi.useRealTimers());
 
+  it("marks each changed snapshot pending until its actual write result", () => {
+    const states: string[] = [];
+    const onPending = () => states.push("pending");
+    const onResult = (saved: boolean) => states.push(saved ? "saved" : "error");
+    const { rerender } = renderHook(({ snapshot }) => useAppStatePersistence(snapshot, onResult, onPending), {
+      initialProps: { snapshot: DEFAULT_APP_STATE },
+    });
+    expect(states).toEqual(["pending"]);
+    act(() => vi.advanceTimersByTime(400));
+    expect(states).toEqual(["pending", "saved"]);
+    vi.mocked(saveAppState).mockReturnValue(false);
+    rerender({ snapshot: { ...DEFAULT_APP_STATE, khatmahPage: 19 } });
+    expect(states.at(-1)).toBe("pending");
+    act(() => vi.advanceTimersByTime(400));
+    expect(states.at(-1)).toBe("error");
+  });
+
   it("coalesces rapid updates into the latest normalized-boundary snapshot", () => {
     const result = vi.fn();
     const { rerender } = renderHook(({ snapshot }) => useAppStatePersistence(snapshot, result), {

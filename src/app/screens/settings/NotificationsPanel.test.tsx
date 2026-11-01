@@ -22,6 +22,28 @@ describe("NotificationsPanel", () => {
     }
   });
 
+  it("groups next configured time, selected timezone and the existing test action without promising closed-browser delivery", () => {
+    Object.defineProperty(window, "Notification", { configurable: true, value: { permission: "granted" } });
+    const onOpenLocation = vi.fn();
+    render(
+      <NotificationsPanel
+        language="en"
+        reminders={DEFAULT_APP_STATE.settings.reminders}
+        onRemindersChange={vi.fn()}
+        onBack={vi.fn()}
+        onOpenLocation={onOpenLocation}
+      />,
+    );
+    expect(screen.getByTestId("reminder-readiness")).toHaveTextContent("Next configured reminder");
+    expect(screen.getByTestId("reminder-readiness")).toHaveTextContent("Africa/Cairo");
+    expect(screen.getByText(/Delivery after the browser closes/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Review location and timezone" }));
+    expect(onOpenLocation).toHaveBeenCalledOnce();
+    expect(screen.getByRole("button", { name: "Send a test notification" }).closest("section")).toContainElement(
+      screen.getByTestId("reminder-readiness"),
+    );
+  });
+
   it("refreshes permission after returning from browser settings without changing saved choices", () => {
     const notification = { permission: "denied", requestPermission: vi.fn() };
     Object.defineProperty(window, "Notification", { configurable: true, value: notification });

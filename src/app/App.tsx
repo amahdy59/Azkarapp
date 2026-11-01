@@ -712,6 +712,7 @@ function AppContent({
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
   const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
   const [remoteSyncReady, setRemoteSyncReady] = useState(false);
+  const [localSaveStatus, setLocalSaveStatus] = useState<"pending" | "saved" | "error">("pending");
   const [persistenceError, setPersistenceError] = useState(false);
   const [persistenceNoticeDismissed, setPersistenceNoticeDismissed] = useState(false);
 
@@ -1410,10 +1411,12 @@ function AppContent({
   ]);
 
   const handlePersistenceResult = useCallback((saved: boolean) => {
+    setLocalSaveStatus(saved ? "saved" : "error");
     setPersistenceError(!saved);
     if (saved) setPersistenceNoticeDismissed(false);
   }, []);
-  useAppStatePersistence(appStateSnapshot, handlePersistenceResult);
+  const handleSavePending = useCallback(() => setLocalSaveStatus("pending"), []);
+  useAppStatePersistence(appStateSnapshot, handlePersistenceResult, handleSavePending);
   /**
    * The Mushaf is a reading surface, not a screen with a menu bar.
    *
@@ -2494,6 +2497,9 @@ function AppContent({
               )}
               {view === "settings" && (
                 <SettingsScreen
+                  localSaveStatus={localSaveStatus}
+                  onRetrySave={() => handlePersistenceResult(saveAppState(appStateSnapshot))}
+                  onRetrySync={retrySync}
                   onReviewUpdate={hasWaitingUpdate ? handleReviewUpdate : undefined}
                   audioController={audioController}
                   themeMode={themeMode}
@@ -2741,7 +2747,7 @@ function AppContent({
                 body={t(selectedLang, "persistence.body")}
                 actionLabel={t(selectedLang, "persistence.retry")}
                 dismissLabel={t(selectedLang, "common.dismiss")}
-                onAction={() => setPersistenceError(!saveAppState(appStateSnapshot))}
+                onAction={() => handlePersistenceResult(saveAppState(appStateSnapshot))}
                 onDismiss={() => setPersistenceNoticeDismissed(true)}
               />
             ) : updateAvailable ? (

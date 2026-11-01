@@ -47,6 +47,22 @@ function openManagement(id: string) {
 }
 
 describe("DownloadsPanel", () => {
+  it("offers Resume download after failure when verified recordings remain", async () => {
+    const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
+    vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>
+      groups.map(() => ({ completed: 1, total: 4, remainingBytes: 2048 })),
+    );
+    audioMocks.download.mockRejectedValue(new AudioDownloadError("network", "connection lost"));
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const row = screen.getByTestId("offline-resource-adhkar");
+    const resume = await within(row).findByRole("button", { name: /Resume/ });
+    await waitFor(() => expect(resume).toBeEnabled());
+    fireEvent.click(resume);
+    await waitFor(() => expect(within(row).getByRole("button", { name: /Resume download/ })).toBeEnabled());
+    expect(row).toHaveTextContent("Partly downloaded");
+    expect(audioMocks.remove).not.toHaveBeenCalled();
+  });
+
   it.each(["ar", "en"] as const)("uses page-specific offline status in %s", async (language) => {
     render(<DownloadsPanel language={language} onBack={vi.fn()} />);
     const row = screen.getByTestId("offline-resource-mushaf");

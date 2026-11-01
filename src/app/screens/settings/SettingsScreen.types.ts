@@ -15,6 +15,9 @@ import type { ProgressRange } from "../../progressDashboard";
 
 /** The screen's application-facing contract, kept separate from its responsive panel composition. */
 export interface SettingsScreenProps {
+  localSaveStatus?: "pending" | "saved" | "error";
+  onRetrySave?: () => void;
+  onRetrySync?: () => void;
   onReviewUpdate?: () => void;
   audioController: AudioController | null;
   themeMode: ThemeMode;
