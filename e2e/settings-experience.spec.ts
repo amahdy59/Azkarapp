@@ -213,7 +213,7 @@ test("launch-critical settings screens are discoverable and accessible", async (
     await page.getByRole("button", { name: destination.row }).click();
     await expect(page.getByRole("heading", { name: destination.heading, exact: true })).toBeVisible();
     await expectNoWcagViolations(page);
-    const backBtn = page.getByRole("button", { name: "Back" });
+    const backBtn = page.getByRole("button", { name: "Back", exact: true });
     if (await backBtn.isVisible()) {
       await backBtn.click();
     }

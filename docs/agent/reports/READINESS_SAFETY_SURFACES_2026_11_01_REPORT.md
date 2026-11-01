@@ -79,3 +79,7 @@ Header audit retained intentional sticky app/Settings/Library/Progress surfaces 
 ## Recommended next step
 
 Execute the physical-device/comprehension checklist and collect representative field samples before additional startup-cache or Home hierarchy changes.
+
+## Local hook correction
+
+The first full check passed in 138.3s, including coverage and all budgets. The tracked push hook reused that exact-content receipt and passed frozen install; its browser smoke returned 27 passed/1 failed. The existing non-exact “Back” lookup matched both “backup” actions in the new Account summary instead of a navigation action. Use the exact accessible navigation name; retain the original visibility, navigation and axe checks. No push occurred. Targeted reproduction and a fresh final-content check/hook follow; exact outcomes are in the generated release report.
