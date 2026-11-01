@@ -3,13 +3,13 @@
     "release": "2026-11-01.7",
     "ar": [
       "أزرار المجموعات والمحفوظات في المكتبة بمحاذاة أدق مع العنوان على الهاتف.",
-      "مسافات متوازنة داخل أزرار الاختيار المستديرة مع الاحتفاظ بمساحة لمس مريحة.",
-      "محاذاة أوضح عند تكبير النص بالعربية والإنجليزية، مع بقاء البحث والفلاتر سهلة الوصول."
+      "أزرار مشاركة الآيات تحافظ على حجمها المناسب عند تكبير النص دون امتداد خارج الشاشة.",
+      "أزرار اختيار مستديرة بمسافات متوازنة ومظهر متناسق، مع وصول واضح باللمس ولوحة المفاتيح."
     ],
     "en": [
       "Library Collections and Saved choices align more precisely with the title on phones.",
-      "Rounded choices keep balanced inner spacing and comfortable touch targets.",
-      "Clearer alignment with enlarged Arabic and English text, while search and filters remain easy to reach."
+      "Ayah-sharing icon actions keep their intended size with enlarged text, without overflowing the screen.",
+      "Rounded choices retain balanced spacing, consistent surfaces and clear touch and keyboard access."
     ]
   },
   {

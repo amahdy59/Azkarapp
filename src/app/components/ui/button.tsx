@@ -26,7 +26,7 @@ const buttonVariants = cva(
         default: "min-h-11 px-4 py-2",
         sm: "min-h-11 gap-1.5 px-3 py-2",
         lg: "min-h-12 px-6 py-2",
-        icon: "ui-icon-button size-11 gap-0 rounded-full p-0",
+        icon: "size-11 gap-0 rounded-full p-0",
       },
     },
     defaultVariants: {
@@ -45,7 +45,7 @@ const Button = React.forwardRef<
 >(function Button({ className, variant, size, asChild = false, ...props }, ref) {
   const Comp = asChild ? Slot : "button";
 
-  return <Comp ref={ref} data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+  return <Comp ref={ref} data-slot="button" data-press-compact={size === "icon" || undefined} className={cn(buttonVariants({ variant, size, className }))} {...props} />;
 });
 
 export { Button, buttonVariants };

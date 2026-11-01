@@ -6,15 +6,15 @@ Repair the exact-commit CI responsive alignment regression while retaining the r
 
 ## Scope completed
 
-The Library title/tab row now centres its children. The inset track retains its border/padding and 44px options. The old track-equals-option-height assertion is replaced by symmetric measured insets; exact title/icon centres, equal options, widths, control spacing, no overflow and keyboard behavior remain asserted at 320/390px and 100/200% text in Arabic/English.
+The compact Library title reserves the same minimum footprint as the inset tab track, preserving the shared title top. The inset track retains its border/padding and 44px options. The old track-equals-option-height assertion is replaced by symmetric measured insets; exact title/icon centres, equal options, widths, control spacing, no overflow and keyboard behavior remain asserted at 320/390px and 100/200% text in Arabic/English.
 
 ## Files changed
 
-src/app/screens/AzkarLibraryScreen.tsx, e2e/responsive.spec.ts, public/release-notes.json, archived release history and this phase's brief/report. No content, persistence, notification or calculation code changes.
+Library/progress screen styles, Button icon feedback, e2e/responsive.spec.ts, e2e/glass-refinement.spec.ts, public/release-notes.json, archived release history and this phase's brief/report. No content, persistence, notification or calculation code changes.
 
 ## Components added or modified
 
-One existing Library flex row changes from start to centre alignment. No new component, dependency, listener or animation is introduced.
+Compact Library title height matches the track; the adjacent Progress date field receives matching vertical insets. Icon-sized Button uses data-press-compact for motion without inheriting ui-icon-button minimum dimensions. The Glass test checks the actual context-inherited muted token. No new component, dependency, listener or animation is introduced.
 
 ## User-visible changes
 
@@ -55,7 +55,7 @@ Complete exact-commit CI and both hosting production checks remain required. Phy
 
 ## Out-of-scope findings
 
-No other product change is included in this remediation.
+Completed Chromium/Firefox/WebKit logs also identified enlarged Ayah-sharing icon overflow and adjacent Progress control misalignment. Both are repaired through existing geometry/feedback recipes. Enlarged Ayah-sharing passed all six original bilingual/engine cases; full page-layout, Glass and protected-dropdown assertions are retained.
 
 ## Recommended next step
 

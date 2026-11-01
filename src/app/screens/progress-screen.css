@@ -46,6 +46,10 @@
   .progress-range-toolbar > .progress-select-field {
     display: grid;
   }
+  .progress-date-filter {
+    /* Align the actual field with the options inside the adjacent pill track. */
+    padding-block: calc(0.25rem + 1px);
+  }
   .progress-range-toolbar > .progress-select-field > label {
     position: absolute;
     inline-size: 1px;

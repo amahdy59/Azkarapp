@@ -179,7 +179,18 @@ for (const [language, width] of [
         for (const content of [header.locator(".progress-range-toolbar"), header.getByRole("tablist")]) {
           await expect(content).toBeVisible();
           await expect(content).toHaveCSS("backdrop-filter", "none");
-          await expect(content).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+          if ((await content.getAttribute("role")) === "tablist") {
+            await expect(content).toHaveClass(/choice-pill/);
+            const muted = await content.evaluate((node) => {
+              const probe = document.createElement("span");
+              probe.style.backgroundColor = "var(--muted)";
+              node.append(probe);
+              const color = getComputedStyle(probe).backgroundColor;
+              probe.remove();
+              return color;
+            });
+            await expect(content).toHaveCSS("background-color", muted);
+          } else await expect(content).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
         }
       }
       await header.evaluate((node) => {

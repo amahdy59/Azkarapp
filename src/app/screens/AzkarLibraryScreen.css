@@ -7,6 +7,10 @@
 
 /* Load this mobile-only presentation with the Library, outside the app shell CSS. */
 @media (width < 40rem) {
+  .library-stationary-header .page-title {
+    /* Reserve the same inset-track height without moving the common title top. */
+    min-block-size: calc(var(--ds-control-height-compact) + 0.5rem + 2px);
+  }
   .library-section-tabs {
     grid-template-columns: repeat(2, var(--ds-control-height-compact));
     align-self: stretch;
