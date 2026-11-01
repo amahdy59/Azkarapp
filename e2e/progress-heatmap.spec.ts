@@ -65,6 +65,17 @@ for (const language of ["ar", "en"] as const) {
       await page.screenshot({ path: info.outputPath(`heatmap-${language}-${width}.png`) });
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    await recorded.click();
+    const dateSheet = page.getByTestId("progress-date-sheet");
+    await expect(dateSheet).toBeVisible();
+    await expect(dateSheet.getByRole("status")).toContainText(language === "ar" ? "٢ من ٣" : "2 of 3");
+    expect(
+      (await new AxeBuilder({ page }).include('[data-testid="progress-date-sheet"]').analyze()).violations,
+    ).toEqual([]);
+    await page.screenshot({ path: info.outputPath(`heatmap-${language}-phone-details.png`) });
+    await page.keyboard.press("Escape");
+    await expect(dateSheet).toBeHidden();
+    await expect(recorded).toBeFocused();
     await page.getByTestId("progress-metric-routines").getByRole("button").click();
     await expect(page.getByTestId("recording-time-column")).toHaveCount(29);
     await chooseProgressOption(
@@ -99,14 +110,29 @@ for (const language of ["ar", "en"] as const) {
     expect(box.height).toBeGreaterThanOrEqual(44);
     await target.click();
     await expect(target).toHaveAttribute("aria-pressed", "true");
-    // Native focus must reveal dates horizontally as well as beneath the
-    // sticky controls. A roving focus target cannot remain outside its viewport.
+    await expect(dateSheet).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dateSheet).toBeHidden();
+    await expect(target).toBeFocused();
+    // Every date must fit horizontally; no hidden swipe is required.
+    expect(await heatmap.locator(".heatmap-scroll").evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(
+      true,
+    );
+    expect(
+      await heatmap.locator("[data-day]:not(:disabled)").evaluateAll((nodes) =>
+        nodes.every((node) => {
+          const box = node.getBoundingClientRect();
+          const grid = node.closest(".heatmap-scroll")!.getBoundingClientRect();
+          return box.width >= 44 && box.height >= 44 && box.left >= grid.left && box.right <= grid.right;
+        }),
+      ),
+    ).toBe(true);
     for (let step = 0; step < 3; step++) await page.keyboard.press(language === "ar" ? "ArrowRight" : "ArrowLeft");
     const focused = heatmap.locator('[data-day="2026-10-16"]');
     await expect(focused).toBeFocused();
     const visible = await focused.evaluate((node) => {
       const bounds = node.getBoundingClientRect();
-      const viewport = node.closest(".progress-heatmap-scroll")!.getBoundingClientRect();
+      const viewport = node.closest(".heatmap-scroll")!.getBoundingClientRect();
       return bounds.left >= viewport.left - 1 && bounds.right <= viewport.right + 1;
     });
     expect(visible).toBe(true);
@@ -122,7 +148,7 @@ test("Progress calendar marks future and unknown goals and bounds long ranges @c
   await expect(heatmap.getByRole("button", { name: "November", exact: true })).toBeDisabled();
   await heatmap.getByRole("button", { name: "January", exact: true }).click();
   await expect(heatmap.getByRole("button", { name: "Previous calendar month" })).toBeDisabled();
-  await chooseProgressOption(heatmap.getByRole("combobox", { name: "Calendar practice" }), "quranGoals");
+  await chooseProgressOption(heatmap.getByRole("combobox", { name: "Activity" }), "quranGoals");
   await expect(heatmap.locator('[data-day="2026-01-01"]')).toHaveAttribute("data-kind", "unavailable");
   await expect(heatmap.locator('[data-day="2026-01-01"]')).toHaveAccessibleName(/Unavailable/);
   await heatmap.getByRole("button", { name: "October", exact: true }).click();

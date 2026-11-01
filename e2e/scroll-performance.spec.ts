@@ -100,7 +100,7 @@ for (const width of [390, 1440]) {
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
     const observations = [];
     for (const route of ["home", "azkar", "progress", "settings"]) {
-      await page.goto("/#/" + route);
+      await page.goto("/#/" + (route === "progress" ? "progress/day" : route));
       if (route === "progress") {
         // The focused overview now fits on desktop. Inspect real optional
         // prayer details to exercise scrolling without inventing tall content.

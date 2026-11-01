@@ -1,4 +1,5 @@
 import { sharingStep } from "./helpers/sharing";
+import { chooseProgressDetail } from "./helpers/progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
@@ -17,7 +18,10 @@ for (const language of ["ar", "en"] as const) {
         }),
       );
     }, language);
-    await page.goto("/#/progress");
+    await page.goto("/#/progress/day");
+    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+    await chooseProgressDetail(page, "reflection");
+    await page.getByTestId("oasis-stage-card").locator(":scope > summary").click();
     await page
       .getByRole("button", { name: language === "ar" ? "مشاركة بطاقة التقدم" : "Share Progress Card", exact: true })
       .click();

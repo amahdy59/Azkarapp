@@ -62,7 +62,9 @@ for (const language of ["ar", "en"] as const) {
           ),
         ).toBe(true);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
-        await pattern.scrollIntoViewIfNeeded();
+        // A reflowed month can be taller than the viewport. Reveal its title,
+        // rather than asking WebKit to centre the entire oversized section.
+        await pattern.getByRole("heading", { level: 2 }).scrollIntoViewIfNeeded();
         expect(await pattern.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
         await page.screenshot({
           path: info.outputPath(`progress-${language}-${width}-${enlarged ? "200" : "100"}.png`),

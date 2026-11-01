@@ -220,6 +220,7 @@ describe("ProgressScreen", () => {
 
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "مشاركة بطاقة التقدم" })).not.toBeInTheDocument();
     openDetailedContext();
     expect(screen.getByTestId("progress-prayer-group")).toBeInTheDocument();
     await chooseDetail("reflection");
@@ -239,7 +240,9 @@ describe("ProgressScreen", () => {
     expect(screen.getByText("النخيل المثمر")).toBeInTheDocument();
 
     // The owner removed the visible header actions; semantic title remains.
-    expect(screen.queryByRole("button", { name: "مشاركة بطاقة التقدم" })).not.toBeInTheDocument();
+    expect(
+      within(screen.getByTestId("progress-sticky-controls")).queryByRole("button", { name: "مشاركة بطاقة التقدم" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "التقدم", exact: true })).toHaveClass("sr-only");
     expect(onOpenShareModal).not.toHaveBeenCalled();
 
@@ -279,6 +282,9 @@ describe("ProgressScreen", () => {
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByText("Garden and past milestones")).toBeInTheDocument();
     expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
+    (screen.getByTestId("oasis-stage-card") as HTMLDetailsElement).open = true;
+    fireEvent.click(screen.getByRole("button", { name: "Share Progress Card" }));
+    expect(onOpenShareModal).toHaveBeenCalledOnce();
     await chooseDetail("routines");
     expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
     expect(screen.getByText("Daily wird records")).toBeInTheDocument();

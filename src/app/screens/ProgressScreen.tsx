@@ -299,9 +299,15 @@ export function ProgressScreen({
           target === event.currentTarget
         )
           return;
-        if (controls.contains(target)) return;
         const viewport = event.currentTarget;
         const reveal = () => {
+          if (controls.contains(target)) {
+            const bounds = controls.getBoundingClientRect();
+            const focused = target.getBoundingClientRect();
+            if (focused.bottom > bounds.bottom - 4) controls.scrollTop += focused.bottom - bounds.bottom + 4;
+            else if (focused.top < bounds.top + 4) controls.scrollTop -= bounds.top + 4 - focused.top;
+            return;
+          }
           const controlsBottom = controls.getBoundingClientRect().bottom;
           const viewportBottom = viewport.getBoundingClientRect().bottom;
           const context = target.closest<HTMLElement>("[data-progress-focus-context]");
@@ -330,7 +336,7 @@ export function ProgressScreen({
       }}
       screenName={t(language, "common.progress")}
     >
-      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 max-w-7xl flex-col items-center px-page pb-8">
+      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 flex-col items-center pb-8">
         <h1 className="sr-only">{t(language, "common.progress")}</h1>
         <div
           ref={controlsRef}
@@ -338,56 +344,57 @@ export function ProgressScreen({
           className="progress-screen-controls w-full"
           data-testid="progress-sticky-controls"
         >
-          <ProgressRangeToolbar
-            period={customRange ? "custom" : activeTab}
-            range={selectedRange}
-            today={civilToday}
-            language={language}
-            calendar={calendarType}
-            onPeriod={handleTabChange}
-            onCustom={setCustomRange}
-          />
-          <TabList
-            value={view}
-            onChange={(next) => {
-              if (next === view) return;
-              setView(next);
-              setDetailsOpen(false);
-              const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
-              if (viewport) viewport.scrollTop = 0;
-            }}
-            tabs={(["overview", "trends", "records"] as const).map((value) => ({
-              value,
-              label: (
-                <span
-                  className="flex items-center justify-center gap-2"
-                  style={{ color: value === view ? "var(--primary-foreground)" : "inherit" }}
-                >
-                  {value === "overview" ? (
-                    <BarChart3 size={18} className="progress-tab-icon" aria-hidden="true" />
-                  ) : value === "trends" ? (
-                    <Sprout size={18} className="progress-tab-icon" aria-hidden="true" />
-                  ) : (
-                    <FileText size={18} className="progress-tab-icon" aria-hidden="true" />
-                  )}
-                  {dashboardText(language, `view_${value}`)}
-                </span>
-              ),
-              testId: `progress-tab-${value}`,
-            }))}
-            direction={direction}
-            idPrefix={viewId}
-            aria-label={dashboardText(language, "views")}
-            className="progress-view-tabs mt-3 mb-1 grid grid-cols-3 gap-2"
-            itemClassName={(selected) =>
-              `min-h-11 min-w-0 rounded-xl border border-border-control px-2 py-2 text-xs font-bold progress-focus ${selected ? "text-primary-foreground" : "bg-card text-foreground"}`
-            }
-            indicatorClassName="rounded-xl bg-primary shadow-xs"
-          />
+          <div className="progress-controls-inner">
+            <ProgressRangeToolbar
+              period={customRange ? "custom" : activeTab}
+              range={selectedRange}
+              today={civilToday}
+              language={language}
+              calendar={calendarType}
+              onPeriod={handleTabChange}
+              onCustom={setCustomRange}
+            />
+            <TabList
+              value={view}
+              onChange={(next) => {
+                if (next === view) return;
+                setView(next);
+                setDetailsOpen(false);
+                const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
+                if (viewport) viewport.scrollTop = 0;
+              }}
+              tabs={(["overview", "trends", "records"] as const).map((value) => ({
+                value,
+                label: (
+                  <span
+                    className="flex items-center justify-center gap-2"
+                    style={{ color: value === view ? "var(--primary-foreground)" : "inherit" }}
+                  >
+                    {value === "overview" ? (
+                      <BarChart3 size={18} className="progress-tab-icon" aria-hidden="true" />
+                    ) : value === "trends" ? (
+                      <Sprout size={18} className="progress-tab-icon" aria-hidden="true" />
+                    ) : (
+                      <FileText size={18} className="progress-tab-icon" aria-hidden="true" />
+                    )}
+                    {dashboardText(language, `view_${value}`)}
+                  </span>
+                ),
+                testId: `progress-tab-${value}`,
+              }))}
+              direction={direction}
+              idPrefix={viewId}
+              aria-label={dashboardText(language, "views")}
+              className="progress-view-tabs mt-3 mb-1 grid grid-cols-3 gap-2"
+              itemClassName={(selected) =>
+                `min-h-11 min-w-0 rounded-xl border border-border-control px-2 py-2 text-xs font-bold progress-focus ${selected ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`
+              }
+            />
+          </div>
         </div>
 
         <div
-          className="w-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="w-full max-w-7xl px-page outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           {...tabPanelProps(viewId, view)}
         >
           <ProgressDashboard
@@ -717,7 +724,6 @@ function ProgressDetails({
         language={language}
         icon={SlidersHorizontal}
       />
-      <p className="sr-only">{dashboardText(language, "detailHelp")}</p>
       {!customRange && activeTab !== "last30" ? (
         <>
           {/* Supporting reflection stays inside optional context. */}
@@ -912,6 +918,13 @@ function ProgressDetails({
                     <Sparkles className="size-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
                     <span dir="auto">{t(language, "progress.recordedPracticeReflection")}</span>
                   </div>
+                  <button
+                    type="button"
+                    onClick={onOpenShareModal}
+                    className="mt-4 min-h-11 rounded-lg border border-border-control px-4 py-2 text-sm font-semibold progress-focus"
+                  >
+                    {t(language, "progress.shareProgressCard")}
+                  </button>
                 </div>
                 {/* 7-Day Rhythm Strip */}
                 <div className="border-t border-border px-4 py-3 sm:px-5">

@@ -560,7 +560,7 @@ for (const language of ["ar", "en"] as const) {
   });
 }
 
-test("shared screen headers stay opaque after scrolling without changing Home", async ({ page }) => {
+test("Progress toolbar stays opaque after scrolling without changing Home", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 });
   await enterEnglishGuestMode(page);
 
@@ -578,7 +578,11 @@ test("shared screen headers stay opaque after scrolling without changing Home", 
     surface.dispatchEvent(new Event("scroll"));
   });
   await expect(header).toHaveAttribute("data-scrolled", "true");
-  await expect(header.getByTestId("shared-screen-header")).toHaveClass(/bg-background/);
+  await expect(header.getByRole("combobox", { name: "Date range", exact: true })).toBeVisible();
+  await expect(header.getByRole("tablist")).toBeVisible();
+  const background = await header.evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(background).not.toBe("transparent");
+  expect(background).not.toMatch(/rgba\([^)]*,\s*(?:0|0?\.\d+)\s*\)/);
   await expect(header).toHaveCSS(
     "background-color",
     await page.locator(".app-screen-surface").evaluate((surface) => getComputedStyle(surface).backgroundColor),

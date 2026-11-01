@@ -1,3 +1,7 @@
+## Progress mobile access and scroll protection — 2026-11-01
+
+The owner's correction supersedes transparent/frost-only Progress chrome: use an opaque theme surface across the complete scrollport and gutters, with a centred inner row for range/tabs. Narrow or enlarged heatmaps reflow into weekday-labelled date tiles, retain 44px targets and reveal exact records in the phone's shared closable sheet. Larger calendars retain weekday alignment and inline date detail. Fixed swatches explain intensity; date and count/denominator have distinct type roles. No hidden sideways gesture is required to reach dates.
+
 ## Progress calendar hierarchy — 2026-11-01
 
 The owner-approved heatmap refinement replaces the recording strip and duplicated latest-day card. Retain four compact independent summaries in the approved 2×2 group, a dominant selected-practice recording calendar with date details, compact same-scale routine bars and at most one subordinate factual insight. The optional routine doughnut partitions saved morning/evening/bedtime completions only. Never combine prayers, pages and routine counts into a score or pie.

@@ -12,8 +12,10 @@ import {
 } from "../progressDashboard";
 import { progressHeatmapDay, progressHeatmapGrid, type HeatmapDay, type HeatmapMetric } from "../progressHeatmap";
 import type { AppLanguage } from "../types";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { Calendar, ChevronLeft, ChevronRight } from "./icons";
 import { ProgressSelectField } from "./ProgressSelectField";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 
 const practices: readonly HeatmapMetric[] = ["routines", "prayers", "pages", "quranGoals"];
 
@@ -39,6 +41,8 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
   displayDate: Date;
 }) {
   const id = useId();
+  const compact = useMediaQuery("(max-width: 599px)");
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [metric, setMetric] = useState<HeatmapMetric>("routines");
   const window = metricProgressRange(range, metric, now, dayStart, false, currentDay);
   const applied = currentDay ? window : range;
@@ -83,28 +87,13 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
     [language, calendar],
   );
   const dateLabel = (key: string) => fullDateFormat.format(new Date(`${key}T12:00:00`));
-  const numberFormat = useMemo(
-    () =>
-      new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
-        day: "numeric",
-        calendar: calendar === "hijri" ? "islamic-umalqura" : "gregory",
-      }),
-    [language, calendar],
-  );
-  const monthFormat = useMemo(
-    () =>
-      new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
-        month: "short",
-        calendar: calendar === "hijri" ? "islamic-umalqura" : "gregory",
-      }),
-    [language, calendar],
-  );
   const weekdays = useMemo(
     () =>
       Array.from({ length: 7 }, (_, index) => {
         const date = new Date(2026, 9, language === "ar" ? 17 + index : 18 + index, 12);
         return {
           short: new Intl.DateTimeFormat(language, { weekday: "narrow" }).format(date),
+          label: new Intl.DateTimeFormat(language, { weekday: "short" }).format(date),
           full: new Intl.DateTimeFormat(language, { weekday: "long" }).format(date),
         };
       }),
@@ -122,6 +111,36 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
   };
   const Previous = language === "ar" ? ChevronRight : ChevronLeft;
   const Next = language === "ar" ? ChevronLeft : ChevronRight;
+  const details = (
+    <section
+      className="progress-date-details"
+      data-testid="progress-date-details"
+      aria-labelledby={`${id}-date-heading`}
+    >
+      <h3 id={`${id}-date-heading`} className="text-base font-bold">
+        <time dateTime={selectedKey}>{dateLabel(selectedKey)}</time>
+      </h3>
+      <p className="my-3 text-sm" role="status" aria-atomic="true">
+        {text(language, metric)}: <bdi className="font-bold">{value(selected)}</bdi>
+      </p>
+      <dl className="divide-y divide-border">
+        {practices
+          .filter((key) => key !== metric)
+          .map((key) => (
+            <div key={key} className="progress-date-detail-row">
+              <dt>{text(language, `short_${key}`)}</dt>
+              <dd className="font-semibold">
+                <bdi>{value(day(selectedKey, key))}</bdi>
+              </dd>
+            </div>
+          ))}
+      </dl>
+    </section>
+  );
+  const scale =
+    metric === "pages"
+      ? ["0", "1–4", "5–10", "11–20", "21+"]
+      : Array.from({ length: metric === "prayers" ? 6 : metric === "routines" ? 4 : 2 }, (_, count) => String(count));
   return (
     <section
       className="progress-summary-card progress-heatmap"
@@ -129,7 +148,7 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
       data-testid="progress-heatmap"
       aria-labelledby={`${id}-heading`}
     >
-      <div className="progress-heatmap-heading">
+      <div className="heatmap-heading">
         <div className="min-w-0">
           <h2 id={`${id}-heading`} className="text-lg font-bold">
             {text(language, "heatmap")}
@@ -167,10 +186,10 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
           })}
         </div>
       )}
-      <div className="progress-heatmap-layout">
+      <div className="heatmap-layout">
         <div className="min-w-0">
           {grid.long ? (
-            <div className="progress-heatmap-month-nav">
+            <div className="heatmap-month-nav">
               <button
                 type="button"
                 className="progress-month-button progress-focus"
@@ -196,33 +215,28 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
           ) : (
             <p className="my-3 text-sm font-semibold">{formatProgressRange(applied, language, calendar)}</p>
           )}
-          {/* This labelled viewport provides native keyboard scrolling for enlarged calendars. */}
-          <div
-            role="region"
-            aria-label={text(language, "heatmapDates")}
-            aria-describedby={`${id}-help`}
-            className="progress-heatmap-scroll progress-focus"
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-            tabIndex={0}
-          >
-            <div className="progress-heatmap-calendar">
-              <div className="progress-heatmap-grid mb-2" aria-hidden="true">
+          <div className="heatmap-scroll progress-focus">
+            <div className="heatmap-calendar">
+              <div className="heatmap-grid heatmap-weekdays mb-2" aria-hidden="true">
                 {weekdays.map(({ short, full }, index) => (
                   <span key={index} className="text-center text-xs font-semibold">
                     <abbr title={full}>{short}</abbr>
                   </span>
                 ))}
               </div>
-              <div className="progress-heatmap-grid" role="group" aria-label={text(language, "heatmapDates")}>
+              <div
+                className="heatmap-grid"
+                role="group"
+                aria-label={text(language, "heatmapDates")}
+                aria-describedby={`${id}-help`}
+              >
                 {grid.days.map((key) => {
                   const entry = day(key);
                   const disabled = entry.kind === "outside" || entry.kind === "future";
                   const date = new Date(`${key}T12:00:00`);
-                  const monthStart =
-                    numberFormat
-                      .formatToParts(date)
-                      .find((part) => part.type === "day")
-                      ?.value.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit))) === "1";
+                  const parts = fullDateFormat.formatToParts(date);
+                  const number = parts.find((part) => part.type === "day")!.value;
+                  const monthStart = number.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit))) === "1";
                   return (
                     <button
                       key={key}
@@ -231,19 +245,27 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
                       data-day={key}
                       data-kind={entry.kind}
                       data-level={entry.level}
-                      className="progress-heatmap-day progress-focus"
+                      className="heatmap-day progress-focus"
                       disabled={disabled}
                       aria-pressed={key === selectedKey && !disabled}
                       aria-label={`${dateLabel(key)} · ${text(language, metric)}: ${value(entry)}`}
+                      aria-haspopup={compact ? "dialog" : undefined}
                       tabIndex={key === selectedKey || (disabled && !enabledKeys.length) ? 0 : -1}
-                      onClick={() => setSelection(key)}
+                      onClick={() => {
+                        setSelection(key);
+                        if (compact) setDetailsOpen(true);
+                      }}
                       onKeyDown={(event) => {
                         const index = enabledKeys.indexOf(key);
+                        const columns =
+                          getComputedStyle(event.currentTarget.parentElement!)
+                            .gridTemplateColumns.split(" ")
+                            .filter(Boolean).length || 7;
                         const delta =
                           event.key === "ArrowDown"
-                            ? 7
+                            ? columns
                             : event.key === "ArrowUp"
-                              ? -7
+                              ? -columns
                               : event.key === "ArrowRight"
                                 ? language === "ar"
                                   ? -1
@@ -268,14 +290,23 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
                         }
                       }}
                     >
+                      <span className="heatmap-weekday" aria-hidden="true">
+                        {weekdays[(date.getDay() + (language === "ar" ? 1 : 0)) % 7]?.label}
+                      </span>
                       <time dateTime={key}>
-                        {numberFormat.format(date)}
+                        {number}
                         {(monthStart || key === applied.startKey) && (
-                          <span className="progress-heatmap-month-label">{monthFormat.format(date)}</span>
+                          <span className="heatmap-month-label">
+                            {parts.find((part) => part.type === "month")!.value}
+                          </span>
                         )}
                       </time>
-                      <span className="progress-heatmap-count" aria-hidden="true">
-                        {entry.value === null ? "—" : formatNumerals(entry.value, language)}
+                      <span className="heatmap-count" aria-hidden="true">
+                        {entry.value === null
+                          ? "—"
+                          : entry.possible === null
+                            ? formatNumerals(entry.value, language)
+                            : `${formatNumerals(entry.value, language)}/${formatNumerals(entry.possible, language)}`}
                       </span>
                     </button>
                   );
@@ -283,38 +314,41 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
               </div>
             </div>
           </div>
+          <div className="heatmap-scale" aria-hidden="true">
+            {scale.map((label, index) => (
+              <span key={label}>
+                <i
+                  className="heatmap-day"
+                  data-level={metric === "pages" ? index : Math.ceil((index / (scale.length - 1)) * 4)}
+                />
+                {formatNumerals(label, language)}
+              </span>
+            ))}
+          </div>
           <p className="mt-3 progress-help" data-testid="progress-heatmap-legend">
             {text(language, metric === "pages" ? "pageHeatmapLegend" : "heatmapLegend")}
           </p>
         </div>
-        <section
-          className="progress-date-details"
-          data-testid="progress-date-details"
-          aria-labelledby={`${id}-date-heading`}
-        >
-          <h3 id={`${id}-date-heading`} className="text-base font-bold">
-            {text(language, "selectedDay")}
-          </h3>
-          <p className="mt-2 text-sm font-semibold">
-            <time dateTime={selectedKey}>{dateLabel(selectedKey)}</time>
-          </p>
-          <p className="my-3 text-sm" role="status" aria-atomic="true">
-            {text(language, metric)}: <bdi className="font-bold">{value(selected)}</bdi>
-          </p>
-          <dl className="divide-y divide-border">
-            {practices
-              .filter((key) => key !== metric)
-              .map((key) => (
-                <div key={key} className="progress-date-detail-row">
-                  <dt>{text(language, `short_${key}`)}</dt>
-                  <dd className="font-semibold">
-                    <bdi>{value(day(selectedKey, key))}</bdi>
-                  </dd>
-                </div>
-              ))}
-          </dl>
-        </section>
+        {!compact && details}
       </div>
+      {compact && (
+        <ResponsiveSheet
+          open={detailsOpen}
+          onClose={() => setDetailsOpen(false)}
+          title={text(language, "selectedDay")}
+          language={language}
+          direction={language === "ar" ? "rtl" : "ltr"}
+          testId="progress-date-sheet"
+          focusOnOpen
+        >
+          <SheetHeader
+            title={text(language, "selectedDay")}
+            onClose={() => setDetailsOpen(false)}
+            language={language}
+          />
+          <div className="overflow-y-auto p-4">{details}</div>
+        </ResponsiveSheet>
+      )}
     </section>
   );
 });

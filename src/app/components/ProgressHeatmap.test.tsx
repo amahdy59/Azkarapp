@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { chooseProgressOption } from "../../test/progressSelect";
 import { ProgressHeatmap } from "./ProgressHeatmap";
 import { indexProgressDashboard } from "../progressDashboard";
@@ -28,6 +28,17 @@ const props = {
 };
 
 describe("ProgressHeatmap", () => {
+  it("moves by the rendered date columns when a narrow calendar reflows", () => {
+    render(<ProgressHeatmap {...props} />);
+    const grid = screen.getByRole("group", { name: "Recording dates" });
+    const start = grid.querySelector<HTMLButtonElement>('[data-day="2026-10-19"]')!;
+    fireEvent.click(start);
+    const styles = vi.spyOn(window, "getComputedStyle");
+    styles.mockReturnValueOnce({ gridTemplateColumns: "60px 60px 60px" } as CSSStyleDeclaration);
+    fireEvent.keyDown(start, { key: "ArrowUp" });
+    expect(grid.querySelector('[data-day="2026-10-16"]')).toHaveFocus();
+    styles.mockRestore();
+  });
   it.each(["en", "ar"] as const)("keeps physical keys, selected date and exact values coherent in %s", (language) => {
     render(<ProgressHeatmap {...props} language={language} />);
     const grid = screen.getByRole("group", { name: /Recording dates|تواريخ التسجيل/ });
@@ -45,12 +56,12 @@ describe("ProgressHeatmap", () => {
   });
   it("keeps unknown historical goals distinct from no saved completion and explains fixed page bands", async () => {
     render(<ProgressHeatmap {...props} />);
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Calendar practice" }), "quranGoals");
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Activity" }), "quranGoals");
     const past = screen.getByRole("button", { name: /19 Oct 2026.*Quran-goal days: Unavailable/ });
     expect(past).toHaveAttribute("data-kind", "unavailable");
     fireEvent.click(past);
     expect(within(screen.getByTestId("progress-date-details")).getByRole("status")).toHaveTextContent("Unavailable");
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Calendar practice" }), "pages");
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Activity" }), "pages");
     expect(screen.getByTestId("progress-heatmap-legend")).toHaveTextContent("1–4 · 5–10 · 11–20 · 21+");
     expect(screen.getByTestId("progress-date-details")).toHaveTextContent("2 pages");
   });

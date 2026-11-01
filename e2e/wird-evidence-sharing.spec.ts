@@ -90,7 +90,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(opener).toBeFocused();
       await page.screenshot({ path: testInfo.outputPath(`wird-evidence-${language}.png`) });
       if (section === "quran") {
-        await page.goto("/#/progress");
+        await page.goto("/#/progress/day");
         await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
         await chooseProgressDetail(page, "reflection");
         await page.getByTestId("oasis-stage-card").locator("summary").click();

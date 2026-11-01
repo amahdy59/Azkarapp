@@ -28,7 +28,7 @@ for (const language of ["ar", "en"] as const) {
               : page.locator(".app-main .shared-screen-header").first();
       await expect(header).toBeVisible();
       await expect(page.getByTestId("app-scene").locator("img")).toBeVisible();
-      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("background-color", route === "progress" ? /^rgb\(/ : "rgba(0, 0, 0, 0)");
       await expect(header).toHaveCSS("backdrop-filter", "none");
       await expect(sidebar).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       if (route === "home") {

@@ -1,12 +1,14 @@
 {
-  "release": "2026-11-01.2",
+  "release": "2026-11-01.3",
   "ar": [
-    "استكشف تقويم تسجيلاتك بالفأرة ولوحة المفاتيح، مع بقاء التاريخ المختار ظاهرًا عند تكبير النص.",
+    "يبقى نطاق التاريخ والتبويبات واضحين أثناء التمرير، دون ظهور السجلات خلفهما.",
+    "تصفح تقويم التسجيلات دون تمرير جانبي، واضغط على تاريخ لعرض تفاصيله على الهاتف.",
     "تفتح صفحة التقدم على آخر ٣٠ يومًا، ببطاقات مختصرة وفترة وتبويبات متجاورة على الشاشات الكبيرة.",
     "قارن الأوراد بالأشرطة وتوزيع السجلات، واختر الأعمدة أو الخطوط وصدّر بيانات الفترة كاملة."
   ],
   "en": [
-    "Explore recording dates by pointer or keyboard, with the focused date staying visible under enlarged text.",
+    "Date controls and tabs stay clear while scrolling, with records fully covered behind them.",
+    "Browse recording dates without sideways scrolling, and tap a date for its details on your phone.",
     "Progress starts with the last 30 days, compact summaries and adjacent tablet/desktop filters and tabs.",
     "Compare routine bars and breakdowns, switch chart styles and export exact records for the whole selected period."
   ]

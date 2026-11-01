@@ -189,8 +189,7 @@
         .bottom-nav,
         [data-material-ui] header,
         [data-material-ui] .shared-screen-header,
-        [data-material-ui] .settings-search-sticky,
-        [data-material-ui] .progress-screen-controls
+        [data-material-ui] .settings-search-sticky
       ) {
       background-color: var(--glass-reading-tint) !important;
       background-image: linear-gradient(
@@ -208,8 +207,7 @@
       :is(
         [data-material-ui] header[data-scrolled="true"],
         [data-material-ui] .shared-screen-header[data-scrolled="true"],
-        [data-material-ui] .settings-search-sticky[data-scrolled="true"],
-        [data-material-ui] .progress-screen-controls[data-scrolled="true"]
+        [data-material-ui] .settings-search-sticky[data-scrolled="true"]
       ) {
       backdrop-filter: var(--glass-chrome-frost) !important;
       border-bottom-color: rgb(255 255 255 / 0.07);
@@ -221,8 +219,7 @@
       :is(
         [data-material-ui] header,
         [data-material-ui] .shared-screen-header,
-        [data-material-ui] .settings-search-sticky,
-        [data-material-ui] .progress-screen-controls
+        [data-material-ui] .settings-search-sticky
       ):not([data-scrolled="true"]) {
       background: transparent !important;
       backdrop-filter: none !important;
@@ -235,31 +232,9 @@
       border-bottom: 0 !important;
       box-shadow: none !important;
     }
-    /* Progress keeps the scene/color unchanged. Only frost strengthens when
-       records pass behind the title, tabs and date navigation. */
+    /* Progress controls cover all moving records, including both page gutters. */
     html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] .progress-screen-controls {
-      background: transparent !important;
-      box-shadow: none !important;
-      inline-size: calc(100% + 2 * var(--spacing-page));
-      margin-inline: calc(-1 * var(--spacing-page));
-      padding-inline: var(--spacing-page);
-      padding-block-end: 1rem;
-    }
-    html[data-app-material-resolved="glass"]:not(.high-contrast) .progress-screen-controls .shared-screen-header {
-      background: transparent !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      border: 0 !important;
-      box-shadow: none !important;
-    }
-    /* Parent frost cannot mask its own children. Independently scrolling
-       filters need title frost too, with no additional tint or dark fill. */
-    html[data-app-material-resolved="glass"]:not(.high-contrast)
-      .progress-screen-controls
-      .shared-screen-header[data-scrolled="true"] {
-      background: transparent !important;
-      backdrop-filter: var(--glass-chrome-frost) !important;
-      -webkit-backdrop-filter: var(--glass-chrome-frost) !important;
+      --background: var(--on-media-surface);
     }
   }
 }

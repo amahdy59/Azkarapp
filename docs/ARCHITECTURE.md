@@ -1,5 +1,9 @@
 # Application architecture
 
+## Progress mobile and scrolling correction — 2026-11-01
+
+The owner supersedes the frost-only Progress header. One opaque full-scrollport sticky wrapper owns an unconstrained inner control row, protecting gutters and keeping enlarged controls reachable in its bounded scroll area. The body owns page gutters separately. Heatmap cells reflow through a named container query instead of horizontal scrolling; physical up/down keys follow actual rendered columns. Phone date activation opens exact records in ResponsiveSheet with native close/focus recovery, while wider layouts retain inline detail. Fixed colour scales and date/month exploration preserve the shared range and persisted data.
+
 ## Progress recording calendar and rolling range — 2026-11-01
 
 The approved heatmap refinement supersedes the separate seven-day presence strip/latest-day list. Unqualified Progress visits default to the typed `last30` rolling range; explicit `day`, `week`, `month`, `year` and `last30` links round-trip. A selected range owns Overview, Trends, Records and JSON export; heatmap date/month exploration never changes it. Last 30 days is thirty inclusive civil dates, with existing per-practice devotional/civil clipping and complete-day comparison rules applied afterwards.
