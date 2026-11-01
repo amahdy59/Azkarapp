@@ -190,7 +190,11 @@ test("launch-critical settings screens are discoverable and accessible", async (
   if (await locationBack.isVisible()) await locationBack.click();
   else await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-notifications").click();
-  await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "false");
+  const prayerReminder = page.getByRole("switch", { name: "Prayer-time reminders" });
+  await expect(prayerReminder).toHaveAttribute("aria-checked", "true");
+  await expect(page.locator("#prayer-reminder-lead")).toBeEnabled();
+  await prayerReminder.click();
+  await expect(prayerReminder).toHaveAttribute("aria-checked", "false");
   await expect(page.locator("#prayer-reminder-lead")).toBeDisabled();
   await expectNoWcagViolations(page);
   const backBtn1 = page.getByRole("button", { name: "Back", exact: true });
