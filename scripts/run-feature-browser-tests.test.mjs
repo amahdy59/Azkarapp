@@ -74,3 +74,29 @@ test("audio and Quran focus groups both retain continuous listening and paired m
       expect(filters.some((pattern) => pattern.test(`e2e/${filename}`))).toBe(true);
   }
 });
+
+test("Home and reminders focus groups include the current behavior and controls retain new shared recipes", () => {
+  for (const [feature, filenames] of Object.entries({
+    home: [
+      "home-prayer-motion.spec.ts",
+      "home-time-actions.spec.ts",
+      "motion-control-polish.spec.ts",
+      "compact-icon-feedback.spec.ts",
+      "todays-path.spec.ts",
+      "reminder-responsive.spec.ts",
+    ],
+    reminders: [
+      "first-use-calm-controls.spec.ts",
+      "reminder-responsive.spec.ts",
+      "contextual-reminder-plan.spec.ts",
+      "pwa-update-flow.spec.ts",
+    ],
+    controls: ["first-use-calm-controls.spec.ts", "compact-icon-feedback.spec.ts"],
+  })) {
+    const patterns = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    for (const filename of filenames) expect(patterns.some((pattern) => pattern.test(`e2e/${filename}`))).toBe(true);
+    expect(patterns.some((pattern) => pattern.test("e2e/audio-integrity.spec.ts"))).toBe(false);
+  }
+});

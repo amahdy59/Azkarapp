@@ -1,3 +1,9 @@
+[Reliable first use and calm controls](phases/RELIABLE_FIRST_USE_AND_CALM_CONTROLS_2026_11_01.md) is the current owner-requested continuation: reliable update activation, optional permission setup, reminder presets, all daily collection tallies except weekly Al-Kahf, simpler palm details, shared pills, clearer Library filters and resilient responsive Relevant now cards. Preserve the successfully deployed Progress release and all release gates.
+
+[Interaction review](phases/INTERACTION_REVIEW_2026_11_01.md) records the owner's subsequent app-wide/Home microinteraction review, shared compact icon feedback correction and required pointer/keyboard/cancellation/reduced-motion evidence. Keep the existing finite motion system and all performance/accessibility gates.
+
+[Test execution refresh](phases/TEST_EXECUTION_REFRESH_2026_11_01.md) records updated Home/reminder test selection, successful-CI timing refresh, current behavior mapping and unchanged complete release inventory. See its structured report for measured scheduling estimates and proof.
+
 [Progress title, mobile filters and Settings export](phases/PROGRESS_FILTER_EXPORT_2026_11_01.md) is the current owner-directed refinement: align page-title bands/gutters, match adjacent control heights, compact wider empty states with rounded artwork, collapse mobile dates behind a filter icon, retain two Progress tabs and move JSON export into Settings. Reuse shared motion and document responsive, performance and accessibility evidence. Preserve the verified scroll protection and mobile date access from [Progress heatmap refinement](phases/PROGRESS_HEATMAP_REFINEMENT_2026_11_01.md) and complete unchanged release verification.
 
 [Visual consistency report](reports/VISUAL_CONSISTENCY_2026_11_01.md) records the app-wide review, reusable metric-card hierarchy, responsive Search/utility fixes, purposeful motion, changed versus retained layouts, screenshot evidence and exact acceptance limits.

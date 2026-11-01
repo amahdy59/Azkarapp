@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-01.5",
+  "release": "2026-11-01.6",
   "ar": [
-    "تصفح صفحات بعناوين وهوامش متناسقة، وبطاقات تقدم أوضح، وعناوين إعدادات تقرأها بسهولة عند تكبير النص.",
-    "استخدم تبويبي التقدم وزر تصفية التاريخ على الهاتف، مع رأس يحمي المحتوى أثناء التمرير.",
-    "افتح تفاصيل أيام التقويم دون تمرير جانبي، ونزّل من الإعدادات نسخة احتياطية كاملة أو بيانات تقدم لفترة تختارها.",
-    "راجع آخر ٣٠ يومًا تلقائيًا، وقارن تسجيلات الأوراد بالأشرطة والتوزيع، وتصفح الاتجاهات بالأعمدة أو الخطوط."
+    "تطبيق التحديثات أكثر موثوقية على الاتصالات البطيئة، مع حماية التقدم والملفات المحفوظة.",
+    "إعداد اختياري عند البداية للإشعارات وحماية التخزين، مع تذكيرات الصلاة والأذكار والجمعة وما قبل الفجر مختارة للمستخدم الجديد.",
+    "ابدأ مجموعات الأذكار والأدعية من جديد كل يوم، مع بقاء الكهف أسبوعيًا وحفظ السجلات والمحفوظات.",
+    "ملخص نخلة أبسط، وأزرار وفلاتر أكثر تناسقًا، وتحسين عرض «تذكير لك الآن» واستعادته بعد انقطاع الاتصال."
   ],
   "en": [
-    "Browse consistent page titles and spacing, clearer Progress cards, and readable Settings headings when text is enlarged.",
-    "Use two Progress tabs and a phone date-filter button, with a header that keeps scrolling content covered.",
-    "Open calendar day details without sideways scrolling, and download a full backup or dated Progress data from Settings.",
-    "See the last 30 days by default, compare routine recordings with bars and breakdowns, and explore column or line trends."
+    "Apply updates more reliably on slower connections while keeping saved progress and downloads safe.",
+    "Optional first-use notification and storage setup, with prayer, daily adhkar, Friday and pre-Fajr reminders selected for new readers.",
+    "Start zikr and dua collections afresh each day; Al-Kahf stays weekly, and history and saved items remain safe.",
+    "A simpler palm summary, consistent control feedback and filters, and a more resilient Relevant now card across screen sizes."
   ]
 }

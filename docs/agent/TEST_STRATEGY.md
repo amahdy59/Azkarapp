@@ -1,5 +1,22 @@
 # Test and Evidence Strategy
 
+## Current behavior and efficient execution — 2026-11-01
+
+Finish application, test and documentation inputs before the final quality pass. Exact-content receipts expire after 24 hours and bind the installed lockfile, Node/platform and build environment; a changed input runs the full gate again. Never create or edit receipts by hand. During development use targeted unit tests and explicit `pnpm test:e2e:feature home` / `reminders` / other feature selections, with `--list`, engine and grep filters. These are development aids; frozen install, complete check, core browser smoke and Pages build remain in the hook. Complete browser inventory/engines run once in mandatory exact-commit CI, and Pages waits for that result. Full local browser runs remain diagnostics when requested or needed for unresolved failures.
+
+| Current contract                                                                                                               | Primary regression                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| First-use permission requests require separate gestures; fresh-only presets; refusal permits reading                           | first-use-calm-controls and FirstUseSetup/contextReminders units                |
+| All collection reading tallies/partials/pages reset daily, Al-Kahf remains weekly; historical Friday activity is independent   | state/progress/fridayProgress units, first-use-calm-controls and pre-phase-nine |
+| Verified Relevant now source/meaning, focus-pinned reading, responsive material/reflow, transient recovery and offline caching | reminder-responsive, contextual-reminder-plan and reminderReadings units        |
+| Full wrapping filter/context and shared tab/radio/compact-icon feedback                                                        | first-use-calm-controls, compact-icon-feedback and shared control units         |
+| Finite Home refresh/actions, smooth/reversible prayer geometry and both motion preferences                                     | home-time-actions, home-prayer-motion and motion-control-polish                 |
+| Actual waiting-worker activation, slow download and cancellation                                                               | pwaUpdate units and real two-build pwa-update-flow                              |
+
+Independent appearance cases have their own browser-test identities; shared suite setup/serial contracts remain intact. Do not hide load failures by deleting assertions or repeatedly rerunning an unchanged passing matrix. Inspect trace/network/page state, reproduce the exact failed case on a fresh preview, and retain both results. Avoid overlapping heavy local suites when memory pressure distorts evidence. Use `E2E_REPORT_PATH` for separate diagnostic reports; include retries and runner errors in timing analysis.
+
+The duration scheduler uses all nine successful CI reports. `scripts/update-browser-timing-baseline.mjs` requires exact commit/run provenance, rejects failed/incomplete/duplicate/missing-project data and retains retry time. Re-run `pnpm test:e2e:inventory` after updating weights or adding tests: every current identity must still appear exactly once. Timing data never changes release assertions, budgets or acceptance.
+
 ## Testing layers
 
 ### 1. Static checks
