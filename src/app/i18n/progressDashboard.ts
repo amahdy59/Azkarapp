@@ -3,6 +3,12 @@ import type { AppLanguage } from "../types";
 
 const en = {
   last30: "Last 30 days",
+  dateFilters: "Date filters",
+  progressExport: "Progress data",
+  exportData: "Export your data",
+  fullBackup: "Full app backup",
+  exportProgressHelp:
+    "Download saved activity for these dates. This file is for reviewing your records; use a full backup to restore the app.",
   heatmap: "Your recording calendar",
   heatmapHelp: "Choose an activity, then tap a date to see its saved records.",
   heatmapPractice: "Activity",
@@ -86,6 +92,7 @@ const en = {
   sleep: "Bedtime routine",
   countOf: "{count} of {total}",
   pagesUnit: "pages",
+  noMetricRecords: "No saved records yet",
   knownGoalDays: "Known goal days",
   noGoals: "No known goal days",
   choose: "Choose metrics",
@@ -149,6 +156,12 @@ const en = {
 };
 const ar: Record<keyof typeof en, string> = {
   last30: "آخر ٣٠ يومًا",
+  dateFilters: "تصفية التاريخ",
+  progressExport: "بيانات التقدم",
+  exportData: "تصدير بياناتك",
+  fullBackup: "نسخة احتياطية كاملة",
+  exportProgressHelp:
+    "نزّل النشاط المحفوظ لهذه الفترة لمراجعة سجلاتك. لاستعادة التطبيق، استخدم النسخة الاحتياطية الكاملة.",
   heatmap: "تقويم تسجيلاتك",
   heatmapHelp: "اختر النشاط، ثم اضغط على تاريخ لعرض سجلاته.",
   heatmapPractice: "النشاط",
@@ -231,6 +244,7 @@ const ar: Record<keyof typeof en, string> = {
   sleep: "ورد النوم",
   countOf: "{count} من {total}",
   pagesUnit: "صفحة",
+  noMetricRecords: "لا سجلات محفوظة بعد",
   knownGoalDays: "أيام ذات هدف معروف",
   noGoals: "لا توجد أيام ذات هدف معروف",
   choose: "اختيار المقاييس",

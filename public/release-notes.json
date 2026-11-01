@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-01.3",
+  "release": "2026-11-01.4",
   "ar": [
-    "يبقى نطاق التاريخ والتبويبات واضحين أثناء التمرير، دون ظهور السجلات خلفهما.",
-    "تصفح تقويم التسجيلات دون تمرير جانبي، واضغط على تاريخ لعرض تفاصيله على الهاتف.",
-    "تفتح صفحة التقدم على آخر ٣٠ يومًا، ببطاقات مختصرة وفترة وتبويبات متجاورة على الشاشات الكبيرة.",
-    "قارن الأوراد بالأشرطة وتوزيع السجلات، واختر الأعمدة أو الخطوط وصدّر بيانات الفترة كاملة."
+    "عناوين وهوامش متناسقة، وبطاقات تقدم أوضح تتكيف مع المظهر وحجم الشاشة، مع تبويبين وزر لتصفية التاريخ على الهاتف.",
+    "تصفح تقويم التسجيلات دون تمرير جانبي، وافتح تفاصيل التاريخ على الهاتف مع رأس يغطي المحتوى أثناء التمرير.",
+    "من الإعدادات، نزّل نسخة احتياطية كاملة أو بيانات التقدم بصيغة JSON لفترة تختارها.",
+    "ابدأ بآخر ٣٠ يومًا، وقارن الأوراد بالأشرطة وتوزيع السجلات واختر الأعمدة أو الخطوط."
   ],
   "en": [
-    "Date controls and tabs stay clear while scrolling, with records fully covered behind them.",
-    "Browse recording dates without sideways scrolling, and tap a date for its details on your phone.",
-    "Progress starts with the last 30 days, compact summaries and adjacent tablet/desktop filters and tabs.",
-    "Compare routine bars and breakdowns, switch chart styles and export exact records for the whole selected period."
+    "Consistent page titles and gutters, clearer Progress cards that adapt to your theme and screen, two tabs and a phone date-filter button.",
+    "Browse dates without sideways scrolling, open phone date details and keep scrolling content covered behind the header.",
+    "In Settings, download a full app backup or Progress JSON for dates you choose.",
+    "Start with the last 30 days, compare routine bars and breakdowns, and choose columns or lines."
   ]
 }

@@ -11,6 +11,7 @@ import {
 import { Calendar } from "./icons";
 import { ProgressSelectField } from "./ProgressSelectField";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
+import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS } from "./FormField";
 
 export function ProgressRangeToolbar({
   period,
@@ -108,10 +109,10 @@ export function ProgressRangeToolbar({
           </p>
           <div className="progress-range-fields">
             {(["startKey", "endKey"] as const).map((key) => (
-              <label key={key} className="block min-w-0 space-y-1 text-sm font-semibold">
+              <label key={key} className={`block min-w-0 space-y-1 ${FIELD_LABEL_CLASS}`}>
                 <span>{text(language, key === "startKey" ? "start" : "end")}</span>
                 <input
-                  className="min-h-11 w-full min-w-0 rounded-lg border border-border-control bg-card px-3 py-2 text-sm text-foreground progress-focus"
+                  className={FIELD_CONTROL_CLASS}
                   type="date"
                   dir="ltr"
                   value={draft[key]}

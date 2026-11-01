@@ -15,6 +15,7 @@
   height: 20px;
   opacity: 1;
   color: var(--foreground);
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
 }
 .select-field-trigger[data-state="open"] > svg:last-child {
   transform: rotate(180deg);

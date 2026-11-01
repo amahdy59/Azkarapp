@@ -1,5 +1,5 @@
 import { chooseProgressOption } from "../../test/progressSelect";
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ProgressDashboard } from "./ProgressDashboard";
 import { indexProgressDashboard } from "../progressDashboard";
@@ -35,30 +35,9 @@ function props() {
     currentDay: false,
     language: "en" as const,
     calendar: "gregorian" as const,
-    onExport: vi.fn().mockResolvedValue(undefined),
   };
 }
 describe("ProgressDashboard", () => {
-  it("keeps one export in flight across date changes and reports the saved filename", async () => {
-    let finish!: () => void;
-    const properties = props();
-    properties.onExport.mockImplementationOnce(
-      () =>
-        new Promise<void>((resolve) => {
-          finish = resolve;
-        }),
-    );
-    const { rerender } = render(<ProgressDashboard {...properties} view="records" />);
-    fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
-    rerender(
-      <ProgressDashboard {...properties} view="records" range={{ startKey: "2026-09-01", endKey: "2026-09-30" }} />,
-    );
-    expect(screen.getByRole("button", { name: "Export JSON" })).toBeDisabled();
-    await act(async () => finish());
-    fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
-    await screen.findByText("progress-2026-09-01-2026-09-30.json");
-    expect(properties.onExport).toHaveBeenCalledTimes(2);
-  });
   it("explains empty and target-only periods without hiding known goals or inventing activity", () => {
     const empty = indexProgressDashboard({ ...input, dailyCompletions: [], wirdHistory: {} }, "2026-10-20");
     const { rerender } = render(
@@ -67,6 +46,8 @@ describe("ProgressDashboard", () => {
     expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("No activity recorded");
     expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument();
     expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("0 of 1");
+    expect(screen.getByTestId("progress-metric-prayers")).toHaveTextContent("No saved records yet");
+    expect(screen.getByTestId("progress-metric-pages")).toHaveTextContent("No saved records yet");
     expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("Saved Quran targets");
     rerender(<ProgressDashboard {...props()} />);
     expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
@@ -143,8 +124,8 @@ describe("ProgressDashboard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
   });
-  it("prevents an empty dashboard and keeps unsaved edits out of the table", () => {
-    const { rerender } = render(<ProgressDashboard {...props()} />);
+  it("prevents an empty dashboard and discards unsaved metric edits", () => {
+    render(<ProgressDashboard {...props()} />);
     fireEvent.click(screen.getByRole("button", { name: "Choose metrics" }));
     for (const checkbox of screen.getAllByRole("checkbox").filter((element) => (element as HTMLInputElement).checked))
       fireEvent.click(checkbox);
@@ -152,9 +133,8 @@ describe("ProgressDashboard", () => {
     expect(screen.getByText("Choose at least one metric.")).toBeInTheDocument();
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    rerender(<ProgressDashboard {...props()} view="records" />);
-    expect(within(screen.getByRole("table")).getAllByRole("columnheader")).toHaveLength(5);
-    expect(screen.getAllByRole("rowheader")).toHaveLength(10);
+    expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
   it("uses a snapshot instead of a one-point line in Day view", () => {
     const { rerender } = render(
@@ -190,33 +170,5 @@ describe("ProgressDashboard", () => {
     await chooseProgressOption(screen.getByRole("combobox", { name: "Show trend for" }), "quranGoals");
     expect(screen.getByTestId("timeline-readout")).toHaveTextContent("—");
     expect(screen.queryByTestId("recording-time-line")).not.toBeInTheDocument();
-  });
-  it("reports save errors and recovery without applying table pagination to the export", async () => {
-    const properties = props();
-    properties.onExport.mockRejectedValueOnce(new Error("cancelled"));
-    render(<ProgressDashboard {...properties} view="records" />);
-    fireEvent.click(screen.getByRole("button", { name: "Next records" }));
-    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
-    const button = screen.getByRole("button", { name: "Export JSON" });
-    fireEvent.click(button);
-    await screen.findByText("Could not save. Try again.");
-    fireEvent.click(button);
-    await screen.findByText("Selected-period data saved.");
-    expect(properties.onExport).toHaveBeenCalledTimes(2);
-    expect(button).not.toBeDisabled();
-  });
-  it("does not announce an earlier export as the newly selected period's success", async () => {
-    let finish!: () => void;
-    const properties = props();
-    properties.onExport.mockImplementationOnce(() => new Promise<void>((resolve) => (finish = resolve)));
-    const { rerender } = render(<ProgressDashboard {...properties} view="records" />);
-    fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
-    expect(screen.getByText("Saving…")).toBeInTheDocument();
-    rerender(
-      <ProgressDashboard {...properties} view="records" range={{ startKey: "2026-09-01", endKey: "2026-09-30" }} />,
-    );
-    await act(async () => finish());
-    await waitFor(() => expect(screen.queryByText("Selected-period data saved.")).not.toBeInTheDocument());
-    expect(screen.getByRole("button", { name: "Export JSON" })).toBeEnabled();
   });
 });

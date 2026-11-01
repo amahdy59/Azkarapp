@@ -11,6 +11,7 @@ import type {
   ZikrFontOption,
 } from "../../types";
 import type { SettingsSubScreen } from "./SettingsPanels";
+import type { ProgressRange } from "../../progressDashboard";
 
 /** The screen's application-facing contract, kept separate from its responsive panel composition. */
 export interface SettingsScreenProps {
@@ -75,6 +76,7 @@ export interface SettingsScreenProps {
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
+  onExportProgress?: (range: ProgressRange) => Promise<void>;
   onRestoreData: (raw: string) => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;

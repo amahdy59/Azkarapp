@@ -63,7 +63,7 @@ for (const language of ["ar", "en"] as const) {
       );
       const chart = page.getByTestId("today-garden-card");
       await expect(chart).toBeVisible();
-      await expect(page.getByRole("combobox")).toHaveCount(4);
+      await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(4);
       const exportButton = chart.getByRole("button", {
         name: ar ? "تصدير الأوراد" : "Azkar JSON",
       });

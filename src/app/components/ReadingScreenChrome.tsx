@@ -147,6 +147,7 @@ export function ReadingScreenChrome({
     <>
       <div className="w-full">
         <Header
+          pageGutters={false}
           title={title}
           onBack={onBack}
           language={language}

@@ -9,6 +9,7 @@ import {
 import type { AppLanguage } from "../types";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import "./select-field.css";
 
 /** Progress filters share the application's menu, focus and selection behavior. */
 export function ProgressSelectField<Value extends string>({
@@ -72,7 +73,7 @@ export function ProgressSelectField<Value extends string>({
         <SelectTrigger
           id={id}
           aria-labelledby={`${id}-label`}
-          className="progress-select-trigger"
+          className="select-field-trigger progress-select-trigger"
           data-progress-value={value}
           onKeyDownCapture={useKeyboard}
         >

@@ -52,6 +52,7 @@ for (const language of ["ar", "en"] as const) {
           document.documentElement.style.fontSize = enlarged ? "200%" : "100%";
         }, enlarged);
         const date = page.getByTestId("garden-view-date");
+        if (!(await date.isVisible())) await page.getByTestId("progress-filters-toggle").click();
         await expect(date).toBeVisible();
         expect(
           await date.evaluate(
@@ -118,9 +119,8 @@ for (const language of ["ar", "en"] as const) {
       );
       await expect(page.getByTestId("recording-time-column").first()).toBeVisible();
       await page.screenshot({ path: info.outputPath(`reference-${language}-${width}-trends.png`), fullPage: true });
-      await page.getByTestId("progress-tab-records").click();
-      await expect(page.getByRole("table")).toBeVisible();
-      await page.screenshot({ path: info.outputPath(`reference-${language}-${width}-records.png`), fullPage: true });
+      await expect(page.getByRole("tab")).toHaveCount(2);
+      await expect(page.getByTestId("progress-tab-records")).toHaveCount(0);
     }
   });
 }

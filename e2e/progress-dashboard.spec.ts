@@ -1,4 +1,9 @@
-import { chooseProgressDetail, chooseProgressOption, expectProgressFilterFocus } from "./helpers/progress";
+import {
+  chooseProgressDetail,
+  chooseProgressOption,
+  expectProgressFilterFocus,
+  openProgressExport,
+} from "./helpers/progress";
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -52,12 +57,18 @@ for (const language of ["ar", "en"] as const) {
     await seed(page, language);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/#/progress/month");
-    await page.getByTestId("progress-tab-records").click();
-    await expect(page.getByRole("searchbox")).toHaveCount(0);
-    await expect(page.locator(".progress-records-surface")).toHaveCSS("background-color", /0\.82/);
-    const dateButton = page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true });
+    await expect(page.getByRole("tab")).toHaveCount(2);
+    await expect(page.getByTestId("progress-tab-records")).toHaveCount(0);
+    await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("heading", { name: ar ? "التقدم" : "Progress", exact: true })).toBeVisible();
+    const dateButton = page.getByRole("combobox", {
+      name: ar ? "نطاق التاريخ" : "Date range",
+      exact: true,
+      includeHidden: true,
+    });
     const openDates = async () => {
       const current = await dateButton.getAttribute("data-progress-value");
+      if (!(await dateButton.isVisible())) await page.getByTestId("progress-filters-toggle").click();
       await dateButton.click();
       await page
         .getByRole("option")
@@ -70,8 +81,9 @@ for (const language of ["ar", "en"] as const) {
     await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-03");
     await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
     await expect(page.getByTestId("progress-date-sheet")).not.toBeVisible();
-    await expect(page.getByRole("table").getByRole("rowheader")).toHaveCount(1);
-    await expect(page.getByRole("rowheader").locator("time")).toHaveAttribute("datetime", "2026-10-03");
+    await expect(page.getByTestId("progress-metric-pages")).toContainText(ar ? "٢" : "2");
+    await expect(page.getByTestId("progress-filters-toggle")).toBeFocused();
+    await expect(dateButton).toBeHidden();
     const selected = await page.getByTestId("garden-view-date").textContent();
     await page.getByTestId("progress-tab-overview").click();
     await expect(page.getByTestId("progress-metric-pages")).toContainText(ar ? "٢" : "2");
@@ -86,26 +98,16 @@ for (const language of ["ar", "en"] as const) {
     await expect(
       page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
     ).toHaveAttribute("data-progress-value", "custom");
-    await page.getByTestId("progress-tab-records").click();
-    await expect(page.getByRole("rowheader")).toHaveCount(0);
-    await expect(
-      page.getByText(ar ? "لا توجد سجلات محفوظة في هذه الفترة." : "No saved records in this period."),
-    ).toBeVisible();
+    await page.getByTestId("progress-tab-overview").click();
+    await expect(page.getByTestId("progress-empty-period")).toBeVisible();
     await chooseProgressOption(dateButton, "day");
-    await expect(page.getByRole("rowheader").locator("time")).toHaveAttribute("datetime", "2026-10-20");
+    await expect(page.getByTestId("progress-metric-pages")).toContainText(ar ? "٤" : "4");
     await openDates();
     await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-02");
     await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-08");
     await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
-    await expect(page.getByRole("rowheader")).toHaveCount(7);
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      page.getByRole("button", { name: ar ? "تصدير JSON" : "Export JSON", exact: true }).click(),
-    ]);
-    const file = JSON.parse(await readFile((await download.path())!, "utf8"));
-    expect(file.selectedRange).toEqual({ startKey: "2026-10-02", endKey: "2026-10-08" });
-    expect(file.dailyRecords).toHaveLength(7);
-    await page.screenshot({ path: info.outputPath(`progress-${language}-clean-records.png`), scale: "css" });
+    await expect(page.getByTestId("progress-metric-pages")).toContainText(ar ? "٢٢" : "22");
+    await page.screenshot({ path: info.outputPath(`progress-${language}-filtered-overview.png`), scale: "css" });
     await page.getByTestId("progress-tab-overview").click();
     await page.getByTestId("progress-detailed-context").locator("summary").click();
     await expect(page.getByRole("region", { name: ar ? "حسب الصلاة" : "By prayer", exact: true })).toBeVisible();
@@ -136,6 +138,16 @@ for (const language of ["ar", "en"] as const) {
     await enlargedDate.press("Escape");
     await expect(page.getByTestId("progress-date-sheet")).not.toBeVisible();
     await expect(dateButton).toBeFocused();
+    const exportMenu = await openProgressExport(page, language);
+    await exportMenu.getByLabel(ar ? "تاريخ البداية" : "Start date").fill("2026-10-02");
+    await exportMenu.getByLabel(ar ? "تاريخ النهاية" : "End date").fill("2026-10-08");
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      exportMenu.getByRole("button", { name: ar ? "تصدير JSON" : "Export JSON" }).click(),
+    ]);
+    const file = JSON.parse(await readFile((await download.path())!, "utf8"));
+    expect(file.selectedRange).toEqual({ startKey: "2026-10-02", endKey: "2026-10-08" });
+    expect(file.dailyRecords).toHaveLength(7);
   });
   test(`Progress cards open their own trend and preserve the range across keyboard tabs in ${language} @cross-browser`, async ({
     page,
@@ -146,8 +158,12 @@ for (const language of ["ar", "en"] as const) {
     const date = page.getByTestId("garden-view-date");
     const included = await date.textContent();
     await expect(
-      page.getByRole("combobox", { name: language === "ar" ? "نطاق التاريخ" : "Date range", exact: true }),
-    ).toBeVisible();
+      page.getByRole("combobox", {
+        name: language === "ar" ? "نطاق التاريخ" : "Date range",
+        exact: true,
+        includeHidden: true,
+      }),
+    ).toBeHidden();
     await expect(page.getByRole("combobox", { name: /Show dates in|عرض التواريخ بالتقويم/ })).toHaveCount(0);
     await expect(page.getByTestId("progress-metric-pages").getByRole("progressbar")).toHaveCount(0);
     await expect(page.getByTestId("progress-metric-prayers").getByRole("progressbar")).toHaveAttribute(
@@ -163,10 +179,10 @@ for (const language of ["ar", "en"] as const) {
     ).toHaveAttribute("data-progress-value", "pages");
     await expect(date).toHaveText(included!);
     await trends.press("End");
-    await expect(page.getByTestId("progress-tab-records")).toBeFocused();
-    await expect(page.getByRole("table")).toBeVisible();
-    await expect(page.getByTestId("progress-main-trend")).toHaveCount(0);
-    await page.getByTestId("progress-tab-records").press("Home");
+    await expect(trends).toBeFocused();
+    await expect(page.getByTestId("progress-main-trend")).toBeVisible();
+    await expect(page.getByTestId("progress-tab-records")).toHaveCount(0);
+    await trends.press("Home");
     await expect(page.getByTestId("progress-tab-overview")).toBeFocused();
     await expect(page.getByTestId("progress-overview")).toBeVisible();
     await expect(date).toHaveText(included!);
@@ -244,15 +260,14 @@ for (const language of ["ar", "en"] as const) {
     await expect(slider).toHaveValue("6");
     await page.keyboard.press(ar ? "ArrowRight" : "ArrowLeft");
     await expect(slider).toHaveValue("5");
-    await page.getByTestId("progress-tab-records").click();
-    const table = page.getByRole("table");
-    await expect(table.getByRole("rowheader")).toHaveCount(7);
-    await expect(page.getByRole("searchbox")).toHaveCount(0);
-    await expect(table.getByRole("rowheader")).toHaveCount(7);
-    const exportButton = page.getByRole("button", {
-      name: ar ? "تصدير JSON" : "Export JSON",
-      exact: true,
-    });
+    await chart.getByText(ar ? "بيانات الرسم الدقيقة" : "Exact chart data", { exact: true }).click();
+    await expect(chart.getByRole("rowheader")).toHaveCount(7);
+    await page.getByTestId("progress-tab-overview").click();
+    await expect(page.getByTestId("progress-metric-prayers")).toContainText(ar ? "١١ من ٣٥" : "11 of 35");
+    const exportMenu = await openProgressExport(page, language);
+    await exportMenu.getByLabel(ar ? "تاريخ البداية" : "Start date").fill("2026-10-02");
+    await exportMenu.getByLabel(ar ? "تاريخ النهاية" : "End date").fill("2026-10-08");
+    const exportButton = exportMenu.getByRole("button", { name: ar ? "تصدير JSON" : "Export JSON", exact: true });
     const [download] = await Promise.all([page.waitForEvent("download"), exportButton.click()]);
     const file = JSON.parse(await readFile((await download.path())!, "utf8"));
     expect(file.selectedRange).toEqual({ startKey: "2026-10-02", endKey: "2026-10-08" });
@@ -261,15 +276,18 @@ for (const language of ["ar", "en"] as const) {
     expect(file.metrics.pages.count).toBe(22);
     expect(file.records.dailyCompletions).toHaveLength(11);
     expect(file.metrics.quranGoals).toMatchObject({ count: 4, possible: 7 });
-    await expect(page.getByRole("combobox", { name: /Show dates in|عرض التواريخ بالتقويم/ })).toHaveCount(0);
-    await page.getByTestId("progress-tab-overview").click();
-    await expect(page.getByTestId("progress-metric-prayers")).toContainText(ar ? "١١ من ٣٥" : "11 of 35");
-    await page.getByTestId("progress-tab-records").click();
-    await page.screenshot({ path: testInfo.outputPath(`progress-${language}-custom-records.png`), scale: "css" });
+    const [backupDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      exportMenu.getByRole("button", { name: ar ? "تنزيل البيانات" : "Download data", exact: true }).click(),
+    ]);
+    const backup = JSON.parse(await readFile((await backupDownload.path())!, "utf8"));
+    expect(backup).toMatchObject({ format: "azkarapp-backup", version: 1 });
+    expect(backup.state.dailyCompletions).toHaveLength(30);
+    await page.screenshot({ path: testInfo.outputPath(`settings-${language}-progress-export.png`), scale: "css" });
     expect(
       (
         await new AxeBuilder({ page })
-          .include(".app-main")
+          .include('[data-testid="settings-export-menu"]')
           .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
           .analyze()
       ).violations,
@@ -311,9 +329,9 @@ for (const language of ["ar", "en"] as const) {
       await chart.getByRole("slider").focus();
       await page.keyboard.press("Home");
       await expect(chart.getByRole("slider")).toHaveValue("0");
-      await page.getByTestId("progress-tab-records").click();
-      await expect(page.getByRole("table")).toBeVisible();
-      await expect(page.getByRole("rowheader")).toHaveCount(10);
+      await chart.getByText(ar ? "بيانات الرسم الدقيقة" : "Exact chart data", { exact: true }).click();
+      await expect(chart.getByRole("table")).toBeVisible();
+      await expect(chart.getByRole("rowheader")).toHaveCount(19);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const targets = await page
         .locator(".progress-screen button, .progress-screen select, .progress-screen summary")
@@ -353,6 +371,7 @@ for (const language of ["ar", "en"] as const) {
       await page.setViewportSize({ width, height: 700 });
       await page.goto("/#/progress/month");
       if (width === 320) await page.locator("html").evaluate((root) => (root.style.fontSize = "200%"));
+      if (width === 320) await page.getByTestId("progress-filters-toggle").click();
       const fields = page.locator(".progress-range-toolbar");
       await expect(fields.getByRole("combobox")).toHaveCount(1);
       expect(await fields.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);

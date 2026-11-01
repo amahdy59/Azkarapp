@@ -141,7 +141,7 @@ function TrackingCheckbox({
   return (
     <label
       htmlFor={id}
-      className={`relative flex min-h-11 items-center justify-between gap-2 rounded-xl px-2.5 py-1 my-0.5 border transition-all duration-standard ${
+      className={`relative flex min-h-11 items-center justify-between gap-2 rounded-xl px-2.5 py-1 my-0.5 border transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-standard ${
         disabled
           ? "cursor-not-allowed opacity-40 border-transparent bg-transparent"
           : checked

@@ -572,13 +572,15 @@ test("Progress toolbar stays opaque after scrolling without changing Home", asyn
   const header = page.getByTestId("progress-sticky-controls");
   await expect(header).toBeVisible();
   await expect(header).not.toHaveAttribute("data-scrolled");
+  await expect(header.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true })).toBeHidden();
+  await page.getByTestId("progress-filters-toggle").click();
 
   await page.locator(".app-screen-surface").evaluate((surface) => {
     surface.scrollTop = 120;
     surface.dispatchEvent(new Event("scroll"));
   });
   await expect(header).toHaveAttribute("data-scrolled", "true");
-  await expect(header.getByRole("combobox", { name: "Date range", exact: true })).toBeVisible();
+  await expect(header.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true })).toBeVisible();
   await expect(header.getByRole("tablist")).toBeVisible();
   const background = await header.evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(background).not.toBe("transparent");

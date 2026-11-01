@@ -68,9 +68,10 @@ describe("ProgressScreen", () => {
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent(/1\s*–\s*29 Feb 2024/);
     expect(screen.getByRole("combobox", { name: "Date range" })).toHaveAttribute("data-progress-value", "custom");
     expect(screen.queryByRole("combobox", { name: "Show dates in" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("progress-tab-records"));
+    expect(screen.getAllByRole("tab")).toHaveLength(2);
+    expect(screen.queryByTestId("progress-tab-records")).not.toBeInTheDocument();
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
-    expect(screen.getByText("No saved records in this period.")).toBeInTheDocument();
+    expect(screen.getByTestId("progress-empty-period")).toBeInTheDocument();
   });
   it("restores focused record controls after delayed native focus scrolling", () => {
     let nextFrame: FrameRequestCallback | undefined;
@@ -243,7 +244,9 @@ describe("ProgressScreen", () => {
     expect(
       within(screen.getByTestId("progress-sticky-controls")).queryByRole("button", { name: "مشاركة بطاقة التقدم" }),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "التقدم", exact: true })).toHaveClass("sr-only");
+    expect(screen.getByTestId("shared-screen-header")).toContainElement(
+      screen.getByRole("heading", { name: "التقدم", exact: true }),
+    );
     expect(onOpenShareModal).not.toHaveBeenCalled();
 
     // 7-Day Rhythm Strip without star glyphs

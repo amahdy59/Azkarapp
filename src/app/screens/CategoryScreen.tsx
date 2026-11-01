@@ -130,25 +130,24 @@ export function CategoryScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative" screenName={isArabic ? cat.nameArabic : cat.name}>
+      <Header
+        title={
+          catId === "after_prayer" && prayer
+            ? isArabic
+              ? `أذكار بعد ${t(language, `notifications.${prayer}`)}`
+              : `After ${t(language, `notifications.${prayer}`)}`
+            : isArabic
+              ? cat.nameArabic
+              : cat.name
+        }
+        onBack={onBack}
+        language={language}
+      />
       <div
         className="relative z-10 mx-auto flex min-h-0 w-full max-w-[var(--content-form)] flex-1 flex-col"
         data-testid="category-overview"
       >
-        <Header
-          title={
-            catId === "after_prayer" && prayer
-              ? isArabic
-                ? `أذكار بعد ${t(language, `notifications.${prayer}`)}`
-                : `After ${t(language, `notifications.${prayer}`)}`
-              : isArabic
-                ? cat.nameArabic
-                : cat.name
-          }
-          onBack={onBack}
-          language={language}
-        />
-
-        <div className="shrink-0 border-b border-border px-5 py-4">
+        <div className="shrink-0 border-b border-border px-page py-4">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-label font-bold text-muted-foreground">
               {t(

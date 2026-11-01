@@ -42,10 +42,12 @@ describe("Progress period navigation", () => {
     expect(screen.getByRole("combobox", { name: "Show trend for" })).toHaveAttribute("data-progress-value", "pages");
     expect(screen.getByTestId("garden-view-date").textContent).toBe(date);
     fireEvent.keyDown(trends, { key: "End" });
-    expect(screen.getByRole("tabpanel", { name: "Records" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Export JSON" })).toBeInTheDocument();
-    expect(screen.queryByTestId("progress-main-trend")).not.toBeInTheDocument();
-    fireEvent.keyDown(screen.getByRole("tab", { name: "Records" }), { key: "Home" });
+    expect(screen.getByRole("tabpanel", { name: "Trends" })).toBeInTheDocument();
+    expect(screen.getAllByRole("tab")).toHaveLength(2);
+    expect(screen.queryByRole("button", { name: "Export JSON" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("progress-main-trend")).toBeInTheDocument();
+    expect(screen.getByTestId("garden-view-date").textContent).toBe(date);
+    fireEvent.keyDown(trends, { key: "Home" });
     expect(screen.getByRole("tabpanel", { name: "Overview" })).toBeInTheDocument();
     expect(screen.getByTestId("garden-view-date").textContent).toBe(date);
   });

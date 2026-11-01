@@ -51,7 +51,7 @@ export function SubHeader({
         ref={headerRef}
         data-testid="shared-screen-header"
         data-scrolled={hasScrolled || undefined}
-        className="shared-screen-header sticky top-0 z-40 flex items-center justify-between bg-background px-page pt-2 pb-1 shrink-0 transition-colors duration-standard"
+        className="shared-screen-header sticky top-0 z-40 flex items-start justify-between gap-2 bg-background px-page pt-2 pb-1 shrink-0 transition-colors duration-standard"
         style={{ minHeight: 56 }}
       >
         <h2
@@ -63,7 +63,7 @@ export function SubHeader({
               ? t(language, "settings.accessibilityDetailHeading")
               : undefined
           }
-          className="block min-w-0 flex-1 break-words font-sans text-xl sm:text-2xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="page-title flex-1 font-sans text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {title}
         </h2>
@@ -77,8 +77,8 @@ export function SubHeader({
       ref={headerRef}
       data-testid="shared-screen-header"
       data-scrolled={hasScrolled || undefined}
-      className="shared-screen-header sticky top-0 z-40 flex items-center justify-between gap-2 bg-background px-4 pt-2 pb-1 shrink-0 transition-colors duration-standard"
-      style={{ minHeight: 56, paddingInline: "min(1rem, 16px)", gap: 8 }}
+      className="shared-screen-header sticky top-0 z-40 flex items-start justify-between gap-2 bg-background px-page pt-2 pb-1 shrink-0 transition-colors duration-standard"
+      style={{ minHeight: 56 }}
     >
       <IconButton
         onClick={onBack}
@@ -91,7 +91,7 @@ export function SubHeader({
         ref={headingRef}
         data-settings-subheading
         tabIndex={-1}
-        className="block min-w-0 flex-1 break-words text-start font-sans text-xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-2xl"
+        className="page-title flex-1 text-start font-sans text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         {title}
       </h1>

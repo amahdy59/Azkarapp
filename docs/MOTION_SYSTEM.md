@@ -1,5 +1,11 @@
 # Azkarapp Motion System
 
+## Progress filters and Settings export — 2026-11-01
+
+The app-wide follow-up narrows remaining broad transitions to actual color, background, border, shadow, opacity and press-transform changes. Friday fills reuse the shared transform-based ProgressBar, preserving exact ratios while removing layout animation and adding native progress semantics. Reader Undo feedback reuses one shared fade with the standard duration, without changing its lifetime or action. Metric cards use a brief border/shadow cue and shared native press response; text and card geometry remain still. Existing Home, devotional toolbar and Mushaf motion owners remain unchanged.
+
+The mobile date disclosure uses one 150ms opacity arrival; layout and focus move immediately, with no animated height, sticky measurement loop or delayed action. Heatmap/month actions retain shared press/focus feedback and add a quiet 150ms fine-pointer inset cue without changing date geometry or intensity colors. Keep selected tab ink/background changes immediate to preserve contrast; existing shared press response acknowledges activation. Select menus and date/export sheets reuse their shared bounded entrance and close motion; the shared select chevron rotates over 150ms to show its open state. Export buttons show actual busy state, freeze submitted dates, and announce real errors/save results; result text arrives once through the shared fade. No fabricated progress, success timer, chart loop or ambient motion. Both application and OS Reduce Motion remove these animations/transitions while preserving static feedback and immediate actions.
+
 ## Home prayer typography and action feedback — 2026-10-21
 
 Android feedback follow-up (2026-10-31): `vibrateIfEnabled` chooses one platform path per accepted action. Browser patterns start on; Android waveform arrays start off, so the bridge prepends a zero delay. Native taps never use an ignore-system-setting flag or a raw fallback after the device declines feedback; longer cues use interaction audio attributes and cancel on pause/destruction. App-off remains silent. See [Android's haptics API guidance](https://developer.android.com/develop/ui/views/haptics/haptics-apis). This requires an updated Android binary; browser tests cannot certify physical strength or OxygenOS policy.

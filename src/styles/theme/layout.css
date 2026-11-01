@@ -143,14 +143,34 @@
   }
 }
 
-/* Content Max-Width Containers */
-@media (min-width: 37.5rem) {
-  .page-content-center {
-    max-width: var(--content-dashboard);
-    margin-inline: auto;
-    width: 100%;
-    padding-inline: 1.5rem;
+/* Ordinary pages share an outer frame and responsive gutters. Focused text
+   and forms may use a narrower inner reading measure. */
+.page-header-frame {
+  max-inline-size: var(--content-page);
+  margin-inline: auto;
+}
+.page-title {
+  display: grid;
+  align-content: center;
+  min-block-size: var(--ds-control-height-compact);
+  min-inline-size: 0;
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+@media (min-width: 40rem) {
+  .page-title {
+    font-size: var(--text-2xl);
   }
+}
+.page-content-center {
+  max-width: var(--content-dashboard);
+  margin-inline: auto;
+  width: 100%;
+  padding-inline: var(--spacing-page);
 }
 
 /* Nav Rail & Sidebar Styles */

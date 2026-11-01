@@ -64,7 +64,7 @@ for (const language of ["ar", "en"] as const) {
       const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       expect(axe.violations).toEqual([]);
       await chooseProgressOption(
-        page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true }),
+        page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
         "custom",
       );
       await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-17");

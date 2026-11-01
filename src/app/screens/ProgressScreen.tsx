@@ -13,18 +13,19 @@ import { ProgressSelectField } from "../components/ProgressSelectField";
 import { ProgressRangeToolbar } from "../components/ProgressRangeToolbar";
 import { ProgressDashboard, type ProgressDashboardView } from "../components/ProgressDashboard";
 import { TabList, tabId, tabPanelProps } from "../components/Tabs";
+import { Header, IconButton } from "../components/LayoutShells";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { ProgressPrayerBreakdown } from "../components/ProgressPrayerBreakdown";
 import { ZikrInsights } from "../components/ZikrInsights";
 import { dashboardText } from "../i18n/progressDashboard";
 import {
-  exportProgressDashboard,
   indexProgressDashboard,
+  formatProgressRange,
   metricProgressRange,
   progressPresetRange,
   type ProgressRange,
   type ProgressPreset,
 } from "../progressDashboard";
-import { saveFileToDevice } from "../share/shareDispatcher";
 
 import { PrayerProgressSummary } from "../components/PrayerProgressSummary";
 import type { PrayerTrackingField } from "../components/PrayerTrackerCards";
@@ -51,7 +52,7 @@ import {
   OasisMark,
   PathRewardMark,
 } from "../components/GardenMarks";
-import { ChevronDown, Sparkles, Zap, SlidersHorizontal, BarChart3, Sprout, FileText } from "../components/icons";
+import { ChevronDown, Sparkles, Zap, SlidersHorizontal, BarChart3, Sprout } from "../components/icons";
 import type {
   AppLanguage,
   CategoryId,
@@ -163,6 +164,15 @@ export function ProgressScreen({
   const detailTopic = detailChoice === "reflection" && (customRange || activeTab !== "day") ? "prayers" : detailChoice;
 
   const [view, setView] = useState<ProgressDashboardView>("overview");
+  const compact = useMediaQuery("(max-width: 599px)");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filterButtonId = useId();
+  const filterId = useId();
+  const closeFilters = () => {
+    if (!compact) return;
+    setFiltersOpen(false);
+    requestAnimationFrame(() => document.getElementById(filterButtonId)?.focus());
+  };
   const viewId = useId();
   useEffect(() => setCalendarType(initialCalendarType), [initialCalendarType]);
   const controlsRef = useRef<HTMLDivElement>(null);
@@ -232,37 +242,6 @@ export function ProgressScreen({
     [dashboardInput, devotionalToday],
   );
   const isCurrentDay = !customRange && activeTab === "day" && offset === 0;
-  const exportSelectedPeriod = async () => {
-    const data = exportProgressDashboard(
-      dashboardInput,
-      dashboardRecords,
-      selectedRange,
-      now,
-      progressDayStartHour,
-      isCurrentDay,
-      calendarType,
-    );
-    const zikrRange = metricProgressRange(selectedRange, "routines", now, progressDayStartHour, false, isCurrentDay);
-    await saveFileToDevice(
-      new File(
-        [
-          JSON.stringify(
-            {
-              ...data,
-              zikrHistory: zikrHistory.filter(
-                (row) => row.dayKey >= zikrRange.startKey && row.dayKey <= zikrRange.endKey,
-              ),
-            },
-            null,
-            2,
-          ),
-        ],
-        `progress-${selectedRange.startKey}-${selectedRange.endKey}.json`,
-        { type: "application/json" },
-      ),
-    );
-  };
-
   const handleTabChange = (tab: ProgressPreset) => {
     activePeriodRef.current = tab;
     setActiveTab(tab);
@@ -337,7 +316,6 @@ export function ProgressScreen({
       screenName={t(language, "common.progress")}
     >
       <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 flex-col items-center pb-8">
-        <h1 className="sr-only">{t(language, "common.progress")}</h1>
         <div
           ref={controlsRef}
           data-scrolled={hasScrolledControls || undefined}
@@ -345,15 +323,44 @@ export function ProgressScreen({
           data-testid="progress-sticky-controls"
         >
           <div className="progress-controls-inner">
-            <ProgressRangeToolbar
-              period={customRange ? "custom" : activeTab}
-              range={selectedRange}
-              today={civilToday}
+            <Header
+              title={t(language, "common.progress")}
+              subtitle={compact ? formatProgressRange(selectedRange, language, calendarType) : undefined}
               language={language}
-              calendar={calendarType}
-              onPeriod={handleTabChange}
-              onCustom={setCustomRange}
+              elevateOnScroll={false}
+              style={{ position: "static", paddingInline: 0, background: "transparent" }}
+              right={
+                compact ? (
+                  <IconButton
+                    id={filterButtonId}
+                    data-testid="progress-filters-toggle"
+                    label={dashboardText(language, "dateFilters")}
+                    aria-expanded={filtersOpen}
+                    aria-controls={filterId}
+                    onClick={() => setFiltersOpen((open) => !open)}
+                  >
+                    <SlidersHorizontal size={20} aria-hidden="true" />
+                  </IconButton>
+                ) : undefined
+              }
             />
+            <div id={filterId} className="progress-date-filter" hidden={compact && !filtersOpen}>
+              <ProgressRangeToolbar
+                period={customRange ? "custom" : activeTab}
+                range={selectedRange}
+                today={civilToday}
+                language={language}
+                calendar={calendarType}
+                onPeriod={(period) => {
+                  handleTabChange(period);
+                  closeFilters();
+                }}
+                onCustom={(range) => {
+                  setCustomRange(range);
+                  closeFilters();
+                }}
+              />
+            </div>
             <TabList
               value={view}
               onChange={(next) => {
@@ -363,7 +370,7 @@ export function ProgressScreen({
                 const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
                 if (viewport) viewport.scrollTop = 0;
               }}
-              tabs={(["overview", "trends", "records"] as const).map((value) => ({
+              tabs={(["overview", "trends"] as const).map((value) => ({
                 value,
                 label: (
                   <span
@@ -374,9 +381,7 @@ export function ProgressScreen({
                       <BarChart3 size={18} className="progress-tab-icon" aria-hidden="true" />
                     ) : value === "trends" ? (
                       <Sprout size={18} className="progress-tab-icon" aria-hidden="true" />
-                    ) : (
-                      <FileText size={18} className="progress-tab-icon" aria-hidden="true" />
-                    )}
+                    ) : null}
                     {dashboardText(language, `view_${value}`)}
                   </span>
                 ),
@@ -385,7 +390,7 @@ export function ProgressScreen({
               direction={direction}
               idPrefix={viewId}
               aria-label={dashboardText(language, "views")}
-              className="progress-view-tabs mt-3 mb-1 grid grid-cols-3 gap-2"
+              className="progress-view-tabs mt-3 mb-1 grid grid-cols-2 gap-2"
               itemClassName={(selected) =>
                 `min-h-11 min-w-0 rounded-xl border border-border-control px-2 py-2 text-xs font-bold progress-focus ${selected ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`
               }
@@ -441,7 +446,6 @@ export function ProgressScreen({
             currentDay={isCurrentDay}
             language={language}
             calendar={calendarType}
-            onExport={exportSelectedPeriod}
           />
           {view === "overview" && (
             <details

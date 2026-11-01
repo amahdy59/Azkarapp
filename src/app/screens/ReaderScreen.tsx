@@ -962,8 +962,8 @@ export function ReaderScreen({
         aria-label={label}
         className={
           inDock
-            ? "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/60 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            : "adaptive-counter-nav devotional-secondary-action flex min-h-12 min-w-11 min-[360px]:w-[88px] shrink-0 items-center justify-center min-[360px]:justify-between gap-1 rounded-xl px-2 border border-border/60 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            ? "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/60 bg-card text-foreground shadow-sm transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "adaptive-counter-nav devotional-secondary-action flex min-h-12 min-w-11 min-[360px]:w-[88px] shrink-0 items-center justify-center min-[360px]:justify-between gap-1 rounded-xl px-2 border border-border/60 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         }
       >
         {isPrevious ? (
@@ -1791,6 +1791,7 @@ export function ReaderScreen({
           <>
             <div data-reading-chrome>
               <Header
+                pageGutters={false}
                 title={displayCategoryName}
                 style={{ paddingInline: 12 }}
                 titleStyle={{ lineHeight: 1.2 }}
@@ -2060,7 +2061,7 @@ export function ReaderScreen({
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/95 px-4 py-2.5 shadow-lg backdrop-blur-md text-foreground transition-all duration-200"
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/95 px-4 py-2.5 shadow-lg backdrop-blur-md text-foreground fade-in transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-standard"
           dir={direction}
         >
           <span className="text-sm font-medium">{t(language, "reader.resetCounter")}</span>

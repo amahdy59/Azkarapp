@@ -190,12 +190,12 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
     await seedAndOpen(page);
     await page.getByTestId("nav-progress").click();
 
-    // The approved compact header retains one semantic h1 without visible
-    // title chrome. Content headings still need full readable geometry.
+    // Progress uses the standard visible title with one semantic h1.
+    // Content headings still need full readable geometry.
     const title = page.getByRole("heading", { name: "Progress", exact: true, level: 1 });
     await expect(title).toHaveCount(1);
-    await expect(title).toHaveClass("sr-only");
-    await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
+    await expect(title).toBeVisible();
+    await expect(page.getByTestId("shared-screen-header")).toHaveCount(1);
 
     const period = page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true });
     for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {

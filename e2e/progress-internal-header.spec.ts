@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const language of ["ar", "en"] as const) {
-  test(`Progress title scrolls away while filters remain reachable in ${language} @cross-browser`, async ({
+  test(`Progress title and filters remain reachable with enlarged text in ${language} @cross-browser`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize({ width: 320, height: 480 });
@@ -18,15 +18,16 @@ for (const language of ["ar", "en"] as const) {
     await page.goto("/#/progress");
     const controls = page.getByTestId("progress-sticky-controls");
     const header = page.getByRole("heading", { name: language === "ar" ? "التقدم" : "Progress", exact: true });
-    await expect(header).toHaveClass("sr-only");
-    await expect(controls.getByTestId("shared-screen-header")).toHaveCount(0);
+    await expect(header).toBeVisible();
+    await expect(controls.getByTestId("shared-screen-header")).toHaveCount(1);
     await page.locator("html").evaluate((node) => (node.style.fontSize = "200%"));
     await expect(page.locator("html")).toHaveCSS("font-size", "32px");
     await page.locator(".progress-screen").evaluate((node) => (node.scrollTop = 250));
     await expect(controls).toHaveAttribute("data-scrolled", "true");
     await expect(controls).toHaveCSS("backdrop-filter", "none");
     await expect(controls).toHaveCSS("background-color", /^rgb\(/);
-    await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
+    await expect(page.getByTestId("shared-screen-header")).toHaveCount(1);
+    await page.getByTestId("progress-filters-toggle").click();
     const period = controls.getByRole("combobox").first();
     await period.focus();
     await expect(period).toBeFocused();
@@ -59,7 +60,7 @@ for (const language of ["ar", "en"] as const) {
     await page.goto("/#/progress");
     const controls = page.getByTestId("progress-sticky-controls");
     const header = page.getByRole("heading", { name: language === "ar" ? "التقدم" : "Progress", exact: true });
-    await expect(header).toHaveClass("sr-only");
+    await expect(header).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     const scene = page.getByTestId("time-of-day-scene-window").last().locator("img");
     await expect.poll(() => scene.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
@@ -73,7 +74,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(controls).toHaveCSS("background-color", /^rgb\(/);
       await expect(controls).toHaveCSS("background-image", "none");
       await expect(controls).toHaveCSS("backdrop-filter", "none");
-      await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
+      await expect(page.getByTestId("shared-screen-header")).toHaveCount(1);
       const coverage = await controls.evaluate((header) => {
         const bounds = header.getBoundingClientRect();
         const viewport = header.closest(".progress-screen")!.getBoundingClientRect();

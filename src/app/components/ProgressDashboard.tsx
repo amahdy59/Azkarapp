@@ -3,7 +3,6 @@ import {
   BarChart3,
   BookOpen,
   CheckCircle2,
-  ChevronRight,
   Moon,
   MoonStar,
   Mosque,
@@ -14,7 +13,6 @@ import {
   Sunrise,
   Lightbulb,
   Sprout,
-  Download,
 } from "./icons";
 import { ProgressBar } from "./ProgressBar";
 import { useId, useMemo, useRef, useState, type ReactNode } from "react";
@@ -39,16 +37,16 @@ import {
   type ProgressRange,
 } from "../progressDashboard";
 import { RecordingTimeline } from "./RecordingTimeline";
-import { ProgressRecordsTable } from "./ProgressRecordsTable";
 import { ProgressHeatmap } from "./ProgressHeatmap";
 import { ProgressRoutineComparison } from "./ProgressRoutineComparison";
+import { ProgressMetricCard } from "./ProgressMetricCard";
 import { IconButton } from "./LayoutShells";
 import { ChevronUp, ChevronDown } from "./icons";
 
 const action =
   "progress-dashboard-action min-h-11 rounded-lg border border-border-control px-3 py-2 text-sm font-semibold progress-focus disabled:opacity-50";
 const summary = "progress-disclosure";
-export type ProgressDashboardView = "overview" | "trends" | "records";
+export type ProgressDashboardView = "overview" | "trends";
 const METRIC_ICONS = {
   prayers: PrayerRug,
   routines: PrayerBeads,
@@ -72,7 +70,6 @@ export function ProgressDashboard({
   currentDay,
   language,
   calendar,
-  onExport,
   view = "overview",
   onShowTrend,
   onChooseWeek,
@@ -87,7 +84,6 @@ export function ProgressDashboard({
   currentDay: boolean;
   language: AppLanguage;
   calendar: CalendarType;
-  onExport: () => Promise<void>;
   view?: ProgressDashboardView;
   onShowTrend?: () => void;
   onChooseWeek?: () => void;
@@ -100,15 +96,6 @@ export function ProgressDashboard({
   const chooseButton = useRef<HTMLButtonElement>(null);
   const [metric, setMetric] = useState<ProgressMetric>("prayers");
   const [chartDisplay, setChartDisplay] = useState<"line" | "columns">("columns");
-  const exportKey = `${range.startKey}:${range.endKey}:${currentDay}:${calendar}`;
-  const exportPending = useRef(false);
-  const [exportBusy, setExportBusy] = useState(false);
-  const [exportState, setExportState] = useState<{ key: string; state: "idle" | "saving" | "saved" | "error" }>({
-    key: exportKey,
-    state: "idle",
-  });
-  const save = exportState.key === exportKey ? exportState.state : "idle";
-  const setSave = (state: typeof exportState.state) => setExportState({ key: exportKey, state });
   const values = useMemo(
     () =>
       Object.fromEntries(
@@ -206,7 +193,10 @@ export function ProgressDashboard({
             })}
           </p>
           {!hasActivity && (
-            <div className="my-3 rounded-xl border border-border bg-muted/30 p-3" data-testid="progress-empty-period">
+            <div
+              className="progress-empty-period my-3 rounded-xl border border-border bg-muted/30"
+              data-testid="progress-empty-period"
+            >
               <img
                 src={`${import.meta.env.BASE_URL}assets/cards/wird-quran-720.webp`}
                 width={720}
@@ -214,11 +204,13 @@ export function ProgressDashboard({
                 alt=""
                 className="progress-empty-art"
               />
-              <p className="text-lg font-bold">{text(language, "emptyPeriod")}</p>
-              <p className="mt-1 progress-help">
-                {text(language, hasTargets ? "targetOnlyHelp" : hasHistory ? "emptyPeriodHelp" : "noHistoryHelp")}
-              </p>
-              {emptyActions && <div className="mt-2 flex flex-wrap gap-2">{emptyActions}</div>}
+              <div className="min-w-0">
+                <p className="text-lg font-bold">{text(language, "emptyPeriod")}</p>
+                <p className="mt-1 progress-help">
+                  {text(language, hasTargets ? "targetOnlyHelp" : hasHistory ? "emptyPeriodHelp" : "noHistoryHelp")}
+                </p>
+                {emptyActions && <div className="progress-empty-actions mt-3 flex flex-wrap gap-2">{emptyActions}</div>}
+              </div>
             </div>
           )}
           {choosing && (
@@ -305,76 +297,39 @@ export function ProgressDashboard({
           )}
           <dl className="progress-overview-grid mt-3" data-testid="progress-overview">
             {metrics.map((key) => {
-              const Icon = METRIC_ICONS[key];
               const value = values[key];
-              return (
-                <div
-                  key={key}
-                  className="progress-metric-card relative min-w-0 rounded-xl border border-border p-3 sm:p-4"
-                  data-metric={key}
-                  data-testid={`progress-metric-${key}`}
-                >
-                  <dt className="text-xs font-semibold leading-relaxed text-muted-foreground">
-                    <button
-                      type="button"
-                      className="progress-metric-link flex min-h-11 w-full items-center gap-2 text-start"
-                      aria-label={text(language, "explore", { metric: text(language, key) })}
-                      onClick={() => {
-                        setMetric(key);
-                        onShowTrend?.();
-                      }}
-                    >
-                      <span className="progress-practice-icon">
-                        <Icon size={26} aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0 flex-1">{text(language, `short_${key}`)}</span>
-                      <ChevronRight size={14} aria-hidden="true" className="shrink-0 rtl:rotate-180" />
-                    </button>
-                  </dt>
-                  <dd className="progress-metric-quantity tabular-nums">
-                    <bdi>
-                      {value.possible !== null && value.possible > 0 ? (
-                        <>
-                          <span className="progress-metric-count">{formatNumerals(value.count, language)}</span>
-                          <span className="progress-metric-denominator">
-                            {text(language, "countOf", { count: "", total: formatNumerals(value.possible, language) })}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="progress-metric-count">{quantity(key)}</span>
-                      )}
-                    </bdi>
-                  </dd>
-                  {value.possible !== null && value.possible > 0 && (
-                    <dd className="mt-3">
-                      <ProgressBar
-                        value={Math.min(value.count, value.possible)}
-                        max={value.possible}
-                        height={5}
-                        fillColor="var(--metric-accent, var(--primary))"
-                        aria-label={text(language, key)}
-                        aria-valuetext={quantity(key)}
-                      />
-                    </dd>
-                  )}
-                  <dd className="mt-1 text-micro leading-relaxed text-muted-foreground">
-                    {key === "pages"
+              const caption =
+                key === "quranGoals"
+                  ? text(language, value.possible ? "knownGoalDays" : "noGoals")
+                  : value.count === 0
+                    ? text(language, "noMetricRecords")
+                    : key === "pages"
                       ? text(language, "pagesUnit")
-                      : key === "quranGoals"
-                        ? text(language, values[key].possible ? "knownGoalDays" : "noGoals")
-                        : values[key].possible
-                          ? formatPercentage(Math.round((values[key].count / values[key].possible!) * 100), language)
-                          : "—"}
-                  </dd>
-                  {(values[key].range.startKey !== values.prayers.range.startKey ||
-                    values[key].range.endKey !== values.prayers.range.endKey) && (
-                    <dd className="mt-2 text-micro leading-relaxed text-muted-foreground">
-                      {text(language, "currentRange", {
-                        range: values[key].days ? formatProgressRange(values[key].range, language, calendar) : "—",
-                      })}
-                    </dd>
-                  )}
-                </div>
+                      : value.possible
+                        ? formatPercentage(Math.round((value.count / value.possible) * 100), language)
+                        : "—";
+              return (
+                <ProgressMetricCard
+                  key={key}
+                  metric={key}
+                  value={value}
+                  valueText={quantity(key)}
+                  caption={caption}
+                  language={language}
+                  icon={METRIC_ICONS[key]}
+                  rangeLabel={
+                    value.range.startKey !== values.prayers.range.startKey ||
+                    value.range.endKey !== values.prayers.range.endKey
+                      ? text(language, "currentRange", {
+                          range: value.days ? formatProgressRange(value.range, language, calendar) : "—",
+                        })
+                      : undefined
+                  }
+                  onExplore={() => {
+                    setMetric(key);
+                    onShowTrend?.();
+                  }}
+                />
               );
             })}
           </dl>
@@ -575,56 +530,6 @@ export function ProgressDashboard({
           </details>
         </>
       )}
-      {view === "records" && (
-        <section aria-labelledby={`${id}-records`} className="space-y-3">
-          <h2 id={`${id}-records`} className="text-lg font-bold">
-            {text(language, "records")}
-          </h2>
-          <>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                className={action}
-                disabled={exportBusy}
-                onClick={async () => {
-                  if (exportPending.current) return;
-                  exportPending.current = true;
-                  setExportBusy(true);
-                  setSave("saving");
-                  try {
-                    await onExport();
-                    setSave("saved");
-                  } catch {
-                    setSave("error");
-                  } finally {
-                    exportPending.current = false;
-                    setExportBusy(false);
-                  }
-                }}
-              >
-                <Download className="me-2 inline-block" size={18} aria-hidden="true" />
-                {text(language, "export")}
-              </button>
-              <span
-                role={save === "error" ? "alert" : "status"}
-                aria-atomic="true"
-                className="text-xs text-muted-foreground"
-              >
-                {save === "idle" ? "" : text(language, save)}
-                {save === "saved" && <bdi className="block">{`progress-${range.startKey}-${range.endKey}.json`}</bdi>}
-              </span>
-            </div>
-          </>
-          <p className="progress-help">{text(language, "exportPrivacy")}</p>
-          <ProgressRecordsTable
-            key={`${range.startKey}-${range.endKey}-${currentDay}`}
-            records={scopedRows}
-            metrics={metrics}
-            language={language}
-            calendar={calendar}
-          />
-        </section>
-      )}
       {view !== "trends" && (
         <details className="rounded-xl border border-border bg-card px-4 sm:px-5">
           <summary className={summary}>
@@ -635,8 +540,6 @@ export function ProgressDashboard({
             <p>{text(language, "boundaryHelp", { hour: formatNumerals(dayStart, language) })}</p>
             <p>{text(language, "goalHelp")}</p>
             <p>{text(language, "chronological")}</p>
-            <p>{text(language, "recordsHelp")}</p>
-            <p>{text(language, "exportHelp")}</p>
           </div>
         </details>
       )}

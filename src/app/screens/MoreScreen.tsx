@@ -21,7 +21,7 @@ function ToolCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group flex min-h-32 w-full items-start gap-4 rounded-3xl border p-5 text-start shadow-raised transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+      className={`group flex min-h-32 min-w-0 w-full flex-wrap items-start gap-4 rounded-3xl border p-5 text-start shadow-raised transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
         featured ? "border-primary/45 bg-primary/10 hover:bg-primary/15" : "border-border/50 bg-card hover:bg-muted"
       }`}
     >
@@ -33,7 +33,7 @@ function ToolCard({
       >
         <Icon size={24} />
       </span>
-      <span className="min-w-0 flex-1">
+      <span className="min-w-0 flex-1 basis-[12rem] [overflow-wrap:anywhere]">
         <span className="block text-title font-extrabold text-foreground">{title}</span>
         <span className="mt-1 block text-sm font-semibold leading-6 text-muted-foreground">{description}</span>
       </span>
@@ -63,7 +63,7 @@ export function MoreScreen({
           subtitle={t(language, "more.subtitle")}
           language={language}
         />
-        <div className="grid w-full grid-cols-1 gap-3 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-4 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
           {onOpenQibla && (
             <ToolCard
               title={t(language, "qibla.title")}

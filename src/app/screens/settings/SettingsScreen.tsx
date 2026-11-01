@@ -90,6 +90,7 @@ export function SettingsScreen({
   onActivateAccount,
   onSignOut,
   onExportData,
+  onExportProgress,
   onRestoreData,
   onResetPreferences,
   onClearLocalData,
@@ -175,7 +176,7 @@ export function SettingsScreen({
   return (
     <div
       data-testid="settings-screen"
-      className="relative mx-auto flex h-full w-full max-w-[80rem] flex-col overflow-hidden bg-background"
+      className="settings-screen relative mx-auto flex h-full w-full max-w-[var(--content-page)] flex-col overflow-hidden bg-background"
       dir={direction}
     >
       {isTwoPaneLayout ? (
@@ -412,6 +413,7 @@ export function SettingsScreen({
             onActivateAccount={onActivateAccount}
             onSignOut={onSignOut}
             onExportData={onExportData}
+            onExportProgress={onExportProgress}
             onRestoreData={onRestoreData}
             onResetPreferences={onResetPreferences}
             onClearLocalData={onClearLocalData}

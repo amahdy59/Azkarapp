@@ -506,6 +506,7 @@ const en = {
     clearSearch: "Clear search",
   },
   search: {
+    title: "Search",
     placeholder: "Search azkar or duas",
     inputAriaLabel: "Search azkar and duas",
     clearAriaLabel: "Clear search",

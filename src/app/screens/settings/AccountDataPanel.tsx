@@ -7,6 +7,8 @@ import type { AppLanguage } from "../../types";
 import { useDeviceLinkStatus } from "../../hooks/useDeviceLinkStatus";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
 import { QrSyncPanel } from "./QrSyncPanel";
+import { DataExportMenu } from "./DataExportMenu";
+import type { ProgressRange } from "../../progressDashboard";
 
 export function AccountDataPanel({
   language,
@@ -20,6 +22,7 @@ export function AccountDataPanel({
   onActivateAccount,
   onSignOut,
   onExportData,
+  onExportProgress,
   onRestoreData,
   onResetPreferences,
   onClearLocalData,
@@ -37,6 +40,7 @@ export function AccountDataPanel({
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
+  onExportProgress?: (range: ProgressRange) => Promise<void>;
   onRestoreData: (raw: string) => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;
@@ -61,6 +65,7 @@ export function AccountDataPanel({
   const hasCloudflareDevice = useDeviceLinkStatus();
   const restoreInputRef = useRef<HTMLInputElement>(null);
   const [restoreError, setRestoreError] = useState("");
+  const [exportOpen, setExportOpen] = useState(false);
 
   const handleRestoreFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -146,7 +151,7 @@ export function AccountDataPanel({
             title={t(language, "accountData.exportTitle")}
             body={t(language, "accountData.exportBody")}
             action={t(language, "accountData.exportAction")}
-            onPress={onExportData}
+            onPress={() => setExportOpen(true)}
           />
           <input
             ref={restoreInputRef}
@@ -194,6 +199,13 @@ export function AccountDataPanel({
           )}
         </div>
       </div>
+      <DataExportMenu
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        language={language}
+        onBackup={onExportData}
+        onProgress={onExportProgress}
+      />
     </div>
   );
 }

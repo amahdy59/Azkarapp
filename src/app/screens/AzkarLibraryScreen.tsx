@@ -219,12 +219,12 @@ export function AzkarLibraryScreen({
     >
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
         <header className="library-stationary-header shrink-0 border-b border-border-control/25 bg-background px-page pb-3 pt-2 sm:pb-4">
-          <div className="flex min-h-11 min-w-0 items-center justify-between gap-3">
+          <div className="flex min-h-11 min-w-0 items-start justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
-                {t(language, "library.title")}
-              </h1>
-              <p className="mt-1 hidden text-sm text-muted-foreground lg:block">{t(language, "library.subtitle")}</p>
+              <h1 className="page-title max-w-full font-sans text-foreground">{t(language, "library.title")}</h1>
+              <p className="hidden text-xs leading-[18px] text-muted-foreground lg:block">
+                {t(language, "library.subtitle")}
+              </p>
             </div>
 
             <TabList
@@ -624,7 +624,7 @@ export function AzkarLibraryScreen({
                                   }
                                   onZikr(zikr.category, Math.max(0, itemIndex));
                                 }}
-                                className="interactive-elem flex w-full flex-col items-start gap-2 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all cursor-pointer"
+                                className="interactive-elem flex w-full flex-col items-start gap-2 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-[color,background-color,border-color,box-shadow,opacity,transform] cursor-pointer"
                                 aria-label={
                                   isArabic ? zikr.arabicText.slice(0, 60) : zikr.translation.split(".")[0] || zikr.id
                                 }

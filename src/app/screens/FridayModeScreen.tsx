@@ -213,7 +213,7 @@ export function FridayModeScreen({
     >
       <Header onBack={onBack} title={t(language, "friday.title")} language={language} />
 
-      <div className="page-content-center relative z-10 grid min-h-0 flex-1 auto-rows-max grid-cols-1 gap-4 overflow-y-auto px-5 pb-8 pt-3 lg:grid-cols-2 lg:items-start">
+      <div className="page-content-center relative z-10 grid min-h-0 flex-1 auto-rows-max grid-cols-1 gap-4 overflow-y-auto pb-8 pt-3 lg:grid-cols-2 lg:items-start">
         <section className="shrink-0 overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 to-card p-5 shadow-raised lg:col-span-2">
           <div className="flex items-start justify-between gap-4">
             <div className="text-start">

@@ -1,4 +1,6 @@
-[Progress heatmap refinement and release](phases/PROGRESS_HEATMAP_REFINEMENT_2026_11_01.md) is the current owner-approved phase: implement all accepted visual/UX recommendations, preserve the four metrics and data contracts, integrate pending changes and complete main/CI/Pages/production verification. It supersedes the proposal-only review and the earlier recording-strip/latest-day presentation in [Progress vNext](phases/PROGRESS_VNEXT_2026_10_31.md).
+[Progress title, mobile filters and Settings export](phases/PROGRESS_FILTER_EXPORT_2026_11_01.md) is the current owner-directed refinement: align page-title bands/gutters, match adjacent control heights, compact wider empty states with rounded artwork, collapse mobile dates behind a filter icon, retain two Progress tabs and move JSON export into Settings. Reuse shared motion and document responsive, performance and accessibility evidence. Preserve the verified scroll protection and mobile date access from [Progress heatmap refinement](phases/PROGRESS_HEATMAP_REFINEMENT_2026_11_01.md) and complete unchanged release verification.
+
+[Visual consistency report](reports/VISUAL_CONSISTENCY_2026_11_01.md) records the app-wide review, reusable metric-card hierarchy, responsive Search/utility fixes, purposeful motion, changed versus retained layouts, screenshot evidence and exact acceptance limits.
 
 [Recognizable Home reminder label](phases/HOME_REMINDER_LABEL_2026_10_31.md) records the preceding completed phase.
 

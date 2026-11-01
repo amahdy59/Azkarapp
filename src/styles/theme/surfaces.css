@@ -504,7 +504,8 @@ button:is([aria-disabled="true"], [data-disabled]):active {
 :root {
   --content-reading: 34rem;
   --content-form: 40rem;
-  --content-dashboard: 90rem;
+  --content-page: 80rem;
+  --content-dashboard: var(--content-page);
   --content-app-shell: 100rem;
   --nav-rail-width: 5rem;
   --nav-sidebar-width: 16rem;

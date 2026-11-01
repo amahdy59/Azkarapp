@@ -89,7 +89,7 @@ export function DailyCompanionsCard({
               </span>
             )}
             <div
-              className={`flex size-6 items-center justify-center rounded-full border transition-all ${
+              className={`flex size-6 items-center justify-center rounded-full border transition-[color,background-color,border-color,box-shadow,opacity,transform] ${
                 quranWird
                   ? "border-success bg-success text-success-foreground"
                   : "border-border bg-transparent text-transparent"

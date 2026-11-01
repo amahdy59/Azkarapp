@@ -9,10 +9,12 @@
 @media (width < 40rem) {
   .library-section-tabs {
     grid-template-columns: repeat(2, var(--ds-control-height-compact));
+    align-self: stretch;
   }
 
   .library-section-tabs [role="tab"] {
-    height: var(--ds-control-height-compact);
+    min-height: var(--ds-control-height-compact);
+    height: auto;
     padding: 0;
   }
 

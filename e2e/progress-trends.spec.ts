@@ -79,7 +79,7 @@ for (const language of ["ar", "en"] as const) {
     await expect(prayerTimeline.getByTestId("timeline-readout")).toContainText(ar ? "١٠٠٪" : "100%");
     await expect(page.getByRole("table")).toHaveCount(0);
     // One range, detail topic and two prayer selectors.
-    await expect(page.getByRole("combobox")).toHaveCount(5);
+    await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(5);
     await expect(page.getByTestId("prayer-coverage-hint")).toContainText(ar ? "١٧" : "17 complete days");
     await expect(prayers.getByTestId("insight-fajr").getByRole("img")).toHaveAccessibleName(
       ar ? /١٠٠٪/ : /100%; 17 days/,
@@ -184,7 +184,7 @@ for (const language of ["ar", "en"] as const) {
     );
     await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(10);
     await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true }),
+      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
       "custom",
     );
     await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2025-01-01");
@@ -202,7 +202,7 @@ for (const language of ["ar", "en"] as const) {
     await historical.getByRole("slider").press("Home");
     await expect(historical.getByTestId("timeline-readout")).toContainText(ar ? "٠" : "0");
     await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true }),
+      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
       "year",
     );
     await page.getByTestId("progress-tab-overview").click();

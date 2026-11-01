@@ -95,7 +95,7 @@ export function Header({
   backButtonClassName,
   style,
   titleStyle,
-  pageGutters = false,
+  pageGutters = true,
 }: {
   title: string;
   subtitle?: string;
@@ -108,7 +108,7 @@ export function Header({
   backButtonClassName?: string;
   style?: React.CSSProperties;
   titleStyle?: React.CSSProperties;
-  /** Ordinary pages use the responsive page gutter; devotional chrome retains its inset. */
+  /** Devotional chrome can opt into its compact reading inset. */
   pageGutters?: boolean;
 }) {
   const headerRef = useRef<HTMLDivElement>(null);
@@ -120,7 +120,7 @@ export function Header({
       data-testid="shared-screen-header"
       data-scrolled={isScrolled || undefined}
       data-header-contrast="solid"
-      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-transparent bg-background ${pageGutters ? "px-page" : "px-4"} pt-2 pb-1 transition-colors duration-standard`}
+      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 gap-2 border-transparent bg-background ${pageGutters ? "page-header-frame items-start px-page" : "items-center px-4"} pt-2 pb-1 transition-colors duration-standard`}
       style={{ minHeight: 56, ...style }}
     >
       {/* Reading headers use one opaque surface; scene artwork belongs below
@@ -152,7 +152,11 @@ export function Header({
             Enlarged text may need more than two lines; the header grows rather
             than hiding the destination name. */}
         <h1
-          className="max-w-full break-words font-sans text-lg font-extrabold leading-tight text-foreground min-[360px]:text-xl sm:text-2xl"
+          className={
+            pageGutters
+              ? "page-title max-w-full font-sans text-foreground"
+              : "max-w-full break-words font-sans text-lg font-extrabold leading-tight text-foreground min-[360px]:text-xl sm:text-2xl"
+          }
           title={title}
           style={titleStyle}
         >
@@ -160,16 +164,18 @@ export function Header({
         </h1>
         {subtitle && <p className="text-xs text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
-      <div
-        style={{
-          position: "relative",
-          zIndex: 10,
-          background: decoration ? "var(--background)" : undefined,
-          borderRadius: "var(--radius-btn)",
-        }}
-      >
-        {right}
-      </div>
+      {right && (
+        <div
+          style={{
+            position: "relative",
+            zIndex: 10,
+            background: decoration ? "var(--background)" : undefined,
+            borderRadius: "var(--radius-btn)",
+          }}
+        >
+          {right}
+        </div>
+      )}
     </div>
   );
 }

@@ -504,6 +504,7 @@ const ar = {
     clearSearch: "مسح البحث",
   },
   search: {
+    title: "البحث",
     placeholder: "ابحث في الأذكار والأدعية",
     inputAriaLabel: "البحث في الأذكار والأدعية",
     clearAriaLabel: "مسح البحث",

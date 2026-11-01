@@ -85,7 +85,7 @@ function WirdCategoryCard({
       data-recommended-now={showRecommended ? "true" : undefined}
       data-category={categoryKey}
       data-testid="wird-category-card"
-      className={`hero-glass home-glass-surface group relative flex min-h-48 flex-col overflow-hidden rounded-3xl border border-white/20 p-4 text-start shadow-raised transition-all duration-standard ease-standard hover:border-white/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 sm:min-h-[13.5rem] lg:min-h-[14.5rem] ${
+      className={`hero-glass home-glass-surface group relative flex min-h-48 flex-col overflow-hidden rounded-3xl border border-white/20 p-4 text-start shadow-raised transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-standard ease-standard hover:border-white/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 sm:min-h-[13.5rem] lg:min-h-[14.5rem] ${
         isCompleted ? "ring-2 ring-success/60" : ""
       }`}
     >

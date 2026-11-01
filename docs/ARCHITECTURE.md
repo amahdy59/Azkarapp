@@ -1,5 +1,17 @@
 # Application architecture
 
+## Ordinary-page layout consistency — 2026-11-01
+
+The shared Header defaults to the ordinary 80rem page frame and responsive page gutter. A shared CSS title recipe reserves a 44px row with subtitles below it; Library and Settings reuse that recipe without replacing their scroll owners or heading hierarchy. Search now uses the same visible header and frame while preserving its native field label and deferred search/index logic. Progress keeps its full-scrollport opaque wrapper and moves the common measure/gutter onto its inner controls, matching its body. Utility content uses the same frame/gutter; Category keeps its narrower form body below an ordinary outer header. ReadingScreenChrome/Reader explicitly opt into compact devotional geometry; immersive Mushaf and Home prayer alignment remain separate intentional contracts. Layout checks compare measured coordinates and reflow across ordinary routes in both directions and enlarged text.
+
+ProgressMetricCard contains reusable presentation only: normalized values, metric identity, localized quantity/caption and navigation arrive from ProgressDashboard. Theme tokens and CSS container queries own color, hierarchy and reflow. No storage/network request, extra index, animation clock or dependency is added. Existing icon exports and the shared ProgressBar supply the symbol and bounded fill feedback.
+
+## Progress title/filter/export refinement — 2026-11-01
+
+The owner replaces three Progress tabs with Overview and Trends and restores the shared visible Header. At the existing 600px compact boundary, the date editor is initially hidden behind an accessible filter action; the applied range remains in the title subtitle. Completed preset/custom choices close the filters and restore focus to their visible opener. Wider screens keep adjacent date/two-tab controls. The opaque full-width sticky wrapper and native focus-clearance boundary remain authoritative.
+
+Settings Account & data owns a shared DataExportMenu sheet offering the existing normalized/restorable full backup separately from dated progress JSON. The app passes a snapshot-bound async callback; progressExport loads only on export intent and reuses existing index/range/unknown-goal rules plus the native-aware file dispatcher. The Progress page no longer mounts its former Records table or file-export UI. Exact chart tables, calendar date details, data schemas and persistence remain intact. Shared form labels, native date fields and protected select primitives supply the same control anatomy.
+
 ## Progress mobile and scrolling correction — 2026-11-01
 
 The owner supersedes the frost-only Progress header. One opaque full-scrollport sticky wrapper owns an unconstrained inner control row, protecting gutters and keeping enlarged controls reachable in its bounded scroll area. The body owns page gutters separately. Heatmap cells reflow through a named container query instead of horizontal scrolling; physical up/down keys follow actual rendered columns. Phone date activation opens exact records in ResponsiveSheet with native close/focus recovery, while wider layouts retain inline detail. Fixed colour scales and date/month exploration preserve the shared range and persisted data.

@@ -463,7 +463,7 @@ export function MushafQuickMenu({
                       aria-label={t(language, opt.nameKey)}
                       data-testid={`quick-theme-${opt.id}`}
                       onClick={() => onSelectTheme(opt.id)}
-                      className={`flex h-11 flex-col items-center justify-center rounded-xl border p-1 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      className={`flex h-11 flex-col items-center justify-center rounded-xl border p-1 transition-[color,background-color,border-color,box-shadow,opacity,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                         isSelected
                           ? "border-primary ring-2 ring-primary/40 shadow-xs"
                           : "border-border/60 hover:border-border"

@@ -1,4 +1,13 @@
 import { expect, type Locator, type Page } from "@playwright/test";
+import { t } from "../../src/app/i18n";
+
+export async function openProgressExport(page: Page, language: "ar" | "en") {
+  await page.goto("/#/settings/account-data");
+  await page.getByRole("button", { name: t(language, "accountData.exportAction"), exact: true }).click();
+  const menu = page.getByTestId("settings-export-menu");
+  await expect(menu).toBeVisible();
+  return menu;
+}
 
 export async function chooseProgressDetail(page: Page, topic: "prayers" | "routines" | "friday" | "reflection") {
   await chooseProgressOption(page.getByRole("combobox", { name: /Explore details|استكشاف التفاصيل/ }), topic);
@@ -12,6 +21,11 @@ export async function expectProgressFilterFocus(control: Locator) {
   }
   const disclosure = control.page().getByTestId("progress-range-disclosure");
   const inRange = await control.evaluate((node) => Boolean(node.closest('[data-testid="progress-range-disclosure"]')));
+  const filters = control.page().getByTestId("progress-filters-toggle");
+  if (!(await control.isVisible()) && (await filters.isVisible())) {
+    await expect(filters).toBeFocused();
+    return;
+  }
   if (inRange && !(await disclosure.evaluate((node) => (node as HTMLDetailsElement).open))) {
     if ((await disclosure.count()) && (await control.getAttribute("data-progress-value")) === "custom")
       await expect(control.page().getByRole("button", { name: /Choose dates:|اختيار التواريخ:/ })).toBeFocused();
@@ -23,6 +37,8 @@ export async function chooseProgressOption(control: Locator, value: string) {
   await control.waitFor({ state: "attached" });
   const disclosure = control.page().getByTestId("progress-range-disclosure");
   if (!(await control.isVisible()) && (await disclosure.count())) await disclosure.locator("summary").click();
+  if (!(await control.isVisible()) && (await control.page().getByTestId("progress-filters-toggle").isVisible()))
+    await control.page().getByTestId("progress-filters-toggle").click();
   const id = await control.getAttribute("id");
   await control.click();
   await control

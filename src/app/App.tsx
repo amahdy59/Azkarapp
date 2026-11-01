@@ -2539,6 +2539,10 @@ function AppContent({
                   onActivateAccount={handleOpenAccountAuth}
                   onSignOut={handleSignOut}
                   onExportData={handleExportData}
+                  onExportProgress={async (range) => {
+                    const { saveProgressExport } = await import("./progressExport");
+                    await saveProgressExport(appStateSnapshot, range);
+                  }}
                   onRestoreData={handleRestoreData}
                   onResetPreferences={handleResetPreferences}
                   onClearLocalData={handleClearLocalData}

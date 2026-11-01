@@ -104,7 +104,11 @@ for (const language of ["en", "ar"] as const) {
     await openReturningHome(page);
     await page.getByTestId("nav-progress").click();
     await chooseProgressOption(
-      page.getByRole("combobox", { name: language === "ar" ? "نطاق التاريخ" : "Date range", exact: true }),
+      page.getByRole("combobox", {
+        name: language === "ar" ? "نطاق التاريخ" : "Date range",
+        exact: true,
+        includeHidden: true,
+      }),
       "day",
     );
     await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
@@ -144,6 +148,7 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   await chooseProgressDetail(page, "routines");
 
   const period = page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true });
+  if (!(await period.isVisible())) await page.getByTestId("progress-filters-toggle").click();
   await period.click();
   const options = page.getByRole("option");
   await expect(options).toHaveCount(6);
@@ -311,7 +316,10 @@ test("weekly charts convey complete-day recording values through accessible text
   await expect(garden).toContainText("3 complete days");
   await page.clock.setFixedTime(new Date("2026-10-12T12:00:00Z"));
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-  await chooseProgressOption(page.getByRole("combobox", { name: "Date range", exact: true }), "week");
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "week",
+  );
   // Monday has one complete day in the Sunday-start week; moving the test
   // clock alone does not fire the visibility/minute events used by the app.
   await expect(garden).toContainText("1 complete days");

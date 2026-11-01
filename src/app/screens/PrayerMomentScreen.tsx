@@ -58,7 +58,7 @@ export function PrayerMomentScreen({
           a page rather than a poster: a grid whose rows may stretch will spread
           three rows of content down a 900px desk screen, leaving 150px of empty
           card between every band. */}
-      <div className="page-content-center flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 [&>*]:shrink-0 md:grid md:content-start md:grid-cols-2 md:gap-4">
+      <div className="page-content-center flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-6 pt-3 [&>*]:shrink-0 md:grid md:content-start md:grid-cols-2">
         <PrayerMomentPanel
           prayer={prayer}
           language={language}

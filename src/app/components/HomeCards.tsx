@@ -114,7 +114,7 @@ export function PrayerRoutineCard({
                   onGlass ? "border-white/20 home-glass-inset" : "border-border bg-muted"
                 }`}
                 itemClassName={(selected) =>
-                  `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-[color,background-color,border-color,box-shadow,opacity,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "bg-primary text-primary-foreground"
                       : onGlass

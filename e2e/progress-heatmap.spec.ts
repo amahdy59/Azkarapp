@@ -36,7 +36,11 @@ for (const language of ["ar", "en"] as const) {
     await seed(page, language);
     await page.setViewportSize({ width: 834, height: 1112 });
     await page.goto("/#/progress");
-    const range = page.getByRole("combobox", { name: language === "ar" ? "نطاق التاريخ" : "Date range", exact: true });
+    const range = page.getByRole("combobox", {
+      name: language === "ar" ? "نطاق التاريخ" : "Date range",
+      exact: true,
+      includeHidden: true,
+    });
     await expect(range).toHaveAttribute("data-progress-value", "last30");
     const date = page.getByTestId("garden-view-date");
     const dates = await date.textContent();
@@ -83,9 +87,8 @@ for (const language of ["ar", "en"] as const) {
       "line",
     );
     await expect(page.getByTestId("recording-time-line")).toBeVisible();
-    await page.getByTestId("progress-tab-records").click();
-    await expect(page.getByRole("table")).toContainText(language === "ar" ? "٢١" : "21");
-    await expect(date).toHaveText(dates!);
+    await expect(page.getByRole("tab")).toHaveCount(2);
+    await expect(page.getByTestId("progress-tab-records")).toHaveCount(0);
     await page.getByTestId("progress-tab-overview").click();
     const composition = page.getByTestId("progress-routine-bars").locator("summary");
     await composition.click();
@@ -98,6 +101,7 @@ for (const language of ["ar", "en"] as const) {
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";
     });
+    await page.getByTestId("progress-filters-toggle").click();
     await range.scrollIntoViewIfNeeded();
     const control = (await range.boundingBox())!;
     const tabs = (await page.getByRole("tablist").boundingBox())!;
@@ -154,7 +158,10 @@ test("Progress calendar marks future and unknown goals and bounds long ranges @c
   await heatmap.getByRole("button", { name: "October", exact: true }).click();
   await expect(heatmap.locator('[data-day="2026-10-21"]')).toBeDisabled();
   await expect(heatmap.locator('[data-day="2026-10-19"]')).toHaveAccessibleName(/0 of 1/);
-  await chooseProgressOption(page.getByRole("combobox", { name: "Date range", exact: true }), "custom");
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "custom",
+  );
   await page.getByLabel("Start date").fill("1900-01-01");
   await page.getByLabel("End date").fill("2026-10-20");
   await page.getByRole("button", { name: "Apply", exact: true }).click();
