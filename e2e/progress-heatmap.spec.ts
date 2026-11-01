@@ -64,7 +64,15 @@ for (const language of ["ar", "en"] as const) {
       await range.scrollIntoViewIfNeeded();
       const control = (await range.boundingBox())!;
       const tabs = (await page.getByRole("tablist").boundingBox())!;
-      expect(Math.abs(control.y + control.height - tabs.y - tabs.height)).toBeLessThanOrEqual(2);
+      for (const tab of await page.getByRole("tab").all()) {
+        const option = (await tab.boundingBox())!;
+        expect(Math.abs(control.y + control.height - option.y - option.height)).toBeLessThanOrEqual(2);
+        expect(Math.abs(control.y - option.y)).toBeLessThanOrEqual(2);
+        const before = option.y - tabs.y;
+        const after = tabs.y + tabs.height - option.y - option.height;
+        expect(before).toBeGreaterThanOrEqual(4);
+        expect(before).toBeCloseTo(after, 0);
+      }
       expect(language === "ar" ? tabs.x + tabs.width <= control.x : control.x + control.width <= tabs.x).toBe(true);
       await page.screenshot({ path: info.outputPath(`heatmap-${language}-${width}.png`) });
     }
