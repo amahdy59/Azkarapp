@@ -275,7 +275,12 @@ for (const language of ["ar", "en"] as const) {
         .poll(() => controls.evaluate((node) => node.getBoundingClientRect().top))
         .toBeLessThanOrEqual(before!.y);
       expect(await scrollport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
-      await expect(page.getByRole("heading", { name: ar ? "التقدم" : "Progress", exact: true })).not.toBeInViewport();
+      const title = controls.getByRole("heading", { level: 1, name: ar ? "التقدم" : "Progress", exact: true });
+      await expect(title).toBeInViewport();
+      const titleBounds = (await title.boundingBox())!;
+      const controlsBounds = (await controls.boundingBox())!;
+      expect(titleBounds.y).toBeGreaterThanOrEqual(controlsBounds.y);
+      expect(titleBounds.y + titleBounds.height).toBeLessThanOrEqual(controlsBounds.y + controlsBounds.height);
       const height = await scrollport.evaluate((node) => node.clientHeight);
       expect((await controls.boundingBox())!.height).toBeLessThanOrEqual(height * 0.7);
       for (const name of ar ? ["يوم", "أسبوع", "شهر", "سنة"] : ["Day", "Week", "Month", "Year"]) {

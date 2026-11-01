@@ -78,7 +78,7 @@ export function SubHeader({
       data-testid="shared-screen-header"
       data-scrolled={hasScrolled || undefined}
       className="shared-screen-header sticky top-0 z-40 flex items-start justify-between gap-2 bg-background px-page pt-2 pb-1 shrink-0 transition-colors duration-standard"
-      style={{ minHeight: 56 }}
+      style={{ minHeight: 56, paddingInline: "min(var(--spacing-page), 16px)", columnGap: 8 }}
     >
       <IconButton
         onClick={onBack}

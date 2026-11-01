@@ -12,6 +12,8 @@ The owner replaces three Progress tabs with Overview and Trends and restores the
 
 Settings Account & data owns a shared DataExportMenu sheet offering the existing normalized/restorable full backup separately from dated progress JSON. The app passes a snapshot-bound async callback; progressExport loads only on export intent and reuses existing index/range/unknown-goal rules plus the native-aware file dispatcher. The Progress page no longer mounts its former Records table or file-export UI. Exact chart tables, calendar date details, data schemas and persistence remain intact. Shared form labels, native date fields and protected select primitives supply the same control anatomy.
 
+Compact Settings subheaders retain a 16 CSS px maximum inline gutter and fixed 8px Back/title gap, so enlarged text keeps its reading width beside the 44px Back action. Downloads storage-details headings/status and diagnostic label/value rows wrap independently at narrow enlarged widths; no clipping or storage-behavior change is introduced.
+
 ## Progress mobile and scrolling correction — 2026-11-01
 
 The owner supersedes the frost-only Progress header. One opaque full-scrollport sticky wrapper owns an unconstrained inner control row, protecting gutters and keeping enlarged controls reachable in its bounded scroll area. The body owns page gutters separately. Heatmap cells reflow through a named container query instead of horizontal scrolling; physical up/down keys follow actual rendered columns. Phone date activation opens exact records in ResponsiveSheet with native close/focus recovery, while wider layouts retain inline detail. Fixed colour scales and date/month exploration preserve the shared range and persisted data.

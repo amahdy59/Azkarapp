@@ -52,7 +52,15 @@ for (const language of ["ar", "en"] as const) {
           document.documentElement.style.fontSize = enlarged ? "200%" : "100%";
         }, enlarged);
         const date = page.getByTestId("garden-view-date");
-        if (!(await date.isVisible())) await page.getByTestId("progress-filters-toggle").click();
+        const filters = page.getByTestId("progress-filters-toggle");
+        // Resize updates the media-query hook after the viewport itself changes.
+        // Wait for that responsive state before deciding whether to open filters.
+        if (width < 600) {
+          await expect(filters).toBeVisible();
+          if ((await filters.getAttribute("aria-expanded")) === "false") await filters.click();
+        } else {
+          await expect(filters).toBeHidden();
+        }
         await expect(date).toBeVisible();
         expect(
           await date.evaluate(
@@ -64,9 +72,26 @@ for (const language of ["ar", "en"] as const) {
         ).toBe(true);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
         // A reflowed month can be taller than the viewport. Reveal its title,
-        // rather than asking WebKit to centre the entire oversized section.
-        await pattern.getByRole("heading", { level: 2 }).scrollIntoViewIfNeeded();
-        expect(await pattern.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+        // including after the responsive shell finishes replacing its scrollport.
+        // Scroll only the page's owner: native scrollIntoView can also scroll
+        // clipped outer shell ancestors during Firefox/WebKit shell replacement.
+        const calendarTitle = pattern.getByRole("heading", { level: 2 });
+        await expect(async () => {
+          await calendarTitle.evaluate((node) => {
+            const viewport = node.closest<HTMLElement>(".progress-screen")!;
+            const controls = viewport.querySelector<HTMLElement>('[data-testid="progress-sticky-controls"]')!;
+            viewport.scrollTop +=
+              node.getBoundingClientRect().top - viewport.getBoundingClientRect().top - controls.clientHeight - 16;
+          });
+          // Font/layout reflow can finish after the scroll assignment. Prove
+          // actual intersection and reveal again within the same 15s deadline.
+          await expect(calendarTitle).toBeInViewport({ timeout: 250 });
+        }).toPass({ timeout: 15_000 });
+        await expect
+          .poll(() => pattern.evaluate((node) => node.scrollWidth - node.clientWidth), {
+            message: `Calendar overflow at ${language}/${width}/${enlarged ? "200" : "100"}%`,
+          })
+          .toBeLessThanOrEqual(1);
         await page.screenshot({
           path: info.outputPath(`progress-${language}-${width}-${enlarged ? "200" : "100"}.png`),
           scale: "css",

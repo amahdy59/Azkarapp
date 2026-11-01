@@ -77,6 +77,12 @@ for (const [language, width] of [
         );
       }, language);
       await page.goto("/#/" + route);
+      if (route === "progress" && width < 600) {
+        const filters = page.getByTestId("progress-filters-toggle");
+        await expect(filters).toHaveAttribute("aria-expanded", "false");
+        await filters.click();
+        await expect(filters).toHaveAttribute("aria-expanded", "true");
+      }
       const scope = page.locator(
         width === 1440 && route.startsWith("settings")
           ? route === "settings"

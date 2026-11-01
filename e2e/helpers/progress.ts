@@ -35,6 +35,13 @@ export async function expectProgressFilterFocus(control: Locator) {
 
 export async function chooseProgressOption(control: Locator, value: string) {
   await control.waitFor({ state: "attached" });
+  if (await control.evaluate((node) => Boolean(node.closest(".progress-range-toolbar")))) {
+    const filters = control.page().getByTestId("progress-filters-toggle");
+    // Viewport resizing and React's media-query subscription settle separately.
+    // Do not click the old phone opener while the wider layout is mounting.
+    if (control.page().viewportSize()!.width < 600) await expect(filters).toBeVisible();
+    else await expect(filters).toBeHidden();
+  }
   const disclosure = control.page().getByTestId("progress-range-disclosure");
   if (!(await control.isVisible()) && (await disclosure.count())) await disclosure.locator("summary").click();
   if (!(await control.isVisible()) && (await control.page().getByTestId("progress-filters-toggle").isVisible()))

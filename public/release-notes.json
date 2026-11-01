@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-01.4",
+  "release": "2026-11-01.5",
   "ar": [
-    "عناوين وهوامش متناسقة، وبطاقات تقدم أوضح تتكيف مع المظهر وحجم الشاشة، مع تبويبين وزر لتصفية التاريخ على الهاتف.",
-    "تصفح تقويم التسجيلات دون تمرير جانبي، وافتح تفاصيل التاريخ على الهاتف مع رأس يغطي المحتوى أثناء التمرير.",
-    "من الإعدادات، نزّل نسخة احتياطية كاملة أو بيانات التقدم بصيغة JSON لفترة تختارها.",
-    "ابدأ بآخر ٣٠ يومًا، وقارن الأوراد بالأشرطة وتوزيع السجلات واختر الأعمدة أو الخطوط."
+    "تصفح صفحات بعناوين وهوامش متناسقة، وبطاقات تقدم أوضح، وعناوين إعدادات تقرأها بسهولة عند تكبير النص.",
+    "استخدم تبويبي التقدم وزر تصفية التاريخ على الهاتف، مع رأس يحمي المحتوى أثناء التمرير.",
+    "افتح تفاصيل أيام التقويم دون تمرير جانبي، ونزّل من الإعدادات نسخة احتياطية كاملة أو بيانات تقدم لفترة تختارها.",
+    "راجع آخر ٣٠ يومًا تلقائيًا، وقارن تسجيلات الأوراد بالأشرطة والتوزيع، وتصفح الاتجاهات بالأعمدة أو الخطوط."
   ],
   "en": [
-    "Consistent page titles and gutters, clearer Progress cards that adapt to your theme and screen, two tabs and a phone date-filter button.",
-    "Browse dates without sideways scrolling, open phone date details and keep scrolling content covered behind the header.",
-    "In Settings, download a full app backup or Progress JSON for dates you choose.",
-    "Start with the last 30 days, compare routine bars and breakdowns, and choose columns or lines."
+    "Browse consistent page titles and spacing, clearer Progress cards, and readable Settings headings when text is enlarged.",
+    "Use two Progress tabs and a phone date-filter button, with a header that keeps scrolling content covered.",
+    "Open calendar day details without sideways scrolling, and download a full backup or dated Progress data from Settings.",
+    "See the last 30 days by default, compare routine recordings with bars and breakdowns, and explore column or line trends."
   ]
 }

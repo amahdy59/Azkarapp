@@ -672,8 +672,8 @@ export function DownloadsPanel({
         </div>
         {/* Card 4: Technical Diagnostics in an expandable disclosure */}
         <details className="group rounded-2xl border border-border/60 bg-card p-4 transition-colors">
-          <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between rounded-lg text-subtitle font-semibold text-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-            <span className="flex items-center gap-2">
+          <summary className="flex min-h-11 cursor-pointer select-none flex-wrap items-center justify-between gap-2 rounded-lg text-subtitle font-semibold text-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+            <span className="flex min-w-0 items-center gap-2">
               <Database size={18} className="text-primary" aria-hidden="true" />
               {t(language, "downloads.storageDetails")}
             </span>
@@ -704,31 +704,31 @@ export function DownloadsPanel({
                     {status.serviceWorkerReady ? t(language, "downloads.active") : t(language, "downloads.inactive")}
                   </dd>
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushaf")}</dt>
                   <dd className="font-medium text-foreground">
                     {formatNumerals(status.downloadedMushafPages, language)} / {formatNumerals(604, language)}
                   </dd>
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.caches")}</dt>
                   <dd className="font-medium text-foreground">{status.cacheCount}</dd>
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.storageUsed")}</dt>
                   <dd className="font-medium text-foreground">{formatMegabytes(status.usageBytes, language)}</dd>
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.quota")}</dt>
                   <dd className="font-medium text-foreground">{formatMegabytes(status.quotaBytes, language)}</dd>
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.downloadedAudio")}</dt>
                   <dd className="font-medium text-foreground">
                     {status.downloadedAudioAssets} · {formatMegabytes(status.downloadedAudioBytes, language)}
                   </dd>
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushafEstimate")}</dt>
                   <dd className="font-medium text-foreground">
                     {status.downloadedMushafPages} ·{" "}

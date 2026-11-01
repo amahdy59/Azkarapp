@@ -11,6 +11,7 @@ for (const scenario of [
   { language: "en", width: 1440, height: 900, theme: "dark", scale: 1 },
   { language: "en", width: 390, height: 844, theme: "light", scale: 2 },
   { language: "ar", width: 320, height: 844, theme: "midnight", scale: 2 },
+  { language: "en", width: 320, height: 844, theme: "light", scale: 2 },
   { language: "ar", width: 844, height: 390, theme: "midnight", scale: 1 },
 ] as const) {
   test(`offline downloads remain reachable with audio: ${scenario.language}/${scenario.width}/${scenario.scale} @cross-browser`, async ({
@@ -81,6 +82,9 @@ for (const scenario of [
     await expect(refresh).toBeFocused();
     const geometry = await scroll.evaluate((el) => ({
       overflow: el.scrollWidth - el.clientWidth,
+      overflowing: Array.from(el.querySelectorAll<HTMLElement>("*"))
+        .filter((node) => node.getClientRects().length && node.scrollWidth > node.clientWidth + 1)
+        .map((node) => ({ tag: node.tagName, className: node.className, text: node.textContent?.slice(0, 90) })),
       buttons: Array.from(el.querySelectorAll("button, summary"))
         .filter((el) => el.getClientRects().length)
         .map((el) => {
@@ -88,7 +92,7 @@ for (const scenario of [
           return { width: box.width, height: box.height };
         }),
     }));
-    expect(geometry.overflow).toBeLessThanOrEqual(1);
+    expect(geometry.overflow, JSON.stringify(geometry.overflowing)).toBeLessThanOrEqual(1);
     for (const box of geometry.buttons) {
       expect(box.width).toBeGreaterThanOrEqual(44);
       expect(box.height).toBeGreaterThanOrEqual(44);
