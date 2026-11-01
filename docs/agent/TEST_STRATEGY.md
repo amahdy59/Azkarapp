@@ -1,5 +1,9 @@
 # Test and Evidence Strategy
 
+## Current readiness phase
+
+Use settings-readiness-surfaces for separate saving/sync/offline status, reminder summary, keyboard navigation, enlarged layout and actual backup output. audio-expanded-layout verifies the transparent non-overlapping toolbar; header-frost-fallback keeps passing-content protection. Keep physical acceptance in DEVICE_ACCEPTANCE.md and unresolved retry identities in FLAKY_TESTS.md. One active phase pointer lives at the top of INDEX.md; historical phase records retain their evidence and authority.
+
 ## Current behavior and efficient execution — 2026-11-01
 
 Finish application, test and documentation inputs before the final quality pass. Exact-content receipts expire after 24 hours and bind the installed lockfile, Node/platform and build environment; a changed input runs the full gate again. Never create or edit receipts by hand. During development use targeted unit tests and explicit `pnpm test:e2e:feature home` / `reminders` / other feature selections, with `--list`, engine and grep filters. These are development aids; frozen install, complete check, core browser smoke and Pages build remain in the hook. Complete browser inventory/engines run once in mandatory exact-commit CI, and Pages waits for that result. Full local browser runs remain diagnostics when requested or needed for unresolved failures.

@@ -1,5 +1,9 @@
 ## Calm path summary and shared pills — 2026-11-01
 
+## Seamless listening and sheet headers — 2026-11-01
+
+Expanded listening’s non-overlapping grid header shares the player’s card canvas instead of a contrasting background token. Shared SheetHeader also uses its owning Glass sheet material without an extra white tint. Neither header has content scrolling behind its row. Keep protected dropdown surfaces and sticky screen headers opaque/frosted when content passes underneath; this refinement is not a blanket transparency rule. Permission, data-safety and recovery actions reuse shared Card/Button anatomy with natural wrapping and 44px targets.
+
 Home's inset palm pill is the visual reference for compact peer choices. Tabs and segmented radios share a rounded track, semantic muted surface/control border, 44px minimum options and primary/primary-foreground selection. Preserve existing tab/radio semantics, labels, keyboard layout and both reduced-motion alternatives. Library retains compact phone icons with full accessible names/counts. Shared paint adds no blur or timer; Forced Colors retains a selection outline.
 
 Today's path uses a stationary shared title/Close header, compact horizontal palm/status row, three read-only progress rows and compact counters. Growth rules and the recording interpretation note live in one initially closed native disclosure. A scrolling body recovers short/enlarged layouts; pointer focus on the opener enables WebKit focus return. No checklist, score or religious interpretation is added. First-use setup shares the protected header/scroll anatomy with separate permission actions and optional Continue.

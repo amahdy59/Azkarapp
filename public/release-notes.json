@@ -1,13 +1,13 @@
 {
-  "release": "2026-11-01.7",
+  "release": "2026-11-01.8",
   "ar": [
-    "أزرار المجموعات والمحفوظات في المكتبة بمحاذاة أدق مع العنوان على الهاتف.",
-    "أزرار مشاركة الآيات تحافظ على حجمها المناسب عند تكبير النص دون امتداد خارج الشاشة.",
-    "أزرار اختيار مستديرة بمسافات متوازنة ومظهر متناسق، مع وصول واضح باللمس ولوحة المفاتيح."
+    "راجع التذكير القادم والموقع وإذن الإشعارات واختبر التنبيهات من ملخص واحد.",
+    "تعرّف على حالة الحفظ والمزامنة والتوفر دون اتصال، وصدّر نسخة احتياطية مباشرة.",
+    "استمتع بخلفية أكثر انسجامًا في مشغل الصوت والنوافذ، مع استئناف أوضح للتنزيلات المتعثرة."
   ],
   "en": [
-    "Library Collections and Saved choices align more precisely with the title on phones.",
-    "Ayah-sharing icon actions keep their intended size with enlarged text, without overflowing the screen.",
-    "Rounded choices retain balanced spacing, consistent surfaces and clear touch and keyboard access."
+    "Review your next reminder, location and notification permission, and test alerts together.",
+    "Check saving, synchronization and offline availability, with direct access to a restorable backup.",
+    "Enjoy seamless listening and sheet headers, with clearer recovery for interrupted downloads."
   ]
 }

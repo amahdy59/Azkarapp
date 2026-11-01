@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-11-01.8",
+    "ar": [
+      "راجع التذكير القادم والموقع وإذن الإشعارات واختبر التنبيهات من ملخص واحد.",
+      "تعرّف على حالة الحفظ والمزامنة والتوفر دون اتصال، وصدّر نسخة احتياطية مباشرة.",
+      "استمتع بخلفية أكثر انسجامًا في مشغل الصوت والنوافذ، مع استئناف أوضح للتنزيلات المتعثرة."
+    ],
+    "en": [
+      "Review your next reminder, location and notification permission, and test alerts together.",
+      "Check saving, synchronization and offline availability, with direct access to a restorable backup.",
+      "Enjoy seamless listening and sheet headers, with clearer recovery for interrupted downloads."
+    ]
+  },
+  {
     "release": "2026-11-01.7",
     "ar": [
       "أزرار المجموعات والمحفوظات في المكتبة بمحاذاة أدق مع العنوان على الهاتف.",

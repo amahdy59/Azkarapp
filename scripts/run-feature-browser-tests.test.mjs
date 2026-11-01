@@ -100,3 +100,10 @@ test("Home and reminders focus groups include the current behavior and controls 
     expect(patterns.some((pattern) => pattern.test("e2e/audio-integrity.spec.ts"))).toBe(false);
   }
 });
+
+test("reminder selection includes readiness and data-safety recovery", () => {
+  const filters = featureBrowserArguments("reminders")
+    .slice(1)
+    .map((pattern) => new RegExp(pattern));
+  expect(filters.some((pattern) => pattern.test("e2e/settings-readiness-surfaces.spec.ts"))).toBe(true);
+});

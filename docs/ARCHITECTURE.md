@@ -1,5 +1,11 @@
 # Application architecture
 
+## Readiness and safety summaries — 2026-11-01
+
+Settings Notifications groups actual permission, next configured reminder, selected location/timezone, existing test and platform limitations. The summary reuses getNextReminderDelay and explicitly allows completion-based suppression; it is configuration visibility, not confirmed OS alarm registration. The test does not guarantee later delivery. Account data receives actual local-save results from App, confirmed account sync time and paired-device transfer state independently. Offline shell readiness requires the native bundle or active worker plus cached app-shell HTML; optional audio/full Mushaf readiness remains in Downloads. No persistence schema, database or merge behavior changed.
+
+Telemetry emits only allowlisted coarse screen names. Routing records committed hash transitions in a bounded 64-entry monotonic timeline. Buffered interaction entries retain the screen at their start; navigation LCP/CLS/TTFB retain the entry screen. Scope is explicit. Existing collector CLS thousandths, DNT, absent-endpoint behavior and error privacy remain intact. These diagnostics do not establish complete standard web-vitals lifecycle parity or field acceptance.
+
 ## Reliable updates and first-use setup — 2026-11-01
 
 Web update attempts allow 120 seconds for offline download/install, independently of the four-second activation handover. The controller observer starts before messaging the registration's current waiting worker. AbortController cancels expired/superseded attempts and removes listeners; late completions cannot activate or reload. Existing stale-worker recovery still preserves user-download caches and saved state.

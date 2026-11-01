@@ -15,6 +15,7 @@ export const FEATURE_SPECS = {
     "contextual-reminder-plan.spec.ts",
   ],
   reminders: [
+    "settings-readiness-surfaces.spec.ts",
     "first-use-calm-controls.spec.ts",
     "reminder-responsive.spec.ts",
     "contextual-reminder-plan.spec.ts",

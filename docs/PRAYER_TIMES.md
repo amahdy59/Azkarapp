@@ -1,5 +1,9 @@
 # Prayer times, location, timezone, and DST
 
+## Reminder readiness — 2026-11-01
+
+Settings → Notifications now brings the existing permission and test action together with the next configured instant, selected location/timezone and location recovery link. It reuses the current scheduler’s next-delay boundary and formats the instant in the displayed timezone. Completed routines may be suppressed by the existing only-incomplete setting. This is not confirmation of a pending native alarm or future delivery; Android and browser limitations are explained separately. No calculation, scheduling, content or saved preference contract changes.
+
 ## First-use reminder selection — 2026-11-01
 
 New installations select prayer and main routine reminders during onboarding, with explicit OS/browser permission still required. Existing users retain saved choices. Optional Friday reading uses 09:00 on Friday, Friday dua 60 minutes before Maghrib, and pre-Fajr dua 20 minutes before Fajr, in the chosen prayer location's date-specific IANA timezone. These product reminder choices match existing contextual reading windows, not new religious-source interpretations. Taps open Al-Kahf or Comprehensive duas. Native contextual entries use the cancellable seven-day queue; web suspension/closure still requires a separate push service for dependable closed-app delivery.
