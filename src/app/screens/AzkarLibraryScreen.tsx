@@ -218,7 +218,7 @@ export function AzkarLibraryScreen({
     >
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
         <header className="library-stationary-header shrink-0 border-b border-border-control/25 bg-background px-page pb-3 pt-2 sm:pb-4">
-          <div className="flex min-h-11 min-w-0 items-start justify-between gap-3">
+          <div className="flex min-h-11 min-w-0 items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="page-title max-w-full font-sans text-foreground">{t(language, "library.title")}</h1>
               <p className="hidden text-xs leading-[18px] text-muted-foreground lg:block">

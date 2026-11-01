@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-11-01.7",
+    "ar": [
+      "أزرار المجموعات والمحفوظات في المكتبة بمحاذاة أدق مع العنوان على الهاتف.",
+      "مسافات متوازنة داخل أزرار الاختيار المستديرة مع الاحتفاظ بمساحة لمس مريحة.",
+      "محاذاة أوضح عند تكبير النص بالعربية والإنجليزية، مع بقاء البحث والفلاتر سهلة الوصول."
+    ],
+    "en": [
+      "Library Collections and Saved choices align more precisely with the title on phones.",
+      "Rounded choices keep balanced inner spacing and comfortable touch targets.",
+      "Clearer alignment with enlarged Arabic and English text, while search and filters remain easy to reach."
+    ]
+  },
+  {
     "release": "2026-11-01.6",
     "ar": [
       "تطبيق التحديثات أكثر موثوقية على الاتصالات البطيئة، مع حماية التقدم والملفات المحفوظة.",

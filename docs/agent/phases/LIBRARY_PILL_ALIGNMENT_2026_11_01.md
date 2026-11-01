@@ -1,0 +1,5 @@
+# Library pill alignment release remediation — 2026-11-01
+
+Exact-commit CI bbc0d6d6 found four failures in the bilingual responsive Library pill regression. Shared pill track padding/border adds ten pixels around the 44px options; the header's items-start leaves the title and track centres five pixels apart. The old regression also assumes track height equals option height, contradicting the requested inset pill design.
+
+Plan before editing: vertically centre the existing heading/tab row, preserve the inset track and option targets, and update the obsolete track-equals-option assertion to verify symmetric actual insets plus 44px targets. Retain exact centre alignment, icon centres, matching options, width/spacing/no-overflow and keyboard assertions at both widths/text scales. Run the affected responsive test in the actual phone/tablet Chromium projects and Firefox/WebKit, then unchanged quality/hook/complete CI/production gates. Collect all other failed-job logs before the remediation push. Fresh release notes describe only this follow-up since deployed .6; no content or state changes.

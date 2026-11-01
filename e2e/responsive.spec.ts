@@ -502,7 +502,11 @@ for (const language of ["ar", "en"] as const) {
         expect(Math.abs(headingBox.y + headingBox.height / 2 - tabsBox.y - tabsBox.height / 2)).toBeLessThan(1);
         expect(collectionsBox.height).toBeGreaterThanOrEqual(44);
         expect(savedBox.width).toBeGreaterThanOrEqual(44);
-        expect(tabsBox.height).toBeCloseTo(collectionsBox.height, 0);
+        // The inset track surrounds its options with equal padding and border.
+        const beforeInset = collectionsBox.y - tabsBox.y;
+        const afterInset = tabsBox.y + tabsBox.height - collectionsBox.y - collectionsBox.height;
+        expect(beforeInset).toBeGreaterThanOrEqual(4);
+        expect(beforeInset).toBeCloseTo(afterInset, 0);
         expect(savedBox.width).toBeCloseTo(collectionsBox.width, 0);
         expect(savedBox.height).toBeCloseTo(collectionsBox.height, 0);
         for (const tab of [collections, saved]) {

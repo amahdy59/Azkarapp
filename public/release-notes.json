@@ -1,15 +1,13 @@
 {
-  "release": "2026-11-01.6",
+  "release": "2026-11-01.7",
   "ar": [
-    "تطبيق التحديثات أكثر موثوقية على الاتصالات البطيئة، مع حماية التقدم والملفات المحفوظة.",
-    "إعداد اختياري عند البداية للإشعارات وحماية التخزين، مع تذكيرات الصلاة والأذكار والجمعة وما قبل الفجر مختارة للمستخدم الجديد.",
-    "ابدأ مجموعات الأذكار والأدعية من جديد كل يوم، مع بقاء الكهف أسبوعيًا وحفظ السجلات والمحفوظات.",
-    "ملخص نخلة أبسط، وأزرار وفلاتر أكثر تناسقًا، وتحسين عرض «تذكير لك الآن» واستعادته بعد انقطاع الاتصال."
+    "أزرار المجموعات والمحفوظات في المكتبة بمحاذاة أدق مع العنوان على الهاتف.",
+    "مسافات متوازنة داخل أزرار الاختيار المستديرة مع الاحتفاظ بمساحة لمس مريحة.",
+    "محاذاة أوضح عند تكبير النص بالعربية والإنجليزية، مع بقاء البحث والفلاتر سهلة الوصول."
   ],
   "en": [
-    "Apply updates more reliably on slower connections while keeping saved progress and downloads safe.",
-    "Optional first-use notification and storage setup, with prayer, daily adhkar, Friday and pre-Fajr reminders selected for new readers.",
-    "Start zikr and dua collections afresh each day; Al-Kahf stays weekly, and history and saved items remain safe.",
-    "A simpler palm summary, consistent control feedback and filters, and a more resilient Relevant now card across screen sizes."
+    "Library Collections and Saved choices align more precisely with the title on phones.",
+    "Rounded choices keep balanced inner spacing and comfortable touch targets.",
+    "Clearer alignment with enlarged Arabic and English text, while search and filters remain easy to reach."
   ]
 }
