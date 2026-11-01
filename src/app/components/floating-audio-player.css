@@ -130,7 +130,8 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   width: 100%;
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   min-height: 44px;
-  background: var(--background);
+  /* The header is in its own grid row; no reading content passes behind it. */
+  background: transparent;
 }
 
 .audio-expanded-header[data-has-page-controls="true"] {

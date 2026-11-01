@@ -3,7 +3,7 @@ import { flushSync } from "react-dom";
 import { parseLocation, routeToHash } from "../routing";
 import type { LibraryRouteSection, ProgressRoutePeriod, RouteState, SettingsRoutePanel } from "../routing";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkar";
-import { reportError } from "../../lib/observability";
+import { recordDiagnosticScreen, reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
 import { isAudioControlLocked } from "../audioControlLock";
@@ -195,6 +195,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     if (`${window.location.pathname}${window.location.hash}` !== target) {
       window.history.replaceState({ view }, "", target);
     }
+    recordDiagnosticScreen();
     renderedLocation.current = { url: window.location.href, state: window.history.state };
   }, [
     view,

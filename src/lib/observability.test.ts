@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createErrorEvent, reportError, startPerformanceMonitoring } from "./observability";
+import {
+  createErrorEvent,
+  diagnosticScreen,
+  recordDiagnosticScreen,
+  reportError,
+  startPerformanceMonitoring,
+} from "./observability";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -148,5 +154,38 @@ describe("collector failures", () => {
       expect.objectContaining({ credentials: "omit", keepalive: true }),
     );
     expect(fetch.mock.calls[0]![1].body).not.toContain("private");
+  });
+});
+
+describe("screen attribution", () => {
+  it.each([
+    ["#/home", "home"],
+    ["#/azkar/morning/2?secret=value", "reader"],
+    ["#/progress?start=private", "progress"],
+    ["#/settings/account-data", "settings"],
+    ["#/search?query=private", "search"],
+    ["#/private-content", "unknown"],
+  ])("maps %s to a coarse screen", (hash, expected) => {
+    expect(diagnosticScreen(hash)).toBe(expected);
+  });
+  it("keeps load metrics on the entry screen and attributes buffered slow interactions to their original screen", () => {
+    window.history.replaceState(null, "", "/#/home");
+    const now = vi.spyOn(performance, "now").mockReturnValue(100);
+    const monitor = monitoring();
+    monitor.emit("largest-contentful-paint", [{ startTime: 120 }]);
+    now.mockReturnValue(200);
+    window.history.replaceState(null, "", "/#/azkar/morning/2");
+    recordDiagnosticScreen();
+    now.mockReturnValue(400);
+    window.history.replaceState(null, "", "/#/progress");
+    recordDiagnosticScreen();
+    monitor.emit("event", [{ interactionId: 7, duration: 230, startTime: 250 }]);
+    monitor.stop();
+    expect(monitor.events).toContainEqual(
+      expect.objectContaining({ name: "LCP", screen: "home", scope: "navigation" }),
+    );
+    expect(monitor.events).toContainEqual(
+      expect.objectContaining({ name: "INP", screen: "reader", scope: "interaction" }),
+    );
   });
 });

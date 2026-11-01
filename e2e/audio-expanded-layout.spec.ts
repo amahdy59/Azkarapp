@@ -128,6 +128,7 @@ for (const scenario of [
     await expand.focus();
     await page.keyboard.press("Enter");
     await expect(player).toHaveAttribute("data-variant", "expanded");
+    await expect(player.locator(".audio-expanded-header")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     await expect(page.locator("[data-audio-covered]").first()).toHaveCSS("opacity", "0");
     await expect(page.locator(".audio-player-surface")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");
     await expect(page.locator(".audio-player-surface")).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
@@ -363,5 +364,54 @@ for (const scenario of [
     ).toBeFocused();
     await expect(canvas.locator("[inert]")).toHaveCount(0);
     await expect(page.locator("[data-audio-covered]")).toHaveCount(0);
+  });
+}
+
+for (const appearance of [
+  { theme: "light", material: "solid", fallback: false },
+  { theme: "dark", material: "solid", fallback: false },
+  { theme: "midnight", material: "glass", fallback: false },
+  { theme: "light", material: "glass", fallback: true },
+]) {
+  test(`listening toolbar shares its canvas ${appearance.theme}-${appearance.material}-${appearance.fallback} @cross-browser`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript((appearance) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: {
+            language: "ar",
+            themeMode: appearance.theme,
+            appMaterial: appearance.material,
+            reduceTransparency: appearance.fallback,
+            reduceMotion: true,
+          },
+          profile: { isGuest: true },
+        }),
+      );
+      HTMLMediaElement.prototype.play = function () {
+        Object.defineProperty(this, "duration", { configurable: true, value: 120 });
+        this.dispatchEvent(new Event("loadedmetadata"));
+        this.dispatchEvent(new Event("playing"));
+        return Promise.resolve();
+      };
+    }, appearance);
+    await page.goto("/#/azkar/evening/1");
+    await page.getByTestId("reader-audio-dock-button").click();
+    await page.getByRole("button", { name: "توسيع المشغل", exact: true }).click();
+    await expect(page.locator("html")).toHaveClass(new RegExp(`theme-${appearance.theme}`));
+    const header = page.locator(".audio-expanded-header");
+    await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    const overlap = await header.evaluate((el) => {
+      const reading = document.querySelector(".audio-expanded-reading, .audio-follow-text, .audio-expanded-text");
+      return reading ? el.getBoundingClientRect().bottom > reading.getBoundingClientRect().top + 1 : false;
+    });
+    expect(overlap).toBe(false);
+    await page.screenshot({ path: testInfo.outputPath("seamless-header.png") });
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".audio-expanded-header")).toHaveCount(0);
   });
 }

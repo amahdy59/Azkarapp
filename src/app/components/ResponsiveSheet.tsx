@@ -105,7 +105,7 @@ export function SheetHeader({
   return (
     <div
       className={`flex shrink-0 items-center justify-between gap-4 border-b px-5 py-3 ${
-        onGlass ? "border-white/20 bg-white/5" : "border-border/40"
+        onGlass ? "border-white/20" : "border-border/40"
       } ${className}`.trim()}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3">
