@@ -642,3 +642,173 @@ describe("AudioProvider integration", () => {
     expect(await screen.findByText("Surah Al-Ikhlas")).toBeInTheDocument();
   });
 });
+
+it("sleep timer pauses at its deadline without recording completion and can be cancelled", () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("Audio", FakeAudio);
+  let controller!: NonNullable<ReturnType<typeof useAudioController>>;
+  function Capture() {
+    controller = useAudioController();
+    return null;
+  }
+  try {
+    const view = render(
+      <AudioProvider>
+        <Capture />
+      </AudioProvider>,
+    );
+    act(() => {
+      controller.startPlan(plan);
+      controller.setSleepTimer?.(15);
+    });
+    act(() => vi.advanceTimersByTime(15 * 60_000));
+    expect(controller.state.status).toBe("paused");
+    expect(controller.state.completionSequence).toBe(0);
+    expect(controller.sleepDeadline).toBeNull();
+    expect(controller.state.announcement).toBe("sleep-timer-ended");
+    act(() => {
+      controller.play();
+      controller.setSleepTimer?.(15);
+      controller.setSleepTimer?.(null);
+    });
+    act(() => vi.advanceTimersByTime(15 * 60_000));
+    expect(controller.state.status).toBe("playing");
+    view.unmount();
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it("changing repetition mode preserves a paused session", () => {
+  vi.stubGlobal("Audio", FakeAudio);
+  let controller!: NonNullable<ReturnType<typeof useAudioController>>;
+  function Capture() {
+    controller = useAudioController();
+    return null;
+  }
+  render(
+    <AudioProvider>
+      <Capture />
+    </AudioProvider>,
+  );
+  act(() => {
+    controller.startPlan(repeatPlan);
+    controller.pause();
+  });
+  act(() => controller.setPlaybackMode("play-once"));
+  expect(controller.state.status).toBe("paused");
+  expect(FakeAudio.latest?.paused).toBe(true);
+});
+
+it("clearing private data stops playback and prevents bookmark resurrection", () => {
+  vi.stubGlobal("Audio", FakeAudio);
+  let controller!: NonNullable<ReturnType<typeof useAudioController>>;
+  function Capture() {
+    controller = useAudioController();
+    return null;
+  }
+  render(
+    <AudioProvider>
+      <Capture />
+    </AudioProvider>,
+  );
+  const checked = {
+    ...plan,
+    entries: [
+      {
+        ...plan.entries[0]!,
+        segmentsByVoice: { voice: [{ ...plan.entries[0]!.segmentsByVoice.voice![0]!, sha256: "a".repeat(64) }] },
+      },
+    ],
+  };
+  act(() => controller.startPlan(checked));
+  act(() => {
+    FakeAudio.latest!.currentTime = 4;
+    FakeAudio.latest!.dispatchEvent(new Event("timeupdate"));
+  });
+  expect(localStorage.getItem("azkarapp.listening-bookmark.v1")).not.toBeNull();
+  act(() => window.dispatchEvent(new Event("azkar-private-data-cleared")));
+  act(() => window.dispatchEvent(new Event("pagehide")));
+  expect(localStorage.getItem("azkarapp.listening-bookmark.v1")).toBeNull();
+  expect(controller.state.plan).toBeNull();
+});
+
+it("reconciles an expired sleep deadline on foreground return without completing the entry", () => {
+  vi.useFakeTimers();
+  vi.stubGlobal("Audio", FakeAudio);
+  let controller!: NonNullable<ReturnType<typeof useAudioController>>;
+  function Capture() {
+    controller = useAudioController();
+    return null;
+  }
+  try {
+    render(
+      <AudioProvider>
+        <Capture />
+      </AudioProvider>,
+    );
+    act(() => {
+      controller.startPlan(repeatPlan);
+      controller.setSleepTimer?.(15);
+    });
+    vi.setSystemTime(Date.now() + 16 * 60_000);
+    act(() => window.dispatchEvent(new Event("pageshow")));
+    expect(controller.state.status).toBe("paused");
+    expect(controller.state.completionSequence).toBe(0);
+    expect(controller.sleepDeadline).toBeNull();
+    act(() => FakeAudio.latest!.dispatchEvent(new Event("playing")));
+    expect(controller.state.status).toBe("paused");
+    act(() => FakeAudio.latest!.dispatchEvent(new Event("waiting")));
+    expect(controller.state.status).toBe("paused");
+    act(() => FakeAudio.latest!.dispatchEvent(new Event("stalled")));
+    expect(controller.state.status).toBe("paused");
+    act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
+    expect(controller.state.status).toBe("paused");
+    expect(controller.state.completionSequence).toBe(0);
+    expect(controller.state.announcement).toBe("sleep-timer-ended");
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it("a delayed resume cannot replace a newer explicit listening plan", async () => {
+  vi.stubGlobal("Audio", FakeAudio);
+  const [{ getAzkarForMode }, { buildPlaybackPlan }, { saveListeningBookmark, recordingFingerprint }] =
+    await Promise.all([import("../content/azkar"), import("./buildPlaybackPlan"), import("./listeningBookmark")]);
+  const reviewed = buildPlaybackPlan({
+    zikrs: getAzkarForMode("evening", "core"),
+    context: { category: "evening", routineMode: "core", source: "section" },
+    audioLanguage: "ar",
+  });
+  const voice = reviewed.entries[0]!.defaultVoiceId;
+  saveListeningBookmark({
+    version: 1,
+    savedAt: Date.now(),
+    context: reviewed.context,
+    ids: reviewed.entries.map((entry) => entry.zikrId),
+    mode: "repeat-prescribed-count",
+    voice,
+    entry: 0,
+    segment: 0,
+    repetition: 0,
+    seconds: 4,
+    fingerprint: recordingFingerprint(reviewed, 0, 0, voice)!,
+  });
+  let controller!: NonNullable<ReturnType<typeof useAudioController>>;
+  function Capture() {
+    controller = useAudioController();
+    return null;
+  }
+  render(
+    <AudioProvider>
+      <Capture />
+    </AudioProvider>,
+  );
+  let resumed!: Promise<boolean>;
+  await act(async () => {
+    resumed = controller.resumeListening!();
+    controller.startPlan(plan);
+    expect(await resumed).toBe(false);
+  });
+  expect(controller.state.plan?.id).toBe(plan.id);
+});

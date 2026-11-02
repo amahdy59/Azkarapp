@@ -1,3 +1,4 @@
+import "./progress-records-table.css";
 import { useId, useMemo, useState } from "react";
 import type { AppLanguage } from "../types";
 import type { CalendarType } from "../calendarPeriods";

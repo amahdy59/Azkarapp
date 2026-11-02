@@ -78,8 +78,8 @@ for (const language of ["ar", "en"] as const) {
     );
     await expect(prayerTimeline.getByTestId("timeline-readout")).toContainText(ar ? "١٠٠٪" : "100%");
     await expect(page.getByRole("table")).toHaveCount(0);
-    // One range, detail topic and two prayer selectors.
-    await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(5);
+    // The date picker is unmounted; trend, detail topic and two prayer selectors remain.
+    await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(4);
     await expect(page.getByTestId("prayer-coverage-hint")).toContainText(ar ? "١٧" : "17 complete days");
     await expect(prayers.getByTestId("insight-fajr").getByRole("img")).toHaveAccessibleName(
       ar ? /١٠٠٪/ : /100%; 17 days/,

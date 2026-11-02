@@ -58,7 +58,7 @@ describe("NotificationsPanel", () => {
     );
     notification.permission = "granted";
     fireEvent.focus(window);
-    expect(screen.getByText("Browser permission is granted.")).toBeInTheDocument();
+    expect(screen.getByText("Notification permission is granted.")).toBeInTheDocument();
     notification.permission = "denied";
     fireEvent(document, new Event("visibilitychange"));
     expect(screen.queryByRole("button", { name: "Send a test notification" })).not.toBeInTheDocument();

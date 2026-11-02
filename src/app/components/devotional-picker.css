@@ -1,4 +1,23 @@
 /* Let available width, rather than a character count, fit each language. */
+.counter-selection-menu {
+  inline-size: var(--radix-dropdown-menu-trigger-width);
+  min-inline-size: 0;
+  max-inline-size: min(calc(100vw - 32px), var(--radix-dropdown-menu-content-available-width));
+  container-type: inline-size;
+}
+.counter-selection-menu .devotional-picker-preview {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+@container (max-width: 18rem) {
+  .devotional-picker-choice {
+    flex-wrap: wrap;
+  }
+  .devotional-picker-choice > .devotional-picker-preview {
+    flex-basis: 100%;
+  }
+}
 .counter-reading-canvas {
   /* Preserve a usable reading/footer region; the existing screen scrollport
      can reveal it when enlarged chrome exceeds a short viewport. */

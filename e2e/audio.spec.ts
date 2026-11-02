@@ -101,7 +101,7 @@ for (const { language, width } of (["ar", "en"] as const).flatMap((language) =>
     });
     if (width === 1440) {
       const indicator = page.getByTestId("audio-play-all-indicator");
-      await expect(indicator).toContainText(language === "ar" ? "تشغيل الكل" : "Play all");
+      await expect(indicator).toContainText(language === "ar" ? "المتابعة التلقائية" : "Auto-continue");
       const layout = await indicator.evaluate((node) => ({
         label: node.getBoundingClientRect().right,
         controls: document.querySelector(".audio-expanded-transport")!.getBoundingClientRect().left,
@@ -110,15 +110,17 @@ for (const { language, width } of (["ar", "en"] as const).flatMap((language) =>
       await page.screenshot({ path: testInfo.outputPath(`play-all-beside-transport-${language}.png`), scale: "css" });
     }
     await options.click();
-    const continuation = page.getByRole("switch", {
-      name: language === "ar" ? "تشغيل الذكر التالي تلقائيًا" : "Play next zikr automatically",
-    });
-    await expect(continuation).toHaveAttribute("aria-checked", "true");
+
     await expect(page.locator(".audio-expanded-meta > .sr-only")).toHaveCount(0); // Reader already supplies context.
     await page.screenshot({ path: testInfo.outputPath(`consistent-audio-options-${language}.png`), scale: "css" });
+    await page.keyboard.press("Escape");
+    const continuation = page.getByRole("switch", {
+      name: language === "ar" ? "المتابعة التلقائية" : "Auto-continue",
+      exact: true,
+    });
+    await expect(continuation).toHaveAttribute("aria-checked", "true");
     await continuation.click();
     await expect(continuation).toHaveAttribute("aria-checked", "false");
-    await page.keyboard.press("Escape");
     const reader = page.getByTestId("reader-screen");
     const firstId = await reader.getAttribute("data-zikr-id");
     await player.getByRole("button", { name: language === "ar" ? "الذكر التالي" : "Next item", exact: true }).click();

@@ -88,6 +88,37 @@ function createController(): AudioController {
 }
 
 describe("FloatingAudioPlayer", () => {
+  it("focuses the current reading without stopping audio and restores the shell and focus on Escape", () => {
+    const shell = document.createElement("div");
+    const nav = document.createElement("nav");
+    const main = document.createElement("main");
+    main.id = "main-content";
+    nav.innerHTML = "<button>Home</button>";
+    shell.append(nav, main);
+    document.body.append(shell);
+    const controller = createController();
+    const view = render(<FloatingAudioPlayer controller={controller} language="en" />, { container: main });
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    const focus = screen.getByTestId("audio-focus-toggle");
+    const text = main.querySelector(".audio-expanded-text");
+    fireEvent.click(focus);
+    expect(focus).toHaveAttribute("aria-pressed", "true");
+    expect(focus).toHaveFocus();
+    expect(main.querySelector(".audio-player-surface")).toHaveAttribute("data-full-screen", "true");
+    expect(nav).toHaveAttribute("inert");
+    expect(nav).toHaveAttribute("aria-hidden", "true");
+    expect(main.querySelector(".audio-expanded-text")).toBe(text);
+    expect(controller.pause).not.toHaveBeenCalled();
+    expect(controller.stop).not.toHaveBeenCalled();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(focus).toHaveAttribute("aria-pressed", "false");
+    expect(focus).toHaveFocus();
+    expect(nav).not.toHaveAttribute("inert");
+    expect(nav).not.toHaveAttribute("aria-hidden");
+    expect(main.querySelector(".audio-expanded-text")).toBe(text);
+    view.unmount();
+    shell.remove();
+  });
   it("hides the Mushaf overlay without stopping playback or reserving page height", async () => {
     const main = document.createElement("main");
     main.id = "main-content";
@@ -633,7 +664,7 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
     fireEvent.click(screen.getByRole("combobox", { name: "Speed: 1×" }));
-    expect(screen.getAllByRole("option")).toHaveLength(5);
+    expect(screen.getAllByRole("option")).toHaveLength(6);
     fireEvent.click(screen.getByRole("option", { name: "1.5×" }));
     expect(controller.setPlaybackRate).toHaveBeenCalledExactlyOnceWith(1.5);
   });
@@ -756,8 +787,7 @@ describe("FloatingAudioPlayer", () => {
     expect(next).toBeEnabled();
     fireEvent.click(next);
     expect(controller.next).toHaveBeenCalledOnce();
-    fireEvent.click(screen.getByRole("button", { name: "خيارات الصوت" }));
-    const toggle = screen.getByRole("switch", { name: "تشغيل الذكر التالي تلقائيًا" });
+    const toggle = screen.getByRole("switch", { name: "المتابعة التلقائية" });
     expect(toggle).toHaveAttribute("aria-checked", "false");
     fireEvent.click(toggle);
     expect(controller.setAutoAdvance).toHaveBeenCalledWith(true);
@@ -877,4 +907,28 @@ describe("FloatingAudioPlayer", () => {
     expect(row.querySelectorAll(".sr-only")).toHaveLength(2);
     expect(row.querySelector('[aria-live="polite"], [aria-live="assertive"]')).toBeNull();
   });
+});
+
+it("shows a current queue entry and selects another recording without forcing autoplay", async () => {
+  const controller = createController();
+  controller.state.plan = {
+    ...plan,
+    entries: [entry, { ...entry, entryId: "entry-2", titleEnglish: "Second recording" }],
+  };
+  render(<FloatingAudioPlayer controller={controller} language="en" />);
+  fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+  const toggle = screen.getByRole("switch", { name: "Auto-continue" });
+  expect(toggle).toHaveAttribute("aria-checked", "true");
+  fireEvent.click(toggle);
+  expect(controller.setAutoAdvance).toHaveBeenCalledWith(false);
+  expect(controller.play).not.toHaveBeenCalled();
+  const queueTrigger = screen.getByRole("button", { name: /Listening queue/ });
+  fireEvent.click(queueTrigger);
+  expect(screen.getByTestId("audio-queue-sheet").querySelector('[aria-current="true"]')).toHaveTextContent(
+    "Current recording",
+  );
+  fireEvent.click(screen.getByRole("button", { name: /Second recording/ }));
+  expect(controller.selectEntry).toHaveBeenCalledWith(1);
+  await waitFor(() => expect(screen.queryByTestId("audio-queue-sheet")).not.toBeInTheDocument());
+  await waitFor(() => expect(queueTrigger).toHaveFocus());
 });

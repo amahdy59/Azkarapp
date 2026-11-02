@@ -1,3 +1,4 @@
+import "./surface-panel.css";
 import { memo, useId, useMemo, useState } from "react";
 import { getCalendarYearPeriods, type CalendarType } from "../calendarPeriods";
 import { getProgressDayKey } from "../progress";
@@ -92,7 +93,7 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
       Array.from({ length: 7 }, (_, index) => {
         const date = new Date(2026, 9, language === "ar" ? 17 + index : 18 + index, 12);
         return {
-          short: new Intl.DateTimeFormat(language, { weekday: "narrow" }).format(date),
+          short: new Intl.DateTimeFormat(language, { weekday: "short" }).format(date),
           label: new Intl.DateTimeFormat(language, { weekday: "short" }).format(date),
           full: new Intl.DateTimeFormat(language, { weekday: "long" }).format(date),
         };
@@ -150,7 +151,10 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
     >
       <div className="heatmap-heading">
         <div className="min-w-0">
-          <h2 id={`${id}-heading`} className="text-lg font-bold">
+          <h2 id={`${id}-heading`} className="surface-panel-heading">
+            <span className="surface-panel-icon surface-control-finish" aria-hidden="true">
+              <Calendar size={20} />
+            </span>
             {text(language, "heatmap")}
           </h2>
           <p id={`${id}-help`} className="mt-1 progress-help">
@@ -236,7 +240,7 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
                   const date = new Date(`${key}T12:00:00`);
                   const parts = fullDateFormat.formatToParts(date);
                   const number = parts.find((part) => part.type === "day")!.value;
-                  const monthStart = number.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit))) === "1";
+
                   return (
                     <button
                       key={key}
@@ -293,20 +297,9 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
                       <span className="heatmap-weekday" aria-hidden="true">
                         {weekdays[(date.getDay() + (language === "ar" ? 1 : 0)) % 7]?.label}
                       </span>
-                      <time dateTime={key}>
-                        {number}
-                        {(monthStart || key === applied.startKey) && (
-                          <span className="heatmap-month-label">
-                            {parts.find((part) => part.type === "month")!.value}
-                          </span>
-                        )}
-                      </time>
+                      <time dateTime={key}>{number}</time>
                       <span className="heatmap-count" aria-hidden="true">
-                        {entry.value === null
-                          ? "—"
-                          : entry.possible === null
-                            ? formatNumerals(entry.value, language)
-                            : `${formatNumerals(entry.value, language)}/${formatNumerals(entry.possible, language)}`}
+                        {entry.value === null ? "—" : formatNumerals(entry.value, language)}
                       </span>
                     </button>
                   );

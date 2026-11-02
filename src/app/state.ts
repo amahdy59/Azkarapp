@@ -124,19 +124,20 @@ export function mergeDailyHabits(
 
 export const DEFAULT_APP_STATE: AppStateSnapshot = {
   settings: {
-    language: "en",
+    language: "ar",
     darkMode: true,
     themeMode: "midnight",
     showTransliteration: false,
     showTranslation: false,
     textSize: "medium",
-    zikrFont: "humanist",
+    zikrFont: "clear",
     highContrast: false,
     boldText: false,
     reduceMotion: false,
-    readerToolLabels: true,
+    readerToolLabels: false,
     readerMeaningOnly: false,
     reduceTransparency: false,
+    paperTexture: true,
     appMaterial: "solid",
     homeMaterial: "inherit",
     homeWirdImages: false,
@@ -950,8 +951,12 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
       reduceMotion:
         typeof settings?.reduceMotion === "boolean" ? settings.reduceMotion : DEFAULT_APP_STATE.settings.reduceMotion,
-      readerToolLabels: typeof settings?.readerToolLabels === "boolean" ? settings.readerToolLabels : true,
+      readerToolLabels:
+        typeof settings?.readerToolLabels === "boolean"
+          ? settings.readerToolLabels
+          : DEFAULT_APP_STATE.settings.readerToolLabels,
       readerMeaningOnly: typeof settings?.readerMeaningOnly === "boolean" ? settings.readerMeaningOnly : false,
+      paperTexture: typeof settings?.paperTexture === "boolean" ? settings.paperTexture : true,
       homeWirdImages:
         typeof settings?.homeWirdImages === "boolean"
           ? settings.homeWirdImages
@@ -1259,6 +1264,7 @@ const OWNED_STORAGE_PREFIXES = [
 ];
 
 const PRIVATE_STORAGE_PREFIXES = [
+  "azkarapp.listening-bookmark.v1",
   "azkarapp.friday-dua-reading.v1",
   "azkarapp_recent_searches_",
   // These are legacy coordinate-bearing caches. Startup also removes them,
@@ -1279,6 +1285,7 @@ function clearStoragePrefixes(prefixes: readonly string[]) {
 /** Removes account-private caches while preserving device preferences and downloads. */
 export function clearPrivateStoredAppData() {
   if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event("azkar-private-data-cleared"));
   try {
     clearStoragePrefixes(PRIVATE_STORAGE_PREFIXES);
   } catch {
@@ -1292,6 +1299,7 @@ export function clearStoredAppData() {
     return;
   }
 
+  window.dispatchEvent(new Event("azkar-private-data-cleared"));
   try {
     clearStoragePrefixes(OWNED_STORAGE_PREFIXES);
   } catch {
@@ -1402,6 +1410,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
           : safeBase.settings.reduceMotion,
       // A foreign snapshot must not change this device's reading-language choice.
       readerMeaningOnly: safeBase.settings.readerMeaningOnly,
+      paperTexture: safeBase.settings.paperTexture,
       readerToolLabels:
         typeof incoming.settings?.readerToolLabels === "boolean"
           ? incoming.settings.readerToolLabels

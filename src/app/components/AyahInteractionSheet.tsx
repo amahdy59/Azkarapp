@@ -16,6 +16,7 @@ type Feedback = { message: string; error: boolean } | null;
 const AyahShareStudio = lazy(() => import("./AyahShareStudio"));
 
 export function AyahInteractionSheet({
+  initialAction = "details",
   isOpen,
   onClose,
   verseKey,
@@ -25,6 +26,7 @@ export function AyahInteractionSheet({
   isBookmarked,
   onBookmark,
 }: {
+  initialAction?: "details" | "share";
   isOpen: boolean;
   onClose: () => void;
   verseKey: string | null;
@@ -47,7 +49,7 @@ export function AyahInteractionSheet({
     includeMeanings: false,
   });
   const imageTrigger = useRef<HTMLButtonElement>(null);
-  useEffect(() => setImageShare(false), [verseKey, isOpen]);
+  useEffect(() => setImageShare(isOpen && initialAction === "share"), [verseKey, isOpen, initialAction]);
 
   useEffect(() => {
     if (!isOpen || !verseKey) {

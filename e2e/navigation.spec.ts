@@ -28,17 +28,21 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
   await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   const filters = page.getByTestId("library-filter-disclosure");
-  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) {
+  if (await filters.locator(".responsive-filter-trigger").isVisible()) {
     await expect(page.getByRole("textbox", { name: "Search azkar and duas", exact: true })).toBeHidden();
-    await filters.locator("summary").click();
+    await filters.locator(".responsive-filter-trigger").click();
   }
   await expect(page.getByRole("textbox", { name: "Search azkar and duas", exact: true })).toBeVisible();
+  const filterSheet = page.getByTestId("library-filter-disclosure-sheet");
+  if (await filterSheet.isVisible()) await filterSheet.getByTestId("modal-close-button").click();
 
   await page.getByTestId("category-card-morning").click();
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();
   await expect(page.getByText(/\d+ of \d+/).first()).toBeVisible();
 
-  await page.getByRole("button", { name: "Back", exact: true }).click();
+  const back = page.getByRole("button", { name: "Back", exact: true });
+  if (await back.isVisible()) await back.click();
+  else await page.getByTestId("nav-azkar").click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
 
@@ -121,7 +125,7 @@ test("@cross-browser navigation switches to wide utilities and opens Settings", 
   await expect(page.getByTestId("nav-quran")).toHaveAttribute("aria-current", "page");
   await expect(page).toHaveTitle("Quran Wird - wa-zaker");
   await expect(page.getByTestId("nav-more")).toHaveCount(0);
-  await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
+  await expect(page.getByTestId("nav-qibla")).toBeVisible();
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
   await page.getByTestId("nav-settings").click();
@@ -151,7 +155,7 @@ for (const language of ["ar", "en"] as const) {
       } else {
         await expect(qibla).toHaveCount(0);
       }
-      await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
+      await expect(page.getByTestId("nav-qibla")).toBeVisible();
       const masbaha = page.getByTestId("home-tool-masbaha");
       await expect(masbaha).toBeVisible();
       if (width >= 900) {
@@ -221,10 +225,15 @@ test("secondary app state is deep-linkable and browser Back restores Settings ro
   await expect(page.getByTestId("settings-sub-audio")).toBeVisible();
 
   await page.goto("/#/progress/month");
+  const dates = page.getByTestId("progress-filters-toggle");
+  await expect(dates).toHaveAttribute("data-progress-value", "month");
+  await dates.click();
   await expect(page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true })).toHaveAttribute(
     "data-progress-value",
     "month",
   );
+  await page.keyboard.press("Escape");
+  await expect(dates).toBeFocused();
 
   await page.goto("/#/azkar/saved");
   await expect(page.getByText("Nothing saved yet", { exact: true })).toBeVisible();

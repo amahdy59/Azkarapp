@@ -20,6 +20,7 @@ export interface AppAppearancePreferences {
   reduceMotion?: boolean;
   readerToolLabels?: boolean;
   reduceTransparency?: boolean;
+  paperTexture?: boolean;
   forceRtl?: boolean;
   colorBlindSupport?: ColorBlindSupport;
   zikrFont?: ZikrFontOption;
@@ -36,6 +37,7 @@ export function applyAppAppearance({
   reduceMotion = false,
   readerToolLabels = true,
   reduceTransparency = false,
+  paperTexture = true,
   forceRtl = false,
   colorBlindSupport = "none",
   zikrFont = "humanist",
@@ -62,6 +64,7 @@ export function applyAppAppearance({
 
   const fontSizes: Record<TextSizeOption, string> = { small: "14px", medium: "16px", large: "18px" };
   root.dataset.readerToolLabels = String(readerToolLabels);
+  root.dataset.paperTexture = paperTexture ? "on" : "off";
   root.dataset.appMaterial = appMaterial;
   root.dataset.appMaterialResolved =
     !highContrast &&

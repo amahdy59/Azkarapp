@@ -1,16 +1,52 @@
+.screen-arrival {
+  animation: fade-in var(--motion-duration-standard) var(--motion-ease-enter) both;
+}
 .quran-wird-overview > section {
   min-width: 0;
-  padding: clamp(16px, 2vw, 24px);
+  padding: 1rem;
+  border-radius: var(--ds-radius-card-large);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    var(--shadow-raised);
+}
+.quran-wird-overview > section h2 {
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+.quran-wird-overview > section > div:first-child {
+  min-block-size: 2.25rem;
+  align-items: center;
+  margin-block-end: 0.75rem;
 }
 .quran-wird-overview > section > div:first-child {
   flex-wrap: wrap;
+}
+.quran-wird-week-day {
+  display: flex;
+  min-inline-size: 0;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--ds-radius-control);
+}
+.quran-wird-week-day[aria-current="date"] {
+  background-color: var(--muted);
+  background-image: var(--paper-grain, none);
+  border-color: var(--border-control);
+}
+.quran-wird-week-label,
+.quran-wird-week-result {
+  white-space: nowrap;
 }
 /* The viewport and usable card width both need room for two readable columns.
    rem follows text enlargement; the phone's established reading order remains. */
 @media (min-width: 48rem) {
   .quran-wird-overview {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, max(20rem, calc(50% - 0.5rem))), 1fr));
-    align-items: start;
+    align-items: stretch;
   }
   .quran-wird-week {
     grid-column: 1 / -1;
@@ -19,9 +55,11 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr));
   }
-  .quran-wird-week-days > [role="listitem"] {
+  .quran-wird-week-day {
     flex-direction: column;
+    justify-content: center;
     gap: 0.5rem;
+    padding-inline: 0.25rem;
   }
 }
 
@@ -38,6 +76,9 @@
 .quran-wird-plan-actions button {
   min-width: 0;
 }
+.quran-wird-plan-form {
+  container: quran-plan / inline-size;
+}
 .quran-wird-number-stepper > button {
   width: 48px;
   height: auto;
@@ -45,6 +86,16 @@
 }
 .quran-wird-number-stepper > input {
   padding-inline: 8px;
+}
+/* Enlarged text needs room for the value and native number-input controls.
+   Reflow in DOM order rather than squeezing the centre input between buttons. */
+@container quran-plan (max-width: 13rem) {
+  .quran-wird-number-stepper {
+    flex-direction: column;
+  }
+  .quran-wird-number-stepper > button {
+    width: 100%;
+  }
 }
 .quran-wird-plan-form [role="combobox"] > span:first-child {
   flex-wrap: wrap;
@@ -68,4 +119,29 @@
 .quran-wird-overview p,
 .quran-wird-overview span {
   overflow-wrap: anywhere;
+}
+
+.quran-continuation-art {
+  display: block;
+  inline-size: 100%;
+  block-size: clamp(7rem, 15vw, 10rem);
+  object-fit: cover;
+  border-radius: var(--ds-radius-control);
+  margin-block-end: 1rem;
+}
+.quran-today-card {
+  display: flex;
+  flex-direction: column;
+}
+.quran-today-card > button:last-child {
+  margin-block-start: auto;
+}
+
+.quran-wird-overview .recorded-pages-chart {
+  margin-block-start: 1rem;
+}
+
+.quran-wird-overview > section[aria-labelledby="wird-plan-title"] {
+  display: flex;
+  flex-direction: column;
 }

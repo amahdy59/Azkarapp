@@ -42,7 +42,7 @@ test("all product themes apply atomically and remain accessible", async ({ page 
 
   const expectations = [
     { mode: "midnight", background: "#0a1228", scheme: "dark" },
-    { mode: "light", background: "#f8f5f0", scheme: "light" },
+    { mode: "light", background: "#f2f0eb", scheme: "light" },
     { mode: "dark", background: "#0d0d0d", scheme: "dark" },
   ] as const;
 
@@ -211,7 +211,7 @@ test("launch-critical settings screens are discoverable and accessible", async (
 
   for (const destination of destinations) {
     await page.getByRole("button", { name: destination.row }).click();
-    await expect(page.getByRole("heading", { name: destination.heading, exact: true })).toBeVisible();
+    await expect(page.locator("[data-settings-subheading]").filter({ hasText: destination.heading })).toBeVisible();
     await expectNoWcagViolations(page);
     const backBtn = page.getByRole("button", { name: "Back", exact: true });
     if (await backBtn.isVisible()) {

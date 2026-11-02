@@ -1,4 +1,56 @@
+## Narrow Progress and notification release — 2026-11-03
+
+Verify visible, named and operable Progress tab icons at 320/360/375/384/390px in Arabic/English at 100%/200% text, including keyboard selection. Native notification adapter tests must exercise the generic Enable notifications action and Android denial/revocation recovery. Keep browser closure limits and device-only acceptance distinctions. The owner's combined release request supersedes historical publication holds below.
+
+At 320px/200%, expanded listening controls must keep Auto-continue independently hittable beside the focus/lock actions; below 20rem available control width these use separate rows. Compact Progress metric headers align their icon beside the complete label, while wide headers center their icon. Preserve quantity placement, full-card focus geometry and protected filter/axe checks in both layouts.
+
+## Index/reader/picker alignment checkpoint
+
+`reader-alignment.spec.ts` uses independent index, bilingual and counting-menu cases with unchanged test timeouts. It measures equal inline edges for index tabs/search/results; no enclosing tab boundary; uncut 44px tabs with RTL arrow/Home and modal focus return. Measure bilingual header/card/footer edges, stationary chrome while scrolling, no horizontal overflow and axe. Measure both counting popup widths against their triggers, available viewport bounds, protected surfaces, long labels and Escape return. Run phone/tablet/desktop, RTL/LTR, 320px/200%, Glass/solid and high-contrast cases across the three engines and retain screenshots. Owner visual and physical-device acceptance remain separate.
+
+## Local completion regressions — 2026-11-02
+
+Run reader-focus-intent and enlarged-control-reflow across Chromium, Firefox and WebKit. Verify forward/reverse Tab entry, Space counting and continued progress, simulated volume events, pointer sound/menu recovery, and Forced Colors. Check actual text ranges inside clipping owners at 320px/200%, whole picker labels, standalone title room, contained navigation, Arabic/English tally ink, Library badge/copy balance and bounded account actions. Browser volume events do not prove physical hardware-key delivery or haptics.
+
+Retain route-inventory candidates and triage intentional preview truncation, oversized scroll content, native proxy controls and geometry that changes during a focus/scroll frame separately from confirmed product defects. Final combined evidence and its input fingerprint belong in output/final-touch-quality/PHASE_REPORT.md. Preserve all existing assertions and the publication hold.
+
 # Engineering and release checklist
+
+## Final-touch quality regressions — 2026-11-02
+
+Paper-grain follow-up: verify the same static tile across midnight/dark/light in solid/Glass, independent Mushaf colors and offline startup. Confirm stable geometry, sharp text, opaque menu hit-testing and no overlay interception. High contrast, reduced transparency, forced colors and printing must resolve the texture to none. Check contrast and unchanged bundle ceilings after adding the asset; capture normal/enlarged screenshots.
+
+Reference-led revision replaces the same-tile assumption. The latest light material supersedes rejected brass particles/fibres: fine neutral pores, more local definition and less average wash on warm-neutral stock. Dark/Glass retains fine grayscale grain. Confirm local themes and that switch/plain accessibility choices override every token. Inspect real normal-zoom Appearance, page gutters, Home strip and Progress surfaces. `paper-grain-assets.test.mjs` bounds dimensions, neutral palette, clear area, tonal definition/average tint and the unchanged 14KB combined payload; the generator ships no runtime filter. Retain geometry, opaque-overlay, contrast and accessibility assertions; owner aesthetic acceptance remains separate.
+
+Latest owner regressions: all grouped rows (including About) inherit actual outer corners and grow naturally at 320px/200%; divider/hover/focus cannot overpaint or overlap adjacent text. Check selected/unselected radio, pill, menu and switch states; protected options still highlight when checked. Verify exclusive Masbaha navigation, separated selector/progress geometry, footer icons with accessible names, More → keyboard-help recovery, organized Settings and fresh Arabic/Midnight/paper/medium/Clear/icons defaults without replacing explicit preferences. Repeat Mushaf resizing/late-font recovery in normal/app/system still modes, shared capsule geometry, safe-edge clearance and focus-mode reading-area/exit/focus-return in both reader owners. No animated fitting geometry or duplicate focus indicator.
+
+Paper texture switch: keyboard/pointer on/off in Arabic/English at 320px/200%, state retained after navigation/reload and protected during foreign merges, legacy/invalid-value default, accessible checked state and clear suppressed-effect copy. The local preference must use existing state normalization and persistence.
+
+Shared Settings switches recover to a single-column label/track layout when their container is below 12rem; decorative badges hide there so enlarged labels do not become one-letter columns. Keep the complete row as one native switch and preserve the original inline layout at ordinary widths.
+
+Verify Home anchor frame coalescing, unchanged-style suppression, hidden cancellation and unchanged prayer geometry. Check shared Button/IconButton glyph hover/focus/press with fixed target/text geometry, disabled/busy exclusion and OS/app reduced motion. At 320px and 200% text, the seven-day saved-page chart must remain chronological with whole dates, exact zeros/counts and a nonzero fill only for recorded pages.
+
+Start an offline audio transfer, navigate Home, return to Downloads and confirm truthful continuing progress and reachable explicit cancel. Check selective page/juz downloads, bounded protected selection menus, input validity, verified checkpoints, reload/resume, cancellation and ZIP focus recovery. Foregrounding reconciles progress; hidden visual updates pause. Run targeted units and three-engine browser tests, full quality/coverage, Pages build, core smoke and production audit. Physical/native/assistive-technology acceptance stays separately recorded; no publication is authorized in this phase.
+
+## Quran week-label regression — 2026-11-02
+
+Check each weekday as one intact text run with no clipping or horizontal overflow in Arabic/English at 390/834/1280/1920px and 320/834px with 200% text. Verify seven ordered days, current-date semantics, accurate counts/dashes, compact wide alignment and natural narrow recovery; retain screenshots and the existing plan keyboard/persistence tests.
+
+## Smooth navigation / compact panels — 2026-11-02 (local review)
+
+navigation-motion verifies one Library/Quran arrival, no returning-page fallback insertion, stationary tab highlight, keyboard/RTL selection, unchanged phone header geometry, full-width Search with filters below, Month default and explicit rolling links. progress-compact-panels verifies compact metric heights, stable hover/press arrow/hit geometry, actual full-card focus, shared calendar/routine radius/padding/type and wide/stacked recovery; inspect screenshots at 1440/834/320px/200%, both languages/materials. Verify Quran overview cards and absent title Back/Continue arrows, and ordinary Back hidden only with actual rail/sidebar while reader/nested recovery remains. Both app and OS Reduce Motion provide still icon/arrival feedback. Keep the current state matrix in MOTION_SYSTEM.md authoritative. Run rejected-import retry/return and routing units, affected browser suites and final complete check/build; lab samples do not prove perfect performance or physical acceptance.
+
+## Shared finish/filter acceptance — 2026-11-02 (local review)
+
+Check quiet solid card surfaces, the existing Glass reflection, glossy controls/pills and flattened high-contrast/reduced-transparency/Forced Colors alternatives. Progress has exactly one date opener, passive selected dates, and a distinct labelled metric-customization action. Opening/closing filters must not shift the metric cards. Verify custom-date application/cancellation, modal/menu nesting, actual topmost hit testing, opaque menu fill, keyboard focus return and viewport bounds. Library phone filters retain search/group state in a sheet, wrap group choices at 320px/200% and expose direct controls on wider layouts. Run shared-card-finish plus affected Progress/Library/layout/overlay and audio/browser regressions, then the full non-browser gate/build/audit. Automated results do not replace device/assistive-technology acceptance.
+
+Verify pointer/touch opening without prior button focus, then Escape, Close, preset selection and custom-date Apply. Focus returns after the modal releases containment, without a guessed frame/timer. Listening queue selection and Escape return to its own opener. Shared card arrival uses the default entrance token, becomes effectively still for either reduced-motion preference, and does not restart on ordinary disclosure state changes.
+
+Filter sheets and the listening queue require an opaque root background in every material/fallback. Inspect the 320px/200% queue over actual enlarged listening text: no background glyphs may bleed through its heading, help or options. Retain this visual evidence alongside computed-opacity assertions; axe cannot establish text occlusion.
+
+## Audio continuation acceptance — 2026-11-02 (local review)
+
+Verify fixed-label switch states/persistence without changing playback, auto-off after complete repetitions/ritual rounds, paused queue selection and mode changes, current item and Escape recovery. Check 320px/200% lock/switch hit coverage, phone/tablet/desktop, RTL/LTR and solid/Glass/fallback themes with axe and screenshots. A resumed actual queue must rebuild from reviewed content/recording identity, restore time/repetition paused, reject corrupt/stale/changed data and never replace a newer explicit play. Denied storage remains usable; sign-out/clear prevents saved-position resurrection. Sleep expiry/cancel/Stop/unmount/foreground/late media callbacks preserve position and do not record completion. Keep full media/queue/offline regressions and standard quality gates. Physical mobile background timing, headphone interruption and TalkBack/VoiceOver remain device acceptance; no field performance claims.
 
 ## Readiness and surface acceptance — 2026-11-01
 
@@ -246,3 +298,11 @@ Verify Masbaha and Salawat in both languages and footer-label modes. Icons-only 
 
 - Compare Library, Progress, Settings, Quran wird, Qibla, Friday, Benefits and prayer detail in Arabic/English at 390px, 834px, 1680px and 320px/200% text. Verify the shared title row, typography and responsive frame/gutters; subtitles cannot raise the title. Preserve the intentional leading Back slot, two-pane hierarchy and readable inner measures.
 - Check header/content alignment and enlarged-label wrapping visually; compare the screenshot set as well as geometry assertions. Confirm Progress's full-width opaque scroll protection still covers gutters after frame alignment. Retain keyboard, protected-menu and offline checks.
+
+## Compact practice acceptance — 2026-11-02
+
+Check Library/Progress header tab geometry, separate filter semantics/value retention and 44px targets at 320px/200%, phone, tablet and desktop in RTL/LTR and Glass/solid/high contrast. Confirm compact metric cards reflow with truthful zero/unknown/goal data and no empty-period banner. Inspect the icon-led Today's path and its full-progress action. In expanded Quran/zikr listening, enter/exit Focus by pointer and Escape: text stays mounted, audio continues, controls leave keyboard/AT order, the viewport is filled, shell focus is protected and restored. Confirm selected Progress/Settings/Masbaha icons stay visible at sampled animation times, including still alternatives. Browser geometry/axe is supplemental to physical-device and human AT acceptance.
+
+## Adaptive navigation acceptance — 2026-11-02
+
+Check five permanent bottom links below 36rem available, sixth Masbaha above, and return to five with enlarged text. Include both sides of 575/576px, phone/tablet, 320px/200%, RTL/LTR and the 900/1200px shell tiers. Settings/Qibla remain named and reachable; optional Masbaha leaves keyboard/AT order when hidden. Verify whole targets contain label ink, 44px size, unique aria-current, keyboard/native href/modified-click behavior, safe areas and short-screen wide-nav scrolling. Preserve Home cards, visible More, Today's path→Month Progress, More→Progress/Masbaha, direct URLs, browser Back and existing reading-focus exclusions.

@@ -6,7 +6,7 @@
 }
 
 .progress-screen-controls {
-  background: var(--background);
+  background-color: var(--background);
   position: sticky;
   inset-block-start: 0;
   z-index: 40;
@@ -36,47 +36,18 @@
 @media (min-width: 600px) {
   .progress-controls-inner {
     display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: stretch;
   }
   .progress-controls-inner > .shared-screen-header {
     grid-column: 1 / -1;
   }
-  .progress-date-filter,
-  .progress-range-toolbar > .progress-select-field {
-    display: grid;
-  }
-  .progress-date-filter {
-    /* Align the actual field with the options inside the adjacent pill track. */
-    padding-block: calc(0.25rem + 1px);
-  }
-  .progress-range-toolbar > .progress-select-field > label {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
   .progress-range-toolbar .progress-select-trigger {
     margin-block: 0;
   }
-  .progress-screen-controls .progress-view-tabs [role="tab"] {
-    min-block-size: var(--ds-control-height);
-    align-self: stretch;
-  }
 }
 .progress-date-filter {
-  flex: 1 1 17rem;
   min-inline-size: 0;
-}
-.progress-date-filter[hidden] {
-  display: none;
-}
-.progress-date-filter:not([hidden]) {
-  animation: fade-in var(--motion-duration-fast) var(--motion-ease-enter);
 }
 .heatmap-day,
 .progress-month-button {
@@ -90,11 +61,6 @@
 }
 .progress-date-filter .progress-range-toolbar {
   inline-size: 100%;
-}
-@media (max-width: 599px) {
-  .progress-date-filter {
-    flex-basis: 100%;
-  }
 }
 
 .progress-screen-controls[data-scrolled="true"] {
@@ -117,10 +83,18 @@
   max-inline-size: none;
 }
 
-.progress-screen-controls .progress-view-tabs {
-  flex: 1 1 23rem;
-  min-inline-size: 0;
-  margin-block: 0;
+.progress-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.progress-header-actions > .ui-icon-button {
+  inline-size: 54px;
+  block-size: 54px;
+  min-inline-size: 54px;
+  min-block-size: 54px;
 }
 
 .progress-range-preset,
@@ -143,43 +117,56 @@
   display: flex;
   flex-direction: column;
   min-inline-size: 0;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 0.375rem;
+  padding: 0.875rem;
   border: 1px solid var(--border);
-  border-radius: var(--ds-radius-card);
+  border-radius: var(--ds-radius-card-large);
+  text-align: center;
   color: var(--foreground);
   background: var(--card);
   transition:
     border-color var(--motion-duration-fast) var(--motion-ease-standard),
     box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 }
+.progress-summary-card.progress-overview-summary {
+  padding: 0;
+  border: 0;
+  background: none;
+}
 .progress-metric-card .progress-practice-icon {
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
   padding: 0.5rem;
-  border-radius: var(--ds-radius-control);
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
   color: var(--primary);
-  background: var(--muted);
+  background-color: var(--muted);
 }
 .progress-metric-link {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.375rem;
   min-block-size: 44px;
   inline-size: 100%;
-  text-align: start;
+  text-align: center;
   color: inherit;
   cursor: pointer;
 }
 .progress-metric-label {
-  flex: 1;
+  display: grid;
+  place-items: center;
+  min-block-size: 1.5em;
   min-inline-size: 0;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: 700;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 .progress-metric-arrow {
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline-end: 0.875rem;
   flex-shrink: 0;
   color: var(--muted-foreground);
 }
@@ -188,9 +175,9 @@
 }
 .progress-metric-quantity > bdi {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.375rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
 }
 .progress-metric-count {
   min-inline-size: 1ch;
@@ -207,8 +194,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 0.5rem;
-  min-block-size: 2.25rem;
+  gap: 0.375rem;
+  min-block-size: 1.75rem;
   margin-block-start: auto;
 }
 .progress-metric-caption,
@@ -228,18 +215,34 @@
 }
 @container progress-dashboard (width < 28rem) {
   .progress-metric-card {
-    padding: 0.875rem;
+    padding: 0.75rem;
+    text-align: start;
+    gap: 0.25rem;
   }
   .progress-metric-link {
+    flex-direction: row;
     gap: 0.5rem;
+    text-align: start;
+    padding-inline-end: 0.75rem;
   }
   .progress-metric-card .progress-practice-icon {
     inline-size: 2rem;
     block-size: 2rem;
+    flex-shrink: 0;
     padding: 0.375rem;
   }
-  .progress-metric-arrow {
-    display: none;
+  .progress-metric-label {
+    display: block;
+    font-size: var(--text-sm);
+  }
+  .progress-metric-quantity > bdi {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+  .progress-metric-count {
+    font-size: var(--text-2xl);
   }
 }
 .heatmap-heading {
@@ -273,7 +276,7 @@
 .heatmap-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(44px, 1fr));
-  gap: 2px;
+  gap: 4px;
 }
 .heatmap-day {
   display: flex;
@@ -283,9 +286,9 @@
   min-block-size: 56px;
   min-inline-size: 44px;
   padding: 4px 2px;
-  border: 1px solid var(--border-control);
-  border-radius: 8px;
-  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--ds-radius-control);
+  background-color: var(--card);
   color: var(--foreground);
   font-size: var(--text-xs);
   line-height: 1.3;
@@ -333,16 +336,16 @@
   }
 }
 .heatmap-day[data-level="1"] {
-  background: color-mix(in srgb, var(--primary) 10%, var(--card));
+  background-color: color-mix(in srgb, var(--primary) 10%, var(--card));
 }
 .heatmap-day[data-level="2"] {
-  background: color-mix(in srgb, var(--primary) 20%, var(--card));
+  background-color: color-mix(in srgb, var(--primary) 20%, var(--card));
 }
 .heatmap-day[data-level="3"] {
-  background: color-mix(in srgb, var(--primary) 30%, var(--card));
+  background-color: color-mix(in srgb, var(--primary) 30%, var(--card));
 }
 .heatmap-day[data-level="4"] {
-  background: var(--primary);
+  background-color: var(--primary);
   color: var(--primary-foreground);
 }
 .heatmap-day[aria-pressed="true"] {
@@ -355,7 +358,7 @@
 .heatmap-day:disabled {
   color: var(--muted-foreground);
   border-style: dashed;
-  background: var(--muted);
+  background-color: var(--muted);
 }
 .heatmap-day[data-kind="outside"] {
   visibility: hidden;
@@ -368,14 +371,11 @@
   font-size: var(--text-sm);
   font-weight: 700;
 }
-.heatmap-month-label {
-  display: block;
-  font-size: 0.85em;
-}
+
 .progress-date-details {
   padding: 0.875rem;
   border-radius: var(--ds-radius-control);
-  background: color-mix(in srgb, var(--muted) 45%, var(--card));
+  background-color: color-mix(in srgb, var(--muted) 45%, var(--card));
   border: 1px solid var(--border);
 }
 .progress-date-detail-row,
@@ -391,7 +391,13 @@
 .progress-overview-support {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 1rem;
+  gap: 1.25rem;
+  align-items: start;
+}
+.progress-routine-column {
+  display: grid;
+  min-inline-size: 0;
+  gap: 1.25rem;
 }
 .progress-overview-support .progress-insight-card {
   align-self: start;
@@ -408,8 +414,8 @@
   justify-content: center;
   min-block-size: 44px;
   min-inline-size: 44px;
-  border: 1px solid var(--border-control);
-  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--ds-radius-control);
   padding: 0.35rem;
   color: var(--foreground);
   font-size: var(--text-xs);
@@ -468,12 +474,14 @@
   grid-column: 1 / -1;
   text-align: start;
 }
-@container progress-dashboard (min-width: 42rem) {
+@container progress-calendar (min-width: 36rem) {
   .heatmap-layout {
     grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   }
+}
+@container progress-dashboard (min-width: 64rem) {
   .progress-overview-support {
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
   }
 }
 @media (forced-colors: active) {
@@ -504,7 +512,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-block-size: 48px;
   gap: 0.625rem;
-  background: var(--card);
+  background-color: var(--card);
   color: var(--foreground);
   text-align: start;
 }
@@ -539,8 +547,12 @@
      move a collision-constrained menu beyond the viewport at enlarged text. */
   translate: none;
   inline-size: var(--radix-select-trigger-width);
+  min-inline-size: 0;
   max-inline-size: calc(100vw - 24px);
   max-block-size: min(24rem, var(--radix-select-content-available-height));
+}
+.progress-select-content [data-radix-select-viewport] {
+  min-inline-size: 0;
 }
 
 .progress-select-content [data-slot="select-item"] {
@@ -558,8 +570,8 @@
 .progress-insight-card,
 .progress-comparison-card {
   border: 1px solid var(--border);
-  border-radius: var(--ds-radius-card);
-  padding: 0.875rem;
+  border-radius: var(--ds-radius-card-large);
+  padding: 1rem;
   background: var(--card);
 }
 .progress-practice-icon {
@@ -597,36 +609,6 @@
   margin-block: 0.75rem;
   font-size: var(--text-xs);
 }
-.progress-empty-art {
-  inline-size: min(100%, 14rem);
-  block-size: auto;
-  margin-inline: auto;
-  border-radius: var(--ds-radius-card);
-}
-.progress-empty-period {
-  display: grid;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  text-align: center;
-}
-.progress-empty-actions {
-  justify-content: center;
-}
-.progress-empty-actions button:first-child {
-  color: var(--primary-foreground);
-  background: var(--primary);
-}
-@container progress-dashboard (min-width: 32rem) {
-  .progress-empty-period {
-    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
-    gap: 1.5rem;
-    text-align: start;
-  }
-  .progress-empty-actions {
-    justify-content: flex-start;
-  }
-}
 .recording-point-label {
   position: absolute;
   font-size: var(--text-xs);
@@ -634,41 +616,6 @@
   color: var(--foreground);
   pointer-events: none;
   white-space: nowrap;
-}
-.progress-styled-records {
-  border-collapse: separate;
-  border-spacing: 0 0.5rem;
-  padding: 0.5rem;
-}
-.progress-styled-records td,
-.progress-styled-records tbody th {
-  background: color-mix(in srgb, var(--muted) 25%, var(--card));
-}
-.progress-styled-records tr > :first-child {
-  border-start-start-radius: var(--radius-lg);
-  border-end-start-radius: var(--radius-lg);
-}
-.progress-styled-records tr > :last-child {
-  border-start-end-radius: var(--radius-lg);
-  border-end-end-radius: var(--radius-lg);
-}
-.progress-record-mini {
-  block-size: 0.3rem;
-  margin-block-start: 0.35rem;
-  background: var(--muted);
-  border-radius: 1rem;
-  overflow: hidden;
-}
-.progress-record-mini > span {
-  display: block;
-  block-size: 100%;
-  background: var(--primary);
-  border-radius: inherit;
-}
-@media (max-width: 24rem) {
-  .progress-tab-icon {
-    display: none;
-  }
 }
 @media (forced-colors: active) {
   .progress-practice-icon,
@@ -690,7 +637,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: var(--ds-radius-card);
+  border-radius: var(--ds-radius-card-large);
 }
 
 .progress-metric-link:focus-visible {
@@ -776,14 +723,8 @@
     block-size: 16px;
   }
 
-  .progress-dashboard-action,
-  .progress-records-pagination {
+  .progress-dashboard-action {
     inline-size: 100%;
-  }
-
-  .progress-records-pagination {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .progress-screen-content > [role="tabpanel"] {
@@ -810,9 +751,8 @@
 .progress-focus:focus-visible,
 .progress-export:focus-visible,
 .progress-disclosure:focus-visible {
-  outline: 3px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px var(--ring);
+  outline: 3px solid var(--ring);
+  outline-offset: -3px;
 }
 .progress-help {
   font-size: var(--text-xs);
@@ -860,26 +800,6 @@
   text-overflow: clip;
 }
 
-@media (max-width: 35rem) {
-  .progress-view-tabs {
-    display: flex;
-    overflow-x: auto;
-  }
-  .progress-view-tabs [role="tab"] {
-    flex: 1 0 max-content;
-    white-space: nowrap;
-  }
-}
-
-.progress-record-column {
-  min-inline-size: 6rem;
-}
-.progress-record-column:first-child {
-  min-inline-size: 7rem;
-}
-.progress-styled-records thead button {
-  flex-wrap: wrap;
-}
 .progress-summary-card {
   box-shadow: 0 2px 12px rgb(0 0 0 / 0.035);
 }
@@ -891,7 +811,32 @@
 .progress-view-tabs [role="tab"] span {
   color: inherit;
 }
-.progress-view-tabs [role="tab"],
-.progress-view-tabs [role="tab"] span {
-  transition: none !important;
+
+.heatmap-weekdays abbr {
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.heatmap-count {
+  border-radius: 999px;
+  padding-inline: 0.25rem;
+  line-height: 1.5;
+}
+.progress-date-details {
+  align-self: start;
+}
+
+.progress-rhythm-panel {
+  display: flex;
+}
+@container progress-dashboard (min-width: 64rem) {
+  .progress-overview-support {
+    align-items: stretch;
+  }
+  .progress-routine-column {
+    display: flex;
+    flex-direction: column;
+  }
+  .progress-rhythm-panel {
+    flex: 1;
+  }
 }

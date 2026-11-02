@@ -86,20 +86,20 @@
 
 .nav-active-cue {
   display: inline-flex;
-  animation: menu-pop var(--motion-duration-standard) var(--motion-ease-enter);
+  animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter);
 }
 
 /* Independent scale preserves an icon's existing RTL rotation. */
 .control-cue {
   scale: 1;
-  transition: scale var(--motion-duration-fast) var(--motion-ease-standard);
+  transition: scale var(--motion-duration-standard) var(--control-cue-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):focus-visible .control-cue {
-  scale: var(--control-cue-scale, 1.08);
+  scale: var(--control-cue-scale, 1.1);
 }
 @media (hover: hover) and (pointer: fine) {
   button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):hover .control-cue {
-    scale: var(--control-cue-scale, 1.08);
+    scale: var(--control-cue-scale, 1.1);
   }
 }
 
@@ -299,24 +299,4 @@ button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):focus-
    one gesture rather than appearing together already finished. */
 .tracking-check[data-checked="true"] > svg {
   animation: favorite-pop var(--motion-duration-fast) var(--motion-ease-enter) 60ms both;
-}
-.settings-toggle-thumb {
-  transform: translateX(0);
-  transition:
-    transform var(--motion-duration-fast) var(--motion-ease-standard),
-    background-color var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.settings-toggle-track[data-checked="true"] > .settings-toggle-thumb {
-  transform: translateX(18px);
-}
-
-.settings-toggle-track:dir(rtl)[data-checked="true"] > .settings-toggle-thumb {
-  transform: translateX(-18px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .settings-toggle-thumb {
-    transition-duration: 0.01ms;
-  }
 }

@@ -291,6 +291,8 @@ export interface UserSettingsState {
   readerMeaningOnly?: boolean;
   /** Blurred materials go solid. See the .reduce-transparency rules. */
   reduceTransparency: boolean;
+  /** Device-only decorative paper texture; absent legacy values default to enabled. */
+  paperTexture?: boolean;
   appMaterial?: "system" | "glass" | "solid";
   homeMaterial?: "inherit" | "system" | "glass" | "solid";
   /** Optional Home daily-wird photography; independent of transparency. */

@@ -24,6 +24,7 @@ function RoutedProgress() {
   );
 }
 async function selectRange(start: string, end: string) {
+  fireEvent.click(screen.getByTestId("progress-filters-toggle"));
   await chooseProgressOption(screen.getByRole("combobox", { name: "Date range" }), "custom");
   fireEvent.change(screen.getByLabelText("Start date"), { target: { value: start } });
   fireEvent.change(screen.getByLabelText("End date"), { target: { value: end } });
@@ -57,13 +58,14 @@ describe("Progress period navigation", () => {
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2025");
     fireEvent.click(screen.getByTestId("progress-tab-trends"));
     expect(screen.getByTestId("progress-main-trend")).toBeVisible();
-    expect(screen.getByRole("combobox", { name: "Date range" })).toHaveAttribute("data-progress-value", "custom");
+    expect(screen.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "custom");
+    fireEvent.click(screen.getByTestId("progress-filters-toggle"));
     await chooseProgressOption(screen.getByRole("combobox", { name: "Date range" }), "month");
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("1 – 31 Oct 2026");
     await selectRange("2026-09-01", "2026-09-30");
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("1 – 30 Sept 2026");
     fireEvent.click(screen.getByRole("button", { name: "History back to year" }));
-    expect(screen.getByRole("combobox", { name: "Date range" })).toHaveAttribute("data-progress-value", "year");
+    expect(screen.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "year");
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2026");
   });
 });

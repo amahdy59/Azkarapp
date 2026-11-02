@@ -1,0 +1,63 @@
+/* Icon cues preserve text, target geometry and an icon's own RTL rotation. */
+:is(.ui-action-cue > svg, .choice-pill-option > span > svg):not([class*="animate-"]) {
+  transition: scale var(--motion-duration-standard) cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ui-action-cue:not(:disabled, [aria-disabled="true"], [aria-busy="true"]):focus-visible > svg:not([class*="animate-"]) {
+  scale: 1.1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-action-cue:not(:disabled, [aria-disabled="true"], [aria-busy="true"]):hover > svg:not([class*="animate-"]) {
+    scale: 1.1;
+  }
+  .choice-pill-option:not(:disabled):hover > span > svg {
+    scale: 1.1;
+  }
+  .choice-surface:not(:disabled):hover {
+    border-color: var(--primary);
+    background-color: color-mix(in srgb, var(--primary) 12%, var(--card));
+  }
+  .choice-surface[data-state="checked"]:not(:disabled):hover {
+    background-color: color-mix(in srgb, var(--primary) 20%, var(--card));
+  }
+}
+.ui-action-cue:not(:disabled, [aria-disabled="true"], [aria-busy="true"]):active > svg:not([class*="animate-"]) {
+  scale: 0.98;
+}
+.offline-resource {
+  transition: box-shadow var(--motion-duration-standard) var(--motion-ease-standard);
+}
+.offline-resource[data-transfer-state="active"] {
+  box-shadow: inset 3px 0 var(--primary);
+}
+.offline-resource[data-transfer-state="ready"] > p {
+  color: var(--success);
+}
+@keyframes transfer-acknowledge {
+  from {
+    opacity: 0.4;
+    scale: 0.85;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+.offline-resource[data-transfer-state="ready"] > p > svg {
+  animation: transfer-acknowledge var(--motion-duration-standard) var(--motion-ease-enter);
+}
+.reduce-motion :is(.ui-action-cue > svg, .choice-pill-option > span > svg) {
+  scale: 1 !important;
+  transition: none;
+}
+.reduce-motion .offline-resource > p > svg {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.ui-action-cue > svg, .choice-pill-option > span > svg) {
+    scale: 1 !important;
+    transition: none;
+  }
+  .offline-resource > p > svg {
+    animation: none;
+  }
+}

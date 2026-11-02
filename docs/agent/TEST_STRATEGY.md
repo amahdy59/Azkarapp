@@ -1,6 +1,24 @@
+## Local completion evidence — 2026-11-02
+
+reader-focus-intent covers real Tab/Space and pointer/menu journeys in the three counting flows, with browser-simulated volume keys and Forced Colors. enlarged-control-reflow checks 320px/200% title/label/tally geometry, contained navigation, category copy and account/notification controls in Arabic/English. The controls selector includes both; reader's existing reader-* pattern includes focus intent. Preserve source snapshot provenance for full quality, affected cross-engine features, core smoke, Pages, audit and browser inventory. Keep owner visual and physical hardware/AT acceptance distinct.
+
 # Test and Evidence Strategy
 
-## Current readiness phase
+## Final-touch quality and motion — 2026-11-02
+
+`paper-grain.spec.ts` verifies the static texture in every app theme/material, asset loading, still geometry, actual Mushaf navigation and plain high-contrast/transparency/forced-color/print fallbacks. The Windows reduced-transparency preference must not hide an enabled static texture: it still disables frosting/material effects, while the app's explicit Reduce transparency, High contrast and Paper texture choices retain plain-surface control. The OS-preference case is separately asserted. Juz selection reuses the existing searchable picker for thirty choices, retaining pointer/keyboard/search and opaque bounded popup checks at 320px/200%.
+
+`final-touch-quality.spec.ts` covers ordered narrow chart geometry/counts, download navigation continuity with explicit cancel, shared button focus/hover and both still modes. Audio download recovery retains ZIP cancellation focus assertions. Targeted units exercise observer/frame coalescing, session ownership/hidden updates/private clear, corrupt-byte repair, cancelled status scans, resolved voices and selected Mushaf acquisition. The working-tree CSS inventory has a temporary-repository regression. These augment existing tests; full quality/coverage, Pages and core smoke remain required. Native storage/process-death and real assistive technology remain manual device evidence.
+
+## Current shared-surface and audio review — 2026-11-02
+
+Use shared-card-finish for rounded metrics, protected nested menus, stationary phone filters, actual focus return, and default/app/OS motion. Card arrival must not replay on an ordinary disclosure render. Use mobile-sharing-filters and progress-dashboard for preset/custom-date application, cancellation, retained values and data/export assertions. audio-continuity covers the visible continuation switch, paused queue selection, return focus after selection/Escape, sleep controls and reload/resume. Retain the audio integrity/control-lock/offline suites and the short-Reader WebKit retry intake. Navigation's Qibla calibration remains a native details/summary check; Library's portalled filter trigger must not replace unrelated disclosure selectors.
+
+Both `pnpm test:e2e:feature progress` and `controls` select shared-card-finish; `audio` already selects audio-continuity through its existing file pattern. Feature-map tests retain these identities. Full CI inventory and release-gate coverage remain unchanged.
+
+Progress restores its known date opener in the modal close-autofocus callback, after focus containment releases; touch activation cannot be assumed to focus a button. The queue explicitly focuses its trigger before opening so the shared modal captures its return target. Keep the browser focus assertions and do not replace them with synthetic test-side focus. Preserve before/after failure reports separately. The current publication hold remains in DECISION_LOG; local verification is not exact-commit CI or deployment evidence.
+
+## Deployed readiness coverage
 
 Use settings-readiness-surfaces for separate saving/sync/offline status, reminder summary, keyboard navigation, enlarged layout and actual backup output. audio-expanded-layout verifies the transparent non-overlapping toolbar; header-frost-fallback keeps passing-content protection. Keep physical acceptance in DEVICE_ACCEPTANCE.md and unresolved retry identities in FLAKY_TESTS.md. One active phase pointer lives at the top of INDEX.md; historical phase records retain their evidence and authority.
 

@@ -1,3 +1,12 @@
+import { MushafDownloadSelection } from "../../components/MushafDownloadSelection";
+import {
+  useDownloadSession,
+  runDownloadSession,
+  updateDownloadSession,
+  cancelDownloadSession,
+  getDownloadSession,
+  clearDownloadNotice,
+} from "../../downloads/downloadSession";
 import { isNativeAndroid } from "../../native/platform";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
@@ -21,6 +30,7 @@ import {
   estimateAudioDownloadBytes,
   getDownloadedAudioSummary,
   getAudioDownloadStatuses,
+  getAudioDownloadVoices,
   removeAudioForZikrs,
   type AudioDownloadProgress,
 } from "../../audio/audioOfflineCache";
@@ -48,7 +58,6 @@ type OfflineStatus = {
   groups: AudioStatus[];
   audio: AudioStatus[];
 };
-type Job = { id: string; completed: number; total: number; detail?: AudioDownloadProgress; archive?: boolean };
 function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
   return typeof bytes === "number"
     ? formatNumerals((bytes / 1_000_000).toFixed(1), language) + " MB"
@@ -69,19 +78,24 @@ export function DownloadsPanel({
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [job, setJob] = useState<Job | null>(null);
+  const session = useDownloadSession();
+  const job = session.job;
   const [failedId, setFailedId] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
   const [persistence, setPersistence] = useState<DownloadPersistence>("unsupported");
   const [requestingPersistence, setRequestingPersistence] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
   const operationRef = useRef(false);
+  const archiveButtonRef = useRef<HTMLButtonElement>(null);
+  const archiveOwnedFocus = useRef(false);
+  const [restoreArchiveFocus, setRestoreArchiveFocus] = useState(false);
   const mountedRef = useRef(true);
   const statusRequestRef = useRef(0);
+  const statusController = useRef<AbortController | null>(null);
   const audioPreferences = useMemo(loadAudioPreferences, []);
   const allAudioZikrs = useMemo(() => collections.flatMap((resource) => resource.zikrs), [collections]);
   // Optional Quran corpora load only when this panel is opened.
-  const resourcePromise = useMemo(
+  const loadResources = useCallback(
     () =>
       Promise.all([
         import("../../content/fridayKahf"),
@@ -117,11 +131,14 @@ export function DownloadsPanel({
 
   const refreshStatus = useCallback(async () => {
     const request = ++statusRequestRef.current;
+    statusController.current?.abort();
+    const acquisition = new AbortController();
+    statusController.current = acquisition;
     setErrorMessage("");
     setSuccessMessage("");
     setIsLoading(true);
     try {
-      const resources = await resourcePromise;
+      const resources = await loadResources();
       if (!mountedRef.current || request !== statusRequestRef.current) return;
       setCollections(resources);
       const [registration, cacheNames, storage, mushafStatus, audioStatus, storagePersistence] = await Promise.all([
@@ -137,6 +154,7 @@ export function DownloadsPanel({
             resources.slice(4).flatMap((r) => r.zikrs),
           ],
           audioPreferences,
+          { signal: acquisition.signal },
         ),
         getDownloadPersistence(),
       ]);
@@ -157,96 +175,119 @@ export function DownloadsPanel({
         audio: audioStatus.slice(0, resources.length),
       });
     } catch (error) {
+      if (acquisition.signal.aborted) return;
       reportError(error, "offline-storage-status");
       if (mountedRef.current && request === statusRequestRef.current)
         setErrorMessage(t(language, "downloads.statusError"));
     } finally {
       if (mountedRef.current && request === statusRequestRef.current) setIsLoading(false);
     }
-  }, [language, resourcePromise, audioPreferences]);
+  }, [language, loadResources, audioPreferences]);
   useEffect(() => {
     mountedRef.current = true;
     void refreshStatus();
     return () => {
       mountedRef.current = false;
       statusRequestRef.current += 1;
-      controllerRef.current?.abort();
+      statusController.current?.abort();
+      if (getDownloadSession().job?.id === "archive") cancelDownloadSession();
     };
   }, [refreshStatus]);
 
   const runDownload = async (id: string, bytes: number, work: (controller: AbortController) => Promise<void>) => {
-    if (operationRef.current || isLoading || !status) return;
+    if (operationRef.current || getDownloadSession().job || isLoading || !status) return;
     operationRef.current = true;
-    const controller = new AbortController();
-    controllerRef.current = controller;
     setErrorMessage("");
     setSuccessMessage("");
     setFailedId(null);
-    setJob({ id, completed: 0, total: id === "mushaf" ? 604 : bytes });
-    let message = "";
-    let failure = "";
-    try {
-      if (!(await hasDownloadSpace(bytes))) throw new DOMException("Storage full", "QuotaExceededError");
-      if (persistence !== "granted") {
-        void requestDownloadPersistence().then((result) => {
-          if (mountedRef.current && result === "granted") setPersistence(result);
-        });
-      }
-      controller.signal.throwIfAborted();
-      await work(controller);
-      message = t(
-        language,
-        id === "mushaf"
-          ? "downloads.mushafDownloadComplete"
-          : id === "archive"
-            ? "downloads.fileHandedToBrowser"
-            : "downloads.downloadComplete",
-      );
-    } catch (error) {
-      if (controller.signal.aborted)
-        message = t(language, id === "mushaf" ? "downloads.mushafCancelled" : "downloads.downloadCancelled");
-      else {
-        reportError(error, "offline-download");
-        failure = t(
-          language,
-          isStorageQuotaError(error)
-            ? "downloads.storageFull"
-            : error instanceof AudioDownloadError
-              ? error.code === "integrity"
-                ? "downloads.integrityError"
-                : error.code === "unsupported"
-                  ? "downloads.unsupportedError"
-                  : error.code === "server"
-                    ? "downloads.serverError"
-                    : "downloads.networkError"
-              : "downloads.downloadErrorDescription",
-        );
-      }
-    } finally {
-      if (mountedRef.current) {
-        await refreshStatus();
-        if (mountedRef.current) {
-          setJob(null);
-          setSuccessMessage(message);
-          if (failure) {
-            setErrorMessage(failure);
-            setFailedId(id);
-          }
+    await runDownloadSession(
+      { id, completed: 0, total: id === "mushaf" ? 604 : id === "mushaf-pages" ? 0 : bytes },
+      async (controller) => {
+        controllerRef.current = controller;
+        if (!(await hasDownloadSpace(bytes))) throw new DOMException("Storage full", "QuotaExceededError");
+        if (persistence !== "granted") {
+          void requestDownloadPersistence().then((result) => {
+            if (mountedRef.current && result === "granted") setPersistence(result);
+          });
         }
-      }
-      controllerRef.current = null;
-      operationRef.current = false;
-    }
+        controller.signal.throwIfAborted();
+        await work(controller);
+      },
+    );
+    controllerRef.current = null;
+    operationRef.current = false;
   };
+  useEffect(() => {
+    const result = session.result;
+    if (!result) return;
+    let active = true;
+    const restore =
+      result.id === "archive" && (archiveOwnedFocus.current || document.activeElement === archiveButtonRef.current);
+    void refreshStatus().then(() => {
+      if (!active) return;
+      if (result.status === "failed") {
+        reportError(result.error, "offline-download");
+        const code = result.error instanceof AudioDownloadError ? result.error.code : undefined;
+        setErrorMessage(
+          t(
+            language,
+            isStorageQuotaError(result.error)
+              ? "downloads.storageFull"
+              : code === "integrity"
+                ? "downloads.integrityError"
+                : code === "unsupported"
+                  ? "downloads.unsupportedError"
+                  : code === "server"
+                    ? "downloads.serverError"
+                    : code === "network"
+                      ? "downloads.networkError"
+                      : "downloads.downloadErrorDescription",
+          ),
+        );
+        setFailedId(result.id);
+      } else
+        setSuccessMessage(
+          t(
+            language,
+            result.status === "cancelled"
+              ? result.id.startsWith("mushaf")
+                ? "downloads.mushafCancelled"
+                : "downloads.downloadCancelled"
+              : result.id === "mushaf"
+                ? "downloads.mushafDownloadComplete"
+                : result.id === "archive"
+                  ? "downloads.fileHandedToBrowser"
+                  : "downloads.downloadComplete",
+          ),
+        );
+      archiveOwnedFocus.current = false;
+      if (restore) setRestoreArchiveFocus(true);
+      else clearDownloadNotice();
+    });
+    return () => {
+      active = false;
+    };
+  }, [session.revision, session.result, refreshStatus, language]);
+  useEffect(() => {
+    if (!restoreArchiveFocus || isLoading || job) return;
+    if (
+      [document.body, document.documentElement, archiveButtonRef.current].includes(
+        document.activeElement as HTMLElement,
+      )
+    )
+      archiveButtonRef.current?.focus();
+    setRestoreArchiveFocus(false);
+    clearDownloadNotice();
+  }, [restoreArchiveFocus, isLoading, job]);
   const updateProgress = (id: string) => (completed: number, total: number) => {
-    if (mountedRef.current) setJob((previous) => ({ ...previous, id, completed, total }));
+    updateDownloadSession({ id, completed, total });
   };
   const updateAudioDetail = (id: string) => (detail: AudioDownloadProgress) => {
-    if (mountedRef.current) setJob({ id, completed: detail.receivedBytes, total: detail.totalBytes, detail });
+    updateDownloadSession({ id, completed: detail.receivedBytes, total: detail.totalBytes, detail });
   };
   const mushafBytes = Math.max(0, 604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES;
   const removeResource = async (id: string, collection?: AudioCollection) => {
-    if (operationRef.current || isLoading) return;
+    if (operationRef.current || getDownloadSession().job || isLoading) return;
     operationRef.current = true;
     setRemoving(true);
     setErrorMessage("");
@@ -312,6 +353,9 @@ export function DownloadsPanel({
               .slice(resource.id === "adhkar" ? 0 : 4, resource.id === "adhkar" ? 4 : undefined)
               .some((collection) => collection.id === job.id)));
       const title = t(language, resource.titleKey);
+      const voices = getAudioDownloadVoices(resource.zikrs, audioPreferences)
+        .map((voice) => voice.name)
+        .join(" · ");
       const detail = active ? job?.detail : undefined;
       const completed = active ? job.completed : (saved?.completed ?? 0);
       const total = active ? job.total : (saved?.total ?? 0);
@@ -331,6 +375,7 @@ export function DownloadsPanel({
           state={active ? t(language, "downloads.downloading") : collectionState(saved)}
           feedback={
             <>
+              {voices && <p>{t(language, "downloads.recordingVoices", { voices })}</p>}
               {!isLoading && saved && (
                 <p>
                   {t(language, "downloads.recordingCoverage", {
@@ -403,7 +448,7 @@ export function DownloadsPanel({
               });
             })
           }
-          onCancel={() => controllerRef.current?.abort()}
+          onCancel={() => cancelDownloadSession()}
           onRemove={() => void removeResource(resource.id, resource)}
         />
       );
@@ -429,6 +474,16 @@ export function DownloadsPanel({
         }}
       >
         <p className="text-sm text-muted-foreground">{t(language, "downloads.includedText")}</p>
+        {job && job.id !== "archive" && (
+          <div className="flex flex-wrap items-center gap-3">
+            <p role="status" className="text-sm text-primary">
+              {t(language, "downloads.continuesOnNavigation")}
+            </p>
+            <Button variant="outline" onClick={cancelDownloadSession}>
+              {t(language, "downloads.cancelDownload")}
+            </Button>
+          </div>
+        )}
         <AudioFileExports
           zikrs={allAudioZikrs}
           preferences={audioPreferences}
@@ -506,15 +561,19 @@ export function DownloadsPanel({
             </>
           )}
           <Button
+            ref={archiveButtonRef}
             variant="outline"
             className="h-auto min-h-11 max-w-full whitespace-normal py-2"
             disabled={
               job?.id !== "archive" &&
+              session.result?.id !== "archive" &&
               (isLoading || isAnyJobActive || !status || !collections.some((r) => r.byteSize > 0))
             }
-            onClick={() => {
+            aria-busy={job?.id === "archive" || session.result?.id === "archive"}
+            onClick={(event) => {
+              archiveOwnedFocus.current = document.activeElement === event.currentTarget;
               if (job?.id === "archive") {
-                controllerRef.current?.abort();
+                cancelDownloadSession();
                 return;
               }
               void runDownload(
@@ -530,7 +589,7 @@ export function DownloadsPanel({
                       signal: controller.signal,
                       onDetail: updateAudioDetail("archive"),
                       onArchiveProgress: (completed, total) => {
-                        if (mountedRef.current) setJob({ id: "archive", completed, total, archive: true });
+                        updateDownloadSession({ id: "archive", completed, total, archive: true });
                       },
                     },
                   );
@@ -627,9 +686,33 @@ export function DownloadsPanel({
                 await downloadMushaf({ signal: controller.signal, onProgress: updateProgress("mushaf") });
               })
             }
-            onCancel={() => controllerRef.current?.abort()}
+            onCancel={() => cancelDownloadSession()}
             onRemove={() => void removeResource("mushaf")}
           />
+          <MushafDownloadSelection
+            language={language}
+            disabled={isLoading || isAnyJobActive}
+            active={job?.id === "mushaf-pages"}
+            onCancel={cancelDownloadSession}
+            onDownload={(first, last) =>
+              void runDownload("mushaf-pages", (last - first + 1) * MUSHAF_ESTIMATED_PAGE_BYTES, async (controller) => {
+                await downloadMushaf({
+                  signal: controller.signal,
+                  pages: Array.from({ length: last - first + 1 }, (_, index) => first + index),
+                  onProgress: updateProgress("mushaf-pages"),
+                });
+              })
+            }
+          />
+          {job?.id === "mushaf-pages" && (
+            <DownloadProgress
+              completed={job.completed}
+              total={job.total}
+              label={t(language, "downloads.downloadPages")}
+              language={language}
+              active
+            />
+          )}
           <details className="group border-t border-border/40">
             <summary
               className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -661,7 +744,7 @@ export function DownloadsPanel({
                   await downloadMushaf({ signal: controller.signal, onProgress: updateProgress("mushaf") });
                 })
               }
-              onCancel={() => controllerRef.current?.abort()}
+              onCancel={() => cancelDownloadSession()}
               onRemove={() => void removeResource("mushaf")}
             />
           </details>

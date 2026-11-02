@@ -73,7 +73,7 @@ function ReminderScheduleRow({
           aria-label={label}
           aria-checked={schedule.enabled}
           onClick={onToggle}
-          className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
         >
           <ToggleTrack checked={schedule.enabled} />
         </button>
@@ -345,7 +345,12 @@ export function NotificationsPanel({
           )}
           {(permission === "denied" || permission === "unsupported") && (
             <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-label leading-5 text-foreground">
-              {t(language, "notifications.permissionBlockedAction")}
+              {t(
+                language,
+                isNativeAndroid()
+                  ? "notifications.nativePermissionBlockedAction"
+                  : "notifications.permissionBlockedAction",
+              )}
             </p>
           )}
           {permissionAttemptBlocked && (
@@ -377,7 +382,7 @@ export function NotificationsPanel({
               aria-label={t(language, "notifications.prayerReminders")}
               aria-checked={reminders.prayer.enabled}
               onClick={() => void togglePrayerReminder()}
-              className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
             >
               <ToggleTrack checked={reminders.prayer.enabled} />
             </button>
@@ -517,7 +522,7 @@ export function NotificationsPanel({
                 role="switch"
                 aria-label={t(language, `notifications.${kind}`)}
                 aria-checked={reminders[kind]?.enabled === true}
-                className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
                 onClick={async () => {
                   const enabling = !reminders[kind]?.enabled;
                   if (enabling && (permission === "default" ? await requestPermission() : permission) !== "granted") {
@@ -533,7 +538,7 @@ export function NotificationsPanel({
           ))}
         </section>
         <details className="group border-t border-border/40">
-          <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring">
             {t(language, "settings.moreDetails")}
             <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
           </summary>

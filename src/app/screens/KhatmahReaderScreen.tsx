@@ -39,6 +39,7 @@ import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
 import { MUSHAF_RAIL_WIDTH, MushafToolRail, type SurahAudioControl } from "../components/MushafToolRail";
 import { MushafQuickMenu } from "../components/MushafQuickMenu";
+import { MushafFocusExit } from "../components/MushafFocusExit";
 import { QuranPageTranslationPanel } from "../components/QuranPageTranslationPanel";
 import { MushafTranslationControls } from "../components/MushafTranslationControls";
 import { QuranBilingualStreamView } from "../components/QuranBilingualStreamView";
@@ -220,24 +221,30 @@ export function KhatmahReaderScreen({
   const [showWordMeanings, setShowWordMeanings] = useState(false);
   const [isLoadingWordMeanings, setIsLoadingWordMeanings] = useState(false);
   const [completionSeen, setCompletionSeen] = useState<string | null>(null);
-  const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
-    null,
-  );
+  const [activeAyah, setActiveAyah] = useState<{
+    verseKey: string;
+    text: string | null;
+    pageNumber: number;
+    action?: "details" | "share";
+  } | null>(null);
   const [highlightedVerseKey, setHighlightedVerseKey] = useState<string | null>(null);
   const ayahRequestId = useRef(0);
 
-  const handleAyahAction = useCallback((verseKey: string, pageNumber: number) => {
-    const requestId = ++ayahRequestId.current;
-    setActiveAyah({ verseKey, text: null, pageNumber });
-    void loadCanonicalAyahText(verseKey, pageNumber)
-      .then((text) => {
-        if (ayahRequestId.current === requestId) setActiveAyah({ verseKey, text, pageNumber });
-      })
-      .catch((error) => {
-        reportError(error, "mushaf-ayah-text");
-        if (ayahRequestId.current === requestId) setActiveAyah(null);
-      });
-  }, []);
+  const handleAyahAction = useCallback(
+    (verseKey: string, pageNumber: number, action: "details" | "share" = "details") => {
+      const requestId = ++ayahRequestId.current;
+      setActiveAyah({ verseKey, text: null, pageNumber, action });
+      void loadCanonicalAyahText(verseKey, pageNumber)
+        .then((text) => {
+          if (ayahRequestId.current === requestId) setActiveAyah({ verseKey, text, pageNumber, action });
+        })
+        .catch((error) => {
+          reportError(error, "mushaf-ayah-text");
+          if (ayahRequestId.current === requestId) setActiveAyah(null);
+        });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!highlightedVerseKey) return;
@@ -1052,24 +1059,7 @@ export function KhatmahReaderScreen({
     />
   );
 
-  /** The one thing left on screen in focus mode: a hairline handle at the foot
-   *  of the page, wide enough to hit and quiet enough to forget. It sits in the
-   *  same place whichever chrome it replaced, so there is one thing to learn. */
-  const focusHandle = (
-    <button
-      type="button"
-      onClick={() => setIsFocusMode(false)}
-      data-testid="mushaf-focus-exit"
-      aria-label={t(language, "mushaf.focusModeExit")}
-      title={t(language, "mushaf.focusModeExit")}
-      className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-    >
-      <span
-        aria-hidden="true"
-        className="h-0.5 w-10 rounded-full bg-muted-foreground transition-colors group-hover:bg-primary"
-      />
-    </button>
-  );
+  const focusHandle = <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} />;
 
   const wirdProgressBar =
     wirdGoal > 0 ? (
@@ -1103,6 +1093,7 @@ export function KhatmahReaderScreen({
           view, which is exactly the deep link or reload case. */}
       <div
         ref={readerRootRef}
+        data-mushaf-reader
         tabIndex={-1}
         className={`relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background text-foreground outline-none theme-${resolvedTheme}`}
         onPointerDown={readingMode === "mushaf" && pageMagnification === 100 ? onPointerDown : undefined}
@@ -1219,6 +1210,7 @@ export function KhatmahReaderScreen({
               onUpdateVerseBookmarks?.(next);
             }}
             onAyahAction={handleAyahAction}
+            onShareAyah={(verseKey, page) => handleAyahAction(verseKey, page, "share")}
             showWordMeanings={showWordMeanings}
             onPaginate={paginate}
             atFirstPage={currentPage <= 1}
@@ -1302,6 +1294,7 @@ export function KhatmahReaderScreen({
               verticalGestures={pageMagnification === 100 && colorGestures}
               magnification={pageMagnification}
               showFloatingPageIndicator={!isFocusMode}
+              focusMode={isFocusMode}
               pageTransitionDirection={pageTransitionDirection}
               reduceMotion={reduceMotion}
               hapticFeedback={hapticFeedback}
@@ -1328,6 +1321,7 @@ export function KhatmahReaderScreen({
       </div>
 
       <AyahInteractionSheet
+        initialAction={activeAyah?.action}
         isOpen={activeAyah !== null}
         onClose={() => {
           ayahRequestId.current += 1;
@@ -1454,6 +1448,7 @@ export function KhatmahReaderScreen({
         }
         surahAudio={activeAudioControl}
         onSelectReadingMode={setReadingMode}
+        onEnterFocusMode={() => setIsFocusMode(true)}
         mushafLayout={internalLayout}
         onSelectLayout={handleSelectLayout}
         showLayoutOptions={shell.spreadRoom}

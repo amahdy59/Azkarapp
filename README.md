@@ -1,10 +1,14 @@
 # Azkarapp
 
+Themes share a subtle static paper-grain background on pages, cards and Quran surfaces. Appearance → Paper texture controls the effect and remembers the device's choice. The small cached tile sits beneath content; accessibility/plain-material fallbacks remain untextured.
+
+Offline audio downloads continue during in-app navigation and expose progress/cancel when returning to Downloads. Readers can choose Mushaf pages or a juz as well as the full pack, and see resolved voices before audio transfer. Shared action icons have eased hover/focus feedback with still alternatives; narrow saved-page charts keep all seven dates in chronological rows. These refinements remain local pending owner review; they do not promise background transfers after closing the app.
+
 Home prayer times are larger inside the same expanded cards and return to their original size when collapsed. Share, Refresh, routine/Wird and shortcut actions have consistent keyboard/pointer feedback, with immediate still alternatives under Reduce Motion.
 
-Mushaf colour swipes can be switched off in Reading Settings; the device remembers the choice. Progress keeps the chosen date first, with secondary calendar settings and a clearer exact-records surface.
+Mushaf colour swipes can be switched off in Reading Settings; the device remembers the choice. Progress opens on Month and keeps the selected period visible, with one header date action that opens a modal without moving the cards. Library Search stays full width above its filters. Returning to a loaded Library or Quran overview avoids a repeated loading flash; tab changes use one restrained arrival.
 
-Mushaf reading tools hide/show with one centre tap; tap the same highlighted word or its explanation to close it. Vertical swipes move forwards/backwards through Mushaf-only page colours, with visible choices and Follow app available in Reading options. Progress separates Overview, Trends and Records while retaining one selected date range; tap a summary card to inspect its trend.
+Mushaf reading tools hide/show with one centre tap; tap the same highlighted word or its explanation to close it. Vertical swipes move forwards/backwards through Mushaf-only page colours, with visible choices and Follow app available in Reading options. Progress has Overview and Trends with one shared date range; tap a rounded summary card to inspect its trend, or a calendar day to inspect its saved records.
 
 ## Isolated browser backend
 
@@ -290,3 +294,7 @@ Documentation sources of truth:
 ### Audio validation during development
 
 Local pnpm check validates audio catalog metadata offline. Use pnpm validate:audio for audio-host/catalog changes and live recording verification; Quality CI requires this full live validation before every release. pnpm validate:audio:local performs the same structural checks without network probes.
+
+## Local adaptive navigation checkpoint
+
+Phone/tablet navigation keeps Home, Quran, Azkar, Qibla and Settings visible. Masbaha additionally appears when the bar has room; its Home card remains available. Progress is reachable through Today's path and More, and stays in wide navigation. Home provides a More action. These owner-approved refinements remain local under the publication hold.

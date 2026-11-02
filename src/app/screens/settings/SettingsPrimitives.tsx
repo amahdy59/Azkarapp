@@ -103,7 +103,7 @@ export function SubHeader({
 export function SectionLabel({ label }: { label: string }) {
   return (
     <div className="px-[var(--settings-gutter,1rem)] pt-6 pb-2">
-      <h2 className="text-label font-semibold font-sans leading-[18px]" style={{ color: "var(--muted-foreground)" }}>
+      <h2 className="text-label font-semibold font-sans leading-snug" style={{ color: "var(--muted-foreground)" }}>
         {label}
       </h2>
     </div>
@@ -132,7 +132,7 @@ export function SettingsSection({
       <Card
         elevation="flat"
         padding={variant === "content" ? "md" : "none"}
-        className={`mx-[var(--settings-gutter,1rem)] ${variant === "rows" ? "overflow-hidden" : ""} ${className}`.trim()}
+        className={`mx-[var(--settings-gutter,1rem)] ${variant === "rows" ? "settings-row-group overflow-hidden" : ""} ${className}`.trim()}
       >
         {children}
       </Card>

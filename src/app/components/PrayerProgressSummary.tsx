@@ -1,5 +1,4 @@
 import { t } from "../i18n";
-import { progressText } from "../i18n/progressInsights";
 import { PRAYER_NAMES } from "../content/prayerTimes";
 import { trackedLocation } from "../prayerMoment";
 import { prayerDisplayName } from "../prayerPresentation";
@@ -57,9 +56,6 @@ export function PrayerProgressSummary({
           );
         })}
       </ul>
-      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        {progressText(language, "insights.noRecord")}
-      </p>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
+import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { useCounterAnnouncement } from "../hooks/useCounterAnnouncement";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
@@ -12,6 +13,7 @@ import {
   ChevronNext,
   ChevronPrevious,
   Lightbulb,
+  Keyboard,
   MoreVertical,
   Play,
   RotateCcw,
@@ -123,6 +125,8 @@ export function CustomCounterScreen({
     AUTHENTIC_AZKAR_COLLECTION.find((item) => item.id === initialMasbahaState?.selectedZikrId) ??
     AUTHENTIC_AZKAR_COLLECTION[0]!;
   const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(() => initialSelectedAuthentic);
+  const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
+  const moreTriggerRef = useRef<HTMLButtonElement>(null);
 
   const [savedItems, setSavedItems] = useState<Record<string, MasbahaZikrItemState>>(() => {
     const rawItems = initialMasbahaState?.items ?? {};
@@ -421,45 +425,24 @@ export function CustomCounterScreen({
               countLabel: `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`,
               ariaLabel: t(language, "counter.targetLabel"),
             }}
-            subRow={
-              <div className="w-full" data-prevent-count="true">
-                <div
-                  className="counter-picker-row relative z-20 flex items-center gap-2 sm:gap-3"
-                  data-prevent-count="true"
-                >
-                  <div className="min-w-0 flex-1">
-                    <AuthenticZikrPicker
-                      items={AUTHENTIC_AZKAR_COLLECTION}
-                      selected={selectedAuthentic}
-                      language={language}
-                      direction={direction}
-                      savedItems={liveSavedItems}
-                      onSelect={handleSelectAuthenticZikr}
-                    />
-                  </div>
-
-                  <div className="min-w-fit shrink-0">
-                    <CounterTargetPicker
-                      activeTarget={target}
-                      onTargetChange={changeTarget}
-                      language={language}
-                      direction={direction}
-                      allowOpen={false}
-                    />
-                  </div>
-                </div>
-              </div>
-            }
             actions={(tier) => {
               const isWide = tier === "wide";
               const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
               return (
                 <div className="flex items-center gap-1.5">
                   <DropdownMenu dir={direction}>
-                    <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
+                    <DropdownMenuTrigger
+                      ref={moreTriggerRef}
+                      className={actionClass}
+                      aria-label={t(language, "common.moreOptions")}
+                    >
                       <MoreVertical size={20} aria-hidden="true" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={() => setKeyboardHelpOpen(true)}>
+                        <Keyboard size={16} aria-hidden="true" />
+                        {t(language, "reader.keyboardShortcuts")}
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={toggleSound}>
                         {soundEnabled ? (
                           <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
@@ -478,6 +461,29 @@ export function CustomCounterScreen({
               );
             }}
           />
+          <div className="mx-4 mt-4 rounded-2xl border border-border/40 bg-card p-3" data-prevent-count="true">
+            <div className="counter-picker-row flex items-center gap-3" data-testid="masbaha-controls">
+              <div>
+                <AuthenticZikrPicker
+                  items={AUTHENTIC_AZKAR_COLLECTION}
+                  selected={selectedAuthentic}
+                  language={language}
+                  direction={direction}
+                  savedItems={liveSavedItems}
+                  onSelect={handleSelectAuthenticZikr}
+                />
+              </div>
+              <div>
+                <CounterTargetPicker
+                  activeTarget={target}
+                  onTargetChange={changeTarget}
+                  language={language}
+                  direction={direction}
+                  allowOpen={false}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="counter-reading-canvas relative mx-4 mb-4 mt-4 flex flex-1 overflow-hidden bg-transparent">
@@ -563,7 +569,7 @@ export function CustomCounterScreen({
                         data-testid="custom-counter-prev-btn"
                       >
                         <ChevronPrevious size={20} aria-hidden="true" />
-                        <span className="hidden sm:inline text-xs">{t(language, "common.previous")}</span>
+                        <span className="reader-tool-label text-xs">{t(language, "common.previous")}</span>
                       </DevotionalAction>
                     }
                     next={
@@ -578,7 +584,7 @@ export function CustomCounterScreen({
                         className="adaptive-counter-nav h-12 min-w-[3rem] px-3 font-semibold"
                         data-testid="custom-counter-next-btn"
                       >
-                        <span className="hidden sm:inline text-xs">{t(language, "common.next")}</span>
+                        <span className="reader-tool-label text-xs">{t(language, "common.next")}</span>
                         <ChevronNext size={20} aria-hidden="true" />
                       </DevotionalAction>
                     }
@@ -622,6 +628,22 @@ export function CustomCounterScreen({
         </div>
       </div>
 
+      <CounterKeyboardHelp
+        language={language}
+        direction={direction}
+        open={keyboardHelpOpen}
+        onOpenChange={setKeyboardHelpOpen}
+        showTrigger={false}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          moreTriggerRef.current?.focus();
+        }}
+        shortcuts={[
+          { keys: ["Space"], label: t(language, "reader.shortcutCount") },
+          { keys: ["R"], label: t(language, "reader.shortcutReset") },
+          { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
+        ]}
+      />
       {showCompletionDialog && (
         <ResponsiveSheet
           open

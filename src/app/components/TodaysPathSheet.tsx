@@ -1,5 +1,5 @@
 import { Modal, SheetHeader } from "./ResponsiveSheet";
-import { Zap, ChevronDown } from "./icons";
+import { Zap, ChevronDown, BookOpen, Leaf, Mosque, CheckCircle2, BarChart3 } from "./icons";
 import { PathRewardMark } from "./GardenMarks";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -36,6 +36,7 @@ export function TodaysPathSheet({
       title: t(language, "dailyPath.dhikr"),
       detail: t(language, "dailyPath.ofThree", { done: count(status.dhikr.completedCount) }),
       complete: status.dhikr.fullComplete,
+      Icon: Leaf,
     },
     {
       title: t(language, "dailyPath.quran"),
@@ -43,11 +44,13 @@ export function TodaysPathSheet({
         ? t(language, "dailyPath.pages", { read: count(status.quran.progress), goal: count(status.quran.goal) })
         : t(language, "dailyPath.noGoalYet"),
       complete: status.quran.complete,
+      Icon: BookOpen,
     },
     {
       title: t(language, "dailyPath.mosque"),
       detail: t(language, "dailyPath.mosqueRecorded", { done: count(status.salah.mosqueCount) }),
       complete: status.salah.mosqueCount >= 5,
+      Icon: Mosque,
     },
   ];
   return (
@@ -69,7 +72,7 @@ export function TodaysPathSheet({
       />
       <div className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 py-4">
         <section
-          className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3"
+          className="paper-surface flex items-center gap-3 rounded-2xl border border-border bg-muted/40 p-3"
           aria-label={t(language, "dailyPath.todayReward")}
         >
           <div className="shrink-0">
@@ -92,15 +95,21 @@ export function TodaysPathSheet({
           </div>
         </section>
 
-        <dl className="divide-y divide-border" aria-label={t(language, "dailyPath.recordedToday")}>
-          {rows.map((row) => (
+        <dl className="grid gap-2" aria-label={t(language, "dailyPath.recordedToday")}>
+          {rows.map(({ Icon, ...row }) => (
             <div
               key={row.title}
-              className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3 first:pt-0 last:pb-0"
+              className="paper-surface relative rounded-2xl border border-border bg-card p-3"
               data-testid={"path-pillar-" + row.title}
             >
-              <dt className="text-label font-bold">{row.title}</dt>
-              <dd className="text-label text-muted-foreground">
+              <dt className="flex min-w-0 items-center gap-3 ps-11 text-label font-bold">
+                <span className="absolute start-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon size={20} aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">{row.title}</span>
+                {row.complete && <CheckCircle2 size={18} aria-hidden="true" className="shrink-0 text-primary" />}
+              </dt>
+              <dd className="ps-11 text-xs leading-relaxed text-muted-foreground">
                 {row.detail}
                 {row.complete && <span className="sr-only"> · {t(language, "dailyPath.complete")}</span>}
               </dd>
@@ -156,20 +165,19 @@ export function TodaysPathSheet({
               </li>
             ))}
           </ol>
-          <p className="text-xs leading-relaxed text-muted-foreground" data-testid="todays-path-summary">
-            {t(language, "dailyPath.recordingNote")}
-          </p>
         </details>
 
         {onViewProgress && (
           <button
             type="button"
+            data-testid="path-view-progress"
             onClick={() => {
               onClose();
               onViewProgress();
             }}
-            className="min-h-11 rounded-xl bg-primary px-4 py-2.5 text-label font-black text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-label font-black text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
           >
+            <BarChart3 size={20} aria-hidden="true" className="shrink-0" />
             {t(language, "dailyPath.viewProgress")}
           </button>
         )}

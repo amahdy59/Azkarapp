@@ -76,8 +76,15 @@ export async function removeDownloadedMushaf(): Promise<void> {
 }
 
 export async function downloadMushaf(
-  options: { signal?: AbortSignal; onProgress?: (completed: number, total: number) => void } = {},
+  options: {
+    signal?: AbortSignal;
+    pages?: readonly number[];
+    onProgress?: (completed: number, total: number) => void;
+  } = {},
 ) {
+  const pages = options.pages ? [...new Set(options.pages)] : Array.from({ length: PAGE_COUNT }, (_, i) => i + 1);
+  if (!pages.length || pages.some((page) => !Number.isInteger(page) || page < 1 || page > PAGE_COUNT))
+    throw new RangeError("Invalid Mushaf page selection");
   if (!("caches" in window)) throw new Error("Cache API unavailable");
   const [pageCache, fontCache] = await Promise.all([caches.open(MUSHAF_CACHE_NAME), caches.open(FONT_CACHE_NAME)]);
 
@@ -91,7 +98,6 @@ export async function downloadMushaf(
     failure ??= error;
     controller.abort();
   };
-  const pages = Array.from({ length: PAGE_COUNT }, (_, i) => i + 1);
 
   const downloadSinglePage = async (page: number) => {
     if (controller.signal.aborted) throw new DOMException("Download cancelled", "AbortError");
@@ -145,7 +151,7 @@ export async function downloadMushaf(
     }
 
     completed += 1;
-    options.onProgress?.(completed, PAGE_COUNT);
+    options.onProgress?.(completed, pages.length);
   };
 
   // Run with bounded concurrency for fast parallel downloads

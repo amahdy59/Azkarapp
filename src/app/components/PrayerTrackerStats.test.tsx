@@ -73,7 +73,7 @@ describe("prayer recording insights", () => {
     await waitFor(() => expect(saveFileToDevice).toHaveBeenCalled());
     expect(vi.mocked(saveFileToDevice).mock.calls.at(-1)?.[0].name).toBe("prayer-patterns-2026-01-01.json");
     expect(await screen.findByText("Data file saved.")).toBeInTheDocument();
-    expect(screen.getByText(/absent record does not mean a missed prayer/)).toBeInTheDocument();
+    expect(screen.queryByText(/absent record does not mean a missed prayer/)).not.toBeInTheDocument();
   });
   it("shows no rate for an unavailable period and localizes Arabic percentages", () => {
     const props = {

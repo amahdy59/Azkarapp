@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 import { expect, test } from "@playwright/test";
 
 test("the app shell fills the viewport at every tier", async ({ page }) => {
@@ -412,7 +413,7 @@ test("there is exactly one main landmark and focus moves to it on navigation", a
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expect(page.locator("main")).toHaveCount(1);
 
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
   await expect(page.getByRole("navigation", { name: "Bottom Navigation" })).toBeVisible();
 
   await expect(page.locator("#main-content")).toBeFocused();
@@ -430,10 +431,11 @@ test("the Library displays unified section tabs beside the heading across mobile
   await expect(collectionsTab).toBeVisible();
   await expect(savedTab).toBeVisible();
 
-  await page.getByTestId("library-filter-disclosure").locator("summary").click();
+  await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   const allPill = page.getByRole("button", { name: "All", exact: true });
   await expect(allPill).toBeVisible();
   await expect(page.getByRole("button", { name: "Daily Azkar", exact: true })).toBeVisible();
+  await page.getByTestId("library-filter-disclosure-sheet").getByTestId("modal-close-button").click();
 
   await savedTab.click();
   await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
@@ -588,7 +590,7 @@ test("Progress toolbar stays opaque after scrolling without changing Home", asyn
   await expect(homeHeader).toBeVisible();
   await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
 
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
   const header = page.getByTestId("progress-sticky-controls");
   await expect(header).toBeVisible();
   await expect(header).not.toHaveAttribute("data-scrolled");
@@ -600,7 +602,11 @@ test("Progress toolbar stays opaque after scrolling without changing Home", asyn
     surface.dispatchEvent(new Event("scroll"));
   });
   await expect(header).toHaveAttribute("data-scrolled", "true");
-  await expect(header.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true })).toBeVisible();
+  await expect(
+    page.getByTestId("progress-filter-sheet").getByRole("combobox", { name: "Date range", exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("progress-filters-toggle")).toBeFocused();
   await expect(header.getByRole("tablist")).toBeVisible();
   const background = await header.evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(background).not.toBe("transparent");

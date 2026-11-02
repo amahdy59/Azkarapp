@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-11-03",
+    "ar": [
+      "تبقى أيقونات تبويبات التقدم ظاهرة وقابلة للاستخدام حتى على الشاشات الصغيرة.",
+      "فعّل الإشعارات بتسمية واضحة على أندرويد والمتصفح، مع إرشادات مناسبة لاستعادة الإذن.",
+      "تنقّل بسهولة أكبر واقرأ بأدوات أوضح وخيارات مظهر وخلفية ورقية قابلة للتخصيص.",
+      "تابع تنزيل الصوت أثناء التنقل داخل التطبيق، واختر صفحات المصحف أو الجزء الذي تريد تنزيله."
+    ],
+    "en": [
+      "Progress tab icons stay visible and usable even on small screens.",
+      "Enable notifications with clear wording on Android and browsers, with guidance to restore permission.",
+      "Navigate more easily and read with clearer tools, appearance choices and an optional paper texture.",
+      "Keep audio downloads running while navigating within the app, and choose Mushaf pages or a juz to download."
+    ]
+  },
+  {
     "release": "2026-11-01.8",
     "ar": [
       "راجع التذكير القادم والموقع وإذن الإشعارات واختبر التنبيهات من ملخص واحد.",

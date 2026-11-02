@@ -203,12 +203,12 @@ export function ZikrCounterSurface({
             </span>
           </div>
         ) : isSingleAction ? (
-          <span className="counter-action-label text-sm font-bold leading-none text-current" dir="auto">
+          <span className="counter-action-label text-sm font-bold leading-normal text-current" dir="auto">
             {actionLabel || activeInstruction}
           </span>
         ) : (
           <p
-            className="inline-flex items-center gap-0.5 text-xl font-black leading-none text-current"
+            className="inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 text-xl font-black leading-normal text-current"
             dir={isArabic ? "rtl" : "ltr"}
             style={{
               fontFamily: counterNumeralFontFamily(language),

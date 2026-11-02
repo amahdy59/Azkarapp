@@ -20,9 +20,3 @@
   background: var(--muted);
   border-color: color-mix(in srgb, var(--primary) 25%, var(--border-control));
 }
-
-.reader-dock .devotional-secondary-action:focus-visible,
-.adaptive-counter-nav.devotional-secondary-action:focus-visible {
-  outline: 3px solid var(--ring);
-  outline-offset: 2px;
-}

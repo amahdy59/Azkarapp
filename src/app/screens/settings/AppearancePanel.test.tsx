@@ -22,6 +22,28 @@ function renderPanel() {
 }
 
 describe("AppearancePanel", () => {
+  it("offers the saved paper texture switch with clear accessibility precedence", () => {
+    const change = vi.fn();
+    const props = {
+      language: "en" as const,
+      direction: "ltr" as const,
+      themeMode: "midnight" as const,
+      highContrast: true,
+      onThemeModeChange: vi.fn(),
+      onDisableHighContrast: vi.fn(),
+      onLanguageChange: vi.fn(),
+      onBack: vi.fn(),
+      onPaperTextureChange: change,
+    };
+    const view = render(<AppearancePanel {...props} paperTexture={false} />);
+    const toggle = screen.getByRole("switch", { name: "Paper texture" });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByText(/Your choice is saved/)).toBeVisible();
+    fireEvent.click(toggle);
+    expect(change).toHaveBeenCalledWith(true);
+    view.rerender(<AppearancePanel {...props} paperTexture />);
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+  });
   it("exposes independent app and Home choices without resetting Home on app selection", () => {
     const app = vi.fn();
     const home = vi.fn();

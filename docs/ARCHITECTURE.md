@@ -1,4 +1,28 @@
+## Reading viewport focus intent — local completion
+
+useReadingFocusIndicator owns only a transient DOM presentation marker. Collection readers and useStandaloneReadingFocus share it; document capture listeners distinguish deliberate Tab entry from counting/device/pointer events without preventing native events or altering focus, shortcuts, saved counts or persistence. Listeners resolve the current ref, clear on focus exit/window blur and clean up on unmount. No data schema or global persisted modality is introduced.
+
 # Application architecture
+
+Paper texture is a device-only appearance preference normalized through the existing state boundary and retained from the local base during foreign snapshot merges. The explicit remote-settings whitelist omits it. Appearance switches update App-owned state, atomic appearance application sets `data-paper-texture`, and one CSS token gates the shared static PNG. Reload/reset uses existing persistence; no new storage, timer, remote schema or texture renderer is introduced.
+
+Final-touch downloads use a small document-owned external store (`src/app/downloads/downloadSession.ts`) for the active controller, truthful progress and one completion notice. Route unmount does not abort offline playback acquisition; explicit cancellation/private-data clearing does. Reload requires explicit resume using existing verified-file checkpoints. No job URL/content or new application-state schema is persisted. ZIP/file handoff remains screen/gesture-owned and ZIP work cancels on departure. Status refreshes cancel stale scans and yield between file verifications; actual resolved voices and optional page/juz selection use existing content/download boundaries. Native persistent-file migration remains a separate Android handoff stage.
+
+Quran word/HUD styles load from their owning reader components rather than the global stylesheet. The unused-CSS inventory includes non-ignored untracked working-tree files, preventing false cleanup recommendations during local development.
+
+Bilingual Quran uses one ordered ayah list as its scroll owner between stationary in-flow header/footer controls. AyahMushafText reuses reviewed per-page glyphs/fallback; direct verse Share opens the existing AyahInteractionSheet in its full share studio without a duplicate export system. Modal plan pickers portal within the owning dialog with bounded collision geometry so focus and text opacity stay protected.
+
+## Stable screen return and Month entry — 2026-11-02 (local review)
+
+retryableScreen retains only successfully loaded component code and shares an in-flight import. Rejected imports clear pending state so explicit retry still works; unmounted instances cannot set their state. Screen-local/user data is not cached. Repeat Library/Quran visits mount the downloaded screen directly instead of inserting a loading placeholder for a resolved import. Their one local opacity arrival replaces a competing route snapshot; Library section history still round-trips, with local panel feedback and no whole-page transition. Shared tabs use immediate selected paint and a stationary finite finish. Their finish stays in the existing pill stylesheet; shared card-action/panel/ordinary-header recipes load with their reusable components, and Quran arrival loads with its screen. Keep feature-only presentation out of the startup theme without changing motion or visual semantics. Unqualified Progress and primary navigation default to Month, preserving explicit period URLs and all date/calculation/storage semantics.
+
+## Stationary filter surfaces — 2026-11-02 (local review)
+
+ProgressScreen keeps one header date action, selected range context and view tabs in its sticky owner. The existing ProgressRangeToolbar/custom-date validation runs inside the shared Modal; selection closes back to the opener without adding in-flow geometry. Metric selection remains a separate labelled action opening the shared protected Modal with draft/apply/cancel/reset and explicit focus return. ResponsiveFilters portals phone controls into ResponsiveSheet while query/group ownership stays in AzkarLibraryScreen; wide controls remain direct. Shared Card/control paint is presentation only, with protected menus on layer 110 above sheets/modals on 100. No persisted progress, routing, calendar, normalization or remote schema changes.
+
+## Audio continuity boundary — 2026-11-02 (local review)
+
+AudioProvider owns device-only listening checkpoints and a session-only sleep deadline. listeningBookmark validates its version, age, IDs, context and positions and rebuilds through buildPlaybackPlan/current reviewed assets before offset restoration; no raw URL/content is restored from local storage. Clear-private/local-data signals stop playback and cancel pending restores before storage removal. Sleep expiry pauses and never emits completion. Settings receives capability callbacks; presentation components perform no storage/network operations. Shared AudioQueueSheet delegates selection to the existing controller and preserves paused state. No app-state/account schema or runtime dependency change.
 
 ## Readiness and safety summaries — 2026-11-01
 
@@ -17,6 +41,10 @@ New installations preselect prayer, four routine reminders, Friday reading (09:0
 Every zikr/dua collection joins daily current-tally rollover on boot, midnight and foreground reconciliation, including situational collections, lazy dua partial counts and collection-reader page positions. Same-day entries resume and event collections retain their explicit New session action. Al-Kahf alone retains its weekly cycle, including its lazy reader identity and page position. Saved IDs, sessions, historical daily records, bookmarks and the independent main Mushaf position remain unchanged. This is a reading convenience, not a new daily religious obligation.
 
 The Friday companion's dua reader uses one dated device-local current tally, cleared on sign-out and read as empty after midnight. Its independent weekly activity remains monotonic and synchronized: a fresh reading or tally undo does not erase the historical activity record. Friday practice records and Al-Kahf keep their existing cycle.
+
+Home's checksum-identical compressed reminder package is shipped as a deferred app asset and precached. It no longer depends on the external R2 host for first acquisition. Reads still verify pinned byte length/checksum before decoding and retain the existing verified cache; an 8-second abort releases stalled acquisition for retry. First-load failure has localized visible status/retry instead of a silent missing card. No religious source, schedule or package byte is changed.
+
+Build-only audio literal interning shares identical long string values in the two existing manifest modules, leaving reviewed authoring files and every exported object unchanged. Actual-manifest round-trip tests cover all text, hashes, variants, attribution and review metadata. This creates room for the local reminder asset within the unchanged output ceiling; no browser decoder, data format, dependency, media-controller or persistence change is introduced.
 
 Home retains the verified current reminder while a replacement loads. Failed first catalogue acquisition retries on online/visible recovery, guarded against overlapping work and removed on context change/unmount. Successful minute ticks reuse the existing verified promise/cache; there is no polling retry or additional clock. Reviewed source selection, timing, checksums and focus-pinned reading remain authoritative.
 
@@ -763,3 +791,11 @@ Progress time-series source arrays retain ascending date order. RecordingTimelin
 ## Device-only Mushaf colour shortcut — 2026-10-20
 
 `mushafColorGestures` is an optional normalized local snapshot field, defaulting to enabled for existing readers. App owns and persists the choice and supplies it to both Mushaf hosts. Incoming account snapshots preserve the local value; the explicit remote payload allowlist omits it. Disabling removes the vertical colour callbacks and fitting-paper gesture override, preserving horizontal turns, explicit colours and native scrolling. No remote schema or reviewed content changes.
+
+## Visit-local listening focus — 2026-11-02
+
+FloatingAudioPlayer owns ephemeral focus state independently of persisted settings/progress and playback. AudioPlayerSurface retains the same portal host and text subtree while expanding to the viewport; focus does not pause/stop or rebuild the plan. It temporarily makes covered shell siblings inert/aria-hidden, restores their previous attributes on exit/unmount, and bounds Tab recovery within the visible reading surface. Escape first exits focus and restores its trigger; a later Escape collapses the ordinary player. Playback errors reveal controls again. Shared ResponsiveFilters adds an optional compact icon trigger while retaining its existing sheet, controlled values and focus return. No new dependency, persistence or synchronization boundary is introduced.
+
+## Responsive navigation utility composition — 2026-11-02
+
+BottomNav and NavRail receive prepared Qibla/Masbaha callbacks and an exclusive activeUtility from App; visual navigation does not mutate persisted activeTab or add route types. Existing native hrefs preserve modified-click behavior. Primary NavTab remains unchanged. A CSS container query controls Masbaha visibility without listeners or state churn. App's existing push and primary Progress handler preserve URL/back/audio-lock behavior. Home exposes More via a callback; More composes a Progress ToolCard using existing routes and localized copy. No persisted state or network changes.

@@ -1,0 +1,5 @@
+# Audio clarity and continuity — 2026-11-02
+
+Owner requests applying all pending audio recommendations and reporting improvements before release. Working tree started clean at deployed 44b56ec0. Keep this follow-up local for pre-release review.
+
+Plan before editing: expose the existing auto-continue preference as one visible fixed-label switch; distinguish repetition mode from queue progression; add optional accessible queue selection; device-only validated resume with recording fingerprint and no autoplay; elapsed-deadline sleep timer (15/30/60 minutes, cancel) owned by the single AudioProvider; align supported speed choices. Keep original recordings/text, prescribed repetition/ritual progression, natural completion semantics, offline source verification and shared portalled primitives. Add unit/browser regressions, responsive RTL/LTR/enlarged/fallback screenshots, targeted three-engine checks and complete pnpm check/Pages build/audit. Review the existing WebKit retry separately and report real-device/assistive-technology/field-performance acceptance gaps honestly. No new dependency or remote schema.

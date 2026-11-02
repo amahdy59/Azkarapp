@@ -9,7 +9,10 @@ export function ScreenFallback({ language }: { language?: AppLanguage }) {
     return () => window.clearTimeout(timer);
   }, []);
   return (
-    <div className="flex h-full min-h-[50vh] w-full flex-1 items-center justify-center bg-background">
+    <div
+      data-testid="screen-loading"
+      className="flex h-full min-h-[50vh] w-full flex-1 items-center justify-center bg-background"
+    >
       <div className="flex flex-col items-center gap-3">
         <div
           className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary"

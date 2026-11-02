@@ -1,5 +1,6 @@
-import { Compass, Settings, Sparkles } from "../components/icons";
+import { BarChart3, Compass, Settings, Sparkles } from "../components/icons";
 import { Header } from "../components/LayoutShells";
+import { NAVIGATION_FOCUS } from "../components/ui/controlStyles";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -21,7 +22,7 @@ function ToolCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group flex min-h-32 min-w-0 w-full flex-wrap items-start gap-4 rounded-3xl border p-5 text-start shadow-raised transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+      className={`group flex min-h-32 min-w-0 w-full flex-wrap items-start gap-4 rounded-3xl border p-5 text-start shadow-raised transition-[background-color,border-color,transform] active:scale-[0.99] ${NAVIGATION_FOCUS} ${
         featured ? "border-primary/45 bg-primary/10 hover:bg-primary/15" : "border-border/50 bg-card hover:bg-muted"
       }`}
     >
@@ -47,12 +48,14 @@ export function MoreScreen({
   onOpenQibla,
   onOpenMasbaha,
   onOpenSettings,
+  onOpenProgress,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onOpenQibla?: () => void;
   onOpenMasbaha: () => void;
   onOpenSettings: () => void;
+  onOpenProgress?: () => void;
 }) {
   return (
     <ScreenContainer dir={direction} screenName={t(language, "more.title")}>
@@ -64,27 +67,26 @@ export function MoreScreen({
           language={language}
         />
         <div className="grid w-full grid-cols-1 gap-4 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-          {onOpenQibla && (
-            <ToolCard
-              title={t(language, "qibla.title")}
-              description={t(language, "more.qiblaDescription")}
-              Icon={Compass}
-              onClick={onOpenQibla}
-              featured
-            />
+          {(
+            [
+              [onOpenQibla, Compass, "qibla.title", "more.qiblaDescription"],
+              [onOpenMasbaha, Sparkles, "counter.tasbeehTitle", "more.masbahaDescription"],
+              [onOpenSettings, Settings, "common.settings", "more.settingsDescription"],
+              [onOpenProgress, BarChart3, "common.progress", "more.progressDescription"],
+            ] as const
+          ).map(
+            ([onClick, Icon, title, description]) =>
+              onClick && (
+                <ToolCard
+                  key={title}
+                  title={t(language, title)}
+                  description={t(language, description)}
+                  Icon={Icon}
+                  onClick={onClick}
+                  featured={Icon === Compass}
+                />
+              ),
           )}
-          <ToolCard
-            title={t(language, "counter.tasbeehTitle")}
-            description={t(language, "more.masbahaDescription")}
-            Icon={Sparkles}
-            onClick={onOpenMasbaha}
-          />
-          <ToolCard
-            title={t(language, "common.settings")}
-            description={t(language, "more.settingsDescription")}
-            Icon={Settings}
-            onClick={onOpenSettings}
-          />
         </div>
       </div>
     </ScreenContainer>

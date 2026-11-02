@@ -1,0 +1,40 @@
+/* The group's curved edge belongs to its first/last row too. Insets are one
+   border-width smaller, so hover/focus does not leave square gold corners. */
+.settings-row-item {
+  container: settings-row settings-toggle / inline-size;
+}
+@container settings-row (max-width: 12rem) {
+  .settings-row-item > [data-card-action] > .control-cue {
+    display: none;
+  }
+  .settings-select-control {
+    flex-wrap: wrap;
+  }
+  .settings-select-control > .settings-row-value {
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+}
+.settings-row-item:first-child {
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+.settings-row-item:last-child {
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+}
+.settings-row-item > [data-card-action] {
+  border-radius: inherit;
+  overflow: clip;
+}
+.settings-row-divider {
+  pointer-events: none;
+}
+.settings-row-item:focus-within > .settings-row-divider {
+  visibility: hidden;
+}
+@media (hover: hover) and (pointer: fine) {
+  .settings-row-item:has(> [data-card-action]:hover) > .settings-row-divider {
+    visibility: hidden;
+  }
+}

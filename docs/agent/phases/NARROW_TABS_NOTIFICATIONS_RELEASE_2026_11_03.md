@@ -1,0 +1,5 @@
+# Narrow Progress tabs and notification release — 2026-11-03
+
+Owner-approved scope: remove the obsolete Progress icon-hiding rule at 24rem, retain the compact icon-only presentation and accessible tab labels, and add regression coverage at 320/360/375/384/390px with normal/enlarged text in Arabic and English across engines. Use generic notification permission/enable labels across Android and browser settings and onboarding. Keep the native permission adapter and accurate platform delivery limits; show Android app-settings recovery after denial. Do not change reminder schedules, persistence, reviewed content or native storage contracts.
+
+Sequential plan: inspect existing presentation and notification adapters; make the bounded fixes; add browser/adapter regressions; update contracts/release notes; verify the complete pending working tree; commit and push all authorized changes; monitor exact-commit Quality and Pages build/deploy; smoke-test production. The owner explicitly lifts the prior publication hold. All thresholds, hooks, assertions and deployment guards remain intact. Physical-device and human assistive-technology acceptance are still separate.

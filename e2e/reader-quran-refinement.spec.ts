@@ -47,15 +47,14 @@ for (const language of ["ar", "en"] as const) {
       expect(initial.gap).toBeLessThanOrEqual(16);
       expect(initial.overflow).toBeLessThanOrEqual(1);
       const help = page.getByTestId("reader-help-trigger");
-      if (width < 768) await expect(help).toBeHidden();
-      else await expect(help).toBeVisible();
+      await expect(help).toHaveCount(0);
       const menuTrigger = page.getByRole("button", { name: t(language, "reader.menu"), exact: true });
       await menuTrigger.focus();
       await page.keyboard.press("Enter");
       const menu = page.getByRole("menu");
       await expect(menu).toBeVisible();
       await expect(menu.getByText(t(language, "category.readAgain"), { exact: true })).toHaveCount(0);
-      await expect(menu.getByText(t(language, "reader.keyboardShortcuts"), { exact: true })).toHaveCount(0);
+      await expect(menu.getByText(t(language, "reader.keyboardShortcuts"), { exact: true })).toBeVisible();
       await expect(menu.getByText(t(language, "reader.enterFocus"), { exact: true })).toHaveCount(0);
       await expect(menu.getByText(t(language, "reader.save"), { exact: true })).toBeVisible();
       await expect(menu.getByText(t(language, "reader.resetCounter"), { exact: true })).toBeVisible();

@@ -208,10 +208,13 @@ for (const scenario of [
     expect(symmetry.alignmentError).toBeLessThanOrEqual(1);
     await expect(player.getByTestId("audio-seek-waveform")).toBeVisible();
     const optionsTrigger = player.getByRole("button", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
+    await expect(
+      player.getByRole("switch", { name: arabic ? "المتابعة التلقائية" : "Auto-continue", exact: true }),
+    ).toHaveAttribute("aria-checked", "true");
     await optionsTrigger.focus();
     await page.keyboard.press("Enter");
     const audioOptions = page.getByRole("dialog", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
-    await expect(audioOptions.getByRole("switch")).toHaveCount(1);
+    await expect(audioOptions.getByRole("switch")).toHaveCount(0); // One visible footer switch; no duplicate preference.
     expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
     await expect(audioOptions.getByTestId("audio-reciter-select")).toBeVisible();
     await expect(audioOptions).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");
@@ -347,8 +350,8 @@ for (const scenario of [
     await expect(voice).toBeFocused();
     const speed = audioOptions.getByRole("combobox", { name: arabic ? /السرعة/ : /Speed/ });
     await speed.click();
-    await expect(page.getByRole("option")).toHaveCount(5);
-    await page.getByRole("option").nth(3).click();
+    await expect(page.getByRole("option")).toHaveCount(6);
+    await page.getByRole("option", { name: arabic ? "١.٥×" : "1.5×", exact: true }).click();
     await expect(speed).toHaveAccessibleName(arabic ? "السرعة: ١.٥×" : "Speed: 1.5×");
     await speed.click();
     await page.keyboard.press("Escape");

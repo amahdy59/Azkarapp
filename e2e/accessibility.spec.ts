@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { chooseProgressOption } from "./helpers/progress";
@@ -195,7 +196,8 @@ test("search results expose concise accessible names", async ({ page }) => {
   await page.getByTestId("nav-azkar").click();
   const searchInput = page.getByRole("textbox", { name: "Search azkar and duas" });
   const filters = page.getByTestId("library-filter-disclosure");
-  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
+  if (await filters.locator(".responsive-filter-trigger").isVisible())
+    await filters.locator(".responsive-filter-trigger").click();
   await searchInput.fill("sleep");
   await searchInput.press("Enter");
 
@@ -211,7 +213,8 @@ test("library filtering announces the collection result count", async ({ page })
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
   const filters = page.getByTestId("library-filter-disclosure");
-  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
+  if (await filters.locator(".responsive-filter-trigger").isVisible())
+    await filters.locator(".responsive-filter-trigger").click();
   await page.getByRole("textbox", { name: "Search azkar and duas" }).fill("sleep");
 
   await expect(page.getByTestId("library-filter-status")).toHaveText("1 collection matches “sleep”");
@@ -220,7 +223,7 @@ test("library filtering announces the collection result count", async ({ page })
 
 test("Progress tabs expose a logical level-two heading in every view", async ({ page }) => {
   await enterEnglishGuestMode(page);
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
 
   const period = page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true });
   for (const value of ["day", "week", "month", "year"] as const) {

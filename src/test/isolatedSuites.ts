@@ -20,6 +20,7 @@ export const ISOLATED_SUITES = [
   "src/app/components/AppSceneBackground.test.tsx",
   "src/app/share/quickRoutineShare.test.ts",
   "src/app/native/reminders.test.ts",
+  "src/app/screens/settings/NotificationsPanel.native.test.tsx",
   "src/app/native/saveFile.test.ts",
   "src/app/hooks/useForegroundReminders.lifecycle.test.ts",
   "src/app/screens/ProgressScreen.periodNavigation.test.tsx",

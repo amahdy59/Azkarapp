@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Eye,
   List,
   Pause,
   Play,
@@ -50,6 +51,7 @@ export interface MushafQuickMenuProps {
   onToggleWordMeanings: () => void;
   onTogglePageBookmark: () => void;
   onOpenSettings: () => void;
+  onEnterFocusMode?: () => void;
   onReadExternally?: () => void;
   onOpenBenefit?: () => void;
   surahAudio?: SurahAudioControl;
@@ -103,6 +105,7 @@ export function MushafQuickMenu({
   onToggleWordMeanings,
   onTogglePageBookmark,
   onOpenSettings,
+  onEnterFocusMode,
   onReadExternally,
   onOpenBenefit,
   surahAudio,
@@ -121,6 +124,17 @@ export function MushafQuickMenu({
   onSelectTheme,
 }: MushafQuickMenuProps) {
   const items: QuickMenuItem[] = [
+    ...(onEnterFocusMode
+      ? [
+          {
+            id: "focus",
+            label: t(language, "mushaf.focusModeEnter"),
+            icon: <Eye size={19} aria-hidden="true" />,
+            onSelect: onEnterFocusMode,
+            testId: "mushaf-focus-enter",
+          },
+        ]
+      : []),
     ...(onOpenBenefit
       ? [
           {

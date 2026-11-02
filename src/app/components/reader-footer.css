@@ -73,7 +73,7 @@ html[data-reader-tool-labels="false"] .reader-tools-row [data-press-compact] {
   padding: 0;
   gap: 0;
 }
-html[data-reader-tool-labels="false"] .reader-tools-row .reader-tool-label {
+html[data-reader-tool-labels="false"] .reader-dock .reader-tool-label {
   display: none;
 }
 @container reader-footer (max-width: 37.5rem) {
@@ -125,8 +125,8 @@ html[data-reader-tool-labels="false"] .reader-tools-row .reader-tool-label {
 
 @media (max-width: 359px) {
   .standalone-counter-navigation {
-    width: calc(100% + 16px);
-    margin-inline: -8px;
+    width: 100%;
+    margin-inline: 0;
     gap: 4px;
   }
   .standalone-counter-navigation .adaptive-counter-nav {

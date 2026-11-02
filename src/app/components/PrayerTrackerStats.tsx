@@ -166,10 +166,7 @@ export function PrayerTrackerStats({
         <summary className="min-h-11 cursor-pointer py-3 progress-focus">
           {progressText(language, "insights.aboutRecords")}
         </summary>
-        <p>
-          {progressText(language, metric === "fard" ? "insights.fardHint" : "insights.optionalHint")}{" "}
-          {progressText(language, "insights.noRecord")}
-        </p>
+        <p>{progressText(language, metric === "fard" ? "insights.fardHint" : "insights.optionalHint")}</p>
       </details>
       <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
         <button

@@ -48,9 +48,11 @@ for (const language of ["ar", "en"] as const) {
           await expect(page.locator(".app-sidebar")).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
         if (flow === "utilities") {
           const filters = page.getByTestId("library-filter-disclosure");
-          if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open)))
-            await filters.locator("summary").click();
+          if (await filters.locator(".responsive-filter-trigger").isVisible())
+            await filters.locator(".responsive-filter-trigger").click();
           await page.getByRole("textbox").fill(language === "ar" ? "اغفر" : "forgive");
+          const sheet = page.getByTestId("library-filter-disclosure-sheet");
+          if (await sheet.isVisible()) await sheet.getByTestId("modal-close-button").click();
           const result = page.getByTestId("matching-zikr-card").first();
           await expect(result).toHaveCSS("backdrop-filter", filter);
           await expect(result).toHaveCSS("background-color", tint);

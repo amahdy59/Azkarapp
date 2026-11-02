@@ -19,6 +19,7 @@ export function CounterKeyboardHelp({
   open: controlledOpen,
   onOpenChange,
   showTrigger = true,
+  onCloseAutoFocus,
 }: {
   shortcuts: readonly CounterShortcut[];
   language: AppLanguage;
@@ -27,6 +28,7 @@ export function CounterKeyboardHelp({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   showTrigger?: boolean;
+  onCloseAutoFocus?: (event: Event) => void;
 }) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isOpen = controlledOpen !== undefined ? controlledOpen : uncontrolledOpen;
@@ -74,6 +76,7 @@ export function CounterKeyboardHelp({
         </Button>
       )}
       <ResponsiveSheet
+        onCloseAutoFocus={onCloseAutoFocus}
         open={isOpen}
         onClose={() => setOpen(false)}
         title={t(language, "reader.keyboardShortcuts")}

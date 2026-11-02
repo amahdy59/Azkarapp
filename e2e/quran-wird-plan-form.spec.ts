@@ -94,7 +94,13 @@ for (const language of ["ar", "en"] as const) {
       for (const control of await form.locator("button, input").all()) {
         const bounds = (await control.boundingBox())!;
         expect(bounds.height).toBeGreaterThanOrEqual(44);
-        expect(await control.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+        const controlGeometry = await control.evaluate((node) => ({
+          tag: node.tagName,
+          id: node.id,
+          width: node.clientWidth,
+          scroll: node.scrollWidth,
+        }));
+        expect(controlGeometry.scroll <= controlGeometry.width + 1, JSON.stringify(controlGeometry)).toBe(true);
       }
       expect((await new AxeBuilder({ page }).include(".quran-wird-plan-form").analyze()).violations).toEqual([]);
       await page.screenshot({ path: testInfo.outputPath(`wird-plan-${language}-200-custom.png`) });

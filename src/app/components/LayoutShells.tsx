@@ -1,5 +1,7 @@
 import React, { useRef } from "react";
 import { useScrollElevation } from "../hooks/useScrollElevation";
+import "./layout-shells.css";
+import "./action-feedback.css";
 import {
   ArrowPrevious,
   BarChart3,
@@ -19,17 +21,45 @@ import { t } from "../i18n";
 import { LANGUAGE_LABELS } from "../languageOptions";
 import type { AppLanguage, ThemeMode } from "../types";
 
+import { NAVIGATION_FOCUS } from "./ui/controlStyles";
+
+const SIDEBAR_QUICK_ACTION = `flex items-center justify-between gap-3 min-h-11 px-3 py-2 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors ${NAVIGATION_FOCUS}`;
+
 // ─── Shared nav tab definition ────────────────────────────────────────────────
 
 export type NavTab = "home" | "quran" | "azkar" | "progress" | "settings";
 
 export interface NavProps {
-  active: NavTab;
+  active?: NavTab;
   onChange: (t: NavTab) => void;
   isArabic?: boolean;
   themeMode?: ThemeMode;
   onThemeModeChange?: (mode: ThemeMode) => void;
   onLanguageChange?: (lang: AppLanguage) => void;
+}
+type UtilityTab = "qibla" | "masbaha";
+interface UtilityNavProps {
+  activeUtility?: UtilityTab;
+  onOpenQibla?: () => void;
+  onOpenMasbaha?: () => void;
+}
+function getUtilityTabs(language: AppLanguage) {
+  return [
+    { id: "qibla" as const, label: t(language, "qibla.title"), Icon: Compass },
+    { id: "masbaha" as const, label: t(language, "counter.tasbeehTitle"), Icon: Sparkles },
+  ];
+}
+function activateNavigation(id: NavTab | UtilityTab, onChange: NavProps["onChange"], utilities: UtilityNavProps) {
+  if (id === "qibla") utilities.onOpenQibla?.();
+  else if (id === "masbaha") utilities.onOpenMasbaha?.();
+  else onChange(id);
+}
+function NavigationIcon({ Icon, selected, size = 20 }: { Icon: typeof Home; selected: boolean; size?: number }) {
+  return (
+    <span className={selected ? "nav-active-cue flex text-primary" : "flex"}>
+      <Icon size={size} />
+    </span>
+  );
 }
 
 interface NavSidebarProps extends NavProps {
@@ -50,12 +80,14 @@ function getNavTabs(language: AppLanguage) {
   ];
 }
 
-const NAV_HREF: Record<NavTab, string> = {
+const NAV_HREF: Record<NavTab | UtilityTab, string> = {
   home: "#/home",
   quran: "#/quran-wird",
   azkar: "#/azkar",
   progress: "#/progress",
   settings: "#/settings",
+  qibla: "#/qibla",
+  masbaha: "#/counter",
 };
 
 function followInAppLink(event: React.MouseEvent<HTMLAnchorElement>, action: () => void) {
@@ -76,7 +108,7 @@ export function IconButton({
     <button
       type="button"
       aria-label={label}
-      className={`ui-icon-button focus-visible:outline-none ${className}`}
+      className={`ui-icon-button ui-action-cue surface-control-finish focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${className}`}
       {...props}
     >
       {children}
@@ -98,7 +130,7 @@ export function Header({
   pageGutters = true,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   onBack?: () => void;
   right?: React.ReactNode;
   language?: AppLanguage;
@@ -127,6 +159,7 @@ export function Header({
           the header so it cannot reduce contrast between the title/actions. */}
       {onBack && (
         <div
+          className={pageGutters ? "shared-header-back" : undefined}
           style={{
             position: "relative",
             zIndex: 10,
@@ -180,9 +213,10 @@ export function Header({
   );
 }
 
-export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
+export function BottomNav({ active, onChange, isArabic = false, ...utilities }: NavProps & UtilityNavProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
-  const tabs = getNavTabs(language);
+  const primary = getNavTabs(language);
+  const tabs = [...primary.slice(0, 3), ...getUtilityTabs(language), primary[4]!];
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
@@ -190,16 +224,20 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
     >
       <div className="bottom-nav-items flex min-h-0 flex-1 items-center justify-between px-1 min-[360px]:px-2 min-[390px]:px-4">
         {tabs.map(({ id, label, Icon }) => {
-          const on = active === id;
+          const on =
+            id === "qibla" || id === "masbaha"
+              ? utilities.activeUtility === id
+              : !utilities.activeUtility && active === id;
           return (
             <a
               key={id}
               href={NAV_HREF[id]}
               data-testid={`nav-${id}`}
-              onClick={(event) => followInAppLink(event, () => onChange(id))}
+              onClick={(event) => followInAppLink(event, () => activateNavigation(id, onChange, utilities))}
               aria-label={label}
               aria-current={on ? "page" : undefined}
-              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg no-underline transition-[opacity,transform] duration-fast active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              data-navigation-optional={id === "masbaha" || undefined}
+              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg no-underline transition-[opacity,transform] duration-fast active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
             >
               {/* Persistent non-color active cue. The selected state must not be
                   conveyed by colour alone, and .nav-active-cue below is only a
@@ -208,7 +246,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
                 aria-hidden="true"
                 className={`absolute inset-x-2 top-0 h-[3px] rounded-b-full ${on ? "bg-primary" : "bg-transparent"}`}
               />
-              <span className={on ? "nav-active-cue" : ""} key={`${id}-${on}`}>
+              <span className={on ? "nav-active-cue" : ""}>
                 <Icon size={22} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
@@ -234,9 +272,12 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
  * Shows icon + short label in a single column. Replaces BottomNav at this
  * breakpoint.
  */
-export function NavRail({ active, onChange, isArabic = false }: NavProps) {
+export function NavRail({ active, onChange, isArabic = false, ...utilities }: NavProps & UtilityNavProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
-  const tabs = getNavTabs(language);
+  const tabs = [
+    ...getNavTabs(language),
+    ...getUtilityTabs(language).filter(({ id }) => (id === "qibla" ? utilities.onOpenQibla : utilities.onOpenMasbaha)),
+  ];
   return (
     <nav
       aria-label={t(language, "common.primaryNavigation")}
@@ -248,25 +289,26 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
         data-testid="desktop-rail-brand-home"
         onClick={(event) => followInAppLink(event, () => onChange("home"))}
         aria-label={t(language, "common.home")}
-        className="flex min-h-11 min-w-11 items-center justify-center p-2 mb-2 rounded-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring hover:bg-white/10 transition-colors"
+        className={`flex min-h-11 min-w-11 items-center justify-center p-2 mb-2 rounded-xl ${NAVIGATION_FOCUS} hover:bg-white/10 transition-colors`}
       >
         <PalmTreeMark size={28} className="text-primary" />
       </a>
 
       {tabs.map(({ id, label, Icon }) => {
-        const on = active === id;
+        const on =
+          id === "qibla" || id === "masbaha"
+            ? utilities.activeUtility === id
+            : !utilities.activeUtility && active === id;
         return (
           <a
             key={id}
             href={NAV_HREF[id]}
             data-testid={`nav-${id}`}
-            onClick={(event) => followInAppLink(event, () => onChange(id))}
+            onClick={(event) => followInAppLink(event, () => activateNavigation(id, onChange, utilities))}
             aria-current={on ? "page" : undefined}
             className="nav-rail-item"
           >
-            <span className={on ? "nav-active-cue" : ""} key={`${id}-${on}`}>
-              <Icon size={22} />
-            </span>
+            <NavigationIcon Icon={Icon} selected={on} size={22} />
             <span className="nav-rail-label" dir="auto">
               {label}
             </span>
@@ -291,19 +333,14 @@ export function NavSidebar({
   onThemeModeChange,
   onLanguageChange,
   activeUtility,
-  onOpenQuran: _onOpenQuran,
   onOpenMasbaha,
-  onOpenSettings: _onOpenSettings,
   onOpenQibla,
 }: NavSidebarProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
   const tabs = getNavTabs(language);
-  const utilityTabs = [
-    { id: "masbaha" as const, label: t(language, "counter.tasbeehTitle"), Icon: Sparkles, onClick: onOpenMasbaha },
-    ...(onOpenQibla
-      ? [{ id: "qibla" as const, label: t(language, "qibla.title"), Icon: Compass, onClick: onOpenQibla }]
-      : []),
-  ];
+  const utilityTabs = getUtilityTabs(language)
+    .filter(({ id }) => id === "masbaha" || onOpenQibla)
+    .map((tool) => ({ ...tool, onClick: tool.id === "masbaha" ? onOpenMasbaha : onOpenQibla }));
 
   const toggleLang = () => {
     onLanguageChange?.(isArabic ? "en" : "ar");
@@ -337,7 +374,7 @@ export function NavSidebar({
           data-testid="desktop-brand-home"
           onClick={(event) => followInAppLink(event, () => onChange("home"))}
           aria-label={t(language, "common.home")}
-          className="nav-sidebar-brand flex min-h-11 items-center gap-3 px-3 py-4 mb-2 border-b border-border/40 rounded-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className={`nav-sidebar-brand flex min-h-11 items-center gap-3 px-3 py-4 mb-2 border-b border-border/40 rounded-xl ${NAVIGATION_FOCUS}`}
         >
           <PalmTreeMark size={32} className="text-primary shrink-0" />
           <div className="flex flex-col leading-tight">
@@ -350,7 +387,7 @@ export function NavSidebar({
 
         {/* Primary nav items */}
         {tabs.map(({ id, label, Icon }) => {
-          const on = active === id;
+          const on = !activeUtility && active === id;
           return (
             <a
               key={id}
@@ -360,9 +397,7 @@ export function NavSidebar({
               aria-current={on ? "page" : undefined}
               className="nav-sidebar-item"
             >
-              <span className={on ? "nav-active-cue flex text-primary" : "flex"} key={`${id}-${on}`}>
-                <Icon size={20} />
-              </span>
+              <NavigationIcon Icon={Icon} selected={on} />
               <span className="font-semibold" dir="auto">
                 {label}
               </span>
@@ -382,9 +417,7 @@ export function NavSidebar({
               aria-current={on ? "page" : undefined}
               className="nav-sidebar-item"
             >
-              <span className={on ? "nav-active-cue flex text-primary" : "flex"} key={`${id}-${on}`}>
-                <Icon size={20} />
-              </span>
+              <NavigationIcon Icon={Icon} selected={on} />
               <span className="font-semibold" dir="auto">
                 {label}
               </span>
@@ -405,7 +438,7 @@ export function NavSidebar({
             // announced in two different formats. The explicit focus ring
             // matches the theme button too, which had one while this did not.
             aria-label={`${t(language, "settings.language")}: ${LANGUAGE_LABELS[language]}`}
-            className="flex items-center justify-between gap-3 min-h-11 px-3 py-2 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className={SIDEBAR_QUICK_ACTION}
           >
             <div className="flex min-w-0 items-center gap-2">
               <Globe size={18} className="block shrink-0 text-primary" />
@@ -425,7 +458,7 @@ export function NavSidebar({
             type="button"
             onClick={cycleTheme}
             aria-label={`${t(language, "common.theme")}: ${t(language, themeLabelKeys[themeMode])}`}
-            className="flex items-center justify-between gap-3 min-h-11 px-3 py-2 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className={SIDEBAR_QUICK_ACTION}
           >
             <div className="flex min-w-0 items-center gap-2">
               <ThemeIcon size={18} className="block shrink-0 text-primary" />

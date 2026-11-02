@@ -332,7 +332,7 @@ export function SearchScreen({
         {results.length > visibleCount && (
           <button
             type="button"
-            className="mt-3 min-h-11 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="mt-3 min-h-11 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
             onClick={() => setResultPage({ query: deferredQuery, count: visibleCount + RESULT_BATCH_SIZE })}
           >
             {t(language, "search.loadMore", {

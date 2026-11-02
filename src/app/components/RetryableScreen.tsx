@@ -13,11 +13,34 @@ function documentLanguage(): AppLanguage {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function retryableScreen<Loaded extends ComponentType<any>>(loader: () => Promise<{ default: Loaded }>) {
   type Props = ComponentProps<Loaded>;
+  // Cache code, not mounted screens or user data. Return visits must not flash
+  // a loading screen while a previously resolved import settles again.
+  let loaded: Loaded | null = null;
+  let pending: Promise<{ default: Loaded }> | null = null;
+  const load = () => {
+    if (loaded) return Promise.resolve({ default: loaded });
+    if (!pending) {
+      pending = Promise.resolve()
+        .then(loader)
+        .then(
+          (module) => {
+            loaded = module.default;
+            pending = null;
+            return module;
+          },
+          (error: unknown) => {
+            pending = null;
+            throw error;
+          },
+        );
+    }
+    return pending;
+  };
   return function RetryableScreen(props: Props) {
     const language =
       "language" in props && (props.language === "ar" || props.language === "en") ? props.language : documentLanguage();
     const [attempt, setAttempt] = useState(0);
-    const [Screen, setScreen] = useState<Loaded | null>(null);
+    const [Screen, setScreen] = useState<Loaded | null>(() => loaded);
     const [failed, setFailed] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const fallbackReloadTimer = useRef<number | null>(null);
@@ -32,7 +55,7 @@ export function retryableScreen<Loaded extends ComponentType<any>>(loader: () =>
     useEffect(() => {
       let active = true;
       setFailed(false);
-      void loader()
+      void load()
         .then((module) => {
           if (active) setScreen(() => module.default);
         })

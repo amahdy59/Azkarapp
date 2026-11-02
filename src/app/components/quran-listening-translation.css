@@ -68,7 +68,7 @@
   line-height: 1.4;
   opacity: 1;
   height: auto;
-  min-height: max(2.75rem, 5.2%);
+  min-height: 2.75rem;
   border-block-end: 0;
 }
 

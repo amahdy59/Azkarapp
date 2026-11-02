@@ -201,12 +201,11 @@
   z-index: 1;
   display: flex;
   width: 100%;
-  height: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  white-space: nowrap;
+  padding: 0.5rem 8px;
+  white-space: normal;
 }
 
 .adaptive-counter-surface.is-complete {
@@ -258,7 +257,7 @@
 }
 .adaptive-counter-nav:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--ring);
+  box-shadow: inset 0 0 0 3px var(--ring);
 }
 .adaptive-counter-nav:disabled {
   opacity: 0.5;

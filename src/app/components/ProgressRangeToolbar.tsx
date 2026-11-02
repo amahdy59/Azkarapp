@@ -21,6 +21,7 @@ export function ProgressRangeToolbar({
   calendar,
   onPeriod,
   onCustom,
+  dateTestId = "garden-view-date",
 }: {
   period: ProgressPreset | "custom";
   range: ProgressRange;
@@ -29,6 +30,7 @@ export function ProgressRangeToolbar({
   calendar: CalendarType;
   onPeriod: (period: ProgressPreset) => void;
   onCustom: (range: ProgressRange) => void;
+  dateTestId?: string;
 }) {
   const id = useId();
   const [editing, setEditing] = useState(false);
@@ -48,7 +50,7 @@ export function ProgressRangeToolbar({
         language={language}
         icon={Calendar}
         displayValue={
-          <span className="block" role="status" aria-atomic="true" data-testid="garden-view-date">
+          <span className="block" role="status" aria-atomic="true" data-testid={dateTestId}>
             <span className="progress-range-preset">{text(language, period)}</span>
             <span className="progress-range-dates">{formatProgressRange(range, language, calendar)}</span>
           </span>

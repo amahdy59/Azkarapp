@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
 import { ignoreGeneratedWatchPath } from "./scripts/generated-watch-paths";
 import { compactBuildManifest } from "./scripts/compact-build-manifest";
+import { compactAudioLiterals } from "./scripts/compact-audio-literals";
 import reminderManifest from "./src/app/content/homeReminderManifest.json";
 
 /**
@@ -204,6 +205,7 @@ export default defineConfig(({ mode, command }) => {
       react(),
       tailwindcss(),
       unwrapColorMixGuards(),
+      compactAudioLiterals(),
       compactBuildManifest(),
       contentSecurityPolicy(audioBaseUrl, cloudflareApiUrl, liveUpdateManifestUrl),
       VitePWA({
@@ -259,6 +261,7 @@ export default defineConfig(({ mode, command }) => {
           globPatterns: [
             "**/*.{js,css,html,svg,png,webp,avif,woff2}",
             "**/release-history-*.bin",
+            "**/home-reminder-readings-*.bin",
             "assets/cards/routine-{morning,evening}-*.webp",
             "assets/cards/routine-before_sleep-*.jpg",
             "data/mushaf/{42,49,75,76,207,603,604}.json",
@@ -423,6 +426,9 @@ export default defineConfig(({ mode, command }) => {
               : "assets/[name]-[hash][extname]";
           },
           manualChunks(id) {
+            // The helper is shared by startup and deferred imports. Folding it
+            // into audio makes every entry import the entire audio subsystem.
+            if (id.includes("vite/preload-helper")) return "preload-helper";
             // Platform detection is shared with startup. Do not let the lazy
             // audio owner's manual chunk absorb it and pull audio into Home.
             if (id.endsWith("/src/app/native/platform.ts") || id.includes("node_modules/@capacitor/core/"))

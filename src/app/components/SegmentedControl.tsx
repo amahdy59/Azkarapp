@@ -75,15 +75,18 @@ export function SegmentedControl<T extends string>({
             }}
             onKeyDownCapture={handleRadioNavigation}
             data-testid={option.testId}
-            className={`${PILL_OPTION} relative isolate overflow-hidden ${resolveItemClass(value === option.value)}`}
+            className={`${PILL_OPTION} relative isolate min-w-0 overflow-hidden focus-visible:ring-inset ${resolveItemClass(value === option.value)}`}
           >
             {value === option.value &&
               (motionReduced ? (
-                <span className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`} aria-hidden="true" />
+                <span
+                  className={`surface-control-finish absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
+                  aria-hidden="true"
+                />
               ) : (
                 <motion.span
                   layoutId={`${indicatorId}-active-pill`}
-                  className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
+                  className={`surface-control-finish absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
                   transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                   aria-hidden="true"
                 />

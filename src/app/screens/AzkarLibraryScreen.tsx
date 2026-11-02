@@ -71,19 +71,11 @@ export function AzkarLibraryScreen({
     if (next !== section) {
       vibrateIfEnabled(Boolean(hapticFeedback), 10);
     }
-    setEntranceActive(false);
     setSection(next);
     onSectionChange?.(next);
   };
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
-  const [entranceActive, setEntranceActive] = useState(true);
-  useEffect(() => {
-    // The final initial card settles after its capped 200ms delay + 260ms entrance.
-    // Later filtering, clearing search and returning to tabs should be immediate.
-    const timer = setTimeout(() => setEntranceActive(false), 460);
-    return () => clearTimeout(timer);
-  }, []);
   const searchInputId = useId();
   const selectedGroupRef = useRef<HTMLButtonElement>(null);
   const isArabic = language === "ar";
@@ -107,7 +99,6 @@ export function AzkarLibraryScreen({
 
   const deferredQuery = useDeferredValue(searchQuery.trim());
   const normalizedQuery = useMemo(() => normalizeSearchText(deferredQuery), [deferredQuery]);
-  const animateCards = entranceActive && !normalizedQuery && selectedGroupId === "all";
 
   const visibleGroups = useMemo(() => {
     if (!normalizedQuery) return CATEGORY_GROUPS.map((group) => ({ group, categories: group.categories }));
@@ -217,13 +208,17 @@ export function AzkarLibraryScreen({
       screenName={t(language, "library.title")}
     >
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
-        <header className="library-stationary-header shrink-0 border-b border-border-control/25 bg-background px-page pb-3 pt-2 sm:pb-4">
-          <div className="flex min-h-11 min-w-0 items-start justify-between gap-3">
+        <header className="library-stationary-header shrink-0 bg-background px-page pb-3 pt-2 sm:pb-4">
+          <div className="library-header-layout flex min-h-11 min-w-0 flex-wrap items-start justify-between gap-x-2 gap-y-2">
             <div className="min-w-0">
-              <h1 className="page-title max-w-full font-sans text-foreground">{t(language, "library.title")}</h1>
-              <p className="hidden text-xs leading-[18px] text-muted-foreground lg:block">
-                {t(language, "library.subtitle")}
-              </p>
+              <h1 aria-label={t(language, "library.title")} className="page-title max-w-full font-sans text-foreground">
+                <span aria-hidden="true" className="library-title-wide">
+                  {t(language, "library.title")}
+                </span>
+                <span aria-hidden="true" className="library-title-compact">
+                  {t(language, language === "ar" ? "library.title" : "common.azkar")}
+                </span>
+              </h1>
             </div>
 
             <TabList
@@ -233,7 +228,7 @@ export function AzkarLibraryScreen({
               idPrefix="library-sections"
               aria-label={t(language, "library.title")}
               indicatorClassName="bg-primary"
-              className="library-section-tabs grid shrink-0 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs sm:min-w-64"
+              className="library-section-tabs section-view-tabs"
               tabs={(["collections", "saved"] as const).map((value) => {
                 const isCollections = value === "collections";
                 const count = savedZikrIds.size;
@@ -250,11 +245,11 @@ export function AzkarLibraryScreen({
                   label: (
                     <span className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
                       {isCollections ? (
-                        <Grid size={18} aria-hidden="true" className="shrink-0" />
+                        <Grid size={18} aria-hidden="true" className="control-cue shrink-0" />
                       ) : (
-                        <Bookmark size={18} aria-hidden="true" className="shrink-0" />
+                        <Bookmark size={18} aria-hidden="true" className="control-cue shrink-0" />
                       )}
-                      <span className="hidden sm:inline">{t(language, `library.${value}`)}</span>
+                      <span className="section-tab-label">{t(language, `library.${value}`)}</span>
                       {value === "saved" && count > 0 && (
                         <span
                           className={`library-saved-count inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold leading-none transition-colors ${
@@ -272,34 +267,30 @@ export function AzkarLibraryScreen({
                 };
               })}
               itemClassName={(selected) =>
-                `flex min-h-11 min-w-11 items-center justify-center rounded-2xl px-2.5 sm:rounded-xl sm:px-3 text-xs sm:text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                `section-view-tab focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                   selected ? "text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`
               }
             />
-          </div>
-
-          <div className="mt-2 sm:mt-4">
             <ResponsiveFilters
+              compactIconOnly
               language={language}
               label={t(language, "library.searchFilters")}
               summary={
                 <>
-                  {section === "saved"
-                    ? t(language, "library.saved")
-                    : selectedGroupId === "all"
-                      ? t(language, "library.all")
-                      : t(
-                          language,
-                          `library.groups.${CATEGORY_GROUPS.find((group) => group.id === selectedGroupId)!.labelKey}`,
-                        )}
+                  {section === "saved" || selectedGroupId === "all"
+                    ? t(language, "library.all")
+                    : t(
+                        language,
+                        `library.groups.${CATEGORY_GROUPS.find((group) => group.id === selectedGroupId)!.labelKey}`,
+                      )}
                   {searchQuery.trim() ? ` · “${searchQuery.trim()}”` : ""}
                 </>
               }
               testId="library-filter-disclosure"
             >
               {({ compact, collapse }) => (
-                <>
+                <div>
                   <div>
                     <form
                       className="min-w-0"
@@ -323,7 +314,6 @@ export function AzkarLibraryScreen({
                           lang={language}
                           autoComplete="off"
                           onChange={(event) => {
-                            setEntranceActive(false);
                             setSearchQuery(event.currentTarget.value);
                           }}
                           onKeyDown={(event) => {
@@ -360,14 +350,18 @@ export function AzkarLibraryScreen({
                   </div>
 
                   {section === "collections" && (
-                    <div className="mt-3 flex min-w-0 items-center gap-2">
+                    <div className="library-group-filters mt-3 flex min-w-0 items-center gap-2">
                       <div className="relative min-w-0 flex-1">
                         <div
                           ref={groupScrollRef}
                           onScroll={checkScrollAffordance}
                           role="group"
                           data-testid="library-category-group-scroll"
-                          className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                          className={
+                            compact
+                              ? "grid min-w-0 grid-cols-1 gap-2"
+                              : "flex min-w-0 flex-1 items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                          }
                           aria-label={t(language, "library.title")}
                         >
                           <button
@@ -378,11 +372,10 @@ export function AzkarLibraryScreen({
                               if (selectedGroupId !== "all") {
                                 vibrateIfEnabled(Boolean(hapticFeedback), 8);
                               }
-                              setEntranceActive(false);
                               setSelectedGroupId("all");
                               if (!searchQuery.trim()) collapse();
                             }}
-                            className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
+                            className={`surface-control-finish interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${
                               selectedGroupId === "all"
                                 ? "bg-primary text-primary-foreground shadow-sm"
                                 : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -400,11 +393,10 @@ export function AzkarLibraryScreen({
                                 if (selectedGroupId !== group.id) {
                                   vibrateIfEnabled(Boolean(hapticFeedback), 8);
                                 }
-                                setEntranceActive(false);
                                 setSelectedGroupId(group.id);
                                 if (!searchQuery.trim()) collapse();
                               }}
-                              className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
+                              className={`surface-control-finish interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${
                                 selectedGroupId === group.id
                                   ? "bg-primary text-primary-foreground shadow-sm"
                                   : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -414,7 +406,7 @@ export function AzkarLibraryScreen({
                             </button>
                           ))}
                         </div>
-                        {canScrollStart && (
+                        {!compact && canScrollStart && (
                           <div
                             data-testid="library-scroll-fade-start"
                             aria-hidden="true"
@@ -426,7 +418,7 @@ export function AzkarLibraryScreen({
                             }}
                           />
                         )}
-                        {canScrollEnd && (
+                        {!compact && canScrollEnd && (
                           <div
                             data-testid="library-scroll-fade-end"
                             aria-hidden="true"
@@ -445,7 +437,7 @@ export function AzkarLibraryScreen({
                     <div className="flex flex-wrap gap-2 pt-2">
                       <button
                         type="button"
-                        className="min-h-11 rounded-xl border border-border-control px-3 text-sm font-semibold"
+                        className="surface-control-finish min-h-11 rounded-xl border border-border-control px-3 text-sm font-semibold"
                         onClick={collapse}
                       >
                         {t(language, "library.showResults")}
@@ -464,15 +456,16 @@ export function AzkarLibraryScreen({
                       )}
                     </div>
                   )}
-                </>
+                </div>
               )}
             </ResponsiveFilters>
           </div>
         </header>
 
         <div
+          key={section}
           data-testid="library-content-scroll"
-          className="min-h-0 flex-1 overflow-y-auto px-page pb-5 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+          className="library-panel min-h-0 flex-1 overflow-y-auto px-page pb-5 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
           {...tabPanelProps("library-sections", section)}
         >
           {section === "collections" ? (
@@ -517,7 +510,7 @@ export function AzkarLibraryScreen({
                           {formatNumerals(matchingCategories.length, language)})
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                          {matchingCategories.map((category, index) => {
+                          {matchingCategories.map((category) => {
                             const isComprehensiveDuas = category.id === "comprehensive_duas";
                             const routineMode = isRoutineCategory(category.id) ? routineModes[category.id] : "complete";
                             const visibleItems = isComprehensiveDuas
@@ -549,7 +542,6 @@ export function AzkarLibraryScreen({
                                 title={isArabic ? category.nameArabic : category.name}
                                 icon={category.icon}
                                 direction={direction}
-                                index={animateCards ? index : undefined}
                                 isOccasional={isOccasional}
                                 totalCount={total}
                                 completedCount={done}
@@ -625,6 +617,7 @@ export function AzkarLibraryScreen({
                                   }
                                   onZikr(zikr.category, Math.max(0, itemIndex));
                                 }}
+                                data-card-action
                                 className="interactive-elem flex w-full flex-col items-start gap-2 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-[color,background-color,border-color,box-shadow,opacity,transform] cursor-pointer"
                                 aria-label={
                                   isArabic ? zikr.arabicText.slice(0, 60) : zikr.translation.split(".")[0] || zikr.id
@@ -715,7 +708,7 @@ export function AzkarLibraryScreen({
                       {t(language, `library.groups.${group.labelKey}`)}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                      {categories.map((categoryId, index) => {
+                      {categories.map((categoryId) => {
                         const category = CATEGORIES.find((item) => item.id === categoryId);
                         if (!category) return null;
                         const isComprehensiveDuas = category.id === "comprehensive_duas";
@@ -747,7 +740,6 @@ export function AzkarLibraryScreen({
                             title={isArabic ? category.nameArabic : category.name}
                             icon={category.icon}
                             direction={direction}
-                            index={animateCards ? index : undefined}
                             isOccasional={isOccasional}
                             totalCount={total}
                             completedCount={done}
@@ -787,6 +779,7 @@ export function AzkarLibraryScreen({
                     type="button"
                     onClick={onOpenBenefits}
                     data-testid="library-benefits-tool"
+                    data-card-action
                     className="interactive-elem mt-2 flex min-h-16 w-full items-center gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     <span
@@ -814,7 +807,7 @@ export function AzkarLibraryScreen({
                 {t(language, "library.savedTitle")}
               </h2>
               <div className="space-y-3">
-                {filteredSavedAzkar.map((zikr, index) => {
+                {filteredSavedAzkar.map((zikr) => {
                   const category = CATEGORIES.find((item) => item.id === zikr.category)!;
                   return (
                     <button
@@ -836,8 +829,8 @@ export function AzkarLibraryScreen({
                         }
                         onZikr(zikr.category, Math.max(0, itemIndex));
                       }}
-                      style={animateCards ? { animationDelay: `${Math.min(Math.max(0, index), 5) * 40}ms` } : undefined}
-                      className={`${animateCards ? "stagger-enter" : ""} flex min-h-24 w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring`}
+                      data-card-action
+                      className="flex min-h-24 w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                         isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
                       }`}

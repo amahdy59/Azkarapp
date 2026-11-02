@@ -27,29 +27,32 @@ for (const language of ["ar", "en"] as const) {
       const ar = language === "ar";
       await page.goto("/#/azkar");
       const library = page.getByTestId("library-filter-disclosure");
-      const summary = library.locator("summary");
-      await expect(library).not.toHaveAttribute("open");
+      const summary = library.locator(".responsive-filter-trigger");
+      const sheet = page.getByTestId("library-filter-disclosure-sheet");
+      await expect(summary).toHaveAttribute("aria-expanded", "false");
       const header = page.locator(".library-stationary-header");
       expect((await header.boundingBox())!.height).toBeLessThan(190);
       await summary.click();
-      await library.getByRole("button", { name: ar ? "أذكار اليوم" : "Daily Azkar", exact: true }).click();
-      await expect(library).not.toHaveAttribute("open");
+      await sheet.getByRole("button", { name: ar ? "أذكار اليوم" : "Daily Azkar", exact: true }).click();
+      await expect(summary).toHaveAttribute("aria-expanded", "false");
       await expect(summary).toContainText(ar ? "أذكار اليوم" : "Daily Azkar");
       await expect(summary).toBeFocused();
       await summary.click();
-      const search = library.getByRole("textbox");
+      const search = sheet.getByRole("textbox");
       await search.fill(ar ? "النوم" : "sleep");
-      await expect(library).toHaveAttribute("open");
-      await library.getByRole("button", { name: t(language, "library.showResults"), exact: true }).click();
+      await expect(summary).toHaveAttribute("aria-expanded", "true");
+      await sheet.getByRole("button", { name: t(language, "library.showResults"), exact: true }).click();
       await expect(summary).toContainText(ar ? "النوم" : "sleep");
       await summary.click();
       await expect(search).toHaveValue(ar ? "النوم" : "sleep");
-      await library.getByRole("button", { name: t(language, "library.clearFilters"), exact: true }).click();
+      await sheet.getByRole("button", { name: t(language, "library.clearFilters"), exact: true }).click();
       await expect(search).toHaveValue("");
+      await sheet.getByRole("button", { name: t(language, "library.showResults"), exact: true }).click();
       await expect(page.getByRole("link", { name: ar ? /^أذكار الصباح/ : /^Morning Azkar/ }).first()).toBeVisible();
-      await library.getByRole("button", { name: t(language, "library.showResults"), exact: true }).click();
       await page.screenshot({ path: testInfo.outputPath(`library-compact-${language}.png`) });
       await page.goto("/#/progress");
+      const trigger = page.getByTestId("progress-filters-toggle");
+      await trigger.click();
       const filters = page.locator(".progress-range-toolbar");
       await expect(filters.getByRole("combobox", { includeHidden: true })).toHaveCount(1);
       const period = filters.getByRole("combobox", {
@@ -58,8 +61,8 @@ for (const language of ["ar", "en"] as const) {
         includeHidden: true,
       });
       await chooseProgressOption(period, "week");
-      await expect(filters.getByRole("combobox", { includeHidden: true })).toHaveCount(1);
-      await expect(period).toHaveAttribute("data-progress-value", "week");
+      await expect(page.getByTestId("progress-filter-sheet")).toBeHidden();
+      await expect(trigger).toHaveAttribute("data-progress-value", "week");
       await chooseProgressOption(period, "custom");
       const editor = page.getByTestId("progress-date-sheet");
       await expect(editor).toBeVisible();
@@ -70,7 +73,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(editor).toBeVisible();
       await editor.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
       await expect(editor).toBeHidden();
-      await expect(filters.getByRole("combobox", { includeHidden: true })).toHaveCount(1);
+      await expect(page.getByTestId("progress-filter-sheet")).toBeHidden();
       await expectProgressFilterFocus(period);
       await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "١" : "1");
       for (const width of [320, 834, 1280]) {
@@ -78,8 +81,8 @@ for (const language of ["ar", "en"] as const) {
         await page.locator("html").evaluate((root, enlarged) => {
           root.style.fontSize = enlarged ? "200%" : "100%";
         }, width === 320);
-        if (width === 320) await expect(filters.getByRole("combobox", { includeHidden: true })).toHaveCount(1);
-        else await expect(period).toBeVisible();
+        await expect(trigger).toBeVisible();
+        await expect(page.getByTestId("progress-filter-sheet")).toBeHidden();
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
         await page.screenshot({ path: testInfo.outputPath(`progress-filters-${language}-${width}.png`) });
       }

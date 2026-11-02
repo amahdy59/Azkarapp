@@ -14,7 +14,7 @@ import { ProgressRangeToolbar } from "../components/ProgressRangeToolbar";
 import { ProgressDashboard, type ProgressDashboardView } from "../components/ProgressDashboard";
 import { TabList, tabId, tabPanelProps } from "../components/Tabs";
 import { Header, IconButton } from "../components/LayoutShells";
-import { useMediaQuery } from "../hooks/useMediaQuery";
+import { Modal, SheetHeader } from "../components/ResponsiveSheet";
 import { ProgressPrayerBreakdown } from "../components/ProgressPrayerBreakdown";
 import { ZikrInsights } from "../components/ZikrInsights";
 import { dashboardText } from "../i18n/progressDashboard";
@@ -142,10 +142,8 @@ export function ProgressScreen({
   mosquePrayerGoal,
   dailyPathStartDayKey,
   weeklyGoalDays,
-  initialPeriod = "last30",
+  initialPeriod = "month",
   onPeriodChange,
-  onOpenHome,
-  onOpenKhatmah,
   zikrHistory = EMPTY_ZIKR_HISTORY,
 }: ProgressScreenProps) {
   const clock = useNow();
@@ -164,14 +162,11 @@ export function ProgressScreen({
   const detailTopic = detailChoice === "reflection" && (customRange || activeTab !== "day") ? "prayers" : detailChoice;
 
   const [view, setView] = useState<ProgressDashboardView>("overview");
-  const compact = useMediaQuery("(max-width: 599px)");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filterButtonId = useId();
   const filterId = useId();
   const closeFilters = () => {
-    if (!compact) return;
     setFiltersOpen(false);
-    requestAnimationFrame(() => document.getElementById(filterButtonId)?.focus());
   };
   const viewId = useId();
   useEffect(() => setCalendarType(initialCalendarType), [initialCalendarType]);
@@ -325,81 +320,112 @@ export function ProgressScreen({
           <div className="progress-controls-inner">
             <Header
               title={t(language, "common.progress")}
-              subtitle={compact ? formatProgressRange(selectedRange, language, calendarType) : undefined}
+              subtitle={
+                <span data-testid="garden-view-date">
+                  {dashboardText(language, customRange ? "custom" : activeTab)} ·{" "}
+                  {formatProgressRange(selectedRange, language, calendarType)}
+                </span>
+              }
               language={language}
               elevateOnScroll={false}
               style={{ position: "static", paddingInline: 0, background: "transparent" }}
               right={
-                compact ? (
+                <div className="progress-header-actions">
+                  <TabList
+                    value={view}
+                    onChange={(next) => {
+                      if (next === view) return;
+                      setView(next);
+                      setDetailsOpen(false);
+                      const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
+                      if (viewport) viewport.scrollTop = 0;
+                    }}
+                    tabs={(["overview", "trends"] as const).map((value) => ({
+                      value,
+                      label: (
+                        <span
+                          className="flex items-center justify-center gap-2"
+                          style={{ color: value === view ? "var(--primary-foreground)" : "inherit" }}
+                        >
+                          {value === "overview" ? (
+                            <BarChart3 size={18} className="progress-tab-icon" aria-hidden="true" />
+                          ) : value === "trends" ? (
+                            <Sprout size={18} className="progress-tab-icon" aria-hidden="true" />
+                          ) : null}
+                          <span className="section-tab-label">{dashboardText(language, `view_${value}`)}</span>
+                        </span>
+                      ),
+                      testId: `progress-tab-${value}`,
+                      ariaLabel: dashboardText(language, `view_${value}`),
+                    }))}
+                    direction={direction}
+                    idPrefix={viewId}
+                    aria-label={dashboardText(language, "views")}
+                    className="progress-view-tabs section-view-tabs"
+                    itemClassName={(selected) =>
+                      `section-view-tab progress-focus ${selected ? "text-primary-foreground" : "text-muted-foreground"}`
+                    }
+                  />
                   <IconButton
                     id={filterButtonId}
                     data-testid="progress-filters-toggle"
+                    data-progress-value={customRange ? "custom" : activeTab}
                     label={dashboardText(language, "dateFilters")}
                     aria-expanded={filtersOpen}
-                    aria-controls={filterId}
-                    onClick={() => setFiltersOpen((open) => !open)}
+                    aria-haspopup="dialog"
+                    onClick={() => setFiltersOpen(true)}
                   >
                     <SlidersHorizontal size={20} aria-hidden="true" />
                   </IconButton>
-                ) : undefined
+                </div>
               }
             />
-            <div id={filterId} className="progress-date-filter" hidden={compact && !filtersOpen}>
-              <ProgressRangeToolbar
-                period={customRange ? "custom" : activeTab}
-                range={selectedRange}
-                today={civilToday}
-                language={language}
-                calendar={calendarType}
-                onPeriod={(period) => {
-                  handleTabChange(period);
-                  closeFilters();
-                }}
-                onCustom={(range) => {
-                  setCustomRange(range);
-                  closeFilters();
-                }}
-              />
-            </div>
-            <TabList
-              value={view}
-              onChange={(next) => {
-                if (next === view) return;
-                setView(next);
-                setDetailsOpen(false);
-                const viewport = controlsRef.current?.closest<HTMLElement>(".app-screen-surface");
-                if (viewport) viewport.scrollTop = 0;
+            <Modal
+              open={filtersOpen}
+              onClose={closeFilters}
+              onCloseAutoFocus={(event) => {
+                // Touch opening need not focus the button in WebKit. Restore
+                // explicitly after the modal releases its focus trap.
+                event.preventDefault();
+                document.getElementById(filterButtonId)?.focus({ preventScroll: true });
               }}
-              tabs={(["overview", "trends"] as const).map((value) => ({
-                value,
-                label: (
-                  <span
-                    className="flex items-center justify-center gap-2"
-                    style={{ color: value === view ? "var(--primary-foreground)" : "inherit" }}
-                  >
-                    {value === "overview" ? (
-                      <BarChart3 size={18} className="progress-tab-icon" aria-hidden="true" />
-                    ) : value === "trends" ? (
-                      <Sprout size={18} className="progress-tab-icon" aria-hidden="true" />
-                    ) : null}
-                    {dashboardText(language, `view_${value}`)}
-                  </span>
-                ),
-                testId: `progress-tab-${value}`,
-              }))}
+              title={dashboardText(language, "dateFilters")}
+              language={language}
               direction={direction}
-              idPrefix={viewId}
-              aria-label={dashboardText(language, "views")}
-              className="progress-view-tabs mt-3 mb-1 grid grid-cols-2 gap-2"
-              itemClassName={(selected) =>
-                `min-h-11 min-w-0 rounded-xl border border-border-control px-2 py-2 text-xs font-bold progress-focus ${selected ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`
-              }
-            />
+              showCloseButton={false}
+              testId="progress-filter-sheet"
+              className="filter-sheet"
+            >
+              <SheetHeader
+                title={dashboardText(language, "dateFilters")}
+                language={language}
+                onClose={closeFilters}
+                className="filter-sheet-header"
+              />
+              <div id={filterId} className="progress-date-filter min-h-0 overflow-y-auto p-3">
+                <ProgressRangeToolbar
+                  dateTestId="progress-filter-date"
+                  period={customRange ? "custom" : activeTab}
+                  range={selectedRange}
+                  today={civilToday}
+                  language={language}
+                  calendar={calendarType}
+                  onPeriod={(period) => {
+                    handleTabChange(period);
+                    closeFilters();
+                  }}
+                  onCustom={(range) => {
+                    setCustomRange(range);
+                    closeFilters();
+                  }}
+                />
+              </div>
+            </Modal>
           </div>
         </div>
 
         <div
-          className="w-full max-w-7xl px-page outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="w-full max-w-7xl px-page outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
           {...tabPanelProps(viewId, view)}
         >
           <ProgressDashboard
@@ -408,28 +434,6 @@ export function ProgressScreen({
               handleTabChange("week");
               document.getElementById(tabId(viewId, "trends"))?.focus({ preventScroll: true });
             }}
-            emptyActions={
-              <>
-                {onOpenHome && (
-                  <button
-                    type="button"
-                    className="min-h-11 rounded-lg border border-border-control px-3 text-sm font-semibold progress-focus"
-                    onClick={onOpenHome}
-                  >
-                    {dashboardText(language, "openHome")}
-                  </button>
-                )}
-                {onOpenKhatmah && (
-                  <button
-                    type="button"
-                    className="min-h-11 rounded-lg border border-border-control px-3 text-sm font-semibold progress-focus"
-                    onClick={onOpenKhatmah}
-                  >
-                    {dashboardText(language, "openQuran")}
-                  </button>
-                )}
-              </>
-            }
             onShowTrend={() => {
               setView("trends");
               setDetailsOpen(false);

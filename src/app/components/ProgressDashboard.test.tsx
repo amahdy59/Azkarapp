@@ -1,5 +1,5 @@
 import { chooseProgressOption } from "../../test/progressSelect";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ProgressDashboard } from "./ProgressDashboard";
 import { indexProgressDashboard } from "../progressDashboard";
@@ -38,25 +38,23 @@ function props() {
   };
 }
 describe("ProgressDashboard", () => {
-  it("explains empty and target-only periods without hiding known goals or inventing activity", () => {
+  it("keeps truthful empty and target-only metrics without a redundant empty-period card", () => {
     const empty = indexProgressDashboard({ ...input, dailyCompletions: [], wirdHistory: {} }, "2026-10-20");
-    const { rerender } = render(
-      <ProgressDashboard {...props()} records={empty} emptyActions={<button>Continue</button>} />,
-    );
-    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("No activity recorded");
-    expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument();
+    const { rerender } = render(<ProgressDashboard {...props()} records={empty} />);
+    expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
     expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("0 of 1");
     expect(screen.getByTestId("progress-metric-prayers")).toHaveTextContent("No saved records yet");
     expect(screen.getByTestId("progress-metric-pages")).toHaveTextContent("No saved records yet");
-    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("Saved Quran targets");
     rerender(<ProgressDashboard {...props()} />);
     expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
   });
   it("distinguishes first records from an empty selection and reports a factual routine insight", () => {
     const { rerender } = render(<ProgressDashboard {...props()} records={[]} />);
-    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("Save a record from Home");
+    expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
+    expect(screen.getByTestId("progress-metric-pages")).toHaveTextContent("No saved records yet");
     rerender(<ProgressDashboard {...props()} range={{ startKey: "2026-09-01", endKey: "2026-09-30" }} />);
-    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("Choose another period");
+    expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
+    expect(screen.getByTestId("progress-metric-prayers")).toHaveTextContent("No saved records yet");
     rerender(<ProgressDashboard {...props()} />);
     expect(screen.getByRole("complementary", { name: "From your saved records" })).toHaveTextContent(
       "Days with morning records: 19. Days with evening records: 0",
@@ -95,21 +93,23 @@ describe("ProgressDashboard", () => {
     expect(screen.getByTestId("progress-main-trend")).toHaveTextContent("count scale starts at zero");
     expect(screen.getByTestId("recording-time-scale")).not.toHaveTextContent("%");
   });
-  it("keeps selection/order reversible and restores focus after Apply and Cancel", () => {
+  it("keeps selection/order reversible and restores focus after Apply and Cancel", async () => {
     render(<ProgressDashboard {...props()} />);
     const choose = screen.getByRole("button", { name: "Choose metrics" });
     fireEvent.click(choose);
+    expect(screen.getByRole("dialog", { name: "Choose metrics" })).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Move Quran pages read up" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Prayers at the mosque" }));
     expect(screen.queryByTestId("progress-metric-mosque")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(choose).toHaveFocus();
+    await waitFor(() => expect(choose).toHaveFocus());
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
     fireEvent.click(choose);
+    expect(screen.getByRole("dialog", { name: "Choose metrics" })).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Move Quran pages read up" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Prayers at the mosque" }));
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(choose).toHaveFocus();
+    await waitFor(() => expect(choose).toHaveFocus());
     expect(
       Array.from(screen.getByTestId("progress-overview").children).map((node) => node.getAttribute("data-testid")),
     ).toEqual([

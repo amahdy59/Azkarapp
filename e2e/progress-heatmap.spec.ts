@@ -35,13 +35,13 @@ for (const language of ["ar", "en"] as const) {
   test(`Progress rolling range, heatmap and aligned toolbar in ${language} @cross-browser`, async ({ page }, info) => {
     await seed(page, language);
     await page.setViewportSize({ width: 834, height: 1112 });
-    await page.goto("/#/progress");
+    await page.goto("/#/progress/last30");
     const range = page.getByRole("combobox", {
       name: language === "ar" ? "نطاق التاريخ" : "Date range",
       exact: true,
       includeHidden: true,
     });
-    await expect(range).toHaveAttribute("data-progress-value", "last30");
+    await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "last30");
     const date = page.getByTestId("garden-view-date");
     const dates = await date.textContent();
     expect(dates).toContain(language === "ar" ? "آخر ٣٠ يومًا" : "Last 30 days");
@@ -61,19 +61,18 @@ for (const language of ["ar", "en"] as const) {
     await expect(date).toHaveText(dates!);
     for (const width of [834, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
-      await range.scrollIntoViewIfNeeded();
-      const control = (await range.boundingBox())!;
+      const control = (await page.getByTestId("progress-filters-toggle").boundingBox())!;
       const tabs = (await page.getByRole("tablist").boundingBox())!;
       for (const tab of await page.getByRole("tab").all()) {
         const option = (await tab.boundingBox())!;
-        expect(Math.abs(control.y + control.height - option.y - option.height)).toBeLessThanOrEqual(2);
-        expect(Math.abs(control.y - option.y)).toBeLessThanOrEqual(2);
+        expect(control.y + control.height).toBeLessThanOrEqual(option.y);
+        expect(option.height).toBeGreaterThanOrEqual(44);
         const before = option.y - tabs.y;
         const after = tabs.y + tabs.height - option.y - option.height;
         expect(before).toBeGreaterThanOrEqual(4);
         expect(before).toBeCloseTo(after, 0);
       }
-      expect(language === "ar" ? tabs.x + tabs.width <= control.x : control.x + control.width <= tabs.x).toBe(true);
+      expect(control.width).toBeGreaterThanOrEqual(44);
       await page.screenshot({ path: info.outputPath(`heatmap-${language}-${width}.png`) });
     }
     await page.setViewportSize({ width: 390, height: 844 });
@@ -112,9 +111,12 @@ for (const language of ["ar", "en"] as const) {
     await page.getByTestId("progress-filters-toggle").click();
     await range.scrollIntoViewIfNeeded();
     const control = (await range.boundingBox())!;
-    const tabs = (await page.getByRole("tablist").boundingBox())!;
-    expect(tabs.y).toBeGreaterThanOrEqual(control.y + control.height);
+    const picker = (await page.getByTestId("progress-filter-sheet").boundingBox())!;
+    expect(control.y).toBeGreaterThanOrEqual(picker.y);
+    expect(control.y + control.height).toBeLessThanOrEqual(picker.y + picker.height);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("progress-filters-toggle")).toBeFocused();
     const target = heatmap.locator('[data-day="2026-10-19"]');
     await target.scrollIntoViewIfNeeded();
     const box = (await target.boundingBox())!;

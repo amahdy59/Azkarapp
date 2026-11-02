@@ -180,7 +180,7 @@ export function WirdBenefitsScreen({
       >
         <section
           {...tabPanelProps("wird-benefits", activeSection)}
-          className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
           data-testid={`wird-benefits-panel-${activeSection}`}
         >
           <div className="grid gap-3.5 lg:grid-cols-2" data-testid="wird-benefits-list">

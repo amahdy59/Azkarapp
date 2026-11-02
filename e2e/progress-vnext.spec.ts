@@ -53,14 +53,8 @@ for (const language of ["ar", "en"] as const) {
         }, enlarged);
         const date = page.getByTestId("garden-view-date");
         const filters = page.getByTestId("progress-filters-toggle");
-        // Resize updates the media-query hook after the viewport itself changes.
-        // Wait for that responsive state before deciding whether to open filters.
-        if (width < 600) {
-          await expect(filters).toBeVisible();
-          if ((await filters.getAttribute("aria-expanded")) === "false") await filters.click();
-        } else {
-          await expect(filters).toBeHidden();
-        }
+        await expect(filters).toBeVisible();
+        await expect(filters).toHaveAttribute("aria-expanded", "false");
         await expect(date).toBeVisible();
         expect(
           await date.evaluate(

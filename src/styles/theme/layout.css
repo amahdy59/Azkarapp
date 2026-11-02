@@ -453,19 +453,40 @@
   --mushaf-frame-pad: clamp(0.5rem, 4.5cqi, 2.75rem);
   max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)));
   padding-inline: var(--mushaf-frame-pad);
-  padding-block: clamp(0.1rem, 0.45cqh, 0.35rem);
+  padding-block: 0;
 }
 
 /* The page is the screen at every width. It never becomes a card laid on a
    second background; a facing spread is separated only by its quiet gutter. */
 
 .mushaf-page-furniture {
-  height: 5.2%;
+  height: 2.75rem;
   min-height: 2.75rem;
   font-size: clamp(8px, min(2.4cqi, 1.5cqh), 13px);
   font-weight: 700;
   line-height: 1;
-  opacity: 0.72;
+}
+
+.mushaf-furniture-pill {
+  display: inline-flex;
+  height: 2rem;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding-inline: 0.75rem;
+  background-color: var(--card);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: var(--shadow-xs);
+}
+.group:is(:hover, :active) > .mushaf-furniture-pill {
+  border-color: var(--primary);
+  background-color: var(--muted);
 }
 
 .mushaf-page-furniture__cartouche {

@@ -1,0 +1,81 @@
+.bilingual-reader {
+  --bilingual-gutter: clamp(12px, 3vw, 24px);
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  background: var(--background);
+}
+.bilingual-reader-header,
+.bilingual-reader-footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem var(--bilingual-gutter);
+  background: var(--background);
+  z-index: 1;
+}
+.bilingual-reader-content {
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.75rem var(--bilingual-gutter);
+}
+.bilingual-reader-header > div {
+  min-inline-size: 0;
+}
+.bilingual-verse-card {
+  border-radius: var(--ds-radius-card);
+  overflow-wrap: anywhere;
+}
+.bilingual-reader-footer {
+  padding-block-end: max(0.5rem, env(safe-area-inset-bottom));
+}
+/* A single ordered verse sequence preserves reading/keyboard order at every
+   width. Arabic remains primary; long translations grow without clipping. */
+
+.bilingual-reader-header,
+.bilingual-reader-footer,
+.bilingual-reader-content {
+  inline-size: 100%;
+  max-inline-size: calc(56rem + 2 * var(--bilingual-gutter));
+  margin-inline: auto;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.bilingual-reader-title {
+  flex: 1 1 12rem;
+}
+.bilingual-reader-title h2 {
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.bilingual-reader-actions {
+  margin-inline-start: auto;
+}
+.bilingual-reader-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+.bilingual-reader-footer > button:first-child {
+  justify-self: start;
+}
+.bilingual-reader-footer > button:last-child {
+  justify-self: end;
+}
+@media (max-width: 480px) {
+  .bilingual-reader-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bilingual-reader-position {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}

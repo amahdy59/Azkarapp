@@ -564,8 +564,8 @@ describe("MushafPageViewer invariant layout and center tap", () => {
 
     const canvasWithControls = withControls.querySelector(".mushaf-page-canvas") as HTMLElement;
     expect(canvasWithControls).toBeInTheDocument();
-    expect(canvasWithControls.style.paddingTop).toBe("var(--mushaf-top-clearance, 3.25rem)");
-    expect(canvasWithControls.style.paddingBottom).toMatch(/^calc\(3\.25rem\s*\+\s*env\(safe-area-inset-bottom\)\)$/);
+    expect(canvasWithControls.style.paddingTop).toBe("var(--mushaf-top-clearance, 3rem)");
+    expect(canvasWithControls.style.paddingBottom).toMatch(/^calc\(3rem\s*\+\s*env\(safe-area-inset-bottom\)\)$/);
     expect(canvasWithControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
 
     const { container: withoutControls } = render(
@@ -581,7 +581,8 @@ describe("MushafPageViewer invariant layout and center tap", () => {
 
     const canvasWithoutControls = withoutControls.querySelector(".mushaf-page-canvas") as HTMLElement;
     expect(canvasWithoutControls).toBeInTheDocument();
-    // Layout and line geometry remain 100% constant in focus mode / hidden controls mode
+    // Merely hiding controls does not change geometry; explicit focusMode
+    // separately reclaims the metadata/chrome reservation.
     expect(canvasWithoutControls.style.paddingTop).toBe(canvasWithControls.style.paddingTop);
     expect(canvasWithoutControls.style.paddingBottom).toBe(canvasWithControls.style.paddingBottom);
     expect(canvasWithoutControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
@@ -675,6 +676,6 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     const centerBtn = center.querySelector("[data-testid='mushaf-furniture-page-btn']") as HTMLElement;
     expect(centerBtn).toBeInTheDocument();
     expect(centerBtn.className).toContain("h-11");
-    expect(centerBtn.querySelector("span")?.className).toContain("h-8");
+    expect(centerBtn.querySelector("span")).toHaveClass("mushaf-furniture-pill");
   });
 });

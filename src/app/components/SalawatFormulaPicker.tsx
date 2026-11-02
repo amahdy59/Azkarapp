@@ -1,3 +1,4 @@
+import { COUNTER_PICKER_TRIGGER } from "./devotionalPickerStyles";
 import type { AppLanguage } from "../types";
 import { t } from "../i18n";
 import { ChevronDown } from "./icons";
@@ -70,7 +71,7 @@ export function SalawatFormulaPicker({
           <button
             type="button"
             data-testid="salawat-formula-filter"
-            className="interactive-elem flex min-h-[44px] w-full items-center justify-between gap-2 sm:gap-3 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-label sm:text-sm font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className={COUNTER_PICKER_TRIGGER}
             title={selectedFullText}
           >
             <span className="min-w-0 flex-1 truncate text-start" dir="auto">

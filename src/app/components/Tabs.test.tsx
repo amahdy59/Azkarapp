@@ -59,9 +59,10 @@ describe("TabList", () => {
     expect(onChange).toHaveBeenCalledWith("week");
   });
 
-  it("renders a single moving selection indicator", () => {
+  it("renders a single stationary selection finish without a shared-layout transform", () => {
     const { container } = renderTabs();
     expect(container.querySelectorAll("[aria-hidden='true']")).toHaveLength(1);
+    expect(container.querySelector(".tab-selection-finish")).not.toHaveAttribute("style");
   });
 
   it("moves to the next tab on ArrowRight in LTR", () => {

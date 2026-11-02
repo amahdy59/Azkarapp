@@ -1,5 +1,9 @@
 # Content authoring guide
 
+## Local reminder acquisition — 2026-11-02
+
+The owner-approved reliability correction now ships and precaches the existing checksum-identical compressed reminder package as a deferred Vite asset. This supersedes the historical external-only delivery and first-online-acquisition statements below. Reviewed source modules, schedule, mappings, pinned checksum and verified cache keys are unchanged. Acquisition is bounded to eight seconds and failed acquisition can be retried explicitly. Existing immutable R2 copies remain available to older clients; this correction requires no content edit or upload.
+
 ## Collection citation and concise-meaning review — 2026-10-18
 
 The owner requests closing the session gaps and removing app/methodological disclaimers from hadith meanings. Nine bilingual meanings are simplified without altering narration bytes or source metadata; prior cautions remain in `agent/evidence/meaning-editorial-notes-2026-10-18.json`. Cite interpretation and grading through existing reference fields rather than inserting implementation caveats into the meaning. `reviewedCollectionCitations.json` now carries precise bilingual references and links for 165 verified original identities, preserving older English citations. The 20 alternative Home mappings remain excluded from collection correction and are individually listed in `agent/evidence/collection-citation-review-2026-10-18.json`; source-specific independent review is still needed for their original semantics.

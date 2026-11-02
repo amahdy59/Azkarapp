@@ -22,11 +22,9 @@ describe("optional first-use setup", () => {
     render(<FirstUseSetup language="en" onClose={close} />);
     expect(requestPermission).not.toHaveBeenCalled();
     expect(persist).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Enable browser notifications" }));
+    fireEvent.click(screen.getByRole("button", { name: "Enable notifications" }));
     await waitFor(() => expect(requestPermission).toHaveBeenCalledOnce());
-    await waitFor(() =>
-      expect(screen.queryByRole("button", { name: "Enable browser notifications" })).not.toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Enable notifications" })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "Request storage protection" }));
     await waitFor(() => expect(persist).toHaveBeenCalledOnce());
     fireEvent.click(screen.getByRole("button", { name: "Continue to Home" }));

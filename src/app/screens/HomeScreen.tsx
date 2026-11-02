@@ -53,6 +53,8 @@ import type {
   QuranWirdPlan,
 } from "../types";
 
+import { NAVIGATION_FOCUS } from "../components/ui/controlStyles";
+
 const seenCompletions = new Set<string>();
 
 type HomeActionKind = "resume" | "start" | "again";
@@ -164,6 +166,7 @@ export function HomeScreen({
   onOpenWirdBenefits,
   onOpenKhatmah,
   onOpenProgress,
+  onOpenMore,
   onOpenQibla,
   onOpenMasbaha,
   onContinueKhatmah,
@@ -206,6 +209,7 @@ export function HomeScreen({
   onOpenWirdBenefits?: () => void;
   onOpenKhatmah?: () => void;
   onOpenProgress?: () => void;
+  onOpenMore?: () => void;
   onOpenQibla?: () => void;
   onOpenMasbaha?: () => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
@@ -386,6 +390,8 @@ export function HomeScreen({
   /* Complete readings load after first paint from the verified R2/offline package,
      including the unchanged schedule and Quran records. Do not briefly show
      unverified legacy excerpts while this catalogue is being unpacked. */
+  const [catalogueFailed, setCatalogueFailed] = useState(false);
+  const [catalogueRetry, setCatalogueRetry] = useState(0);
   const [libraryEvidence, setLibraryEvidence] = useState<ReturnType<typeof getContextualEvidence>>(null);
   const [readingCatalogue, setReadingCatalogue] = useState<Awaited<
     ReturnType<typeof import("../content/reminderReadings").loadReminderReadings>
@@ -400,6 +406,7 @@ export function HomeScreen({
       if (cancelled || pending) return;
       pending = true;
       failed = false;
+      setCatalogueFailed(false);
       try {
         const catalogue = await import("../content/reminderReadings");
         if (cancelled) return;
@@ -418,6 +425,7 @@ export function HomeScreen({
         );
       } catch {
         failed = true;
+        if (!cancelled) setCatalogueFailed(true);
       } finally {
         pending = false;
       }
@@ -441,7 +449,7 @@ export function HomeScreen({
       window.removeEventListener("online", retry);
       document.removeEventListener("visibilitychange", retry);
     };
-  }, [language, manualEvidenceOffset, reminderContexts, reminderSlotKey]);
+  }, [language, manualEvidenceOffset, reminderContexts, reminderSlotKey, catalogueRetry]);
 
   /* The library wins only where it is at least as specific as what the corpus
      found. Otherwise a Friday source would displace the Asr one the reader is
@@ -602,10 +610,23 @@ export function HomeScreen({
     if (!prayer) updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0, prayerControlFocused());
   };
   const hasPrimaryContext = showCompletionCard || showRoutineCard;
-  const hasContextCompanion = Boolean(dailyEvidence);
+  const hasContextCompanion = Boolean(dailyEvidence) || !readingCatalogue;
   const hasContextStackContent = Boolean(hasPrimaryContext || dailyEvidence);
 
   /* The named scroll region must itself be keyboard-scrollable. */
+  const toolCardClass = `group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] ${NAVIGATION_FOCUS} ${
+    homeVisualEffects
+      ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
+      : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
+  }`;
+  const toolIconClass = `control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
+    homeVisualEffects
+      ? "border border-white/20 bg-white/10 text-on-media-accent"
+      : "border border-primary/30 bg-primary/10 text-primary"
+  }`;
+  const toolOpenClass = `inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
+    homeVisualEffects ? "text-on-media-accent" : "text-primary"
+  }`;
   return (
     <ScreenContainer
       dir={direction}
@@ -700,7 +721,7 @@ export function HomeScreen({
                     setPathSheetOpen(true);
                   }}
                   aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
-                  className="choice-pill home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:hidden"
+                  className={`choice-pill home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold ${NAVIGATION_FOCUS} min-[600px]:hidden`}
                 >
                   <span className="flex items-center gap-1" aria-hidden="true">
                     <PalmTreeMark size={20} className="control-cue" strokeWidth={3} />
@@ -720,7 +741,7 @@ export function HomeScreen({
                     setPathSheetOpen(true);
                   }}
                   aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
-                  className="choice-pill home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:flex"
+                  className={`choice-pill home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold ${NAVIGATION_FOCUS} min-[600px]:flex`}
                 >
                   <span className="hidden min-[900px]:inline" aria-hidden="true">
                     {t(language, "dailyPath.title")}
@@ -868,6 +889,24 @@ export function HomeScreen({
                             onGlass={homeVisualEffects}
                           />
                         </div>
+                      ) : !readingCatalogue ? (
+                        <div
+                          className="w-full rounded-3xl border border-border bg-card p-4"
+                          data-testid="home-reminder-status"
+                        >
+                          <p role="status" className="text-sm text-muted-foreground">
+                            {t(language, catalogueFailed ? "home.reminderUnavailable" : "common.loading")}
+                          </p>
+                          {catalogueFailed && (
+                            <button
+                              type="button"
+                              className="mt-2 min-h-11 rounded-xl border border-border-control px-4 text-sm font-bold text-primary"
+                              onClick={() => setCatalogueRetry((value) => value + 1)}
+                            >
+                              {t(language, "mushaf.retry")}
+                            </button>
+                          )}
+                        </div>
                       ) : null}
                     </div>
                   )}
@@ -934,95 +973,63 @@ export function HomeScreen({
           {(onOpenQibla || onOpenMasbaha) && (
             <div className="px-page mx-auto w-full">
               <div className={`grid grid-cols-1 gap-3 ${onOpenQibla && onOpenMasbaha ? "sm:grid-cols-2" : ""}`}>
-                {onOpenQibla && (
-                  <button
-                    type="button"
-                    onClick={onOpenQibla}
-                    data-testid="home-tool-qibla"
-                    className={`group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      homeVisualEffects
-                        ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
-                        : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <span
-                        className={`control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
-                          homeVisualEffects
-                            ? "border border-white/20 bg-white/10 text-on-media-accent"
-                            : "border border-primary/30 bg-primary/10 text-primary"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        <Compass size={22} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <span className="block text-subtitle font-extrabold text-foreground">
-                          {t(language, "qibla.title")}
-                        </span>
-                        <span className="block text-micro font-semibold text-muted-foreground">
-                          {locationSettings?.latitude != null && locationSettings?.longitude != null
-                            ? `${displayLocationName(locationSettings, language) || t(language, "qibla.currentLocation")} · ${formatNumerals(
-                                Math.round(getQiblaBearing(locationSettings.latitude, locationSettings.longitude)),
-                                language,
-                              )}°`
-                            : t(language, "more.qiblaDescription")}
-                        </span>
-                      </div>
-                    </div>
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
-                        homeVisualEffects ? "text-on-media-accent" : "text-primary"
-                      }`}
+                {[
+                  {
+                    id: "qibla",
+                    title: t(language, "qibla.title"),
+                    Icon: Compass,
+                    onClick: onOpenQibla,
+                    description:
+                      locationSettings?.latitude != null && locationSettings?.longitude != null
+                        ? `${displayLocationName(locationSettings, language) || t(language, "qibla.currentLocation")} · ${formatNumerals(Math.round(getQiblaBearing(locationSettings.latitude, locationSettings.longitude)), language)}°`
+                        : t(language, "more.qiblaDescription"),
+                  },
+                  {
+                    id: "masbaha",
+                    title: t(language, "counter.tasbeehTitle"),
+                    Icon: Sparkles,
+                    onClick: onOpenMasbaha,
+                    description: t(language, "more.masbahaDescription"),
+                  },
+                ]
+                  .filter((tool) => tool.onClick)
+                  .map(({ id, title, Icon, onClick, description }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={onClick}
+                      data-testid={`home-tool-${id}`}
+                      className={toolCardClass}
                     >
-                      <span>{t(language, "common.open")}</span>
-                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
-                    </span>
-                  </button>
-                )}
-
-                {onOpenMasbaha && (
-                  <button
-                    type="button"
-                    onClick={onOpenMasbaha}
-                    data-testid="home-tool-masbaha"
-                    className={`group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      homeVisualEffects
-                        ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
-                        : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <span
-                        className={`control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
-                          homeVisualEffects
-                            ? "border border-white/20 bg-white/10 text-on-media-accent"
-                            : "border border-primary/30 bg-primary/10 text-primary"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        <Sparkles size={22} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <span className="block text-subtitle font-extrabold text-foreground">
-                          {t(language, "counter.tasbeehTitle")}
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <span className={toolIconClass} aria-hidden="true">
+                          <Icon size={22} />
                         </span>
-                        <span className="block text-micro font-semibold text-muted-foreground">
-                          {t(language, "more.masbahaDescription")}
-                        </span>
+                        <div className="min-w-0 flex-1">
+                          <span className="block text-subtitle font-extrabold text-foreground">{title}</span>
+                          <span className="block text-micro font-semibold text-muted-foreground">{description}</span>
+                        </div>
                       </div>
-                    </div>
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
-                        homeVisualEffects ? "text-on-media-accent" : "text-primary"
-                      }`}
-                    >
-                      <span>{t(language, "common.open")}</span>
-                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
-                    </span>
-                  </button>
-                )}
+                      <span className={toolOpenClass}>
+                        <span>{t(language, "common.open")}</span>
+                        <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
+                      </span>
+                    </button>
+                  ))}
               </div>
+            </div>
+          )}
+          {onOpenMore && (
+            <div className="px-page mx-auto w-full">
+              <button
+                type="button"
+                data-testid="home-more"
+                onClick={onOpenMore}
+                className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm font-bold text-foreground hover:bg-muted ${NAVIGATION_FOCUS}`}
+              >
+                {t(language, "more.title")}
+                <ArrowNext size={18} data-rtl-flip aria-hidden="true" />
+              </button>
             </div>
           )}
           <footer className="px-page" data-testid="home-visitor-footer">

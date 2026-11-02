@@ -1,3 +1,6 @@
+.responsive-filters {
+  container: responsive-filters / inline-size;
+}
 .responsive-filter-trigger {
   grid-template-columns: 36px minmax(0, 1fr) 20px;
   min-block-size: 56px;
@@ -31,14 +34,22 @@
   font-size: var(--text-xs);
   line-height: 1.5;
 }
+/* At narrow/enlarged measures, keep label and context on their own lines.
+   A different tab's context must not change how the label wraps beside it. */
+@container responsive-filters (max-width: 20rem) {
+  .responsive-filter-copy {
+    display: grid;
+    justify-items: start;
+  }
+}
 .responsive-filter-chevron {
   inline-size: 20px;
   block-size: 20px;
 }
-.responsive-filters[open] > .responsive-filter-trigger {
+.responsive-filters[data-open] > .responsive-filter-trigger {
   border-color: var(--primary);
 }
-.responsive-filters[open] .responsive-filter-chevron {
+.responsive-filters[data-open] .responsive-filter-chevron {
   transform: rotate(180deg);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -56,7 +67,16 @@
     border: 1px solid ButtonText;
     box-shadow: none;
   }
-  .responsive-filters[open] > .responsive-filter-trigger {
-    border: 2px solid Highlight;
+  .responsive-filters[data-open] > .responsive-filter-trigger {
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
   }
+}
+.filter-sheet .filter-sheet-header {
+  gap: 8px;
+  padding: 12px;
+}
+.filter-sheet-header h2 {
+  font-size: 1.125rem;
+  line-height: 1.35;
 }

@@ -45,7 +45,9 @@ export function useControlFeedback() {
       );
       if (
         !control ||
-        control.matches(':disabled, [aria-disabled="true"], [data-disabled], [aria-readonly="true"], .no-press')
+        control.matches(
+          ':disabled, [aria-disabled="true"], [data-disabled], [aria-readonly="true"], .no-press:not([data-card-action])',
+        )
       )
         return;
       if (event.key === " " && control.matches("a[href]")) return;

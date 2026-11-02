@@ -1,10 +1,11 @@
+import "./surface-panel.css";
 import { memo, useId, useState } from "react";
 import type { ProgressMetricValue } from "../progressDashboard";
 import type { AppLanguage } from "../types";
 import { dashboardText as text } from "../i18n/progressDashboard";
 import { formatNumerals, formatPercentage } from "../formatting";
 import { ProgressBar } from "./ProgressBar";
-import { ChevronDown } from "./icons";
+import { ChevronDown, Repeat } from "./icons";
 
 const routines = ["morning", "evening", "sleep"] as const;
 const colours = ["var(--primary)", "var(--success)", "var(--info)"];
@@ -34,7 +35,10 @@ export const ProgressRoutineComparison = memo(function ProgressRoutineComparison
       data-testid="progress-routine-bars"
       aria-labelledby={`${id}-heading`}
     >
-      <h2 id={`${id}-heading`} className="text-base font-bold">
+      <h2 id={`${id}-heading`} className="surface-panel-heading">
+        <span className="surface-panel-icon surface-control-finish" aria-hidden="true">
+          <Repeat size={20} />
+        </span>
         {text(language, "routineBars")}
       </h2>
       <p className="mt-1 progress-help">{text(language, "routineBarsHelp")}</p>

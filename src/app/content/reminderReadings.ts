@@ -1,4 +1,5 @@
 import manifest from "./homeReminderManifest.json";
+import packagedUrl from "./home-reminder-readings.bin?url";
 import type { DailyEvidence } from "../dailyEvidence";
 import type { AppLanguage } from "../types";
 import type { RelevantNowSource } from "./relevantNowLibrary";
@@ -119,7 +120,7 @@ async function verifyResponse(response: Response) {
   return { catalogue: createReminderReadingCatalogue(data), bytes };
 }
 
-/** Pinned R2 bytes, verified on both network and offline-cache reads. */
+/** Pinned packaged bytes, verified on both acquisition and offline-cache reads. */
 export function loadReminderReadings() {
   return (cached ??= (async () => {
     try {
@@ -137,8 +138,17 @@ export function loadReminderReadings() {
       } catch {
         // Restricted/quota-limited storage must not prevent online reading.
       }
-      const response = await fetch(manifest.url, { credentials: "omit" });
-      const verified = await verifyResponse(response);
+      // The reviewed bytes belong to the offline app, not a remote availability
+      // dependency. A deadline also releases the shared promise for retry.
+      const controller = new AbortController();
+      const deadline = setTimeout(() => controller.abort(), 8000);
+      let verified: Awaited<ReturnType<typeof verifyResponse>>;
+      try {
+        const response = await fetch(packagedUrl, { credentials: "omit", signal: controller.signal });
+        verified = await verifyResponse(response);
+      } finally {
+        clearTimeout(deadline);
+      }
       try {
         await cache?.put(manifest.url, new Response(verified.bytes));
       } catch {

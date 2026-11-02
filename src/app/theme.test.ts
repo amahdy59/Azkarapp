@@ -1,6 +1,15 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { applyAppAppearance } from "./theme";
 
+it("applies and restores the device's paper texture choice independently of the theme", () => {
+  applyAppAppearance({ themeMode: "light", paperTexture: false });
+  expect(document.documentElement).toHaveAttribute("data-paper-texture", "off");
+  applyAppAppearance({ themeMode: "dark", paperTexture: false, highContrast: true });
+  expect(document.documentElement).toHaveAttribute("data-paper-texture", "off");
+  applyAppAppearance({ themeMode: "midnight" });
+  expect(document.documentElement).toHaveAttribute("data-paper-texture", "on");
+});
+
 describe("app appearance", () => {
   it("resolves global materials with independent accessibility precedence", () => {
     applyAppAppearance({ themeMode: "midnight", appMaterial: "glass", reduceTransparency: true });

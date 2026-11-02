@@ -18,6 +18,36 @@ import {
 import { getProgressDayKey, shiftProgressDayKey } from "./progress";
 
 describe("app state persistence", () => {
+  it("starts with the owner's Arabic night-paper reading defaults without replacing saved choices", () => {
+    const fresh = normalizeAppState({}).settings;
+    expect(fresh).toMatchObject({
+      language: "ar",
+      themeMode: "midnight",
+      paperTexture: true,
+      zikrFont: "clear",
+      textSize: "medium",
+      readerToolLabels: false,
+    });
+    const saved = normalizeAppState({
+      settings: { language: "en", themeMode: "light", paperTexture: false, zikrFont: "naskh", readerToolLabels: true },
+    }).settings;
+    expect(saved).toMatchObject({
+      language: "en",
+      themeMode: "light",
+      paperTexture: false,
+      zikrFont: "naskh",
+      readerToolLabels: true,
+    });
+  });
+  it("normalizes and remembers the local paper texture choice across reload and foreign merges", () => {
+    expect(normalizeAppState({}).settings.paperTexture).toBe(true);
+    expect(normalizeAppState({ settings: { paperTexture: "false" } }).settings.paperTexture).toBe(true);
+    const local = normalizeAppState({ settings: { paperTexture: false } });
+    expect(saveAppState(local)).toBe(true);
+    expect(loadAppState().settings.paperTexture).toBe(false);
+    expect(mergeAppStates(local, DEFAULT_APP_STATE).settings.paperTexture).toBe(false);
+    expect(mergeAppStates(DEFAULT_APP_STATE, local).settings.paperTexture).toBe(true);
+  });
   it("migrates the combined Ruqyah bookmark and completion to all three surahs without changing history", () => {
     const session = {
       id: "before-ruqyah-split",
@@ -196,6 +226,7 @@ describe("app state persistence", () => {
       "azkarapp.prayer_times_cache.2026-08-09.30.0.31.2.5",
       "azkarapp.prayer_time_zone.30.0.31.2",
       "azkarapp.last-successful-sync.v1",
+      "azkarapp.listening-bookmark.v1",
       "azkar.audio-preferences.v1",
       "azkar.audio-content-review.v1",
       "sb-project-ref-auth-token",
@@ -226,7 +257,9 @@ describe("app state persistence", () => {
     window.localStorage.setItem("azkar.audio-preferences.v1", '{"voice":"reader"}');
     window.localStorage.setItem("azkar.audio-downloads.v1", "{}");
 
+    window.localStorage.setItem("azkarapp.listening-bookmark.v1", "private reading");
     clearPrivateStoredAppData();
+    expect(window.localStorage.getItem("azkarapp.listening-bookmark.v1")).toBeNull();
 
     expect(window.localStorage.getItem("azkarapp.friday-dua-reading.v1")).toBeNull();
     expect(window.localStorage.getItem("azkarapp_recent_searches_ar")).toBeNull();
@@ -910,9 +943,9 @@ describe("explicit Home material", () => {
 });
 
 describe("reader footer label preference", () => {
-  it("defaults legacy and invalid values to labelled controls and retains icons-only", () => {
-    expect(normalizeAppState({}).settings.readerToolLabels).toBe(true);
-    expect(normalizeAppState({ settings: { readerToolLabels: "false" } }).settings.readerToolLabels).toBe(true);
+  it("defaults absent and invalid values to icons and retains explicit label choices", () => {
+    expect(normalizeAppState({}).settings.readerToolLabels).toBe(false);
+    expect(normalizeAppState({ settings: { readerToolLabels: "false" } }).settings.readerToolLabels).toBe(false);
     const icons = normalizeAppState({ settings: { readerToolLabels: false } });
     expect(icons.settings.readerToolLabels).toBe(false);
     expect(

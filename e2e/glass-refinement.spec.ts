@@ -77,12 +77,8 @@ for (const [language, width] of [
         );
       }, language);
       await page.goto("/#/" + route);
-      if (route === "progress" && width < 600) {
-        const filters = page.getByTestId("progress-filters-toggle");
-        await expect(filters).toHaveAttribute("aria-expanded", "false");
-        await filters.click();
-        await expect(filters).toHaveAttribute("aria-expanded", "true");
-      }
+      if (route === "progress")
+        await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("aria-expanded", "false");
       const scope = page.locator(
         width === 1440 && route.startsWith("settings")
           ? route === "settings"
@@ -176,7 +172,7 @@ for (const [language, width] of [
       }
       await expect(header).toHaveCSS("backdrop-filter", route === "progress" ? "none" : "blur(32px) saturate(1.35)");
       if (route === "progress") {
-        for (const content of [header.locator(".progress-range-toolbar"), header.getByRole("tablist")]) {
+        for (const content of [header.getByTestId("progress-filters-toggle"), header.getByRole("tablist")]) {
           await expect(content).toBeVisible();
           await expect(content).toHaveCSS("backdrop-filter", "none");
           if ((await content.getAttribute("role")) === "tablist") {

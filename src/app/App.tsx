@@ -3,6 +3,7 @@ import { recommendedReminders } from "./contextReminders";
 import { useNativeServices } from "./hooks/useNativeServices";
 import { useQueuedAudioAction } from "./hooks/useQueuedAudioAction";
 import "../styles/theme/materials.css";
+import "../styles/theme/paper-grain.css";
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   fromCompletedSets,
@@ -394,6 +395,7 @@ function AppContent({
   const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "inherit");
   const resolvedHomeMaterial = homeMaterial === "inherit" ? appMaterial : homeMaterial;
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
+  const [paperTexture, setPaperTexture] = useState(initialState.settings.paperTexture ?? true);
   const [homeWirdImages, setHomeWirdImages] = useState(initialState.settings.homeWirdImages);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
   const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
@@ -775,6 +777,7 @@ function AppContent({
         reduceMotion,
         readerToolLabels,
         readerMeaningOnly,
+        paperTexture,
         reduceTransparency,
         homeWirdImages,
         appMaterial,
@@ -833,6 +836,7 @@ function AppContent({
       highContrast,
       isGuest,
       homeWirdImages,
+      paperTexture,
       appMaterial,
       homeMaterial,
       phone,
@@ -1198,6 +1202,7 @@ function AppContent({
     setAppMaterial(state.settings.appMaterial ?? "solid");
     setHomeMaterial(state.settings.homeMaterial ?? "inherit");
     setHomeWirdImages(state.settings.homeWirdImages);
+    setPaperTexture(state.settings.paperTexture ?? true);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
     setColorBlindSupport(state.settings.colorBlindSupport);
@@ -1387,6 +1392,7 @@ function AppContent({
         reduceMotion,
         readerToolLabels,
         reduceTransparency,
+        paperTexture,
         appMaterial,
         forceRtl,
         colorBlindSupport,
@@ -1404,6 +1410,7 @@ function AppContent({
     reduceMotion,
     readerToolLabels,
     reduceTransparency,
+    paperTexture,
     appMaterial,
     selectedLang,
     textSize,
@@ -1740,7 +1747,21 @@ function AppContent({
       layoutMode === "medium");
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
+  // Utility pages have their own sidebar entry. Smaller nav variants must
+  // not pretend that the previously visited primary destination is current.
+  const activeNavigationTab = view === "custom_counter" || view === "qibla" || view === "more" ? undefined : activeTab;
 
+  const utilityNavigation = {
+    activeUtility: view === "custom_counter" ? ("masbaha" as const) : view === "qibla" ? ("qibla" as const) : undefined,
+    onOpenQibla: () => {
+      setFridayDuaFlow(false);
+      push("qibla");
+    },
+    onOpenMasbaha: () => {
+      setFridayDuaFlow(false);
+      push("custom_counter");
+    },
+  };
   const handleNavigationTab = (tab: NavTab) => {
     setFridayDuaFlow(false);
     if (tab === "home" && view === "home") {
@@ -1821,24 +1842,19 @@ function AppContent({
         </div>
 
         {/* Adaptive navigation — only one renders at a time */}
-        {showRail && <NavRail active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />}
+        {showRail && (
+          <NavRail
+            active={activeNavigationTab}
+            {...utilityNavigation}
+            onChange={handleNavigationTab}
+            isArabic={isArabic}
+          />
+        )}
         {showSidebar && (
           <NavSidebar
-            active={activeTab}
-            activeUtility={view === "custom_counter" ? "masbaha" : view === "qibla" ? "qibla" : undefined}
+            active={activeNavigationTab}
+            {...utilityNavigation}
             onChange={handleNavigationTab}
-            onOpenQuran={() => {
-              setFridayDuaFlow(false);
-              push("khatmah_overview");
-            }}
-            onOpenMasbaha={() => {
-              setFridayDuaFlow(false);
-              push("custom_counter");
-            }}
-            onOpenSettings={() => {
-              setFridayDuaFlow(false);
-              push("settings");
-            }}
             isArabic={isArabic}
             themeMode={themeMode}
             onThemeModeChange={setThemeMode}
@@ -2029,9 +2045,10 @@ function AppContent({
                   }}
                   onOpenWirdBenefits={() => push("wird_benefits")}
                   onOpenKhatmah={() => push("khatmah_overview")}
-                  onOpenProgress={() => push("progress")}
-                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
-                  onOpenMasbaha={() => push("custom_counter")}
+                  onOpenProgress={() => handleNavigationTab("progress")}
+                  onOpenMore={() => push("more")}
+                  onOpenQibla={showQiblaShortcut ? utilityNavigation.onOpenQibla : undefined}
+                  onOpenMasbaha={utilityNavigation.onOpenMasbaha}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                 />
@@ -2040,9 +2057,10 @@ function AppContent({
                 <MoreScreen
                   language={selectedLang}
                   direction={layoutDirection}
-                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
-                  onOpenMasbaha={() => push("custom_counter")}
+                  onOpenQibla={showQiblaShortcut ? utilityNavigation.onOpenQibla : undefined}
+                  onOpenMasbaha={utilityNavigation.onOpenMasbaha}
                   onOpenSettings={() => push("settings")}
+                  onOpenProgress={() => handleNavigationTab("progress")}
                 />
               )}
               {view === "qibla" && (
@@ -2551,6 +2569,8 @@ function AppContent({
                   onReduceMotionChange={setReduceMotion}
                   onReduceTransparencyChange={setReduceTransparency}
                   onHomeWirdImagesChange={setHomeWirdImages}
+                  paperTexture={paperTexture}
+                  onPaperTextureChange={setPaperTexture}
                   onHapticFeedbackChange={setHapticFeedback}
                   onForceRtlChange={setForceRtl}
                   onColorBlindSupportChange={setColorBlindSupport}
@@ -2790,7 +2810,12 @@ function AppContent({
         {/* Bottom nav — compact and medium only, shown in its own grid area */}
         {showBottomNavArea && (
           <div className="app-bottom-nav">
-            <BottomNav active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />
+            <BottomNav
+              active={activeNavigationTab}
+              {...utilityNavigation}
+              onChange={handleNavigationTab}
+              isArabic={isArabic}
+            />
           </div>
         )}
       </div>

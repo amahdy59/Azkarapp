@@ -1,3 +1,4 @@
+import "./form-controls.css";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import "./accessible-combobox.css";
@@ -186,7 +187,7 @@ export function AccessibleCombobox({
           </button>
         </Popover.Trigger>
 
-        <Popover.Portal>
+        <Popover.Portal container={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}>
           <Popover.Content
             data-slot="combobox-content"
             data-dropdown-surface=""
@@ -195,11 +196,12 @@ export function AccessibleCombobox({
             align="start"
             sideOffset={6}
             collisionPadding={8}
+            collisionBoundary={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}
             onOpenAutoFocus={(event) => {
               event.preventDefault();
               searchInputRef.current?.focus();
             }}
-            className="accessible-combobox-popup z-50 flex flex-col overflow-hidden rounded-2xl border border-border-control p-2 text-popover-foreground shadow-overlay"
+            className="accessible-combobox-popup z-[110] flex flex-col overflow-hidden rounded-2xl border border-border-control p-2 text-popover-foreground shadow-overlay"
           >
             {/* Search bar inside dropdown */}
             <div className="relative mb-2 shrink-0">

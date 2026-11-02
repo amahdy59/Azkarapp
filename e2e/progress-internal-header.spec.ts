@@ -28,14 +28,15 @@ for (const language of ["ar", "en"] as const) {
     await expect(controls).toHaveCSS("background-color", /^rgb\(/);
     await expect(page.getByTestId("shared-screen-header")).toHaveCount(1);
     await page.getByTestId("progress-filters-toggle").click();
-    const period = controls.getByRole("combobox").first();
+    const sheet = page.getByTestId("progress-filter-sheet");
+    const period = sheet.getByRole("combobox").first();
     await period.focus();
     await expect(period).toBeFocused();
     // Native focus scrolling can finish after focus capture (notably WebKit).
     await expect
       .poll(async () => {
         const focused = (await period.boundingBox())!;
-        const bounds = (await controls.boundingBox())!;
+        const bounds = (await sheet.boundingBox())!;
         return { top: focused.y >= bounds.y - 1, bottom: focused.y + focused.height <= bounds.y + bounds.height + 1 };
       })
       .toEqual({ top: true, bottom: true });

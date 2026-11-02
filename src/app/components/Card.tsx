@@ -1,3 +1,4 @@
+import "./card-action.css";
 import { forwardRef, type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react";
 
 export interface CardProps extends ComponentPropsWithoutRef<"section"> {
@@ -32,8 +33,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     <Component
       ref={ref}
       data-material-card
+      data-card-action={rest.onClick || Component === "button" || Component === "a" ? true : undefined}
       data-material-elevation={elevation}
-      className={`${elevation === "overlay" ? "rounded-3xl" : "rounded-2xl"} border border-border/40 bg-card ${PADDING_CLASS[padding]} ${ELEVATION_CLASS[elevation]} ${className}`.trim()}
+      className={`surface-card-finish ${elevation === "overlay" ? "rounded-3xl" : "rounded-2xl"} border border-border/40 bg-card ${PADDING_CLASS[padding]} ${ELEVATION_CLASS[elevation]} ${className}`.trim()}
       {...rest}
     >
       {children}

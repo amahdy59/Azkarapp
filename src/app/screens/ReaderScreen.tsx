@@ -14,6 +14,7 @@ import {
 import "../../styles/animations/ZikrAnimations.css";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
+import { useReadingFocusIndicator } from "../hooks/useReadingFocusIndicator";
 import { prefixZikrId, SITUATIONAL_SESSION_CATEGORY_IDS } from "../progress";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
@@ -98,6 +99,19 @@ import {
 } from "../components/ui/dropdown-menu";
 import { AzkarListLayout } from "../components/AzkarListLayout";
 import { getReadingFontSize } from "./readingTypography";
+
+const COLLECTION_MENU_ACTION =
+  "flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
+const READER_TOOL_LABEL = "reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]";
+
+const READER_OVERFLOW_ACTION =
+  "flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted";
+
+const READER_MENU_TRIGGER =
+  "ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1";
+
+const ACTION_FOCUS = "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 /**
  * Same three steps, same labels and same order as Settings → Accessibility →
@@ -382,7 +396,7 @@ export function ReaderScreen({
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   const readerMainRef = useRef<HTMLDivElement | null>(null);
-  const readingScrollRef = useRef<HTMLDivElement | null>(null);
+  const readingScrollRef = useReadingFocusIndicator();
   const restoreReadingFocusOnAdvanceRef = useRef(false);
   const activeNavigatorItemRef = useRef<HTMLDivElement | null>(null);
 
@@ -402,7 +416,7 @@ export function ReaderScreen({
       (focusMode ? focusExitRef.current : readingScrollRef.current)?.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
-  }, [focusMode]);
+  }, [focusMode, readingScrollRef]);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -590,7 +604,7 @@ export function ReaderScreen({
         restoreReadingFocusOnAdvanceRef.current = false;
       }
     }
-  }, [idx]);
+  }, [idx, readingScrollRef]);
 
   useEffect(() => {
     const activeItem = activeNavigatorItemRef.current;
@@ -709,6 +723,7 @@ export function ReaderScreen({
     audioModeActive,
     focusMode,
     canDockCollection,
+    readingScrollRef,
   ]);
 
   if (!z || !category) {
@@ -762,13 +777,18 @@ export function ReaderScreen({
           type="button"
           data-testid="reader-language-toggle"
           aria-controls={readingRegionId}
+          onFocus={(event) => {
+            if (window.matchMedia("(max-height: 560px)").matches) {
+              event.currentTarget.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" });
+            }
+          }}
           onClick={(event) => {
             event.stopPropagation();
             setLocalMeaningOnly(!translationOnly);
             onReaderMeaningOnlyChange?.(!translationOnly);
             if (readingScrollRef.current) readingScrollRef.current.scrollTop = 0;
           }}
-          className="inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 py-2 text-label font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className={`inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 py-2 text-label font-semibold text-foreground ${ACTION_FOCUS}`}
         >
           <Translate size={18} className="shrink-0" aria-hidden="true" />
           <span className="inline-grid min-w-0 [overflow-wrap:anywhere]">
@@ -810,7 +830,7 @@ export function ReaderScreen({
               onClick={handleShare}
               aria-label={t(language, "reader.shareCurrent")}
               data-testid="reader-surah-share-button"
-              className="absolute end-2 top-2 flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={`absolute end-2 top-2 flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-muted ${ACTION_FOCUS}`}
             >
               <ShareExport size={20} aria-hidden="true" />
             </button>
@@ -1052,7 +1072,7 @@ export function ReaderScreen({
                   <button
                     type="button"
                     data-testid="routine-mode-filter"
-                    className="flex min-h-[44px] flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className={`flex min-h-[44px] flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground ${ACTION_FOCUS}`}
                   >
                     <span className="flex items-center gap-2">
                       <SlidersHorizontal size={14} className="text-muted-foreground" />
@@ -1079,7 +1099,7 @@ export function ReaderScreen({
                 type="button"
                 onClick={onRepeat}
                 data-testid="reader-repeat-collection"
-                className="interactive-elem flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary shadow-xs transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className={`interactive-elem flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary shadow-xs transition-colors hover:bg-primary/20 ${ACTION_FOCUS}`}
               >
                 <RefreshCw size={16} className="shrink-0" aria-hidden="true" />
                 <span>
@@ -1111,7 +1131,7 @@ export function ReaderScreen({
               <button
                 type="button"
                 onClick={onReset}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className={COLLECTION_MENU_ACTION}
                 aria-label={t(language, "category.resetProgress")}
                 title={t(language, "category.resetProgress")}
               >
@@ -1123,7 +1143,7 @@ export function ReaderScreen({
               type="button"
               data-testid="reader-sidebar-share"
               onClick={() => setCollectionShareOpen(true)}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={COLLECTION_MENU_ACTION}
               aria-label={t(language, "shareStoryPack.actionButtonAria")}
               title={t(language, "shareStoryPack.actionButton")}
             >
@@ -1134,7 +1154,7 @@ export function ReaderScreen({
               <button
                 type="button"
                 onClick={onPlayAllAudio}
-                className="flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-sm font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-primary"
+                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-sm font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 ${ACTION_FOCUS} dark:text-primary`}
                 aria-label={t(language, "category.playAllAudio")}
                 title={
                   audioCoverage
@@ -1244,9 +1264,7 @@ export function ReaderScreen({
         className={`min-w-0 flex-1 ${audioModeActive ? "" : "shadow-sm"}`}
       >
         <Headphones size={20} className="shrink-0" aria-hidden="true" />
-        <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-          {t(language, "reader.menuAudio")}
-        </span>
+        <span className={READER_TOOL_LABEL}>{t(language, "reader.menuAudio")}</span>
       </DevotionalAction>
     );
   };
@@ -1269,9 +1287,7 @@ export function ReaderScreen({
       className="min-w-0 flex-1 shadow-sm"
     >
       <Lightbulb size={20} aria-hidden="true" />
-      <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-        {t(language, "reader.referencesButton")}
-      </span>
+      <span className={READER_TOOL_LABEL}>{t(language, "reader.referencesButton")}</span>
     </DevotionalAction>
   );
 
@@ -1354,9 +1370,7 @@ export function ReaderScreen({
                 className="min-w-[5rem] flex-1 shadow-sm"
               >
                 <Share2 size={20} aria-hidden="true" />
-                <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-                  {t(language, "reader.shareAction")}
-                </span>
+                <span className={READER_TOOL_LABEL}>{t(language, "reader.shareAction")}</span>
               </DevotionalAction>
             </div>
           </ReaderFooterTools>
@@ -1382,6 +1396,16 @@ export function ReaderScreen({
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => {
     return (
       <ReaderOptionsContext.Provider value={{ sheet: false, close: () => {} }}>
+        <ReaderOptionsAction
+          data-testid="reader-help-trigger"
+          onSelect={() => {
+            collectionMenuRequested.current = true;
+            setKeyboardHelpOpen(true);
+          }}
+        >
+          <Keyboard size={16} aria-hidden="true" />
+          <span>{t(language, "reader.keyboardShortcuts")}</span>
+        </ReaderOptionsAction>
         {!canDockCollection && onSelectZikr && azkar.length > 1 && (
           <ReaderOptionsAction
             onSelect={() => {
@@ -1396,10 +1420,7 @@ export function ReaderScreen({
 
         {/* 4. Saved state and reading recovery */}
         <div>
-          <ReaderOptionsAction
-            onClick={handleToggleSaved}
-            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-          >
+          <ReaderOptionsAction onClick={handleToggleSaved} className={READER_OVERFLOW_ACTION}>
             <Bookmark
               key={String(isSaved)}
               size={16}
@@ -1417,7 +1438,7 @@ export function ReaderScreen({
                 onClick={toggleSound}
                 keepOpen
                 data-testid={`reader-counter-sound-toggle-${layout}`}
-                className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                className={READER_OVERFLOW_ACTION}
               >
                 {soundEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
                 <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
@@ -1454,7 +1475,7 @@ export function ReaderScreen({
           <ReaderOptionsAction
             onClick={onViewAllAzkar ?? onBack}
             data-testid="reader-view-all-azkar"
-            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            className={READER_OVERFLOW_ACTION}
           >
             <List size={16} aria-hidden="true" />
             <span>{t(language, "reader.viewAllAzkar")}</span>
@@ -1602,20 +1623,6 @@ export function ReaderScreen({
                     className="flex min-w-0 flex-wrap items-center justify-end gap-2"
                     data-testid="reader-hero-actions"
                   >
-                    <button
-                      type="button"
-                      data-testid="reader-help-trigger"
-                      aria-label={t(language, "reader.keyboardShortcuts")}
-                      title={t(language, "reader.keyboardShortcuts")}
-                      aria-expanded={keyboardHelpOpen}
-                      className={READER_WIDE_HEADER_ACTION_CLASS}
-                      onClick={(event) => {
-                        event.currentTarget.focus({ preventScroll: true });
-                        setKeyboardHelpOpen((prev) => !prev);
-                      }}
-                    >
-                      <Keyboard size={20} aria-hidden="true" />
-                    </button>
                     {renderAppearanceMenu(READER_WIDE_HEADER_ACTION_CLASS)}
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
@@ -1716,7 +1723,7 @@ export function ReaderScreen({
                           role="switch"
                           aria-checked={showDifficultWords}
                           onClick={() => setShowDifficultWords((v) => !v)}
-                          className="ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
+                          className={READER_MENU_TRIGGER}
                           aria-label={t(language, "settings.showDifficultWords")}
                           title={t(language, "settings.showDifficultWords")}
                         >
@@ -1808,20 +1815,6 @@ export function ReaderScreen({
                   // a per-zikr primary. Both share the header's ghost
                   // icon-button treatment so the row reads as one set.
                   <div className="flex items-center gap-1" data-testid="reader-actions">
-                    <button
-                      type="button"
-                      data-testid="reader-help-trigger"
-                      aria-label={t(language, "reader.keyboardShortcuts")}
-                      title={t(language, "reader.keyboardShortcuts")}
-                      aria-expanded={keyboardHelpOpen}
-                      className={`${READER_HEADER_ACTION_CLASS} max-md:hidden`}
-                      onClick={(event) => {
-                        event.currentTarget.focus({ preventScroll: true });
-                        setKeyboardHelpOpen((prev) => !prev);
-                      }}
-                    >
-                      <Keyboard size={18} aria-hidden="true" />
-                    </button>
                     {renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
 
                     <DropdownMenu dir={direction}>
@@ -1902,7 +1895,7 @@ export function ReaderScreen({
                         e.stopPropagation();
                         setShowDifficultWords((v) => !v);
                       }}
-                      className="ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
+                      className={READER_MENU_TRIGGER}
                       aria-label={t(language, "settings.showDifficultWords")}
                       title={t(language, "settings.showDifficultWords")}
                     >
@@ -2068,13 +2061,17 @@ export function ReaderScreen({
           <button
             type="button"
             onClick={handleUndoReset}
-            className="interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-sm font-bold text-primary transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+            className={`interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-sm font-bold text-primary transition-colors ${ACTION_FOCUS} cursor-pointer`}
           >
             {t(language, "common.undo")}
           </button>
         </div>
       )}
       <CounterKeyboardHelp
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          requestAnimationFrame(() => readerMenuRef.current?.focus({ preventScroll: true }));
+        }}
         compact
         language={language}
         direction={direction}

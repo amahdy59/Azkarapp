@@ -133,7 +133,10 @@ test("shared feedback has appropriate press depth, clean cancellation and disabl
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     localStorage.setItem(
       "azkarapp.state.v1",
-      JSON.stringify({ settings: { language: "en", reduceMotion: false }, profile: { isGuest: true } }),
+      JSON.stringify({
+        settings: { language: "en", reduceMotion: false, readerToolLabels: true },
+        profile: { isGuest: true },
+      }),
     );
   });
   await page.goto("/#/azkar/morning/1");

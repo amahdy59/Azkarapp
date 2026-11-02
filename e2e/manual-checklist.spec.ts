@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 /**
  * Automated evidence for rows of the Manual release record in
  * `docs/QUALITY_CHECKLIST.md` that do not actually require a human.
@@ -188,7 +189,7 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
   test(`mobile headings: ${viewport.name} keeps Progress titles readable without clipping`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await seedAndOpen(page);
-    await page.getByTestId("nav-progress").click();
+    await openProgress(page);
 
     // Progress uses the standard visible title with one semantic h1.
     // Content headings still need full readable geometry.
@@ -211,7 +212,7 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
 test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable without clipping", async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 924 });
   await seedAndOpen(page, { language: "ar" });
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
 
   const period = page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true });
   for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {

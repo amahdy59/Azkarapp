@@ -15,7 +15,7 @@ import {
 import { CrescentMark } from "../../components/CrescentMark";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
-import { RowChevron, SectionLabel, SubHeader } from "./SettingsPrimitives";
+import { RowChevron, SectionLabel, SettingsRowItem, SubHeader } from "./SettingsPrimitives";
 
 const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
 
@@ -60,7 +60,7 @@ export function AboutPanel({
               {t(language, "about.subtitle")}
             </p>
             <p className="latin-ui text-xs text-muted-foreground opacity-60" lang="en" dir="ltr">
-              {[APP_VERSION, APP_RELEASE].filter(Boolean).join(" � ")}
+              {[APP_VERSION, APP_RELEASE].filter(Boolean).join(" · ")}
             </p>
           </div>
         </div>
@@ -177,34 +177,15 @@ function AboutRow({
   hasDivider?: boolean;
   onPress?: () => void;
 }) {
-  const content = (
-    <>
-      {icon}
-      <div className="flex flex-1 flex-col items-start gap-0.5">
-        <p className="font-sans text-subtitle font-medium leading-[22px] text-foreground">{label}</p>
-        {sub && <p className="font-sans text-sm text-muted-foreground">{sub}</p>}
-      </div>
-      {right}
-    </>
-  );
-
   return (
-    <div className="relative">
-      {onPress ? (
-        <button
-          type="button"
-          onClick={onPress}
-          className="flex h-[72px] w-full items-center gap-4 bg-card px-4 text-start transition-[background-color,opacity] active:opacity-70"
-        >
-          {content}
-        </button>
-      ) : (
-        <div className="flex h-[72px] w-full items-center gap-4 bg-card px-4">{content}</div>
-      )}
-      {hasDivider && (
-        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 64, insetInlineEnd: 0 }} />
-      )}
-    </div>
+    <SettingsRowItem
+      icon={icon}
+      label={label}
+      description={sub}
+      right={right}
+      onPress={onPress}
+      hasDivider={hasDivider}
+    />
   );
 }
 
@@ -222,19 +203,13 @@ function SupportRow({
   onPress?: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={onPress}
-        className="flex min-h-[56px] w-full items-center gap-4 bg-card px-4 py-3 text-start transition-[background-color,opacity] active:opacity-70"
-      >
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground">{icon}</div>
-        <p className="flex-1 font-sans text-subtitle font-medium text-foreground">{label}</p>
-        {right}
-      </button>
-      {hasDivider && (
-        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 64, insetInlineEnd: 0 }} />
-      )}
-    </div>
+    <SettingsRowItem
+      icon={icon}
+      iconBg="var(--foreground)"
+      label={label}
+      right={right}
+      onPress={onPress}
+      hasDivider={hasDivider}
+    />
   );
 }

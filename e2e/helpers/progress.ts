@@ -19,13 +19,13 @@ export async function expectProgressFilterFocus(control: Locator) {
     await expect.poll(() => editor.evaluate((node) => node.contains(document.activeElement))).toBe(true);
     return;
   }
-  const disclosure = control.page().getByTestId("progress-range-disclosure");
-  const inRange = await control.evaluate((node) => Boolean(node.closest('[data-testid="progress-range-disclosure"]')));
   const filters = control.page().getByTestId("progress-filters-toggle");
   if (!(await control.isVisible()) && (await filters.isVisible())) {
     await expect(filters).toBeFocused();
     return;
   }
+  const disclosure = control.page().getByTestId("progress-range-disclosure");
+  const inRange = await control.evaluate((node) => Boolean(node.closest('[data-testid="progress-range-disclosure"]')));
   if (inRange && !(await disclosure.evaluate((node) => (node as HTMLDetailsElement).open))) {
     if ((await disclosure.count()) && (await control.getAttribute("data-progress-value")) === "custom")
       await expect(control.page().getByRole("button", { name: /Choose dates:|اختيار التواريخ:/ })).toBeFocused();
@@ -34,14 +34,9 @@ export async function expectProgressFilterFocus(control: Locator) {
 }
 
 export async function chooseProgressOption(control: Locator, value: string) {
+  const filters = control.page().getByTestId("progress-filters-toggle");
+  if (!(await control.isVisible()) && (await filters.isVisible())) await filters.click();
   await control.waitFor({ state: "attached" });
-  if (await control.evaluate((node) => Boolean(node.closest(".progress-range-toolbar")))) {
-    const filters = control.page().getByTestId("progress-filters-toggle");
-    // Viewport resizing and React's media-query subscription settle separately.
-    // Do not click the old phone opener while the wider layout is mounting.
-    if (control.page().viewportSize()!.width < 600) await expect(filters).toBeVisible();
-    else await expect(filters).toBeHidden();
-  }
   const disclosure = control.page().getByTestId("progress-range-disclosure");
   if (!(await control.isVisible()) && (await disclosure.count())) await disclosure.locator("summary").click();
   if (!(await control.isVisible()) && (await control.page().getByTestId("progress-filters-toggle").isVisible()))
@@ -54,6 +49,7 @@ export async function chooseProgressOption(control: Locator, value: string) {
     .and(control.page().locator(`[data-progress-value="${value}"]`))
     .click();
   const applied = id ? control.page().locator(`[id="${id}"]`) : control;
-  await expect(applied).toHaveAttribute("data-progress-value", value);
+  if (await applied.isVisible()) await expect(applied).toHaveAttribute("data-progress-value", value);
+  else await expect(filters).toHaveAttribute("data-progress-value", value);
   await expectProgressFilterFocus(applied);
 }

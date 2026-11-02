@@ -403,14 +403,16 @@ test("desktop and tablet keep navigation below reading text and one reachable ke
     await expect(card.getByTestId("reader-side-navigation")).toHaveCount(0);
     await expect(navigation.getByRole("button", { name: "Prev", exact: true })).toBeVisible();
     await expect(navigation.getByRole("button", { name: "Next", exact: true })).toBeVisible();
-    const keyboardHelp = page.getByRole("button", { name: "Keyboard shortcuts", exact: true });
+    const menuTrigger = page.getByRole("button", { name: "Reader options", exact: true });
+    await menuTrigger.click();
+    const keyboardHelp = page.getByTestId("reader-help-trigger");
     await expect(keyboardHelp).toHaveCount(1);
     await expect(keyboardHelp).toBeVisible();
     await keyboardHelp.click();
     await expect(page.getByRole("dialog", { name: "Keyboard shortcuts", exact: true })).toHaveCount(1);
     await expect(page.getByRole("dialog", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(keyboardHelp).toBeFocused();
+    await expect(menuTrigger).toBeFocused();
     await expect(page.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
     await expect(counter).toHaveAccessibleName(/Click the dhikr or press Space 0 \/ 1/);
 
@@ -441,7 +443,7 @@ test("desktop and tablet keep navigation below reading text and one reachable ke
   await expect(collectionToggle).toBeVisible();
   await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
   await expect(heroActions.getByRole("button", { name: "Appearance", exact: true })).toBeVisible();
-  await expect(heroActions.getByRole("button", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
+  await expect(heroActions.getByRole("button", { name: "Keyboard shortcuts", exact: true })).toHaveCount(0);
   await expect(heroActions.locator("button:visible")).toHaveCount(4);
   await collectionToggle.click();
   await expect(page.getByTestId("reader-collection-drawer")).toBeVisible();

@@ -48,14 +48,23 @@ for (const language of ["ar", "en"] as const) {
             await page.locator("html").evaluate((node, enlarged) => {
               node.style.fontSize = enlarged ? "200%" : "100%";
             }, width === 320);
-            const geometry = await grid.evaluate((node) =>
-              [...node.children].map((card) => {
+            const geometry = await grid.evaluate((node) => {
+              const canvas = document.createElement("canvas");
+              canvas.width = canvas.height = 1;
+              const paint = canvas.getContext("2d")!;
+              return [...node.children].map((card) => {
                 const box = card.getBoundingClientRect();
                 const button = card.querySelector("button")!;
                 const footer = card.querySelector(".progress-metric-footer")!.getBoundingClientRect();
                 const number = card.querySelector(".progress-metric-count")!.getBoundingClientRect();
                 const quantity = card.querySelector(".progress-metric-quantity")!.getBoundingClientRect();
-                const rtl = getComputedStyle(card).direction === "rtl";
+                const background = getComputedStyle(card).backgroundColor;
+                // Sample the rendered alpha: CSSOM may serialize color-mix as
+                // color(srgb ...) rather than the older rgb()/rgba() forms.
+                paint.clearRect(0, 0, 1, 1);
+                paint.fillStyle = "transparent";
+                paint.fillStyle = background;
+                paint.fillRect(0, 0, 1, 1);
                 return {
                   top: box.top,
                   right: box.right,
@@ -66,12 +75,13 @@ for (const language of ["ar", "en"] as const) {
                   numberSize: parseFloat(getComputedStyle(card.querySelector(".progress-metric-count")!).fontSize),
                   captionSize: parseFloat(getComputedStyle(card.querySelector(".progress-metric-caption")!).fontSize),
                   footerBottom: footer.bottom,
-                  background: getComputedStyle(card).backgroundColor,
+                  background,
+                  alpha: paint.getImageData(0, 0, 1, 1).data[3]! / 255,
                   radius: parseFloat(getComputedStyle(card).borderTopLeftRadius),
-                  valueAligned: Math.abs(rtl ? number.right - quantity.right : number.left - quantity.left) <= 1,
+                  valueCentred: Math.abs(number.x + number.width / 2 - quantity.x - quantity.width / 2) <= 1,
                 };
-              }),
-            );
+              });
+            });
             expect(geometry).toHaveLength(4);
             for (const card of geometry) {
               expect(card.overflow).toBe(false);
@@ -79,15 +89,11 @@ for (const language of ["ar", "en"] as const) {
               expect(card.numberSize).toBeGreaterThanOrEqual(30);
               expect(card.captionSize).toBeGreaterThanOrEqual(12);
               expect(card.radius).toBeGreaterThan(0);
-              expect(card.valueAligned).toBe(true);
+              expect(card.valueCentred).toBe(true);
               // Glass deliberately retains the app's shared translucent
               // material; Solid is opaque. Contrast is checked below.
-              const paint = card.background.match(/^rgba?\(([^)]+)\)$/);
-              expect(paint).not.toBeNull();
-              const channels = paint![1].split(",").map(Number);
-              const alpha = channels.length === 4 ? channels[3] : 1;
-              expect(alpha).toBeGreaterThan(0);
-              if (material === "solid") expect(alpha).toBe(1);
+              expect(card.alpha).toBeGreaterThan(0);
+              if (material === "solid") expect(card.alpha).toBe(1);
             }
             expect(new Set(geometry.map((card) => card.background)).size).toBe(1);
             for (const card of geometry)

@@ -31,7 +31,8 @@ describe("TodaysPathSheet", () => {
     expect(text.indexOf("Dhikr")).toBeLessThan(text.indexOf("Qur'an wird"));
     expect(text.indexOf("Qur'an wird")).toBeLessThan(text.indexOf("Prayers in congregation"));
     expect(screen.getByText("2 of 5 at the mosque")).toBeInTheDocument();
-    expect(screen.getByText(/does not measure faith or reward/i)).toBeInTheDocument();
+    expect(screen.getByTestId("todays-path-sheet").querySelectorAll("dl dt svg")).toHaveLength(3);
+    expect(screen.queryByText(/does not measure faith or reward/i)).not.toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     expect(screen.getByText("Updates automatically from your recorded practice")).toBeInTheDocument();

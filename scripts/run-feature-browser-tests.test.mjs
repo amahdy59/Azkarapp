@@ -1,6 +1,15 @@
 import { expect, test } from "vitest";
 import { featureBrowserArguments } from "./run-feature-browser-tests.mjs";
 
+test("includes final-touch download/chart/control coverage in each affected feature selection", () => {
+  for (const feature of ["quran", "audio", "progress", "controls", "settings"]) {
+    const filters = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    expect(filters.some((pattern) => pattern.test("e2e/final-touch-quality.spec.ts"))).toBe(true);
+  }
+});
+
 test("selects persistence regressions and forwards engine or test filters without shell interpolation", () => {
   expect(featureBrowserArguments("persistence", ["--project=desktop-firefox-smoke", "--grep", "reload"])).toEqual([
     "test",
@@ -43,6 +52,7 @@ test("focused Progress includes trends, responsive layouts, recordings and headi
   for (const filename of [
     "progress-trends.spec.ts",
     "progress-responsive.spec.ts",
+    "shared-card-finish.spec.ts",
     "quiet-garden.spec.ts",
     "settings-progress-clarity.spec.ts",
     "manual-checklist.spec.ts",
@@ -56,7 +66,10 @@ test("focused controls includes shared geometry and keyboard behavior without th
     .slice(1)
     .map((pattern) => new RegExp(pattern));
   for (const filename of [
+    "navigation-motion.spec.ts",
+    "progress-compact-panels.spec.ts",
     "responsive.spec.ts",
+    "shared-card-finish.spec.ts",
     "narrow-layout.spec.ts",
     "overlay-geometry.spec.ts",
     "settings-experience.spec.ts",

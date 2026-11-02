@@ -11,6 +11,7 @@ import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
+import "./home-routine-mode.css";
 import {
   ArrowNext,
   Bookmark,
@@ -92,7 +93,7 @@ export function PrayerRoutineCard({
     >
       <HomeCard onGlass={onGlass} className="flex-1 flex-col gap-5 text-start">
         {/* Header Row: "It is time for" + Mode Selector */}
-        <div className="flex w-full items-center justify-between gap-4">
+        <div className="flex w-full flex-wrap items-center justify-between gap-4">
           <div
             className={`flex items-center gap-2 text-sm font-bold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
             dir="auto"
@@ -103,7 +104,7 @@ export function PrayerRoutineCard({
               aria-hidden="true"
             />
           </div>
-          <div className="w-fit min-w-[140px]">
+          <div className="home-routine-mode">
             {showModeSelector && (
               <SegmentedControl
                 value={mode}
@@ -204,7 +205,7 @@ export function PrayerRoutineCard({
             data-testid="home-primary-cta"
             aria-describedby={progressId}
             onClick={onOpen}
-            className="group flex min-h-[52px] min-w-0 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="surface-control-finish group flex min-h-[52px] min-w-0 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <span className="min-w-0 truncate" title={ctaLabel}>
               {ctaLabel}

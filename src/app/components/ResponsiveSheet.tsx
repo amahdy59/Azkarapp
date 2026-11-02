@@ -159,6 +159,7 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  onOpenAutoFocus?: (event: Event) => void;
   /** Explicit recovery when the opener unmounts or becomes hidden. */
   onCloseAutoFocus?: (event: Event) => void;
   preventOutsideDismiss?: boolean;
@@ -199,6 +200,7 @@ interface ModalProps {
  * that — see DEC-025.
  */
 export function Modal({
+  onOpenAutoFocus,
   onCloseAutoFocus,
   returnFocusRef,
   returnFocusScopeId,
@@ -240,6 +242,10 @@ export function Modal({
         <DialogPrimitive.Content
           data-back-dismiss={backDismiss}
           {...focusScope}
+          onOpenAutoFocus={(event) => {
+            focusScope.onOpenAutoFocus();
+            onOpenAutoFocus?.(event);
+          }}
           onCloseAutoFocus={(event) => {
             onCloseAutoFocus?.(event);
             if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);

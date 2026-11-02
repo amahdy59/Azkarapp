@@ -33,6 +33,22 @@ vi.mock("./nativeMushafDownload", () => ({
 afterEach(() => vi.unstubAllGlobals());
 
 describe("mushafOfflineCache", () => {
+  it("downloads only selected pages and fonts, deduplicates the range, and rejects invalid input before fetching", async () => {
+    const { stores } = installCaches();
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL) => new Response(String(input).includes(".woff2") ? fontBytes : pageBytes),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const progress = vi.fn();
+    await downloadMushaf({ pages: [42, 43, 42], onProgress: progress });
+    expect(stores.get(MUSHAF_CACHE_NAME)?.size).toBe(2);
+    expect(stores.get(FONT_CACHE_NAME)?.size).toBe(2);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(progress).toHaveBeenLastCalledWith(2, 2);
+    await expect(downloadMushaf({ pages: [0, 605] })).rejects.toThrow("Invalid Mushaf");
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
   it("reports cached Mushaf pages and fonts and caches every requested page and font", async () => {
     const { open, deleteFn, stores } = installCaches();
     const pageCache = await open(MUSHAF_CACHE_NAME);

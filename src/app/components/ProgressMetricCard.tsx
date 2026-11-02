@@ -1,3 +1,4 @@
+import "./card-action.css";
 import type { ComponentType } from "react";
 import type { AppLanguage } from "../types";
 import type { ProgressMetric, ProgressMetricValue } from "../progressDashboard";
@@ -30,7 +31,8 @@ export function ProgressMetricCard({
   const unknown = metric === "quranGoals" && !value.possible;
   return (
     <div
-      className="progress-metric-card"
+      className="progress-metric-card surface-card-finish"
+      data-material-card
       data-metric={metric}
       data-empty={value.count === 0}
       data-testid={`progress-metric-${metric}`}
@@ -38,12 +40,13 @@ export function ProgressMetricCard({
       <dt>
         <button
           type="button"
-          className="progress-metric-link"
+          className="progress-metric-link no-press"
+          data-card-action
           aria-label={text(language, "explore", { metric: text(language, metric) })}
           onClick={onExplore}
         >
-          <span className="progress-practice-icon">
-            <Icon size={22} aria-hidden="true" />
+          <span className="progress-practice-icon surface-control-finish control-cue">
+            <Icon size={24} aria-hidden="true" />
           </span>
           <span className="progress-metric-label">{text(language, `short_${metric}`)}</span>
           <ChevronRight size={16} aria-hidden="true" className="progress-metric-arrow rtl:rotate-180" />

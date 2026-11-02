@@ -54,6 +54,8 @@ export function SettingsScreen({
   reduceMotion,
   reduceTransparency,
   homeWirdImages = false,
+  paperTexture = true,
+  onPaperTextureChange,
   appMaterial = "solid",
   onAppMaterialChange,
   homeMaterial = "inherit",
@@ -286,6 +288,8 @@ export function SettingsScreen({
             homeMaterial={homeMaterial}
             onHomeMaterialChange={onHomeMaterialChange}
             homeWirdImages={homeWirdImages}
+            paperTexture={paperTexture}
+            onPaperTextureChange={onPaperTextureChange}
             onHomeWirdImagesChange={onHomeWirdImagesChange}
             reduceTransparency={reduceTransparency}
             onReduceTransparencyChange={onReduceTransparencyChange}

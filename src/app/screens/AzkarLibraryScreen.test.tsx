@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { CategoryId } from "../types";
@@ -18,8 +18,8 @@ describe("AzkarLibraryScreen", () => {
         savedZikrIds={new Set()}
       />,
     );
-    expect(container.querySelector(".stagger-enter")).not.toBeNull();
-    await waitFor(() => expect(container.querySelector(".stagger-enter")).toBeNull(), { timeout: 2000 });
+    expect(container.querySelector(".library-panel")).not.toBeNull();
+    expect(container.querySelector(".stagger-enter")).toBeNull();
     const input = screen.getByRole("textbox", { name: "Search azkar and duas" });
     fireEvent.change(input, { target: { value: "sleep" } });
     expect(screen.getAllByTestId("matching-zikr-card").length).toBeGreaterThan(0);

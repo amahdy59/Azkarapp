@@ -18,6 +18,18 @@ export interface AudioDownloadProgress {
 
 export const AUDIO_CACHE_NAME = `azkar-audio-v${AUDIO_MANIFEST_VERSION}`;
 const REGISTRY_KEY = "azkar.audio-downloads.v1";
+// Serialize verification/repair with app writes for the same exact recording.
+const entryLocks = new Map<string, Promise<unknown>>();
+async function withAudioEntry<T>(url: string, work: () => Promise<T>): Promise<T> {
+  const previous = entryLocks.get(url) ?? Promise.resolve();
+  const current = previous.catch(() => undefined).then(work);
+  entryLocks.set(url, current);
+  try {
+    return await current;
+  } finally {
+    if (entryLocks.get(url) === current) entryLocks.delete(url);
+  }
+}
 
 interface DownloadedAssetRecord {
   assetId: string;
@@ -99,6 +111,18 @@ function getDownloadVariants(zikrs: readonly Zikr[], preferences: AudioPreferenc
     }
   }
   return [...variants.values()];
+}
+
+/** The actual resolved recordings, including fallback voices, shown before transfer. */
+export function getAudioDownloadVoices(zikrs: readonly Zikr[], preferences: AudioPreferences) {
+  return [
+    ...new Map(
+      getDownloadVariants(zikrs, preferences).map(({ variant }) => [
+        variant.voiceId,
+        { id: variant.voiceId, name: variant.voiceName },
+      ]),
+    ).values(),
+  ];
 }
 
 export function estimateAudioDownloadBytes(zikrs: readonly Zikr[], preferences: AudioPreferences) {
@@ -184,19 +208,39 @@ export async function prepareSavedAudioFile(
 }
 
 async function isVerifiedCachedAudio(cache: Cache, item: ReturnType<typeof getDownloadVariants>[number]) {
-  const response = await cache.match(item.url);
-  if (
-    !response ||
-    response.status !== 200 ||
-    response.headers.get("content-type")?.split(";")[0]?.trim() !== item.variant.mimeType
-  )
-    return false;
-  try {
-    await verifyDownload(await response.arrayBuffer(), item.variant);
-    return true;
-  } catch {
-    return false;
-  }
+  return withAudioEntry(item.url, async () => {
+    const discard = async () => {
+      await cache.delete(item.url);
+      const registry = loadRegistry();
+      const record = registry[item.assetId];
+      if (!Array.isArray(record?.urls) || !Array.isArray(record?.variantIds)) return;
+      const index = record?.urls?.indexOf(item.url) ?? -1;
+      if (!record || record.assetVersion !== item.assetVersion || index < 0) return;
+      record.urls.splice(index, 1);
+      record.variantIds.splice(index, 1);
+      record.byteSize = Math.max(0, record.byteSize - item.variant.byteSize);
+      if (!record.urls.length) delete registry[item.assetId];
+      saveRegistry(registry);
+    };
+    const response = await cache.match(item.url);
+    if (!response) return false;
+    if (
+      response.status !== 200 ||
+      response.headers.get("content-type")?.split(";")[0]?.trim() !== item.variant.mimeType
+    ) {
+      await discard();
+      return false;
+    }
+    try {
+      await verifyDownload(await response.arrayBuffer(), item.variant);
+      return true;
+    } catch (error) {
+      // Only definite integrity failures are repairable. Preserve unreadable data
+      // after a transient I/O error so a later check can recover it.
+      if (error instanceof AudioDownloadError && error.code === "integrity") await discard();
+      return false;
+    }
+  });
 }
 
 /**
@@ -236,14 +280,26 @@ export async function getAudioDownloadStatus(zikrs: readonly Zikr[], preferences
 export async function getAudioDownloadStatuses(
   collections: readonly (readonly Zikr[])[],
   preferences: AudioPreferences,
+  options: { signal?: AbortSignal } = {},
 ) {
   const groups = collections.map((zikrs) => getDownloadVariants(zikrs, preferences));
   const verified = new Map<string, boolean>();
   if ("caches" in window) {
     const cache = await caches.open(AUDIO_CACHE_NAME);
+    let yieldedAt = performance.now();
     for (const variants of groups) {
       for (const item of variants) {
-        if (!verified.has(item.variant.id)) verified.set(item.variant.id, await isVerifiedCachedAudio(cache, item));
+        options.signal?.throwIfAborted();
+        if (!verified.has(item.variant.id)) {
+          verified.set(item.variant.id, await isVerifiedCachedAudio(cache, item));
+          // Yield after a small work budget, not for each absent cache entry.
+          // Large-file verification stays sequential and releases its buffer.
+          if (performance.now() - yieldedAt >= 8) {
+            await new Promise<void>((resolve) => setTimeout(resolve, 0));
+            yieldedAt = performance.now();
+          }
+          options.signal?.throwIfAborted();
+        }
       }
     }
   }
@@ -322,7 +378,7 @@ export async function downloadAudioForZikrs(
         const headers = new Headers(receivedHeaders);
         headers.set("content-length", String(buffer.byteLength));
         headers.set("content-type", item.variant.mimeType);
-        await cache.put(item.url, new Response(buffer, { status: 200, headers }));
+        await withAudioEntry(item.url, () => cache.put(item.url, new Response(buffer, { status: 200, headers })));
       }
       completedBytes += item.variant.byteSize;
       completedFiles++;

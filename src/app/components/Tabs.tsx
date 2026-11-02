@@ -1,6 +1,6 @@
+import "./ui/pill-controls.css";
 import { useRef, type KeyboardEvent, type ReactNode } from "react";
 import { PILL_GROUP, PILL_OPTION } from "./ui/controlStyles";
-import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 
 export interface TabDefinition<T extends string> {
   value: T;
@@ -65,10 +65,6 @@ export function TabList<T extends string>({
   indicatorClassName?: string;
 }) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const systemReducedMotion = useReducedMotion();
-  const motionReduced =
-    systemReducedMotion ||
-    (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
 
   const focusTab = (index: number) => {
     const next = tabs[index];
@@ -97,44 +93,40 @@ export function TabList<T extends string>({
   };
 
   return (
-    <LayoutGroup id={idPrefix}>
-      <div role="tablist" aria-label={ariaLabel} aria-orientation="horizontal" className={`${PILL_GROUP} ${className}`}>
-        {tabs.map((tab, index) => {
-          const selected = tab.value === value;
-          return (
-            <button
-              key={tab.value}
-              ref={(node) => {
-                tabRefs.current[index] = node;
-              }}
-              type="button"
-              role="tab"
-              id={tabId(idPrefix, tab.value)}
-              aria-selected={selected}
-              aria-controls={tabPanelId(idPrefix, tab.value)}
-              aria-label={tab.ariaLabel}
-              title={tab.title}
-              tabIndex={selected ? 0 : -1}
-              data-testid={tab.testId}
-              onClick={() => onChange(tab.value)}
-              onKeyDown={(event) => handleKeyDown(event, index)}
-              className={`${PILL_OPTION} relative isolate overflow-hidden ${itemClassName(selected)}`}
-            >
-              {selected && indicatorClassName && (
-                <motion.span
-                  layoutId={`${idPrefix}-active-pill`}
-                  className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
-                  transition={{ duration: motionReduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
-                  aria-hidden="true"
-                />
-              )}
-              <span className="relative z-10 flex min-w-0 items-center justify-center gap-2 [&>svg]:block [&>svg]:shrink-0">
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </LayoutGroup>
+    <div role="tablist" aria-label={ariaLabel} aria-orientation="horizontal" className={`${PILL_GROUP} ${className}`}>
+      {tabs.map((tab, index) => {
+        const selected = tab.value === value;
+        return (
+          <button
+            key={tab.value}
+            ref={(node) => {
+              tabRefs.current[index] = node;
+            }}
+            type="button"
+            role="tab"
+            id={tabId(idPrefix, tab.value)}
+            aria-selected={selected}
+            aria-controls={tabPanelId(idPrefix, tab.value)}
+            aria-label={tab.ariaLabel}
+            title={tab.title}
+            tabIndex={selected ? 0 : -1}
+            data-testid={tab.testId}
+            onClick={() => onChange(tab.value)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
+            className={`${PILL_OPTION} relative isolate overflow-hidden ${itemClassName(selected)}`}
+          >
+            {selected && indicatorClassName && (
+              <span
+                className={`tab-selection-finish surface-control-finish absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
+                aria-hidden="true"
+              />
+            )}
+            <span className="relative z-10 flex min-w-0 items-center justify-center gap-2 [&>svg]:block [&>svg]:shrink-0">
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }

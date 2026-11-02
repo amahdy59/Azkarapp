@@ -6,10 +6,12 @@ import { isAudioControlLocked } from "../audioControlLock";
 export function AudioPlayerSurface({
   dockedInReader,
   onCollapse,
+  fullScreen = false,
   children,
 }: {
   dockedInReader: boolean;
   onCollapse: () => void;
+  fullScreen?: boolean;
   children: ReactNode;
 }) {
   const anchorRef = useRef<HTMLSpanElement>(null);
@@ -82,8 +84,49 @@ export function AudioPlayerSurface({
     };
   }, [dockedInReader, host]);
 
+  useLayoutEffect(() => {
+    if (!fullScreen || !host) return;
+    // Cover the shell as well as the reader, without remounting its text or audio.
+    const covered: { node: Element; inert: boolean; hidden: string | null }[] = [];
+    for (let branch = host; branch.parentElement && branch !== document.body; branch = branch.parentElement) {
+      for (const node of Array.from(branch.parentElement.children)) {
+        if (node === branch) continue;
+        covered.push({ node, inert: node.hasAttribute("inert"), hidden: node.getAttribute("aria-hidden") });
+        node.setAttribute("inert", "");
+        node.setAttribute("aria-hidden", "true");
+      }
+    }
+    const trap = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return;
+      const targets = Array.from(
+        surfaceRef.current?.querySelectorAll<HTMLElement>('button, [tabindex="0"]') ?? [],
+      ).filter(
+        (node) => node.getClientRects().length > 0 && !node.closest("[inert], [hidden]") && !node.matches(":disabled"),
+      );
+      const first = targets[0],
+        last = targets.at(-1);
+      if (first && last && (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+    };
+    window.addEventListener("keydown", trap, true);
+    return () => {
+      window.removeEventListener("keydown", trap, true);
+      for (const { node, inert, hidden } of covered) {
+        if (!inert) node.removeAttribute("inert");
+        if (hidden === null) node.removeAttribute("aria-hidden");
+        else node.setAttribute("aria-hidden", hidden);
+      }
+    };
+  }, [fullScreen, host]);
+
   const surface = (
-    <div ref={surfaceRef} className={`audio-player-surface${host ? "" : " audio-player-surface--viewport"}`}>
+    <div
+      ref={surfaceRef}
+      data-full-screen={fullScreen || undefined}
+      className={`audio-player-surface${host ? "" : " audio-player-surface--viewport"}`}
+    >
       {children}
     </div>
   );

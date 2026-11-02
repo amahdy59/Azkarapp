@@ -47,12 +47,14 @@
   background-color: var(--home-glass-tint);
   /* A directional sheen makes the material visible even over the dark sky.
      Keep the brightest stop bounded by the white-source contrast test. */
-  background-image: linear-gradient(
-    135deg,
-    rgb(255 255 255 / var(--home-glass-sheen, var(--glass-sheen-strength))),
-    var(--glass-sheen-midpoint) 55%,
-    var(--glass-sheen-shade)
-  );
+  background-image:
+    var(--paper-grain, none),
+    linear-gradient(
+      135deg,
+      rgb(255 255 255 / var(--home-glass-sheen, var(--glass-sheen-strength))),
+      var(--glass-sheen-midpoint) 55%,
+      var(--glass-sheen-shade)
+    );
   border-color: var(--glass-edge);
   backdrop-filter: var(--glass-frost);
   box-shadow: var(--glass-shadow);
@@ -67,7 +69,7 @@
 @supports not (backdrop-filter: blur(1px)) {
   .home-photo-canvas .hero-glass.home-glass-surface {
     background-color: var(--on-media-surface);
-    background-image: none;
+    background-image: var(--paper-grain, none);
   }
 }
 
@@ -80,7 +82,7 @@
 @media (prefers-reduced-transparency: reduce) {
   .home-photo-canvas .hero-glass.home-glass-surface {
     background-color: var(--on-media-surface);
-    background-image: none;
+    background-image: var(--paper-grain, none);
     backdrop-filter: none;
   }
 }
@@ -734,12 +736,14 @@
 @supports (backdrop-filter: blur(1px)) {
   html:not(.high-contrast) .home-force-glass .hero-glass.home-glass-surface {
     background-color: var(--home-glass-tint) !important;
-    background-image: linear-gradient(
-      135deg,
-      rgb(255 255 255 / var(--home-glass-sheen, var(--glass-sheen-strength))),
-      var(--glass-sheen-midpoint) 55%,
-      var(--glass-sheen-shade)
-    ) !important;
+    background-image:
+      var(--paper-grain, none),
+      linear-gradient(
+        135deg,
+        rgb(255 255 255 / var(--home-glass-sheen, var(--glass-sheen-strength))),
+        var(--glass-sheen-midpoint) 55%,
+        var(--glass-sheen-shade)
+      ) !important;
     backdrop-filter: var(--glass-frost) !important;
   }
   @media (forced-colors: active) {
@@ -762,12 +766,9 @@ html:not(.high-contrast) .home-photo-canvas {
   @media not (forced-colors: active) {
     html[data-app-material-resolved="glass"]:not(.high-contrast) .home-photo-canvas .hero-glass.home-glass-header {
       background-color: var(--glass-reading-tint) !important;
-      background-image: linear-gradient(
-        135deg,
-        rgb(255 255 255 / 0.045),
-        rgb(255 255 255 / 0.012) 55%,
-        transparent
-      ) !important;
+      background-image:
+        var(--paper-grain, none),
+        linear-gradient(135deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.012) 55%, transparent) !important;
       backdrop-filter: var(--glass-chrome-frost) !important;
     }
     /* Home retains independent Glass even when the rest of the app is opaque. */
@@ -783,7 +784,7 @@ html:not(.high-contrast) .home-photo-canvas {
 /* The scrolled strip protects its full width, including gaps and page gutters.
    Material changes are discrete; native scrolling never interpolates frost. */
 .home-prayer-sticky[data-scrolled] {
-  background: var(--background);
+  background-color: var(--background);
 }
 @supports (backdrop-filter: blur(1px)) {
   /* Only an active Glass header opts the shared strip into photographic frost.
@@ -792,7 +793,9 @@ html:not(.high-contrast) .home-photo-canvas {
     .home-photo-canvas
     .home-prayer-sticky[data-scrolled]:where(:has(> .hero-glass.home-glass-header)) {
     background-color: color-mix(in srgb, var(--on-media-surface) 60%, transparent);
-    background-image: linear-gradient(135deg, rgb(255 255 255 / 0.045), var(--glass-sheen-midpoint) 55%, transparent);
+    background-image:
+      var(--paper-grain, none),
+      linear-gradient(135deg, rgb(255 255 255 / 0.045), var(--glass-sheen-midpoint) 55%, transparent);
     backdrop-filter: var(--glass-chrome-frost);
   }
   html:not(.high-contrast) .home-photo-canvas .home-prayer-sticky[data-scrolled] .hero-glass.home-glass-surface {
@@ -816,12 +819,12 @@ html:not(.high-contrast) .home-photo-canvas {
 }
 html.reduce-transparency .home-photo-canvas:not(.home-force-glass) .home-prayer-sticky[data-scrolled],
 .high-contrast .home-photo-canvas .home-prayer-sticky[data-scrolled] {
-  background: var(--background);
+  background-color: var(--background);
   backdrop-filter: none;
 }
 @media (prefers-reduced-transparency: reduce) {
   html:not(.high-contrast) .home-photo-canvas:not(.home-force-glass) .home-prayer-sticky[data-scrolled] {
-    background: var(--background);
+    background-color: var(--background);
     backdrop-filter: none;
   }
 }

@@ -3,6 +3,17 @@ import { describe, expect, it, vi } from "vitest";
 import { retryableScreen } from "./RetryableScreen";
 
 describe("retryableScreen", () => {
+  it("renders a successfully loaded module immediately on return without a loading flash", async () => {
+    const loader = vi.fn().mockResolvedValue({ default: () => <h1>Ready screen</h1> });
+    const TestScreen = retryableScreen(loader);
+    const view = render(<TestScreen />);
+    expect(await screen.findByRole("heading", { name: "Ready screen" })).toBeVisible();
+    view.unmount();
+    render(<TestScreen />);
+    expect(screen.getByRole("heading", { name: "Ready screen" })).toBeVisible();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(loader).toHaveBeenCalledOnce();
+  });
   it("retries a rejected chunk without reloading the app", async () => {
     const loader = vi
       .fn()

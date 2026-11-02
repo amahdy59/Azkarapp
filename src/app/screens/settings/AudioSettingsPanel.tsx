@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { Button } from "../../components/ui/button";
+import { useEffect, useRef, useState } from "react";
 import type { AudioController } from "../../audio/AudioProvider";
 import { loadAudioPreferences, saveAudioPreferences } from "../../audio/audioPreferences";
 import { getAudioVoices } from "../../audio/audioVoices";
@@ -15,7 +16,7 @@ import {
   useSettingsReturnFocus,
 } from "./SettingsPrimitives";
 
-const PLAYBACK_RATES = [0.75, 1, 1.25] as const;
+const PLAYBACK_RATES = [0.75, 0.8, 1, 1.25, 1.5, 2] as const;
 
 export function AudioSettingsPanel({
   language,
@@ -32,6 +33,16 @@ export function AudioSettingsPanel({
   focusOnMount?: boolean;
   direction?: "ltr" | "rtl";
 }) {
+  const resumePending = useRef(false);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const [resumeStatus, setResumeStatus] = useState("");
+  const [resuming, setResuming] = useState(false);
   const panelRef = useSettingsReturnFocus(focusOnMount ? "settings-sub-downloads" : undefined);
   const [preferences, setPreferences] = useState(() => controller?.preferences ?? loadAudioPreferences());
   const voices = getAudioVoices(language);
@@ -62,6 +73,52 @@ export function AudioSettingsPanel({
     <div ref={panelRef} className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "settings.audioDownloads")} onBack={onBack} language={language} />
       <div className="flex-1 overflow-y-auto pb-8">
+        {controller?.canResumeListening && (
+          <div className="mx-4 mt-3 rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm text-muted-foreground">{t(language, "listening.resumeHelp")}</p>
+            <Button
+              type="button"
+              disabled={resuming}
+              aria-busy={resuming}
+              className="mt-2 w-full"
+              onClick={async () => {
+                if (resumePending.current) return;
+                resumePending.current = true;
+                setResuming(true);
+                setResumeStatus("");
+                try {
+                  const restored = await controller.resumeListening?.();
+                  if (mounted.current)
+                    setResumeStatus(t(language, restored ? "listening.restored" : "listening.unavailable"));
+                } catch {
+                  if (mounted.current) setResumeStatus(t(language, "listening.unavailable"));
+                } finally {
+                  resumePending.current = false;
+                  if (mounted.current) setResuming(false);
+                }
+              }}
+            >
+              {t(language, resuming ? "listening.restoring" : "listening.resume")}
+            </Button>
+            <Button
+              variant="ghost"
+              type="button"
+              className="mt-1 w-full"
+              disabled={resuming}
+              onClick={() => {
+                setResumeStatus("");
+                controller.dismissResume?.();
+              }}
+            >
+              {t(language, "listening.forget")}
+            </Button>
+          </div>
+        )}
+        {resumeStatus && (
+          <p role="status" className="mx-4 mt-3 text-sm">
+            {resumeStatus}
+          </p>
+        )}
         {onOpenDownloads && (
           <SettingsSection className="mt-3">
             <SettingsRowItem

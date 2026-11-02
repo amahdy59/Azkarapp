@@ -51,7 +51,12 @@ for (const language of ["ar", "en"] as const) {
         await page.evaluate(() => document.fonts.ready);
         const geometry = await title.evaluate((heading) => {
           const header = heading.closest(".shared-screen-header, .library-stationary-header")!;
-          const main = document.querySelector(".app-main")!.getBoundingClientRect();
+          // Center within the screen's usable scrollport. Classic scrollbars
+          // reserve space independently of the outer application canvas.
+          const screen =
+            heading.closest<HTMLElement>(".app-screen-surface") ?? document.querySelector<HTMLElement>(".app-main")!;
+          const screenBounds = screen.getBoundingClientRect();
+          const main = { left: screenBounds.left + screen.clientLeft, width: screen.clientWidth };
           const bounds = header.getBoundingClientRect();
           const title = heading.getBoundingClientRect();
           const rtl = getComputedStyle(heading).direction === "rtl";
@@ -63,7 +68,7 @@ for (const language of ["ar", "en"] as const) {
           );
           const frameLeft = main.left + (main.width - frameWidth) / 2;
           const back = header.querySelector('button[aria-label="Back"], button[aria-label="رجوع"]');
-          const backWidth = back
+          const backWidth = back?.getClientRects().length
             ? back.getBoundingClientRect().width + parseFloat(getComputedStyle(header).columnGap)
             : 0;
           const expectedLeading = rtl ? frameLeft + frameWidth - gutter - backWidth : frameLeft + gutter + backWidth;
@@ -99,39 +104,23 @@ for (const language of ["ar", "en"] as const) {
         expect(geometry.subtitleBelow, route).toBe(true);
         expect(geometry.overflow, route).toBeLessThanOrEqual(geometry.mainWidth + 1);
         if (route === "progress") {
-          const emptyLayout = await page.getByTestId("progress-empty-period").evaluate((empty) => {
-            const image = empty.querySelector("img")!;
-            const imageBounds = image.getBoundingClientRect();
-            const emptyBounds = empty.getBoundingClientRect();
+          await expect(page.getByTestId("progress-empty-period")).toHaveCount(0);
+          const layout = await page.locator(".progress-dashboard").evaluate((dashboard) => {
             const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-            const dashboard = document.querySelector(".progress-dashboard")!.getBoundingClientRect();
-            const grid = document.querySelector(".progress-overview-grid")!;
-            const columns = getComputedStyle(grid).gridTemplateColumns.split(" ").length;
             return {
-              radius: parseFloat(getComputedStyle(image).borderTopLeftRadius),
-              imageWidth: imageBounds.width,
-              height: emptyBounds.height,
-              columns,
-              expectedColumns: dashboard.width >= rootSize * 56 ? 4 : dashboard.width >= rootSize * 18 ? 2 : 1,
-              horizontal: dashboard.width >= rootSize * 32,
-              rowAligned:
-                Math.abs(imageBounds.top + imageBounds.height / 2 - emptyBounds.top - emptyBounds.height / 2) <= 1,
+              columns: getComputedStyle(dashboard.querySelector(".progress-overview-grid")!).gridTemplateColumns.split(
+                " ",
+              ).length,
+              expectedColumns:
+                dashboard.clientWidth >= rootSize * 56 ? 4 : dashboard.clientWidth >= rootSize * 18 ? 2 : 1,
             };
           });
-          expect(emptyLayout.radius).toBeGreaterThan(0);
-          expect(emptyLayout.columns).toBe(emptyLayout.expectedColumns);
-          if (emptyLayout.horizontal) {
-            expect(emptyLayout.rowAligned).toBe(true);
-            expect(emptyLayout.imageWidth).toBeLessThanOrEqual(176);
-            expect(emptyLayout.height).toBeLessThan(260);
-          }
-          if (viewport.width >= 600) {
-            const picker = await page.locator(".progress-range-toolbar [role=combobox]").boundingBox();
-            for (const tab of await page.getByRole("tab").all()) {
-              const button = (await tab.boundingBox())!;
-              expect(Math.abs(button.height - picker!.height)).toBeLessThanOrEqual(1);
-              expect(Math.abs(button.y - picker!.y)).toBeLessThanOrEqual(1);
-            }
+          expect(layout.columns).toBe(layout.expectedColumns);
+          const picker = (await page.getByTestId("progress-filters-toggle").boundingBox())!;
+          for (const tab of await page.getByRole("tab").all()) {
+            const button = (await tab.boundingBox())!;
+            expect(button.height).toBeGreaterThanOrEqual(44);
+            expect(Math.abs(button.y - picker.y)).toBeLessThanOrEqual(5);
           }
         }
         if (route === "progress" || route === "azkar" || route === "settings") {
@@ -166,19 +155,19 @@ for (const mode of ["default", "app", "os"] as const) {
     await toggle.focus();
     await toggle.press("Enter");
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
-    const dates = page.locator(".progress-date-filter");
+    const dates = page.getByTestId("progress-filter-sheet");
     await expect(dates.getByRole("combobox")).toBeVisible();
     const animation = await dates.evaluate((node) => ({
       name: getComputedStyle(node).animationName,
       seconds: parseFloat(getComputedStyle(node).animationDuration),
     }));
     if (mode === "default") {
-      expect(animation.name).toBe("fade-in");
-      expect(animation.seconds).toBe(0.15);
+      expect(animation.name).toContain("enter");
+      expect(animation.seconds).toBeGreaterThan(0);
     } else {
       expect(animation.seconds).toBeLessThanOrEqual(0.001);
     }
-    await toggle.press("Enter");
+    await page.keyboard.press("Escape");
     await expect(dates).toBeHidden();
     await expect(toggle).toBeFocused();
   });

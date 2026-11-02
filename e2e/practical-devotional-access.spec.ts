@@ -39,7 +39,7 @@ test("keyboard instructions follow the shared breakpoint on every counter @cross
     const help = page.getByRole("button", { name: "Keyboard shortcuts", exact: true });
     for (const width of [320, 767, 768, 1440]) {
       await page.setViewportSize({ width, height: 900 });
-      if (width < 768) {
+      if (route.includes("/azkar/") || width < 768) {
         await expect(help).not.toBeVisible();
       } else {
         await expect(help).toBeVisible();

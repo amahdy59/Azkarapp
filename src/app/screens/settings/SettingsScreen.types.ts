@@ -40,6 +40,8 @@ export interface SettingsScreenProps {
   reduceMotion: boolean;
   reduceTransparency: boolean;
   homeWirdImages?: boolean;
+  paperTexture?: boolean;
+  onPaperTextureChange?: (value: boolean) => void;
   appMaterial?: "system" | "glass" | "solid";
   onAppMaterialChange?: (value: "system" | "glass" | "solid") => void;
   homeMaterial?: "inherit" | "system" | "glass" | "solid";

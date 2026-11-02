@@ -172,20 +172,21 @@ for (const language of ["ar", "en"] as const) {
       await page.reload();
       await expect(page.locator("html")).toHaveClass(new RegExp(`theme-${mode.themeMode}`));
       const filters = page.getByTestId("library-filter-disclosure");
-      const trigger = filters.locator("summary");
+      const trigger = filters.locator(".responsive-filter-trigger");
+      const sheet = page.getByTestId("library-filter-disclosure-sheet");
       await expect(trigger).toBeVisible();
       await trigger.focus();
       await trigger.press("Enter");
-      await expect(filters).toHaveAttribute("open");
-      const search = filters.getByRole("textbox");
+      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      const search = page.getByRole("textbox");
       const query =
         language === "ar"
           ? "دعاء طويل لاختبار التفاف النص وحفظ البحث"
           : "A long search to check wrapping and retained filters";
       await search.fill(query);
-      await trigger.focus();
-      await trigger.press("Space");
-      await expect(filters).not.toHaveAttribute("open");
+      await sheet.getByTestId("modal-close-button").focus();
+      await sheet.getByTestId("modal-close-button").press("Space");
+      await expect(trigger).toHaveAttribute("aria-expanded", "false");
       await expect(trigger).toBeFocused();
       await expect(trigger.locator(".responsive-filter-context")).toContainText(query);
       for (const enlarged of [false, true]) {

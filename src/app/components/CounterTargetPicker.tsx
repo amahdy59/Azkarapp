@@ -1,4 +1,6 @@
+import { COUNTER_PICKER_TRIGGER } from "./devotionalPickerStyles";
 import { useState } from "react";
+import "./devotional-picker.css";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -65,19 +67,19 @@ export function CounterTargetPicker({
           <button
             type="button"
             data-testid="counter-target-filter"
-            className="interactive-elem flex min-h-[44px] w-full items-center justify-between gap-2 sm:gap-3 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-label sm:text-sm font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className={COUNTER_PICKER_TRIGGER}
             aria-label={`${t(language, "counter.targetLabel")} ${activeLabel}`}
           >
-            <div className="flex items-center gap-2 truncate">
+            <div className="flex min-w-0 items-center gap-2 py-2">
               <SlidersHorizontal size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-              <span className="truncate">
+              <span className="min-w-0 whitespace-normal break-words text-start">
                 {t(language, "counter.targetLabel")} {activeLabel}
               </span>
             </div>
             <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="min-w-[var(--radix-dropdown-menu-trigger-width)]">
+        <DropdownMenuContent align="start" collisionPadding={16} className="counter-selection-menu">
           <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
             {t(language, "counter.targetLabel")}
           </DropdownMenuLabel>

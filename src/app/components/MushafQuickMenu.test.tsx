@@ -27,6 +27,15 @@ describe("MushafQuickMenu", () => {
     expect(screen.getByRole("heading", { name: "Reading View & Options" })).toBeInTheDocument();
   });
 
+  it("exposes focus mode as an immediate action and closes the tools sheet", async () => {
+    const onClose = vi.fn();
+    const onEnterFocusMode = vi.fn();
+    render(<MushafQuickMenu {...defaultProps} onClose={onClose} onEnterFocusMode={onEnterFocusMode} />);
+    await userEvent.setup().click(screen.getByRole("button", { name: "Turn on focus mode" }));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(onEnterFocusMode).toHaveBeenCalledOnce();
+  });
+
   it("keeps Follow app explicit and offers keyboard colour selection independently", async () => {
     const onSelectTheme = vi.fn();
     render(<MushafQuickMenu {...defaultProps} theme="follow-app" appTheme="light" onSelectTheme={onSelectTheme} />);

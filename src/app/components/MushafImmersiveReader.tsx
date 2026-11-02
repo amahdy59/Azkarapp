@@ -9,6 +9,7 @@ import { MushafNavigationModal } from "./MushafNavigationModal";
 import { MushafSettingsSheet } from "./MushafSettingsSheet";
 import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
 import { MushafQuickMenu } from "./MushafQuickMenu";
+import { MushafFocusExit } from "./MushafFocusExit";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { t } from "../i18n";
 import type {
@@ -785,6 +786,8 @@ export function MushafImmersiveReader({
      */
     <section
       data-testid="mushaf-immersive"
+      data-mushaf-reader
+      tabIndex={-1}
       dir={direction}
       aria-label={t(language, "reader.immersiveTitle")}
       className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground outline-none select-none"
@@ -857,6 +860,7 @@ export function MushafImmersiveReader({
             verticalGestures={pageMagnification === 100 && mushafSettings?.colorGestures !== false}
             magnification={pageMagnification}
             showFloatingPageIndicator={!isFocusMode}
+            focusMode={isFocusMode}
             reduceMotion={reducedMotion}
             textScale={textScale}
             facingPage={
@@ -906,23 +910,12 @@ export function MushafImmersiveReader({
         /* Focus mode hides the rail that turned it on, so without this the only
            way out was leaving the surah altogether — and on a phone, with no
            keyboard, there was no way out at all. The Mushaf's own handle. */
-        <button
-          type="button"
-          onClick={() => setIsFocusMode(false)}
-          data-testid="mushaf-focus-exit"
-          aria-label={t(language, "mushaf.focusModeExit")}
-          title={t(language, "mushaf.focusModeExit")}
-          className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <span
-            aria-hidden="true"
-            className="h-0.5 w-10 rounded-full bg-muted-foreground transition-colors group-hover:bg-primary"
-          />
-        </button>
+        <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} />
       )}
 
       <MushafQuickMenu
         open={isQuickMenuOpen}
+        onEnterFocusMode={() => setIsFocusMode(true)}
         onClose={() => setIsQuickMenuOpen(false)}
         language={language}
         direction={direction}

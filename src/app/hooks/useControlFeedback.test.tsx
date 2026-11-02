@@ -2,6 +2,35 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 import { useControlFeedback } from "./useControlFeedback";
 
+it("keeps full-card geometry fixed while acknowledging and cancelling keyboard badge presses", () => {
+  const onClick = vi.fn();
+  function Metric() {
+    useControlFeedback();
+    return (
+      <button className="no-press" data-card-action onClick={onClick}>
+        Progress
+      </button>
+    );
+  }
+  const { unmount } = render(<Metric />);
+  const button = screen.getByRole("button");
+  for (const cancel of [
+    () => fireEvent.keyUp(button, { key: " " }),
+    () => fireEvent.keyDown(button, { key: "Escape" }),
+    () => fireEvent.focusOut(button),
+    () => fireEvent.pointerCancel(button),
+  ]) {
+    fireEvent.keyDown(button, { key: " " });
+    expect(button).toHaveAttribute("data-key-pressed");
+    cancel();
+    expect(button).not.toHaveAttribute("data-key-pressed");
+    expect(button).toHaveAttribute("data-key-released");
+  }
+  expect(onClick).not.toHaveBeenCalled();
+  unmount();
+  expect(button).not.toHaveAttribute("data-key-released");
+});
+
 it("confirms keyboard activation without changing native actions and cleans up cancellation", () => {
   const onClick = vi.fn();
   function Controls() {

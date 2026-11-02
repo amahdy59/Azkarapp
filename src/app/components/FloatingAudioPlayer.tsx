@@ -1,3 +1,5 @@
+import { AudioQueueSheet } from "./AudioQueueSheet";
+import { ToggleTrack } from "./SettingsRow";
 import { AudioControlLock } from "./AudioControlLock";
 import { Lock } from "./icons";
 import { AudioOptionToggle } from "./AudioOptionToggle";
@@ -29,6 +31,8 @@ import {
   SkipBack,
   SkipForward,
   SlidersHorizontal,
+  Maximize,
+  Minimize,
   X,
 } from "./icons";
 import type { AppLanguage, TextSizeOption, MushafPageTheme, MushafTextScale } from "../types";
@@ -52,11 +56,23 @@ import { useListeningTextFollowing } from "../hooks/useListeningTextFollowing";
 import { MUSHAF_EXCERPTS } from "../content/mushafExcerpts";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 
+const AUDIO_ICON_ACTION =
+  "flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
+const AUDIO_CHROME_ACTION =
+  "flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
+const AUDIO_TIME_LABEL = "text-center text-xs font-medium tabular-nums text-muted-foreground";
+
+const AUDIO_OPTION_GROUP = "flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40";
+
+const ACTION_FOCUS = "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
 const QuranListeningReader = lazy(() => import("./QuranListeningReader"));
 const MushafExcerpt = lazy(() => import("./MushafExcerpt"));
 
 /** Existing supported speeds, shown explicitly in the selection menu. */
-const PLAYBACK_RATES = [0.8, 1, 1.25, 1.5, 2] as const;
+const PLAYBACK_RATES = [0.75, 0.8, 1, 1.25, 1.5, 2] as const;
 const LARGE_SEEK_SECONDS = 30;
 
 function getErrorMessage(code: string | undefined, language: AppLanguage) {
@@ -130,7 +146,7 @@ function TransportButton({
       disabled={disabled}
       aria-label={accessibleName}
       title={accessibleName}
-      className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30"
+      className={`flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground active:scale-95 ${ACTION_FOCUS} disabled:opacity-30`}
     >
       {children}
     </button>
@@ -181,7 +197,17 @@ export function FloatingAudioPlayer({
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && (preferCompactReading || !hasRoomBesideReading);
   const [isMinimized, setIsMinimized] = useState(true);
+  const [queueOpen, setQueueOpen] = useState(false);
   const [controlsLocked, setControlsLocked] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+  const focusEntryRef = useRef<HTMLButtonElement>(null);
+  const focusExitRef = useRef<HTMLButtonElement>(null);
+  const previousFocusMode = useRef(false);
+  useLayoutEffect(() => {
+    if (!focusMode && !previousFocusMode.current) return;
+    previousFocusMode.current = focusMode;
+    (focusMode ? focusExitRef.current : focusEntryRef.current)?.focus({ preventScroll: true });
+  }, [focusMode]);
   const [readingDockHidden, setReadingDockHidden] = useState(false);
   const showDockRef = useRef<HTMLButtonElement>(null);
   const hideDockRef = useRef<HTMLButtonElement>(null);
@@ -277,6 +303,7 @@ export function FloatingAudioPlayer({
   const [showListeningWords, setShowListeningWords] = useState(true);
   const arabicTextId = useId();
   const compactDescriptionId = useId();
+  const continuationDescriptionId = useId();
   const controllerRef = useRef(controller);
   controllerRef.current = controller;
   const timingRef = useRef({ currentTime: state.currentTime, duration: state.duration });
@@ -295,7 +322,10 @@ export function FloatingAudioPlayer({
 
   useEffect(() => {
     // Recovery actions must never be hidden behind the compact player.
-    if (state.status === "error") setIsMinimized(false);
+    if (state.status === "error") {
+      setIsMinimized(false);
+      setFocusMode(false);
+    }
   }, [state.status]);
 
   const jumpSeconds = useCallback((delta: number) => {
@@ -442,15 +472,17 @@ export function FloatingAudioPlayer({
   const liveMessage =
     state.status === "error"
       ? getErrorMessage(state.error?.code, language)
-      : state.announcement === "entry-completed"
-        ? t(language, "audioPlayer.entryCompleted")
-        : state.announcement === "queue-completed"
-          ? t(language, "audioPlayer.queueCompleted")
-          : state.announcement === "repetition-completed"
-            ? t(language, "audioPlayer.repetitionCompleted")
-            : state.announcement === "track-changed"
-              ? `${t(language, "audioPlayer.trackChanged")}: ${title}`
-              : "";
+      : state.announcement === "sleep-timer-ended"
+        ? t(language, "listening.sleepEnded")
+        : state.announcement === "entry-completed"
+          ? t(language, "audioPlayer.entryCompleted")
+          : state.announcement === "queue-completed"
+            ? t(language, "audioPlayer.queueCompleted")
+            : state.announcement === "repetition-completed"
+              ? t(language, "audioPlayer.repetitionCompleted")
+              : state.announcement === "track-changed"
+                ? `${t(language, "audioPlayer.trackChanged")}: ${title}`
+                : "";
 
   const waveform = getAudioWaveform(currentSegment);
   const repeatEnabled = currentEntry.playbackMode === "repeat-prescribed-count" || currentEntry.repetitions > 1;
@@ -543,7 +575,7 @@ export function FloatingAudioPlayer({
         <button
           type="button"
           ref={showDockRef}
-          className="flex min-h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className={`flex min-h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-semibold text-foreground ${ACTION_FOCUS}`}
           aria-expanded={false}
           aria-label={t(language, "audioPlayer.showPlayer")}
           onClick={() => {
@@ -569,7 +601,7 @@ export function FloatingAudioPlayer({
                 onClose?.();
               }}
               aria-label={t(language, "audioPlayer.stop")}
-              className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={AUDIO_ICON_ACTION}
             >
               <X size={19} aria-hidden="true" />
             </button>
@@ -577,7 +609,7 @@ export function FloatingAudioPlayer({
               type="button"
               onClick={() => setIsMinimized(false)}
               aria-label={`${t(language, "audioPlayer.openFullPlayer")}: ${title}`}
-              className="audio-compact-context flex min-h-11 min-w-11 items-center gap-2 rounded-xl py-1 text-start hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={`audio-compact-context flex min-h-11 min-w-11 items-center gap-2 rounded-xl py-1 text-start hover:bg-muted ${ACTION_FOCUS}`}
             >
               <span className="audio-compact-context-icon shrink-0 items-center justify-center text-muted-foreground">
                 <Headphones size={20} aria-hidden="true" />
@@ -611,7 +643,7 @@ export function FloatingAudioPlayer({
               type="button"
               onClick={isPlaying ? controller.pause : controller.play}
               aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={`flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 ${ACTION_FOCUS}`}
             >
               {isPlaying ? <Pause size={22} aria-hidden="true" /> : <Play size={22} aria-hidden="true" />}
             </button>
@@ -622,7 +654,7 @@ export function FloatingAudioPlayer({
               aria-label={t(language, "audioPlayer.expand")}
               aria-describedby={compactDescriptionId}
               aria-expanded={false}
-              className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={AUDIO_ICON_ACTION}
             >
               <ChevronUp size={20} aria-hidden="true" />
             </button>
@@ -635,7 +667,7 @@ export function FloatingAudioPlayer({
               <button
                 type="button"
                 ref={hideDockRef}
-                className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className={`flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted ${ACTION_FOCUS}`}
                 aria-label={t(language, "audioPlayer.hidePlayer")}
                 onClick={() => {
                   setReadingDockHidden(true);
@@ -666,7 +698,7 @@ export function FloatingAudioPlayer({
                   "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted-foreground) ${progressPercent}%)`,
                 } as CSSProperties
               }
-              className="audio-timeline-range audio-compact-range min-w-0 flex-1 cursor-pointer appearance-none rounded-lg accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-default disabled:opacity-50"
+              className={`audio-timeline-range audio-compact-range min-w-0 flex-1 cursor-pointer appearance-none rounded-lg accent-primary ${ACTION_FOCUS} disabled:cursor-default disabled:opacity-50`}
             />
             <span dir="ltr" className="text-xs tabular-nums text-muted-foreground">
               <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
@@ -683,7 +715,11 @@ export function FloatingAudioPlayer({
   }
 
   return (
-    <AudioPlayerSurface dockedInReader={dockedInReader} onCollapse={() => setIsMinimized(true)}>
+    <AudioPlayerSurface
+      fullScreen={focusMode}
+      dockedInReader={dockedInReader}
+      onCollapse={() => (focusMode ? setFocusMode(false) : setIsMinimized(true))}
+    >
       <motion.section
         initial={motionReduced ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -692,6 +728,7 @@ export function FloatingAudioPlayer({
         aria-label={t(language, "audioPlayer.region")}
         dir={direction}
         data-variant="expanded"
+        data-listening-focus={focusMode || undefined}
         onKeyDown={(event) => {
           event.stopPropagation();
           const viewport = readingTextRef.current;
@@ -739,7 +776,7 @@ export function FloatingAudioPlayer({
               }}
               aria-label={t(language, "audioPlayer.stop")}
               title={t(language, "audioPlayer.stop")}
-              className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={AUDIO_CHROME_ACTION}
             >
               <X size={19} aria-hidden="true" />
             </button>
@@ -759,7 +796,7 @@ export function FloatingAudioPlayer({
               onClick={() => setIsMinimized(true)}
               aria-label={t(language, "audioPlayer.collapse")}
               title={t(language, "audioPlayer.collapse")}
-              className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={AUDIO_CHROME_ACTION}
             >
               <ChevronDown size={22} aria-hidden="true" />
             </button>
@@ -935,7 +972,7 @@ export function FloatingAudioPlayer({
           <div className="audio-expanded-controls mx-auto w-full max-w-5xl shrink-0 border-t border-border pt-1">
             {/* One waveform seek control with balanced time labels. */}
             <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
-              <span dir="ltr" className="text-center text-xs font-medium tabular-nums text-muted-foreground">
+              <span dir="ltr" className={AUDIO_TIME_LABEL}>
                 <span className="sr-only">{t(language, "audioPlayer.elapsed")}: </span>
                 {formatTime(state.currentTime, language)}
               </span>
@@ -960,15 +997,46 @@ export function FloatingAudioPlayer({
                       "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%)`,
                     } as CSSProperties
                   }
-                  className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className={`audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary ${ACTION_FOCUS}`}
                 />
               </div>
-              <span dir="ltr" className="text-center text-xs font-medium tabular-nums text-muted-foreground">
+              <span dir="ltr" className={AUDIO_TIME_LABEL}>
                 <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
                 {formatTime(state.duration, language)}
               </span>
             </div>
 
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {totalTracks > 1 && (
+                <button
+                  type="button"
+                  className={`min-h-11 rounded-xl px-3 text-xs font-semibold ${ACTION_FOCUS}`}
+                  onClick={(event) => {
+                    // Touch activation may not focus buttons in WebKit; the
+                    // shared modal needs this opener for close-focus recovery.
+                    event.currentTarget.focus({ preventScroll: true });
+                    setQueueOpen(true);
+                  }}
+                >
+                  {t(language, "listening.queue")} · <bdi>{queuePosition}</bdi>
+                </button>
+              )}
+              {controller.sleepDeadline && (
+                <span className="text-xs text-muted-foreground">
+                  {t(language, "listening.sleepAt", {
+                    time: new Intl.DateTimeFormat(language, { hour: "numeric", minute: "2-digit" }).format(
+                      controller.sleepDeadline,
+                    ),
+                  })}
+                </span>
+              )}
+            </div>
+            <AudioQueueSheet
+              open={queueOpen}
+              onClose={() => setQueueOpen(false)}
+              controller={controller}
+              language={language}
+            />
             <div
               className="audio-expanded-feedback flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
               dir={direction}
@@ -978,14 +1046,33 @@ export function FloatingAudioPlayer({
                   {t(language, "audioPlayer.repetitionChip")} <bdi dir="ltr">{repetitionProgress}</bdi>
                 </span>
               )}
-              {canRepeat && <span>{repeatLabel}</span>}
+              {canRepeat && <span>{repeatEnabled ? repeatLabel : t(language, "audioPlayer.playOnce")}</span>}
             </div>
             <div className="audio-expanded-actions" dir={direction}>
-              <span
-                className="audio-play-all-indicator text-xs text-muted-foreground"
-                data-testid="audio-play-all-indicator"
-              >
-                {totalTracks > 1 && controller.autoAdvance ? t(language, "audioPlayer.playAllShort") : null}
+              <div className="audio-play-all-indicator" data-testid="audio-play-all-indicator">
+                {totalTracks > 1 && (
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={controller.autoAdvance}
+                    aria-label={t(language, "listening.autoContinue")}
+                    title={t(language, "listening.autoContinueHelp")}
+                    aria-describedby={continuationDescriptionId}
+                    onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
+                    className={`audio-continuation-switch flex min-h-11 w-full flex-wrap items-center justify-between gap-2 rounded-xl border border-border px-3 py-2 text-start text-xs ${ACTION_FOCUS}`}
+                  >
+                    <span className="min-w-0 font-semibold">
+                      {t(language, "listening.autoContinue")}
+                      <span className="block text-muted-foreground">
+                        {t(language, controller.autoAdvance ? "listening.on" : "listening.off")}
+                      </span>
+                    </span>
+                    <ToggleTrack checked={controller.autoAdvance} />
+                  </button>
+                )}
+              </div>
+              <span id={continuationDescriptionId} className="sr-only">
+                {t(language, "listening.autoContinueHelp")}
               </span>
               {/* Equal transport slots keep the play button centered. */}
               <div
@@ -1022,7 +1109,7 @@ export function FloatingAudioPlayer({
                   type="button"
                   onClick={isPlaying ? controller.pause : controller.play}
                   aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-                  className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className={`flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 ${ACTION_FOCUS}`}
                 >
                   <span className="flex items-center justify-center">
                     {isPlaying ? <Pause size={24} aria-hidden="true" /> : <Play size={24} aria-hidden="true" />}
@@ -1053,19 +1140,33 @@ export function FloatingAudioPlayer({
                   </TransportButton>
                 )}
               </div>
-              <button
-                type="button"
-                data-testid="audio-lock-controls"
-                aria-label={t(language, "audioPlayer.lockControls")}
-                title={t(language, "audioPlayer.lockControls")}
-                onClick={(event) => {
-                  event.currentTarget.focus();
-                  setControlsLocked(true);
-                }}
-                className="audio-lock-trigger inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              >
-                <Lock size={18} aria-hidden="true" />
-              </button>
+              <div className="audio-lock-trigger audio-focus-actions">
+                <button
+                  type="button"
+                  ref={focusMode ? focusExitRef : focusEntryRef}
+                  data-testid="audio-focus-toggle"
+                  aria-pressed={focusMode}
+                  aria-label={t(language, focusMode ? "reader.exitFocus" : "reader.enterFocus")}
+                  onClick={() => setFocusMode(!focusMode)}
+                  className={`audio-focus-toggle surface-control-finish flex min-h-11 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-sm font-semibold text-foreground ${ACTION_FOCUS}`}
+                >
+                  {focusMode ? <Minimize size={20} aria-hidden="true" /> : <Maximize size={20} aria-hidden="true" />}
+                  {t(language, focusMode ? "reader.exitFocusShort" : "reader.focusShort")}
+                </button>
+                <button
+                  type="button"
+                  data-testid="audio-lock-controls"
+                  aria-label={t(language, "audioPlayer.lockControls")}
+                  title={t(language, "audioPlayer.lockControls")}
+                  onClick={(event) => {
+                    event.currentTarget.focus();
+                    setControlsLocked(true);
+                  }}
+                  className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted ${ACTION_FOCUS}`}
+                >
+                  <Lock size={18} aria-hidden="true" />
+                </button>
+              </div>
             </div>
 
             {audioOptionsHost &&
@@ -1080,9 +1181,12 @@ export function FloatingAudioPlayer({
                         type="button"
                         aria-label={t(language, "audioPlayer.options")}
                         title={t(language, "audioPlayer.options")}
-                        className="audio-options-trigger inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        data-card-action
+                        className={`audio-options-trigger surface-control-finish inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast ${ACTION_FOCUS}`}
                       >
-                        <SlidersHorizontal size={18} aria-hidden="true" />
+                        <span className="audio-options-icon control-cue" aria-hidden="true">
+                          <SlidersHorizontal size={18} />
+                        </span>
                         <span>{t(language, "audioPlayer.options")}</span>
                         <ChevronDown size={16} aria-hidden="true" />
                       </button>
@@ -1132,7 +1236,7 @@ export function FloatingAudioPlayer({
                           />
                         ) : null}
 
-                        <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
+                        <div className={AUDIO_OPTION_GROUP}>
                           <div className="flex flex-col gap-1.5 p-2.5">
                             <span className="text-micro font-medium text-muted-foreground px-0.5">
                               {t(language, "audioPlayer.reciterShort")}
@@ -1205,7 +1309,7 @@ export function FloatingAudioPlayer({
                               <SelectTrigger
                                 size="sm"
                                 aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
-                                className="audio-speed-select w-auto min-h-11 gap-2 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground shadow-2xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                                className={`audio-speed-select w-auto min-h-11 gap-2 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground shadow-2xs hover:bg-muted ${ACTION_FOCUS}`}
                               >
                                 <SelectValue />
                               </SelectTrigger>
@@ -1234,7 +1338,7 @@ export function FloatingAudioPlayer({
                         </div>
 
                         {(currentEntry.contentKind === "quran" || englishFirst || listeningTiming) && (
-                          <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
+                          <div className={AUDIO_OPTION_GROUP}>
                             {currentEntry.contentKind === "quran" && (
                               <div className="p-2.5">
                                 <MushafMagnificationControl
@@ -1251,7 +1355,7 @@ export function FloatingAudioPlayer({
                                 aria-expanded={showArabic}
                                 aria-controls={arabicTextId}
                                 onClick={() => setArabicVisibility(showArabic ? "hide" : "show")}
-                                className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+                                className={`audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 ${ACTION_FOCUS} transition-colors cursor-pointer`}
                               >
                                 <span>
                                   {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
@@ -1290,6 +1394,7 @@ export function FloatingAudioPlayer({
                           </div>
                         )}
 
+                        <p className="px-3 text-xs text-muted-foreground">{t(language, "listening.repeatHelp")}</p>
                         {canRepeat && (
                           <AudioOptionToggle
                             className="audio-repeat-option"
@@ -1300,19 +1405,50 @@ export function FloatingAudioPlayer({
                             }
                           />
                         )}
-                        {totalTracks > 1 && (
-                          <AudioOptionToggle
-                            className="audio-auto-advance"
-                            switchRole
-                            label={t(language, "audioPlayer.playAllShort")}
-                            hint={t(language, "audioPlayer.autoAdvance")}
-                            checked={controller.autoAdvance}
-                            onChange={() => controller.setAutoAdvance(!controller.autoAdvance)}
-                          />
+
+                        {controller.setSleepTimer && (
+                          <div className="space-y-2 px-3">
+                            <label id="audio-sleep-label" className="text-sm font-semibold">
+                              {t(language, "listening.sleep")}
+                            </label>
+                            <Select
+                              value={controller.sleepDeadline ? "active" : "off"}
+                              onValueChange={(value) => {
+                                if (value !== "active")
+                                  controller.setSleepTimer?.(value === "off" ? null : Number(value));
+                              }}
+                              dir={direction}
+                            >
+                              <SelectTrigger aria-labelledby="audio-sleep-label">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {controller.sleepDeadline && (
+                                  <SelectItem value="active">
+                                    {t(language, "listening.sleepAt", {
+                                      time: new Intl.DateTimeFormat(language, {
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                      }).format(controller.sleepDeadline),
+                                    })}
+                                  </SelectItem>
+                                )}
+                                <SelectItem value="off">{t(language, "listening.sleepOff")}</SelectItem>
+                                {[15, 30, 60].map((minutes) => (
+                                  <SelectItem key={minutes} value={String(minutes)}>
+                                    {t(language, "listening.minutes", { minutes: formatNumerals(minutes, language) })}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">{t(language, "listening.sleepHelp")}</p>
+                          </div>
                         )}
 
                         <details className="text-sm text-foreground">
-                          <summary className="flex min-h-11 cursor-pointer items-center rounded-xl px-3 font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                          <summary
+                            className={`flex min-h-11 cursor-pointer items-center rounded-xl px-3 font-semibold ${ACTION_FOCUS}`}
+                          >
                             {t(language, "audioPlayer.pinningHelp")}
                           </summary>
                           <p className="px-3 text-muted-foreground">{t(language, "audioPlayer.pinningHint")}</p>
@@ -1336,7 +1472,7 @@ export function FloatingAudioPlayer({
                         <Popover.Close asChild>
                           <button
                             type="button"
-                            className="audio-options-close min-h-11 w-full rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors shadow-2xs cursor-pointer"
+                            className={`audio-options-close min-h-11 w-full rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted ${ACTION_FOCUS} transition-colors shadow-2xs cursor-pointer`}
                           >
                             {t(language, "common.close")}
                           </button>
@@ -1358,21 +1494,21 @@ export function FloatingAudioPlayer({
                   <button
                     type="button"
                     onClick={controller.retry}
-                    className="min-h-11 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className={`min-h-11 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground ${ACTION_FOCUS}`}
                   >
                     {t(language, "audioPlayer.retry")}
                   </button>
                   <button
                     type="button"
                     onClick={controller.skip}
-                    className="min-h-11 rounded-xl border border-border px-4 text-xs font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className={`min-h-11 rounded-xl border border-border px-4 text-xs font-bold text-foreground ${ACTION_FOCUS}`}
                   >
                     {t(language, "audioPlayer.skip")}
                   </button>
                   <button
                     type="button"
                     onClick={controller.stop}
-                    className="min-h-11 rounded-xl border border-destructive/40 px-4 text-xs font-bold text-destructive focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className={`min-h-11 rounded-xl border border-destructive/40 px-4 text-xs font-bold text-destructive ${ACTION_FOCUS}`}
                   >
                     {t(language, "audioPlayer.stop")}
                   </button>

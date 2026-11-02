@@ -407,7 +407,7 @@ export function SettingsRootPanel({
       {/* ── Client-side Instant Search Bar Pinned at Top (sticky with Header) ── */}
       <div
         data-scrolled={hasScrolled || undefined}
-        className="settings-search-sticky shrink-0 border-b border-border/40 px-[var(--settings-gutter,1rem)] pt-1 pb-3 transition-colors duration-standard"
+        className="settings-search-sticky shrink-0 px-[var(--settings-gutter,1rem)] pt-1 pb-3 transition-colors duration-standard"
       >
         <div className="relative">
           <label htmlFor="settings-search-input" className="sr-only">
@@ -475,21 +475,29 @@ export function SettingsRootPanel({
           </div>
         ) : (
           <>
-            <SettingsSection className="mt-3">
-              {mainItems.map((item, index) => (
-                <SettingsRowItem
-                  key={item.id}
-                  iconBg={iconBackground}
-                  icon={item.icon}
-                  label={item.title}
-                  description={item.value}
-                  right={<RowChevron />}
-                  onPress={() => onNav(item.id)}
-                  hasDivider={index < mainItems.length - 1}
-                  {...itemProps(item.id)}
-                />
-              ))}
-            </SettingsSection>
+            {[
+              { label: "settings.personalizationSection", ids: ["appearance", "reading", "accessibility"] },
+              { label: "settings.dailyPracticeSection", ids: ["prayer", "audio", "progress"] },
+              { label: "settings.accountData", ids: ["account-data"] },
+            ].map((group) => (
+              <SettingsSection key={group.label} label={t(language, group.label)}>
+                {mainItems
+                  .filter((item) => group.ids.includes(item.id))
+                  .map((item, index, items) => (
+                    <SettingsRowItem
+                      key={item.id}
+                      iconBg={iconBackground}
+                      icon={item.icon}
+                      label={item.title}
+                      description={item.value}
+                      right={<RowChevron />}
+                      onPress={() => onNav(item.id)}
+                      hasDivider={index < items.length - 1}
+                      {...itemProps(item.id)}
+                    />
+                  ))}
+              </SettingsSection>
+            ))}
             <SettingsSection label={t(language, "settings.supportSection")}>
               {searchableItems
                 .filter((item) => ["help", "sources", "legal", "about"].includes(item.id))

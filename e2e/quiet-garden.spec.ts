@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -102,7 +103,7 @@ for (const language of ["en", "ar"] as const) {
     await page.setViewportSize({ width: 1280, height: 900 });
     await seedReturningGardenUser(page, { language, completedToday: [] });
     await openReturningHome(page);
-    await page.getByTestId("nav-progress").click();
+    await openProgress(page);
     await chooseProgressOption(
       page.getByRole("combobox", {
         name: language === "ar" ? "نطاق التاريخ" : "Date range",
@@ -143,7 +144,7 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   await page.setViewportSize({ width: 320, height: 700 });
   await seedReturningGardenUser(page, { language: "ar", completedToday: [], textSize: "large" });
   await openReturningHome(page);
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
 
