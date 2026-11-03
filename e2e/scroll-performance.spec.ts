@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 import { expect, test } from "@playwright/test";
 
 for (const width of [390, 1440]) {
@@ -30,8 +31,11 @@ for (const width of [390, 1440]) {
     await expect(page.getByTestId("time-of-day-scene-window").locator("img")).toHaveCount(0);
     const samples = [];
     for (const tab of ["home", "azkar", "progress", "settings"] as const) {
-      await page.getByTestId(`nav-${tab}`).click();
-      await expect(page.getByTestId(`nav-${tab}`)).toHaveAttribute("aria-current", "page");
+      if (tab === "progress") await openProgress(page);
+      else {
+        await page.getByTestId(`nav-${tab}`).click();
+        await expect(page.getByTestId(`nav-${tab}`)).toHaveAttribute("aria-current", "page");
+      }
       if (tab === "home") await expect(page.getByTestId("home-tool-masbaha")).toBeAttached();
       if (tab === "azkar") await expect(page.getByTestId("category-card-morning")).toBeVisible();
       if (tab === "progress") await expect(page.getByTestId("progress-sticky-controls")).toBeVisible();

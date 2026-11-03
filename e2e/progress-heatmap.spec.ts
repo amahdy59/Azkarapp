@@ -65,7 +65,7 @@ for (const language of ["ar", "en"] as const) {
       const tabs = (await page.getByRole("tablist").boundingBox())!;
       for (const tab of await page.getByRole("tab").all()) {
         const option = (await tab.boundingBox())!;
-        expect(control.y + control.height).toBeLessThanOrEqual(option.y);
+        expect(Math.abs(control.y + control.height / 2 - option.y - option.height / 2)).toBeLessThanOrEqual(1);
         expect(option.height).toBeGreaterThanOrEqual(44);
         const before = option.y - tabs.y;
         const after = tabs.y + tabs.height - option.y - option.height;

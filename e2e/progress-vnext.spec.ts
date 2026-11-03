@@ -60,7 +60,7 @@ for (const language of ["ar", "en"] as const) {
           await date.evaluate(
             (node) =>
               node.scrollWidth <= node.clientWidth + 1 &&
-              getComputedStyle(node).overflow === "visible" &&
+              getComputedStyle(node).overflowX === "visible" &&
               node.getBoundingClientRect().height <= node.parentElement!.getBoundingClientRect().height,
           ),
         ).toBe(true);

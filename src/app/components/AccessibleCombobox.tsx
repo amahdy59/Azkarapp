@@ -52,6 +52,21 @@ export function AccessibleCombobox({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || !(event.target instanceof Node) || !popupRef.current?.contains(event.target))
+        return;
+      event.preventDefault();
+      event.stopPropagation();
+      setIsOpen(false);
+      triggerRef.current?.focus();
+    };
+    window.addEventListener("keydown", escape, true);
+    return () => window.removeEventListener("keydown", escape, true);
+  }, [isOpen]);
 
   const selectedOption = useMemo(() => options.find((opt) => String(opt.id) === String(value)), [options, value]);
 
@@ -100,6 +115,7 @@ export function AccessibleCombobox({
 
     if (event.key === "Escape") {
       event.preventDefault();
+      event.stopPropagation();
       setIsOpen(false);
       triggerRef.current?.focus();
       return;
@@ -189,6 +205,7 @@ export function AccessibleCombobox({
 
         <Popover.Portal container={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}>
           <Popover.Content
+            ref={popupRef}
             data-slot="combobox-content"
             data-dropdown-surface=""
             aria-labelledby={`${comboboxId}-label`}

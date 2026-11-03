@@ -2,6 +2,7 @@ import { openProgress } from "./helpers/open-progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { chooseProgressOption } from "./helpers/progress";
+import { t } from "../src/app/i18n";
 
 async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.goto("/");
@@ -158,7 +159,7 @@ test("initial flow has no automatically detectable WCAG A/AA violations", async 
   await page.goto("/");
   await expect(page.locator("#main-content")).toBeVisible();
   // Wait for the splash screen to finish by looking for the Language screen content
-  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: t("ar", "onboarding.chooseLanguage") })).toBeVisible();
   await expectNoWcagViolations(page);
 });
 
@@ -172,7 +173,7 @@ test("skip link moves keyboard focus to the main content", async ({ page }) => {
 
 test("reduced motion reveals the skip link immediately when focused", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: t("ar", "onboarding.chooseLanguage") })).toBeVisible();
   await page.locator("html").evaluate((element) => element.classList.add("reduce-motion"));
 
   const skipLink = page.locator(".skip-link");
@@ -195,9 +196,8 @@ test("search results expose concise accessible names", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
   const searchInput = page.getByRole("textbox", { name: "Search azkar and duas" });
-  const filters = page.getByTestId("library-filter-disclosure");
-  if (await filters.locator(".responsive-filter-trigger").isVisible())
-    await filters.locator(".responsive-filter-trigger").click();
+  if (page.viewportSize()!.width < 600)
+    await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   await searchInput.fill("sleep");
   await searchInput.press("Enter");
 
@@ -212,9 +212,8 @@ test("search results expose concise accessible names", async ({ page }) => {
 test("library filtering announces the collection result count", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
-  const filters = page.getByTestId("library-filter-disclosure");
-  if (await filters.locator(".responsive-filter-trigger").isVisible())
-    await filters.locator(".responsive-filter-trigger").click();
+  if (page.viewportSize()!.width < 600)
+    await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   await page.getByRole("textbox", { name: "Search azkar and duas" }).fill("sleep");
 
   await expect(page.getByTestId("library-filter-status")).toHaveText("1 collection matches “sleep”");

@@ -62,17 +62,6 @@
   }
 }
 
-@keyframes adaptive-counter-pulse {
-  0% {
-    opacity: 0.5;
-    transform: scale(0.92);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.06);
-  }
-}
-
 @keyframes counter-face-swap {
   from {
     opacity: 0;
@@ -217,16 +206,6 @@
   background: var(--primary);
 }
 
-.adaptive-counter-pulse {
-  position: absolute;
-  inset: 6px;
-  border: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  animation: adaptive-counter-pulse 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 .adaptive-counter-nav {
   display: flex;
   width: auto;
@@ -337,7 +316,6 @@
   .adaptive-counter-nav {
     transition-duration: 0.01ms;
   }
-  .adaptive-counter-pulse,
   .counter-number,
   .counter-ring-ready::after,
   .adaptive-counter-surface.just-completed::after,

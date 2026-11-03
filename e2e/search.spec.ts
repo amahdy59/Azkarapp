@@ -88,14 +88,13 @@ test("Library search and responsive section controls stay bounded at every tier"
   await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   await expect(async () => {
     const mobileInput = await input.boundingBox();
-    const mobileTabs = await tabs.boundingBox();
+    const mobileTabs = await page.locator("[role=tablist]").boundingBox();
     expect(mobileInput).not.toBeNull();
     expect(mobileTabs).not.toBeNull();
     const sheet = (await page.getByTestId("library-filter-disclosure-sheet").boundingBox())!;
     expect(mobileInput!.y).toBeGreaterThanOrEqual(sheet.y);
     expect(mobileInput!.y + mobileInput!.height).toBeLessThanOrEqual(sheet.y + sheet.height);
-    expect(mobileTabs!.x).toBeGreaterThanOrEqual(0);
-    expect(mobileTabs!.x + mobileTabs!.width).toBeLessThanOrEqual(390);
+    await expect(tabs).toBeHidden();
   }).toPass({ timeout: 15_000 });
 });
 

@@ -1,3 +1,7 @@
+## Combined release recovery — 2026-11-03
+
+AccessibleCombobox consumes Escape from its own popup at window capture before parent document-level dismissal, preserving the enclosing plan dialog and restoring its trigger. Compact ResponsiveSheet defers protected-dropdown Escape. This is transient overlay ownership only; no route, stored state or native permission boundary changes. Header subtitles scale their leading with font size; Progress date context uses a block box for correct enlarged-text measurement.
+
 ## Reading viewport focus intent — local completion
 
 useReadingFocusIndicator owns only a transient DOM presentation marker. Collection readers and useStandaloneReadingFocus share it; document capture listeners distinguish deliberate Tab entry from counting/device/pointer events without preventing native events or altering focus, shortcuts, saved counts or persistence. Listeners resolve the current ref, clear on focus exit/window blur and clean up on unmount. No data schema or global persisted modality is introduced.

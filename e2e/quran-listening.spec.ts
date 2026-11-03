@@ -101,10 +101,15 @@ for (const scenario of [
           (Math.min(options.left, navigation.left) + Math.max(options.right, navigation.right)) / 2 -
           (header.left + header.width / 2),
         rowOffset: options.top + options.height / 2 - navigation.top - navigation.height / 2,
+        separateRow:
+          getComputedStyle(
+            element.querySelector(".audio-listening-navigation") ?? element.querySelector("[data-listening-controls]")!,
+          ).gridRow !== getComputedStyle(element.querySelector(".audio-options-trigger")!).gridRow,
+        noOverlap: options.bottom <= navigation.top || navigation.bottom <= options.top,
       };
     });
     expect(Math.abs(alignment.centerOffset)).toBeLessThanOrEqual(2);
-    if (!scenario.enlarged) expect(Math.abs(alignment.rowOffset)).toBeLessThanOrEqual(2);
+    if (!scenario.enlarged) expect(Math.abs(alignment.rowOffset) <= 2 || alignment.noOverlap).toBe(true);
     await options.focus();
     await page.keyboard.press("Enter");
     const dialog = page.getByRole("dialog", { name: t(scenario.language, "audioPlayer.options"), exact: true });

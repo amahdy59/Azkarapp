@@ -11,7 +11,7 @@ for (const language of ["ar", "en"] as const) {
           localStorage.setItem(
             "azkarapp.state.v1",
             JSON.stringify({
-              settings: { language, themeMode: "midnight", reduceMotion: true },
+              settings: { readerToolLabels: true, language, themeMode: "midnight", reduceMotion: true },
               profile: { isGuest: true },
             }),
           );
@@ -71,8 +71,8 @@ for (const language of ["ar", "en"] as const) {
             }),
           );
           expect(new Set(geometry.map((item) => Math.round(item.top))).size).toBe(
-            // Standalone counters also retain their desktop keyboard-help target.
-            textScale === 2 && (width < 600 || route !== "azkar/morning/1") ? 2 : 1,
+            // Labelled controls wrap on enlarged phones; help lives in More.
+            textScale === 2 && width < 600 ? 2 : 1,
           );
           for (const item of geometry) {
             expect(item.left).toBeGreaterThanOrEqual(0);

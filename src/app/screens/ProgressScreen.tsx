@@ -321,7 +321,7 @@ export function ProgressScreen({
             <Header
               title={t(language, "common.progress")}
               subtitle={
-                <span data-testid="garden-view-date">
+                <span data-testid="garden-view-date" className="block">
                   {dashboardText(language, customRange ? "custom" : activeTab)} ·{" "}
                   {formatProgressRange(selectedRange, language, calendarType)}
                 </span>

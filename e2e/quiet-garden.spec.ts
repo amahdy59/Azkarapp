@@ -160,7 +160,7 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   }
   await page.keyboard.press("Escape");
   await chooseProgressOption(period, "month");
-  await expect(page.getByTestId("today-garden-card").getByRole("heading", { name: /rhythm|إيقاع/ })).toBeVisible();
+  await expect(page.getByTestId("today-garden-card").getByTestId("progress-primary-heading")).toBeVisible();
   await expect(page.getByRole("table")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 
@@ -249,7 +249,7 @@ test("month view shows routine patterns without the removed summary card", async
     "month",
   );
 
-  await expect(page.getByTestId("today-garden-card").getByRole("heading", { name: /rhythm|إيقاع/ })).toBeVisible();
+  await expect(page.getByTestId("today-garden-card").getByTestId("progress-primary-heading")).toBeVisible();
   await expect(page.getByRole("table")).toHaveCount(0);
   await expect(page.getByText("Longest Streak", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Adherence", { exact: true })).toHaveCount(0);
@@ -280,6 +280,10 @@ test("both Home and Progress keep prayer tracking outside the wird card", async 
   await chooseProgressDetail(page, "prayers");
   const prayerGroup = page.getByTestId("progress-prayer-group");
   await expect(prayerGroup).toBeVisible();
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "day",
+  );
   await expect(prayerGroup.getByTestId("prayer-progress-summary").getByRole("listitem")).toHaveCount(5);
   await expect(prayerGroup.locator("input, table")).toHaveCount(0);
   await expect(progressGarden).toHaveCount(0);
@@ -327,7 +331,7 @@ test("weekly charts convey complete-day recording values through accessible text
   await page.clock.setFixedTime(new Date("2026-10-17T12:00:00+03:00"));
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await expect(garden).toContainText("6 complete days");
-  await expect(garden.getByRole("list").getByRole("img")).toHaveCount(3);
+  await expect(garden.locator("[data-testid^=insight-]").getByRole("img")).toHaveCount(3);
   await expect(garden.getByTestId("routine-trends").getByRole("img")).toBeVisible();
   // The October 14 morning record now belongs to this six-day complete scope.
   // Preserve its real 1/3 rate while every other date remains zero.

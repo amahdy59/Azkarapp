@@ -39,11 +39,14 @@ test("keyboard instructions follow the shared breakpoint on every counter @cross
     const help = page.getByRole("button", { name: "Keyboard shortcuts", exact: true });
     for (const width of [320, 767, 768, 1440]) {
       await page.setViewportSize({ width, height: 900 });
-      if (route.includes("/azkar/") || width < 768) {
-        await expect(help).not.toBeVisible();
-      } else {
-        await expect(help).toBeVisible();
-      }
+      await expect(help).not.toBeVisible();
+      const more = page.getByRole("button", {
+        name: route.includes("/azkar/") ? "Reader options" : "More options",
+        exact: true,
+      });
+      await more.click();
+      await expect(page.getByRole("menuitem", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
+      await page.keyboard.press("Escape");
     }
   }
 });
@@ -202,7 +205,8 @@ test("keyboard help disables character actions while preserving native counting"
   const counter = page.getByTestId("custom-counter-surface");
   await expect(counter).toBeVisible();
   await counter.click();
-  await page.getByRole("button", { name: "Keyboard shortcuts", exact: true }).click();
+  await page.getByRole("button", { name: "More options", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Keyboard shortcuts", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Keyboard shortcuts" });
   await dialog.getByRole("checkbox").uncheck();
   const axe = await new AxeBuilder({ page })

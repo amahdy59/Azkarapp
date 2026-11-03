@@ -4,6 +4,8 @@ Compact Progress tabs retain visible icons at every narrow width, including 384p
 
 Expanded listening puts transport, Auto-continue and focus/lock actions on separate rows below 20rem of available controls width. Focus text may shrink/wrap within its row, retaining 44px targets and independent hit areas at enlarged text sizes. Wider listening arrangements retain their existing shared layout.
 
+Header subtitles use font-relative leading and block date context so enlarged lines remain within their own measured row. Escape closes a searchable picker before its enclosing dialog/sheet; pointer/Tab cancellation and return focus retain their native recovery path. Protected popup text and 44px targets remain mandatory.
+
 ## Index and bilingual alignment — local owner follow-up
 
 Mushaf index title, tabs, search and tab content share a 16px phone / 20px wider gutter plus consistent classic-scrollbar reservation. The index removes the outer segmented-pill boundary only; individual option selection, hover and focus use the existing shared recipe. Keep search outside scrolling results, and allow enlarged tabs/labels to reflow. Surah results use two columns only when their content fits; narrow/enlarged measures recover to one column with complete names and subordinate page metadata on its own aligned row. Other segmented controls retain their existing container.

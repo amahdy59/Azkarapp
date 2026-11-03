@@ -14,6 +14,8 @@ for (const language of ["ar", "en"] as const) {
     for (const theme of ["midnight", "light", "dark"] as const) {
       await page.goto("/#/settings/appearance");
       await page.getByTestId(`theme-option-${theme}`).click();
+      await page.mouse.move(0, 0);
+      await page.getByTestId(`theme-option-${theme}`).evaluate((node) => (node as HTMLElement).blur());
       const paint = await page.getByTestId(`theme-option-${theme}`).evaluate((element) => {
         const style = getComputedStyle(element);
         return { radius: style.borderRadius, border: style.borderColor, background: style.backgroundColor };
@@ -46,7 +48,8 @@ for (const language of ["ar", "en"] as const) {
     for (const width of [390, 820]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/#/azkar");
-      const library = await page.locator(".field-shell").boundingBox();
+      await expect(page.locator(".library-stationary-header")).toBeVisible();
+      const library = await page.locator(".library-header-layout").boundingBox();
       expect(library).not.toBeNull();
       if (width === 390) {
         for (const tab of await page.getByRole("tab").all()) {

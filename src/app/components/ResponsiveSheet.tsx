@@ -413,6 +413,7 @@ export function ResponsiveSheet({
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (event.target instanceof Element && event.target.closest("[data-dropdown-surface]")) return;
         if (topOverlay()?.dataset.backDismiss !== backDismiss) return;
         event.stopPropagation();
         onClose();

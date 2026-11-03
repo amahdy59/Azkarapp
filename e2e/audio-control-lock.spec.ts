@@ -69,7 +69,11 @@ for (const language of ["ar", "en"] as const) {
       [],
     );
     await page.screenshot({ path: testInfo.outputPath(`audio-lock-${language}.png`) });
-    await page.clock.install();
+    const holdClock = new Date("2026-11-03T08:00:00Z");
+    await page.clock.install({ time: holdClock });
+    // Keep runner/screenshot time out of the two-second hold. runFor advances
+    // the paused clock explicitly, preserving exact halfway/cancellation checks.
+    await page.clock.pauseAt(new Date(holdClock.getTime() + 1000));
     await unlock.focus();
     await page.keyboard.down("Space");
     await page.clock.runFor(1000);
@@ -94,12 +98,16 @@ for (const language of ["ar", "en"] as const) {
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
     await trigger.click();
+    // Let the newly mounted focus scope settle before starting pointer input.
+    await page.clock.runFor(100);
+    await expect(unlock).toBeFocused();
     const bounds = (await unlock.boundingBox())!;
     await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
     await page.mouse.down();
+    await expect(dialog.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
     await page.clock.runFor(2001);
-    await page.mouse.up();
     await expect(dialog).toHaveCount(0);
+    await page.mouse.up();
     expect(await page.evaluate(() => (window as unknown as { lockAudio: { paused: boolean } }).lockAudio.paused)).toBe(
       false,
     );

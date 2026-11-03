@@ -66,14 +66,15 @@ for (const language of ["ar", "en"] as const) {
     const scene = page.getByTestId("time-of-day-scene-window").last().locator("img");
     await expect.poll(() => scene.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
     await expect(controls).toHaveCSS("background-color", /^rgb\(/);
-    await expect(controls).toHaveCSS("background-image", "none");
+    await expect(controls).toHaveCSS("background-image", /paper-grain/);
+    const restingBackground = await controls.evaluate((node) => getComputedStyle(node).backgroundImage);
     await expect(controls).toHaveCSS("backdrop-filter", "none");
     await page.screenshot({ path: testInfo.outputPath(`progress-${language}-rest.png`), scale: "css" });
     for (const top of [240, 96, 48, 12]) {
       await page.locator(".progress-screen").evaluate((node, top) => (node.scrollTop = top), top);
       await expect(controls).toHaveAttribute("data-scrolled", "true");
       await expect(controls).toHaveCSS("background-color", /^rgb\(/);
-      await expect(controls).toHaveCSS("background-image", "none");
+      await expect(controls).toHaveCSS("background-image", restingBackground);
       await expect(controls).toHaveCSS("backdrop-filter", "none");
       await expect(page.getByTestId("shared-screen-header")).toHaveCount(1);
       const coverage = await controls.evaluate((header) => {

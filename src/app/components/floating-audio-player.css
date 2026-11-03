@@ -229,14 +229,6 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   padding-block-start: 0;
   align-items: center;
 }
-.audio-expanded-options > .audio-auto-advance {
-  flex: 0 1 auto;
-  max-width: 100%;
-  padding-inline: 0.5rem;
-}
-.audio-expanded-options .audio-auto-advance > span:first-child {
-  min-width: 0;
-}
 .audio-seek-row > span {
   flex: 0 0 auto;
   min-width: 3.5em;

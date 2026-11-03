@@ -77,11 +77,13 @@ for (const language of ["ar", "en"] as const) {
           )
           .toBe(true);
         expect(await menu.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
-        expect(
-          await menu
-            .getByRole("menuitemradio")
-            .evaluateAll((nodes) => nodes.every((node) => node.getBoundingClientRect().height >= 64)),
-        ).toBe(true);
+        await expect
+          .poll(() =>
+            menu
+              .getByRole("menuitemradio")
+              .evaluateAll((nodes) => nodes.every((node) => node.getBoundingClientRect().height >= 64)),
+          )
+          .toBe(true);
         expect(
           await menu.evaluate(
             (node) => node.hasAttribute("data-dropdown-surface") && node.closest(".app-shell") === null,
@@ -105,7 +107,8 @@ for (const language of ["ar", "en"] as const) {
           const item = AUTHENTIC_AZKAR_COLLECTION[2]!;
           const option = page.getByTestId(`zikr-option-${item.id}`);
           await expect(option).toContainText(language === "ar" ? item.textAr : item.textEn);
-          await expect(option.locator(".devotional-picker-preview")).toHaveCSS("-webkit-line-clamp", "2");
+          await expect(option.locator(".devotional-picker-preview")).toHaveCSS("-webkit-line-clamp", "none");
+          expect(await option.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
         }
         await page.screenshot({
           path: info.outputPath(
@@ -142,6 +145,9 @@ for (const language of ["ar", "en"] as const) {
       for (const action of await actions.all()) {
         await expect(action.locator(".reader-tool-label")).toBeVisible();
         await action.focus();
+        await action.evaluate((node) =>
+          node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }),
+        );
         await expect(action).toBeInViewport({ ratio: 1 });
         expect(await action.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
       }

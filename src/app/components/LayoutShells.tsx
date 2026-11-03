@@ -195,7 +195,7 @@ export function Header({
         >
           {title}
         </h1>
-        {subtitle && <p className="text-xs text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
+        {subtitle && <p className="text-xs text-muted-foreground font-sans leading-normal">{subtitle}</p>}
       </div>
       {right && (
         <div

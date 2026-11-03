@@ -75,7 +75,9 @@ for (const language of ["ar", "en"] as const) {
           const subtitle = heading.parentElement?.querySelector("p");
           return {
             titleTop: title.top - bounds.top,
-            topPadding: parseFloat(getComputedStyle(header).paddingTop),
+            topPadding: header.classList.contains("library-stationary-header")
+              ? header.querySelector(".library-header-layout > :first-child")!.getBoundingClientRect().top - bounds.top
+              : parseFloat(getComputedStyle(header).paddingTop),
             leading: rtl ? title.right : title.left,
             expectedLeading,
             fontSize: getComputedStyle(heading).fontSize,

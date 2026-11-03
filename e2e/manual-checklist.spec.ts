@@ -450,7 +450,16 @@ test("keyboard: the core flow is reachable with a visible focus indicator and no
         style.boxShadow !== "none" || Boolean(visualFocusStyle && visualFocusStyle.boxShadow !== "none");
       return {
         key: `${el.tagName}:${el.getAttribute("data-testid") ?? el.textContent?.trim().slice(0, 24) ?? ""}`,
-        visible: hasOutline || hasShadowRing,
+        visible:
+          hasOutline ||
+          hasShadowRing ||
+          ["::before", "::after"].some((pseudo) => {
+            const paint = getComputedStyle(el, pseudo);
+            return (
+              paint.content !== "none" &&
+              ((paint.outlineStyle !== "none" && parseFloat(paint.outlineWidth) > 0) || paint.boxShadow !== "none")
+            );
+          }),
         unobscured:
           rect.top >= 0 &&
           rect.bottom <= window.innerHeight &&

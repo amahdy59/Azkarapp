@@ -488,8 +488,8 @@ for (const language of ["ar", "en"] as const) {
           await document.fonts.ready;
           await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
         });
-        await expect(collections.locator("span.hidden")).toBeHidden();
-        await expect(saved.locator("span.hidden")).toBeHidden();
+        await expect(collections.locator(".section-tab-label")).toBeHidden();
+        await expect(saved.locator(".section-tab-label")).toBeHidden();
         const [headingBox, tabsBox, collectionsBox, savedBox] = await Promise.all([
           heading.boundingBox(),
           tabs.boundingBox(),
@@ -501,7 +501,11 @@ for (const language of ["ar", "en"] as const) {
         expect(collectionsBox).not.toBeNull();
         expect(savedBox).not.toBeNull();
         if (!headingBox || !tabsBox || !collectionsBox || !savedBox) return;
-        expect(Math.abs(headingBox.y + headingBox.height / 2 - tabsBox.y - tabsBox.height / 2)).toBeLessThan(1);
+        // Native scrollbar/font metrics can wrap the complete title before
+        // the explicit narrow-container rule. Both layouts must stay aligned.
+        const titleBesideTabs = Math.abs(headingBox.y + headingBox.height / 2 - tabsBox.y - tabsBox.height / 2) < 1;
+        const titleAboveTabs = headingBox.y + headingBox.height <= tabsBox.y;
+        expect(titleBesideTabs || titleAboveTabs, JSON.stringify({ width, scale, headingBox, tabsBox })).toBe(true);
         expect(collectionsBox.height).toBeGreaterThanOrEqual(44);
         expect(savedBox.width).toBeGreaterThanOrEqual(44);
         // The inset track surrounds its options with equal padding and border.
@@ -519,7 +523,11 @@ for (const language of ["ar", "en"] as const) {
         }
         expect(tabsBox.width).toBeLessThanOrEqual(scale === "100%" ? 110 : 200);
         const filtersBox = await page.getByTestId("library-filter-disclosure").boundingBox();
-        expect(filtersBox!.y - (tabsBox.y + tabsBox.height)).toBeCloseTo(scale === "100%" ? 8 : 16, 0);
+        expect(Math.abs(filtersBox!.y + filtersBox!.height / 2 - tabsBox.y - tabsBox.height / 2)).toBeLessThanOrEqual(
+          1,
+        );
+        expect(filtersBox!.height).toBeCloseTo(tabsBox.height, 0);
+        expect(filtersBox!.x + filtersBox!.width <= tabsBox.x || tabsBox.x + tabsBox.width <= filtersBox!.x).toBe(true);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
     }
@@ -538,8 +546,8 @@ for (const language of ["ar", "en"] as const) {
     await expect(collections).toHaveAttribute("aria-selected", "true");
 
     await page.setViewportSize({ width: 1280, height: 800 });
-    await expect(collections.locator("span.hidden")).toBeVisible();
-    await expect(saved.locator("span.hidden")).toBeVisible();
+    await expect(collections.locator(".section-tab-label")).toBeVisible();
+    await expect(saved.locator(".section-tab-label")).toBeVisible();
     await expect(tabs).toHaveCSS("padding", "4px");
 
     // Nested inline-flex labels used to add baseline/descent space around the
@@ -559,7 +567,7 @@ for (const language of ["ar", "en"] as const) {
             buttonBox: button.getBoundingClientRect().toJSON(),
             groupBox: button.querySelector(":scope > span > span")!.getBoundingClientRect().toJSON(),
             iconBox: button.querySelector("svg")!.getBoundingClientRect().toJSON(),
-            textBox: button.querySelector("span.hidden")!.getBoundingClientRect().toJSON(),
+            textBox: button.querySelector(".section-tab-label")!.getBoundingClientRect().toJSON(),
           }));
           const centreY = buttonBox.y + buttonBox.height / 2;
           expect(Math.abs(groupBox.y + groupBox.height / 2 - centreY)).toBeLessThan(1);

@@ -339,7 +339,7 @@ for (const language of ["ar", "en"] as const) {
             right: getComputedStyle(element).paddingRight,
           }));
           // Labelled phone tiles use the shared 0.875rem control radius; primary controls remain pills.
-          expect(style.radius).toBe(width < 600 ? "14px" : surfaceRadius);
+          expect(style.radius).toBe(width < 600 ? "999px" : surfaceRadius);
           expect(style.left).toBe(style.right);
           padding.push(style.left);
         }

@@ -252,6 +252,9 @@ test("Library Benefits entry and section tabs stay inside the content boundary a
         regionOverflow: region.scrollWidth - region.clientWidth,
         offenders: [...region.querySelectorAll<HTMLElement>("*")]
           .filter((element) => !element.closest(".overflow-x-auto"))
+          // Icon-only filters retain clipped assistive text; its descendants
+          // do not paint or contribute to the content's scroll geometry.
+          .filter((element) => !element.closest(".sr-only"))
           /* Decorative paint inside a frame that clips it. The prayer scene's
              halo is a 9rem circle centred on the moon, so on a 320px card it
              reaches past the edge and is cut off there — which is what a sky

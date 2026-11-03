@@ -22,21 +22,27 @@ for (const themeMode of ["light", "midnight", "dark"] as const) {
       '[role="menuitem"]:focus, [role="menuitemcheckbox"]:focus, [role="menuitemradio"]:focus',
     );
     await expect(focused).toHaveCount(1);
-    const colors = await focused.evaluate((element) => {
-      const probe = document.createElement("div");
-      probe.style.backgroundColor = "var(--muted)";
-      probe.style.color = "var(--foreground)";
-      element.append(probe);
-      const expected = getComputedStyle(probe);
-      const actual = getComputedStyle(element);
-      const result = {
-        actual: [actual.backgroundColor, actual.color],
-        expected: [expected.backgroundColor, expected.color],
-      };
-      probe.remove();
-      return result;
-    });
-    expect(colors.actual).toEqual(colors.expected);
+    const readColors = () =>
+      focused.evaluate((element) => {
+        const probe = document.createElement("div");
+        probe.style.backgroundColor = "color-mix(in srgb, var(--menu-highlight, var(--primary)) 16%, var(--popover))";
+        probe.style.color = "var(--menu-highlight-foreground, var(--popover-foreground))";
+        element.append(probe);
+        const expected = getComputedStyle(probe);
+        const actual = getComputedStyle(element);
+        const result = {
+          actual: [actual.backgroundColor, actual.color],
+          expected: [expected.backgroundColor, expected.color],
+        };
+        probe.remove();
+        return result;
+      });
+    await expect
+      .poll(async () => {
+        const colors = await readColors();
+        return colors.actual;
+      })
+      .toEqual((await readColors()).expected);
     expect(
       (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations,
     ).toEqual([]);

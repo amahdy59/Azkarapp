@@ -2,12 +2,19 @@ import { expect, test, type Page } from "@playwright/test";
 import { t } from "../src/app/i18n";
 
 async function seed(page: Page, language: "ar" | "en") {
+  await page.clock.setFixedTime(new Date("2026-10-20T08:00:00+03:00"));
   await page.addInitScript((language) => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     localStorage.setItem(
       "azkarapp.state.v1",
       JSON.stringify({
-        settings: { language, themeMode: "light", reduceMotion: true, paperTexture: true },
+        settings: {
+          routineModes: { morning: "complete", evening: "complete", before_sleep: "complete" },
+          language,
+          themeMode: "light",
+          reduceMotion: true,
+          paperTexture: true,
+        },
         profile: { isGuest: true },
       }),
     );

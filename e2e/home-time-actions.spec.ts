@@ -224,7 +224,7 @@ for (const language of ["ar", "en"] as const) {
     await evidence.scrollIntoViewIfNeeded();
     await page.keyboard.press("Tab");
     await share.focus();
-    await expect(share.locator("svg")).toHaveCSS("scale", "1.08");
+    await expect(share.locator("svg")).toHaveCSS("scale", "1.1");
     await expect(share.locator("svg")).toHaveCSS("translate", "0px -2px");
     const footprint = (await share.boundingBox())!;
     expect(Number(footprint.width.toFixed(3))).toBeGreaterThanOrEqual(44);
@@ -235,7 +235,7 @@ for (const language of ["ar", "en"] as const) {
       page.getByTestId("situational-shortcuts").getByRole("link").first(),
     ]) {
       await target.focus();
-      await expect(target.locator(".control-cue").first()).toHaveCSS("scale", "1.08");
+      await expect(target.locator(".control-cue").first()).toHaveCSS("scale", "1.1");
     }
     // Refresh is synchronous: the icon acknowledges actual activation once,
     // without adding a fake loading state or remounting the focused button.

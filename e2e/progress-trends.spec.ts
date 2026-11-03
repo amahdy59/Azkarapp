@@ -302,7 +302,7 @@ for (const language of ["ar", "en"] as const) {
           } as Record<string, string>
         )[name]!;
         await chooseProgressOption(period, value);
-        await expect(period).toHaveAttribute("data-progress-value", value);
+        await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", value);
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
         ).toBe(true);

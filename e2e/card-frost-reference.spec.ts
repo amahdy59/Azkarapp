@@ -56,11 +56,30 @@ for (const [language, width] of [
           )
           .map((node) => {
             const style = getComputedStyle(node);
-            return { tint: style.backgroundColor, sheen: style.backgroundImage, frost: style.backdropFilter };
+            const probe = document.createElement("span");
+            probe.style.backgroundColor = node.matches(".progress-metric-card, .progress-records-surface.glass-reading")
+              ? "color-mix(in srgb, var(--on-media-surface) 82%, transparent)"
+              : "var(--glass-card-tint)";
+            probe.style.backgroundImage = style.getPropertyValue("--paper-grain");
+            node.append(probe);
+            const expected = getComputedStyle(probe);
+            const result = {
+              tint: style.backgroundColor,
+              sheen: style.backgroundImage,
+              frost: style.backdropFilter,
+              expectedTint: expected.backgroundColor,
+              expectedGrain: expected.backgroundImage,
+            };
+            probe.remove();
+            return result;
           }),
       );
       expect(surfaces.length).toBeGreaterThan(0);
-      for (const surface of surfaces) expect(surface).toEqual(material);
+      for (const surface of surfaces) {
+        expect(surface.frost).toBe(material.frost);
+        expect(surface.sheen).toContain(surface.expectedGrain);
+        expect(surface.tint).toBe(route === "home" ? material.tint : surface.expectedTint);
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
       await page.evaluate(() => document.fonts.ready);

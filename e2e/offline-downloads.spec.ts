@@ -50,7 +50,7 @@ for (const scenario of [
       const heading = page.getByRole("heading", { level: 1, name: t(scenario.language, "downloads.title") });
       expect((await heading.boundingBox())!.width).toBeGreaterThan(220);
       expect((await heading.boundingBox())!.height).toBeLessThanOrEqual(110);
-      const links = page.locator(".bottom-nav a");
+      const links = page.locator(".bottom-nav a:visible");
       for (const link of await links.all()) {
         expect((await link.boundingBox())!.width).toBeGreaterThanOrEqual(95);
       }

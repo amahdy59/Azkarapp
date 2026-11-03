@@ -248,8 +248,19 @@ for (const language of ["ar", "en"] as const) {
           ),
         )
         .toBe(true);
-      // Firefox delivers the footer's ResizeObserver after the font-size
-      // mutation. Assert the settled shared geometry, not its intervening frame.
+      // ResizeObserver follows descendant font reflow in Firefox/WebKit.
+      // Wait for the actual content fit as well as aligned footer tops.
+      await expect
+        .poll(() =>
+          row
+            .locator("[data-prayer-footer]")
+            .evaluateAll((nodes) =>
+              nodes.every(
+                (node) => node.firstElementChild!.getBoundingClientRect().height <= node.getBoundingClientRect().height,
+              ),
+            ),
+        )
+        .toBe(true);
       await expect
         .poll(() =>
           row.locator("[data-prayer-footer]").evaluateAll((nodes) => {
@@ -290,6 +301,7 @@ for (const language of ["ar", "en"] as const) {
           };
         }),
       );
+      await page.screenshot({ path: testInfo.outputPath("enlarged-footer-geometry.png") });
       expect(footerTextBounds).toHaveLength(5);
       expect(
         footerTextBounds.every(

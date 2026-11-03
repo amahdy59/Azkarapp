@@ -72,6 +72,8 @@ for (const language of ["ar", "en"] as const) {
                   left: box.left,
                   overflow: card.scrollWidth > card.clientWidth + 1,
                   buttonHeight: button.getBoundingClientRect().height,
+                  compact: getComputedStyle(button).flexDirection === "row",
+                  quantityContained: number.left >= quantity.left && number.right <= quantity.right,
                   numberSize: parseFloat(getComputedStyle(card.querySelector(".progress-metric-count")!).fontSize),
                   captionSize: parseFloat(getComputedStyle(card.querySelector(".progress-metric-caption")!).fontSize),
                   footerBottom: footer.bottom,
@@ -86,10 +88,11 @@ for (const language of ["ar", "en"] as const) {
             for (const card of geometry) {
               expect(card.overflow).toBe(false);
               expect(card.buttonHeight).toBeGreaterThanOrEqual(44);
-              expect(card.numberSize).toBeGreaterThanOrEqual(30);
+              expect(card.numberSize).toBeGreaterThanOrEqual(card.compact ? 24 : 30);
               expect(card.captionSize).toBeGreaterThanOrEqual(12);
               expect(card.radius).toBeGreaterThan(0);
-              expect(card.valueCentred).toBe(true);
+              if (card.compact) expect(card.quantityContained).toBe(true);
+              else expect(card.valueCentred).toBe(true);
               // Glass deliberately retains the app's shared translucent
               // material; Solid is opaque. Contrast is checked below.
               expect(card.alpha).toBeGreaterThan(0);

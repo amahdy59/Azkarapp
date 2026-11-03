@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AccessibleCombobox } from "./AccessibleCombobox";
+import { Modal } from "./ResponsiveSheet";
 
 const testOptions = [
   { id: 1, label: "Al-Fatihah", secondaryLabel: "1–1", badge: 1 },
@@ -9,6 +10,20 @@ const testOptions = [
 ];
 
 describe("AccessibleCombobox", () => {
+  it("keeps Escape inside the picker so its parent dialog remains open", async () => {
+    const closeParent = vi.fn();
+    render(
+      <Modal open onClose={closeParent} title="Reading plan" direction="ltr">
+        <AccessibleCombobox label="Surah" value={1} options={testOptions} onChange={vi.fn()} />
+      </Modal>,
+    );
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Escape" });
+    expect(closeParent).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.queryByRole("textbox")).not.toBeInTheDocument());
+    expect(screen.getByRole("combobox")).toHaveFocus();
+    expect(screen.getByRole("dialog", { name: "Reading plan" })).toBeVisible();
+  });
   it("finds a Quran choice by its other-language name and selects it with the keyboard", () => {
     const onChange = vi.fn();
     render(

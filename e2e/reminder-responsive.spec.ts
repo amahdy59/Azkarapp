@@ -88,10 +88,9 @@ for (const language of ["ar", "en"] as const) {
 test("Relevant now recovers after a failed first request without reloading or refetching each minute @cross-browser", async ({
   page,
 }) => {
-  const manifest = JSON.parse(readFileSync("src/app/content/homeReminderManifest.json", "utf8")) as { url: string };
   const bytes = readFileSync("src/app/content/home-reminder-readings.bin");
   let requests = 0;
-  await page.route(manifest.url, (route) => {
+  await page.route("**/assets/home-reminder-readings-*.bin", (route) => {
     requests++;
     return requests === 1
       ? route.fulfill({ status: 503, body: "Unavailable" })

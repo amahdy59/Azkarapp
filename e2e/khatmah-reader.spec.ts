@@ -345,14 +345,28 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
     )
     .toEqual({ sameMode: true, visible: true });
   const spreadGeometry = await page.locator("[data-mushaf-page]").evaluateAll((pages) => {
-    const frames = pages.map((page) => page.querySelector<HTMLElement>(".mushaf-page-frame")?.getBoundingClientRect());
+    // Facing paper canvases are equal; each inner ink frame follows its own
+    // fitted measure, which differs between pages in the Unicode fallback.
+    const frames = pages.map((page) => page.getBoundingClientRect());
     return {
       widthDelta: Math.abs((frames[0]?.width ?? 0) - (frames[1]?.width ?? 0)),
       heightDelta: Math.abs((frames[0]?.height ?? 0) - (frames[1]?.height ?? 0)),
+      pages: pages.map((page) => ({
+        mode: page.getAttribute("data-mushaf-rendering"),
+        frame: page.querySelector(".mushaf-page-frame")!.getBoundingClientRect().toJSON(),
+        measure: (page as HTMLElement).style.getPropertyValue("--mushaf-measure"),
+      })),
+      inkContained: pages.every((page) => {
+        const paper = page.getBoundingClientRect();
+        const ink = page.querySelector(".mushaf-page-frame")!.getBoundingClientRect();
+        return ink.left >= paper.left && ink.right <= paper.right && ink.top >= paper.top && ink.bottom <= paper.bottom;
+      }),
     };
   });
-  expect(spreadGeometry.widthDelta).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: testInfo.outputPath("spread-geometry.png") });
+  expect(spreadGeometry.widthDelta, JSON.stringify(spreadGeometry)).toBeLessThanOrEqual(1);
   expect(spreadGeometry.heightDelta).toBeLessThanOrEqual(1);
+  expect(spreadGeometry.inkContained).toBe(true);
   const widestWordGap = await article.locator("[data-mushaf-line-content]").evaluateAll((lines) =>
     Math.max(
       0,

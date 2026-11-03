@@ -42,12 +42,21 @@ export async function chooseProgressOption(control: Locator, value: string) {
   if (!(await control.isVisible()) && (await control.page().getByTestId("progress-filters-toggle").isVisible()))
     await control.page().getByTestId("progress-filters-toggle").click();
   const id = await control.getAttribute("id");
+  const previousValue = await control.getAttribute("data-progress-value");
   await control.click();
   await control
     .page()
     .getByRole("option")
     .and(control.page().locator(`[data-progress-value="${value}"]`))
     .click();
+  // Radix does not emit value-change for reselecting the applied preset.
+  // Dismiss that unchanged editor through its real keyboard recovery path.
+  if (
+    previousValue === value &&
+    value !== "custom" &&
+    (await control.page().getByTestId("progress-filter-sheet").isVisible())
+  )
+    await control.page().keyboard.press("Escape");
   const applied = id ? control.page().locator(`[id="${id}"]`) : control;
   if (await applied.isVisible()) await expect(applied).toHaveAttribute("data-progress-value", value);
   else await expect(filters).toHaveAttribute("data-progress-value", value);
