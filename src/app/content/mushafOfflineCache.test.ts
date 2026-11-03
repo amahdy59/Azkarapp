@@ -145,10 +145,9 @@ describe("mushafOfflineCache", () => {
     });
     vi.stubGlobal(
       "fetch",
-      vi.fn((input: RequestInfo | URL) => {
-        const url = String(input);
-        return Promise.resolve(new Response("", { status: url.includes("/fonts/") ? 503 : 200 }));
-      }),
+      vi.fn(async (input: RequestInfo | URL) =>
+        String(input).includes(".woff2") ? new Response(null, { status: 503 }) : new Response(pageBytes),
+      ),
     );
 
     await expect(downloadMushaf()).rejects.toThrow(/Mushaf font \d+ failed: 503/);
