@@ -31,6 +31,7 @@ it.each([false, true])(
     const details = screen.getByTestId("filters");
     const summary = screen.getByRole("button", { name: /Search and filters/ });
     expect(summary).toHaveAttribute("aria-expanded", "false");
+    summary.focus();
     fireEvent.click(summary);
     expect(screen.getByRole("textbox")).toHaveValue("morning");
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "evening" } });
