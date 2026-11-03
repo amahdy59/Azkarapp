@@ -235,7 +235,7 @@ test("Quran zikr requests its font before slow local page data resolves and keep
     await expect.poll(() => fontRequested).toBe(true);
     const text = page.getByTestId("zikr-text");
     await expect(text).toBeVisible();
-    await expect(text).toContainText("قُلْ");
+    await expect(text.getByRole("status")).toHaveText("Loading");
     await expect(text.locator("[data-quran-glyph]")).toHaveCount(0);
     release();
     await expect(text).toContainText("قُلْ");

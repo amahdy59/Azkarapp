@@ -102,7 +102,9 @@ for (const { language, width } of (["ar", "en"] as const).flatMap((language) =>
     if (width === 1440) {
       const indicator = page.getByTestId("audio-play-all-indicator");
       await expect(indicator).toContainText(language === "ar" ? "تلقائي" : "Play next");
-      await expect(indicator).toHaveAccessibleName(language === "ar" ? "تشغيل التالي تلقائيًا" : "Auto-play next");
+      await expect(indicator.getByRole("switch")).toHaveAccessibleName(
+        language === "ar" ? "تشغيل التالي تلقائيًا" : "Auto-play next",
+      );
       const layout = await indicator.evaluate((node) => ({
         label: node.getBoundingClientRect().bottom,
         controls: document.querySelector(".audio-seek-row")!.getBoundingClientRect().top,

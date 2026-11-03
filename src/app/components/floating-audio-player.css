@@ -749,7 +749,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   --control-cue-scale: 1.035;
 }
 .audio-play-all-indicator {
-  flex: 0 1 auto;
+  flex: 0 1 8rem;
 }
 .audio-continuation-switch {
   inline-size: 100%;

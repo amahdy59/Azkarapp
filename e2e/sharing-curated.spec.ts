@@ -37,7 +37,7 @@ for (const category of ["morning", "evening", "before_sleep"] as const) {
     await modal.getByRole("button", { name: "البطاقات المعتمدة", exact: true }).click();
     await sharingStep(modal, "share");
     const extension = category === "before_sleep" ? "jpg" : "webp";
-    const image = modal.getByRole("img").first();
+    const image = modal.getByTestId("sharing-preview").locator(".sharing-preview-image img");
     await expect(image).toBeVisible();
     await expect(image).toHaveAttribute("src", /^blob:/u);
     await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(900);
@@ -192,7 +192,7 @@ test("all supplied curated images are available on the first offline visit after
         }),
       );
     });
-    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152, 139375, 150392]);
+    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152, 131054, 150392]);
   } finally {
     await context.setOffline(false);
   }

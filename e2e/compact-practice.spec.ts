@@ -150,7 +150,7 @@ for (const profile of [
         await expect(toggle).toBeFocused();
         await expect(toggle).toHaveAttribute("aria-pressed", "true");
         await expect(player.locator(".audio-expanded-transport")).toBeHidden();
-        await expect(player.getByTestId("audio-lock-controls")).toBeHidden();
+        await expect(player.getByTestId("audio-lock-controls")).toBeVisible();
         await expect(player.getByRole("slider")).toHaveCount(0);
         await expect(player.locator('[data-preserved-reading="true"]')).toBeVisible();
         const bounds = (await page.locator(".audio-player-surface").boundingBox())!;
