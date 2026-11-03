@@ -4,6 +4,20 @@ import { describe, expect, it, vi } from "vitest";
 import { PwaNotice } from "./PwaNotice";
 
 describe("PwaNotice", () => {
+  it("keeps Later enabled while the update is preparing", () => {
+    render(
+      <PwaNotice
+        title="Update available"
+        actionLabel="Preparing"
+        actionDisabled
+        dismissLabel="Later"
+        onAction={vi.fn()}
+        onDismiss={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Preparing" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Later" })).toBeEnabled();
+  });
   it("lets manual update review focus its native action", () => {
     const actionRef = createRef<HTMLButtonElement>();
     render(

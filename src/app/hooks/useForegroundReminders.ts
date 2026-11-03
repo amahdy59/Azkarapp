@@ -3,8 +3,7 @@ import { contextReminderPlan, type ContextReminderKind } from "../contextReminde
 import { isNativeAndroid, rescheduleNativeReminders } from "@azkar/native-reminders";
 import { readNotificationPermission, showBrowserNotification } from "../notifications";
 import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
-import { t } from "../i18n";
-import { formatNumerals } from "../formatting";
+import { notificationCopy } from "../notificationCopy";
 import { DEFAULT_PROGRESS_DAY_START_HOUR, getProgressDayKey } from "../progress";
 import type {
   AppLanguage,
@@ -190,14 +189,9 @@ async function deliverNotification(
   isCurrent: () => boolean,
 ) {
   const isPrayer = reminder.kind === "prayer";
-  const prayerName = isPrayer ? t(language, `notifications.${reminder.prayer}`) : "";
+  const { title, body } = notificationCopy(language, reminder);
   const options: NotificationOptions = {
-    body: isPrayer
-      ? t(language, "notifications.prayerReminderBody", {
-          prayer: prayerName,
-          minutes: formatNumerals(reminder.leadMinutes, language),
-        })
-      : t(language, `notifications.${reminder.kind}`),
+    body,
     tag: `azkar-${reminderHistoryKey(reminder).replace(":", "-")}-${dayKey}`,
     lang: language,
     dir: language === "ar" ? "rtl" : "ltr",
@@ -207,8 +201,6 @@ async function deliverNotification(
       url: `${import.meta.env.BASE_URL}#/azkar/${isPrayer ? "after_prayer" : reminder.category}`,
     },
   };
-  const title = isPrayer ? t(language, "notifications.prayerReminderTitle", { prayer: prayerName }) : "Azkar";
-
   return showBrowserNotification(title, options, isCurrent);
 }
 

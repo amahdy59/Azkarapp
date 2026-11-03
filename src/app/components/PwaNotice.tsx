@@ -10,6 +10,7 @@ export function PwaNotice({
   onAction,
   onDismiss,
   isActionLoading,
+  actionDisabled,
   statusMessage,
   errorMessage,
   actionRef,
@@ -22,6 +23,7 @@ export function PwaNotice({
   onAction?: () => void;
   onDismiss: () => void;
   isActionLoading?: boolean;
+  actionDisabled?: boolean;
   statusMessage?: string;
   errorMessage?: string;
   actionRef?: Ref<HTMLButtonElement>;
@@ -79,7 +81,7 @@ export function PwaNotice({
             ref={actionRef}
             type="button"
             onClick={onAction}
-            disabled={isActionLoading}
+            disabled={isActionLoading || actionDisabled}
             className="text-label disabled:cursor-not-allowed"
           >
             {isActionLoading && (

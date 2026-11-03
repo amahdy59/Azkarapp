@@ -248,8 +248,10 @@
   background-color: rgb(255 255 255 / 0.08);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
 }
-.home-header-path-button:hover {
-  background-color: rgb(255 255 255 / 0.14);
+@media (hover: hover) and (pointer: fine) {
+  .home-header-path-button:hover {
+    background-color: rgb(255 255 255 / 0.14);
+  }
 }
 .home-header-path-divider {
   width: 1px;
@@ -280,8 +282,10 @@
 .home-glass-inset {
   background-color: rgb(2 6 23 / 0.12);
 }
-.home-glass-inset:hover {
-  background-color: rgb(2 6 23 / 0.2);
+@media (hover: hover) and (pointer: fine) {
+  .home-glass-inset:hover {
+    background-color: rgb(2 6 23 / 0.2);
+  }
 }
 
 /* Local feedback uses the shared press response without moving card content. */
@@ -310,7 +314,7 @@
   translate: 0 var(--home-action-lift, -2px);
 }
 .home-photo-canvas :is(a, summary):focus-visible .control-cue {
-  scale: var(--control-cue-scale, 1.08);
+  scale: var(--control-cue-scale, var(--motion-icon-hover-scale));
 }
 @media (hover: hover) and (pointer: fine) {
   .home-icon-action:enabled:hover::before {
@@ -320,7 +324,7 @@
     translate: 0 var(--home-action-lift, -2px);
   }
   .home-photo-canvas :is(a, summary):hover .control-cue {
-    scale: var(--control-cue-scale, 1.08);
+    scale: var(--control-cue-scale, var(--motion-icon-hover-scale));
   }
 }
 .home-icon-action:enabled:is(:active, [data-key-pressed])::before {

@@ -207,9 +207,37 @@ for (const scenario of [
     expect(symmetry.mirrorError).toBeLessThanOrEqual(1);
     expect(symmetry.alignmentError).toBeLessThanOrEqual(1);
     await expect(player.getByTestId("audio-seek-waveform")).toBeVisible();
+    const context = player.locator(".audio-expanded-feedback");
+    await expect(context.getByTestId("audio-queue-trigger")).toBeVisible();
+    await expect(context.getByTestId("audio-lock-controls")).toBeVisible();
+    await expect(context.getByRole("switch")).toBeVisible();
+    const row = await context.evaluate((element) => {
+      const controls = [...element.querySelectorAll("button")].map((button) => button.getBoundingClientRect());
+      const bounds = element.getBoundingClientRect();
+      return controls.every(
+        (box) =>
+          box.width >= 44 &&
+          box.left >= bounds.left - 1 &&
+          box.right <= bounds.right + 1 &&
+          Math.abs(box.top + box.height / 2 - (bounds.top + bounds.height / 2)) <= 1,
+      );
+    });
+    expect(row).toBe(true);
+    const autoPlay = context.getByRole("switch");
+    const autoLabel = autoPlay.locator(".audio-continue-label");
+    await expect(autoLabel).toBeVisible();
+    await expect(autoLabel).toHaveText(arabic ? "تلقائي" : "Play next");
+    expect(await autoLabel.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+    const queueWidth = (await context.getByTestId("audio-queue-trigger").boundingBox())!.width;
+    expect((await autoPlay.boundingBox())!.width).toBeGreaterThanOrEqual(queueWidth);
+
+    const contextBounds = (await context.boundingBox())!;
+    const seekBounds = (await player.locator(".audio-seek-row").boundingBox())!;
+    expect(contextBounds.y + contextBounds.height).toBeLessThanOrEqual(seekBounds.y + 1);
+
     const optionsTrigger = player.getByRole("button", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
     await expect(
-      player.getByRole("switch", { name: arabic ? "المتابعة التلقائية" : "Auto-continue", exact: true }),
+      player.getByRole("switch", { name: arabic ? "تشغيل التالي تلقائيًا" : "Auto-play next", exact: true }),
     ).toHaveAttribute("aria-checked", "true");
     await optionsTrigger.focus();
     await page.keyboard.press("Enter");
@@ -217,9 +245,90 @@ for (const scenario of [
     await expect(audioOptions.getByRole("switch")).toHaveCount(0); // One visible footer switch; no duplicate preference.
     expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
     await expect(audioOptions.getByTestId("audio-reciter-select")).toBeVisible();
-    await expect(audioOptions).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");
+    await expect(
+      audioOptions.getByText(arabic ? "عرض النص والمتابعة" : "Text and following", { exact: true }),
+    ).toHaveCount(0);
+    await expect(audioOptions).toHaveAttribute("data-dropdown-surface", "");
+    await expect(audioOptions.locator(".audio-options-scroll")).toHaveCSS("overflow-y", "auto");
+    await expect(player.locator(".audio-expanded-controls")).toHaveCSS("border-top-width", "0px");
+    const menuGeometry = await audioOptions.evaluate((node) => {
+      const scroll = node.querySelector<HTMLElement>(".audio-options-scroll")!;
+      const bounds = scroll.getBoundingClientRect();
+      const panel = node.getBoundingClientRect();
+      const fields = [...node.querySelectorAll<HTMLElement>(".audio-option-field")];
+      const gaps = fields.map((field) => {
+        const label = field.querySelector("label")!.getBoundingClientRect();
+        const input = field.querySelector('[role="combobox"]')!.getBoundingClientRect();
+        return input.top - label.bottom;
+      });
+      const groups = [
+        ...node.querySelectorAll<HTMLElement>(".audio-options-list, .audio-sleep-setting, .audio-quran-preferences"),
+      ];
+      return {
+        edgeInset: Math.max(Math.abs(bounds.left - panel.left), Math.abs(panel.right - bounds.right)),
+        flat: groups.every((group) => {
+          const style = getComputedStyle(group);
+          return (
+            style.backgroundColor === "rgba(0, 0, 0, 0)" &&
+            style.borderLeftWidth === "0px" &&
+            style.borderRightWidth === "0px"
+          );
+        }),
+        gaps,
+      };
+    });
+    expect(menuGeometry.edgeInset).toBeLessThanOrEqual(2);
+    expect(menuGeometry.flat).toBe(true);
+    expect(menuGeometry.gaps.length).toBeGreaterThanOrEqual(1);
+    expect(menuGeometry.gaps.every((gap) => gap >= 11)).toBe(true);
+    const pair = audioOptions.locator(".audio-options-pair");
+    expect(await pair.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+    for (const button of await pair.getByRole("combobox").or(pair.getByRole("button")).all()) {
+      const box = (await button.boundingBox())!;
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+    if (scenario.name === "phone") {
+      expect(
+        await audioOptions.locator(".audio-options-scroll").evaluate((node) => node.scrollHeight - node.clientHeight),
+      ).toBeLessThanOrEqual(1);
+    }
+
+    await expect(audioOptions.getByRole("button", { name: arabic ? "إغلاق" : "Close", exact: true })).toBeVisible();
+    if (scenario.name === "phone") {
+      const volume = pair.getByRole("button", { name: arabic ? "مستوى الصوت" : "Volume", exact: true });
+      if (await volume.count()) {
+        await volume.click();
+        const popup = page.getByTestId("audio-volume-popover");
+        await expect(popup).toHaveAttribute("data-dropdown-surface", "");
+        await expect(popup).toHaveCSS("background-color", "rgb(15, 23, 42)");
+        await page.keyboard.press("Escape");
+        await expect(popup).toHaveCount(0);
+        await expect(volume).toBeFocused();
+        await expect(audioOptions).toBeVisible();
+        await volume.click();
+        await audioOptions.locator(".audio-options-heading").dispatchEvent("pointerdown", { pointerType: "touch" });
+        await expect(popup).toHaveCount(0);
+        await expect(audioOptions).toBeVisible();
+      } else {
+        await expect(pair.getByText(arabic ? "مستوى الصوت" : "Volume", { exact: true })).toHaveCount(0);
+      }
+    }
+
+    const reciter = audioOptions.getByTestId("audio-reciter-select");
+    const borderBefore = await reciter.evaluate((node) => getComputedStyle(node).borderColor);
+    await reciter.hover();
+    await expect(reciter).toHaveCSS("border-color", borderBefore);
+    await expect(audioOptions).toHaveCSS("background-color", "rgb(15, 23, 42)");
     await expect(audioOptions).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
     await page.screenshot({ path: testInfo.outputPath(`frosted-options-${scenario.name}.png`) });
+    const help = audioOptions.locator(".audio-options-help");
+    await expect(help).not.toHaveAttribute("open");
+    await help.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await expect(help).toHaveAttribute("open", "");
+    await help.locator(".audio-sleep-note").scrollIntoViewIfNeeded();
+    await expect(help.locator(".audio-sleep-note")).toBeVisible();
     const speedAlignment = await audioOptions.locator(".audio-speed-select").evaluate((element) => {
       const value = element.querySelector('[data-slot="select-value"]')!.getBoundingClientRect();
       const icon = element.querySelector("svg")!.getBoundingClientRect();
@@ -229,6 +338,15 @@ for (const scenario of [
     await page.keyboard.press("Escape");
     await expect(audioOptions).toHaveCount(0);
     await expect(optionsTrigger).toBeFocused();
+    if (scenario.name === "phone") {
+      await optionsTrigger.click();
+      await expect(audioOptions).toBeVisible();
+      await audioOptions.getByTestId("audio-reciter-select").click();
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await player.locator(".audio-seek-row").dispatchEvent("pointerdown", { pointerType: "touch" });
+      await expect(page.getByRole("listbox")).toHaveCount(0);
+      await expect(audioOptions).toHaveCount(0);
+    }
     await expect(player).toHaveAttribute("data-variant", "expanded");
     const options = player.locator(".audio-expanded-options");
     const header = player.locator(".audio-expanded-header");

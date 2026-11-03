@@ -1,3 +1,7 @@
+## 2026-11-03 — Optional updates and mobile Masbaha settings
+
+The owner approves local implementation of background update preparation with explicit acceptance or Later, and a compact Masbaha settings button opening a sheet for dhikr and goals. Keep desktop selector behavior and the save/reset confirmation for an active count. The owner explicitly prohibits pushing this phase.
+
 ## 2026-11-03 — Narrow Progress tabs, notification wording and combined release
 
 The owner confirms the blank Progress toggles at 384px and below, requests removal of the obsolete icon-hiding rule with a narrow-screen regression, and requests notification enablement wording suitable for Android and browsers. The existing native permission adapter remains authoritative; shared permission labels become platform-neutral and blocked Android permission points to device app settings. The owner explicitly requests applying all fixes and pushing all changes. This supersedes the preceding local publication hold and authorizes releasing the complete pending working tree after unchanged local and exact-commit CI gates. Physical-device/AT acceptance remains separate from browser and adapter tests.
@@ -5300,3 +5304,41 @@ Owner screenshots authorize a scoped alignment checkpoint: remove the Mushaf ind
 ## 2026-11-02 — Grain accepted and adaptive navigation approved
 
 The owner accepts the procedural light grain. The owner then approves implementing the navigation recommendation with Settings permanently retained: compact/medium Home, Quran, Azkar, Qibla, Settings; add Masbaha only when the navigation container has 36rem available, so enlarged text recovers to five items. Keep the Home Masbaha card and More fallback. Progress is secondary on compact screens via Today's path and More; keep existing Progress URLs and wide-navigation access. Add a discoverable Home More action; expose utilities in wide rail/sidebar with one active selection. Stable container thresholds govern optional visibility, not screen content, scrolling or audio state. Existing immersive reading/focus exclusions remain. No content, data, routing-system replacement or publication. Physical-device acceptance remains separate.
+
+## 2026-11-03 — Dark paper strength and audio/Mushaf recommendations
+
+The owner requests a modest dark-paper increase and asks for audio-footer and Mushaf performance recommendations. Increase only the authored dark/Glass tile's opacity calibration, preserve accepted light-paper bytes, static paint ownership, existing asset/bundle ceilings and accessibility opt-outs. Inspect and report audio/download proposals separately; the existing queue/repetition/continuation semantics and canonical Mushaf reference remain authoritative. Preserve pending optional-update/Masbaha work. The owner's explicit local-only/no-push instruction remains in force.
+
+## 2026-11-03 — Quran entry font/size stability
+
+The owner asks to continue locally and reports a brief font/size change when opening Quran pages and Quran-containing azkar. Repair avoidable warm-entry fallback and partially initialized spreads, start critical resources together and add small navigation-intent warm-up. Keep exact content, fifteen-line geometry, offline data, immediate readable fallback and late-font recovery. Do not hide loading with artificial waits or add a new cache/dependency. All changes remain local, with publication prohibited.
+
+## 2026-11-03 — Audio focus controls and Mushaf performance
+
+The owner approves compact queue and repetition context, Play next, and independent audio focus and control lock. The owner also approves foreground Mushaf request priority, bounded decoded-font retention and independent offline status checks. See the local audio footer and Mushaf performance phase.
+
+## 2026-11-03 — Labelled auto-play and subtle audio hover
+
+The owner rejects the large queue selector and icon-only continuation switch. Give the switch a visible concise label and spare width, bound queue/repeat to their content, and retain the one-row arrangement. Use an audio-scoped tint and small icon cue for hover, with keyboard focus and reduced-motion alternatives. Simplify the timer description and group its field. The local-only instruction applies.
+
+## 2026-11-03 — Flat audio menu and quiet collection headers
+
+The owner rejects cards within the audio options panel and the deeply inset scrollbar. This supersedes the preceding rail-under-Close alignment: keep a fixed header, flat labelled sections, section dividers and an edge scrollbar with consistent content gutters. Input fields retain their boundaries. Remove individual title/action background fills from decorated collection headers and the Back control finish while preserving the shared contrast surface and keyboard indicators. Retain all previous footer, optional update, Masbaha and Mushaf work locally. No commit, push or deployment.
+
+The owner then requests less scrolling: pair speed and volume when labels fit, stack them for enlarged text, preserve full-width voice/timer fields, and move supporting timer/device prose into Playback help. Keep ordinary phone options visible without scrolling, related text controls together and unsupported iOS volume rows absent. Native disclosure and all controls retain keyboard access and 44px targets.
+
+## 2026-11-03 — Final auto-play copy and compact keyboard menus
+
+The owner chooses تلقائي for the visible Arabic auto-play label; keep the full accessible name. Keyboard-help entries leave compact zikr, Masbaha and Friday menus below their existing 768px wide-header boundary. This supersedes earlier phone-menu discoverability guidance. Actual keyboard shortcuts and wide-menu access remain. Existing Mushaf rail-only keyboard help retains its contract. Consolidate previous comments and preserve the publication hold.
+
+## 2026-11-03 — Menu dismissal and notification writing
+
+The owner requests outside-pointer dismissal, flat visual groups without headings and clear bilingual reminder messages. Keep the existing prayer/route contracts and validated device cache. Verify saved Mushaf page/font reuse after a fresh document load. Continue showing readable fallback on genuinely uncached entries, pending evidence of a repeat download or a different cold-entry policy. Changes remain local.
+
+## 2026-11-03 — Mushaf bands and compact embedded surahs
+
+The owner reports that phone controls can cover the first line and prefers a compact embedded surah without the decorative title. The phone controls now reserve actual in-flow space outside the paper, including translation tools and the focus exit. For short surahs inside zikr groups this supersedes the ornamental presentation in DEC-127. Preserve the basmalah, named accessible group, existing text and source layout in the full Mushaf. Keep the implementation local.
+
+## 2026-11-03 — Stable first-visit lettering, size catalog and hover review
+
+The owner approves brief bounded preparation then stable readable fallback for the visit, a measured versioned Mushaf size catalog, the mobile Progress sticky-header repair and an app-wide hover review. This supersedes earlier immediate-fallback/late-upgrade presentation. Reuse existing data/font caches and explicit retry. Shared icons use a smaller 1.05 cue, audio retains 1.035, and card pointer feedback uses a quiet inset tint with keyboard focus boundaries. The latest instruction keeps the working tree local.

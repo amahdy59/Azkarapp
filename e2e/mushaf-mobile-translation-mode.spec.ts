@@ -27,6 +27,13 @@ test("Compact mode retains Arabic recovery offline in every theme @cross-browser
   const retry = page.getByRole("button", { name: t("ar", "mushaf.retry"), exact: true });
   await expect(retry).toBeVisible();
   await expect(page.getByRole("radio", { name: "English", exact: true })).toBeChecked();
+  await page.getByTestId("mushaf-more-actions").click();
+  await page.getByTestId("mushaf-focus-enter").click();
+  await expect(canvas).toBeVisible();
+  await expect(page.getByTestId("mushaf-translation-toolbar")).toHaveCount(0);
+  await page.getByTestId("mushaf-focus-exit").click();
+  await expect(page.getByRole("radio", { name: "English", exact: true })).toBeChecked();
+  await expect(retry).toBeVisible();
   for (const theme of ["light", "dark", "midnight"] as const) {
     await page.getByTestId("mushaf-more-actions").click();
     await page.getByTestId(`quick-theme-${theme}`).click();

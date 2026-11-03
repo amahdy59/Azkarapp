@@ -489,7 +489,6 @@ describe("AudioProvider integration", () => {
 
     // Where the reader is in a prescribed repetition, said once.
     fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
-    expect(screen.getByRole("button", { name: "Repeat 3 times" })).toBeInTheDocument();
 
     // Select a rate directly and verify the real controller updates the displayed value.
     const speed = screen.getByRole("combobox", { name: /Speed/ });
@@ -498,6 +497,8 @@ describe("AudioProvider integration", () => {
     fireEvent.click(screen.getByRole("option", { name: "1.25×" }));
     expect(screen.getByRole("combobox", { name: /Speed/ })).toHaveTextContent("1.25×");
 
+    fireEvent.keyDown(document.activeElement ?? document.body, { key: "Escape" });
+    fireEvent.click(screen.getByTestId("audio-repetition-progress"));
     const repeat = screen.getByRole("button", { name: "Repeat 3 times" });
     expect(repeat).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(repeat);

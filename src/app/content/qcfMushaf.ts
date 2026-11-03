@@ -13,6 +13,8 @@
  * and offline reads are instant.
  */
 
+import { promoteMushafRequest, scheduleMushafRequest, type MushafPriority } from "./mushafScheduler";
+
 export type MushafWordTuple = [
   position: number,
   lineNumber: number,
@@ -35,6 +37,42 @@ const pageCache = new Map<number, MushafVerseData[]>();
 const pendingPages = new Map<number, Promise<MushafVerseData[]>>();
 const readyFonts = new Set<number>();
 const pendingFonts = new Map<number, Promise<boolean>>();
+const decodedFonts = new Map<number, FontFace>();
+const pinnedFonts = new Map<number, number>();
+const MAX_DECODED_FONTS = 12;
+
+function trimDecodedFonts(except?: number) {
+  for (const [page, face] of decodedFonts) {
+    if (decodedFonts.size <= MAX_DECODED_FONTS) break;
+    if (page === except || pinnedFonts.has(page)) continue;
+    document.fonts?.delete?.(face);
+    decodedFonts.delete(page);
+    readyFonts.delete(page);
+  }
+}
+
+/** Mounted readers own leases; eviction never removes their matching page font. */
+export function retainQcfFonts(pages: readonly number[]) {
+  const unique = [...new Set(pages.filter((page) => page >= 1 && page <= 604))];
+  for (const page of unique) pinnedFonts.set(page, (pinnedFonts.get(page) ?? 0) + 1);
+  return () => {
+    for (const page of unique) {
+      const count = pinnedFonts.get(page) ?? 0;
+      if (count <= 1) pinnedFonts.delete(page);
+      else pinnedFonts.set(page, count - 1);
+    }
+    queueMicrotask(() => trimDecodedFonts());
+  };
+}
+
+export function getMushafMemoryStats() {
+  return {
+    decodedFonts: decodedFonts.size,
+    pinnedFonts: pinnedFonts.size,
+    fontLimit: MAX_DECODED_FONTS,
+    parsedPages: pageCache.size,
+  };
+}
 
 export function getMushafPageUrl(page: number) {
   const base = import.meta.env.BASE_URL || "/";
@@ -134,6 +172,14 @@ export function isQcfFontReady(page: number): boolean {
   return readyFonts.has(page);
 }
 
+/** Synchronous first paint only when its canonical glyph mode is already ready. */
+export function getReadyMushafPage(page: number) {
+  const data = getCachedMushafPage(page);
+  if (!data) return null;
+  const qcf = pageHasQcfGlyphs(data);
+  return qcf && !isQcfFontReady(page) ? null : { page, data, qcf };
+}
+
 function rememberPage(page: number, data: MushafVerseData[]) {
   pageCache.delete(page);
   pageCache.set(page, data);
@@ -149,12 +195,15 @@ function rememberPage(page: number, data: MushafVerseData[]) {
  * neighbour prefetch, so letting one consumer's AbortSignal cancel it would let
  * a fast double tap cancel the page the reader is about to show.
  */
-export function loadMushafPage(page: number): Promise<MushafVerseData[]> {
+export function loadMushafPage(page: number, priority: MushafPriority = "foreground"): Promise<MushafVerseData[]> {
   const cached = pageCache.get(page);
   if (cached) return Promise.resolve(cached);
 
   const pending = pendingPages.get(page);
-  if (pending) return pending;
+  if (pending) {
+    promoteMushafRequest(`page:${page}`, priority);
+    return pending;
+  }
 
   const request = (async () => {
     const url = getMushafPageUrl(page);
@@ -177,7 +226,7 @@ export function loadMushafPage(page: number): Promise<MushafVerseData[]> {
       }
     }
 
-    const response = await fetch(url);
+    const response = await scheduleMushafRequest(`page:${page}`, () => fetch(url), priority);
     if (!response.ok) throw new Error(`Mushaf page ${page} request failed with HTTP ${response.status}`);
     const parsed = await readMushafPageResponse(response);
     if (!parsed) throw new Error(`Mushaf page ${page} did not match the expected shape`);
@@ -257,27 +306,7 @@ async function openFontCache(): Promise<Cache | null> {
   }
 }
 
-const injectedStyles = new Set<number>();
-
-export function injectFontFaceRule(page: number) {
-  if (typeof document === "undefined" || injectedStyles.has(page)) return;
-  injectedStyles.add(page);
-  const family = getQcfFontFamily(page);
-  const primaryUrl = getQcfFontUrl(page);
-
-  const style = document.createElement("style");
-  style.setAttribute("data-qcf-page", String(page));
-  style.textContent = `
-    @font-face {
-      font-family: '${family}';
-      src: url('${primaryUrl}') format('woff2');
-      font-display: swap;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-async function createFontFace(page: number): Promise<FontFace> {
+async function createFontFace(page: number, priority: MushafPriority): Promise<FontFace> {
   const family = getQcfFontFamily(page);
   const primaryUrl = getQcfFontUrl(page);
   const cache = await openFontCache();
@@ -292,14 +321,15 @@ async function createFontFace(page: number): Promise<FontFace> {
         response = undefined;
       }
       if (!response) {
-        const network = await fetch(primaryUrl);
+        const network = await scheduleMushafRequest(`font:${page}`, () => fetch(primaryUrl), priority);
         const bytes = await readQcfFontResponse(network);
         if (bytes) {
           await cache.put(primaryUrl, network.clone()).catch(() => undefined);
           return new FontFace(family, bytes);
         }
       }
-    } catch {
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") throw error;
       /* Fall through to the plain URL source below. */
     }
   }
@@ -307,44 +337,39 @@ async function createFontFace(page: number): Promise<FontFace> {
   return new FontFace(family, `url(${primaryUrl})`);
 }
 
-type FontLoadListener = (page: number) => void;
-const fontLoadListeners = new Set<FontLoadListener>();
-
-export function subscribeQcfFontLoaded(listener: FontLoadListener): () => void {
-  fontLoadListeners.add(listener);
-  return () => {
-    fontLoadListeners.delete(listener);
-  };
-}
-
-export function loadQcfFont(page: number): Promise<boolean> {
+export function loadQcfFont(page: number, priority: MushafPriority = "foreground"): Promise<boolean> {
   if (page < 1 || page > 604) return Promise.resolve(false);
-  injectFontFaceRule(page);
 
   if (typeof FontFace === "undefined" || typeof document === "undefined" || !document.fonts) {
     readyFonts.add(page);
     return Promise.resolve(true);
   }
-  if (readyFonts.has(page)) return Promise.resolve(true);
+  if (readyFonts.has(page)) {
+    const face = decodedFonts.get(page);
+    if (face) {
+      decodedFonts.delete(page);
+      decodedFonts.set(page, face);
+    }
+    return Promise.resolve(true);
+  }
 
   const pending = pendingFonts.get(page);
-  if (pending) return pending;
+  if (pending) {
+    promoteMushafRequest(`font:${page}`, priority);
+    return pending;
+  }
 
   const request = (async () => {
     try {
-      const face = await createFontFace(page);
+      const face = await createFontFace(page, priority);
       const loaded = await face.load();
       document.fonts.add(loaded);
       readyFonts.add(page);
-      for (const listener of fontLoadListeners) {
-        try {
-          listener(page);
-        } catch {
-          /* ignore listener errors */
-        }
-      }
+      decodedFonts.set(page, loaded);
+      trimDecodedFonts(page);
       return true;
-    } catch {
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return false;
       // A structurally complete WOFF2 file can still fail browser decoding.
       // Remove only that derived font so the next explicit attempt can recover.
       try {
@@ -392,13 +417,37 @@ export async function discardRetiredCaches(): Promise<string[]> {
  * parsing work. Callers with strong navigation intent may await this; ordinary
  * look-ahead uses the non-blocking wrapper below.
  */
-export async function prepareMushafPage(page: number): Promise<boolean> {
+export async function prepareMushafPage(page: number, priority: MushafPriority = "foreground"): Promise<boolean> {
   if (page < 1 || page > 604) return false;
-  const [, fontReady] = await Promise.all([loadMushafPage(page), loadQcfFont(page)]);
+  const [, fontReady] = await Promise.all([loadMushafPage(page, priority), loadQcfFont(page, priority)]);
   return fontReady;
 }
 
+/** Choose the typeface once before painting this visit. Late fonts warm the next visit. */
+export async function resolveMushafPage(page: number, loadPageFont = true) {
+  const font = loadPageFont ? loadQcfFont(page).catch(() => false) : Promise.resolve(false);
+  const data = await loadMushafPage(page);
+  if (!loadPageFont || !pageHasQcfGlyphs(data)) return { page, data, qcf: false };
+  if (isQcfFontReady(page)) return { page, data, qcf: true };
+  return { page, data, qcf: await waitForQcfFont(font) };
+}
+
+export async function waitForQcfFont(font: Promise<boolean>) {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      font,
+      new Promise<boolean>((resolve) => {
+        timeout = setTimeout(() => resolve(false), 1200);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 /** Warms a neighbouring page without ever surfacing its failure. */
-export function prefetchMushafPage(page: number) {
-  void prepareMushafPage(page).catch(() => undefined);
+export function prefetchMushafPage(page: number, priority: "next" | "prefetch" = "next") {
+  if (typeof document !== "undefined" && document.hidden) return;
+  void prepareMushafPage(page, priority).catch(() => undefined);
 }

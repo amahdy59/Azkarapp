@@ -19,6 +19,12 @@
   scroll-padding-block: 4px;
   overscroll-behavior: contain;
 }
+.progress-screen-content {
+  display: contents;
+}
+.progress-screen {
+  isolation: isolate;
+}
 
 .progress-controls-inner {
   display: flex;

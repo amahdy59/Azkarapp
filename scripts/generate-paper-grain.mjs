@@ -87,11 +87,13 @@ try {
       const rgb = name === "light" ? [128, 128, 128] : [gray, gray, gray];
       // The new light candidate is continuous procedural paper, without the
       // previous pore cut. A narrow neutral alpha palette keeps the material
-      // soft and small. Dark retains the existing authored fractal unchanged.
+      // soft and small. A modest opacity gain makes dark paper more visible;
+      // retain its original quantization so frequency and transfer size stay stable.
+      const darkAlpha = Math.round((source[i + 3] * 0.07) / 3) * 3;
       const alpha =
         name === "light"
           ? Math.round(Math.max(0, Math.min(28, 8 + ((mean - softGray[i / 4]) / deviation) * 4)) / 2) * 2
-          : Math.round((source[i + 3] * 0.07) / 3) * 3;
+          : Math.round(darkAlpha * 1.35);
       const key = `${rgb},${alpha}`;
       if (!lookup.has(key)) {
         lookup.set(key, palette.length);

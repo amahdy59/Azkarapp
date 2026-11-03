@@ -135,7 +135,7 @@ for (const language of ["ar", "en"] as const) {
       await page.keyboard.press("Tab");
       await metric.focus();
       const metricGeometry = await metric.boundingBox();
-      await expect(badge).toHaveCSS("scale", mode === "default" ? "1.1" : "1");
+      await expect(badge).toHaveCSS("scale", mode === "default" ? "1.05" : "1");
       await page.keyboard.down(" ");
       await expect(metric).toHaveAttribute("data-key-pressed", "");
       await expect(badge).toHaveCSS("scale", mode === "default" ? "0.98" : "1");

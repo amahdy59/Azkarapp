@@ -88,6 +88,16 @@ function createController(): AudioController {
 }
 
 describe("FloatingAudioPlayer", () => {
+  it("announces buffering without adding a visible line above the zikr", () => {
+    const controller = createController();
+    controller.state.status = "buffering";
+    render(<FloatingAudioPlayer controller={controller} language="en" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    const player = screen.getByRole("region", { name: "Audio player" });
+    expect(player.querySelector(".audio-expanded-reading [role=status]")).toBeNull();
+    expect(player.querySelector("[role=status].sr-only")).toBeInTheDocument();
+  });
+
   it("focuses the current reading without stopping audio and restores the shell and focus on Escape", () => {
     const shell = document.createElement("div");
     const nav = document.createElement("nav");
@@ -184,7 +194,7 @@ describe("FloatingAudioPlayer", () => {
     rerender(<FloatingAudioPlayer controller={controller} language="en" />);
     expect(screen.getByTestId("audio-player-arabic-text")).not.toBeVisible();
   });
-  it("highlights the spoken language independent of interface language and clears cues between tracks", () => {
+  it("highlights the spoken language independent of interface language and clears cues between tracks", async () => {
     const controller = createController();
     const text = "Allah protects";
     controller.currentEntry = { ...entry, contentKind: "dua", translation: text, arabicText: "اللَّهُ" };
@@ -202,7 +212,9 @@ describe("FloatingAudioPlayer", () => {
     expect(container.querySelector("[data-listening-word]")?.textContent).toBe("Allah");
     expect(container.querySelector("[data-listening-word]")?.closest("p")).toHaveAttribute("lang", "en");
     expect(screen.getByTestId("audio-player-zikr-text").textContent).toBe(text);
-    expect(screen.getByTestId("audio-player-arabic-text").textContent).toBe("اللَّهُ");
+    await waitFor(() => expect(screen.getByTestId("audio-player-arabic-text").textContent).toBe("اللَّهُ"), {
+      timeout: 2000,
+    });
     const highlight = screen.getByRole("button", { name: "تمييز الكلمات" });
     expect(highlight).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(highlight);
@@ -377,6 +389,7 @@ describe("FloatingAudioPlayer", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(trigger);
     const slider = screen.getByRole("slider", { name: "Volume" });
+    expect(screen.getByTestId("audio-volume-popover")).toHaveAttribute("data-dropdown-surface", "");
     expect(slider).toHaveAttribute("aria-orientation", "vertical");
     fireEvent.change(slider, { target: { value: "0.4" } });
     expect(controller.setVolume).toHaveBeenCalledWith(0.4);
@@ -465,7 +478,7 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("button", { name: "Pause audio" })).toBeInTheDocument();
   });
 
-  it("keeps the repeat state visible and offers one prescribed-repeat control in audio options", () => {
+  it("keeps repeat progress concise and opens its prescribed-repeat control from the footer", () => {
     const controller = createController();
     const repeatableEntry: PlaybackEntry = {
       ...entry,
@@ -478,8 +491,8 @@ describe("FloatingAudioPlayer", () => {
     render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
-    expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("Repeat 3 times");
-    fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
+    expect(screen.getByTestId("audio-repetition-progress")).toHaveTextContent("1 / 3");
+    fireEvent.click(screen.getByTestId("audio-repetition-progress"));
     const repeatBtn = screen.getByRole("button", { name: "Repeat 3 times" });
     expect(repeatBtn).toBeInTheDocument();
     expect(repeatBtn).toHaveAttribute("aria-pressed", "true");
@@ -530,7 +543,7 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("33 / 33");
   });
 
-  it("renders Quranic verses with ornamental ayah badges in expanded zikr text", () => {
+  it("renders Quranic verses with ornamental ayah badges in expanded zikr text", async () => {
     const controller = createController();
     const quranEntry: PlaybackEntry = {
       ...entry,
@@ -542,7 +555,7 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
 
     const zikrText = screen.getByTestId("audio-player-zikr-text");
-    expect(zikrText).toHaveTextContent("تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ");
+    await waitFor(() => expect(zikrText).toHaveTextContent("تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ"), { timeout: 2000 });
     expect(zikrText).toHaveTextContent("١");
     expect(zikrText).toHaveTextContent("الَّذِي خَلَقَ الْمَوْتَ");
     expect(zikrText).toHaveTextContent("٢");
@@ -669,7 +682,7 @@ describe("FloatingAudioPlayer", () => {
     expect(controller.setPlaybackRate).toHaveBeenCalledExactlyOnceWith(1.5);
   });
 
-  it("updates listening typography when the app text-size setting changes", () => {
+  it("updates listening typography when the app text-size setting changes", async () => {
     const controller = createController();
     controller.currentEntry = { ...entry, arabicText: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ." };
     const { rerender } = render(<FloatingAudioPlayer controller={controller} language="ar" textSize="small" />);
@@ -692,7 +705,7 @@ describe("FloatingAudioPlayer", () => {
         longSurah: false,
       }),
     });
-    expect(text.textContent).toBe(controller.currentEntry.arabicText);
+    await waitFor(() => expect(text.textContent).toBe(controller.currentEntry.arabicText), { timeout: 2000 });
   });
 
   it("covers the session header and restores covered controls and focus on collapse", () => {
@@ -787,7 +800,8 @@ describe("FloatingAudioPlayer", () => {
     expect(next).toBeEnabled();
     fireEvent.click(next);
     expect(controller.next).toHaveBeenCalledOnce();
-    const toggle = screen.getByRole("switch", { name: "المتابعة التلقائية" });
+    const toggle = screen.getByRole("switch", { name: "تشغيل التالي تلقائيًا" });
+    expect(toggle).toHaveTextContent("تلقائي");
     expect(toggle).toHaveAttribute("aria-checked", "false");
     fireEvent.click(toggle);
     expect(controller.setAutoAdvance).toHaveBeenCalledWith(true);
@@ -810,6 +824,8 @@ describe("FloatingAudioPlayer", () => {
       render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
       fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
       expect(screen.queryByRole("slider", { name: "Volume" })).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
+      expect(screen.queryByText("Volume", { exact: true })).not.toBeInTheDocument();
     } finally {
       Object.defineProperty(navigator, "userAgent", {
         value: originalUserAgent,
@@ -917,7 +933,7 @@ it("shows a current queue entry and selects another recording without forcing au
   };
   render(<FloatingAudioPlayer controller={controller} language="en" />);
   fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
-  const toggle = screen.getByRole("switch", { name: "Auto-continue" });
+  const toggle = screen.getByRole("switch", { name: "Auto-play next" });
   expect(toggle).toHaveAttribute("aria-checked", "true");
   fireEvent.click(toggle);
   expect(controller.setAutoAdvance).toHaveBeenCalledWith(false);

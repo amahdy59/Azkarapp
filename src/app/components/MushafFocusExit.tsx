@@ -25,7 +25,7 @@ export function MushafFocusExit({ language, onExit }: { language: AppLanguage; o
           (trigger ?? reader)?.focus({ preventScroll: true });
         });
       }}
-      className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-30 flex h-11 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+      className="group flex min-h-11 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
     >
       <span className="mushaf-furniture-pill gap-2">
         <Eye size={14} aria-hidden="true" />

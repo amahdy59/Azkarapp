@@ -1,3 +1,4 @@
+import { retainQcfFonts } from "../content/qcfMushaf";
 import "../../styles/theme/wordPopover.css";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 import { AyahMarker } from "./AyahMarker";
@@ -842,8 +843,6 @@ function MushafPageCanvas({
   spreadSide,
   textScale,
   showPageIdentity,
-  hasTopCenterControl: _hasTopCenterControl = false,
-  hasFloatingControls = false,
   isFloatingLayout = false,
   focusMode = false,
   onAyahAction,
@@ -875,8 +874,6 @@ function MushafPageCanvas({
    * with the chrome hidden, the page is the only thing that can say where it is.
    */
   showPageIdentity: boolean;
-  hasTopCenterControl?: boolean;
-  hasFloatingControls?: boolean;
   isFloatingLayout?: boolean;
   focusMode?: boolean;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
@@ -888,7 +885,7 @@ function MushafPageCanvas({
   onPageClick?: () => void;
   onlySurah?: number;
 }) {
-  const isFloating = isFloatingLayout ?? hasFloatingControls ?? false;
+  const isFloating = isFloatingLayout ?? false;
   const showPageFurnitureHead = !focusMode && (Boolean(spreadSide) || (!isFloating && showPageIdentity));
   const showPageFurnitureFoot = !focusMode && (Boolean(spreadSide) || (!isFloating && showPageIdentity));
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
@@ -917,6 +914,7 @@ function MushafPageCanvas({
 
   const lineDetails = useLineDetails(lines, pageNumber, onlySurah);
   const isOpening = OPENING_PAGES.has(pageNumber);
+  useLayoutEffect(() => retainQcfFonts([pageNumber]), [pageNumber]);
   const canvasRef = useLineFitter(
     // Retain the normal-page fit across enlargement. Restarting the fitter
     // measures its previously fitted frame and cancels part of the zoom.
@@ -951,18 +949,7 @@ function MushafPageCanvas({
       className={`relative ${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
         isFloating ? "" : "py-1 sm:py-2"
       }`}
-      style={{
-        containerType: "size",
-        ...(isFloating || focusMode
-          ? {
-              // Reserve the new floating footer without taking space from the
-              // existing fifteen-line minimum on short, scrolling viewports.
-              minHeight: "calc(32rem + 2.65rem)",
-              paddingTop: focusMode ? "0.5rem" : "var(--mushaf-top-clearance, 3rem)",
-              paddingBottom: `calc(${focusMode ? "2.75rem" : "3rem"} + env(safe-area-inset-bottom))`,
-            }
-          : {}),
-      }}
+      style={{ containerType: "size" }}
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
@@ -1421,16 +1408,8 @@ export function MushafPageViewer({
      chrome is not carrying the surah above the paper. */
   const showPageIdentity = Boolean(facingPage) || useRail || !headerContent;
   const isFloatingLayout = !useRail && !headerContent;
-  const hasFloatingControls =
-    isFloatingLayout &&
-    Boolean(
-      topLeftControl ||
-      topRightControl ||
-      topCenterControl ||
-      bottomLeftControl ||
-      bottomRightControl ||
-      bottomCenterControl,
-    );
+  const showBottomCenter =
+    bottomCenterControl || (isFloatingLayout && !facingPage && showPageIdentity && showFloatingPageIndicator);
 
   return (
     <article
@@ -1491,83 +1470,45 @@ export function MushafPageViewer({
         </div>
       )}
 
-      {/* 4 Corner Integrated Controls for Mobile Portrait */}
-      {topLeftControl && (
-        <div
-          data-testid="mushaf-corner-top-left"
-          className="pointer-events-auto absolute left-2.5 z-30 flex items-center justify-center"
-          style={{ top: "max(0.125rem, env(safe-area-inset-top))" }}
-        >
-          {topLeftControl}
-        </div>
-      )}
-
-      {topCenterControl && (
-        <div
-          data-testid="mushaf-control-top-center"
-          dir="ltr"
-          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-1.5"
-          style={{
-            top: "max(0.125rem, env(safe-area-inset-top))",
-            maxWidth: "calc(100vw - 7.5rem)",
-          }}
-        >
-          {isBookmarked && (
-            <span
-              className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-primary/50 bg-card/90 px-2 text-primary shadow-xs backdrop-blur-md"
-              role="img"
-              aria-label={t(language, "mushaf.bookmarkSaved")}
-              title={t(language, "mushaf.bookmarkSaved")}
+      {(topLeftControl || topRightControl || topCenterControl) && (
+        <div dir="ltr" className="mushaf-control-band mushaf-control-band--top">
+          {topLeftControl && (
+            <div
+              data-testid="mushaf-corner-top-left"
+              className="col-start-1 row-start-1 flex min-w-0 justify-center gap-1.5"
             >
-              <Bookmark size={15} className="fill-primary text-primary" aria-hidden="true" />
-            </span>
+              {topLeftControl}
+            </div>
           )}
-          {topCenterControl}
-        </div>
-      )}
 
-      {topRightControl && (
-        <div
-          data-testid="mushaf-corner-top-right"
-          className="pointer-events-auto absolute right-2.5 z-30 flex items-center justify-center"
-          style={{ top: "max(0.125rem, env(safe-area-inset-top))" }}
-        >
-          {topRightControl}
-        </div>
-      )}
-
-      {bottomLeftControl && (
-        <div
-          data-testid="mushaf-corner-bottom-left"
-          className="pointer-events-auto absolute left-2.5 z-30 flex items-center justify-center"
-          style={{ bottom: "max(0.125rem, env(safe-area-inset-bottom))" }}
-        >
-          {bottomLeftControl}
-        </div>
-      )}
-
-      {(bottomCenterControl || (isFloatingLayout && !facingPage && showPageIdentity && showFloatingPageIndicator)) && (
-        <div
-          data-testid="mushaf-control-bottom-center"
-          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center"
-          style={{
-            bottom: "max(0.125rem, env(safe-area-inset-bottom))",
-            maxWidth: "calc(100vw - 7.5rem)",
-          }}
-        >
-          {bottomCenterControl ?? (
-            <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} floating />
+          {topCenterControl && (
+            <div
+              data-testid="mushaf-control-top-center"
+              className="col-start-2 row-start-1 flex min-w-0 justify-center gap-1.5"
+              dir="ltr"
+            >
+              {isBookmarked && (
+                <span
+                  className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-primary/50 bg-card/90 px-2 text-primary shadow-xs backdrop-blur-md"
+                  role="img"
+                  aria-label={t(language, "mushaf.bookmarkSaved")}
+                  title={t(language, "mushaf.bookmarkSaved")}
+                >
+                  <Bookmark size={15} className="fill-primary text-primary" aria-hidden="true" />
+                </span>
+              )}
+              {topCenterControl}
+            </div>
           )}
-        </div>
-      )}
 
-      {bottomRightControl && (
-        <div
-          data-testid="mushaf-corner-bottom-right"
-          className="pointer-events-auto absolute right-2.5 z-30 flex items-center justify-center"
-          style={{ bottom: "max(0.125rem, env(safe-area-inset-bottom))" }}
-        >
-          {bottomRightControl}
+          {topRightControl && (
+            <div
+              data-testid="mushaf-corner-top-right"
+              className="col-start-3 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {topRightControl}
+            </div>
+          )}
         </div>
       )}
 
@@ -1670,8 +1611,6 @@ export function MushafPageViewer({
             textScale={textScale}
             magnification={magnification}
             showPageIdentity={showPageIdentity}
-            hasTopCenterControl={Boolean(topCenterControl)}
-            hasFloatingControls={hasFloatingControls}
             isFloatingLayout={isFloatingLayout}
             focusMode={focusMode}
             onAyahAction={onAyahAction}
@@ -1697,7 +1636,6 @@ export function MushafPageViewer({
                 textScale={textScale}
                 magnification={magnification}
                 showPageIdentity={showPageIdentity}
-                hasFloatingControls={false}
                 isFloatingLayout={false}
                 focusMode={focusMode}
                 onAyahAction={onAyahAction}
@@ -1716,16 +1654,7 @@ export function MushafPageViewer({
                 className={`relative mushaf-spread__page mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
                   isFloatingLayout ? "" : "py-1 sm:py-2"
                 }`}
-                style={{
-                  containerType: "size",
-                  ...(isFloatingLayout
-                    ? {
-                        minHeight: "calc(32rem + 2.65rem)",
-                        paddingTop: "3rem",
-                        paddingBottom: "calc(3rem + env(safe-area-inset-bottom))",
-                      }
-                    : {}),
-                }}
+                style={{ containerType: "size" }}
                 data-mushaf-meaning=""
               >
                 <div
@@ -1754,6 +1683,39 @@ export function MushafPageViewer({
           </div>
         )}
       </div>
+
+      {(bottomLeftControl || bottomRightControl || showBottomCenter) && (
+        <div dir="ltr" className="mushaf-control-band mushaf-control-band--bottom">
+          {bottomLeftControl && (
+            <div
+              data-testid="mushaf-corner-bottom-left"
+              className="col-start-1 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {bottomLeftControl}
+            </div>
+          )}
+
+          {showBottomCenter && (
+            <div
+              data-testid="mushaf-control-bottom-center"
+              className="col-start-2 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {bottomCenterControl ?? (
+                <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} floating />
+              )}
+            </div>
+          )}
+
+          {bottomRightControl && (
+            <div
+              data-testid="mushaf-corner-bottom-right"
+              className="col-start-3 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {bottomRightControl}
+            </div>
+          )}
+        </div>
+      )}
 
       {!useRail && footerContent && (
         <div

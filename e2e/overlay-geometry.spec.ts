@@ -122,6 +122,7 @@ test("menus stay inside a 320px viewport and keep their item geometry", async ({
 });
 
 test("radio menu items keep their logical-end indicator gutter in Arabic", async ({ page }) => {
+  await page.setViewportSize({ width: 834, height: 900 });
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(

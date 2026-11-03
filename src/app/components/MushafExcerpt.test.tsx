@@ -12,8 +12,8 @@ const words: MushafWordToken[] = [
   { verseKey: "112:1", position: 3, isEnd: 1, text: "١", qcfCode: "C" },
 ];
 describe("MushafExcerpt", () => {
-  it("retains readable text while loading or when the ordered transcript differs", () => {
-    useListeningMushafPage.mockReturnValue({ result: null });
+  it("shows preparation before choosing a stable readable fallback", () => {
+    useListeningMushafPage.mockReturnValue({ result: null, error: false });
     const { rerender } = render(
       <MushafExcerpt
         canonicalKey="quran-112"
@@ -24,7 +24,7 @@ describe("MushafExcerpt", () => {
       />,
     );
     expect(useListeningMushafPage).toHaveBeenCalledWith(604, 0);
-    expect(screen.getByText("Fallback text")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveAttribute("aria-busy", "true");
     useListeningMushafPage.mockReturnValue({ result: { page: 604, lines: [words], qcf: false } });
     rerender(
       <MushafExcerpt

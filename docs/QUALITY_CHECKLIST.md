@@ -1,3 +1,7 @@
+## Optional updates and compact Masbaha settings
+
+Verify two real local builds with a delayed worker download. Later remains available during preparation, completion respects the deferral, About can reopen the ready release and explicit acceptance changes the build. Check the waiting-worker fast path, preparation failure retry, one-time recovery and native activation consent in unit tests. Exercise the Masbaha sheet at phone and 320px/200% widths in both directions, including full labels, opacity/hit testing, Escape focus return, valid custom goals, cancellation, and saved count/goal restoration on reload and switching dhikr.
+
 ## Narrow Progress and notification release — 2026-11-03
 
 Verify visible, named and operable Progress tab icons at 320/360/375/384/390px in Arabic/English at 100%/200% text, including keyboard selection. Native notification adapter tests must exercise the generic Enable notifications action and Android denial/revocation recovery. Keep browser closure limits and device-only acceptance distinctions. The owner's combined release request supersedes historical publication holds below.
@@ -19,6 +23,10 @@ Retain route-inventory candidates and triage intentional preview truncation, ove
 ## Final-touch quality regressions — 2026-11-02
 
 Paper-grain follow-up: verify the same static tile across midnight/dark/light in solid/Glass, independent Mushaf colors and offline startup. Confirm stable geometry, sharp text, opaque menu hit-testing and no overlay interception. High contrast, reduced transparency, forced colors and printing must resolve the texture to none. Check contrast and unchanged bundle ceilings after adding the asset; capture normal/enlarged screenshots.
+
+Dark-paper calibration: assert the dark tile's pixel-weighted mean alpha stays between 11/255 and 13/255 with peak 18–20/255; retain the combined 14KB asset ceiling and light-paper bounds. Exercise all four independent Mushaf colors against a light app theme so inherited app color cannot mask a broken reader preference. Review normal-zoom screenshots; alpha measurements alone do not prove aesthetic acceptance.
+
+Quran entry: record the initial/return DOM commits for ready snippets and spreads. A ready cached passage must not temporarily render Unicode or an empty state, and a ready spread must include both faces immediately. Cover online/offline return, first reader entry after category warm-up, concurrent slow-data/font loading and readable rejected-font fallback in all three engines. Verify Data Saver/2G/hidden warm-up restraint. Real first-time font downloads may still upgrade Unicode; do not claim every cold font swap is eliminated.
 
 Reference-led revision replaces the same-tile assumption. The latest light material supersedes rejected brass particles/fibres: fine neutral pores, more local definition and less average wash on warm-neutral stock. Dark/Glass retains fine grayscale grain. Confirm local themes and that switch/plain accessibility choices override every token. Inspect real normal-zoom Appearance, page gutters, Home strip and Progress surfaces. `paper-grain-assets.test.mjs` bounds dimensions, neutral palette, clear area, tonal definition/average tint and the unchanged 14KB combined payload; the generator ships no runtime filter. Retain geometry, opaque-overlay, contrast and accessibility assertions; owner aesthetic acceptance remains separate.
 
@@ -306,3 +314,17 @@ Check Library/Progress header tab geometry, separate filter semantics/value rete
 ## Adaptive navigation acceptance — 2026-11-02
 
 Check five permanent bottom links below 36rem available, sixth Masbaha above, and return to five with enlarged text. Include both sides of 575/576px, phone/tablet, 320px/200%, RTL/LTR and the 900/1200px shell tiers. Settings/Qibla remain named and reachable; optional Masbaha leaves keyboard/AT order when hidden. Verify whole targets contain label ink, 44px size, unique aria-current, keyboard/native href/modified-click behavior, safe areas and short-screen wide-nav scrolling. Preserve Home cards, visible More, Today's path→Month Progress, More→Progress/Masbaha, direct URLs, browser Back and existing reading-focus exclusions.
+
+Audio footer verification covers queue and repeat access, narrow and enlarged reflow, focus lock and unlock, keyboard focus recovery and playback continuity. Mushaf download checks cover foreground priority, speculative cancellation, font eviction and backtracking, actual byte reporting, corrupt cache entries and partial resume.
+
+Audio label priority regression checks the visible continuation label, queue-versus-switch width, row containment, 44px targets and enlarged text. Pointer hover must preserve the select border while keyboard focus remains visible. Test the timer field, protected opaque menu and independent scrolling in RTL/LTR.
+
+Audio options uses flat transparent groups inside one protected panel. Verify consistent label/control gutters, at least 12px label-to-field spacing and an edge scrollbar without a deeply inset empty lane in RTL/LTR. Check the fixed Close action and bottom settings under scrolling. Collection title/action wrappers and resting ghost buttons stay transparent across morning, evening and before-sleep, including dark Glass and enlarged/high-contrast layouts; the parent header remains legible.
+
+Check the consolidated audio menu at normal phone text without scrolling, paired speed/volume targets, 320px and enlarged-text recovery, and keyboard expansion of Playback help with reachable timer/device explanations. Unsupported iOS software volume must leave neither an empty row nor an orphaned label.
+
+Verify تلقائي is visible while the auto-play switch retains its full accessible name. At 320/767px keyboard-help menu entries are absent in zikr, Masbaha and Friday; at 768/1440px they are available. Preserve keyboard navigation, help-dialog recovery and the existing Mushaf rail policy.
+
+Verify no Mushaf top or bottom tool intersects the paper scrollport. Exercise nonzero safe-area insets, 320px with 200% text, native paper scrolling, focus exit and the Arabic/English translation toggle. Verify the 15 canonical slots and that a short embedded zikr surah keeps its basmalah, accessible identity and readable verses without scrolling at normal phone settings.
+
+Delay the exact Quran font beyond 1.2 seconds. Verify a preparation status, readable settled fallback, unchanged visible geometry after the late font arrives and exact glyphs on the next visit. Cover full Mushaf and identified zikr passages, cache reload/offline and explicit retry. Validate all 604 measured resource sizes, catalog-version invalidation and missing-font-only versus missing-page-only accounting. Progress heading coordinates must remain stable through wheel/end scrolling and 200% text. Check shared hover on Home, Library, Quran, Progress and Settings, including stationary targets, keyboard focus, disabled controls, touch and app/OS motion reduction.

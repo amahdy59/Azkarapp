@@ -1,7 +1,7 @@
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { getEstimatedPrayerTimes, PRAYER_NAMES } from "../content/prayerTimes";
 import { t } from "../i18n";
-import { formatNumerals } from "../formatting";
+import { notificationCopy } from "../notificationCopy";
 import { DEFAULT_PROGRESS_DAY_START_HOUR, getProgressDayKey } from "../progress";
 import type {
   AppLanguage,
@@ -85,8 +85,7 @@ export function getUpcomingNativeReminders(
       if (at <= now) continue;
       upcoming.push({
         id: nativeNotificationId(kind, at),
-        title: "Azkar",
-        body: t(language, `notifications.${kind}`),
+        ...notificationCopy(language, { kind }),
         at,
         kind,
         dayKey,
@@ -97,14 +96,9 @@ export function getUpcomingNativeReminders(
     for (const prayer of PRAYER_NAMES) {
       const at = new Date(scheduledTime(date, prayerTimes[prayer]).getTime() - reminders.prayer.leadMinutes * 60_000);
       if (at <= now) continue;
-      const prayerName = t(language, `notifications.${prayer}`);
       upcoming.push({
         id: nativeNotificationId(`prayer:${prayer}`, at),
-        title: t(language, "notifications.prayerReminderTitle", { prayer: prayerName }),
-        body: t(language, "notifications.prayerReminderBody", {
-          prayer: prayerName,
-          minutes: formatNumerals(reminders.prayer.leadMinutes, language),
-        }),
+        ...notificationCopy(language, { kind: "prayer", prayer, leadMinutes: reminders.prayer.leadMinutes }),
         at,
         kind: `prayer:${prayer}`,
         dayKey,
@@ -127,7 +121,11 @@ export async function rescheduleNativeReminders(
   if (owned.length) await LocalNotifications.cancel({ notifications: owned.map(({ id }) => ({ id })) });
   const upcoming = getUpcomingNativeReminders(reminders, dailyCompletions, language, location);
   if (!upcoming.length) return;
-  await LocalNotifications.createChannel({ id: ANDROID_CHANNEL_ID, name: "Azkar reminders", importance: 4 });
+  await LocalNotifications.createChannel({
+    id: ANDROID_CHANNEL_ID,
+    name: t(language, "notifications.notificationsTab"),
+    importance: 4,
+  });
   await LocalNotifications.schedule({
     notifications: upcoming.map(({ id, title, body, at, kind, dayKey }) => ({
       id,

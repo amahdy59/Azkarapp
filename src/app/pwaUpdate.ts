@@ -1,21 +1,6 @@
-/**
- * Applying an update has to work from a cold prompt, not only from one the
- * service worker itself raised.
- *
- * `updateServiceWorker(true)` skips the waiting worker and reloads when the new
- * controller takes over — but if no worker is waiting yet it resolves having
- * done nothing, and the reader who just pressed "update" is left on the version
- * they pressed it to leave. That is the common case now that the prompt can
- * also come from the deployed release notes disagreeing with this bundle's own
- * stamp: the app knows an update exists before the worker has looked for it.
- *
- * So: ask the registration to look first, wait out an install that is still
- * running, hand over if something is waiting, and otherwise reload — by then
- * the caches hold the new build either way.
- *
- * It lives here rather than in main.tsx so it can be tested against a fake
- * registration. Two bugs have now hidden in these few lines, both of which a
- * test would have caught and neither of which a reading of the diff did.
+/** Background preparation leaves the current worker active. Explicit acceptance
+ * activates a ready worker directly, then reloads after the bounded handover.
+ * Cold activation callers can still check and await an install before reloading.
  */
 export interface UpdateDeps {
   /** Resolves the active registration, or undefined where there is none. */
@@ -75,6 +60,39 @@ function waitForInstall(worker: ServiceWorker, signal?: AbortSignal): Promise<vo
   });
 }
 
+/** Prepare the offline shell without activating it or reloading the reader. */
+export async function prepareServiceWorkerUpdate(
+  getRegistration: UpdateDeps["getRegistration"],
+  signal?: AbortSignal,
+): Promise<ServiceWorkerRegistration | undefined> {
+  signal?.throwIfAborted();
+  const registration = await getRegistration();
+  signal?.throwIfAborted();
+  if (!registration || registration.waiting) return registration;
+  if (!registration.installing && registration.update) {
+    // An explicit check can queue behind a browser check already in flight.
+    // Follow the install it discovers even if our own check is still pending.
+    let found = () => {};
+    let abort = () => {};
+    const installationStarted = new Promise<void>((resolve, reject) => {
+      found = resolve;
+      abort = () => reject(signal?.reason);
+      registration.addEventListener("updatefound", found, { once: true });
+      signal?.addEventListener("abort", abort, { once: true });
+    });
+    try {
+      await Promise.race([registration.update(), installationStarted]);
+    } finally {
+      registration.removeEventListener("updatefound", found);
+      signal?.removeEventListener("abort", abort);
+    }
+  }
+  signal?.throwIfAborted();
+  if (registration.installing) await waitForInstall(registration.installing, signal);
+  signal?.throwIfAborted();
+  return registration;
+}
+
 export async function applyServiceWorkerUpdate({
   getRegistration,
   updateServiceWorker,
@@ -87,10 +105,11 @@ export async function applyServiceWorkerUpdate({
   signal?.throwIfAborted();
 
   if (registration) {
-    await registration.update?.().catch(() => {
-      // A failed check is not a failed update: fall through to the reload,
-      // which is what the reader asked for.
-    });
+    if (!registration.waiting && !registration.installing)
+      await registration.update?.().catch(() => {
+        // A failed check is not a failed update: fall through to the reload,
+        // which is what the reader asked for.
+      });
     signal?.throwIfAborted();
 
     /* A worker that is still installing cannot be told to stand aside: there is
@@ -156,7 +175,7 @@ function readUpdateAttempt(): string | null {
   }
 }
 
-function clearUpdateAttempt() {
+export function clearUpdateAttempt() {
   try {
     window.sessionStorage.removeItem(UPDATE_ATTEMPT_KEY);
   } catch {

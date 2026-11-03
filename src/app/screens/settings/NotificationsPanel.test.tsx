@@ -112,12 +112,12 @@ describe("NotificationsPanel", () => {
     );
 
     expect(screen.getByText(/Open this site’s settings/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("switch", { name: "Morning reminder" }));
+    fireEvent.click(screen.getByRole("switch", { name: "Morning adhkar" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Notifications remain off");
     expect(onRemindersChange).not.toHaveBeenCalled();
   });
 
-  for (const name of ["Morning reminder", "Prayer-time reminders"]) {
+  for (const name of ["Morning adhkar", "Prayer-time reminders"]) {
     it(`enables ${name} immediately after a newly granted permission`, async () => {
       Object.defineProperty(window, "Notification", {
         configurable: true,
@@ -136,7 +136,7 @@ describe("NotificationsPanel", () => {
       await vi.waitFor(() => expect(onRemindersChange).toHaveBeenCalledOnce());
       expect(onRemindersChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          [name === "Morning reminder" ? "morning" : "prayer"]: expect.objectContaining({ enabled: true }),
+          [name === "Morning adhkar" ? "morning" : "prayer"]: expect.objectContaining({ enabled: true }),
         }),
       );
     });

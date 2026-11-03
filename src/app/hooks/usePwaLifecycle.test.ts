@@ -5,9 +5,10 @@ import type { BeforeInstallPromptEvent } from "../types";
 import { usePwaLifecycle } from "./usePwaLifecycle";
 import { UPDATE_DEFERRAL_KEY, UPDATE_DEFERRAL_MS } from "../updateDeferral";
 
-const { loadReleaseNotes, reportError } = vi.hoisted(() => ({
+const { loadReleaseNotes, reportError, runningRelease } = vi.hoisted(() => ({
   loadReleaseNotes: vi.fn(),
   reportError: vi.fn(),
+  runningRelease: { value: "" },
 }));
 
 // Only the network call is faked: the seen-release helpers are plain
@@ -18,7 +19,15 @@ vi.mock("../releaseNotes", async (importOriginal) => ({
 }));
 vi.mock("../../lib/observability", () => ({ reportError }));
 
+vi.mock("../releaseStamp", () => ({
+  get APP_RELEASE() {
+    return runningRelease.value;
+  },
+}));
+
 beforeEach(() => {
+  runningRelease.value = "";
+  window.sessionStorage.clear();
   window.localStorage.clear();
   loadReleaseNotes.mockReset();
   loadReleaseNotes.mockResolvedValue(null);
@@ -26,6 +35,50 @@ beforeEach(() => {
 });
 
 describe("usePwaLifecycle", () => {
+  it("prepares a discovered release without activating and respects Later after readiness", async () => {
+    runningRelease.value = "old";
+    loadReleaseNotes.mockResolvedValue({ release: "new", ar: [], en: [] });
+    const prepare = vi.fn(),
+      apply = vi.fn();
+    window.addEventListener("azkar-prepare-update", prepare);
+    window.addEventListener("azkar-apply-update", apply);
+    const view = renderHook(() => usePwaLifecycle("en"));
+    await waitFor(() => expect(prepare).toHaveBeenCalledOnce());
+    expect(view.result.current.isPreparingUpdate).toBe(true);
+    expect(view.result.current.updateReady).toBe(false);
+    expect(apply).not.toHaveBeenCalled();
+    act(() => view.result.current.dismissUpdate());
+    await act(async () => window.dispatchEvent(new Event("azkar-update-available")));
+    expect(view.result.current.updateReady).toBe(true);
+    expect(view.result.current.updateAvailable).toBe(false);
+    expect(apply).not.toHaveBeenCalled();
+    act(() => view.result.current.reviewUpdate());
+    await act(async () => window.dispatchEvent(new Event("azkar-update-available")));
+    expect(view.result.current.updateAvailable).toBe(true);
+    act(() => view.result.current.applyUpdate());
+    expect(apply).toHaveBeenCalledOnce();
+    expect(window.sessionStorage.getItem("azkarapp.update-attempted-for")).toBe("new");
+    act(() => view.result.current.dismissUpdate());
+    expect(window.sessionStorage.getItem("azkarapp.update-attempted-for")).toBeNull();
+    view.unmount();
+    window.removeEventListener("azkar-prepare-update", prepare);
+    window.removeEventListener("azkar-apply-update", apply);
+  });
+
+  it("retries failed preparation without requesting activation", async () => {
+    const view = renderHook(() => usePwaLifecycle("en"));
+    act(() => window.dispatchEvent(new Event("azkar-update-preparation-failed")));
+    expect(view.result.current.pwaError).toBe(t("en", "pwa.preparationError"));
+    const apply = vi.fn();
+    window.addEventListener("azkar-apply-update", apply);
+    act(() => view.result.current.applyUpdate());
+    expect(view.result.current.isPreparingUpdate).toBe(true);
+    expect(view.result.current.pwaError).toBe("");
+    expect(apply).not.toHaveBeenCalled();
+    view.unmount();
+    window.removeEventListener("azkar-apply-update", apply);
+  });
+
   it("preserves a known release deferral when notes are unavailable", async () => {
     const notes = { release: "release-a", en: [], ar: [] };
     loadReleaseNotes.mockResolvedValue(notes);

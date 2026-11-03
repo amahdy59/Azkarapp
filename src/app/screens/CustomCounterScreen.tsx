@@ -1,5 +1,8 @@
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { ReferenceCard } from "../components/ReferenceCard";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { MasbahaSettingsSheet } from "../components/MasbahaSettingsSheet";
+import { useLayoutMode } from "../hooks/useLayoutMode";
 import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
@@ -17,6 +20,7 @@ import {
   MoreVertical,
   Play,
   RotateCcw,
+  SlidersHorizontal,
   Volume2,
   VolumeX,
 } from "../components/icons";
@@ -40,7 +44,7 @@ import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
 import { getProgressDayKey } from "../progress";
 import { useWakeLock } from "../hooks/useWakeLock";
-import { isCounterShortcutBlocked } from "../keyboardShortcuts";
+import { COMPACT_TOUCH_KEYBOARD_HELP_QUERY, isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { getReadingFontSize } from "./readingTypography";
 import type { AppLanguage, TextSizeOption, Zikr } from "../types";
 
@@ -125,6 +129,7 @@ export function CustomCounterScreen({
     AUTHENTIC_AZKAR_COLLECTION.find((item) => item.id === initialMasbahaState?.selectedZikrId) ??
     AUTHENTIC_AZKAR_COLLECTION[0]!;
   const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(() => initialSelectedAuthentic);
+  const compactTouch = useMediaQuery(COMPACT_TOUCH_KEYBOARD_HELP_QUERY);
   const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
   const moreTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -157,6 +162,9 @@ export function CustomCounterScreen({
   const [showReference, setShowReference] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const compactSettings = useLayoutMode() === "compact";
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [pendingTarget, setPendingTarget] = useState<number>();
   const [pendingZikr, setPendingZikr] = useState<AuthenticZikrItem | null>(null);
   const [currentTextSize, setCurrentTextSize] = useState<TextSizeOption>(textSize);
   const [shareOpen, setShareOpen] = useState(false);
@@ -239,7 +247,7 @@ export function CustomCounterScreen({
   }, [selectedAuthentic.id]);
 
   const switchToZikr = useCallback(
-    (item: AuthenticZikrItem, preserveCurrent: boolean) => {
+    (item: AuthenticZikrItem, preserveCurrent: boolean, targetOverride?: number) => {
       const nextSavedItems: Record<string, MasbahaZikrItemState> = { ...savedItems };
 
       if (preserveCurrent && (count > 0 || laps > 0)) {
@@ -258,11 +266,11 @@ export function CustomCounterScreen({
       const savedForNew = nextSavedItems[item.id];
       if (savedForNew && (!savedForNew.dayKey || savedForNew.dayKey === currentDayKey)) {
         setCount(savedForNew.count);
-        setTarget(savedForNew.target > 0 ? savedForNew.target : item.recommendedTarget);
+        setTarget(targetOverride ?? (savedForNew.target > 0 ? savedForNew.target : item.recommendedTarget));
         setLaps(savedForNew.laps);
       } else {
         setCount(0);
-        setTarget(item.recommendedTarget);
+        setTarget(targetOverride ?? item.recommendedTarget);
         setLaps(0);
       }
 
@@ -274,6 +282,7 @@ export function CustomCounterScreen({
 
   const handleSelectAuthenticZikr = useCallback(
     (item: AuthenticZikrItem) => {
+      setPendingTarget(undefined);
       if (item.id === selectedAuthentic.id) return;
       if (count > 0 || laps > 0) {
         setPendingZikr(item);
@@ -285,12 +294,14 @@ export function CustomCounterScreen({
   );
 
   const handleSaveAndSwitch = (item: AuthenticZikrItem) => {
-    switchToZikr(item, true);
+    switchToZikr(item, true, pendingTarget);
+    setPendingTarget(undefined);
     setPendingZikr(null);
   };
 
   const handleResetAndSwitch = (item: AuthenticZikrItem) => {
-    switchToZikr(item, false);
+    switchToZikr(item, false, pendingTarget);
+    setPendingTarget(undefined);
     setPendingZikr(null);
   };
 
@@ -439,10 +450,12 @@ export function CustomCounterScreen({
                       <MoreVertical size={20} aria-hidden="true" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={() => setKeyboardHelpOpen(true)}>
-                        <Keyboard size={16} aria-hidden="true" />
-                        {t(language, "reader.keyboardShortcuts")}
-                      </DropdownMenuItem>
+                      {isWide && !compactTouch && (
+                        <DropdownMenuItem onSelect={() => setKeyboardHelpOpen(true)}>
+                          <Keyboard size={16} aria-hidden="true" />
+                          {t(language, "reader.keyboardShortcuts")}
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={toggleSound}>
                         {soundEnabled ? (
                           <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
@@ -461,29 +474,79 @@ export function CustomCounterScreen({
               );
             }}
           />
-          <div className="mx-4 mt-4 rounded-2xl border border-border/40 bg-card p-3" data-prevent-count="true">
-            <div className="counter-picker-row flex items-center gap-3" data-testid="masbaha-controls">
-              <div>
-                <AuthenticZikrPicker
-                  items={AUTHENTIC_AZKAR_COLLECTION}
-                  selected={selectedAuthentic}
-                  language={language}
-                  direction={direction}
-                  savedItems={liveSavedItems}
-                  onSelect={handleSelectAuthenticZikr}
-                />
+          {compactSettings ? (
+            <div className="mx-4 mt-4 flex items-center gap-3" data-testid="masbaha-controls" data-prevent-count="true">
+              <div className="min-w-0 flex-1 text-sm leading-[2.2]" data-testid="masbaha-settings-summary">
+                <p className="font-semibold [overflow-wrap:anywhere]">
+                  {language === "ar" ? selectedAuthentic.shortNameAr : selectedAuthentic.shortNameEn}
+                </p>
+                <p className="text-muted-foreground">
+                  {t(language, "counter.targetLabel")} {formatNumerals(target, language)}
+                </p>
               </div>
-              <div>
-                <CounterTargetPicker
-                  activeTarget={target}
-                  onTargetChange={changeTarget}
-                  language={language}
-                  direction={direction}
-                  allowOpen={false}
-                />
-              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="size-[44px] shrink-0 p-0"
+                data-testid="masbaha-settings-trigger"
+                aria-label={t(language, "counter.settings")}
+                aria-haspopup="dialog"
+                aria-expanded={settingsOpen}
+                onClick={(event) => {
+                  event.currentTarget.focus({ preventScroll: true });
+                  setSettingsOpen(true);
+                }}
+              >
+                <SlidersHorizontal size={20} aria-hidden="true" />
+              </Button>
             </div>
-          </div>
+          ) : (
+            <>
+              {" "}
+              <div className="mx-4 mt-4 rounded-2xl border border-border/40 bg-card p-3" data-prevent-count="true">
+                <div className="counter-picker-row flex items-center gap-3" data-testid="masbaha-controls">
+                  <div>
+                    <AuthenticZikrPicker
+                      items={AUTHENTIC_AZKAR_COLLECTION}
+                      selected={selectedAuthentic}
+                      language={language}
+                      direction={direction}
+                      savedItems={liveSavedItems}
+                      onSelect={handleSelectAuthenticZikr}
+                    />
+                  </div>
+                  <div>
+                    <CounterTargetPicker
+                      activeTarget={target}
+                      onTargetChange={changeTarget}
+                      language={language}
+                      direction={direction}
+                      allowOpen={false}
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+          {settingsOpen && (
+            <MasbahaSettingsSheet
+              items={AUTHENTIC_AZKAR_COLLECTION}
+              selected={selectedAuthentic}
+              target={target}
+              savedItems={liveSavedItems}
+              language={language}
+              direction={direction}
+              onClose={() => setSettingsOpen(false)}
+              onApply={(item, nextTarget) => {
+                setSettingsOpen(false);
+                if (item.id === selectedAuthentic.id) changeTarget(nextTarget);
+                else if (count > 0 || laps > 0) {
+                  setPendingTarget(nextTarget);
+                  setPendingZikr(item);
+                } else switchToZikr(item, false, nextTarget);
+              }}
+            />
+          )}
         </div>
 
         <div className="counter-reading-canvas relative mx-4 mb-4 mt-4 flex flex-1 overflow-hidden bg-transparent">

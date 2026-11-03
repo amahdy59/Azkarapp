@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { CategoryId } from "../types";
@@ -253,7 +253,7 @@ describe("AzkarLibraryScreen", () => {
     expect(input).toHaveAttribute("dir", "auto");
   });
 
-  it("normalizes unvocalized Arabic search and finds vocalized azkar in-page", () => {
+  it("normalizes unvocalized Arabic search and finds vocalized azkar in-page", async () => {
     const onZikr = vi.fn();
     render(
       <AzkarLibraryScreen
@@ -274,7 +274,7 @@ describe("AzkarLibraryScreen", () => {
 
     const matchingZikrCards = screen.getAllByTestId("matching-zikr-card");
     expect(matchingZikrCards.length).toBeGreaterThan(0);
-    expect(normalizeSearchText(matchingZikrCards[0].textContent!)).toContain("حسبي الله");
+    await waitFor(() => expect(normalizeSearchText(matchingZikrCards[0].textContent!)).toContain("حسبي الله"));
 
     fireEvent.click(matchingZikrCards[0]);
     expect(onZikr).toHaveBeenCalled();

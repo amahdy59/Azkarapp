@@ -29,7 +29,7 @@ import {
   ReaderOptionsSection,
 } from "../components/ReaderOptions";
 import { useWakeLock } from "../hooks/useWakeLock";
-import { isCounterShortcutBlocked } from "../keyboardShortcuts";
+import { COMPACT_TOUCH_KEYBOARD_HELP_QUERY, isCounterShortcutBlocked } from "../keyboardShortcuts";
 import {
   BookOpen,
   ArrowPrevious,
@@ -76,7 +76,7 @@ import { Header } from "../components/LayoutShells";
 import { ReaderSceneArt } from "../components/ReaderSceneArt";
 import { ReadingHeroToolbar } from "../components/ReadingHeroToolbar";
 import { AppearanceMenu } from "../components/AppearanceMenu";
-import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
+import { QuranPrelude } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 import {
@@ -309,7 +309,7 @@ export function ReaderScreen({
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
   /** A surah short enough to be read here rather than in the Mushaf view. */
-  const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
+  const isShortSurah = Boolean(z?.isSurah) && !longSurah;
   const [localMeaningOnly, setLocalMeaningOnly] = useState(false);
   const translationOnly = readerMeaningOnly ?? localMeaningOnly;
   const readingRegionId = useId();
@@ -375,6 +375,7 @@ export function ReaderScreen({
   const [shareMessage, setShareMessage] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [collectionShareOpen, setCollectionShareOpen] = useState(false);
+  const compactTouch = useMediaQuery(COMPACT_TOUCH_KEYBOARD_HELP_QUERY);
   const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
   useEffect(() => {
@@ -886,11 +887,11 @@ export function ReaderScreen({
             </section>
           ) : (
             <>
-              {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
-
               <div
-                className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
-                data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
+                className={isShortSurah ? "w-full max-w-[42rem]" : "contents"}
+                data-testid={isShortSurah ? "canonical-surah-passage" : undefined}
+                role={isShortSurah ? "group" : undefined}
+                aria-label={isShortSurah ? (readerZikrTitle ?? z.surahNameArabic) : undefined}
               >
                 {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none" />}
 
@@ -1396,16 +1397,18 @@ export function ReaderScreen({
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => {
     return (
       <ReaderOptionsContext.Provider value={{ sheet: false, close: () => {} }}>
-        <ReaderOptionsAction
-          data-testid="reader-help-trigger"
-          onSelect={() => {
-            collectionMenuRequested.current = true;
-            setKeyboardHelpOpen(true);
-          }}
-        >
-          <Keyboard size={16} aria-hidden="true" />
-          <span>{t(language, "reader.keyboardShortcuts")}</span>
-        </ReaderOptionsAction>
+        {layout === "desktop" && !compactTouch && (
+          <ReaderOptionsAction
+            data-testid="reader-help-trigger"
+            onSelect={() => {
+              collectionMenuRequested.current = true;
+              setKeyboardHelpOpen(true);
+            }}
+          >
+            <Keyboard size={16} aria-hidden="true" />
+            <span>{t(language, "reader.keyboardShortcuts")}</span>
+          </ReaderOptionsAction>
+        )}
         {!canDockCollection && onSelectZikr && azkar.length > 1 && (
           <ReaderOptionsAction
             onSelect={() => {
@@ -1701,13 +1704,13 @@ export function ReaderScreen({
                   data-testid="reader-card"
                   {...surfaceProps}
                 >
-                  {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+                  {((!isShortSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
                     <div
                       data-testid="reader-entry-tools"
                       data-prevent-count="true"
                       className="reader-entry-tools--wide shrink-0 pt-1 pb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"
                     >
-                      {!showSurahChrome && readerZikrTitle && (
+                      {!isShortSurah && readerZikrTitle && (
                         <h2
                           className="max-w-full shrink-0 truncate text-start text-sm font-extrabold leading-relaxed text-foreground"
                           dir="auto"
@@ -1870,13 +1873,13 @@ export function ReaderScreen({
               data-testid="reader-card"
               {...surfaceProps}
             >
-              {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+              {((!isShortSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
                 <div
                   data-testid="reader-entry-tools"
                   data-prevent-count="true"
                   className="px-5 pt-2.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1"
                 >
-                  {!showSurahChrome && readerZikrTitle && (
+                  {!isShortSurah && readerZikrTitle && (
                     <h2
                       className="max-w-full shrink-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
                       dir="auto"

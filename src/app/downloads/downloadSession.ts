@@ -5,6 +5,7 @@ export type DownloadJob = {
   id: string;
   completed: number;
   total: number;
+  transferredBytes?: number;
   detail?: AudioDownloadProgress;
   archive?: boolean;
 };

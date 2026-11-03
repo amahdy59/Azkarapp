@@ -191,8 +191,9 @@ describe("the three surah readings", () => {
 
   it("shows a short surah as canonical Quran without an ornamental card", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-99-ikhlas"));
-    expect(screen.getByText(/سُورَةُ/)).toBeInTheDocument();
-    expect(screen.getByTestId("canonical-surah-passage")).toBeInTheDocument();
+    expect(screen.queryByTestId("quran-surah-header")).not.toBeInTheDocument();
+    expect(screen.getByTestId("canonical-surah-passage")).toHaveAccessibleName(/ikhlas/i);
+    expect(screen.getByTestId("quran-basmalah")).toBeInTheDocument();
     expect(document.querySelector(".quran-passage")).toBeNull();
     expect(screen.getByRole("switch", { name: "Rare words" })).toHaveAttribute("aria-checked", "false");
   });

@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-11-04",
+    "ar": [
+      "ثبّت التحديث عندما يناسبك أو أجّله، وتعرّف بسهولة على الصلاة أو الورد المقصود من عنوان التذكير.",
+      "تحكّم في قائمة الاستماع والتكرار والتشغيل التلقائي من صف واحد، واقفل عناصر التحكم وافتحها أثناء وضع التركيز.",
+      "اقرأ القرآن دون تغيّر مفاجئ في الخط بعد ظهور النص، واعرف حجم صفحات المصحف وخطوطها قبل حفظها للقراءة دون اتصال.",
+      "اضبط هدف المسبحة والذكر من زر إعدادات واحد على الهاتف، وراجع تقدمك مع بقاء العنوان ظاهرًا أثناء التمرير."
+    ],
+    "en": [
+      "Install updates when convenient or choose Later, and see which prayer or reading a reminder is for from its title.",
+      "Manage your queue, repeats, and autoplay from one row, and lock or unlock the playback controls in Focus mode.",
+      "Read Quran text without a sudden font change after it appears, and see how much space Mushaf pages and fonts take before saving them for offline reading.",
+      "Change your Masbaha phrase and target from one settings button on mobile, and keep the Progress heading in view as you scroll."
+    ]
+  },
+  {
     "release": "2026-11-03.2",
     "ar": [
       "استخدم تبويبات التقدم بأيقونات واضحة حتى عند عرض الشاشة الصغير وتكبير النص.",

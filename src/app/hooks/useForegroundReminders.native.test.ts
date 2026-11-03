@@ -55,7 +55,8 @@ describe("native reminder delivery", () => {
     const request = nativeNotifications.schedule.mock.calls[0]![0];
     expect(request.notifications).toHaveLength(14);
     expect(request.notifications[0]).toMatchObject({
-      body: "Morning reminder",
+      title: "Morning adhkar",
+      body: "Open your adhkar when you’re ready to read.",
       channelId: "azkarapp-reminders",
       schedule: { allowWhileIdle: true, isExactNotification: true },
     });

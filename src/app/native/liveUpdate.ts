@@ -9,6 +9,7 @@ const LiveUpdate = registerPlugin<LiveUpdatePlugin>("LiveUpdate");
 
 const DEFAULT_MANIFEST_URL = "https://amahdy59.github.io/Azkarapp/live-updates/manifest.json";
 const REQUEST_TIMEOUT_MS = 15_000;
+let preparedBundleId: string | undefined;
 
 export interface NativeLiveUpdateManifest {
   bundleId: string;
@@ -82,7 +83,7 @@ export async function checkForNativeLiveUpdate(): Promise<boolean> {
     url: manifest.url,
     ...(manifest.checksum ? { checksum: manifest.checksum } : {}),
   });
-  await LiveUpdate.setNextBundle({ bundleId: manifest.bundleId });
+  preparedBundleId = manifest.bundleId;
   window.dispatchEvent(new Event("azkar-update-available"));
   return true;
 }
@@ -100,5 +101,7 @@ export async function initializeNativeLiveUpdate() {
 
 export async function applyNativeLiveUpdate() {
   if (!isNativeAndroid()) return;
+  if (!preparedBundleId) throw new Error("No prepared native update");
+  await LiveUpdate.setNextBundle({ bundleId: preparedBundleId });
   await LiveUpdate.reload();
 }

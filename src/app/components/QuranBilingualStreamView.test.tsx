@@ -57,7 +57,7 @@ describe("QuranBilingualStreamView", () => {
 
     expect(screen.getByTestId("bilingual-stream-view")).toBeInTheDocument();
     expect(screen.getByText("Saheeh International")).toBeVisible();
-    expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ١")).toBeInTheDocument();
+    expect(await screen.findByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ١")).toBeInTheDocument();
     expect(
       await screen.findByText("In the name of Allah, the Entirely Merciful, the Especially Merciful."),
     ).toBeInTheDocument();

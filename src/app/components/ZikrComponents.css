@@ -129,9 +129,11 @@
     background-color 200ms ease;
 }
 
-.adaptive-counter-surface:hover:not(:disabled, [aria-disabled="true"]) {
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
-  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .adaptive-counter-surface:hover:not(:disabled, [aria-disabled="true"]) {
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
+  }
 }
 
 .adaptive-counter-surface.is-pressed,
@@ -227,9 +229,11 @@
     opacity 160ms ease;
 }
 
-.adaptive-counter-nav:hover:not(:disabled) {
-  background: var(--muted);
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));
+@media (hover: hover) and (pointer: fine) {
+  .adaptive-counter-nav:hover:not(:disabled) {
+    background: var(--muted);
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));
+  }
 }
 .adaptive-counter-nav:active:not(:disabled) {
   transform: scale(0.94);

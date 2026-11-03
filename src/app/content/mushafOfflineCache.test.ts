@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
+import { getMushafDownloadBytes, getMushafAssetBytes } from "./downloadStorage";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "./mushafOfflineCache";
 import { FONT_CACHE_NAME, MUSHAF_CACHE_NAME, getMushafPageUrl, getQcfFontUrl } from "./qcfMushaf";
 
@@ -44,7 +45,11 @@ describe("mushafOfflineCache", () => {
     expect(stores.get(MUSHAF_CACHE_NAME)?.size).toBe(2);
     expect(stores.get(FONT_CACHE_NAME)?.size).toBe(2);
     expect(fetchMock).toHaveBeenCalledTimes(4);
-    expect(progress).toHaveBeenLastCalledWith(2, 2);
+    expect(progress).toHaveBeenLastCalledWith(
+      2,
+      2,
+      2 * (new TextEncoder().encode(pageBytes).byteLength + fontBytes.byteLength),
+    );
     await expect(downloadMushaf({ pages: [0, 605] })).rejects.toThrow("Invalid Mushaf");
     expect(fetchMock).toHaveBeenCalledTimes(4);
   });
@@ -60,10 +65,12 @@ describe("mushafOfflineCache", () => {
       vi.fn(async (input: RequestInfo | URL) => new Response(String(input).includes(".woff2") ? fontBytes : pageBytes)),
     );
 
-    await expect(getMushafDownloadStatus()).resolves.toEqual({
+    await expect(getMushafDownloadStatus()).resolves.toMatchObject({
+      downloadedBytes: new TextEncoder().encode(pageBytes).byteLength + fontBytes.byteLength,
       downloadedPages: 1,
       downloadedFonts: 1,
       totalPages: 604,
+      remainingBytes: getMushafDownloadBytes(2, 604),
       isComplete: false,
     });
 
@@ -98,6 +105,7 @@ describe("mushafOfflineCache", () => {
       downloadedPages: 0,
       downloadedFonts: 1,
       isComplete: false,
+      remainingBytes: getMushafDownloadBytes(1, 604) - getMushafAssetBytes(1).font - getMushafAssetBytes(2).page,
     });
     expect(await pages.match(getMushafPageUrl(1))).toBeUndefined();
     expect(await fonts.match(getQcfFontUrl(2))).toBeUndefined();

@@ -100,15 +100,17 @@ export function IconButton({
   label,
   className = "",
   children,
+  surfaceFinish = true,
   ...props
 }: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "aria-label"> & {
   label: string;
+  surfaceFinish?: boolean;
 }) {
   return (
     <button
       type="button"
       aria-label={label}
-      className={`ui-icon-button ui-action-cue surface-control-finish focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${className}`}
+      className={`ui-icon-button ui-action-cue ${surfaceFinish ? "surface-control-finish" : ""} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${className}`}
       {...props}
     >
       {children}
@@ -163,11 +165,14 @@ export function Header({
           style={{
             position: "relative",
             zIndex: 10,
-            background: decoration ? "var(--background)" : undefined,
-            borderRadius: "var(--radius-btn)",
           }}
         >
-          <IconButton onClick={onBack} label={t(language, "common.back")} className={backButtonClassName}>
+          <IconButton
+            surfaceFinish={false}
+            onClick={onBack}
+            label={t(language, "common.back")}
+            className={backButtonClassName}
+          >
             <ArrowPrevious size={20} className="text-foreground" />
           </IconButton>
         </div>
@@ -176,8 +181,6 @@ export function Header({
         style={{
           position: "relative",
           zIndex: 10,
-          background: decoration ? "var(--background)" : undefined,
-          borderRadius: "var(--radius-btn)",
         }}
         className="flex-1 min-w-0"
       >
@@ -202,8 +205,6 @@ export function Header({
           style={{
             position: "relative",
             zIndex: 10,
-            background: decoration ? "var(--background)" : undefined,
-            borderRadius: "var(--radius-btn)",
           }}
         >
           {right}

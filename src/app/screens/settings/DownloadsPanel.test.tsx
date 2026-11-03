@@ -36,6 +36,7 @@ vi.mock("../../audio/audioOfflineCache", () => ({
 vi.mock("../../content/mushafOfflineCache", () => ({
   downloadMushaf: vi.fn(),
   removeDownloadedMushaf: vi.fn().mockResolvedValue(undefined),
+  getPreviousMushafDownloadStatus: () => undefined,
   getMushafDownloadStatus: vi.fn().mockResolvedValue({ downloadedPages: 0, totalPages: 604 }),
 }));
 

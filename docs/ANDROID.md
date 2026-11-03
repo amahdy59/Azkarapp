@@ -1,3 +1,7 @@
+## Local live update consent refinement
+
+The app downloads and validates a candidate ZIP in the background. It records the candidate in memory and calls the plugin's next-bundle selection only when the reader accepts the update, immediately before requesting reload. Later leaves the currently selected bundle active. Mocked adapter tests cover this boundary. Physical relaunch and rollback remain device acceptance checks.
+
 # Android host and release verification
 
 Start with the [Android developer handoff](ANDROID_DEVELOPER_HANDOFF.md) for the shared-code map, existing native services, missing persistent native-file download backend and implementation/acceptance sequence. Current offline audio uses device-local WebView Cache Storage; native document export does not make it an app-private file repository.
@@ -27,7 +31,7 @@ The app shell ships in the package and does not register the PWA update worker. 
 
 ### Free self-hosted UI updates
 
-The native shell uses `@capawesome/capacitor-live-update` only for binary-compatible web assets. On startup it calls `LiveUpdate.ready()` before checking the static `live-updates/manifest.json` published with the GitHub Pages artifact. A newer checksum-verified ZIP is downloaded and staged for the next app reload; the existing update prompt lets the reader choose when to apply it. If the network, manifest, checksum, or bundle is unavailable, the bundled Android assets continue to work offline. The plugin rolls back a staged bundle that does not call `ready()` within 15 seconds and automatically blocks that failed bundle.
+The native shell uses `@capawesome/capacitor-live-update` only for binary-compatible web assets. On startup it calls `LiveUpdate.ready()` before checking the static `live-updates/manifest.json` published with the GitHub Pages artifact. The app downloads a newer ZIP, verifies its checksum, and offers it in the update prompt. Accepting selects the new bundle and requests a reload. If the network, manifest, checksum, or bundle is unavailable, the bundled Android assets continue to work offline. The plugin rolls back a staged bundle that does not call `ready()` within 15 seconds and automatically blocks that failed bundle.
 
 `pnpm build:live-update` creates the Android-mode ZIP and manifest. GitHub Pages runs it after the regular Pages build, so no paid update service is required. The manifest URL and host can be overridden with `VITE_NATIVE_LIVE_UPDATE_MANIFEST_URL` and `VITE_NATIVE_LIVE_UPDATE_BASE_URL`. Live updates must not contain native plugin, permission, WebView, or storage-contract changes; those still require a store release and a new native binary. The current implementation verifies SHA-256 checksums. Add a protected RSA public key/private signing workflow before treating an untrusted publishing account as a release authority.
 

@@ -60,11 +60,12 @@ for (const language of ["ar", "en"] as const) {
           expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(owner!.x + owner!.width);
           expect(bounds!.width).toBeGreaterThanOrEqual(44);
         }
-        for (const id of ["counter-zikr-filter", "counter-target-filter"]) {
-          const picker = page.getByTestId(id);
-          await picker.scrollIntoViewIfNeeded();
-          await expectTextInside(picker, picker.locator("span").first());
-        }
+        const summary = page.getByTestId("masbaha-settings-summary");
+        await summary.scrollIntoViewIfNeeded();
+        for (const line of await summary.locator("p").all()) await expectTextInside(summary, line);
+        const settings = (await page.getByTestId("masbaha-settings-trigger").boundingBox())!;
+        expect(settings.width).toBeGreaterThanOrEqual(44);
+        expect(settings.height).toBeGreaterThanOrEqual(44);
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
       await page.screenshot({ path: info.outputPath(`${reading.counter}-200.png`) });

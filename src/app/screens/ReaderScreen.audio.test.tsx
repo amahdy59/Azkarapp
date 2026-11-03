@@ -857,6 +857,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("reader-share-dock-button")).toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-repeat")).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-keyboard-help")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("reader-help-trigger")).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-focus-toggle")).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-routine-mode")).not.toBeInTheDocument();
     expect(screen.getByTestId("reader-menu-reset-collection")).toBeInTheDocument();

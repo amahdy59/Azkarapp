@@ -1,5 +1,22 @@
-/** Conservative estimate, including page JSON and QCF font; actual font sizes vary. */
-export const MUSHAF_ESTIMATED_PAGE_BYTES = 224 * 1024;
+import sizes from "./mushafAssetSizes.json";
+
+export const MUSHAF_SIZE_VERSION = sizes.version;
+
+export function getMushafAssetBytes(page: number) {
+  if (!Number.isInteger(page) || page < 1 || page > 604) throw new RangeError("Invalid Mushaf page");
+  return { page: sizes.pageBytes[page - 1]!, font: sizes.fontBytes[page - 1]! };
+}
+
+export function getMushafDownloadBytes(first: number, last: number) {
+  if (!Number.isInteger(first) || !Number.isInteger(last) || first < 1 || last > 604 || first > last)
+    throw new RangeError("Invalid Mushaf page range");
+  let bytes = 0;
+  for (let page = first; page <= last; page++) {
+    const asset = getMushafAssetBytes(page);
+    bytes += asset.page + asset.font;
+  }
+  return bytes;
+}
 
 export async function hasDownloadSpace(bytes: number): Promise<boolean> {
   try {

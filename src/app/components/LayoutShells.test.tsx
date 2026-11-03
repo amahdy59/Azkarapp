@@ -10,9 +10,20 @@ describe("Header", () => {
     expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
   });
   it("keeps artwork out of the compact title and action surface", () => {
-    render(<Header title="Reader" decoration={<div data-testid="header-art">Scene</div>} />);
+    render(
+      <Header
+        title="Reader"
+        onBack={vi.fn()}
+        right={<button>Options</button>}
+        decoration={<div data-testid="header-art">Scene</div>}
+      />,
+    );
     expect(screen.queryByTestId("header-art")).not.toBeInTheDocument();
     expect(screen.getByTestId("shared-screen-header")).toHaveAttribute("data-header-contrast", "solid");
+    for (const child of screen.getByTestId("shared-screen-header").children) {
+      expect((child as HTMLElement).style.background).toBe("");
+    }
+    expect(screen.getByRole("button", { name: "Back", exact: true })).not.toHaveClass("surface-control-finish");
   });
   it("keeps a stable header surface without decorative dividers after nested content scrolls", () => {
     render(

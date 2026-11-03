@@ -1,3 +1,4 @@
+import { trimMushafPrefetch } from "../content/mushafScheduler";
 import { progressFillStyle } from "./progressFillStyle";
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
@@ -23,15 +24,11 @@ import type {
   Zikr,
 } from "../types";
 import {
-  getCachedMushafPage,
-  isQcfFontReady,
+  getReadyMushafPage,
   loadCanonicalAyahText,
-  loadMushafPage,
-  loadQcfFont,
-  pageHasQcfGlyphs,
   prefetchMushafPage,
   resolveSpreadQcfMode,
-  subscribeQcfFontLoaded,
+  resolveMushafPage,
   type MushafVerseData,
 } from "../content/qcfMushaf";
 import {
@@ -52,8 +49,6 @@ import type { AudioController } from "../audio/AudioProvider";
 import { useMushafPlayback } from "../hooks/useMushafPlayback";
 import { useMushafMeaningsReady } from "../hooks/useMushafMeaningsReady";
 export type { SurahAudioControl } from "./MushafToolRail";
-
-const FONT_WAIT_MS = 1200;
 
 function toMushafLines(pageData: MushafVerseData[] | null) {
   if (!pageData) return [];
@@ -77,27 +72,6 @@ interface ResolvedPage {
   page: number;
   data: MushafVerseData[];
   qcf: boolean;
-}
-
-async function resolveMushafPage(page: number): Promise<ResolvedPage> {
-  const font = isQcfFontReady(page) ? Promise.resolve(true) : loadQcfFont(page);
-  const data = await loadMushafPage(page);
-  let timer: number | undefined;
-  let qcf = false;
-  if (pageHasQcfGlyphs(data)) {
-    if (isQcfFontReady(page)) {
-      qcf = true;
-    } else {
-      qcf = await Promise.race([
-        font,
-        new Promise<boolean>((resolve) => {
-          timer = window.setTimeout(() => resolve(false), FONT_WAIT_MS);
-        }),
-      ]);
-    }
-  }
-  window.clearTimeout(timer);
-  return { page, data, qcf };
 }
 
 /**
@@ -319,25 +293,14 @@ export function MushafImmersiveReader({
   const hasSpread = leftNumber !== null;
   const facingNumber = hasSpread ? (currentPage === rightNumber ? leftNumber : rightNumber) : null;
 
-  const [facing, setFacing] = useState<ResolvedPage | null>(null);
-  const [fontRevision, setFontRevision] = useState(0);
+  const [facing, setFacing] = useState<ResolvedPage | null>(() =>
+    facingNumber === null ? null : getReadyMushafPage(facingNumber),
+  );
 
-  const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
-    const cached = getCachedMushafPage(currentPage);
-    if (!cached) return null;
-    const hasQcfGlyphs = pageHasQcfGlyphs(cached);
-    if (hasQcfGlyphs && !isQcfFontReady(currentPage)) return null;
-    return { page: currentPage, data: cached, qcf: hasQcfGlyphs };
-  });
+  const [resolved, setResolved] = useState<ResolvedPage | null>(() => getReadyMushafPage(currentPage));
 
   const rightResolved = resolved?.page === rightNumber ? resolved : facing?.page === rightNumber ? facing : null;
   const leftResolved = resolved?.page === leftNumber ? resolved : facing?.page === leftNumber ? facing : null;
-
-  useEffect(() => {
-    return subscribeQcfFontLoaded((page) => {
-      if (page === currentPage || page === rightNumber || page === leftNumber) setFontRevision((value) => value + 1);
-    });
-  }, [currentPage, leftNumber, rightNumber]);
 
   const displayPage = rightResolved?.page ?? (hasSpread ? rightNumber : (resolved?.page ?? currentPage));
   const pageData = rightResolved?.data ?? resolved?.data ?? null;
@@ -369,7 +332,9 @@ export function MushafImmersiveReader({
     return () => {
       active = false;
     };
-  }, [currentPage, facingNumber, fontRevision]);
+  }, [currentPage, facingNumber]);
+
+  useEffect(() => trimMushafPrefetch([currentPage - 1, currentPage, currentPage + 1]), [currentPage]);
 
   // Start immediate neighbours first. Farther fonts wait for the visible page
   // so a cold surah opening never competes with six speculative downloads.
@@ -390,8 +355,8 @@ export function MushafImmersiveReader({
       for (const offset of [2, 3]) {
         const next = pageNumbers[pageIndex + offset];
         const previous = pageNumbers[pageIndex - offset];
-        if (next) prefetchMushafPage(next);
-        if (previous) prefetchMushafPage(previous);
+        if (next) prefetchMushafPage(next, "prefetch");
+        if (previous) prefetchMushafPage(previous, "prefetch");
       }
     }, 150);
     return () => window.clearTimeout(timer);
@@ -836,7 +801,13 @@ export function MushafImmersiveReader({
             topRightControl={mobileTopRight}
             topCenterControl={mobileTopCenter}
             bottomLeftControl={mobileBottomLeft}
-            bottomCenterControl={mobileBottomCenter}
+            bottomCenterControl={
+              isFocusMode ? (
+                <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} />
+              ) : (
+                mobileBottomCenter
+              )
+            }
             bottomRightControl={mobileBottomRight}
             onSurahClick={() => {
               setIndexTab("surahs");
@@ -904,13 +875,6 @@ export function MushafImmersiveReader({
             </span>
           </div>
         </div>
-      )}
-
-      {isFocusMode && (
-        /* Focus mode hides the rail that turned it on, so without this the only
-           way out was leaving the surah altogether — and on a phone, with no
-           keyboard, there was no way out at all. The Mushaf's own handle. */
-        <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} />
       )}
 
       <MushafQuickMenu

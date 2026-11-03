@@ -656,8 +656,9 @@ describe("KhatmahReaderScreen wird completion notice", () => {
     // Press 'f' to toggle focus mode
     fireEvent.keyDown(document.body, { key: "f" });
     expect(screen.queryByTestId("mushaf-top-left-back")).toBeNull();
-    expect(screen.queryByTestId("mushaf-control-bottom-center")).toBeNull();
-    expect(screen.getByTestId("mushaf-focus-exit")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-control-bottom-center").firstElementChild).toBe(
+      screen.getByTestId("mushaf-focus-exit"),
+    );
 
     // Click focus exit handle
     fireEvent.click(screen.getByTestId("mushaf-focus-exit"));

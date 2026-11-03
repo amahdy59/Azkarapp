@@ -311,7 +311,7 @@ export function ProgressScreen({
       }}
       screenName={t(language, "common.progress")}
     >
-      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 flex-col items-center pb-8">
+      <div className="progress-screen-content">
         <div
           ref={controlsRef}
           data-scrolled={hasScrolledControls || undefined}
@@ -329,7 +329,7 @@ export function ProgressScreen({
               }
               language={language}
               elevateOnScroll={false}
-              style={{ position: "static", paddingInline: 0, background: "transparent" }}
+              style={{ paddingInline: 0 }}
               right={
                 <div className="progress-header-actions">
                   <TabList
@@ -426,7 +426,7 @@ export function ProgressScreen({
         </div>
 
         <div
-          className="w-full max-w-7xl px-page outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          className="mx-auto w-full max-w-7xl shrink-0 px-page pb-8 outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
           {...tabPanelProps(viewId, view)}
         >
           <ProgressDashboard

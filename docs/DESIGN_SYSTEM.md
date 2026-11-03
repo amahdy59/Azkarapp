@@ -1,3 +1,7 @@
+## Mobile Masbaha settings
+
+Below 600px, a named 44px settings button sits beside the selected dhikr and goal summary. The shared opaque sheet keeps its header and Apply/Cancel actions outside the scrolling options. Dhikr expands in place and goals use direct radio choices with an inline custom field. Closing discards the draft and returns focus to the settings button. Wider layouts retain the existing selectors.
+
 ## Narrow Progress tabs and notification labels — 2026-11-03
 
 Compact Progress tabs retain visible icons at every narrow width, including 384px and below; only their visual labels hide, while accessible names and 44px targets remain. Shared notification permission and enable labels apply to both Android and browsers. Recovery guidance follows the actual platform, preserving truthful delivery limitations.
@@ -21,6 +25,8 @@ A keyboard-scrollable reading viewport paints its inset boundary only for delibe
 At narrow/enlarged sizes, standalone reading headers put the title on its own row with comfortable Arabic line height; icon-only targets remain 44px. Picker short labels wrap, tally values retain scalable vertical clearance and may wrap complete number tokens. Navigation never extends outside its card. Category badges keep their 44px decorative measure; their existing 18px padding and 16px gap stay bounded instead of doubling with text, so enlarged labels receive the remaining width and summary phrases reflow. This is a scoped text-reflow exception that preserves the normal-size spacing. Shared Buttons are bounded by their container and wrap labels; tightly enclosed controls/panels use inset focus. Keep normal-size geometry and sacred text unchanged.
 
 ## Consolidated spacing and state contract — 2026-11-02
+
+The 2026-11-03 local dark-paper adjustment increases the existing dark/Glass tile's quantized opacity by approximately 35% (peak alpha 20/255, previously 15/255). Its grain frequency, 7,358-byte transfer size and static paint ownership are unchanged. The accepted light tile remains byte-identical. Keep the same opt-out and accessibility precedence, including independent dark, Midnight and OLED Mushaf colors.
 
 Paper texture belongs to complete filled page/card surfaces, including `bg-background`, grouped Settings rows and nested filled Glass cards. Transparent structural wrappers reveal their parent's texture instead of stacking it. Use `background-color` for state tinting; a `background` shorthand erases the material image. Verify the wide Settings master/detail canvas and Library search/filter header together: no isolated textured header, flat row group or rectangular untextured patch. Nested Glass drops extra frost/sheen while keeping grain on its filled owners. The same global switch/accessibility precedence governs every owner.
 
@@ -1453,3 +1459,29 @@ Today's path is a read-only recorded-data summary with three icon-led rows, comp
 Bottom navigation permanently shows Home, Quran, Azkar, Qibla and Settings with visible labels and native link semantics. Masbaha occupies the slot immediately before Settings only at a stable 36rem navigation-container width; rem follows enlarged text. Hidden optional links leave keyboard/AT order through display:none. Preserve 44px minimum targets, RTL DOM order, safe-area padding and the existing enlarged-text three-column recovery. Never substitute items based on route, scroll or audio state. Home retains its Masbaha card and provides a More action. Today's path and More lead to Month Progress; wide navigation retains Progress and gains both utility destinations. Utility active state excludes remembered primary selection. Existing immersive reading/focus navigation exclusions remain.
 
 Compact filter titles use the shared SheetHeader title marker for font-relative sizing; obsolete heading-tag selectors must not leave enlarged Arabic titles consuming the date-control viewport. Native range inputs retain a visible outline as well as tint when keyboard focused, including engines that suppress shadow rings.
+
+### Expanded listening footer
+
+Queue and repetition counts share a compact row with distinct text labels. Secondary controls can wrap on narrow screens while transport keeps its centered play action. Focus mode exposes exit and accidental-touch lock with full-sized targets. The unlock overlay keeps the existing hold action and returns focus to its trigger.
+
+The expanded player's context and utility controls sit above the waveform. Transport stays centered below it. Auto-play next has the same pill shape as queue and repeat. Routine preparation and buffering announcements take no layout space.
+
+## Labelled audio continuation — owner correction
+
+Auto-play keeps a visible short label at compact and enlarged sizes. Its flex space takes priority over content-sized queue and repeat controls. The same row retains 44px focus and lock targets. Hovering audio controls uses a light surface tint and a 1.035 icon cue with stable borders. Keyboard focus retains the shared indicator and both reduced-motion preferences retain still feedback. The timer uses a grouped field and concise explanation.
+
+Audio options uses one opaque surface with flat Playback and Text and following sections, whitespace and section dividers. Do not outline or fill nested groups. Voice and sleep timer fields use the same block label and 12px field gap. The fixed header and scrolling body use 12px content gutters; the native scrollbar stays at the panel edge in RTL/LTR, independently of the Close target. The listening footer uses spacing above its context row without a top separator. Shared collection headers retain one stable contrast surface, transparent title/action wrappers and a ghost Back action without a decorative control finish.
+
+Within the flat audio panel, speed and volume use an adaptive two-column row (stacking when enlarged text needs it). Avoid duplicated label/control icons. Keep voice and sleep timer full width; related text toggles remain in reading order. Playback help discloses timer and device guidance with a visible chevron. Ordinary phone settings should fit without scrolling; short/enlarged views and expanded help retain independent scrolling rather than smaller targets. Hide unsupported software volume together with its label on iOS.
+
+The owner-selected Arabic continuation caption is تلقائي; its accessible name stays تشغيل التالي تلقائيًا. Compact zikr, Masbaha and Friday menus omit keyboard help below the shared 768px wide-header threshold. Wide-menu help and actual keyboard shortcuts remain available.
+
+Audio options groups are separated by spacing and dividers without visible section headings. Repeat, Audio options and Volume dismiss on an outside pointer action, including touch. An action inside a nested option stays within the menu. Escape returns focus to the relevant trigger. Short touch layouts omit keyboard help from the counter menus, including phone landscape.
+
+Mobile Mushaf controls and compact translation tools own in-flow rows outside the paper. Row height includes actual control size and safe-area insets. The scrollable paper fits its canonical page between these rows, including when focus mode exposes only the exit. Short surahs embedded in zikr groups show the basmalah and verses without decorative title and metadata. The passage retains a localized accessible name. Full Mushaf headings continue occupying their canonical slots. Short viewports and enlarged reading sizes can scroll without shrinking text to force a fit.
+
+## Stable reading and hover continuation
+
+The owner approves a bounded preparation state before Quran lettering is selected. After fallback appears, its font choice stays stable during that visit. Warm visits retain immediate exact glyphs. The Progress title/tabs are sticky directly within the scrolling screen, with the title retaining its position inside enlarged controls. Test wheel and full-height scrolling in both directions.
+
+Shared actionable icon hover/focus now uses a 1.05 scale token with the existing finite easing. Home and ordinary controls share it, while audio keeps its deliberate 1.035 reading cue. Shared card hover uses a 6% inset tint with stationary geometry. Keyboard focus retains the visible boundary. The general brightness response is reduced to 1.03. Home Tasbih no longer moves its arrow on hover. Touch and both Reduce Motion preferences retain still feedback. This supersedes the previous 1.10 icon-hover and primary stroke guidance for these shared recipes.

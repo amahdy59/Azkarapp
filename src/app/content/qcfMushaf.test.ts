@@ -4,6 +4,10 @@ import {
   getQcfFontFamily,
   getQcfFontUrl,
   getMushafPageUrl,
+  getReadyMushafPage,
+  getMushafMemoryStats,
+  retainQcfFonts,
+  isQcfFontReady,
   loadMushafPage,
   loadQcfFont,
   pageHasQcfGlyphs,
@@ -171,6 +175,14 @@ describe("Mushaf page data", () => {
 
     expect(a).toBe(b);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(getReadyMushafPage(512)).toBeNull();
+  });
+
+  it("can immediately reuse a cached Unicode page without a private-use font", async () => {
+    const data = [{ k: "1:1", w: [[1, 1, 0, "بِسْمِ"]] }];
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(data))));
+    await loadMushafPage(534);
+    expect(getReadyMushafPage(534)).toEqual({ page: 534, data, qcf: false });
   });
 
   it("prepares the requested page data and font as one navigation-intent task", async () => {
@@ -186,7 +198,9 @@ describe("Mushaf page data", () => {
     vi.stubGlobal("FontFace", TestFontFace);
     Object.defineProperty(document, "fonts", { configurable: true, value: { add: vi.fn() } });
 
+    expect(getReadyMushafPage(513)).toBeNull();
     await expect(prepareMushafPage(513)).resolves.toBe(true);
+    expect(getReadyMushafPage(513)).toEqual({ page: 513, data: json, qcf: true });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(load).toHaveBeenCalledTimes(1);
 
@@ -250,4 +264,29 @@ describe("QCF page fonts", () => {
     if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
     else Reflect.deleteProperty(document, "fonts");
   });
+});
+
+it("evicts old decoded faces while retaining mounted pages and allowing backtracking", async () => {
+  const previous = Object.getOwnPropertyDescriptor(document, "fonts");
+  const remove = vi.fn();
+  class TestFace {
+    async load() {
+      return this;
+    }
+  }
+  vi.stubGlobal("FontFace", TestFace);
+  Object.defineProperty(document, "fonts", { configurable: true, value: { add: vi.fn(), delete: remove } });
+  const release = retainQcfFonts([101]);
+  try {
+    for (let page = 101; page <= 120; page++) await loadQcfFont(page);
+    expect(getMushafMemoryStats().decodedFonts).toBeLessThanOrEqual(12);
+    expect(isQcfFontReady(101)).toBe(true);
+    expect(isQcfFontReady(102)).toBe(false);
+    expect(remove).toHaveBeenCalled();
+    await expect(loadQcfFont(102)).resolves.toBe(true);
+  } finally {
+    release();
+    if (previous) Object.defineProperty(document, "fonts", previous);
+    else Reflect.deleteProperty(document, "fonts");
+  }
 });

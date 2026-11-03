@@ -1,5 +1,5 @@
 /* Static neutral grain: soft procedural white wove paper in light mode,
-   existing fine fractal in dark. No live filter, overlay or animation. */
+   fine fractal with a modest opacity gain in dark. No live filter, overlay or animation. */
 :root {
   --paper-grain-light: url("../../assets/paper-grain-light.png?no-inline");
   --paper-grain-dark: url("../../assets/paper-grain-dark.png?no-inline");

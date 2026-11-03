@@ -224,15 +224,15 @@ for (const language of ["ar", "en"] as const) {
     await evidence.scrollIntoViewIfNeeded();
     await page.keyboard.press("Tab");
     await share.focus();
-    await expect(share.locator("svg")).toHaveCSS("scale", "1.1");
+    await expect(share.locator("svg")).toHaveCSS("scale", "1.05");
     await expect(share.locator("svg")).toHaveCSS("translate", "0px -2px");
     const footprint = (await share.boundingBox())!;
     expect(Number(footprint.width.toFixed(3))).toBeGreaterThanOrEqual(44);
     expect(Number(footprint.height.toFixed(3))).toBeGreaterThanOrEqual(44);
     for (const [target, scale] of [
-      [page.getByTestId("home-quick-share"), "1.1"],
-      [page.getByTestId("wird-category-card").first(), "1.1"],
-      [page.getByTestId("situational-shortcuts").getByRole("link").first(), "1.08"],
+      [page.getByTestId("home-quick-share"), "1.05"],
+      [page.getByTestId("wird-category-card").first(), "1.05"],
+      [page.getByTestId("situational-shortcuts").getByRole("link").first(), "1.05"],
     ] as const) {
       await target.focus();
       await expect(target.locator(".control-cue").first()).toHaveCSS("scale", scale);

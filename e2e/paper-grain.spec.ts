@@ -135,37 +135,47 @@ for (const theme of ["light", "dark", "midnight"] as const) {
   }
 }
 
-test("Mushaf paper retains the shared grain @cross-browser", async ({ page }, info) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.addInitScript(() => {
-    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({ settings: { language: "ar", reduceMotion: true }, profile: { isGuest: true }, khatmahPage: 42 }),
-    );
+for (const mushafTheme of ["light", "dark", "midnight", "oled"] as const) {
+  test(`Mushaf ${mushafTheme} paper retains the shared grain @cross-browser`, async ({ page }, info) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.addInitScript((mushafTheme) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: { language: "ar", themeMode: "light", reduceMotion: true },
+          profile: { isGuest: true },
+          khatmahPage: 42,
+          mushafTheme,
+        }),
+      );
+    }, mushafTheme);
+    await page.goto("/#/quran-wird");
+    await page.getByRole("button", { name: "متابعة القراءة", exact: true }).click();
+    const paper = page.locator(".mushaf-page-canvas").first();
+    await expect(paper).toBeVisible();
+    // The text canvas is transparent structure, not a second paper sheet.
+    await expect(paper).toHaveCSS("background-image", "none");
+    await expect
+      .poll(() => paper.evaluate((node) => getComputedStyle(node).getPropertyValue("--paper-grain")))
+      .toMatch(new RegExp(`paper-grain-${mushafTheme === "light" ? "light" : "dark"}`));
+    await expect
+      .poll(() =>
+        paper.evaluate((node) => {
+          let layers = 0;
+          for (let owner: Element | null = node; owner; owner = owner.parentElement) {
+            const style = getComputedStyle(owner);
+            if (/paper-grain/.test(style.backgroundImage)) layers++;
+            if (!["transparent", "rgba(0, 0, 0, 0)"].includes(style.backgroundColor)) break;
+          }
+          return layers;
+        }),
+      )
+      .toBe(1);
+    await page.screenshot({ path: info.outputPath(`mushaf-grain-${mushafTheme}.png`) });
+    expect(await paper.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
   });
-  await page.goto("/#/quran-wird");
-  await page.getByRole("button", { name: "متابعة القراءة", exact: true }).click();
-  const paper = page.locator(".mushaf-page-canvas").first();
-  await expect(paper).toBeVisible();
-  // The text canvas is transparent structure, not a second paper sheet.
-  await expect(paper).toHaveCSS("background-image", "none");
-  await expect
-    .poll(() =>
-      paper.evaluate((node) => {
-        let layers = 0;
-        for (let owner: Element | null = node; owner; owner = owner.parentElement) {
-          const style = getComputedStyle(owner);
-          if (/paper-grain/.test(style.backgroundImage)) layers++;
-          if (!["transparent", "rgba(0, 0, 0, 0)"].includes(style.backgroundColor)) break;
-        }
-        return layers;
-      }),
-    )
-    .toBe(1);
-  await page.screenshot({ path: info.outputPath("mushaf-grain.png") });
-  expect(await paper.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
-});
+}
 
 for (const homeMaterial of ["solid", "glass"] as const) {
   test(`Home cards and scrolled prayer strip retain grain ${homeMaterial} @cross-browser`, async ({ page }, info) => {

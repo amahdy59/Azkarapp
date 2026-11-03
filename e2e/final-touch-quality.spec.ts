@@ -217,11 +217,11 @@ for (const mode of ["default", "app", "os"] as const) {
     const before = await geometry();
     await page.keyboard.press("Tab");
     await button.focus();
-    await expect(button.locator("svg")).toHaveCSS("scale", mode === "default" ? "1.1" : "1");
+    await expect(button.locator("svg")).toHaveCSS("scale", mode === "default" ? "1.05" : "1");
     expect(await geometry()).toEqual(before);
     if (await page.evaluate(() => matchMedia("(hover:hover) and (pointer:fine)").matches)) {
       await button.hover();
-      await expect(button.locator("svg")).toHaveCSS("scale", mode === "default" ? "1.1" : "1");
+      await expect(button.locator("svg")).toHaveCSS("scale", mode === "default" ? "1.05" : "1");
     }
   });
 }

@@ -8,6 +8,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --motion-icon-hover-scale: 1.05;
   --glass-card-tint: rgb(15 23 42 / 0.24);
   --glass-reading-tint: rgb(15 23 42 / 0.36);
   --glass-frost: blur(22px) saturate(135%);

@@ -1,3 +1,4 @@
+import { trimMushafPrefetch } from "../content/mushafScheduler";
 import { progressFillStyle } from "../components/progressFillStyle";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -55,15 +56,11 @@ import { getProgressDayKey } from "../progress";
 import { useNow } from "../hooks/useNow";
 import { getQuranWirdDayProgress } from "./quranWirdGoal";
 import {
-  getCachedMushafPage,
-  isQcfFontReady,
-  loadMushafPage,
+  getReadyMushafPage,
   loadCanonicalAyahText,
-  loadQcfFont,
-  pageHasQcfGlyphs,
   prefetchMushafPage,
   resolveSpreadQcfMode,
-  subscribeQcfFontLoaded,
+  resolveMushafPage,
   type MushafVerseData,
 } from "../content/qcfMushaf";
 import { reportError } from "../../lib/observability";
@@ -73,7 +70,6 @@ const LAST_PAGE = 604;
 const SWIPE_THRESHOLD = 60;
 /** Only incomplete drags settle; committed turns use the viewer's animation. */
 const PAPER_SETTLE = "transform var(--motion-duration-fast) var(--motion-ease-standard)";
-const FONT_WAIT_MS = 1200;
 
 const COMPLETION_NOTICE_MS = 4000;
 
@@ -102,24 +98,6 @@ interface ResolvedPage {
   /** Settled with the page, never after it: flipping this later reflowed the
    *  whole canvas as the Unicode fallback gave way to QCF. */
   qcf: boolean;
-}
-
-async function resolveMushafPage(page: number): Promise<ResolvedPage> {
-  // Start the only cold reading resource before waiting for local page data.
-  const font = isQcfFontReady(page) ? Promise.resolve(true) : loadQcfFont(page);
-  const data = await loadMushafPage(page);
-  let timer: number | undefined;
-  const qcf =
-    pageHasQcfGlyphs(data) &&
-    (isQcfFontReady(page) ||
-      (await Promise.race([
-        font,
-        new Promise<boolean>((resolve) => {
-          timer = window.setTimeout(() => resolve(false), FONT_WAIT_MS);
-        }),
-      ])));
-  window.clearTimeout(timer);
-  return { page, data, qcf };
 }
 
 export function KhatmahReaderScreen({
@@ -203,17 +181,9 @@ export function KhatmahReaderScreen({
 
   const [theme, setTheme] = useState<MushafTheme>(initialTheme);
   const resolvedTheme = theme === "follow-app" ? appTheme : theme;
-  const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
-    const cached = getCachedMushafPage(currentPage);
-    if (!cached) return null;
-    const hasQcfGlyphs = pageHasQcfGlyphs(cached);
-    if (hasQcfGlyphs && !isQcfFontReady(currentPage)) return null;
-    return { page: currentPage, data: cached, qcf: hasQcfGlyphs };
-  });
+  const [resolved, setResolved] = useState<ResolvedPage | null>(() => getReadyMushafPage(currentPage));
   const settledPage = useRef(resolved?.page ?? currentPage);
   const [pageTransitionDirection, setPageTransitionDirection] = useState<"forward" | "backward" | undefined>();
-  const [other, setOther] = useState<ResolvedPage | null>(null);
-  const [fontRevision, setFontRevision] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
@@ -293,15 +263,12 @@ export function KhatmahReaderScreen({
     !showPageTranslation &&
     (internalLayout === "spread" || (internalLayout === "auto" && autoSpreadRoom));
   const useRail = shell.rail;
-
-  // Re-resolve both visible pages when a timed-out QCF font finishes later.
-  useEffect(() => {
-    return subscribeQcfFontLoaded((page) => {
-      const right = spreadStart(currentPage);
-      const left = right + 1 <= LAST_PAGE ? right + 1 : null;
-      if (page === currentPage || page === right || page === left) setFontRevision((value) => value + 1);
-    });
-  }, [currentPage]);
+  const [other, setOther] = useState<ResolvedPage | null>(() => {
+    if (!spreadRoom) return null;
+    const right = spreadStart(currentPage);
+    const left = right + 1 <= LAST_PAGE ? right + 1 : null;
+    return left === null ? null : getReadyMushafPage(currentPage === right ? left : right);
+  });
 
   const paperRef = useRef<HTMLDivElement>(null);
   const readerRootRef = useRef<HTMLDivElement>(null);
@@ -312,23 +279,7 @@ export function KhatmahReaderScreen({
    * preference honoured.
    */
   const [isFocusMode, setIsFocusMode] = useState(false);
-  const compactTranslation = showPageTranslation && !pairedMeaning && readingMode === "mushaf";
-  const translationToolbarRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const toolbar = translationToolbarRef.current;
-    const root = readerRootRef.current;
-    if (!toolbar || !root || !compactTranslation || isFocusMode) return;
-    const measure = () =>
-      root.style.setProperty("--mushaf-top-clearance", `${toolbar.getBoundingClientRect().height}px`);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(toolbar);
-    return () => {
-      observer.disconnect();
-      root.style.removeProperty("--mushaf-top-clearance");
-    };
-  }, [compactTranslation, isFocusMode]);
-
+  const compactTranslation = !isFocusMode && showPageTranslation && !pairedMeaning && readingMode === "mushaf";
   const togglePageTranslation = () => {
     if (!showPageTranslation) setCompactMeaningPane("english");
     setShowPageTranslation(!showPageTranslation);
@@ -520,7 +471,7 @@ export function KhatmahReaderScreen({
     return () => {
       active = false;
     };
-  }, [currentPage, language, reloadToken, spreadRoom, fontRevision]);
+  }, [currentPage, language, reloadToken, spreadRoom]);
 
   /**
    * A page counts itself once it has actually been read.
@@ -598,6 +549,8 @@ export function KhatmahReaderScreen({
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
   }, [onRecordPages, quranWirdPlan?.kind, todayKey, visiblePages, wirdGoal, wirdHistory]);
 
+  useEffect(() => trimMushafPrefetch([currentPage - 1, currentPage, currentPage + 1]), [currentPage]);
+
   // Warm the two most likely next turns immediately. Page JSON is local and
   // the corresponding QCF fonts are the only cold resource, so waiting for
   // the current page to settle before starting these requests made quick
@@ -625,13 +578,13 @@ export function KhatmahReaderScreen({
     const timer = window.setTimeout(() => {
       if (spreadRoom && leftNumber !== null) {
         for (let offset = 2; offset <= 4; offset++) {
-          if (leftNumber + offset <= LAST_PAGE) prefetchMushafPage(leftNumber + offset);
-          if (rightNumber - offset >= 1) prefetchMushafPage(rightNumber - offset);
+          if (leftNumber + offset <= LAST_PAGE) prefetchMushafPage(leftNumber + offset, "prefetch");
+          if (rightNumber - offset >= 1) prefetchMushafPage(rightNumber - offset, "prefetch");
         }
       } else {
         for (let offset = 2; offset <= 3; offset++) {
-          if (currentPage + offset <= LAST_PAGE) prefetchMushafPage(currentPage + offset);
-          if (currentPage - offset >= 1) prefetchMushafPage(currentPage - offset);
+          if (currentPage + offset <= LAST_PAGE) prefetchMushafPage(currentPage + offset, "prefetch");
+          if (currentPage - offset >= 1) prefetchMushafPage(currentPage - offset, "prefetch");
         }
       }
     }, 100);
@@ -1125,13 +1078,11 @@ export function KhatmahReaderScreen({
           </div>
         )}
 
-        {pageData && compactTranslation && !isFocusMode && (
+        {pageData && compactTranslation && (
           <div
-            ref={translationToolbarRef}
             data-testid="mushaf-translation-toolbar"
             dir="ltr"
-            className="absolute inset-x-0 top-0 z-30 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center bg-background px-1"
-            style={{ paddingTop: 4, paddingBottom: 4 }}
+            className="mushaf-control-band mushaf-control-band--top mushaf-control-band--translation bg-background"
           >
             <div className="flex justify-center">{mobileTopLeft}</div>
             <MushafTranslationControls
@@ -1148,7 +1099,6 @@ export function KhatmahReaderScreen({
             hidden={compactMeaningPane !== "english"}
             style={{
               display: compactMeaningPane !== "english" ? "none" : undefined,
-              paddingTop: "var(--mushaf-top-clearance, 52px)",
             }}
             className="flex min-h-0 flex-1 flex-col px-2 sm:px-4"
           >
@@ -1268,7 +1218,7 @@ export function KhatmahReaderScreen({
               topRightControl={compactTranslation ? undefined : mobileTopRight}
               topCenterControl={compactTranslation ? undefined : mobileTopCenter}
               bottomLeftControl={mobileBottomLeft}
-              bottomCenterControl={mobileBottomCenter}
+              bottomCenterControl={isFocusMode ? focusHandle : mobileBottomCenter}
               bottomRightControl={mobileBottomRight}
               onSurahClick={() => {
                 setIndexTab("surahs");
@@ -1301,7 +1251,6 @@ export function KhatmahReaderScreen({
               textScale={mushafTextScale}
               onAyahAction={handleAyahAction}
             />
-            {isFocusMode && focusHandle}
           </div>
         ) : null}
         {isFocusMode && (

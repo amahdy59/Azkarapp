@@ -2,7 +2,9 @@
 
 ## Active phase
 
-[Narrow tabs and notification release](phases/NARROW_TABS_NOTIFICATIONS_RELEASE_2026_11_03.md) is active. The owner's explicit request to apply fixes and push all changes supersedes the previous publication hold. Preserve preceding phase evidence; release the combined pending tree through the full local hook and exact-commit CI/deployment gates.
+[Audio footer and Mushaf performance](phases/AUDIO_FOOTER_MUSHAF_PERFORMANCE_LOCAL_2026_11_03.md) is the current approved local-only phase. Preserve completed [Quran entry stability](phases/QURAN_ENTRY_STABILITY_LOCAL_2026_11_03.md), [dark paper and audio/Mushaf review](phases/DARK_PAPER_AUDIO_MUSHAF_REVIEW_2026_11_03.md) and [optional updates and mobile Masbaha settings](phases/UPDATE_READINESS_MASBAHA_LOCAL_2026_11_03.md) changes. The owner authorized publishing this completed batch to main on 2026-11-04.
+
+[Narrow tabs and notification release](phases/NARROW_TABS_NOTIFICATIONS_RELEASE_2026_11_03.md) records the preceding deployed checkpoint; the subsequent local-only instruction supersedes its publication authority for pending work.
 
 [Evidence-led final touches](phases/FINAL_TOUCH_QUALITY_MOTION_2026_11_02.md) is the preceding implementation phase. The [consolidated implementation](phases/CONSOLIDATED_IMPLEMENTATION_2026_11_02.md) and [acceptance ledger](CONSOLIDATED_REVIEW_CHECKLIST_2026_11_02.md) retain their evidence.
 

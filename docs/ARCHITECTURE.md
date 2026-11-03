@@ -1,3 +1,9 @@
+## Local optional update and Masbaha settings
+
+Release metadata can announce a new browser build while its offline shell is still preparing. Preparation checks or awaits the service worker without activating it. A ready worker goes straight to activation after the reader accepts, then uses the existing bounded handover and one-time stale-worker recovery. Later applies the existing per-release deferral while downloads finish. The Android host keeps the downloaded bundle as a candidate in memory and selects it for the next load only on acceptance. The plugin continues to own bundle validation and rollback.
+
+The compact Masbaha settings sheet holds only draft dhikr and goal values. Apply delegates to the screen's current target or switch workflow. A changed dhikr with an active count still requires its save/reset confirmation. The screen continues to own persisted counts and targets.
+
 ## Combined release recovery — 2026-11-03
 
 AccessibleCombobox consumes Escape from its own popup at window capture before parent document-level dismissal, preserving the enclosing plan dialog and restoring its trigger. Compact ResponsiveSheet defers protected-dropdown Escape. This is transient overlay ownership only; no route, stored state or native permission boundary changes. Header subtitles scale their leading with font size; Progress date context uses a block box for correct enlarged-text measurement.
@@ -297,6 +303,8 @@ AyahShareStudio uses the same cached local Saheeh International loader as Quran 
 ### Verified Quran snippet lettering (2026-10-11)
 
 `useQuranSnippet` resolves explicit passage/evidence identities through the existing Mushaf loader. `excerptWordMapping` validates consecutive source tokens against the cited Uthmani words; only display normalization is applied, including orthographic joins. `QuranGlyphSlice` paints page-specific QCF glyphs while preserving the original accessible source and offsets. Unverified text or unavailable fonts use the shared Unicode fallback. A late font notification upgrades the fallback without blocking reading.
+
+Quran entry stability (2026-11-03, local): the shared listening/snippet hook reads the validated in-memory page and decoded-font readiness synchronously for its initial/page-change render, rather than discarding ready content. Cold font and page acquisition start together. Full and immersive Mushaf readers initialize both already-ready spread faces through `getReadyMushafPage`; no cached single-page-to-spread handoff is needed. App-owned navigation intent lazily warms at most two page/font pairs from a category or the next two reader entries through `quranReadiness`, reusing the same deduplicated loaders. Hidden screens, Data Saver and 2G skip speculative requests. This does not add a cache or persistence schema, block reading on fonts, or remove late-font/offline fallback recovery.
 
 The daily page fonts and JSON for 42, 49, 603 and 604 are precached for first offline use after installation. `scripts/prepare-daily-quran-fonts.mjs` refreshes dated assets and records provider URLs and hashes; updates must also change the local font directory in `qcfMushaf.ts`. Image exports prepare separate verified drawing data and preserve the original text payload. Quran Foundation credentials are not bundled or used for font loading.
 
@@ -803,3 +811,15 @@ FloatingAudioPlayer owns ephemeral focus state independently of persisted settin
 ## Responsive navigation utility composition — 2026-11-02
 
 BottomNav and NavRail receive prepared Qibla/Masbaha callbacks and an exclusive activeUtility from App; visual navigation does not mutate persisted activeTab or add route types. Existing native hrefs preserve modified-click behavior. Primary NavTab remains unchanged. A CSS container query controls Masbaha visibility without listeners or state churn. App's existing push and primary Progress handler preserve URL/back/audio-lock behavior. Home exposes More via a callback; More composes a Progress ToolCard using existing routes and localized copy. No persisted state or network changes.
+
+### Audio focus and Mushaf downloads
+
+Focus mode retains its exit and accidental-touch lock actions. The footer shows compact queue and repetition context, a fixed Play next switch and an active timer indicator. Repeat settings open from the repetition control. The shared lock overlay returns focus to the lock button after unlocking.
+
+Mushaf requests share a priority queue that reserves foreground capacity. Queued speculation can be discarded when the reader moves. Explicit downloads retain their cancellation and resume path. Mounted page renderers retain their decoded fonts, with a twelve-face target for the remaining pool. Eviction preserves Cache Storage. Downloads publishes Mushaf and audio status independently, revalidates cached bodies in cancellable batches, and displays a versioned session hint while checking. Actual byte totals count validated payloads. Remaining sizes use known bundled pairs and a conservative estimate for remote pairs.
+
+## Stable Quran font settlement and measured Mushaf sizes — local
+
+Visible Quran pages and identified snippets choose their typeface after page/font preparation, bounded by the existing 1.2-second font wait. They retain that choice until navigation or explicit retry. The decoded font/cache may finish in the background for the next visit. The shared page resolver and snippet hook retain warm-cache first renders and foreground priority. Late-font subscriptions no longer replace visible word boxes. Identified inline passages expose a short preparation status before exact glyphs or readable Unicode. This supersedes the earlier automatic late-font recovery presentation.
+
+The generated mushafAssetSizes catalog records the 604 shipped JSON lengths and remote WOFF2 Content-Length values. A content-derived version invalidates old status summaries. Download status sums missing page/font resources separately and reports verified stored bytes independently. Generation records remote ETags in ignored output evidence. CI tests compare all shipped page lengths and bundled font lengths against the catalog. Refresh the catalog when the source or shipped resources change. Quota preflight retains its 15% overhead allowance and actual transfer notifications use received bytes.

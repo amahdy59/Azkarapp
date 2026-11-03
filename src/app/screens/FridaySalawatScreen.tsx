@@ -1,3 +1,4 @@
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { ReferenceCard } from "../components/ReferenceCard";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { DevotionalAction } from "../components/DevotionalControls";
@@ -30,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
-import { isCounterShortcutBlocked } from "../keyboardShortcuts";
+import { COMPACT_TOUCH_KEYBOARD_HELP_QUERY, isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
@@ -140,6 +141,7 @@ export function FridaySalawatScreen({
   const [selectedFormula, setSelectedFormula] = useState<SalawatFormula>(() => SALAWAT_FORMULAS[0]!);
   const [currentTextSize, setCurrentTextSize] = useState<TextSizeOption>(textSize);
   const [shareOpen, setShareOpen] = useState(false);
+  const compactTouch = useMediaQuery(COMPACT_TOUCH_KEYBOARD_HELP_QUERY);
   const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
   const moreTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -340,10 +342,12 @@ export function FridaySalawatScreen({
                       <MoreVertical size={20} aria-hidden="true" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={() => setKeyboardHelpOpen(true)}>
-                        <Keyboard size={16} aria-hidden="true" />
-                        {t(language, "reader.keyboardShortcuts")}
-                      </DropdownMenuItem>
+                      {isWide && !compactTouch && (
+                        <DropdownMenuItem onSelect={() => setKeyboardHelpOpen(true)}>
+                          <Keyboard size={16} aria-hidden="true" />
+                          {t(language, "reader.keyboardShortcuts")}
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={toggleSound}>
                         {soundEnabled ? (
                           <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />

@@ -11,6 +11,8 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/content/quranReadiness.test.ts",
+  "src/app/native/liveUpdate.consent.test.ts",
   // Vaul/Radix focus-scope state must not carry across unrelated overlay suites.
   "src/app/components/ResponsiveFilters.test.tsx",
   "src/app/progressExport.test.ts",

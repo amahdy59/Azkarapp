@@ -1,3 +1,4 @@
+import { checkMasbahaSettings } from "./helpers/masbaha-settings";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
@@ -27,6 +28,38 @@ for (const scenario of [
         );
       }, scenario);
     });
+    if (scenario.width <= 834)
+      test("collection headers use one quiet surface @cross-browser", async ({ page }, info) => {
+        // This contract belongs to the compact header, below the 768px hero.
+        await page.setViewportSize({ width: Math.min(scenario.width, 600), height: 1000 });
+        for (const collection of ["morning", "evening", "before-sleep"]) {
+          await page.goto(`/#/azkar/${collection}/1`);
+          const header = page.getByTestId("shared-screen-header");
+          await expect(header).toBeVisible();
+          await page.locator("html").evaluate((node, scale) => {
+            node.style.fontSize = `${scale * 100}%`;
+          }, scenario.scale);
+          await page.mouse.move(0, 0);
+          const geometry = await header.evaluate((node) => {
+            const bounds = node.getBoundingClientRect();
+            const buttons = [...node.querySelectorAll("button")];
+            return {
+              plain: [...node.children, ...buttons].every(
+                (child) => getComputedStyle(child).backgroundColor === "rgba(0, 0, 0, 0)",
+              ),
+              targets: buttons.every((button) => {
+                const box = button.getBoundingClientRect();
+                return box.width >= 44 && box.height >= 44 && box.left >= bounds.left && box.right <= bounds.right + 1;
+              }),
+              overflow: node.scrollWidth - node.clientWidth,
+            };
+          });
+          expect(geometry.plain).toBe(true);
+          expect(geometry.targets).toBe(true);
+          expect(geometry.overflow).toBeLessThanOrEqual(1);
+          await page.screenshot({ path: info.outputPath(`${collection}-quiet-header.png`) });
+        }
+      });
     test("aligned Mushaf index @cross-browser", async ({ page }, info) => {
       await page.goto("/#/quran/3");
       await page.locator('[data-mushaf-page="3"]').waitFor();
@@ -140,14 +173,20 @@ for (const scenario of [
       ).toEqual([]);
       await page.screenshot({ path: info.outputPath("aligned-bilingual.png") });
     });
-    test("trigger-width counting menus @cross-browser", async ({ page }, info) => {
+    test("counting settings and trigger-width menus @cross-browser", async ({ page }, info) => {
       await page.goto("/#/counter");
       const zikr = page.getByTestId("counter-zikr-filter");
-      await expect(zikr).toBeVisible();
+      await expect(page.getByTestId("custom-counter-surface")).toBeVisible();
       // A new document may restore the root font; apply the same actual text scale.
       await page.locator("html").evaluate((node, scale) => {
         node.style.fontSize = `${scale * 100}%`;
       }, scenario.scale);
+      if (scenario.width < 600) {
+        await checkMasbahaSettings(page, scenario.language);
+        await page.screenshot({ path: info.outputPath("masbaha-sheet-recovery.png") });
+        return;
+      }
+      await expect(zikr).toBeVisible();
       for (const trigger of [zikr, page.getByTestId("counter-target-filter")]) {
         await trigger.click();
         const menu = page.getByRole("menu");

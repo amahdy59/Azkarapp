@@ -54,7 +54,9 @@ for (const language of ["ar", "en"] as const) {
       const menu = page.getByRole("menu");
       await expect(menu).toBeVisible();
       await expect(menu.getByText(t(language, "category.readAgain"), { exact: true })).toHaveCount(0);
-      await expect(menu.getByText(t(language, "reader.keyboardShortcuts"), { exact: true })).toBeVisible();
+      const keyboardHelp = menu.getByText(t(language, "reader.keyboardShortcuts"), { exact: true });
+      if (width < 768) await expect(keyboardHelp).toHaveCount(0);
+      else await expect(keyboardHelp).toBeVisible();
       await expect(menu.getByText(t(language, "reader.enterFocus"), { exact: true })).toHaveCount(0);
       await expect(menu.getByText(t(language, "reader.save"), { exact: true })).toBeVisible();
       await expect(menu.getByText(t(language, "reader.resetCounter"), { exact: true })).toBeVisible();

@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { applyServiceWorkerUpdate, escapeStaleServiceWorker, isProtectedContentCache } from "./pwaUpdate";
+import {
+  applyServiceWorkerUpdate,
+  prepareServiceWorkerUpdate,
+  escapeStaleServiceWorker,
+  isProtectedContentCache,
+} from "./pwaUpdate";
 
 /** A worker whose state can be driven, as the browser drives a real one. */
 function fakeWorker(state: ServiceWorker["state"]) {
@@ -31,6 +36,44 @@ function deps(registration: Partial<ServiceWorkerRegistration> | undefined) {
 }
 
 describe("applying a service worker update", () => {
+  it("does not recheck the network when a worker is already ready", async () => {
+    const update = vi.fn(() => new Promise<void>(() => {}));
+    const postMessage = vi.fn();
+    const { args, reload } = deps({ update, waiting: { postMessage } as unknown as ServiceWorker });
+    await applyServiceWorkerUpdate(args);
+    expect(update).not.toHaveBeenCalled();
+    expect(postMessage).toHaveBeenCalledOnce();
+    expect(reload).toHaveBeenCalledOnce();
+  });
+
+  it("follows an install discovered by the browser while an explicit check is queued", async () => {
+    const installing = fakeWorker("installing");
+    const registration = Object.assign(new EventTarget(), {
+      update: vi.fn(() => new Promise<void>(() => {})),
+      installing: null as ServiceWorker | null,
+      waiting: null as ServiceWorker | null,
+    });
+    const preparing = prepareServiceWorkerUpdate(async () => registration as unknown as ServiceWorkerRegistration);
+    await Promise.resolve();
+    registration.installing = installing.worker;
+    registration.dispatchEvent(new Event("updatefound"));
+    registration.waiting = {} as ServiceWorker;
+    installing.finish("installed");
+    expect(await preparing).toBe(registration);
+  });
+
+  it("prepares an installing worker without granting activation consent", async () => {
+    const installing = fakeWorker("installing");
+    const postMessage = vi.fn();
+    const registration = { installing: installing.worker, waiting: null as ServiceWorker | null };
+    const preparing = prepareServiceWorkerUpdate(async () => registration as ServiceWorkerRegistration);
+    await Promise.resolve();
+    registration.waiting = { postMessage } as unknown as ServiceWorker;
+    installing.finish("installed");
+    expect(await preparing).toBe(registration);
+    expect(postMessage).not.toHaveBeenCalled();
+  });
+
   it("observes handover before messaging the actual waiting worker", async () => {
     const order: string[] = [];
     const postMessage = vi.fn(() => order.push("activate"));

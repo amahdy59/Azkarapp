@@ -46,7 +46,7 @@ An owner-approved Capacitor Android host retains the web application and its off
 
 ### Android live UI updates
 
-The Android shell includes the Capacitor Live Update plugin, but the update source is free and self-hosted on GitHub Pages. At startup, the app acknowledges the current bundle, fetches `live-updates/manifest.json`, and compares its bundle ID with the active bundle. A newer Android-mode web bundle is downloaded with a SHA-256 checksum, staged for the next reload, and offered through the normal update prompt. If the device is offline or the manifest/download/checksum is invalid, the bundled app continues to work normally. A bundle that fails to become ready is rolled back and blocked automatically.
+The Android shell includes the Capacitor Live Update plugin, but the update source is free and self-hosted on GitHub Pages. At startup, the app acknowledges the current bundle, fetches `live-updates/manifest.json`, and compares its bundle ID with the active bundle. A newer Android-mode web bundle is downloaded with a SHA-256 checksum and offered through the normal update prompt. Accepting the update selects the bundle and reloads the app. If the device is offline or the manifest/download/checksum is invalid, the bundled app continues to work normally. A bundle that fails to become ready is rolled back and blocked automatically.
 
 Live updates are limited to binary-compatible web changes: React/JavaScript, CSS, static UI content, and reviewed web assets. Native Android code, Capacitor plugins, permissions, manifest changes, or storage contracts still require a new Play Store APK/AAB. The first store release containing the Live Update plugin must be installed before OTA updates can be tested.
 

@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-03.2",
+  "release": "2026-11-04",
   "ar": [
-    "استخدم تبويبات التقدم بأيقونات واضحة حتى عند عرض الشاشة الصغير وتكبير النص.",
-    "تجد خيار تفعيل الإشعارات واضحًا للتطبيق والمتصفح، مع إرشادات أندرويد عند حظر الإذن.",
-    "استمتع بتنقل وقراءة أوضح وخلفية ورقية اختيارية، ومرشحات تاريخ مقروءة وتركيز واضح عند ضبط حجم الصفحة بلوحة المفاتيح.",
-    "تستمر تنزيلات الصوت أثناء تنقلك داخل التطبيق، ويمكنك تحديد صفحات المصحف أو جزء لتنزيله."
+    "ثبّت التحديث عندما يناسبك أو أجّله، وتعرّف بسهولة على الصلاة أو الورد المقصود من عنوان التذكير.",
+    "تحكّم في قائمة الاستماع والتكرار والتشغيل التلقائي من صف واحد، واقفل عناصر التحكم وافتحها أثناء وضع التركيز.",
+    "اقرأ القرآن دون تغيّر مفاجئ في الخط بعد ظهور النص، واعرف حجم صفحات المصحف وخطوطها قبل حفظها للقراءة دون اتصال.",
+    "اضبط هدف المسبحة والذكر من زر إعدادات واحد على الهاتف، وراجع تقدمك مع بقاء العنوان ظاهرًا أثناء التمرير."
   ],
   "en": [
-    "Use clearly visible Progress tab icons on small screens, including with enlarged text.",
-    "Find a clear Enable notifications option for the app and browser, with Android guidance when permission is blocked.",
-    "Enjoy clearer navigation and reading, optional paper texture, readable date filters, and visible keyboard focus when adjusting page size.",
-    "Audio downloads continue during in-app navigation, with a choice of Mushaf pages or a juz to save."
+    "Install updates when convenient or choose Later, and see which prayer or reading a reminder is for from its title.",
+    "Manage your queue, repeats, and autoplay from one row, and lock or unlock the playback controls in Focus mode.",
+    "Read Quran text without a sudden font change after it appears, and see how much space Mushaf pages and fonts take before saving them for offline reading.",
+    "Change your Masbaha phrase and target from one settings button on mobile, and keep the Progress heading in view as you scroll."
   ]
 }

@@ -24,6 +24,8 @@ for (const language of ["ar", "en"] as const) {
     await expect(page.locator("html")).toHaveCSS("font-size", "32px");
     await page.locator(".progress-screen").evaluate((node) => (node.scrollTop = 250));
     await expect(controls).toHaveAttribute("data-scrolled", "true");
+    const viewportTop = (await page.locator(".progress-screen").boundingBox())!.y;
+    await expect.poll(async () => Math.abs((await controls.boundingBox())!.y - viewportTop)).toBeLessThanOrEqual(1);
     await expect(controls).toHaveCSS("backdrop-filter", "none");
     await expect(controls).toHaveCSS("background-color", /^rgb\(/);
     await expect(page.getByTestId("shared-screen-header")).toHaveCount(1);
@@ -63,6 +65,23 @@ for (const language of ["ar", "en"] as const) {
     const header = page.getByRole("heading", { name: language === "ar" ? "التقدم" : "Progress", exact: true });
     await expect(header).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
+    const initialTop = (await header.boundingBox())!.y;
+    if (await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches)) {
+      await page.mouse.move(200, 600);
+      await page.mouse.wheel(0, 1200);
+    } else {
+      await page.locator(".progress-screen").evaluate((node) => {
+        node.scrollTop = 1200;
+      });
+    }
+    await expect.poll(async () => Math.abs((await header.boundingBox())!.y - initialTop)).toBeLessThanOrEqual(1);
+    await page.locator(".progress-screen").evaluate((node) => {
+      node.scrollTop = node.scrollHeight;
+    });
+    await expect.poll(async () => Math.abs((await header.boundingBox())!.y - initialTop)).toBeLessThanOrEqual(1);
+    await page.locator(".progress-screen").evaluate((node) => {
+      node.scrollTop = 0;
+    });
     const scene = page.getByTestId("time-of-day-scene-window").last().locator("img");
     await expect.poll(() => scene.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
     await expect(controls).toHaveCSS("background-color", /^rgb\(/);

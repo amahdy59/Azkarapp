@@ -456,9 +456,11 @@
   border-color: var(--primary);
   background: var(--muted);
 }
-.sharing-artwork-choice:hover:not(:disabled) {
-  border-color: var(--primary);
-  background: var(--muted);
+@media (hover: hover) and (pointer: fine) {
+  .sharing-artwork-choice:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--muted);
+  }
 }
 .sharing-choice-icon {
   width: 32px;

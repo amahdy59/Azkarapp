@@ -40,8 +40,13 @@ for (const scenario of [
       await page.locator("html").evaluate((el) => {
         el.style.fontSize = "32px";
       });
-    const toggle = page.getByRole("switch", { name: ar ? "المتابعة التلقائية" : "Auto-continue", exact: true });
+    const toggle = page.getByRole("switch", { name: ar ? "تشغيل التالي تلقائيًا" : "Auto-play next", exact: true });
     await expect(toggle).toHaveAttribute("aria-checked", "true");
+    await expect(toggle.locator(".audio-continue-label")).toBeVisible();
+    expect(
+      await toggle.locator(".audio-continue-label").evaluate((node) => node.scrollWidth - node.clientWidth),
+    ).toBeLessThanOrEqual(1);
+
     const expectContainedThumb = async () => {
       const geometry = await toggle.locator(".settings-toggle-track").evaluate((track) => {
         const outer = track.getBoundingClientRect(),
@@ -73,7 +78,7 @@ for (const scenario of [
       page.getByRole("button", { name: t(scenario.language, "audioPlayer.play"), exact: true }),
     ).toBeVisible();
     const bounds = await toggle.boundingBox();
-    const lock = await page.locator(".audio-lock-trigger").boundingBox();
+    const lock = await page.locator(".audio-focus-actions").boundingBox();
     expect(bounds!.height).toBeGreaterThanOrEqual(44);
     expect(
       bounds!.x + bounds!.width <= lock!.x + 1 ||

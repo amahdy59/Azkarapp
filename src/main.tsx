@@ -9,7 +9,7 @@ import { reportError, startPerformanceMonitoring } from "./lib/observability.ts"
 import "./styles/index.css";
 
 import { registerSW } from "virtual:pwa-register";
-import { applyServiceWorkerUpdate } from "./app/pwaUpdate";
+import { applyServiceWorkerUpdate, prepareServiceWorkerUpdate } from "./app/pwaUpdate";
 
 const App = lazy(() => import("./app/App.tsx"));
 const MarketingLanding = lazy(() => import("./app/screens/MarketingLanding.tsx"));
@@ -100,6 +100,37 @@ const updateServiceWorker =
         },
       });
 
+// Preparation never grants consent to activate: Later keeps this build running.
+let preparationAttempt: AbortController | undefined;
+window.addEventListener("azkar-prepare-update", () => {
+  if (import.meta.env.MODE === "android") return;
+  preparationAttempt?.abort();
+  const attempt = new AbortController();
+  preparationAttempt = attempt;
+  const timer = window.setTimeout(() => attempt.abort(new Error("Update preparation timed out")), 120_000);
+  const aborted = new Promise<never>((_, reject) => {
+    attempt.signal.addEventListener("abort", () => reject(attempt.signal.reason), { once: true });
+  });
+  void Promise.race([
+    prepareServiceWorkerUpdate(
+      () => navigator.serviceWorker?.getRegistration?.() ?? Promise.resolve(undefined),
+      attempt.signal,
+    ),
+    aborted,
+  ])
+    .then((registration) => {
+      if (registration && !registration.waiting) throw new Error("Update is not ready yet");
+      window.dispatchEvent(new Event("azkar-update-available"));
+    })
+    .catch(() => {
+      if (preparationAttempt === attempt) window.dispatchEvent(new Event("azkar-update-preparation-failed"));
+    })
+    .finally(() => {
+      window.clearTimeout(timer);
+      if (preparationAttempt === attempt) preparationAttempt = undefined;
+    });
+});
+
 let updateAttempt: AbortController | undefined;
 window.addEventListener("azkar-apply-update", () => {
   if (import.meta.env.MODE === "android") {
@@ -126,7 +157,7 @@ window.addEventListener("azkar-apply-update", () => {
   });
   void Promise.race([
     applyServiceWorkerUpdate({
-      getRegistration: () => navigator.serviceWorker.getRegistration(),
+      getRegistration: () => navigator.serviceWorker?.getRegistration?.() ?? Promise.resolve(undefined),
       updateServiceWorker,
       signal: attempt.signal,
       reload: () => window.location.reload(),

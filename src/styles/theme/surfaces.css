@@ -360,7 +360,7 @@ a[href]:not(.no-press),
   a[href]:not(.no-press):not(.skip-link):hover,
   summary:hover,
   .interactive-elem:hover {
-    filter: brightness(var(--control-hover-brightness, 1.08));
+    filter: brightness(var(--control-hover-brightness, 1.03));
   }
 }
 @media (hover: hover) and (pointer: fine) {

@@ -3,14 +3,14 @@
   transition: scale var(--motion-duration-standard) cubic-bezier(0.4, 0, 0.2, 1);
 }
 .ui-action-cue:not(:disabled, [aria-disabled="true"], [aria-busy="true"]):focus-visible > svg:not([class*="animate-"]) {
-  scale: 1.1;
+  scale: var(--motion-icon-hover-scale);
 }
 @media (hover: hover) and (pointer: fine) {
   .ui-action-cue:not(:disabled, [aria-disabled="true"], [aria-busy="true"]):hover > svg:not([class*="animate-"]) {
-    scale: 1.1;
+    scale: var(--motion-icon-hover-scale);
   }
   .choice-pill-option:not(:disabled):hover > span > svg {
-    scale: 1.1;
+    scale: var(--motion-icon-hover-scale);
   }
   .choice-surface:not(:disabled):hover {
     border-color: var(--primary);

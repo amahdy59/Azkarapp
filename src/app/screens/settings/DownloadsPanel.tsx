@@ -35,11 +35,16 @@ import {
   type AudioDownloadProgress,
 } from "../../audio/audioOfflineCache";
 import { AudioDownloadError } from "../../audio/audioDownloadTransfer";
-import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "../../content/mushafOfflineCache";
+import {
+  downloadMushaf,
+  getMushafDownloadStatus,
+  getPreviousMushafDownloadStatus,
+  removeDownloadedMushaf,
+} from "../../content/mushafOfflineCache";
 import {
   hasDownloadSpace,
   isStorageQuotaError,
-  MUSHAF_ESTIMATED_PAGE_BYTES,
+  getMushafDownloadBytes,
   getDownloadPersistence,
   requestDownloadPersistence,
   type DownloadPersistence,
@@ -54,7 +59,6 @@ type OfflineStatus = {
   quotaBytes?: number;
   downloadedAudioAssets: number;
   downloadedAudioBytes: number;
-  downloadedMushafPages: number;
   groups: AudioStatus[];
   audio: AudioStatus[];
 };
@@ -75,6 +79,8 @@ export function DownloadsPanel({
 }) {
   const [collections, setCollections] = useState<AudioCollection[]>([]);
   const [status, setStatus] = useState<OfflineStatus | null>(null);
+  const [mushafStatus, setMushafStatus] = useState(() => getPreviousMushafDownloadStatus());
+  const [checkingMushaf, setCheckingMushaf] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -137,15 +143,25 @@ export function DownloadsPanel({
     setErrorMessage("");
     setSuccessMessage("");
     setIsLoading(true);
+    setCheckingMushaf(true);
+    const mushafCheck = getMushafDownloadStatus(acquisition.signal)
+      .then((value) => {
+        if (!acquisition.signal.aborted) setMushafStatus(value);
+      })
+      .catch((error) => {
+        if (!acquisition.signal.aborted) reportError(error, "mushaf-storage-status");
+      })
+      .finally(() => {
+        if (!acquisition.signal.aborted) setCheckingMushaf(false);
+      });
     try {
       const resources = await loadResources();
       if (!mountedRef.current || request !== statusRequestRef.current) return;
       setCollections(resources);
-      const [registration, cacheNames, storage, mushafStatus, audioStatus, storagePersistence] = await Promise.all([
+      const [registration, cacheNames, storage, audioStatus, storagePersistence] = await Promise.all([
         "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : undefined,
         "caches" in window ? caches.keys() : [],
         navigator.storage?.estimate?.().catch(() => ({}) as StorageEstimate) ?? {},
-        getMushafDownloadStatus(),
         // Aggregate groups use the same exact-variant deduplication and verification as individual downloads.
         getAudioDownloadStatuses(
           [
@@ -170,7 +186,6 @@ export function DownloadsPanel({
         quotaBytes: storage.quota,
         downloadedAudioAssets: audioSummary.assetCount,
         downloadedAudioBytes: audioSummary.byteSize,
-        downloadedMushafPages: mushafStatus.downloadedPages,
         groups: audioStatus.slice(resources.length),
         audio: audioStatus.slice(0, resources.length),
       });
@@ -181,6 +196,7 @@ export function DownloadsPanel({
         setErrorMessage(t(language, "downloads.statusError"));
     } finally {
       if (mountedRef.current && request === statusRequestRef.current) setIsLoading(false);
+      await mushafCheck;
     }
   }, [language, loadResources, audioPreferences]);
   useEffect(() => {
@@ -279,13 +295,13 @@ export function DownloadsPanel({
     setRestoreArchiveFocus(false);
     clearDownloadNotice();
   }, [restoreArchiveFocus, isLoading, job]);
-  const updateProgress = (id: string) => (completed: number, total: number) => {
-    updateDownloadSession({ id, completed, total });
+  const updateProgress = (id: string) => (completed: number, total: number, transferredBytes?: number) => {
+    updateDownloadSession({ id, completed, total, transferredBytes });
   };
   const updateAudioDetail = (id: string) => (detail: AudioDownloadProgress) => {
     updateDownloadSession({ id, completed: detail.receivedBytes, total: detail.totalBytes, detail });
   };
-  const mushafBytes = Math.max(0, 604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES;
+  const mushafBytes = mushafStatus?.remainingBytes ?? getMushafDownloadBytes(1, 604);
   const removeResource = async (id: string, collection?: AudioCollection) => {
     if (operationRef.current || getDownloadSession().job || isLoading) return;
     operationRef.current = true;
@@ -640,44 +656,47 @@ export function DownloadsPanel({
                     completed: formatNumerals(job.completed, language),
                     total: formatNumerals(604, language),
                   })
-                : collectionState(
-                    status
-                      ? { completed: status.downloadedMushafPages, total: 604, remainingBytes: mushafBytes }
-                      : undefined,
-                    true,
-                  )
+                : checkingMushaf
+                  ? t(language, "downloads.checking")
+                  : collectionState(
+                      mushafStatus
+                        ? { completed: mushafStatus?.downloadedPages ?? 0, total: 604, remainingBytes: mushafBytes }
+                        : undefined,
+                      true,
+                    )
             }
             feedback={
-              !isLoading && (
+              mushafStatus && (
                 <>
                   <p>
                     {t(language, "downloads.mushafProgressValue", {
-                      completed: formatNumerals(status?.downloadedMushafPages ?? 0, language),
+                      completed: formatNumerals(mushafStatus?.downloadedPages ?? 0, language),
                       total: formatNumerals(604, language),
-                    })}
+                    })}{" "}
+                    · {numeric(mushafStatus.downloadedBytes)}
                   </p>
                   {failedId === "mushaf" && <p className="text-destructive">{errorMessage}</p>}
                 </>
               )
             }
-            size={numeric(status ? mushafBytes : undefined)}
-            completed={job?.id === "mushaf" ? job.completed : (status?.downloadedMushafPages ?? 0)}
+            size={numeric(job?.id === "mushaf" ? job.transferredBytes : mushafStatus ? mushafBytes : undefined)}
+            completed={job?.id === "mushaf" ? job.completed : (mushafStatus?.downloadedPages ?? 0)}
             total={604}
             language={language}
             direction={direction}
             compact
             hideRemove
-            disabled={isLoading || isAnyJobActive}
+            disabled={isLoading || checkingMushaf || isAnyJobActive}
             active={job?.id === "mushaf"}
             action={t(
               language,
               failedId === "mushaf"
-                ? status?.downloadedMushafPages
+                ? mushafStatus?.downloadedPages
                   ? "downloads.resumeDownload"
                   : "downloads.retry"
-                : status?.downloadedMushafPages === 604
+                : mushafStatus?.downloadedPages === 604
                   ? "downloads.downloaded"
-                  : status?.downloadedMushafPages
+                  : mushafStatus?.downloadedPages
                     ? "downloads.resumeResource"
                     : "downloads.downloadResource",
             )}
@@ -695,7 +714,7 @@ export function DownloadsPanel({
             active={job?.id === "mushaf-pages"}
             onCancel={cancelDownloadSession}
             onDownload={(first, last) =>
-              void runDownload("mushaf-pages", (last - first + 1) * MUSHAF_ESTIMATED_PAGE_BYTES, async (controller) => {
+              void runDownload("mushaf-pages", getMushafDownloadBytes(first, last), async (controller) => {
                 await downloadMushaf({
                   signal: controller.signal,
                   pages: Array.from({ length: last - first + 1 }, (_, index) => first + index),
@@ -705,13 +724,18 @@ export function DownloadsPanel({
             }
           />
           {job?.id === "mushaf-pages" && (
-            <DownloadProgress
-              completed={job.completed}
-              total={job.total}
-              label={t(language, "downloads.downloadPages")}
-              language={language}
-              active
-            />
+            <div>
+              <DownloadProgress
+                completed={job.completed}
+                total={job.total}
+                label={t(language, "downloads.downloadPages")}
+                language={language}
+                active
+              />
+              {job.transferredBytes !== undefined && (
+                <p className="text-xs text-muted-foreground">{numeric(job.transferredBytes)}</p>
+              )}
+            </div>
           )}
           <details className="group border-t border-border/40">
             <summary
@@ -726,11 +750,11 @@ export function DownloadsPanel({
               title={t(language, "downloads.pagesTitle")}
               detail=""
               state={t(language, "downloads.mushafProgressValue", {
-                completed: formatNumerals(status?.downloadedMushafPages ?? 0, language),
+                completed: formatNumerals(mushafStatus?.downloadedPages ?? 0, language),
                 total: formatNumerals(604, language),
               })}
-              size={numeric(status ? mushafBytes : undefined)}
-              completed={status?.downloadedMushafPages ?? 0}
+              size={numeric(mushafStatus ? mushafBytes : undefined)}
+              completed={mushafStatus?.downloadedPages ?? 0}
               total={604}
               language={language}
               direction={direction}
@@ -794,7 +818,7 @@ export function DownloadsPanel({
                 <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushaf")}</dt>
                   <dd className="font-medium text-foreground">
-                    {formatNumerals(status.downloadedMushafPages, language)} / {formatNumerals(604, language)}
+                    {formatNumerals(mushafStatus?.downloadedPages ?? 0, language)} / {formatNumerals(604, language)}
                   </dd>
                 </div>
                 <div className="flex flex-wrap justify-between gap-3">
@@ -818,8 +842,7 @@ export function DownloadsPanel({
                 <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushafEstimate")}</dt>
                   <dd className="font-medium text-foreground">
-                    {status.downloadedMushafPages} ·{" "}
-                    {formatMegabytes(status.downloadedMushafPages * MUSHAF_ESTIMATED_PAGE_BYTES, language)}
+                    {mushafStatus?.downloadedPages ?? 0} · {formatMegabytes(mushafStatus?.downloadedBytes, language)}
                   </dd>
                 </div>
               </dl>

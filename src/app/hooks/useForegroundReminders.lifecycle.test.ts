@@ -30,6 +30,11 @@ describe("reminder lifecycle", () => {
     delivery.permission = "granted";
     await act(async () => window.dispatchEvent(new Event("focus")));
     expect(delivery.show).toHaveBeenCalledOnce();
+    expect(delivery.show).toHaveBeenCalledWith(
+      "Morning adhkar",
+      expect.objectContaining({ body: "Open your adhkar when you’re ready to read.", lang: "en", dir: "ltr" }),
+      expect.any(Function),
+    );
     await act(async () => {
       window.dispatchEvent(new Event("focus"));
       await vi.advanceTimersByTimeAsync(250);
@@ -61,6 +66,7 @@ describe("reminder lifecycle", () => {
     });
     expect(delivery.show).toHaveBeenCalledOnce();
     expect(delivery.show.mock.calls[0]![1].data.url).toContain("comprehensive_duas");
+    expect(delivery.show.mock.calls[0]![0]).toBe("Dua before Fajr");
     await act(async () => {
       window.dispatchEvent(new Event("focus"));
       await vi.advanceTimersByTimeAsync(300);

@@ -359,6 +359,8 @@ function AppContent({
     installPrompt,
     isInstalling,
     isUpdating,
+    updateReady,
+    isPreparingUpdate,
     pwaError,
     pwaStatus,
     releaseNotes,
@@ -1452,6 +1454,20 @@ function AppContent({
     ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];
+  useEffect(() => {
+    if (view !== "category" && view !== "reader") return;
+    const candidates = view === "category" ? azkar : azkar.slice(activeIdx + 1, activeIdx + 3);
+    if (!candidates.some((entry) => entry.canonicalKey || entry.mushafPages?.length)) return;
+    let active = true;
+    void import("./content/quranReadiness")
+      .then((module) => {
+        if (active) module.warmQuranPassages(candidates);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [view, azkar, activeIdx]);
   const isAudioPlayerDockedInReader =
     view === "reader" &&
     !readerInMushafMode &&
@@ -1809,7 +1825,7 @@ function AppContent({
             them underneath the rail on the expanded and large tiers. */}
         <div className="app-status">
           {playAllAction.pending && (
-            <p className="sync-status" role="status">
+            <p className="sr-only" role="status">
               {t(selectedLang, "audioPlayer.loading")}
             </p>
           )}
@@ -2772,14 +2788,24 @@ function AppContent({
               />
             ) : updateAvailable ? (
               <PwaNotice
-                title={t(selectedLang, "pwa.updateTitle")}
+                title={t(selectedLang, updateReady ? "pwa.updateTitle" : "pwa.preparingTitle")}
                 actionRef={updateActionRef}
                 body={t(selectedLang, "pwa.deferHint")}
                 items={releaseNotes?.[selectedLang]}
-                actionLabel={t(selectedLang, "pwa.refresh")}
+                actionLabel={t(
+                  selectedLang,
+                  updateReady ? "pwa.refresh" : isPreparingUpdate ? "pwa.preparing" : "pwa.retryPreparation",
+                )}
+                actionDisabled={isPreparingUpdate}
                 dismissLabel={t(selectedLang, "pwa.later")}
                 isActionLoading={isUpdating}
-                statusMessage={isUpdating ? t(selectedLang, "pwa.updating") : undefined}
+                statusMessage={
+                  isUpdating
+                    ? t(selectedLang, "pwa.updating")
+                    : isPreparingUpdate
+                      ? t(selectedLang, "pwa.preparingBody")
+                      : undefined
+                }
                 errorMessage={pwaError}
                 onAction={applyUpdate}
                 onDismiss={dismissUpdate}

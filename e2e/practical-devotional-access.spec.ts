@@ -1,3 +1,4 @@
+import { openMasbahaSettings } from "./helpers/masbaha-settings";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
@@ -37,15 +38,24 @@ test("keyboard instructions follow the shared breakpoint on every counter @cross
   for (const route of ["/#/azkar/evening/1", "/#/counter", "/#/friday/salawat"]) {
     await page.goto(route);
     const help = page.getByRole("button", { name: "Keyboard shortcuts", exact: true });
-    for (const width of [320, 767, 768, 1440]) {
-      await page.setViewportSize({ width, height: 900 });
+    for (const [width, height] of [
+      [320, 900],
+      [767, 900],
+      [768, 900],
+      [844, 390],
+      [1440, 900],
+    ]) {
+      await page.setViewportSize({ width, height });
       await expect(help).not.toBeVisible();
       const more = page.getByRole("button", {
         name: route.includes("/azkar/") ? "Reader options" : "More options",
         exact: true,
       });
       await more.click();
-      await expect(page.getByRole("menuitem", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
+      const shortcutItem = page.getByRole("menuitem", { name: "Keyboard shortcuts", exact: true });
+      const shortTouch = height <= 600 && (await page.evaluate(() => matchMedia("(pointer: coarse)").matches));
+      if (width < 768 || shortTouch) await expect(shortcutItem).toHaveCount(0);
+      else await expect(shortcutItem).toBeVisible();
       await page.keyboard.press("Escape");
     }
   }
@@ -303,6 +313,26 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
 test("dhikr picker supports arrow keys, explicit activation and cancellation @cross-browser", async ({ page }) => {
   await returningReader(page, "en");
   await page.goto("/#/counter");
+  await expect(page.getByTestId("custom-counter-surface")).toBeVisible();
+  if (page.viewportSize()!.width < 600) {
+    let sheet = await openMasbahaSettings(page);
+    await sheet.locator("summary").press("Enter");
+    let radios = sheet.getByRole("group", { name: t("en", "counter.chooseDhikr"), exact: true }).getByRole("radio");
+    await radios.first().focus();
+    await page.keyboard.press("ArrowDown");
+    await sheet.getByRole("button", { name: "Apply settings", exact: true }).click();
+    const chosen = await page.getByTestId("masbaha-settings-summary").textContent();
+    sheet = await openMasbahaSettings(page);
+    await sheet.locator("summary").press("Enter");
+    radios = sheet.getByRole("group", { name: t("en", "counter.chooseDhikr"), exact: true }).getByRole("radio");
+    await expect(radios.nth(1)).toBeChecked();
+    await radios.nth(1).focus();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("masbaha-settings-trigger")).toBeFocused();
+    await expect(page.getByTestId("masbaha-settings-summary")).toHaveText(chosen!);
+    return;
+  }
   await page.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }).click();
   const menu = page.getByRole("menu");
   const radios = menu.getByRole("menuitemradio");

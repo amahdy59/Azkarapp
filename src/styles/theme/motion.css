@@ -95,11 +95,11 @@
   transition: scale var(--motion-duration-standard) var(--control-cue-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):focus-visible .control-cue {
-  scale: var(--control-cue-scale, 1.1);
+  scale: var(--control-cue-scale, var(--motion-icon-hover-scale));
 }
 @media (hover: hover) and (pointer: fine) {
   button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):hover .control-cue {
-    scale: var(--control-cue-scale, 1.1);
+    scale: var(--control-cue-scale, var(--motion-icon-hover-scale));
   }
 }
 

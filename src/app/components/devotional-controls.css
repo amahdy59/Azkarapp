@@ -15,8 +15,10 @@
   backdrop-filter: none;
 }
 
-.reader-dock .devotional-secondary-action:hover:not(:disabled),
-.adaptive-counter-nav.devotional-secondary-action:hover:not(:disabled) {
-  background: var(--muted);
-  border-color: color-mix(in srgb, var(--primary) 25%, var(--border-control));
+@media (hover: hover) and (pointer: fine) {
+  .reader-dock .devotional-secondary-action:hover:not(:disabled),
+  .adaptive-counter-nav.devotional-secondary-action:hover:not(:disabled) {
+    background: var(--muted);
+    border-color: color-mix(in srgb, var(--primary) 25%, var(--border-control));
+  }
 }
