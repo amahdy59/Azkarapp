@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-03.1",
+  "release": "2026-11-03.2",
   "ar": [
     "استخدم تبويبات التقدم بأيقونات واضحة حتى عند عرض الشاشة الصغير وتكبير النص.",
     "تجد خيار تفعيل الإشعارات واضحًا للتطبيق والمتصفح، مع إرشادات أندرويد عند حظر الإذن.",
-    "استمتع بتنقل وقراءة أوضح وخلفية ورقية اختيارية، وأغلق القوائم دون إغلاق النافذة التي تحتويها.",
+    "استمتع بتنقل وقراءة أوضح وخلفية ورقية اختيارية، ومرشحات تاريخ مقروءة وتركيز واضح عند ضبط حجم الصفحة بلوحة المفاتيح.",
     "تستمر تنزيلات الصوت أثناء تنقلك داخل التطبيق، ويمكنك تحديد صفحات المصحف أو جزء لتنزيله."
   ],
   "en": [
     "Use clearly visible Progress tab icons on small screens, including with enlarged text.",
     "Find a clear Enable notifications option for the app and browser, with Android guidance when permission is blocked.",
-    "Enjoy clearer navigation and reading, optional paper texture, and menus that close while keeping their parent window open.",
+    "Enjoy clearer navigation and reading, optional paper texture, readable date filters, and visible keyboard focus when adjusting page size.",
     "Audio downloads continue during in-app navigation, with a choice of Mushaf pages or a juz to save."
   ]
 }

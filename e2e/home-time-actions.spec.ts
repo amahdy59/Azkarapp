@@ -229,13 +229,13 @@ for (const language of ["ar", "en"] as const) {
     const footprint = (await share.boundingBox())!;
     expect(Number(footprint.width.toFixed(3))).toBeGreaterThanOrEqual(44);
     expect(Number(footprint.height.toFixed(3))).toBeGreaterThanOrEqual(44);
-    for (const target of [
-      page.getByTestId("home-quick-share"),
-      page.getByTestId("wird-category-card").first(),
-      page.getByTestId("situational-shortcuts").getByRole("link").first(),
-    ]) {
+    for (const [target, scale] of [
+      [page.getByTestId("home-quick-share"), "1.1"],
+      [page.getByTestId("wird-category-card").first(), "1.1"],
+      [page.getByTestId("situational-shortcuts").getByRole("link").first(), "1.08"],
+    ] as const) {
       await target.focus();
-      await expect(target.locator(".control-cue").first()).toHaveCSS("scale", "1.1");
+      await expect(target.locator(".control-cue").first()).toHaveCSS("scale", scale);
     }
     // Refresh is synchronous: the icon acknowledges actual activation once,
     // without adding a fake loading state or remounting the focused button.

@@ -76,7 +76,7 @@
   gap: 8px;
   padding: 12px;
 }
-.filter-sheet-header h2 {
+.filter-sheet-header [data-testid="sheet-header-title"] {
   font-size: 1.125rem;
   line-height: 1.35;
 }

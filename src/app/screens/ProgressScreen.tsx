@@ -1,5 +1,6 @@
 import { useScrollElevation } from "../hooks/useScrollElevation";
 import "./progress-screen.css";
+import "../components/responsive-filters.css";
 import { useState, useEffect, useMemo, useRef, useId } from "react";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { RoutineInsights } from "../components/RoutineInsights";

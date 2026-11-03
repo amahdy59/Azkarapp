@@ -10,6 +10,9 @@ export async function openProgressExport(page: Page, language: "ar" | "en") {
 }
 
 export async function chooseProgressDetail(page: Page, topic: "prayers" | "routines" | "friday" | "reflection") {
+  const details = page.getByTestId("progress-detailed-context");
+  await expect(details).toBeAttached();
+  if ((await details.getAttribute("open")) === null) await details.locator(":scope > summary").click();
   await chooseProgressOption(page.getByRole("combobox", { name: /Explore details|استكشاف التفاصيل/ }), topic);
 }
 

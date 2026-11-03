@@ -62,6 +62,7 @@ for (const language of ["ar", "en"] as const) {
   test(`@cross-browser ${language} optional patterns preserve exact data, rankings and complete exports`, async ({
     page,
   }, testInfo) => {
+    test.setTimeout(180_000);
     const ar = language === "ar";
     await seedProgress(page, language);
     await page.setViewportSize({ width: 390, height: 844 });

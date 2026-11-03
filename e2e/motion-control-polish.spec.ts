@@ -89,8 +89,11 @@ for (const language of ["ar", "en"] as const) {
       const slider = page.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true });
       await page.keyboard.press("Tab");
       await slider.focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
+      await expect(slider).toBeFocused();
       await slider.press("Home");
-      await expect(slider).not.toHaveCSS("box-shadow", "none");
+      await expect(slider).toHaveCSS("outline-style", "solid");
       await expect(slider).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       expect(await slider.evaluate((node) => getComputedStyle(node).transitionProperty)).toContain("background-color");
       await slider.press("ArrowUp");
@@ -106,7 +109,7 @@ for (const language of ["ar", "en"] as const) {
         }
         await slider.press("End");
         await expect(slider).toHaveValue("200");
-        await expect(slider).not.toHaveCSS("box-shadow", "none");
+        await expect(slider).toHaveCSS("outline-style", "solid");
         const duration = await slider.evaluate((node) => parseFloat(getComputedStyle(node).transitionDuration));
         expect(duration).toBeLessThanOrEqual(0.1);
         await slider.press("Home");
