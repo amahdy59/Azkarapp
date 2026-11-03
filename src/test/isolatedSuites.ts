@@ -11,6 +11,8 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  // Vaul/Radix focus-scope state must not carry across unrelated overlay suites.
+  "src/app/components/ResponsiveFilters.test.tsx",
   "src/app/progressExport.test.ts",
   "src/app/share/curatedRoutineCards.test.ts",
   "src/app/content/reminderReadings.test.ts",
