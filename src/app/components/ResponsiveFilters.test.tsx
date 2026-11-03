@@ -33,6 +33,7 @@ it.each([false, true])(
     expect(summary).toHaveAttribute("aria-expanded", "false");
     summary.focus();
     fireEvent.click(summary);
+    await waitFor(() => expect(screen.getByRole("dialog")).toContainElement(document.activeElement as HTMLElement));
     expect(screen.getByRole("textbox")).toHaveValue("morning");
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "evening" } });
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Search and filters");
