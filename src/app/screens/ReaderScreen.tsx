@@ -86,7 +86,7 @@ import {
 } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { QuranWordPopover } from "../components/QuranWordPopover";
-import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
+import { getQuranSurahNumber, getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { AzkarListItem } from "../components/AzkarListItem";
 import {
@@ -126,6 +126,8 @@ const READER_SIDEBAR_TOGGLE_CLASS =
   "flex size-11 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-card shadow-xs text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran-720.webp`;
+const SURAH_CARD_ORIGIN = "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/visuals/surah/2026-11-04";
+const SURAH_CARD_ART: Readonly<Partial<Record<number, string>>> = { 18: "al-kahf", 32: "as-sajdah", 67: "al-mulk" };
 
 const SharingPreview = lazy(() =>
   import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
@@ -308,6 +310,7 @@ export function ReaderScreen({
       : `${category ? (isArabic ? category.nameArabic : category.name) : ""}`;
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
+  const surahCardArt = longSurah && z ? SURAH_CARD_ART[getQuranSurahNumber(z) ?? 0] : undefined;
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const isShortSurah = Boolean(z?.isSurah) && !longSurah;
   const [localMeaningOnly, setLocalMeaningOnly] = useState(false);
@@ -815,7 +818,19 @@ export function ReaderScreen({
         >
           <figure className="relative mb-1 h-32 w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
             <img
-              src={QURAN_CARD_IMAGE}
+              key={surahCardArt}
+              src={surahCardArt ? `${SURAH_CARD_ORIGIN}/${surahCardArt}-384.webp` : QURAN_CARD_IMAGE}
+              srcSet={
+                surahCardArt
+                  ? `${SURAH_CARD_ORIGIN}/${surahCardArt}-384.webp 384w, ${SURAH_CARD_ORIGIN}/${surahCardArt}-768.webp 768w`
+                  : undefined
+              }
+              sizes="(max-width: 416px) calc(100vw - 32px), 384px"
+              onError={({ currentTarget }) => {
+                if (!currentTarget.srcset) return;
+                currentTarget.removeAttribute("srcset");
+                currentTarget.src = QURAN_CARD_IMAGE;
+              }}
               alt=""
               aria-hidden="true"
               className="h-full w-full object-cover object-center opacity-75"

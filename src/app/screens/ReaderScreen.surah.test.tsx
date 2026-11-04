@@ -97,6 +97,22 @@ function leaveMushaf() {
 }
 
 describe("the three surah readings", () => {
+  it.each([
+    ["friday-kahf", "al-kahf"],
+    ["s-hm-110a", "as-sajdah"],
+    ["s-hm-110b", "al-mulk"],
+  ])("uses responsive artwork and recovers offline for %s", (id, artwork) => {
+    if (id === "friday-kahf") renderKahf();
+    else renderReader("before_sleep", indexOf("before_sleep", id));
+    leaveMushaf();
+    const image = screen.getByTestId("surah-reading-actions").querySelector("img")!;
+    expect(image.getAttribute("srcset")).toContain(`/${artwork}-768.webp 768w`);
+    expect(image).toHaveAttribute("alt", "");
+    fireEvent.error(image);
+    expect(image).not.toHaveAttribute("srcset");
+    expect(image.getAttribute("src")).toMatch(/\/assets\/cards\/wird-quran-720\.webp$/);
+  });
+
   it.each(["s-hm-110a", "s-hm-110b"])("keeps benefits out of the reading choices for %s", (id) => {
     renderReader("before_sleep", indexOf("before_sleep", id));
     leaveMushaf();

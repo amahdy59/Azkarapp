@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-11-04.3",
+    "ar": [
+      "حدّث التطبيق في الوقت المناسب لك أو أجّل التحديث، مع عناوين أوضح لتذكيرات الصلاة والأوراد.",
+      "تحكّم في الاستماع من صف مرتب، مع مساحة أوضح للتشغيل التلقائي وإمكانية القفل داخل وضع التركيز.",
+      "اقرأ القرآن بخط ثابت، واحفظ صفحات المصحف وخطوطها دون اتصال مع معرفة حجم التنزيل.",
+      "تعرّف على الكهف والسجدة والملك بصور مميزة، واضبط المسبحة بسهولة وتابع تقدمك بعنوان ثابت وقوائم أكثر استقرارًا."
+    ],
+    "en": [
+      "Update when it suits you or defer, with clearer titles for prayer and reading reminders.",
+      "Manage listening from one organized row, with clearer autoplay spacing and locking available in Focus mode.",
+      "Read Quran text with a stable font and save Mushaf pages and fonts offline with download sizes shown.",
+      "Recognize Al-Kahf, As-Sajdah and Al-Mulk by their artwork, adjust Masbaha easily, and review Progress with a fixed heading and steadier menus."
+    ]
+  },
+  {
     "release": "2026-11-04.2",
     "ar": [
       "اختر وقت تثبيت التحديث أو أجّله، واقرأ عناوين أوضح لتذكيرات الصلاة والأوراد.",

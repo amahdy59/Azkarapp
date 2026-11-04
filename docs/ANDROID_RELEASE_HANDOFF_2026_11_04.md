@@ -4,6 +4,8 @@ This batch changes the shared React app packaged by Capacitor. It includes a cha
 
 ## What changed since the last release
 
+- **Surah artwork.** Al-Kahf, As-Sajdah and Al-Mulk reading cards use optimized responsive images hosted on R2. Their existing bundled Quran image appears when the artwork is unavailable. Include an offline first-open check for these cards.
+
 - **Updates and reminders.** The app prepares and verifies an update in the background. On Android, it selects the new bundle only when the reader taps Update. Later keeps the current bundle active. Reminder titles identify the prayer or reading, and prayer copy distinguishes a due reminder from an advance one.
 - **Audio.** Queue, repeat, autoplay, Focus and lock controls share a compact row above the waveform. Lock and unlock work within Focus mode. Audio options use a flatter layout and dismiss on an outside tap. Routine buffering no longer shifts the zikr text.
 - **Quran and offline reading.** Downloaded Mushaf pages and fonts are reused, and size figures use measured data for all 604 pages. Reading takes priority over background downloads. On a slow first visit the reader waits briefly for the exact font, then keeps the chosen font stable until navigation. Mobile controls reserve their own space above and below the page. Short surahs inside zikr groups show the basmalah and verses without the decorative heading.
