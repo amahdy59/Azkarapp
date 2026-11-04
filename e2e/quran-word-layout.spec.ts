@@ -67,6 +67,7 @@ for (const fallback of [false, true])
         const text = page.getByTestId("zikr-text");
         await expect(text).toBeVisible();
         if (!fallback) await expect(text.locator("[data-quran-glyph]").first()).toBeVisible();
+        else await expect(text.locator("[data-quran-word]").first()).toBeVisible();
         await page.evaluate(() => document.fonts.ready);
         const toggle = page.getByRole("switch", { name: "كلمات غريبة", exact: true });
         for (const width of widths) {

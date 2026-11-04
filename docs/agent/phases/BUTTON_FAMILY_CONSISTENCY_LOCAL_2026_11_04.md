@@ -11,3 +11,9 @@ Plan before editing:
 5. Update the design-system rules with an explicit family/state/geometry matrix and record the audit, migrations, exceptions and screenshot evidence. Run focused units and affected browser engines, then complete quality/coverage, inventory and Pages gates with unchanged budgets.
 
 No content, persistence/sync, data/permission semantics, recording/timing, runtime dependency or native-host change is authorized. Physical device/assistive-technology and owner visual acceptance remain separate.
+
+## Owner follow-up and release corrections
+
+The owner reports Settings-row hover still feels inconsistent and requests the listening menu to open from its own button. Extend this same control-family checkpoint: preserve row ink/geometry and separators, remove enabled-row press fading, and use the existing portalled Radix popover with an opaque protected surface, trigger origin, collision/height bounds and current-recording focus/reveal. Verify Arabic/English, 320px/200%, phone/tablet/desktop, solid/Glass, keyboard/Escape/recovery and actual screenshots. Preserve playback, selection and saved-position semantics.
+
+Exact-commit CI found older material assertions still expecting the superseded Progress header/filter paint, a real 48px translation-column offset, and async test reads before Quran words/font layout settled. Reconcile tests to the documented new materials without dropping coverage, repair the alignment, and wait for real readiness before measuring. Inspect every failed shard and preserve full release gates.

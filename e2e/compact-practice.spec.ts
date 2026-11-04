@@ -46,6 +46,7 @@ for (const profile of [
       await page.locator("html").evaluate((node, scale) => {
         node.style.fontSize = `${scale * 100}%`;
       }, profile.scale);
+      await page.evaluate(() => document.fonts.ready);
       const libraryTab = page.getByTestId("library-section-collections");
       const tabSize = (await libraryTab.boundingBox())!;
       expect(tabSize.width).toBeGreaterThanOrEqual(44);
@@ -72,6 +73,7 @@ for (const profile of [
       await page.goto("/#/progress");
       const overview = page.getByTestId("progress-tab-overview");
       await overview.waitFor();
+      await page.evaluate(() => document.fonts.ready);
       const progressTab = (await overview.boundingBox())!;
       expect(progressTab.width).toBeGreaterThanOrEqual(44);
       expect(Math.abs(progressTab.height - tabSize.height)).toBeLessThanOrEqual(1);

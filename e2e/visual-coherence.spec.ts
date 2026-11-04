@@ -29,6 +29,7 @@ for (const language of ["ar", "en"] as const) {
       });
       expect(readingPaint).toEqual(paint);
       await medium.focus();
+      await expect(medium).toBeFocused();
       await page.keyboard.press(language === "ar" ? "ArrowLeft" : "ArrowRight");
       await expect(page.getByTestId("reading-text-size-large")).toBeChecked();
       await expect(medium).not.toBeChecked();

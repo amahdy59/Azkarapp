@@ -91,6 +91,19 @@ for (const scenario of [
     await queueTrigger.click();
     const queue = page.getByTestId("audio-queue-sheet");
     await expect(queue).toHaveCSS("background-color", /^rgb\(/);
+    await expect(queue).toHaveAttribute("data-dropdown-surface", "");
+    const anchor = (await queueTrigger.boundingBox())!;
+    const popup = (await queue.boundingBox())!;
+    expect(popup.x).toBeGreaterThanOrEqual(7);
+    expect(popup.x + popup.width).toBeLessThanOrEqual(scenario.width - 7);
+    expect(popup.y).toBeGreaterThanOrEqual(7);
+    expect(popup.y + popup.height).toBeLessThanOrEqual(scenario.height - 7);
+    const side = await queue.getAttribute("data-side");
+    expect(["top", "bottom"]).toContain(side);
+    const gap = side === "top" ? anchor.y - popup.y - popup.height : popup.y - anchor.y - anchor.height;
+    expect(gap).toBeGreaterThanOrEqual(7);
+    expect(gap).toBeLessThanOrEqual(9);
+    await page.screenshot({ path: testInfo.outputPath("queue-anchored.png"), scale: "css" });
     await expect(queue.locator('[aria-current="true"]')).toBeInViewport({ ratio: 1 });
     const scan = await new AxeBuilder({ page })
       .include('[data-testid="audio-queue-sheet"]')

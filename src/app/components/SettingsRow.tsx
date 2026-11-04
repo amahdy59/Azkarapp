@@ -62,7 +62,7 @@ export function SettingsRowItem({
           data-card-action
           data-testid={testId}
           aria-current={current ? "page" : undefined}
-          className="relative flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow,opacity] active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          className="relative flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
           style={{ backgroundColor: current ? "color-mix(in srgb, var(--primary) 10%, var(--card))" : undefined }}
         >
           {current && <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1 bg-primary" />}
@@ -243,7 +243,7 @@ export function SettingsToggleRow({
         aria-checked={checked}
         data-card-action
         onClick={onChange}
-        className="settings-toggle-control flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+        className="settings-toggle-control flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span
           aria-hidden="true"

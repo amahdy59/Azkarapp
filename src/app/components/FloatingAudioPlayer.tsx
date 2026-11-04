@@ -989,22 +989,21 @@ export function FloatingAudioPlayer({
               dir={direction}
             >
               {totalTracks > 1 && (
-                <button
-                  type="button"
-                  data-testid="audio-queue-trigger"
-                  aria-label={`${t(language, "listening.queue")} · ${queuePosition}`}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 text-xs font-semibold hover:bg-muted ${ACTION_FOCUS}`}
-                  onClick={(event) => {
-                    // Touch activation may not focus buttons in WebKit; the
-                    // shared modal needs this opener for close-focus recovery.
-                    event.currentTarget.focus({ preventScroll: true });
-                    setQueueOpen(true);
-                  }}
-                >
-                  <List size={16} className="control-cue" aria-hidden="true" />
-                  <span className="audio-context-label">{t(language, "listening.queueShort")}</span>{" "}
-                  <bdi dir="ltr">{queuePosition}</bdi>
-                </button>
+                <Popover.Root open={queueOpen} onOpenChange={setQueueOpen}>
+                  <Popover.Trigger asChild>
+                    <button
+                      type="button"
+                      data-testid="audio-queue-trigger"
+                      aria-label={`${t(language, "listening.queue")} · ${queuePosition}`}
+                      className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 text-xs font-semibold hover:bg-muted ${ACTION_FOCUS}`}
+                    >
+                      <List size={16} className="control-cue" aria-hidden="true" />
+                      <span className="audio-context-label">{t(language, "listening.queueShort")}</span>{" "}
+                      <bdi dir="ltr">{queuePosition}</bdi>
+                    </button>
+                  </Popover.Trigger>
+                  <AudioQueueSheet onClose={() => setQueueOpen(false)} controller={controller} language={language} />
+                </Popover.Root>
               )}
               {(canRepeat || repetitionProgress) && (
                 <Popover.Root open={repeatOpen} onOpenChange={setRepeatOpen}>
@@ -1127,12 +1126,6 @@ export function FloatingAudioPlayer({
                 </button>
               </div>
             </div>
-            <AudioQueueSheet
-              open={queueOpen}
-              onClose={() => setQueueOpen(false)}
-              controller={controller}
-              language={language}
-            />
             {/* One waveform seek control with balanced time labels. */}
             <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
               <span dir="ltr" className={AUDIO_TIME_LABEL}>

@@ -696,10 +696,11 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   display: none;
 }
 
-/* The queue is a task dialog: enlarged guidance scrolls with its recordings. */
+/* Queue opens from its own button; Radix flips and bounds it to the viewport. */
 .audio-queue-sheet {
-  width: min(38rem, calc(100vw - 24px));
-  max-height: calc(100dvh - 24px);
+  width: min(26rem, calc(100vw - 16px));
+  max-height: min(32rem, var(--radix-popover-content-available-height));
+  transform-origin: var(--radix-popover-content-transform-origin);
 }
 .audio-queue-sheet > :first-child {
   gap: 12px;

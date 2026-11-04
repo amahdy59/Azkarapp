@@ -129,7 +129,8 @@ for (const appearance of [
     ).toBe(true);
     const osOpaque = await page.evaluate(() => matchMedia("(prefers-reduced-transparency: reduce)").matches);
     const still = settings.highContrast || settings.reduceTransparency || osOpaque || "forced" in appearance;
-    await expect(opener).toHaveCSS("background-image", still ? "none" : /linear-gradient/);
+    await expect(opener).toHaveClass(/choice-pill/);
+    await expect(opener).toHaveCSS("background-image", still ? "none" : /paper-grain/);
     const before = (await card.boundingBox())!;
     await opener.click();
     const sheet = page.getByTestId("progress-filter-sheet");

@@ -156,6 +156,7 @@ test("exact Mushaf glyphs retain word geometry and clear neighboring ayah ink @c
     appMaterial: "solid",
     reduceMotion: false,
   });
+  await expect(player.locator("[data-mushaf-page]")).toBeVisible();
   // Page 42 has its own shipped, verified QCF font; no external font request is needed.
   const verse = listeningTiming(item).verses.find((verse) => verse.verseKey === "2:255")!;
   await page.evaluate(

@@ -57,6 +57,7 @@ export const FEATURE_SPECS = {
     "manual-checklist.spec.ts",
   ],
   controls: [
+    "settings-row-hover.spec.ts",
     "button-family-consistency.spec.ts",
     "adaptive-navigation.spec.ts",
     "compact-practice.spec.ts",

@@ -51,7 +51,10 @@ for (const [language, width] of [
           page.getByTestId(route === "home" ? "home-utility-header" : "progress-sticky-controls"),
         ).toHaveAttribute("data-scrolled", "true");
         if (route === "progress")
-          await expect(page.getByTestId("progress-sticky-controls")).toHaveCSS("background-color", /^rgb\(/);
+          await expect(page.getByTestId("progress-sticky-controls")).toHaveCSS(
+            "background-color",
+            "rgba(15, 23, 42, 0.36)",
+          );
         await capture(route + "-scrolled");
       }
     }
@@ -117,7 +120,7 @@ for (const [language, width] of [
               ? page.locator(".settings-detail-pane .shared-screen-header")
               : page.getByTestId("shared-screen-header").first();
       await expect(header).not.toHaveAttribute("data-scrolled");
-      await expect(header).toHaveCSS("background-color", route === "progress" ? /^rgb\(/ : "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(header).toHaveCSS("backdrop-filter", "none");
       await expect(page.locator(".app-main-view")).toHaveCSS("view-transition-name", "none");
       const material = () =>
@@ -163,14 +166,9 @@ for (const [language, width] of [
         node.scrollTop = 120;
       });
       await expect(header).toHaveAttribute("data-scrolled", "true");
-      if (route === "progress") {
-        await expect(header).toHaveCSS("background-color", /^rgb\(/);
-        expect(await material()).toEqual(restingMaterial);
-      } else {
-        await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-        expect(await material()).not.toEqual(restingMaterial);
-      }
-      await expect(header).toHaveCSS("backdrop-filter", route === "progress" ? "none" : "blur(32px) saturate(1.35)");
+      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
+      expect(await material()).not.toEqual(restingMaterial);
+      await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       if (route === "progress") {
         for (const content of [header.getByTestId("progress-filters-toggle"), header.getByRole("tablist")]) {
           await expect(content).toBeVisible();
@@ -186,7 +184,13 @@ for (const [language, width] of [
               return color;
             });
             await expect(content).toHaveCSS("background-color", muted);
-          } else await expect(content).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+          } else {
+            await expect(content).toHaveClass(/choice-pill/);
+            await expect(content).toHaveCSS(
+              "background-color",
+              await header.getByRole("tablist").evaluate((node) => getComputedStyle(node).backgroundColor),
+            );
+          }
         }
       }
       await header.evaluate((node) => {
@@ -210,7 +214,7 @@ for (const [language, width] of [
           node.scrollTop = top;
         }, top);
         await expect(header).toHaveAttribute("data-scrolled", "true");
-        await expect(header).toHaveCSS("backdrop-filter", route === "progress" ? "none" : "blur(32px) saturate(1.35)");
+        await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
         expect(await header.boundingBox()).toEqual(fixedBounds);
       }
       await capture("scroll-up-protected");
@@ -230,12 +234,9 @@ for (const [language, width] of [
         }, top);
         if (elevated) await expect(header).toHaveAttribute("data-scrolled", "true");
         else await expect(header).not.toHaveAttribute("data-scrolled");
-        if (elevated && route !== "progress") expect(await material()).not.toEqual(restingMaterial);
+        if (elevated) expect(await material()).not.toEqual(restingMaterial);
         else expect(await material()).toEqual(restingMaterial);
-        await expect(header).toHaveCSS(
-          "backdrop-filter",
-          elevated && route !== "progress" ? "blur(32px) saturate(1.35)" : "none",
-        );
+        await expect(header).toHaveCSS("backdrop-filter", elevated ? "blur(32px) saturate(1.35)" : "none");
       }
       // The stationary Glass treatment must not leak into opaque modes.
       await page.locator("html").evaluate((root) => root.classList.add("high-contrast"));
