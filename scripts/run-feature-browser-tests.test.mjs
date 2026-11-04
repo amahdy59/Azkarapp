@@ -129,3 +129,13 @@ test("reminder selection includes readiness and data-safety recovery", () => {
     .map((pattern) => new RegExp(pattern));
   expect(filters.some((pattern) => pattern.test("e2e/settings-readiness-surfaces.spec.ts"))).toBe(true);
 });
+
+test("Settings hover and existing focus contracts stay together in owning feature selections", () => {
+  for (const feature of ["controls", "settings"]) {
+    const patterns = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    for (const spec of ["settings-row-hover.spec.ts", "focus-highlight-surfaces.spec.ts"])
+      expect(patterns.some((pattern) => pattern.test(`e2e/${spec}`))).toBe(true);
+  }
+});

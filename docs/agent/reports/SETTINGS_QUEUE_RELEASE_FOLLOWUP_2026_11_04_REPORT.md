@@ -65,3 +65,7 @@ No reviewed devotional content, timing annotations, persistence/sync schema, run
 ## Recommended next step
 
 Finish exact-commit release verification, then review the deployed UI on the owner's target device using the existing Android handoff.
+
+## Existing focus regression reconciliation
+
+CI for df961cb2 passed the main checks, Android, responsive and the first two Chromium shards, then exposed three old focus-surface assertions that explicitly required Settings separators to disappear. The current owner follow-up requires stable separators. Update both hover/focus expectations to visible; keep every corner, single-focus, enlarged-layout, dialog, Forced Colors and keyboard recovery assertion. The missing legacy test selection was a local coverage gap, not evidence that the product should restore disappearing separators. Run the complete nine-case focus specification across all three engines and intact release gates before the test/documentation correction push. The application and current .7 release notes remain unchanged by this correction.

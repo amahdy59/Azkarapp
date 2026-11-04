@@ -6,7 +6,7 @@ for (const scenario of [
   { language: "en", width: 834, scale: 2, material: "solid" },
   { language: "ar", width: 320, scale: 2, material: "glass" },
 ] as const) {
-  test(`single focus and continuous grouped highlight ${scenario.language}/${scenario.width}/${scenario.scale} @cross-browser`, async ({
+  test(`single focus and stable grouped separators ${scenario.language}/${scenario.width}/${scenario.scale} @cross-browser`, async ({
     page,
   }, info) => {
     await page.setViewportSize({ width: scenario.width, height: 1000 });
@@ -52,7 +52,7 @@ for (const scenario of [
     const first = page.getByTestId("settings-sub-appearance");
     await first.focus();
     const wrapper = first.locator("..");
-    await expect(wrapper.locator(".settings-row-divider")).toHaveCSS("visibility", "hidden");
+    await expect(wrapper.locator(".settings-row-divider")).toHaveCSS("visibility", "visible");
     const corners = await first.evaluate((node) => {
       const s = getComputedStyle(node);
       return {
@@ -67,7 +67,7 @@ for (const scenario of [
     if (await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches)) {
       await input.focus();
       await first.hover();
-      await expect(wrapper.locator(".settings-row-divider")).toHaveCSS("visibility", "hidden");
+      await expect(wrapper.locator(".settings-row-divider")).toHaveCSS("visibility", "visible");
       await page.screenshot({ path: info.outputPath("rounded-row-hover.png") });
     }
 
