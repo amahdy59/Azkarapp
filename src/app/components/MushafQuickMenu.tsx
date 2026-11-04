@@ -1,5 +1,5 @@
 import { MushafMaterialHint } from "./MushafMaterialHint";
-import { type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { handleRadioNavigation } from "./radioNavigation";
 import { formatNumerals } from "../formatting";
@@ -123,6 +123,7 @@ export function MushafQuickMenu({
   appTheme = "midnight",
   onSelectTheme,
 }: MushafQuickMenuProps) {
+  const focusOnClose = useRef(false);
   const items: QuickMenuItem[] = [
     ...(onEnterFocusMode
       ? [
@@ -244,6 +245,15 @@ export function MushafQuickMenu({
     <ResponsiveSheet
       open={open}
       onClose={onClose}
+      onCloseAutoFocus={(event) => {
+        if (!focusOnClose.current) return;
+        const exit = document.querySelector<HTMLElement>('[data-testid="mushaf-focus-exit"]');
+        if (exit) {
+          event.preventDefault();
+          exit.focus({ preventScroll: true });
+        }
+        focusOnClose.current = false;
+      }}
       title={t(language, "mushaf.readingViewOptions")}
       direction={direction}
       testId="mushaf-quick-menu"
@@ -415,6 +425,7 @@ export function MushafQuickMenu({
                   data-testid={item.testId}
                   {...(isToggle ? { role: "switch" as const, "aria-checked": item.pressed } : {})}
                   onClick={() => {
+                    focusOnClose.current = item.id === "focus";
                     item.onSelect();
                     if (!isToggle) onClose();
                   }}

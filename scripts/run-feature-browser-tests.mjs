@@ -57,6 +57,7 @@ export const FEATURE_SPECS = {
     "manual-checklist.spec.ts",
   ],
   controls: [
+    "mushaf-balanced-reader.spec.ts",
     "focus-highlight-surfaces.spec.ts",
     "settings-row-hover.spec.ts",
     "button-family-consistency.spec.ts",

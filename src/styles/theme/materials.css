@@ -120,8 +120,7 @@
         [role="listbox"],
         .audio-options-menu,
         .audio-player-surface,
-        .quran-word-popover,
-        .mushaf-theme-hud-surface
+        .quran-word-popover
       ):not(.audio-lock-shield) {
       background-color: rgb(15 23 42 / 0.8);
       background-image:

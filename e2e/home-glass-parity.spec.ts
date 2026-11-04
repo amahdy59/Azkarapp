@@ -42,7 +42,8 @@ for (const language of ["ar", "en"] as const) {
         const card = page.getByTestId("category-card-morning");
         await expect(card).toHaveCSS("background-color", tint);
         await expect(card).toHaveCSS("backdrop-filter", filter);
-        await expect(card).toHaveCSS("background-image", /linear-gradient/);
+        const osOpaque = await page.evaluate(() => matchMedia("(prefers-reduced-transparency: reduce)").matches);
+        await expect(card).toHaveCSS("background-image", osOpaque ? /paper-grain/ : /linear-gradient/);
         await expect(page.getByTestId("app-scene").locator("img")).toHaveAttribute("src", scene!);
         if (width === 1440)
           await expect(page.locator(".app-sidebar")).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
@@ -101,8 +102,16 @@ for (const language of ["ar", "en"] as const) {
             .click();
           const mushaf = page.locator("[data-mushaf-chrome-mode]");
           await expect(mushaf).toBeVisible();
-          await expect(mushaf).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-          await expect(mushaf).toHaveCSS("backdrop-filter", filter);
+          const paperColor = await mushaf.evaluate((node) => {
+            const probe = document.createElement("span");
+            probe.style.backgroundColor = "var(--mushaf-paper)";
+            node.append(probe);
+            const color = getComputedStyle(probe).backgroundColor;
+            probe.remove();
+            return color;
+          });
+          await expect(mushaf).toHaveCSS("background-color", paperColor);
+          await expect(mushaf).toHaveCSS("backdrop-filter", "none");
           expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
           await page.screenshot({ path: testInfo.outputPath("mushaf.png"), scale: "css" });
         }

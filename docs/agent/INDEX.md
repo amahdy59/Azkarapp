@@ -2,6 +2,10 @@
 
 ## Active phase
 
+[Balanced Mushaf reader](phases/MUSHAF_BALANCED_READER_2026_11_04.md) is the current owner-approved checkpoint. Preserve distinct capsule geometry and existing rail/menu semantics; improve notifications, page measure/centering and compact two-column index. The preceding button-family batch is deployed at f337183c.
+
+## Preceding checkpoint
+
 [Button family consistency](phases/BUTTON_FAMILY_CONSISTENCY_LOCAL_2026_11_04.md) is the current checkpoint: reusable configuration pills, shared role/state rules and cross-screen screenshot/keyboard regressions. Preserve the completed audio Mushaf/Progress-control work and preceding Glass/reader edits. The owner now authorizes completing and pushing the full pending batch; monitor Quality/Pages and verify production.
 
 [Audio Mushaf space and word clarity](phases/AUDIO_MUSHAF_SPACE_LOCAL_2026_11_04.md) records the preceding completed local checkpoint. It preserves the pending Glass/reader batch, moves recovery to the footer, frees reading space, uses word-only playback paint, sizes footer pills to content and aligns Progress with shared header materials. Its earlier local hold is superseded by the owner's current push-all instruction.

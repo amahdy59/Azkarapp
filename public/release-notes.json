@@ -1,15 +1,13 @@
 {
-  "release": "2026-11-04.7",
+  "release": "2026-11-04.8",
   "ar": [
-    "استمع واقرأ بمساحة مصحف أوسع وتمييز واضح للكلمة، وأعد الآية الحالية من أدوات التركيز والقفل.",
-    "اختر مقاييس التقدم وعدّل خطة القرآن بأزرار متناسقة وعناوين ثابتة وأدوات متراصفة.",
-    "افتح قائمة الاستماع بجانب زرها، وتنقّل في الإعدادات بتأثير مرور ثابت لا يخفي الفواصل أو يبهت النص.",
-    "شاهد صور سور أطول بعناوين ذهبية وملمسًا ورقيًا داكنًا أوضح وبطاقات زجاجية ألطف، واضبط اهتزاز القارئ."
+    "تصفّح فهرس السور في عمودين داخل نافذة أصغر، مع بحث ثابت وأسماء واضحة حتى عند تكبير النص.",
+    "اقرأ المصحف على الكمبيوتر بمقاس أكثر اتزانًا ومساحة مريحة حول الصفحة، مع بقاء أدواته المألوفة والتكبير اليدوي.",
+    "شاهد تأكيد تغيير لون الصفحة بنفس ألوان المظهر الجديد، بعيدًا عن الآيات، مع احتفاظ المصحف بأزراره المميزة."
   ],
   "en": [
-    "Listen and read with more Mushaf space, a clear word cue and current-ayah recovery beside Focus and Lock.",
-    "Choose Progress metrics and edit your Quran plan with matching buttons, steady headings and aligned tools.",
-    "Open the listening queue beside its button and browse Settings with stable hover feedback that preserves text and dividers.",
-    "See taller surah artwork with gold titles, clearer dark paper and softer Glass cards, and adjust Reader vibration."
+    "Browse surahs in a compact two-column index with separate search and readable names when text is enlarged.",
+    "Read a balanced desktop Mushaf page with comfortable margins while keeping familiar tools and manual zoom.",
+    "See page-color confirmations in the newly applied theme, clear of the verses, while retaining the Mushaf’s distinct buttons."
   ]
 }

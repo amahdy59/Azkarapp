@@ -88,8 +88,8 @@ for (const scenario of [
           );
         });
       await expect.poll(alignment).toBeLessThanOrEqual(1);
-      await expect(modal.getByRole("tablist")).toHaveCSS("border-top-width", "0px");
-      await expect(modal.getByRole("tablist")).toHaveCSS("box-shadow", "none");
+      await expect(modal.getByRole("tablist")).toHaveCSS("border-top-width", "1px");
+      await expect(modal.getByRole("tablist")).toHaveCSS("border-radius", "999px");
       for (const card of (await modal.getByRole("tabpanel").locator(":scope > div > button").all()).slice(0, 4)) {
         await card.scrollIntoViewIfNeeded();
         expect(

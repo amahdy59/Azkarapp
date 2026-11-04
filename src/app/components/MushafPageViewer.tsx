@@ -1191,6 +1191,7 @@ export function MushafPageViewer({
   topLeftControl,
   topRightControl,
   topCenterControl,
+  themeNotice,
   bottomLeftControl,
   bottomCenterControl,
   bottomRightControl,
@@ -1252,6 +1253,7 @@ export function MushafPageViewer({
   topLeftControl?: ReactNode;
   topRightControl?: ReactNode;
   topCenterControl?: ReactNode;
+  themeNotice?: ReactNode;
   bottomLeftControl?: ReactNode;
   bottomCenterControl?: ReactNode;
   bottomRightControl?: ReactNode;
@@ -1403,7 +1405,16 @@ export function MushafPageViewer({
 
   return (
     <article
-      className={`glass-reading relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
+      className={`mushaf-reader-viewer glass-reading relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
+      style={
+        {
+          "--foreground": "var(--mushaf-ink)",
+          backgroundColor: "var(--mushaf-paper)",
+          color: "var(--mushaf-ink)",
+          backgroundImage: "var(--paper-grain, none)",
+          backdropFilter: "none",
+        } as CSSProperties
+      }
       data-mushaf-chrome-mode={useRail ? "rail" : headerContent ? "bars" : "clean"}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
@@ -1474,7 +1485,8 @@ export function MushafPageViewer({
           {topCenterControl && (
             <div
               data-testid="mushaf-control-top-center"
-              className="col-start-2 row-start-1 flex min-w-0 justify-center gap-1.5"
+              className="relative col-start-2 row-start-1 flex min-w-0 justify-center gap-1.5"
+              data-theme-notice={Boolean(themeNotice)}
               dir="ltr"
             >
               {isBookmarked && (
@@ -1487,7 +1499,8 @@ export function MushafPageViewer({
                   <Bookmark size={15} className="fill-primary text-primary" aria-hidden="true" />
                 </span>
               )}
-              {topCenterControl}
+              <span className="mushaf-title-control flex min-w-0 items-center justify-center">{topCenterControl}</span>
+              {themeNotice && <div className="mushaf-title-notice">{themeNotice}</div>}
             </div>
           )}
 
@@ -1551,6 +1564,7 @@ export function MushafPageViewer({
           { ...paperStyle, "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)) } as CSSProperties
         }
         data-magnified={magnification > 100}
+        data-theme-notice={Boolean(themeNotice && !topCenterControl)}
         role={magnification > 100 ? "region" : undefined}
         aria-label={magnification > 100 ? t(language, "mushaf.magnification") : undefined}
         tabIndex={magnification > 100 ? 0 : undefined}
@@ -1587,6 +1601,7 @@ export function MushafPageViewer({
             study mode is enabled; ayah-marker buttons remain operable in
             either mode, while the cohesive page regions below carry the
             normal reading experience. */}
+        {themeNotice && !topCenterControl && <div className="mushaf-paper-notice">{themeNotice}</div>}
         <div className="contents">
           <MushafPageCanvas
             lines={lines}

@@ -1,33 +1,59 @@
-/* Header, choices, search and results share one column, including classic scrollbars. */
+/* One bounded opaque index, with search outside the scrolling results. */
 [data-testid="mushaf-index-modal"] {
   --mushaf-index-gutter: 16px;
+  container: mushaf-index / inline-size;
+}
+.mushaf-index-dialog {
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  transform: translate(-50%, -50%);
+  inline-size: min(36rem, calc(100vw - 1rem));
+  block-size: min(40rem, 76dvh);
+  max-block-size: calc(100dvh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom)));
+}
+/* Physical centering is independent of Arabic/English inline direction. */
+.mushaf-index-dialog[dir="rtl"] {
+  inset-inline-start: auto;
+  left: 50%;
 }
 .mushaf-index-header,
 .mushaf-index-controls,
 .mushaf-index-panel {
   padding-inline: var(--mushaf-index-gutter);
-  overflow-y: auto;
   scrollbar-gutter: stable;
+}
+.mushaf-index-header,
+.mushaf-index-controls {
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 .mushaf-index-controls,
 .mushaf-index-panel {
-  padding-block: 10px;
+  padding-block: 8px;
 }
-/* Retain the shared option states without an enclosing pill boundary. */
 .mushaf-index-tabs.choice-pill {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  padding: 4px;
 }
 .mushaf-index-surahs {
-  container-type: inline-size;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-@container (max-width: 20rem) {
-  .mushaf-index-surah-page {
-    flex-basis: 100%;
-    padding-inline-start: 2rem;
+.mushaf-index-surah-page {
+  flex-basis: 100%;
+  padding-inline-start: 2rem;
+}
+.mushaf-index-surah {
+  align-content: center;
+  min-block-size: 4rem;
+}
+/* Large text and narrow windows recover without truncated names/targets. */
+@container mushaf-index (max-width: 17rem) {
+  .mushaf-index-surahs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-height: 540px) {
+  .mushaf-index-dialog {
+    block-size: calc(100dvh - 1rem);
   }
 }
 @media (min-width: 640px) {

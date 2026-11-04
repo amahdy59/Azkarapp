@@ -1,3 +1,4 @@
+import { MushafThemeNotice } from "./MushafThemeNotice";
 import { trimMushafPrefetch } from "../content/mushafScheduler";
 import { progressFillStyle } from "./progressFillStyle";
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
@@ -782,6 +783,7 @@ export function MushafImmersiveReader({
             </div>
           )}
           <MushafPageViewer
+            themeNotice={themeHud ? <MushafThemeNotice theme={themeHud} language={language} /> : undefined}
             lines={lines}
             language={language}
             pageNumber={displayPage}
@@ -848,34 +850,6 @@ export function MushafImmersiveReader({
           />
         </div>
       </div>
-
-      {/* Theme cycle HUD feedback */}
-      {themeHud && (
-        <div
-          role="status"
-          aria-live="polite"
-          data-testid="mushaf-theme-hud"
-          className="pointer-events-none absolute inset-x-0 top-16 z-30 flex justify-center px-4"
-        >
-          <div className="mushaf-theme-hud-surface inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-border px-4 py-2 text-xs font-bold text-popover-foreground shadow-md">
-            <span
-              className="size-3 rounded-full border border-border"
-              style={{
-                backgroundColor: themeHud === "light" ? "#fdfbf7" : themeHud === "midnight" ? "#0b1220" : "#18181b",
-              }}
-              aria-hidden="true"
-            />
-            <span className="mushaf-material-hint hidden">{t(language, "mushaf.glassActive")}</span>
-            <span>
-              {themeHud === "light"
-                ? t(language, "mushaf.themeLight")
-                : themeHud === "midnight"
-                  ? t(language, "mushaf.themeMidnight")
-                  : t(language, "mushaf.themeDark")}
-            </span>
-          </div>
-        </div>
-      )}
 
       <MushafQuickMenu
         open={isQuickMenuOpen}

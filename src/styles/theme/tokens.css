@@ -72,6 +72,7 @@
      it from its own background by about as much as a card, warm-tinted, so it
      reads as paper under the shell's light rather than as another panel. */
   --mushaf-paper: #101010;
+  --mushaf-ink: #f2f2ea;
   --font-mushaf: "Amiri Quran", "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", serif;
   /* The zikr face follows the reader's choice. The default is the value above,
      so a reader who never opens the setting sees exactly what they always saw.
@@ -143,6 +144,7 @@
 .dark,
 .theme-dark {
   --mushaf-paper: #141312;
+  --mushaf-ink: #f5f0e8;
   color-scheme: dark;
   --background: #0d0d0d;
   --foreground: #f5f0e8;
@@ -185,6 +187,7 @@
   --mushaf-rule-ink: #a97f36;
   /* Brighter than the ground, the way a sheet sits on a table. */
   --mushaf-paper: #fffdf8;
+  --mushaf-ink: #171717;
   color-scheme: light;
   --background: #f8f5f0;
   --foreground: #171717;
@@ -224,6 +227,7 @@
 .theme-midnight {
   color-scheme: dark;
   --mushaf-paper: #101b3a;
+  --mushaf-ink: #f5f0e8;
   --background: #0a1228;
   --foreground: #f5f0e8;
   --card: #111b35;
@@ -262,6 +266,7 @@
 .theme-oled {
   color-scheme: dark;
   --mushaf-paper: #000000;
+  --mushaf-ink: #ffffff;
   --mushaf-rule-ink: #d4b47c;
   --background: #000000;
   --foreground: #ffffff;
@@ -465,6 +470,7 @@ textarea {
   /* No lift here: high contrast buys its separation with the rule, not by
      raising the ground the text has to be read against. */
   --mushaf-paper: #02050d;
+  --mushaf-ink: #ffffff;
   --foreground: #ffffff;
   --card: #050505;
   --card-foreground: #ffffff;

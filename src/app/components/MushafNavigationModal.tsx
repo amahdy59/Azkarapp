@@ -211,10 +211,10 @@ export function MushafNavigationModal({
               opener.focus({ preventScroll: true });
             }
           }}
-          className="fixed top-[max(0.5rem,env(safe-area-inset-top))] bottom-[max(0.5rem,env(safe-area-inset-bottom))] left-[max(0.5rem,env(safe-area-inset-left))] right-[max(0.5rem,env(safe-area-inset-right))] z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
+          className="mushaf-index-dialog fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-overlay animate-in fade-in zoom-in-95"
         >
           {/* Header */}
-          <div className="mushaf-index-header flex shrink-0 items-center justify-between gap-2 border-b border-border/40 bg-card py-2.5 sm:py-3">
+          <div className="mushaf-index-header flex shrink-0 items-center justify-between gap-2 border-b border-border/40 py-2.5 sm:py-3">
             <div className="flex min-w-0 flex-1 items-center gap-2.5">
               <Dialog.Title className="break-words text-base font-extrabold leading-snug text-foreground sm:text-lg">
                 {t(language, "mushaf.indexTitle")}
@@ -234,7 +234,7 @@ export function MushafNavigationModal({
           </div>
 
           {/* Navigation Tabs */}
-          <div className="mushaf-index-controls shrink-0 bg-card">
+          <div className="mushaf-index-controls shrink-0">
             <TabList
               value={activeTab}
               onChange={setActiveTab}
@@ -294,7 +294,7 @@ export function MushafNavigationModal({
           >
             {/* Surahs Tab - 2 Columns Grid */}
             {activeTab === "surahs" && (
-              <div className="mushaf-index-surahs grid grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-1.5">
+              <div className="mushaf-index-surahs grid gap-2">
                 {filteredSurahs.map((surah) => {
                   const isCurrent =
                     currentPage >= surah.startPage &&
@@ -307,12 +307,12 @@ export function MushafNavigationModal({
                       onMouseEnter={() => prefetchMushafPage(surah.startPage)}
                       onPointerDown={() => prefetchMushafPage(surah.startPage)}
                       aria-current={isCurrent ? "true" : undefined}
-                      className={`group flex min-h-11 min-w-0 flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
+                      className={`mushaf-index-surah group flex min-h-11 min-w-0 flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
                         isCurrent
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border/60 bg-card hover:border-border hover:bg-muted/50 text-foreground"
                       }`}
-                      style={{ contentVisibility: "auto", containIntrinsicSize: "2.75rem" }}
+                      style={{ contentVisibility: "auto", containIntrinsicSize: "4rem" }}
                     >
                       <div className="flex min-w-0 flex-1 items-center gap-2">
                         <span
