@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-04.3",
+  "release": "2026-11-04.4",
   "ar": [
-    "حدّث التطبيق في الوقت المناسب لك أو أجّل التحديث، مع عناوين أوضح لتذكيرات الصلاة والأوراد.",
-    "تحكّم في الاستماع من صف مرتب، مع مساحة أوضح للتشغيل التلقائي وإمكانية القفل داخل وضع التركيز.",
-    "اقرأ القرآن بخط ثابت، واحفظ صفحات المصحف وخطوطها دون اتصال مع معرفة حجم التنزيل.",
-    "تعرّف على الكهف والسجدة والملك بصور مميزة، واضبط المسبحة بسهولة وتابع تقدمك بعنوان ثابت وقوائم أكثر استقرارًا."
+    "اختر تثبيت التحديث أو تأجيله، مع تذكيرات أوضح للصلاة والأوراد.",
+    "استمع بعناصر تحكم في صف واحد، ومساحة أوسع للتشغيل التلقائي، وقفل متاح في وضع التركيز.",
+    "اقرأ القرآن دون تبدّل مفاجئ للخط، واحفظ صفحات المصحف وخطوطها دون اتصال مع عرض حجمها.",
+    "صور مميزة للكهف والسجدة والملك، وإعدادات مسبحة أسهل، وعنوان تقدم ثابت وخيارات لا تتحرك أثناء النقر."
   ],
   "en": [
-    "Update when it suits you or defer, with clearer titles for prayer and reading reminders.",
-    "Manage listening from one organized row, with clearer autoplay spacing and locking available in Focus mode.",
-    "Read Quran text with a stable font and save Mushaf pages and fonts offline with download sizes shown.",
-    "Recognize Al-Kahf, As-Sajdah and Al-Mulk by their artwork, adjust Masbaha easily, and review Progress with a fixed heading and steadier menus."
+    "Choose to install or defer updates, with clearer prayer and reading reminders.",
+    "Listen with controls in one row, more room for autoplay, and a lock available in Focus mode.",
+    "Read Quran text without a sudden font change and save Mushaf pages and fonts offline with their sizes shown.",
+    "Find distinct Al-Kahf, As-Sajdah and Al-Mulk artwork, simpler Masbaha settings, a fixed Progress heading and stationary menu options."
   ]
 }
