@@ -10,6 +10,22 @@ const testOptions = [
 ];
 
 describe("AccessibleCombobox", () => {
+  it("keeps options stationary under the pointer while keyboard navigation scrolls", () => {
+    const onChange = vi.fn();
+    render(<AccessibleCombobox label="Surah" options={testOptions} value={1} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const option = screen.getAllByRole("option")[2]!;
+    const scroll = vi.spyOn(option, "scrollIntoView");
+    fireEvent.mouseEnter(option);
+    expect(scroll).not.toHaveBeenCalled();
+    expect(fireEvent.mouseDown(option)).toBe(false);
+    expect(screen.getByRole("textbox")).toHaveFocus();
+    fireEvent.keyDown(screen.getByRole("listbox"), { key: "End" });
+    expect(scroll).toHaveBeenCalledWith({ block: "nearest" });
+    fireEvent.click(option);
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(18);
+  });
+
   it("keeps Escape inside the picker so its parent dialog remains open", async () => {
     const closeParent = vi.fn();
     render(

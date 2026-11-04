@@ -286,6 +286,7 @@ export function AccessibleCombobox({
                       role="option"
                       tabIndex={-1}
                       aria-selected={isSelected}
+                      onMouseDown={(event) => event.preventDefault()}
                       onClick={() => handleSelect(option)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -294,7 +295,6 @@ export function AccessibleCombobox({
                           handleSelect(option);
                         }
                       }}
-                      onMouseEnter={() => setActiveIndex(index)}
                       className={`flex min-h-11 shrink-0 cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-2 text-start transition-colors ${
                         isSelected
                           ? "bg-primary/10 text-primary font-bold"

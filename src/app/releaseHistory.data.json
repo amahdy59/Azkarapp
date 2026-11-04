@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-11-04.2",
+    "ar": [
+      "اختر وقت تثبيت التحديث أو أجّله، واقرأ عناوين أوضح لتذكيرات الصلاة والأوراد.",
+      "استخدم عناصر استماع مرتبة في صف واحد، مع مساحة أوضح للتشغيل التلقائي وقفل متاح داخل وضع التركيز.",
+      "استمتع بخط قرآني ثابت أثناء القراءة، وحفظ صفحات المصحف وخطوطها دون اتصال مع عرض حجم التنزيل.",
+      "اضبط المسبحة من زر إعدادات واحد، وتابع تقدمك بعنوان ثابت، واختر من القوائم دون تحرّك الخيارات أثناء النقر."
+    ],
+    "en": [
+      "Choose when to install an update or defer it, with clearer titles for prayer and reading reminders.",
+      "Use a single row of listening controls, with more room for autoplay and a lock available in Focus mode.",
+      "Read Quran text with a stable font and save Mushaf pages and fonts offline with download sizes shown.",
+      "Adjust Masbaha from one settings button, keep the Progress heading visible, and select menu options without them moving during a click."
+    ]
+  },
+  {
     "release": "2026-11-04",
     "ar": [
       "ثبّت التحديث عندما يناسبك أو أجّله، وتعرّف بسهولة على الصلاة أو الورد المقصود من عنوان التذكير.",
