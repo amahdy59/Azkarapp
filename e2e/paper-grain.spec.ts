@@ -31,7 +31,6 @@ for (const theme of ["light", "dark", "midnight"] as const) {
       if (theme === "light" && material === "solid")
         await expect(card).toHaveCSS("background-color", "rgb(251, 249, 245)");
       for (const selector of [
-        ".progress-screen-controls",
         ".progress-date-details",
         ".progress-select-trigger",
         '.heatmap-day:not([data-kind="outside"])',
@@ -42,6 +41,14 @@ for (const theme of ["light", "dark", "midnight"] as const) {
           "background-image",
           new RegExp(`paper-grain-${theme === "light" ? "light" : "dark"}`),
         );
+      // The header reveals the textured canvas at rest and owns its paper/frost only over scrolled records.
+      await page.locator(".progress-screen").evaluate((node) => {
+        node.scrollTop = 64;
+      });
+      await expect(page.getByTestId("progress-sticky-controls")).toHaveCSS("background-image", /paper-grain/);
+      await page.locator(".progress-screen").evaluate((node) => {
+        node.scrollTop = 0;
+      });
       const texture = await card.evaluate(
         (node) => getComputedStyle(node).backgroundImage.match(/url\("?([^")]+)"?\)/)?.[1],
       );

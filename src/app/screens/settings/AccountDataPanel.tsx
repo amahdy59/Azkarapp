@@ -216,7 +216,7 @@ export function AccountDataPanel({
             )}
             <Button onClick={onExportData}>{t(language, "dataSafety.backup")}</Button>
             {onOpenDownloads && (
-              <Button variant="outline" onClick={onOpenDownloads}>
+              <Button variant="pill" size="pill" onClick={onOpenDownloads}>
                 {t(language, "dataSafety.downloads")}
               </Button>
             )}

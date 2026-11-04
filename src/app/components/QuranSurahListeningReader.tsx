@@ -1,3 +1,4 @@
+import { ListeningResumeButton } from "./ListeningResumeButton";
 import { AudioOptionToggle } from "./AudioOptionToggle";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
@@ -87,7 +88,7 @@ function Passage({
       if (
         (atOpening && Math.abs(ink.top - bounds.top - 8) > 1) ||
         ink.top < bounds.top ||
-        ink.bottom > bounds.bottom - 56
+        ink.bottom > bounds.bottom - 8
       )
         viewport.scrollTo({ top: Math.max(0, viewport.scrollTop + ink.top - bounds.top - 8), behavior: "instant" });
     };
@@ -175,6 +176,7 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
     playing = false,
     readTime,
     preferencesHost,
+    recoveryHost,
     theme = "light",
     textSize = "medium",
   } = props;
@@ -278,18 +280,14 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
   );
   const resume =
     timing && !follow ? (
-      <button
-        type="button"
-        className={`${actionClass} audio-listening-resume`}
-        onClick={() => {
+      <ListeningResumeButton
+        language={language}
+        onResume={() => {
           setFollow(true);
           root.current?.closest<HTMLElement>(".audio-expanded-text")?.focus({ preventScroll: true });
         }}
-      >
-        {t(language, "quranListening.returnToVerse")}
-      </button>
+      />
     ) : null;
-  const overlayHost = root.current?.closest(".audio-expanded-reading");
   return (
     <section
       ref={root}
@@ -301,7 +299,7 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
         : preferencesHost === undefined
           ? preferences
           : null}
-      {overlayHost ? createPortal(resume, overlayHost) : resume}
+      {recoveryHost ? createPortal(resume, recoveryHost) : resume}
       <div className="audio-listening-body" data-listening-magnified={(props.magnification ?? 100) > 100}>
         <div
           className="audio-listening-arabic"

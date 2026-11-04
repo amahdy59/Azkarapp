@@ -60,10 +60,8 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       await page.keyboard.press("ArrowDown");
       const resume = player.getByRole("button", { name: t(language, "quranListening.returnToVerse"), exact: true });
       await expect(resume).toBeVisible();
-      expect(
-        await resume.evaluate((button) => button.parentElement!.classList.contains("audio-expanded-reading")),
-      ).toBe(true);
-      // The recovery action overlays the reading surface and adds no document-flow height.
+      expect(await resume.evaluate((button) => Boolean(button.closest(".audio-focus-actions")))).toBe(true);
+      // Footer recovery leaves the canonical page dimensions unchanged.
       const after = await passages.first().boundingBox();
       expect(after!.height).toBeCloseTo(before!.height, 1);
       await resume.click();

@@ -15,6 +15,7 @@ import { ProgressRangeToolbar } from "../components/ProgressRangeToolbar";
 import { ProgressDashboard, type ProgressDashboardView } from "../components/ProgressDashboard";
 import { TabList, tabId, tabPanelProps } from "../components/Tabs";
 import { Header, IconButton } from "../components/LayoutShells";
+import { PILL_ACTION } from "../components/ui/controlStyles";
 import { Modal, SheetHeader } from "../components/ResponsiveSheet";
 import { ProgressPrayerBreakdown } from "../components/ProgressPrayerBreakdown";
 import { ZikrInsights } from "../components/ZikrInsights";
@@ -331,7 +332,7 @@ export function ProgressScreen({
               elevateOnScroll={false}
               style={{ paddingInline: 0 }}
               right={
-                <div className="progress-header-actions">
+                <div className="progress-header-actions section-view-actions">
                   <TabList
                     value={view}
                     onChange={(next) => {
@@ -349,9 +350,9 @@ export function ProgressScreen({
                           style={{ color: value === view ? "var(--primary-foreground)" : "inherit" }}
                         >
                           {value === "overview" ? (
-                            <BarChart3 size={18} className="progress-tab-icon" aria-hidden="true" />
+                            <BarChart3 size={20} className="progress-tab-icon shrink-0" aria-hidden="true" />
                           ) : value === "trends" ? (
-                            <Sprout size={18} className="progress-tab-icon" aria-hidden="true" />
+                            <Sprout size={20} className="progress-tab-icon shrink-0" aria-hidden="true" />
                           ) : null}
                           <span className="section-tab-label">{dashboardText(language, `view_${value}`)}</span>
                         </span>
@@ -368,6 +369,7 @@ export function ProgressScreen({
                     }
                   />
                   <IconButton
+                    className={`${PILL_ACTION} section-view-action`}
                     id={filterButtonId}
                     data-testid="progress-filters-toggle"
                     data-progress-value={customRange ? "custom" : activeTab}
@@ -425,6 +427,7 @@ export function ProgressScreen({
           </div>
         </div>
 
+        <div className="progress-scroll-edge" data-scrolled={hasScrolledControls || undefined} aria-hidden="true" />
         <div
           className="mx-auto w-full max-w-7xl shrink-0 px-page pb-8 outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
           {...tabPanelProps(viewId, view)}

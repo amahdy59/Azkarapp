@@ -192,7 +192,7 @@ test("all supplied curated images are available on the first offline visit after
         }),
       );
     });
-    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152, 131054, 150392]);
+    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152, 131054, 141687]);
   } finally {
     await context.setOffline(false);
   }

@@ -121,3 +121,28 @@
 .reader-language-toolbar button {
   scroll-margin-block: 8px;
 }
+
+.reader-surah-title {
+  max-inline-size: 100%;
+  color: #f0c14b;
+  font:
+    700 2rem / 1.6 Georgia,
+    serif;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.reader-surah-title:lang(ar) {
+  font-family: var(--font-mushaf);
+}
+.theme-light .reader-surah-title {
+  color: #835806;
+}
+html[data-app-material-resolved="glass"]:not(.high-contrast) .reader-surah-title {
+  color: #f0c14b;
+}
+.high-contrast .reader-surah-title {
+  color: var(--foreground);
+}
+.reader-surah-artwork {
+  aspect-ratio: 4 / 3;
+}

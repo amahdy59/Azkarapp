@@ -338,13 +338,14 @@ export function QuranWirdScreen({
     <ScreenContainer
       dir={direction}
       screenName={t(language, "mushaf.wirdTitle")}
-      className="screen-arrival overflow-y-auto"
+      className="quran-wird-screen overflow-hidden"
     >
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
+      <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
         <Header pageGutters title={t(language, "mushaf.wirdTitle")} language={language} />
         <div
           data-testid="quran-wird-content"
-          className={`quran-wird-overview grid w-full grid-cols-1 gap-4 px-page pb-8 pt-3 ${textAlignment}`}
+          data-header-scroll-owner=""
+          className={`quran-wird-overview fade-in grid min-h-0 w-full flex-1 grid-cols-1 gap-4 overflow-y-auto px-page pb-8 pt-3 ${textAlignment}`}
         >
           <section
             className="quran-today-card rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6"
@@ -512,8 +513,8 @@ export function QuranWirdScreen({
             className="rounded-3xl border border-border bg-card p-5 shadow-xs sm:p-6"
             aria-labelledby="wird-plan-title"
           >
-            <div className="mb-4 flex items-start justify-between">
-              <div>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0 flex-1 basis-40">
                 <h2 id="wird-plan-title" className="surface-panel-heading font-extrabold text-foreground">
                   <span className="surface-panel-icon surface-control-finish" aria-hidden="true">
                     <Calendar size={20} />
@@ -528,17 +529,19 @@ export function QuranWirdScreen({
                 }
               </div>
               {
-                <button
+                <Button
                   ref={editButton}
                   type="button"
+                  variant="pill"
+                  size="pill"
+                  data-testid="wird-edit-plan"
                   onClick={() => {
                     setDraftPlan(plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan);
                     setIsDrafting(true);
                   }}
-                  className="min-h-11 rounded-xl px-3 text-sm font-bold text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   {t(language, "mushaf.editPlan")}
-                </button>
+                </Button>
               }
             </div>
 

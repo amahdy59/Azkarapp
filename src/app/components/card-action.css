@@ -55,7 +55,7 @@
       [aria-disabled="true"],
       [data-disabled]
     ):not(:focus-visible):not(:has(:focus-visible)):hover {
-    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--primary) 6%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, currentColor 12%, transparent);
     filter: none;
   }
 }

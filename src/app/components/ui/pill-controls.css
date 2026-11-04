@@ -23,6 +23,22 @@
   font-size: var(--text-sm);
   font-weight: 800;
 }
+/* A neighboring action matches the complete tab frame, not its inset option.
+   The grid row follows labels as they grow, without fixed-size overrides. */
+.section-view-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 8px;
+  max-inline-size: 100%;
+}
+.section-view-actions > .section-view-action {
+  inline-size: auto;
+  block-size: 100%;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  aspect-ratio: 1;
+}
 @media (width < 600px) {
   .section-view-tabs .section-view-tab {
     padding: 0;
@@ -36,6 +52,14 @@
   border-radius: 999px;
   background-color: var(--muted);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+.choice-pill-action {
+  color: var(--foreground);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.choice-pill-action:active:not(:disabled, [aria-disabled="true"], [aria-busy="true"]) {
+  background-color: color-mix(in srgb, var(--primary) 20%, var(--muted));
 }
 .choice-pill .choice-pill-option {
   min-block-size: 44px;
@@ -70,6 +94,10 @@
     box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 }
 @media (hover: hover) and (pointer: fine) {
+  .choice-pill-action:not(:disabled, [aria-disabled="true"], [aria-busy="true"]):hover {
+    background-color: color-mix(in srgb, var(--primary) 12%, var(--muted));
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
   .choice-pill .choice-pill-option:not(:disabled):hover {
     box-shadow: inset 0 0 0 1px var(--primary);
     background-color: color-mix(in srgb, var(--primary) 12%, var(--muted));

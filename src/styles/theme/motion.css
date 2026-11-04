@@ -75,7 +75,7 @@
    .fade-in is on all four Progress views, so this was the slowest entrance in
    the app on the screen users open most repeatedly. */
 .fade-in {
-  animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) both;
+  animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) backwards;
 }
 
 /* Translate a full-size fill through its clipped track. Unlike scaling, this

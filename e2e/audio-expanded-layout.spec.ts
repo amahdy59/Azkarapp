@@ -228,8 +228,27 @@ for (const scenario of [
     await expect(autoLabel).toBeVisible();
     await expect(autoLabel).toHaveText(arabic ? "تلقائي" : "Play next");
     expect(await autoLabel.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
-    const queueWidth = (await context.getByTestId("audio-queue-trigger").boundingBox())!.width;
-    expect((await autoPlay.boundingBox())!.width).toBeGreaterThanOrEqual(queueWidth);
+    const pillSpacing = await autoPlay.evaluate((button) => {
+      const label = button.querySelector(".audio-continue-label")!.getBoundingClientRect();
+      const track = button.querySelector(".settings-toggle-track")!.getBoundingClientRect();
+      const style = getComputedStyle(button);
+      return {
+        gap: Math.max(label.left - track.right, track.left - label.right),
+        intendedGap: parseFloat(style.columnGap),
+        width: button.getBoundingClientRect().width,
+        content:
+          label.width +
+          track.width +
+          parseFloat(style.columnGap) +
+          parseFloat(style.paddingLeft) +
+          parseFloat(style.paddingRight) +
+          parseFloat(style.borderLeftWidth) +
+          parseFloat(style.borderRightWidth),
+      };
+    });
+    expect(pillSpacing.gap).toBeLessThanOrEqual(pillSpacing.intendedGap + 1);
+    expect(pillSpacing.width - pillSpacing.content).toBeLessThanOrEqual(2);
+    await context.screenshot({ path: testInfo.outputPath(`footer-row-${scenario.name}.png`) });
 
     const contextBounds = (await context.boundingBox())!;
     const seekBounds = (await player.locator(".audio-seek-row").boundingBox())!;

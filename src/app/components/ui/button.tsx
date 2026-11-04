@@ -4,6 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "./utils";
+import { PILL_ACTION } from "./controlStyles";
 
 const buttonVariants = cva(
   // Note: sizes use min-h, never a fixed height. Arabic labels run longer than
@@ -19,6 +20,7 @@ const buttonVariants = cva(
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive",
         outline: "border border-border-control bg-background text-foreground hover:bg-muted hover:text-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        pill: PILL_ACTION,
         ghost: "hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
@@ -27,6 +29,7 @@ const buttonVariants = cva(
         sm: "min-h-11 gap-1.5 px-3 py-2",
         lg: "min-h-12 px-6 py-2",
         icon: "size-11 gap-0 rounded-full p-0",
+        pill: "min-h-[54px] rounded-full px-4 py-2",
       },
     },
     defaultVariants: {
@@ -44,15 +47,18 @@ const Button = React.forwardRef<
     }
 >(function Button({ className, variant, size, asChild = false, ...props }, ref) {
   const Comp = asChild ? Slot : "button";
+  const resolvedSize = size ?? (variant === "pill" ? "pill" : "default");
 
   return (
     <Comp
       ref={ref}
       data-slot="button"
-      data-press-compact={size === "icon" || undefined}
+      data-variant={variant ?? "default"}
+      data-size={resolvedSize}
+      data-press-compact={resolvedSize === "icon" || undefined}
       className={cn(
-        variant !== "ghost" && variant !== "link" && "surface-control-finish",
-        buttonVariants({ variant, size, className }),
+        variant !== "ghost" && variant !== "link" && variant !== "pill" && "surface-control-finish",
+        buttonVariants({ variant, size: resolvedSize, className }),
       )}
       {...props}
     />

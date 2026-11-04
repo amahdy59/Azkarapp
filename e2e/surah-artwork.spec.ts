@@ -23,6 +23,13 @@ test("surah thumbnails load their hosted artwork and recover from an unavailable
     await page.goto(id === "friday-kahf" ? "/#/azkar/friday-kahf/1" : `/#/azkar/before-sleep/${position}`);
     const image = page.getByTestId("surah-reading-actions").locator("img");
     await expect(image).toBeVisible();
+    const title = page.getByTestId("reader-zikr-title");
+    await expect(title).toHaveCount(1);
+    const titleBounds = (await title.boundingBox())!;
+    const artworkBounds = (await image.boundingBox())!;
+    expect(titleBounds.y + titleBounds.height).toBeLessThanOrEqual(artworkBounds.y);
+    expect(artworkBounds.height).toBeGreaterThanOrEqual(200);
+    expect(artworkBounds.width / artworkBounds.height).toBeCloseTo(4 / 3, 1);
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.naturalWidth)).toBeGreaterThan(0);
     expect(await image.evaluate((node: HTMLImageElement) => node.currentSrc)).toContain(`/${artwork}-`);
     await page.screenshot({ path: info.outputPath(`${artwork}.png`) });

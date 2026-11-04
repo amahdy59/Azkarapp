@@ -2319,6 +2319,7 @@ function AppContent({
                         : getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory).size
                   }
                   hapticFeedback={hapticFeedback}
+                  onHapticFeedbackChange={setHapticFeedback}
                   reduceMotion={reduceMotion}
                   showTranslation={showTranslation}
                   showTransliteration={showTransliteration}

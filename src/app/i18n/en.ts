@@ -2214,6 +2214,8 @@ const en = {
     sound: "Counter sound",
     muteSound: "Mute counter sound",
     enableSound: "Enable counter sound",
+    enableVibration: "Enable counter vibration",
+    disableVibration: "Disable counter vibration",
     done: "Done",
     continueHigherStreak: "Increase target & continue",
     continueHigherTargetWithNum: "Increase target to {target} & continue",

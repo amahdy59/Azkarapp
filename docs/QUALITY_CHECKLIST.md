@@ -328,3 +328,29 @@ Verify تلقائي is visible while the auto-play switch retains its full acces
 Verify no Mushaf top or bottom tool intersects the paper scrollport. Exercise nonzero safe-area insets, 320px with 200% text, native paper scrolling, focus exit and the Arabic/English translation toggle. Verify the 15 canonical slots and that a short embedded zikr surah keeps its basmalah, accessible identity and readable verses without scrolling at normal phone settings.
 
 Delay the exact Quran font beyond 1.2 seconds. Verify a preparation status, readable settled fallback, unchanged visible geometry after the late font arrives and exact glyphs on the next visit. Cover full Mushaf and identified zikr passages, cache reload/offline and explicit retry. Validate all 604 measured resource sizes, catalog-version invalidation and missing-font-only versus missing-page-only accounting. Progress heading coordinates must remain stable through wheel/end scrolling and 200% text. Check shared hover on Home, Library, Quran, Progress and Settings, including stationary targets, keyboard focus, disabled controls, touch and app/OS motion reduction.
+
+## Glass and reader regressions · 2026-11-04
+
+- Check scenery visibility through Home prayer, routine and evidence cards using contrasting controlled backdrops, including hover after entrance.
+- Keep Settings row ink, opacity and filter stable during hover. Preserve protected opaque menus and solid/accessibility fallbacks.
+- Scroll mobile Quran Wird to the bottom in RTL/LTR and at 200% text. The heading stays in its stationary row and content remains scrollable.
+- Check the three long-surah cards for a single gold heading above taller artwork, wrapping at enlarged text and reachable reading/audio/completion actions.
+- Toggle reader vibration, reload and confirm the App-owned preference persists.
+
+## Mushaf listening space — local 2026-11-04
+
+Verify paged and continuous listening: no visible header folio selector; page browsing remains in Audio options; Return to current ayah belongs to footer Focus/Lock with 44px hit-tested controls, including Focus and 320px/200% text. Recovery restores reading focus and retains Focus/audio state. Check phone/tablet/desktop RTL/LTR, light solid/dark Glass, fifteen slots, first/last ink, no overlay padding and no footer overlap. Only the active word has a strong fill/outline/underline; neighboring ayah words retain a clear background. Turning word emphasis off, missing timing, seek and recording changes must not leave stale word paint. Retain current-verse semantics and marker fallback. Inspect Forced Colors and screenshots alongside axe. Physical Android/TalkBack/VoiceOver remains separate acceptance.
+
+## Progress header consistency — owner correction 2026-11-04
+
+Compare Progress to the ordinary Quran Wird header in the same viewport/material/theme: title type, clear resting Glass surface, shared frosted scrolled surface and standard 44px icon size (font-relative under enlargement). Keep title/date/tabs/filter stationary, full-width control hit-testing and one feathered edge. Verify RTL/LTR, phone/320px/200%, tablet/desktop, solid and protected filter dialog focus/recovery. The latest owner-approved shared material replaces older tests requiring an always-opaque, backdrop-free Progress header; keep their sticky/coverage assertions.
+
+For Progress's adjacent filter/view controls, compare **outer** top/bottom edges within 1px, square filter geometry, common icon center lines and 20px non-shrinking glyphs. Compare choice-pill fill/edge/radius and hit-test controls. A 44px hit-target check alone misses the difference between a 54px padded tab frame and a 44px standalone action. Include the 600px enlarged-label boundary in addition to narrow icon-only and wide layouts.
+
+In the Progress 600px/200% case, require the same compact accessible tab presentation as other constrained heading layouts: visible icons and hidden optional labels, no title letter-column, no frame overflow and matched action/tab outer edges. The labelled tablet/desktop cases still verify visible labels and equal icons.
+
+## Shared configuration-button family — 2026-11-04
+
+Use `Button variant="pill"` for neutral configuration/navigation actions, preserving primary/destructive/ghost and domain-specific transport/counter/row roles. Verify Choose metrics against its view-pill fill/border/radius and cross-screen Quran plan/Settings counterparts. Size is minimum 54px for the pill family, with intrinsic width and wrapping growth; standard targets remain at least 44px. Keep full names, dialog keyboard/focus recovery, disabled empty-selection Apply and 20px/rem-scaled non-shrinking action icons.
+
+Run button-family-consistency in Chromium/Firefox/WebKit plus affected Progress/Quran/Settings units. Check RTL/LTR, 320px/200%, 600px enlarged, phone/desktop, solid/Glass, Forced Colors and both reduced-motion modes. Hover must preserve the frame and ink opacity/color. Inspect fresh whole-screen screenshots; do not infer complete accessibility or global consistency from class matching alone. The current family audit and intentional exceptions live in the design-system matrix and phase report.

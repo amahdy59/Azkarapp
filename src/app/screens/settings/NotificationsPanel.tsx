@@ -305,7 +305,7 @@ export function NotificationsPanel({
           </p>
           <p className="mt-2 text-label text-muted-foreground">{t(language, "readiness.testHelp")}</p>
           {onOpenLocation && (
-            <Button type="button" variant="outline" className="mt-3 w-full" onClick={onOpenLocation}>
+            <Button type="button" variant="pill" size="pill" className="mt-3 w-full" onClick={onOpenLocation}>
               {t(language, "readiness.changeLocation")}
             </Button>
           )}

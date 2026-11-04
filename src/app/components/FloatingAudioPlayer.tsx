@@ -218,7 +218,7 @@ export function FloatingAudioPlayer({
   const readingOverlay = preferCompactReading && overReadingSurface && !dockedInReader;
   useEffect(() => setReadingDockHidden(false), [currentEntry?.entryId, readingOverlay]);
   const [audioOptionsHost, setAudioOptionsHost] = useState<HTMLDivElement | null>(null);
-  const [listeningControlsHost, setListeningControlsHost] = useState<HTMLDivElement | null>(null);
+  const [listeningRecoveryHost, setListeningRecoveryHost] = useState<HTMLDivElement | null>(null);
   const [quranPreferencesHost, setQuranPreferencesHost] = useState<HTMLDivElement | null>(null);
   const [repeatOpen, setRepeatOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -791,10 +791,7 @@ export function FloatingAudioPlayer({
           className="audio-expanded-layout"
         >
           {/* Minimize and close retain the same logical edges in both player sizes. */}
-          <div
-            className="audio-expanded-header relative grid shrink-0 items-center"
-            data-has-page-controls={Boolean(currentEntry.quranRange && currentEntry.mushafPages?.length)}
-          >
+          <div className="audio-expanded-header relative grid shrink-0 items-center">
             <button
               type="button"
               onClick={() => {
@@ -812,9 +809,6 @@ export function FloatingAudioPlayer({
               data-testid="audio-expanded-identity"
             >
               <div className="min-w-0 max-w-full" ref={setAudioOptionsHost} />
-              {currentEntry.contentKind === "quran" && currentEntry.quranRange && currentEntry.mushafPages?.length ? (
-                <div className="audio-expanded-page-controls" ref={setListeningControlsHost} />
-              ) : null}
             </div>
             <button
               ref={collapseButtonRef}
@@ -856,7 +850,7 @@ export function FloatingAudioPlayer({
                   <Suspense fallback={<p role="status">{t(language, "quranListening.loading")}</p>}>
                     <QuranListeningReader
                       key={currentEntry.entryId}
-                      controlsHost={listeningControlsHost}
+                      recoveryHost={listeningRecoveryHost}
                       preferencesHost={quranPreferencesHost}
                       entry={currentEntry}
                       segment={controller.currentSegment}
@@ -1099,6 +1093,7 @@ export function FloatingAudioPlayer({
                 {t(language, "listening.autoContinueHelp")}
               </span>
               <div className="audio-focus-actions">
+                <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
                 <button
                   type="button"
                   ref={focusMode ? focusExitRef : focusEntryRef}

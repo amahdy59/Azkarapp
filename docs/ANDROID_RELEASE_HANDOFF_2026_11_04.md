@@ -19,3 +19,15 @@ This batch changes the shared React app packaged by Capacitor. It includes a cha
 4. For Play distribution, confirm the highest uploaded version code before setting the next one. The source currently uses `versionCode 1`. Build a signed AAB with the configured upload key and test it on the internal track.
 
 The local web quality gate, Pages build and 63 targeted browser checks passed for the application changes. The Android device and signed upgrade checks above remain to be done.
+
+## Reader and material follow-up · 2026-11-04
+
+Quran Wird now scrolls below a stationary title. The three surah cards use taller artwork and a gold heading. Reader options can change the existing App-owned vibration preference beside sound. Verify that this setting persists after relaunch and triggers the existing native haptic adapter on a counting tap. Shared hover feedback keeps text and Glass scenery stable.
+
+The stronger dark paper tile retains its resolution and compressed size. Device/browser haptic support and the native vibration adapter still need physical-device acceptance. Soft header edges are visual presentation and should be checked on the target WebView while scrolling with large system text.
+
+## Final listening, Progress and shared-button follow-up
+
+Mushaf listening removes the folio row from the main view, keeps page browsing inside Audio options, puts current-ayah recovery beside Focus/Lock and emphasizes only the timed word. The utility auto-play pill sizes to content. Progress uses shared header material and matched view/filter outer frames, with compact/enlarged recovery and non-shrinking icons. Choose metrics, Quran plan editing and relevant Settings configuration navigation share neutral pill actions; primary Apply/Save remains distinct.
+
+These are compatible web UI changes; no native permission/storage/schema, signing/version or recording/timing change is included. Test Android WebView with large system text in RTL/LTR: header tools, Choose metrics dialog focus, Focus/Lock recovery, word outlines and shared button contrast. Browser screenshots and full gates are recorded in the phase reports; they do not replace device delivery/vibration/TalkBack acceptance.

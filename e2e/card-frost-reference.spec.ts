@@ -57,7 +57,7 @@ for (const [language, width] of [
           .map((node) => {
             const style = getComputedStyle(node);
             const probe = document.createElement("span");
-            probe.style.backgroundColor = node.matches(".progress-metric-card, .progress-records-surface.glass-reading")
+            probe.style.backgroundColor = node.matches(".progress-records-surface.glass-reading")
               ? "color-mix(in srgb, var(--on-media-surface) 82%, transparent)"
               : "var(--glass-card-tint)";
             probe.style.backgroundImage = style.getPropertyValue("--paper-grain");

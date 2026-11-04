@@ -2203,6 +2203,8 @@ const ar = {
     sound: "صوت العداد",
     muteSound: "كتم صوت العداد",
     enableSound: "تشغيل صوت العداد",
+    enableVibration: "تفعيل اهتزاز العداد",
+    disableVibration: "إيقاف اهتزاز العداد",
     done: "مكتمل",
     continueHigherStreak: "رفع الهدف والمتابعة",
     continueHigherTargetWithNum: "رفع الهدف إلى {target} والمتابعة",

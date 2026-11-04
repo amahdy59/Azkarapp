@@ -44,11 +44,10 @@ import { ProgressHeatmap } from "./ProgressHeatmap";
 import { ProgressRoutineComparison } from "./ProgressRoutineComparison";
 import { ProgressMetricCard } from "./ProgressMetricCard";
 import { IconButton } from "./LayoutShells";
+import { Button } from "./ui/button";
 import { ChevronUp, ChevronDown } from "./icons";
 import { Modal, SheetHeader } from "./ResponsiveSheet";
 
-const action =
-  "progress-dashboard-action min-h-11 rounded-lg border border-border-control px-3 py-2 text-sm font-semibold progress-focus disabled:opacity-50";
 const summary = "progress-disclosure";
 export type ProgressDashboardView = "overview" | "trends";
 const METRIC_ICONS = {
@@ -159,19 +158,21 @@ export function ProgressDashboard({
     <div className="progress-dashboard space-y-5" data-testid="progress-dashboard">
       {view === "overview" && (
         <section className="progress-summary-card progress-overview-summary" aria-labelledby={`${id}-overview`}>
-          <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2
               id={`${id}-overview`}
               data-testid="progress-primary-heading"
-              className="min-w-0 flex-1 text-lg font-bold"
+              className="min-w-0 flex-1 basis-40 text-lg font-bold"
             >
               {text(language, "overview")}
             </h2>
-            <button
+            <Button
               ref={chooseButton}
               type="button"
-              className={`${action} flex min-w-11 shrink-0 items-center justify-center gap-2 text-xs`}
-              style={{ inlineSize: "auto" }}
+              variant="pill"
+              size="pill"
+              data-testid="progress-choose-metrics"
+              className="min-w-11"
               title={text(language, "choose")}
               aria-expanded={choosing}
               aria-haspopup="dialog"
@@ -181,9 +182,9 @@ export function ProgressDashboard({
                 setChoosing(!choosing);
               }}
             >
-              <BarChart3 size={18} aria-hidden="true" />
+              <BarChart3 className="size-5" aria-hidden="true" />
               <span>{text(language, "choose")}</span>
-            </button>
+            </Button>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             {text(language, "currentRange", {
@@ -259,9 +260,9 @@ export function ProgressDashboard({
                   : text(language, "chooseOne")}
               </p>
               <div className="flex flex-wrap gap-2">
-                <button
+                <Button
                   type="button"
-                  className={action}
+                  size="pill"
                   disabled={!draft.length}
                   onClick={() => {
                     setMetrics(draft);
@@ -269,19 +270,20 @@ export function ProgressDashboard({
                   }}
                 >
                   {text(language, "apply")}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={action}
+                  variant="pill"
+                  size="pill"
                   onClick={() => {
                     setChoosing(false);
                   }}
                 >
                   {text(language, "cancel")}
-                </button>
-                <button type="button" className={action} onClick={() => setDraft(DEFAULT_PROGRESS_METRICS)}>
+                </Button>
+                <Button type="button" variant="ghost" size="pill" onClick={() => setDraft(DEFAULT_PROGRESS_METRICS)}>
                   {text(language, "reset")}
-                </button>
+                </Button>
               </div>
             </fieldset>
           </Modal>
@@ -402,9 +404,9 @@ export function ProgressDashboard({
               <div className="space-y-3">
                 <p className="text-sm leading-relaxed text-muted-foreground">{text(language, "dayView")}</p>
                 {onChooseWeek && (
-                  <button type="button" className={action} onClick={onChooseWeek}>
+                  <Button type="button" variant="pill" size="pill" onClick={onChooseWeek}>
                     {text(language, "viewWeek")}
-                  </button>
+                  </Button>
                 )}
               </div>
             ) : (

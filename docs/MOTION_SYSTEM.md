@@ -295,3 +295,9 @@ Keyboard release also overrides WebKit's lingering native :active appearance aft
 ## Shared hover continuation — 2026-11-03
 
 The owner requests a consistent app-wide review. Shared action/card icon cues use the semantic 1.05 hover scale token and current easing. Reading audio retains its quieter 1.035 cue. Card pointer feedback uses a 6% inset tint, while visible keyboard focus owns the primary boundary. This supersedes the 1.10 scale and primary pointer-stroke recipe above for shared cards. General brightness is reduced to 1.03 and the Home Tasbih arrow stays stationary. Counter, sharing-artwork and Home inset hover feedback is gated to a hovering fine pointer. Preserve selected/open/error state recognition and the established form/menu semantics. App and OS Reduce Motion keep immediate still state feedback.
+
+## Stable hover materials · 2026-11-04
+
+Whole-control pointer hover uses no brightness filter or opacity change. Those effects can establish backdrop boundaries and wash out the target's ink. Shared card hover uses a quiet edge reflection and existing finite icon scale. Keyboard focus remains distinct. Completed opacity entrances use backwards fill so the finished animation does not retain a compositing boundary over scenery.
+
+Soft scroll edges use threshold-only visibility and a fixed mask/blur. Header geometry, typography and blur strength do not animate with scroll position. High contrast and reduced transparency keep their existing clear boundary.

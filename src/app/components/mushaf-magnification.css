@@ -35,3 +35,26 @@
     outline: 2px solid Highlight;
   }
 }
+
+/* One stationary word cue across exact glyphs and Unicode. Retain ink contrast
+   and add a shape/underline rather than relying on gold text or diffuse glow. */
+.mushaf-page-canvas [data-playback-word="true"] {
+  color: var(--foreground);
+  background-color: color-mix(in srgb, var(--primary) 24%, var(--background));
+  border-radius: 0.15em;
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  text-decoration: underline;
+  text-decoration-color: var(--primary);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+}
+@media (forced-colors: active) {
+  .mushaf-page-canvas [data-playback-word="true"] {
+    color: CanvasText;
+    background-color: Canvas;
+    outline-color: Highlight;
+    text-decoration-color: CanvasText;
+  }
+}

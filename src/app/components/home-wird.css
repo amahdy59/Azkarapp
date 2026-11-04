@@ -43,8 +43,6 @@
   }
 }
 .home-photo-canvas .hero-glass.home-glass-surface {
-  --home-glass-tint: var(--glass-card-tint);
-  background-color: var(--home-glass-tint);
   /* A directional sheen makes the material visible even over the dark sky.
      Keep the brightest stop bounded by the white-source contrast test. */
   background-image:
@@ -58,11 +56,6 @@
   border-color: var(--glass-edge);
   backdrop-filter: var(--glass-frost);
   box-shadow: var(--glass-shadow);
-}
-@media (hover: hover) and (pointer: fine) {
-  .home-photo-canvas .hero-glass.home-glass-surface:hover {
-    border-color: var(--glass-edge-hover);
-  }
 }
 
 /* Preserve the material's legible ground without relying on blur support. */

@@ -336,7 +336,6 @@ a[href]:not(.no-press),
      way. The release now runs longer and overshoots before it settles. */
   transition:
     transform var(--motion-duration-release) var(--motion-ease-release),
-    filter var(--motion-duration-fast) var(--motion-ease-standard),
     opacity var(--motion-duration-press) var(--motion-ease-standard),
     color var(--motion-duration-fast) var(--motion-ease-standard),
     background-color var(--motion-duration-fast) var(--motion-ease-standard),
@@ -344,25 +343,6 @@ a[href]:not(.no-press),
     box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
-/* One hover treatment for everything that acts.
-   Hovers were previously per-component and mostly absent, so the app felt
-   static under a mouse. A brightness lift is used rather than a transform or a
-   background change: it costs no layout, it works on a photograph, a gradient
-   and a flat fill alike, and it cannot fight whatever background a component
-   already sets — which is why a global `hover:bg-*` would not have worked.
-
-   Gated on a real hovering pointer so touch devices do not get a state that
-   sticks after a tap. Reduced motion keeps the change but removes its
-   transition, through the rule above. */
-@media (hover: hover) and (pointer: fine) {
-  button:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]):hover,
-  [role="button"]:not([aria-disabled="true"]):not([data-disabled]):not(.no-press):hover,
-  a[href]:not(.no-press):not(.skip-link):hover,
-  summary:hover,
-  .interactive-elem:hover {
-    filter: brightness(var(--control-hover-brightness, 1.03));
-  }
-}
 @media (hover: hover) and (pointer: fine) {
   .tracking-choice:not(:disabled, :focus-visible):hover ~ .tracking-check {
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
@@ -371,12 +351,6 @@ a[href]:not(.no-press),
     outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
-}
-.theme-light {
-  --control-hover-brightness: 0.96;
-}
-:is(.theme-dark, .theme-midnight, .theme-oled) {
-  --control-hover-brightness: 1.08;
 }
 
 button:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]):active,
@@ -644,7 +618,7 @@ button:is([aria-disabled="true"], [data-disabled]):active {
     var(--shadow-raised);
 }
 .surface-card-finish:not(.stagger-enter) {
-  animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) both;
+  animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) backwards;
 }
 .surface-card-finish[data-material-elevation="flat"] {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);

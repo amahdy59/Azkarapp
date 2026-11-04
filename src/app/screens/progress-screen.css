@@ -27,6 +27,7 @@
 }
 
 .progress-controls-inner {
+  container: progress-heading / inline-size;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -38,6 +39,21 @@
 }
 .progress-controls-inner > .shared-screen-header {
   flex-basis: 100%;
+}
+@container progress-heading (max-width: 18rem) {
+  .progress-controls-inner > .shared-screen-header {
+    flex-wrap: wrap;
+  }
+  .progress-controls-inner > .shared-screen-header > :first-child {
+    flex-basis: 100%;
+  }
+  .progress-controls-inner > .shared-screen-header > :last-child {
+    margin-inline-start: auto;
+    max-inline-size: 100%;
+  }
+  .progress-view-tabs .section-tab-label {
+    display: none;
+  }
 }
 @media (min-width: 600px) {
   .progress-controls-inner {
@@ -69,11 +85,6 @@
   inline-size: 100%;
 }
 
-.progress-screen-controls[data-scrolled="true"] {
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
-}
-
 .progress-range-fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
@@ -87,20 +98,6 @@
   min-inline-size: 0;
   gap: 8px;
   max-inline-size: none;
-}
-
-.progress-header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-.progress-header-actions > .ui-icon-button {
-  inline-size: 54px;
-  block-size: 54px;
-  min-inline-size: 54px;
-  min-block-size: 54px;
 }
 
 .progress-range-preset,
@@ -697,7 +694,6 @@
   block-size: 100%;
 }
 
-.progress-dashboard-action,
 .progress-export {
   white-space: nowrap;
 }
@@ -727,10 +723,6 @@
   .progress-select-trigger > svg {
     inline-size: 16px;
     block-size: 16px;
-  }
-
-  .progress-dashboard-action {
-    inline-size: 100%;
   }
 
   .progress-screen-content > [role="tabpanel"] {

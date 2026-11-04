@@ -7,7 +7,7 @@ it("ships small fine neutral grain without coarse coloured particles or excessiv
   const sizes = [];
   for (const [name, maximum] of [
     ["light", 28],
-    ["dark", 20],
+    ["dark", 26],
   ]) {
     const bytes = readFileSync(`src/assets/paper-grain-${name}.png`);
     sizes.push(bytes.length);
@@ -39,9 +39,9 @@ it("ships small fine neutral grain without coarse coloured particles or excessiv
       // opacity, not just an unused palette entry, without restoring heavy grain.
       let totalAlpha = 0;
       for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) totalAlpha += alpha[rows[y * stride + x + 1]];
-      expect(totalAlpha / (size * size)).toBeGreaterThan(11);
-      expect(totalAlpha / (size * size)).toBeLessThan(13);
-      expect(Math.max(...alpha)).toBeGreaterThanOrEqual(18);
+      expect(totalAlpha / (size * size)).toBeGreaterThan(14);
+      expect(totalAlpha / (size * size)).toBeLessThan(16);
+      expect(Math.max(...alpha)).toBeGreaterThanOrEqual(24);
     }
     if (name === "light") {
       // The selected soft-paper trial replaces discrete pores with a gentle

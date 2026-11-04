@@ -160,25 +160,8 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   background: transparent;
 }
 
-.audio-expanded-header[data-has-page-controls="true"] {
-  min-height: min-content;
-}
-
 .audio-expanded-identity {
   padding-inline: 0;
-}
-
-.audio-listening-navigation {
-  min-height: 44px;
-}
-
-.audio-listening-navigation > button {
-  width: 44px;
-  height: 44px;
-}
-
-.audio-listening-navigation > [role="status"] {
-  white-space: nowrap;
 }
 
 .audio-expanded-controls {
@@ -380,10 +363,6 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 
 .audio-expanded-feedback > * {
   max-inline-size: 100%;
-}
-
-.audio-expanded-page-controls {
-  flex-shrink: 0;
 }
 
 .audio-expanded-feedback:not(:empty) {
@@ -681,25 +660,37 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 .audio-expanded-text {
   padding-inline: 0.5rem;
 }
+.audio-listening-recovery-host:empty {
+  display: none;
+}
+.audio-listening-recovery-host:not(:empty) {
+  display: contents;
+}
 .audio-listening-resume {
-  position: absolute;
-  z-index: 5;
-  inset-inline-end: 0.75rem;
-  bottom: 0.75rem;
-  max-width: calc(100% - 1.5rem);
-  background: var(--card);
-  color: var(--foreground);
-  border: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.audio-listening-stream {
-  padding-block-end: 4rem;
+.audio-expanded-feedback:has(.audio-listening-resume) {
+  flex-wrap: wrap;
 }
-.audio-listening-stream [data-playback-verse] {
-  background-color: color-mix(in srgb, var(--primary) 9%, transparent);
+/* Recovery lives in the footer, so neither paper nor follow scrolling needs
+   clearance for an overlay. Focus gives every remaining pixel to reading. */
+[data-listening-focus] .audio-expanded-text {
+  margin-block-start: 0;
+  padding-block: 0;
 }
-.audio-listening-stream [data-playback-word="true"] {
-  outline: 1px solid var(--primary);
-  border-radius: 0.15em;
+[data-listening-focus] .audio-expanded-layout {
+  padding-block-end: max(0.25rem, env(safe-area-inset-bottom));
+}
+[data-listening-focus] .audio-expanded-feedback .audio-focus-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.audio-listening-page [data-playback-verse]:not([data-playback-word="true"]) {
+  background-color: transparent;
+}
+.audio-listening-page:has([data-playback-word="true"]) [data-current-ayah-marker="true"] {
+  background-color: transparent;
+  outline: none;
 }
 .audio-expanded-meta:empty {
   display: none;
@@ -749,10 +740,13 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   --control-cue-scale: 1.035;
 }
 .audio-play-all-indicator {
-  flex: 0 1 9rem;
+  flex: 0 1 auto;
+  min-inline-size: 0;
 }
 .audio-continuation-switch {
-  inline-size: 100%;
+  inline-size: max-content;
+  max-inline-size: 100%;
+  justify-content: center;
 }
 .audio-continue-label {
   overflow-wrap: anywhere;
@@ -791,11 +785,6 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   }
   .audio-expanded-feedback .audio-focus-actions > button {
     min-inline-size: 44px;
-  }
-  .audio-play-all-indicator {
-    flex: 1 1 7rem;
-    min-inline-size: 0;
-    max-inline-size: 13rem;
   }
   .audio-continuation-switch {
     padding: 6px;

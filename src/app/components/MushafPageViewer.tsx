@@ -371,17 +371,7 @@ const MushafTextLine = memo(function MushafTextLine({
               data-listening-verse={readOnly ? w.verseKey : undefined}
               data-playback-word={isWordHighlighted ? "true" : undefined}
               data-listening-word={isWordHighlighted ? "" : undefined}
-              style={
-                isWordHighlighted
-                  ? {
-                      color: "color-mix(in srgb, var(--primary) 85%, var(--foreground))",
-                      boxShadow: "0 0 6px color-mix(in srgb, var(--primary) 35%, transparent)",
-                    }
-                  : undefined
-              }
-              className={`shrink-0 transition-colors ${
-                isWordHighlighted ? "rounded-md bg-primary/25 text-primary ring-1 ring-primary/50" : "rounded-sm"
-              }`}
+              className="shrink-0 rounded-sm"
               aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -1858,7 +1848,7 @@ export function MushafListeningPage({
             "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
             width: `calc(100% * ${magnification / 100})`,
             maxWidth: "none",
-            height: `calc(max(36rem, calc(100cqh - 3rem)) * ${magnification / 100})`,
+            height: `calc(max(36rem, 100cqh) * ${magnification / 100})`,
           } as CSSProperties
         }
         aria-hidden="true"

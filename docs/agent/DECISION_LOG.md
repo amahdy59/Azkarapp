@@ -5342,3 +5342,31 @@ The owner reports that phone controls can cover the first line and prefers a com
 ## 2026-11-03 — Stable first-visit lettering, size catalog and hover review
 
 The owner approves brief bounded preparation then stable readable fallback for the visit, a measured versioned Mushaf size catalog, the mobile Progress sticky-header repair and an app-wide hover review. This supersedes earlier immediate-fallback/late-upgrade presentation. Reuse existing data/font caches and explicit retry. Shared icons use a smaller 1.05 cue, audio retains 1.035, and card pointer feedback uses a quiet inset tint with keyboard focus boundaries. The latest instruction keeps the working tree local.
+
+## Owner correction · 2026-11-04 Glass and reader presentation
+
+The owner requests the Quran Wird heading remain stationary, 4:3 surah thumbnails with gold names above, reader vibration controls, consistent card translucency and removal of whole-control hover fading. This supersedes the brightness and full-card hover-tint guidance in the previous motion checkpoint. Shared ordinary cards use the Glass card material, exact-record reading and protected overlays retain their dedicated legibility treatment.
+
+## Owner correction — 2026-11-04 local Mushaf listening space
+
+The owner requests verifying prior comment completion and local improvements to audio Mushaf: remove the redundant visible page number, move current-ayah recovery to footer tools, use whitespace efficiently in Focus and emphasize the word rather than the whole ayah. Move page selection into Audio options to retain browsing. Use stationary ink with a stronger fill/outline/underline, retaining marker fallback and semantic verse state. Remove obsolete floating-button clearance. Preserve the pending Glass/reader batch. The latest local-only request takes precedence over publication instructions quoted in the pasted historical conversation; do not commit, push or deploy this checkpoint.
+
+## Owner follow-up — 2026-11-04 footer pill space and dark-paper evidence
+
+The owner shows a large empty gap in the auto-play pill and requests improving the entire row. Remove its fixed/growing width, size it to the label/track, center the utility controls with consistent gaps, and preserve label/count visibility and targets. This supersedes the earlier relative-width preference that auto-play be wider than queue. Capture the row at phone/narrow/enlarged/desktop sizes. The owner also requests concrete stronger-paper evidence: compare the previous committed tile, current stronger local tile and off on identical dark/Midnight solid/Glass screens. No additional texture increase, publication or new product scope.
+
+## Owner follow-up — 2026-11-04 homogeneous Progress heading
+
+The owner shows Progress's distinctive dark heading and requests consistency with other screen headers. The existing shared Header is retained; remove Progress-only opaque background-variable and 54px filter sizing overrides. Apply the same clear-at-rest/frosted-on-scroll Glass material to its outer sticky controls, retaining full-width coverage, title/type/gutters, date identity, enlarged layout and all solid/accessibility fallbacks. The owner request supersedes the earlier always-opaque/no-frost Progress presentation only. Screenshot comparison uses the actual Quran Wird header as reference and verifies both resting/scrolled paint and sticky hit-testing across RTL/LTR, narrow/200%, tablet and desktop. No data, religious content or publication changes.
+
+## Owner correction — 2026-11-04 equal Progress control frames
+
+The owner identifies unequal button sizes and slight icon misalignment in the latest Progress screenshot. The preceding standard 44px filter correction matched the inner tab target but missed the 54px outer frame. Match the complete frame through a shared content-sized grid row and choice-pill surface; the square filter follows that actual row height, including enlarged labels. Normalize the three glyphs to 20px and prevent flex shrinking (Firefox exposed this at labelled widths). This supersedes only the standalone icon-size part of the prior heading decision; shared material/type/sticky/filter semantics remain. Verify actual outer edges, icon geometry, matched surfaces, hit-testing, RTL/LTR and 320/600/enlarged/wide screenshots locally. No publication.
+
+## Owner release authority — 2026-11-04 button consistency and full pending batch
+
+The owner requests continuing the Choose metrics/shared-button work and explicitly instructs pushing **all changes**. This supersedes the earlier local-only holds for the pending Glass/reader, audio Mushaf/Progress-control and button-family checkpoints. Finish visual/keyboard regressions, fresh bilingual release notes, complete local hook gates and commit the full reviewed batch to main. Monitor all triggered workflows, inspect every failed job and remediate minimally until Quality verify and Pages build/deploy pass and the exact release is live. Keep native signing/device/AT acceptance distinct; no force push, skipped hook, weaker assertion, content change or dependency replacement.
+
+## Owner agreement — 2026-11-04 shared button families
+
+The owner requests Choose metrics match the pill controls, consistent button appearance across the app, updated testing and design-system rules. Implement a shared neutral pill action and migrate equivalent configuration/navigation actions; replace copied Progress dialog buttons with shared primary/neutral/ghost roles. Keep tab selection, destructive confirmations, Settings rows, reading/counting/audio transport, native fields and protected menus semantically distinct. No blanket button selector or universal shape/size replacement. The design matrix defines family geometry, role hierarchy, focus/hover/disabled/motion rules and audit limits; cross-screen browser screenshots/paint/keyboard tests cover actual Progress, Quran and Settings usage. The subsequent explicit push-all instruction authorizes release after verification.

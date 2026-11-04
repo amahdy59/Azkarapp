@@ -93,7 +93,7 @@ try {
       const alpha =
         name === "light"
           ? Math.round(Math.max(0, Math.min(28, 8 + ((mean - softGray[i / 4]) / deviation) * 4)) / 2) * 2
-          : Math.round(darkAlpha * 1.35);
+          : Math.round(darkAlpha * 1.7);
       const key = `${rgb},${alpha}`;
       if (!lookup.has(key)) {
         lookup.set(key, palette.length);

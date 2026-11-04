@@ -1,6 +1,15 @@
 import { expect, test } from "vitest";
 import { featureBrowserArguments } from "./run-feature-browser-tests.mjs";
 
+test("shared configuration pills are covered by each owning screen feature", () => {
+  for (const feature of ["quran", "progress", "controls", "settings"]) {
+    const patterns = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    expect(patterns.some((pattern) => pattern.test("e2e/button-family-consistency.spec.ts"))).toBe(true);
+  }
+});
+
 test("includes final-touch download/chart/control coverage in each affected feature selection", () => {
   for (const feature of ["quran", "audio", "progress", "controls", "settings"]) {
     const filters = featureBrowserArguments(feature)

@@ -79,18 +79,11 @@
       backdrop-filter: var(--glass-frost);
       box-shadow: var(--glass-shadow);
     }
-    @media (hover: hover) and (pointer: fine) {
-      html[data-app-material-resolved="glass"]:not(.high-contrast)
-        [data-material-ui]
-        :is([data-material-card], .bg-card, .glass-reading):hover {
-        border-color: var(--glass-edge-hover);
-      }
-    }
     /* Exact .bg-card is the legacy surface contract; shared primitives carry
        explicit ownership. Opacity/hover utility substrings never opt in. */
     html[data-app-material-resolved="glass"]:not(.high-contrast)
       [data-material-ui]
-      :is(.progress-records-surface.glass-reading, .progress-metric-card) {
+      .progress-records-surface.glass-reading {
       background-color: color-mix(in srgb, var(--on-media-surface) 82%, transparent);
       backdrop-filter: var(--glass-frost);
     }
@@ -207,7 +200,8 @@
         .bottom-nav,
         [data-material-ui] header,
         [data-material-ui] .shared-screen-header,
-        [data-material-ui] .settings-search-sticky
+        [data-material-ui] .settings-search-sticky,
+        [data-material-ui] .progress-screen-controls
       ) {
       background-color: var(--glass-reading-tint) !important;
       background-image:
@@ -218,23 +212,14 @@
       box-shadow: none;
       transition-property: border-color, box-shadow !important;
     }
-    html[data-app-material-resolved="glass"]:not(.high-contrast)
-      :is(
-        [data-material-ui] header[data-scrolled="true"],
-        [data-material-ui] .shared-screen-header[data-scrolled="true"],
-        [data-material-ui] .settings-search-sticky[data-scrolled="true"]
-      ) {
-      backdrop-filter: var(--glass-chrome-frost) !important;
-      border-bottom-color: rgb(255 255 255 / 0.07);
-      box-shadow: 0 3px 12px rgb(2 6 23 / 0.12);
-    }
     /* At the top, chrome belongs to the same canvas as its content. Only
        passing content needs a separate frosted surface. Keep navigation fixed. */
     html[data-app-material-resolved="glass"]:not(.high-contrast)
       :is(
         [data-material-ui] header,
         [data-material-ui] .shared-screen-header,
-        [data-material-ui] .settings-search-sticky
+        [data-material-ui] .settings-search-sticky,
+        [data-material-ui] .progress-screen-controls
       ):not([data-scrolled="true"]) {
       background: transparent !important;
       backdrop-filter: none !important;
@@ -246,10 +231,6 @@
       :is([data-testid="settings-screen"] > div > .shared-screen-header, .settings-nav-pane > .shared-screen-header) {
       border-bottom: 0 !important;
       box-shadow: none !important;
-    }
-    /* Progress controls cover all moving records, including both page gutters. */
-    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] .progress-screen-controls {
-      --background: var(--on-media-surface);
     }
   }
 }

@@ -7,6 +7,7 @@ import { shouldReduceMotion } from "../../motionPreferences";
 import { useLayoutMode } from "../../hooks/useLayoutMode";
 import { useScreenFocus } from "../../hooks/useScreenFocus";
 import "./SettingsScreen.css";
+import "../../components/scroll-edge.css";
 import type { SettingsScreenProps } from "./SettingsScreen.types";
 import {
   AppearancePanel,

@@ -33,62 +33,70 @@ export function listeningTiming(item: ListeningCase) {
   return annotation;
 }
 
-export async function openListeningPage(page: Page, item: ListeningCase, language: "en" | "ar") {
+export async function openListeningPage(
+  page: Page,
+  item: ListeningCase,
+  language: "en" | "ar",
+  appearance: { themeMode?: "light" | "midnight"; appMaterial?: "glass" | "solid"; reduceMotion?: boolean } = {},
+) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.route("https://verses.quran.foundation/fonts/**", (route) => route.abort());
-  await page.addInitScript((language) => {
-    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({
-        settings: { language, routineMode: "complete", reduceMotion: true },
-        routineMode: "complete",
-        profile: { isGuest: true },
-        khatmahPage: 42,
-      }),
-    );
-    class ListeningAudio extends EventTarget {
-      private source = "";
-      get src() {
-        return this.source;
+  await page.addInitScript(
+    ({ language, appearance }) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: { language, routineMode: "complete", reduceMotion: true, ...appearance },
+          routineMode: "complete",
+          profile: { isGuest: true },
+          khatmahPage: 42,
+        }),
+      );
+      class ListeningAudio extends EventTarget {
+        private source = "";
+        get src() {
+          return this.source;
+        }
+        set src(value: string) {
+          this.source = value ? new URL(value, window.location.href).href : "";
+        }
+        currentTime = 30;
+        duration = 120;
+        volume = 1;
+        muted = false;
+        playbackRate = 1;
+        paused = true;
+        ended = false;
+        constructor() {
+          super();
+          Object.assign(window, {
+            __listeningAudio: this,
+            __listeningAudioCount:
+              ((window as unknown as { __listeningAudioCount?: number }).__listeningAudioCount ?? 0) + 1,
+          });
+        }
+        load() {
+          this.dispatchEvent(new Event("loadedmetadata"));
+          this.dispatchEvent(new Event("canplay"));
+        }
+        play() {
+          this.paused = false;
+          this.dispatchEvent(new Event("playing"));
+          return Promise.resolve();
+        }
+        pause() {
+          this.paused = true;
+          this.dispatchEvent(new Event("pause"));
+        }
+        removeAttribute() {
+          this.src = "";
+        }
       }
-      set src(value: string) {
-        this.source = value ? new URL(value, window.location.href).href : "";
-      }
-      currentTime = 30;
-      duration = 120;
-      volume = 1;
-      muted = false;
-      playbackRate = 1;
-      paused = true;
-      ended = false;
-      constructor() {
-        super();
-        Object.assign(window, {
-          __listeningAudio: this,
-          __listeningAudioCount:
-            ((window as unknown as { __listeningAudioCount?: number }).__listeningAudioCount ?? 0) + 1,
-        });
-      }
-      load() {
-        this.dispatchEvent(new Event("loadedmetadata"));
-        this.dispatchEvent(new Event("canplay"));
-      }
-      play() {
-        this.paused = false;
-        this.dispatchEvent(new Event("playing"));
-        return Promise.resolve();
-      }
-      pause() {
-        this.paused = true;
-        this.dispatchEvent(new Event("pause"));
-      }
-      removeAttribute() {
-        this.src = "";
-      }
-    }
-    Object.defineProperty(window, "Audio", { value: ListeningAudio });
-  }, language);
+      Object.defineProperty(window, "Audio", { value: ListeningAudio });
+    },
+    { language, appearance },
+  );
   const index =
     item.id === "friday-kahf" ? 0 : getAzkarForMode(item.category, "complete").findIndex((zikr) => zikr.id === item.id);
   await page.goto(`/#/azkar/${item.route}/${index + 1}`);

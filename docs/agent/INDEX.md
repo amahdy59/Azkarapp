@@ -2,7 +2,13 @@
 
 ## Active phase
 
-[Audio footer and Mushaf performance](phases/AUDIO_FOOTER_MUSHAF_PERFORMANCE_LOCAL_2026_11_03.md) is the current approved local-only phase. Preserve completed [Quran entry stability](phases/QURAN_ENTRY_STABILITY_LOCAL_2026_11_03.md), [dark paper and audio/Mushaf review](phases/DARK_PAPER_AUDIO_MUSHAF_REVIEW_2026_11_03.md) and [optional updates and mobile Masbaha settings](phases/UPDATE_READINESS_MASBAHA_LOCAL_2026_11_03.md) changes. The owner authorized publishing this completed batch to main on 2026-11-04.
+[Button family consistency](phases/BUTTON_FAMILY_CONSISTENCY_LOCAL_2026_11_04.md) is the current checkpoint: reusable configuration pills, shared role/state rules and cross-screen screenshot/keyboard regressions. Preserve the completed audio Mushaf/Progress-control work and preceding Glass/reader edits. The owner now authorizes completing and pushing the full pending batch; monitor Quality/Pages and verify production.
+
+[Audio Mushaf space and word clarity](phases/AUDIO_MUSHAF_SPACE_LOCAL_2026_11_04.md) records the preceding completed local checkpoint. It preserves the pending Glass/reader batch, moves recovery to the footer, frees reading space, uses word-only playback paint, sizes footer pills to content and aligns Progress with shared header materials. Its earlier local hold is superseded by the owner's current push-all instruction.
+
+[Glass and reader polish](phases/GLASS_READER_POLISH_2026_11_04.md) covers the owner's latest header, surah, vibration, paper and hover corrections. The preceding release completed Quality and GitHub Pages verification at 66bf7965.
+
+[Audio footer and Mushaf performance](phases/AUDIO_FOOTER_MUSHAF_PERFORMANCE_LOCAL_2026_11_03.md) records the preceding approved local work. Preserve completed [Quran entry stability](phases/QURAN_ENTRY_STABILITY_LOCAL_2026_11_03.md), [dark paper and audio/Mushaf review](phases/DARK_PAPER_AUDIO_MUSHAF_REVIEW_2026_11_03.md) and [optional updates and mobile Masbaha settings](phases/UPDATE_READINESS_MASBAHA_LOCAL_2026_11_03.md) changes. The owner authorized publishing this completed batch to main on 2026-11-04.
 
 [Narrow tabs and notification release](phases/NARROW_TABS_NOTIFICATIONS_RELEASE_2026_11_03.md) records the preceding deployed checkpoint; the subsequent local-only instruction supersedes its publication authority for pending work.
 

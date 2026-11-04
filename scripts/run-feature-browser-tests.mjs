@@ -25,6 +25,7 @@ export const FEATURE_SPECS = {
   ],
   reader: ["reader-*.spec.ts", "devotional-footer.spec.ts", "reading-reliability.spec.ts"],
   quran: [
+    "button-family-consistency.spec.ts",
     "adaptive-navigation.spec.ts",
     "compact-practice.spec.ts",
     "reader-alignment.spec.ts",
@@ -45,6 +46,7 @@ export const FEATURE_SPECS = {
     "player-containment-benefits.spec.ts",
   ],
   progress: [
+    "button-family-consistency.spec.ts",
     "adaptive-navigation.spec.ts",
     "compact-practice.spec.ts",
     "final-touch-quality.spec.ts",
@@ -55,6 +57,7 @@ export const FEATURE_SPECS = {
     "manual-checklist.spec.ts",
   ],
   controls: [
+    "button-family-consistency.spec.ts",
     "adaptive-navigation.spec.ts",
     "compact-practice.spec.ts",
     "reader-alignment.spec.ts",
@@ -78,6 +81,7 @@ export const FEATURE_SPECS = {
     "first-use-calm-controls.spec.ts",
   ],
   settings: [
+    "button-family-consistency.spec.ts",
     "adaptive-navigation.spec.ts",
     "focus-highlight-surfaces.spec.ts",
     "final-touch-quality.spec.ts",

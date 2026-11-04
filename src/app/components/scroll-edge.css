@@ -1,0 +1,50 @@
+/* One soft edge per scrolling pane. The title and controls keep their own
+   legible surface; only the narrow overlap with moving content is feathered. */
+:is(.shared-screen-header, .settings-search-sticky, .home-prayer-sticky)[data-scrolled]::after,
+.progress-scroll-edge[data-scrolled="true"] {
+  display: var(--scroll-edge-display, block);
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(100% - 1px);
+  block-size: 12px;
+  pointer-events: none;
+  background: var(--scroll-edge-ink, var(--background));
+  backdrop-filter: blur(4px);
+  mask-image: linear-gradient(#000, transparent);
+}
+.progress-screen-controls .shared-screen-header::after,
+[data-testid="settings-screen"] .shared-screen-header::after {
+  display: none;
+}
+.progress-scroll-edge {
+  --scroll-edge-ink: var(--background);
+  position: sticky;
+  inset-block-start: var(--progress-controls-height, 12rem);
+  flex: 0 0 12px;
+  margin-block: -1rem 4px;
+  z-index: 39;
+  pointer-events: none;
+}
+html[data-app-material-resolved="glass"] .progress-scroll-edge {
+  --scroll-edge-ink: var(--glass-reading-tint);
+}
+.home-prayer-sticky[data-scrolled] {
+  --scroll-edge-ink: rgb(15 23 42 / 0.6);
+}
+.progress-scroll-edge[data-scrolled="true"] {
+  position: sticky;
+  inset-block-start: var(--progress-controls-height, 12rem);
+}
+html[data-app-material-resolved="glass"],
+.home-photo-canvas {
+  --scroll-edge-ink: rgb(15 23 42 / 0.36);
+}
+:is(.high-contrast, .reduce-transparency) {
+  --scroll-edge-display: none;
+}
+@media (forced-colors: active), (prefers-reduced-transparency: reduce) {
+  :root {
+    --scroll-edge-display: none;
+  }
+}

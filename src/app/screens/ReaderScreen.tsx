@@ -52,6 +52,7 @@ import {
   Share2,
   Keyboard,
   Translate,
+  Smartphone,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
@@ -171,6 +172,7 @@ export function ReaderScreen({
   isDone,
   collectionCompletedCount,
   hapticFeedback,
+  onHapticFeedbackChange,
   reduceMotion = false,
   showTranslation,
   showTransliteration,
@@ -224,6 +226,7 @@ export function ReaderScreen({
   isDone: boolean;
   collectionCompletedCount: number;
   hapticFeedback: boolean;
+  onHapticFeedbackChange?: (value: boolean) => void;
   reduceMotion?: boolean;
   showTranslation: boolean;
   showTransliteration: boolean;
@@ -816,7 +819,10 @@ export function ReaderScreen({
           className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 pb-5 pt-2"
           data-testid="surah-reading-actions"
         >
-          <figure className="relative mb-1 h-32 w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
+          <h2 className="reader-surah-title" dir="auto" lang={language} data-testid="reader-zikr-title">
+            {readerZikrTitle}
+          </h2>
+          <figure className="reader-surah-artwork relative mb-1 w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
             <img
               key={surahCardArt}
               src={surahCardArt ? `${SURAH_CARD_ORIGIN}/${surahCardArt}-384.webp` : QURAN_CARD_IMAGE}
@@ -1461,6 +1467,17 @@ export function ReaderScreen({
                 {soundEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
                 <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
               </ReaderOptionsAction>
+              {onHapticFeedbackChange && (
+                <ReaderOptionsAction
+                  onClick={() => onHapticFeedbackChange(!hapticFeedback)}
+                  keepOpen
+                  data-testid={`reader-counter-vibration-toggle-${layout}`}
+                  className={READER_OVERFLOW_ACTION}
+                >
+                  <Smartphone size={16} aria-hidden="true" />
+                  <span>{t(language, hapticFeedback ? "counter.disableVibration" : "counter.enableVibration")}</span>
+                </ReaderOptionsAction>
+              )}
               <ReaderOptionsAction
                 onClick={handleResetCounter}
                 className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -1719,13 +1736,13 @@ export function ReaderScreen({
                   data-testid="reader-card"
                   {...surfaceProps}
                 >
-                  {((!isShortSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+                  {((!isShortSurah && !longSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
                     <div
                       data-testid="reader-entry-tools"
                       data-prevent-count="true"
                       className="reader-entry-tools--wide shrink-0 pt-1 pb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"
                     >
-                      {!isShortSurah && readerZikrTitle && (
+                      {!isShortSurah && !longSurah && readerZikrTitle && (
                         <h2
                           className="max-w-full shrink-0 truncate text-start text-sm font-extrabold leading-relaxed text-foreground"
                           dir="auto"
@@ -1888,13 +1905,13 @@ export function ReaderScreen({
               data-testid="reader-card"
               {...surfaceProps}
             >
-              {((!isShortSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+              {((!isShortSurah && !longSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
                 <div
                   data-testid="reader-entry-tools"
                   data-prevent-count="true"
                   className="px-5 pt-2.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1"
                 >
-                  {!isShortSurah && readerZikrTitle && (
+                  {!isShortSurah && !longSurah && readerZikrTitle && (
                     <h2
                       className="max-w-full shrink-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
                       dir="auto"

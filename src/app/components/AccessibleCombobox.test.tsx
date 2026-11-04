@@ -15,7 +15,8 @@ describe("AccessibleCombobox", () => {
     render(<AccessibleCombobox label="Surah" options={testOptions} value={1} onChange={onChange} />);
     fireEvent.click(screen.getByRole("combobox"));
     const option = screen.getAllByRole("option")[2]!;
-    const scroll = vi.spyOn(option, "scrollIntoView");
+    const scroll = vi.fn();
+    option.scrollIntoView = scroll;
     fireEvent.mouseEnter(option);
     expect(scroll).not.toHaveBeenCalled();
     expect(fireEvent.mouseDown(option)).toBe(false);
