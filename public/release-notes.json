@@ -1,13 +1,13 @@
 {
-  "release": "2026-11-04.8",
+  "release": "2026-11-04.9",
   "ar": [
-    "تصفّح فهرس السور في عمودين داخل نافذة أصغر، مع بحث ثابت وأسماء واضحة حتى عند تكبير النص.",
-    "اقرأ المصحف على الكمبيوتر بمقاس أكثر اتزانًا ومساحة مريحة حول الصفحة، مع بقاء أدواته المألوفة والتكبير اليدوي.",
-    "شاهد تأكيد تغيير لون الصفحة بنفس ألوان المظهر الجديد، بعيدًا عن الآيات، مع احتفاظ المصحف بأزراره المميزة."
+    "ابحث عن السور في فهرس أصغر بعمودين، مع مساحة أوسع للنتائج عند تكبير النص.",
+    "استمتع بصفحة مصحف متوازنة على الكمبيوتر وهوامش مريحة، مع الحفاظ على أزرار المصحف المعتادة والتكبير اليدوي.",
+    "تعرّف على لون الصفحة الجديد من إشعار مطابق له بعيدًا عن الآيات، واستعد أدوات التركيز بلوحة المفاتيح."
   ],
   "en": [
-    "Browse surahs in a compact two-column index with separate search and readable names when text is enlarged.",
-    "Read a balanced desktop Mushaf page with comfortable margins while keeping familiar tools and manual zoom.",
-    "See page-color confirmations in the newly applied theme, clear of the verses, while retaining the Mushaf’s distinct buttons."
+    "Find surahs in a smaller two-column index, with more results space when text is enlarged.",
+    "Read a balanced desktop Mushaf page with comfortable margins, familiar Mushaf controls and manual zoom.",
+    "Recognize the newly applied page theme from a matching notification clear of the verses, with reliable keyboard recovery from Focus."
   ]
 }

@@ -62,3 +62,7 @@ No reviewed religious wording/font data, timing annotations, storage/sync contra
 ## Recommended next step
 
 Complete exact-commit release and review the deployed reader on the owner's phone/desktop with the screenshot checklist.
+
+## Exact-commit CI enlarged-index correction
+
+Candidate 355e56d5 passed local quality/hook and most completed browser shards, but CI retained an existing Android-reliability assertion requiring a 200px results viewport at 320px/200% text. Arabic header/tab wrapping left 163px. Keep that assertion intact and allow font-relative dialog expansion (within safe-area/viewport limits) for enlarged text. Normal-size two-column geometry is unchanged. Verify the existing quarter/page reveal and selection/recovery cases across all engines, then run intact release gates again. This is a functional large-text correction, not a reason to weaken the regression.

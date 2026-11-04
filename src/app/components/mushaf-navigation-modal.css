@@ -8,7 +8,7 @@
   inset-block-start: 50%;
   transform: translate(-50%, -50%);
   inline-size: min(36rem, calc(100vw - 1rem));
-  block-size: min(40rem, 76dvh);
+  block-size: min(40rem, max(76dvh, calc(14rem + 200px)));
   max-block-size: calc(100dvh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom)));
 }
 /* Physical centering is independent of Arabic/English inline direction. */
