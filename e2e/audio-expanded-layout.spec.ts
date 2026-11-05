@@ -1,8 +1,8 @@
 import { playEnglishTranslation } from "./reader-options";
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-for (const scenario of [
+const listeningScenarios = [
   { name: "narrow", width: 320, height: 568, language: "en", theme: "midnight" },
   { name: "phone", width: 390, height: 844, language: "ar", theme: "light" },
   { name: "tablet", width: 768, height: 1024, language: "ar", theme: "dark" },
@@ -13,43 +13,50 @@ for (const scenario of [
   { name: "compact-boundary", width: 599, height: 800, language: "en", theme: "dark" },
   { name: "rail-boundary", width: 900, height: 768, language: "ar", theme: "midnight" },
   { name: "sidebar-boundary", width: 1200, height: 800, language: "en", theme: "light" },
-] as const) {
+] as const;
+
+async function openListeningScenario(page: Page, scenario: (typeof listeningScenarios)[number]) {
+  await page.setViewportSize({ width: scenario.width, height: scenario.height });
+  await page.addInitScript(({ language, theme }) => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language, themeMode: theme, appMaterial: "glass", reduceMotion: true },
+        profile: { displayName: "Guest", isGuest: true },
+      }),
+    );
+    HTMLMediaElement.prototype.play = function () {
+      Object.defineProperty(this, "duration", { configurable: true, value: 120 });
+      this.dispatchEvent(new Event("loadedmetadata"));
+      this.dispatchEvent(new Event("playing"));
+      return Promise.resolve();
+    };
+  }, scenario);
+  await page.goto("/#/azkar/evening/1");
+  if ("textScale" in scenario) {
+    await page.locator("html").evaluate((el) => {
+      el.style.fontSize = "32px";
+    });
+  }
+  const arabic = scenario.language === "ar";
+  if (arabic) {
+    await page.getByTestId("reader-audio-dock-button").click();
+  } else {
+    await page.getByRole("button", { name: "Reader options", exact: true }).click();
+    await playEnglishTranslation(page);
+  }
+  const player = page.getByRole("region", { name: arabic ? "مشغل الصوت" : "Audio player", exact: true });
+  const canvas = page.getByTestId("reader-card");
+  return { arabic, player, canvas };
+}
+
+for (const scenario of listeningScenarios) {
   const engineSmoke = ["phone", "desktop", "enlarged"].includes(scenario.name);
   test(`expanded listening fills the reader canvas: ${scenario.name}${engineSmoke ? " @cross-browser" : ""}`, async ({
     page,
   }, testInfo) => {
-    await page.setViewportSize({ width: scenario.width, height: scenario.height });
-    await page.addInitScript(({ language, theme }) => {
-      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-      localStorage.setItem(
-        "azkarapp.state.v1",
-        JSON.stringify({
-          settings: { language, themeMode: theme, appMaterial: "glass", reduceMotion: true },
-          profile: { displayName: "Guest", isGuest: true },
-        }),
-      );
-      HTMLMediaElement.prototype.play = function () {
-        Object.defineProperty(this, "duration", { configurable: true, value: 120 });
-        this.dispatchEvent(new Event("loadedmetadata"));
-        this.dispatchEvent(new Event("playing"));
-        return Promise.resolve();
-      };
-    }, scenario);
-    await page.goto("/#/azkar/evening/1");
-    if ("textScale" in scenario) {
-      await page.locator("html").evaluate((el) => {
-        el.style.fontSize = "32px";
-      });
-    }
-    const arabic = scenario.language === "ar";
-    if (arabic) {
-      await page.getByTestId("reader-audio-dock-button").click();
-    } else {
-      await page.getByRole("button", { name: "Reader options", exact: true }).click();
-      await playEnglishTranslation(page);
-    }
-    const player = page.getByRole("region", { name: arabic ? "مشغل الصوت" : "Audio player", exact: true });
-    const canvas = page.getByTestId("reader-card");
+    const { arabic, player, canvas } = await openListeningScenario(page, scenario);
     // Verify the initial dock, before scrolling or expanding can conceal containment failures.
     await expect(player).toHaveAttribute("data-variant", "compact");
     const checkCompactContainment = async () => {
@@ -183,8 +190,6 @@ for (const scenario of [
       expect(play.y).toBeGreaterThanOrEqual(bounds.y);
       expect(play.y + play.height).toBeLessThanOrEqual(Math.min(bounds.y + bounds.height, scenario.height) + 1);
     }
-    const reading = player.getByRole("region", { name: arabic ? "جارٍ التشغيل" : "Now playing" });
-
     const symmetry = await player.locator(".audio-expanded-transport").evaluate((element) => {
       const controls = Array.from(element.querySelectorAll("button"));
       const centers = controls.map((button) => {
@@ -367,6 +372,19 @@ for (const scenario of [
       await expect(audioOptions).toHaveCount(0);
     }
     await expect(player).toHaveAttribute("data-variant", "expanded");
+  });
+
+  // Keep the complete assertions and captures while giving the independent
+  // reading/keyboard journey its own unchanged 90-second test boundary.
+  test(`expanded listening reading and keyboard recovery: ${scenario.name}${engineSmoke ? " @cross-browser" : ""}`, async ({
+    page,
+  }, testInfo) => {
+    const { arabic, player, canvas } = await openListeningScenario(page, scenario);
+    await player.getByRole("button", { name: arabic ? "توسيع المشغل" : "Expand player", exact: true }).click();
+    await expect(player).toHaveAttribute("data-variant", "expanded");
+    const reading = player.getByRole("region", { name: arabic ? "جارٍ التشغيل" : "Now playing" });
+    const optionsTrigger = player.getByRole("button", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
+    const audioOptions = page.getByRole("dialog", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
     const options = player.locator(".audio-expanded-options");
     const header = player.locator(".audio-expanded-header");
     await expect(header).toContainText(arabic ? "خيارات الصوت" : "Audio options");
