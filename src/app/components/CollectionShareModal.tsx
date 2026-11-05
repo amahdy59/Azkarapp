@@ -327,6 +327,9 @@ export function CollectionShareModal({
   const isCuratedActive = mode === "image" && Boolean(curatedPack) && imageSource === "curated";
   const currentCuratedCard: CuratedRoutineCard | undefined = curatedPack?.cards[curatedIndex];
   const totalCurated = curatedPack?.cards.length ?? 0;
+  const hasPreview = isCuratedActive ? Boolean(currentCuratedCard) : Boolean(previewPage);
+  const reservePreview =
+    mode === "image" && currentStep === "content" && Boolean(curatedPack) && !isCuratedActive && !inspect && !failed;
   const scopedNative = isCuratedActive
     ? curatedFiles.length > 0 && canShareMultipleFiles(curatedFiles)
     : scopedPages.length > 0 && canShareMultipleFiles(scopedPages.map((page) => page.file));
@@ -649,12 +652,17 @@ export function CollectionShareModal({
               data-step={currentStep}
               dir={direction}
             >
-              <section data-testid="sharing-preview" dir={direction} className="sharing-preview min-w-0 space-y-2">
+              <section
+                data-testid="sharing-preview"
+                data-reserve-preview={reservePreview || undefined}
+                dir={direction}
+                className="sharing-preview min-w-0 space-y-2"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
                     <h2 className="text-title font-bold">
                       {t(language, "shareStudio.previewHeading")}
-                      {generating && !isCuratedActive && <span aria-hidden="true"> …</span>}
+                      {generating && !isCuratedActive && !reservePreview && <span aria-hidden="true"> …</span>}
                     </h2>
                     {mode === "image" && !isCuratedActive && generating && pages.length > 0 && (
                       <p role="status" className="sr-only">
@@ -662,11 +670,12 @@ export function CollectionShareModal({
                       </p>
                     )}
                   </div>
-                  {mode === "image" && (isCuratedActive ? Boolean(currentCuratedCard) : Boolean(previewPage)) && (
+                  {mode === "image" && (hasPreview || reservePreview) && (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="min-h-11 h-auto whitespace-normal text-label"
+                      className={`min-h-11 h-auto whitespace-normal text-label${hasPreview ? "" : " invisible"}`}
+                      disabled={!hasPreview}
                       aria-expanded={inspect}
                       data-testid="sharing-preview-toggle"
                       onKeyDown={onPreviewKeyDown}
@@ -679,7 +688,12 @@ export function CollectionShareModal({
                 </div>
                 {mode === "image" ? (
                   <>
-                    <div role="group" aria-label={t(language, "shareStudio.preview")} aria-busy={generating}>
+                    <div
+                      className="sharing-preview-stage"
+                      role="group"
+                      aria-label={t(language, "shareStudio.preview")}
+                      aria-busy={generating}
+                    >
                       {failed && !isCuratedActive ? (
                         <div className="rounded-2xl border border-border bg-muted/30 p-4 text-start space-y-3">
                           <h3 className="font-bold">
@@ -792,7 +806,7 @@ export function CollectionShareModal({
                           />
                         </button>
                       ) : (
-                        <p role="status" className="py-12 text-center text-sm">
+                        <p role="status" className="sharing-preview-loading py-12 text-center text-sm">
                           {t(language, "shareStoryPack.generating")}
                         </p>
                       )}

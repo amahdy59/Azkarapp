@@ -71,18 +71,25 @@ for (const scenario of [
         await expect(region).not.toHaveAttribute("data-reading-keyboard-focus");
       }
 
-      await page
-        .getByRole("button", {
-          name: t(scenario.language, reading.collection ? "reader.menu" : "common.moreOptions"),
-          exact: true,
-        })
-        .click();
+      const options = page.getByRole("button", {
+        name: t(scenario.language, reading.collection ? "reader.menu" : "common.moreOptions"),
+        exact: true,
+      });
+      await options.click();
       if (reading.collection) {
         await clickReaderOption(page, t(scenario.language, "counter.muteSound"));
       } else {
         await page.getByRole("menuitem", { name: t(scenario.language, "counter.muteSound"), exact: true }).click();
+        await expect(page.getByRole("menu")).toHaveCount(0);
+        await expect(options).toBeFocused();
+        // Selection closes this menu. Reopen it before testing Escape dismissal.
+        await options.click();
+        await expect(page.getByRole("menu")).toBeVisible();
       }
       await page.keyboard.press("Escape");
+      await expect(page.getByRole("menu").or(page.getByTestId("reader-options-sheet"))).toHaveCount(0);
+      await expect(options).toBeFocused();
+      await expect(page).toHaveURL(new RegExp(`#${reading.route}$`));
       await region.focus();
       await expect(region).not.toHaveAttribute("data-reading-keyboard-focus");
       await page.screenshot({ path: info.outputPath("reading-without-incidental-boundary.png") });
