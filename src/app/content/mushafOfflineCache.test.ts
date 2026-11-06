@@ -31,7 +31,10 @@ vi.mock("./nativeMushafDownload", () => ({
   fetchNativeBinaryResource: (url: string, signal?: AbortSignal) => fetch(url, { signal }),
 }));
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 describe("mushafOfflineCache", () => {
   it("downloads only selected pages and fonts, deduplicates the range, and rejects invalid input before fetching", async () => {
@@ -156,5 +159,27 @@ describe("mushafOfflineCache", () => {
     for (const [, options] of vi.mocked(fetch).mock.calls) {
       expect(options?.signal?.aborted).toBe(true);
     }
+  });
+
+  it("times out a stalled font and retries only the missing part of the page", async () => {
+    vi.useFakeTimers();
+    const { open } = installCaches();
+    const pages = await open(MUSHAF_CACHE_NAME);
+    await pages.put(getMushafPageUrl(1), new Response(pageBytes));
+    const fetchMock = vi.fn(
+      (_url: string, { signal }: RequestInit) =>
+        new Promise<Response>((_, reject) =>
+          signal!.addEventListener("abort", () => reject(signal!.reason), { once: true }),
+        ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = expect(downloadMushaf({ pages: [1] })).rejects.toMatchObject({ name: "TimeoutError" });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
+    await vi.advanceTimersByTimeAsync(30_000);
+    await result;
+    fetchMock.mockResolvedValue(new Response(fontBytes));
+    await downloadMushaf({ pages: [1] });
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([getQcfFontUrl(1), getQcfFontUrl(1)]);
+    await expect(getMushafDownloadStatus()).resolves.toMatchObject({ downloadedPages: 1, downloadedFonts: 1 });
   });
 });

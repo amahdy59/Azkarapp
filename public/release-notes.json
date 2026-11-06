@@ -1,13 +1,13 @@
 {
-  "release": "2026-11-06.5",
+  "release": "2026-11-06.6",
   "ar": [
-    "تملأ صور الكهف والسجدة والملك عرض الهاتف، ويظهر اسم السورة وتفاصيلها بمسافات أوضح على الشاشات الصغيرة والكبيرة.",
-    "تابع الآيات مع شريط تشغيل ثابت ومساحة أوسع للقراءة، واعرض الترجمة بجانب النص على الشاشة الواسعة.",
-    "تُعرض صور الجمعة والتقدّم بأحجام مناسبة للشاشة، وتظهر نسخة مدمجة من صورة السورة إذا تعذّر تحميل الصورة الكبيرة."
+    "يبدأ تحميل الصفحة الرئيسية مبكرًا، وتظل سورة البقرة متاحة للقراءة دون اتصال بعد تثبيت التطبيق.",
+    "تتحدّث تذكيرات أندرويد عند تغيير مواعيدها أو لغتها، وتبقى التذكيرات الأخرى في مواعيدها.",
+    "إذا تعثّر تنزيل المصحف، يمكنك المحاولة مجددًا مع الاحتفاظ بالملفات التي اكتمل تنزيلها والتحقّق منها."
   ],
   "en": [
-    "See edge-to-edge artwork on phones for Al-Kahf, As-Sajdah and Al-Mulk, with more space between the title and details.",
-    "Follow the verses with a stationary playback dock and more reading room. On wide screens, keep the translation beside the Arabic.",
-    "Friday and Progress photos use screen-appropriate sizes, and surah artwork falls back to a compact offline copy when the large cover is unavailable."
+    "Home starts loading earlier. Al-Baqarah remains available offline after installation.",
+    "Android reminders update when you change their times or language, while other reminders keep their schedules.",
+    "If a Mushaf download stalls, retry and keep the files that already downloaded and passed verification."
   ]
 }

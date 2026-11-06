@@ -13,6 +13,7 @@ import { scheduleMushafRequest } from "./mushafScheduler";
 
 const PAGE_COUNT = 604;
 const CONCURRENCY_LIMIT = 4;
+const DOWNLOAD_REQUEST_TIMEOUT_MS = 30_000;
 
 function pageUrl(page: number) {
   return new URL(getMushafPageUrl(page), window.location.href).toString();
@@ -129,6 +130,32 @@ async function validCachedResource(
   return false;
 }
 
+async function downloadResource(
+  cache: Cache,
+  url: string,
+  label: string,
+  read: (response: Response) => Promise<ArrayBuffer | null>,
+  controller: AbortController,
+) {
+  const { signal } = controller;
+  signal.throwIfAborted();
+  const timeout = setTimeout(
+    () => controller.abort(new DOMException(`${label} timed out`, "TimeoutError")),
+    DOWNLOAD_REQUEST_TIMEOUT_MS,
+  );
+  try {
+    const response = await fetchNativeBinaryResource(url, signal);
+    if (!response.ok) throw new Error(`${label} failed: ${response.status}`);
+    const bytes = await read(response);
+    signal.throwIfAborted();
+    if (!bytes) throw new Error(`${label} was invalid`);
+    await cache.put(url, response);
+    return bytes.byteLength;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function removeDownloadedMushaf(): Promise<void> {
   if (!("caches" in window)) return;
   lastStatus = undefined;
@@ -183,13 +210,8 @@ export async function downloadMushaf(
         scheduleMushafRequest(
           pUrl,
           async () => {
-            const response = await fetchNativeBinaryResource(pUrl, controller.signal);
-            if (!response.ok) throw new Error(`Mushaf page ${page} failed: ${response.status}`);
-            const pageBytes = await readPageBytes(response);
-            if (!pageBytes) throw new Error(`Mushaf page ${page} was invalid`);
-            controller.signal.throwIfAborted();
-            await pageCache.put(pUrl, response);
-            bytes += pageBytes.byteLength;
+            const size = await downloadResource(pageCache, pUrl, `Mushaf page ${page}`, readPageBytes, controller);
+            bytes += size;
           },
           "download",
           controller.signal,
@@ -202,13 +224,14 @@ export async function downloadMushaf(
         scheduleMushafRequest(
           fUrl,
           async () => {
-            const fontResponse = await fetchNativeBinaryResource(fUrl, controller.signal);
-            if (!fontResponse.ok) throw new Error(`Mushaf font ${page} failed: ${fontResponse.status}`);
-            const fontBytes = await readQcfFontResponse(fontResponse);
-            if (!fontBytes) throw new Error(`Mushaf font ${page} was invalid`);
-            controller.signal.throwIfAborted();
-            await fontCache.put(fUrl, fontResponse);
-            bytes += fontBytes.byteLength;
+            const size = await downloadResource(
+              fontCache,
+              fUrl,
+              `Mushaf font ${page}`,
+              readQcfFontResponse,
+              controller,
+            );
+            bytes += size;
           },
           "download",
           controller.signal,

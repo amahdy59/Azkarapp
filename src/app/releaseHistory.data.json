@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-11-06.6",
+    "ar": [
+      "يبدأ تحميل الصفحة الرئيسية مبكرًا، وتظل سورة البقرة متاحة للقراءة دون اتصال بعد تثبيت التطبيق.",
+      "تتحدّث تذكيرات أندرويد عند تغيير مواعيدها أو لغتها، وتبقى التذكيرات الأخرى في مواعيدها.",
+      "إذا تعثّر تنزيل المصحف، يمكنك المحاولة مجددًا مع الاحتفاظ بالملفات التي اكتمل تنزيلها والتحقّق منها."
+    ],
+    "en": [
+      "Home starts loading earlier. Al-Baqarah remains available offline after installation.",
+      "Android reminders update when you change their times or language, while other reminders keep their schedules.",
+      "If a Mushaf download stalls, retry and keep the files that already downloaded and passed verification."
+    ]
+  },
+  {
     "release": "2026-11-06.5",
     "ar": [
       "تملأ صور الكهف والسجدة والملك عرض الهاتف، ويظهر اسم السورة وتفاصيلها بمسافات أوضح على الشاشات الصغيرة والكبيرة.",

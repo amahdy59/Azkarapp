@@ -1,3 +1,9 @@
+## Home startup and offline acquisition — 2026-11-06
+
+Home launches start its screen import alongside the application shell. The regular screen boundary still owns localized loading and retry feedback. The startup bundle check walks the entry, shell and Home graphs together. Home uses reviewed Al-Baqarah metadata for its evidence rotation, while the complete text, transliteration, translation and page boundaries load through the full collection or listening paths. The install cache retains the complete reading chunk and the Ruqyah route hydrates before rendering.
+
+Explicit Mushaf downloads bound each active resource request. A stall ends the job and leaves independently verified page and font files available on retry. The Android audio bridge checks each response's declared byte range against the returned bytes before advancing. Downloaded audio still requires full-file size and checksum verification before publication.
+
 ## Local optional update and Masbaha settings
 
 Release metadata can announce a new browser build while its offline shell is still preparing. Preparation checks or awaits the service worker without activating it. A ready worker goes straight to activation after the reader accepts, then uses the existing bounded handover and one-time stale-worker recovery. Later applies the existing per-release deferral while downloads finish. The Android host keeps the downloaded bundle as a candidate in memory and selects it for the next load only on acceptance. The plugin continues to own bundle validation and rollback.

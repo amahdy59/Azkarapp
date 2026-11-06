@@ -5410,3 +5410,7 @@ The owner approved the phone, tablet and desktop surah-entry recommendation and 
 ## 2026-11-06 · Image-led surah covers and listening desk
 
 The owner supplied a visual reference for larger covers and authorized a verified release. Apply the same responsive composition to Al-Kahf, As-Sajdah and Al-Mulk. The layout draws from the reference while retaining the app's Glass and paper materials. This supersedes the prior cover dimensions and hosted artwork delivery. The approved listening desk applies to single-track canonical Quran listening. Keep the canonical full-page reader, text, playback and stored progress contracts. See [the phase brief](phases/SURAH_COVERS_AND_IMAGE_DELIVERY_2026_11_06.md).
+
+## 2026-11-06 · Home startup, reminders and downloads
+
+The owner approves the startup audit recommendations and requests reliable notification updates and Android and desktop downloads. Preserve the existing offline installation promise, the exact reviewed Al-Baqarah text and evidence, and the reminder schedule and consent rules. Measure the full Home path, reconcile owned native alarms against the current plan, and retain verified file checkpoints when a download stalls. See [the phase brief](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md).
