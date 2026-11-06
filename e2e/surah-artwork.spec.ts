@@ -99,6 +99,12 @@ for (const layout of [
     await expect(photo).toBeVisible();
     await expect.poll(() => photo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
     await page.evaluate(() => document.fonts.ready);
+    if (layout.enlarged) {
+      const titleLines = await title.evaluate(
+        (node) => node.clientHeight / parseFloat(getComputedStyle(node).lineHeight),
+      );
+      expect(titleLines).toBeLessThanOrEqual(2.05);
+    }
     if (layout.language === "ar") {
       await expect(title).toHaveCSS("font-weight", "400");
       await expect(title).toHaveCSS("font-family", /Amiri/i);

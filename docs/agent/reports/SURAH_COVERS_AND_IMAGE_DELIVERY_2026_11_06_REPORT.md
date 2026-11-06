@@ -40,3 +40,7 @@ Phase brief, decision log, design system, architecture, and the bilingual releas
 ## Recommended next step
 
 Verify the exact commit in Quality and Pages and smoke-test the production update.
+
+## Release follow-up
+
+The 320px view at 200% text now gives the title the full row and places Share beside the details. The English As-Sajdah title fits in two lines. The added regression passed in Chromium, Firefox and WebKit. Exact-commit CI on the first candidate exposed the listening desk narrowing the wide English translation below its two-column breakpoint. The desk now restores the wide measure while the paired meaning is open. The unchanged paired translation regression passed on all three engines.

@@ -1,15 +1,15 @@
 [
   {
-    "release": "2026-11-06.4",
+    "release": "2026-11-06.5",
     "ar": [
-      "شاهد صورًا أكبر لسور الكهف والسجدة والملك، مع اسم السورة وعدد آياتها وخيارات القراءة والاستماع في مكان واضح.",
-      "استفد من مساحة أكبر للآيات عند الاستماع، مع بقاء شريط العنوان وأدوات التشغيل في مكانهما أثناء التمرير.",
-      "تُحمَّل صور السور وبطاقة الجمعة وصور التقدّم بالحجم المناسب لشاشتك، وتتوفر نسخ مدمجة من صور السور دون اتصال بعد تثبيت التحديث."
+      "تملأ صور الكهف والسجدة والملك عرض الهاتف، ويظهر اسم السورة وتفاصيلها بمسافات أوضح على الشاشات الصغيرة والكبيرة.",
+      "تابع الآيات مع شريط تشغيل ثابت ومساحة أوسع للقراءة، واعرض الترجمة بجانب النص على الشاشة الواسعة.",
+      "تُعرض صور الجمعة والتقدّم بأحجام مناسبة للشاشة، وتظهر نسخة مدمجة من صورة السورة إذا تعذّر تحميل الصورة الكبيرة."
     ],
     "en": [
-      "See larger covers for Al-Kahf, As-Sajdah and Al-Mulk, with verse counts and clear reading and listening actions.",
-      "See more verses while listening. The title and playback controls stay in place as you scroll.",
-      "Surah covers, Friday artwork and Progress photos use sizes suited to your screen. Compact surah covers are available offline after the update installs."
+      "See edge-to-edge artwork on phones for Al-Kahf, As-Sajdah and Al-Mulk, with more space between the title and details.",
+      "Follow the verses with a stationary playback dock and more reading room. On wide screens, keep the translation beside the Arabic.",
+      "Friday and Progress photos use screen-appropriate sizes, and surah artwork falls back to a compact offline copy when the large cover is unavailable."
     ]
   },
   {

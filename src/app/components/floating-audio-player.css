@@ -172,6 +172,16 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   --listening-desk-width: 39rem;
 }
 
+@container audio-surface (min-width: 58rem) {
+  [data-listening-desk] .audio-expanded-layout:has(.audio-listening-translation[open]) {
+    --listening-desk-width: 72rem;
+  }
+
+  [data-listening-desk] .audio-listening-stream:has(.audio-listening-translation[open]) {
+    max-width: none;
+  }
+}
+
 [data-listening-desk] :is(.audio-expanded-header, .audio-expanded-controls) {
   width: min(100%, var(--listening-desk-width));
   margin-inline: auto;

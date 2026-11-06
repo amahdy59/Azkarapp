@@ -218,6 +218,26 @@ html[data-app-material-resolved="glass"]:not(.high-contrast) .reader-surah-title
   grid-area: navigation;
 }
 
+/* At doubled text on small phones the heading needs the whole line. */
+@container surah-entry (width < 11rem) {
+  .reader-surah-heading .reader-surah-title {
+    grid-column: 1 / -1;
+    line-height: 1.3;
+  }
+
+  .reader-surah-heading .reader-surah-title:not(:lang(ar)) {
+    font-size: 1.5rem;
+  }
+
+  .reader-surah-heading button {
+    grid-row: 2;
+  }
+
+  .reader-surah-meta {
+    grid-row: 2;
+  }
+}
+
 @media (width < 600px) {
   .reader-surah-entry {
     padding-inline: 0;
