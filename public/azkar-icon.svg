@@ -1,17 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
-  <title id="title">Azkar crescent icon</title>
-  <defs>
-    <linearGradient id="background" x1="88" y1="56" x2="424" y2="456" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#14234a" />
-      <stop offset="1" stop-color="#070d20" />
-    </linearGradient>
-    <linearGradient id="gold" x1="130" y1="128" x2="350" y2="380" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#f0cf6a" />
-      <stop offset="1" stop-color="#c88c13" />
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="url(#background)" />
-  <circle cx="244" cy="266" r="142" fill="url(#gold)" />
-  <circle cx="308" cy="214" r="147" fill="url(#background)" />
-  <path d="m374 138 8.8 19.2 19.2 8.8-19.2 8.8L374 194l-8.8-19.2L346 166l19.2-8.8L374 138Z" fill="#f0cf6a" />
+  <title id="title">wa-zaker</title>
+  <rect width="512" height="512" rx="112" fill="#0d1428" />
+  <path d="M182 138A142 142 0 1 0 357 353A147 147 0 0 1 182 138Z" fill="#d4a020" />
+  <path d="M374 138L379 155L394 146L385 161L402 166L385 171L394 186L379 177L374 194L369 177L354 186L363 171L346 166L363 161L354 146L369 155Z" fill="#f0cf6a" />
 </svg>

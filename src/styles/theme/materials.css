@@ -137,7 +137,8 @@
         .mushaf-protected-overlay[role="dialog"],
         .progress-date-sheet[role="dialog"],
         .filter-sheet[role="dialog"],
-        .audio-queue-sheet[role="dialog"]
+        .audio-queue-sheet[role="dialog"],
+        .evidence-source-surface[role="dialog"]
       ) {
       background-color: rgb(15 23 42);
     }

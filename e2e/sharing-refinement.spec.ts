@@ -100,8 +100,8 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
         if (this.canvas.width === 1080) {
           const bounds = this.measureText(text);
           const state = artwork.get(this) ?? { panelBottom: 0 };
-          if (text === "وَذَكِّرْ") state.wordmarkBottom = y + bounds.actualBoundingBoxDescent;
-          if (text === "WA ZAKER") {
+          if (text === "وَذَكِّرْ") state.wordmarkBottom = y + bounds.actualBoundingBoxDescent;
+          if (text === "wa-zaker") {
             artworkChecks.push({
               kind: "wordmark",
               clearance: y - bounds.actualBoundingBoxAscent - state.wordmarkBottom!,

@@ -3,30 +3,26 @@ import { prayerCountdownReading, type PrayerCountdownInterval } from "../prayerC
 import type { AppLanguage } from "../types";
 import "./prayer-countdown.css";
 
-/** Presentation only; both copies receive the next card's single clock reading. */
+/** Presentation only. The expanded card provides the visible clock reading. */
 export function PrayerCountdown({
   interval,
   now,
   language,
   prayerName,
-  decorative = false,
 }: {
   interval: PrayerCountdownInterval;
   now: number;
   language: AppLanguage;
   prayerName: string;
-  decorative?: boolean;
 }) {
   const reading = prayerCountdownReading(interval, now, language);
   const [before, after] = t(language, "prayerTracking.timeLeft", { time: "\u0001" }).split("\u0001");
   return (
-    <span className="prayer-countdown" data-prayer-countdown aria-hidden={decorative || undefined}>
-      {!decorative && (
-        <span className="sr-only">
-          {t(language, "prayerMoment.countdownProgress", { prayer: prayerName })}.{" "}
-          {t(language, "prayerTracking.timeLeft", { time: reading.text })}
-        </span>
-      )}
+    <span className="prayer-countdown" data-prayer-countdown>
+      <span className="sr-only">
+        {t(language, "prayerMoment.countdownProgress", { prayer: prayerName })}.{" "}
+        {t(language, "prayerTracking.timeLeft", { time: reading.text })}
+      </span>
       <span className="prayer-countdown-visual" aria-hidden="true">
         <svg className="prayer-countdown-ring" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
           <circle className="prayer-countdown-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />

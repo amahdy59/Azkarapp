@@ -386,6 +386,11 @@ export function SettingsScreen({
       case "notifications":
         return (
           <NotificationsPanel
+            hijriDateOffset={hijriDateOffset}
+            localSaveStatus={localSaveStatus}
+            onRetrySave={onRetrySave}
+            dailyCompletions={dailyCompletions}
+            progressDayStartHour={progressDayStartHour}
             locationSettings={locationSettings}
             onOpenLocation={() => openSubPanel("location")}
             language={language}

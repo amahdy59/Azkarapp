@@ -258,6 +258,7 @@ export default defineConfig(({ mode, command }) => {
           ],
         },
         workbox: {
+          importScripts: ["notification-navigation.js"],
           globPatterns: [
             "**/*.{js,css,html,svg,png,webp,avif,woff2}",
             "**/release-history-*.bin",

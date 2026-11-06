@@ -436,7 +436,7 @@ export async function generateAllCollectionStoryPages(
         document.fonts.load(`600 60px ${SHARE_ARABIC_FONT}`, "أذكار"),
         document.fonts.load(`700 60px ${SHARE_ARABIC_FONT}`, "أذكار"),
         document.fonts.load(`400 36px ${SHARE_UI_FONT}`, "Meaning and source"),
-        document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "WA ZAKER wa-zaker.com"),
+        document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "wa-zaker.com"),
         document.fonts.ready,
       ]);
     if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
@@ -489,7 +489,7 @@ export async function getCompatibleShareFormats(
       document.fonts.load(`600 40px ${SHARE_ARABIC_FONT}`, "سورة"),
       document.fonts.load(`400 36px ${SHARE_ARABIC_FONT}`, "المصدر"),
       document.fonts.load(`400 36px ${SHARE_UI_FONT}`, "Meaning and source"),
-      document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "WA ZAKER wa-zaker.com"),
+      document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "wa-zaker.com"),
       document.fonts.ready,
     ]);
   }

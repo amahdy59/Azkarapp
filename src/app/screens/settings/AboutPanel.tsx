@@ -7,27 +7,42 @@ import {
   Globe,
   HelpCircle,
   Info,
-  MessageChat,
   Sparkles,
   Star,
   Translate,
 } from "../../components/icons";
 import { CrescentMark } from "../../components/CrescentMark";
+import { Button } from "../../components/ui/button";
+import ahmedPortrait from "../../../assets/team/ahmed-mahdy.webp";
+import mohamedPortrait from "../../../assets/team/mohamed-hussien.webp";
+import { SUPPORT_EMAILS, supportEmailHref } from "../../supportContact";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { RowChevron, SectionLabel, SettingsRowItem, SubHeader } from "./SettingsPrimitives";
 
 const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
+const PROGRAMMERS = [
+  {
+    nameKey: "ahmedMahdy",
+    roleKey: "ahmedRole",
+    bioKey: "ahmedBio",
+    portrait: ahmedPortrait,
+    email: SUPPORT_EMAILS[0],
+    linkedin: "https://www.linkedin.com/in/creativemahdy",
+  },
+  {
+    nameKey: "mohamedHussien",
+    roleKey: "mohamedRole",
+    bioKey: "mohamedBio",
+    portrait: mohamedPortrait,
+    email: SUPPORT_EMAILS[1],
+    linkedin: "https://www.linkedin.com/in/mohamed-hussien-a5608613b/",
+  },
+] as const;
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
     window.open(url, "_blank", "noopener,noreferrer");
-  }
-}
-
-function openMailto(email: string, subject: string) {
-  if (typeof window !== "undefined") {
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
   }
 }
 
@@ -53,17 +68,77 @@ export function AboutPanel({
       <SubHeader title={t(language, "about.title")} onBack={onBack} language={language} />
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-4">
         <div className="flex flex-col items-center gap-4 rounded-3xl border border-border/40 bg-card p-8 shadow-raised">
-          <CrescentMark size={36} />
+          <CrescentMark size={64} />
           <div className="flex flex-col items-center gap-1.5">
-            <p className="font-sans text-2xl font-bold text-foreground">Azkar</p>
-            <p className="latin-ui text-sm text-muted-foreground" lang="en" dir="ltr">
-              {t(language, "about.subtitle")}
-            </p>
+            <p className="font-sans text-2xl font-bold text-foreground">{t(language, "common.appName")}</p>
+            <p className="text-sm text-center text-muted-foreground">{t(language, "about.subtitle")}</p>
             <p className="latin-ui text-xs text-muted-foreground opacity-60" lang="en" dir="ltr">
               {[APP_VERSION, APP_RELEASE].filter(Boolean).join(" · ")}
             </p>
           </div>
         </div>
+
+        <Button type="button" variant="outline" className="w-full justify-start" onClick={onHelp}>
+          <HelpCircle size={19} aria-hidden="true" />
+          {t(language, "about.faq")}
+        </Button>
+
+        <section aria-label={t(language, "about.programmers")} data-testid="about-programmers">
+          <SectionLabel label={t(language, "about.programmers")} />
+          <div
+            className="grid gap-3"
+            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 17rem), 1fr))" }}
+          >
+            {PROGRAMMERS.map((programmer) => {
+              const name = t(language, `about.${programmer.nameKey}`);
+              return (
+                <div
+                  key={programmer.email}
+                  className="flex min-w-0 flex-col gap-4 rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+                >
+                  <div className="flex flex-wrap items-start gap-3">
+                    <img
+                      src={programmer.portrait}
+                      alt=""
+                      width={56}
+                      height={56}
+                      loading="lazy"
+                      decoding="async"
+                      className="shrink-0 rounded-2xl object-cover"
+                    />
+                    <div className="min-w-0 flex-[1_1_8rem] break-words">
+                      <h3 className="font-sans text-base font-semibold text-foreground">{name}</h3>
+                      <p className="mt-1 text-sm text-primary">{t(language, `about.${programmer.roleKey}`)}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {t(language, `about.${programmer.bioKey}`)}
+                  </p>
+                  <div className="mt-auto flex min-w-0 flex-wrap gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <a
+                        href={`mailto:${programmer.email}`}
+                        aria-label={t(language, "about.emailProgrammer", { name })}
+                      >
+                        {t(language, "about.email")}
+                      </a>
+                    </Button>
+                    <Button asChild variant="outline" size="sm">
+                      <a
+                        href={programmer.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={t(language, "about.linkedinProfile", { name })}
+                      >
+                        LinkedIn <ExternalLink size={16} aria-hidden="true" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
 
         <div>
           <SectionLabel label={t(language, "about.contentSource")} />
@@ -106,6 +181,13 @@ export function AboutPanel({
         <div>
           <SectionLabel label={t(language, "about.support")} />
           <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
+            <div className="flex flex-wrap gap-2 p-4" data-testid="about-contact-actions">
+              {(["reportBug", "suggestFeature"] as const).map((kind) => (
+                <Button key={kind} asChild variant="outline" size="sm">
+                  <a href={supportEmailHref(t(language, `about.${kind}Subject`))}>{t(language, `about.${kind}`)}</a>
+                </Button>
+              ))}
+            </div>
             {onReviewUpdate && (
               <SupportRow
                 icon={<Sparkles size={18} className="text-background" />}
@@ -116,16 +198,6 @@ export function AboutPanel({
                 }}
               />
             )}
-            <SupportRow
-              icon={<MessageChat size={18} className="text-background" />}
-              label={t(language, "about.sendFeedback")}
-              onPress={() => openMailto("amahdy59@yahoo.com", "Azkar feedback")}
-            />
-            <SupportRow
-              icon={<HelpCircle size={18} className="text-background" />}
-              label={t(language, "about.faq")}
-              onPress={onHelp}
-            />
             <SupportRow
               icon={<Sparkles size={18} className="text-background" />}
               label={t(language, "about.whatsNew")}

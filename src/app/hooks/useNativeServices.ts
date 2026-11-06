@@ -52,12 +52,16 @@ export function useNativeServices(state: AppStateSnapshot) {
     const timer = window.setInterval(refresh, 60 * 60_000);
     document.addEventListener("visibilitychange", refresh);
     window.addEventListener("azkar-notification-permission", refresh);
+    window.addEventListener("azkar-exact-alarm-permission", refresh);
+    window.addEventListener("azkar-retry-native-reminders", refresh);
     return () => {
       active = false;
       void routeListener?.remove();
       clearInterval(timer);
       document.removeEventListener("visibilitychange", refresh);
       window.removeEventListener("azkar-notification-permission", refresh);
+      window.removeEventListener("azkar-exact-alarm-permission", refresh);
+      window.removeEventListener("azkar-retry-native-reminders", refresh);
     };
   }, []);
 

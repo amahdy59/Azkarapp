@@ -1338,6 +1338,7 @@ function AppContent({
     progressDayStartHour,
     language: selectedLang,
     location: locationSettings,
+    hijriDateOffset,
   });
 
   const reconcileDailyProgress = useCallback(() => {
@@ -2043,6 +2044,10 @@ function AppContent({
                     }
                   }}
                   onOpenPrayerAdhkar={(prayer) => resumeCategory("after_prayer", prayer)}
+                  onViewPrayers={(prayer) => {
+                    setActivePrayer(prayer);
+                    push("prayer");
+                  }}
                   mosquePrayerGoal={mosquePrayerGoal}
                   dailyPathStartDayKey={dailyPathStartDayKey}
                   onMosquePrayerGoalChange={setMosquePrayerGoal}

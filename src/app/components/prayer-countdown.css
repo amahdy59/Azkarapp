@@ -37,13 +37,6 @@
     opacity: 1;
   }
 }
-.home-prayer-compact-countdown .prayer-countdown {
-  justify-content: flex-end;
-}
-.home-prayer-compact-countdown .prayer-countdown-word,
-.home-prayer-compact-countdown .prayer-countdown-ring {
-  display: none;
-}
 /* Preserve all digits before spending scarce card width on supporting words. */
 @container (max-width: 11rem) {
   .prayer-countdown-word {

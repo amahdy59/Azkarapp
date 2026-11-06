@@ -404,7 +404,7 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   await expect(page.getByTestId("mushaf-rail-page-bookmark")).toBeVisible();
   await expect(page.getByTestId("mushaf-difficult-words-switch")).toBeVisible();
   await expect(page.getByTestId("mushaf-rail-more")).toBeVisible();
-  await expect(page.getByTestId("mushaf-focus-enter")).toHaveCount(0);
+  await expect(page.getByTestId("mushaf-focus-toggle")).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
   const desktopGeometry = await page.evaluate(() => {
     const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;

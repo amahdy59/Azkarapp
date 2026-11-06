@@ -101,20 +101,19 @@ for (const owner of ["wird", "surah"] as const) {
     await page.screenshot({ path: info.outputPath(`${owner}-focus.png`) });
     await exit.click();
     await expect(more).toBeVisible();
-    await expect(more).toBeFocused();
+    await expect(page.getByTestId("mushaf-focus-toggle")).toBeFocused();
     expect(await canvas.getAttribute("data-mushaf-page")).toBe(position);
   });
 }
 
-test("Juz, Surah and folio capsules match on a desktop spread @cross-browser", async ({ page }, info) => {
+test("Desktop location and page range capsules share the Mushaf shape @cross-browser", async ({ page }, info) => {
   await seed(page, true);
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/#/quran/42");
   await expect(page.locator("[data-mushaf-page]")).toHaveCount(2);
-  const canvas = page.locator("[data-mushaf-page]").first();
   const styles = [];
-  for (const kind of ["juz", "surah", "page"]) {
-    const button = canvas.getByTestId(`mushaf-furniture-${kind}-btn`);
+  for (const id of ["mushaf-desktop-juz", "mushaf-rail-index", "mushaf-desktop-page-range"]) {
+    const button = page.getByTestId(id);
     expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     styles.push(
       await button

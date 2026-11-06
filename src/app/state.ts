@@ -710,7 +710,7 @@ function normalizeReminders(
   };
   return {
     ...Object.fromEntries(
-      (["friday", "fridayDua", "beforeFajrDua"] as const).flatMap((key) =>
+      (["friday", "fridayDua", "beforeFajrDua", "fridaySalawat", "fastingPreparation"] as const).flatMap((key) =>
         candidate?.[key] || fallback?.[key]
           ? [
               [

@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { contextReminderPlan, type ContextReminderKind } from "../contextReminders";
-import { isNativeAndroid, rescheduleNativeReminders } from "@azkar/native-reminders";
+import { CONTEXT_REMINDER_KINDS, type ContextReminderKind } from "../contextReminders";
+import { reminderOccurrences, REMINDER_WINDOW_MS, type ReminderOccurrence } from "../reminderOccurrences";
+import { isNativeAndroid } from "@azkar/native-reminders";
 import { readNotificationPermission, showBrowserNotification } from "../notifications";
-import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
+import { getEstimatedPrayerTimes, type PrayerTimes } from "../content/prayerTimes";
 import { notificationCopy } from "../notificationCopy";
 import { DEFAULT_PROGRESS_DAY_START_HOUR, getProgressDayKey } from "../progress";
 import type {
@@ -16,7 +17,6 @@ import type {
 } from "../types";
 
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
-const REMINDER_WINDOW_MS = 5 * 60_000;
 const MAX_TIMEOUT_MS = 2_147_000_000;
 
 export { getUpcomingNativeReminders } from "@azkar/native-reminders";
@@ -70,31 +70,22 @@ function hasReachedReminderTime(now: Date, time: string) {
   return elapsed >= 0 && elapsed < REMINDER_WINDOW_MS;
 }
 
-function reminderHistoryKey(reminder: DueReminder): ReminderHistoryKey {
-  return reminder.kind === "prayer" ? `prayer:${reminder.prayer}` : reminder.kind;
-}
-
 export function getDuePrayerReminder(
   reminders: ReminderSettings,
   location: LocationSettings | undefined,
   now = new Date(),
   wasAlreadyNotified: (key: ReminderHistoryKey) => boolean = () => false,
 ): DueReminder | null {
-  if (!reminders.prayer.enabled) return null;
-
-  const times = getEstimatedPrayerTimes(now, location);
-  for (const prayer of PRAYER_NAMES) {
-    if (reminders.prayer.prayers && !reminders.prayer.prayers.includes(prayer)) continue;
-    const notificationTime = new Date(
-      scheduledTime(now, times[prayer]).getTime() - reminders.prayer.leadMinutes * 60_000,
-    );
-    const elapsed = now.getTime() - notificationTime.getTime();
-    const key = `prayer:${prayer}` as const;
-    if (elapsed >= 0 && elapsed < REMINDER_WINDOW_MS && !wasAlreadyNotified(key)) {
-      return { kind: "prayer", prayer, leadMinutes: reminders.prayer.leadMinutes };
-    }
-  }
-  return null;
+  const event = reminderOccurrences(reminders, [], location, DEFAULT_PROGRESS_DAY_START_HOUR, now, 1).find(
+    (event) => event.kind === "prayer" && event.at <= now.getTime() && !wasAlreadyNotified(`prayer:${event.prayer}`),
+  );
+  return event?.kind === "prayer"
+    ? {
+        kind: "prayer",
+        prayer: event.prayer,
+        leadMinutes: event.leadMinutes as PrayerReminderLeadMinutes,
+      }
+    : null;
 }
 
 export function getDueReminder(
@@ -133,30 +124,19 @@ export function getNextReminderDelay(
   reminders: ReminderSettings,
   location: LocationSettings | undefined,
   now = new Date(),
+  hijriDateOffset = 0,
 ): number | null {
-  const candidates: number[] = contextReminderPlan(reminders, location, now)
-    .filter((event) => event.at > now.getTime())
-    .map((event) => event.at);
-  for (const kind of ["morning", "evening", "before_sleep", "after_prayer"] as const) {
-    if (!reminders[kind].enabled) continue;
-    for (const dayOffset of [0, 1]) {
-      const at = scheduledTime(now, reminders[kind].time, dayOffset).getTime();
-      if (at > now.getTime()) candidates.push(at);
-    }
-  }
-  if (reminders.prayer.enabled) {
-    for (const dayOffset of [0, 1]) {
-      const date = new Date(now);
-      date.setDate(date.getDate() + dayOffset);
-      const times = getEstimatedPrayerTimes(date, location);
-      for (const prayer of PRAYER_NAMES) {
-        if (reminders.prayer.prayers && !reminders.prayer.prayers.includes(prayer)) continue;
-        const at = scheduledTime(now, times[prayer], dayOffset).getTime() - reminders.prayer.leadMinutes * 60_000;
-        if (at > now.getTime()) candidates.push(at);
-      }
-    }
-  }
-  return candidates.length > 0 ? Math.min(...candidates) - now.getTime() : null;
+  const horizon = CONTEXT_REMINDER_KINDS.some((kind) => reminders[kind]?.enabled) ? 8 : 2;
+  const next = reminderOccurrences(
+    reminders,
+    [],
+    location,
+    DEFAULT_PROGRESS_DAY_START_HOUR,
+    now,
+    horizon,
+    hijriDateOffset,
+  ).find((event) => event.at > now.getTime());
+  return next ? next.at - now.getTime() : null;
 }
 
 function readReminderHistory() {
@@ -168,40 +148,64 @@ function readReminderHistory() {
   }
 }
 
-function hasAlreadyNotified(key: ReminderHistoryKey, now: Date, progressDayStartHour: number) {
-  return readReminderHistory()[key] === getProgressDayKey(now, progressDayStartHour);
-}
+// Same-realm fallback when Web Locks is unavailable. Web Locks coordinates tabs.
+const pendingDeliveries = new Set<string>();
+const deliveredInSession = new Map<string, string>();
 
-function recordNotification(key: ReminderHistoryKey, now: Date, progressDayStartHour: number) {
+function wasDelivered(event: ReminderOccurrence, progressDayStartHour: number) {
   const history = readReminderHistory();
-  history[key] = getProgressDayKey(now, progressDayStartHour);
-  try {
-    window.localStorage.setItem(REMINDER_HISTORY_KEY, JSON.stringify(history));
-  } catch {
-    // Notification delivery should not fail when history storage is unavailable.
-  }
+  const legacyKey = event.kind === "prayer" ? `prayer:${event.prayer}` : event.kind;
+  return (
+    deliveredInSession.has(event.key) ||
+    Boolean(history[event.key]) ||
+    history[legacyKey] === getProgressDayKey(new Date(event.at), progressDayStartHour)
+  );
 }
 
-async function deliverNotification(
-  reminder: DueReminder,
+async function deliverOccurrence(
+  event: ReminderOccurrence,
   language: AppLanguage,
-  dayKey: string,
+  progressDayStartHour: number,
   isCurrent: () => boolean,
 ) {
-  const isPrayer = reminder.kind === "prayer";
-  const { title, body } = notificationCopy(language, reminder);
-  const options: NotificationOptions = {
-    body,
-    tag: `azkar-${reminderHistoryKey(reminder).replace(":", "-")}-${dayKey}`,
-    lang: language,
-    dir: language === "ar" ? "rtl" : "ltr",
-    icon: `${window.location.origin}${import.meta.env.BASE_URL}192.png`,
-    badge: `${window.location.origin}${import.meta.env.BASE_URL}192.png`,
-    data: {
-      url: `${import.meta.env.BASE_URL}#/azkar/${isPrayer ? "after_prayer" : reminder.category}`,
-    },
+  const run = async () => {
+    if (!isCurrent() || wasDelivered(event, progressDayStartHour) || pendingDeliveries.has(event.key)) return false;
+    pendingDeliveries.add(event.key);
+    try {
+      const { title, body } = notificationCopy(language, event, event.dateKey, event.prayerTime);
+      const sent = await showBrowserNotification(
+        title,
+        {
+          body,
+          tag: `azkar-${event.key}`,
+          lang: language,
+          dir: language === "ar" ? "rtl" : "ltr",
+          icon: `${window.location.origin}${import.meta.env.BASE_URL}192.png`,
+          badge: `${window.location.origin}${import.meta.env.BASE_URL}192.png`,
+          data: { url: `${import.meta.env.BASE_URL}${event.route}` },
+        },
+        () => isCurrent() && Date.now() < event.expiresAt,
+      );
+      if (sent) {
+        deliveredInSession.set(event.key, event.dateKey);
+        // Keep dated dedupe separate from progress-day rollover at 04:00.
+        const history = readReminderHistory();
+        history[event.key] = event.dateKey;
+        const oldest = new Date(Date.now() - 8 * 86_400_000).toISOString().slice(0, 10);
+        for (const key of Object.keys(history)) if (history[key]! < oldest) delete history[key];
+        for (const [key, date] of deliveredInSession) if (date < oldest) deliveredInSession.delete(key);
+        try {
+          window.localStorage.setItem(REMINDER_HISTORY_KEY, JSON.stringify(history));
+        } catch {
+          /* Storage may be unavailable. */
+        }
+      }
+      return sent;
+    } finally {
+      pendingDeliveries.delete(event.key);
+    }
   };
-  return showBrowserNotification(title, options, isCurrent);
+  return navigator.locks ? navigator.locks.request(`azkar-reminder-${event.key}`, run).catch(() => false) : run();
 }
 
 /**
@@ -215,18 +219,18 @@ export function useForegroundReminders({
   progressDayStartHour,
   language,
   location,
+  hijriDateOffset = 0,
 }: {
   reminders: ReminderSettings;
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
   language: AppLanguage;
   location?: LocationSettings;
+  hijriDateOffset?: number;
 }) {
   useEffect(() => {
-    if (isNativeAndroid()) {
-      void rescheduleNativeReminders(reminders, dailyCompletions, language, location);
-      return;
-    }
+    // useNativeServices owns the Android queue. A second owner delivered duplicate prayers.
+    if (isNativeAndroid()) return;
     let isDelivering = false;
     let cancelled = false;
     let timerId: number | undefined;
@@ -234,9 +238,11 @@ export function useForegroundReminders({
     const scheduleNextCheck = () => {
       if (cancelled) return;
       if (timerId !== undefined) window.clearTimeout(timerId);
-      const delay = getNextReminderDelay(reminders, location);
-      if (delay === null) return;
-      timerId = window.setTimeout(() => void notifyIfDue(), Math.min(MAX_TIMEOUT_MS, Math.max(1_000, delay + 100)));
+      const delay = getNextReminderDelay(reminders, location, new Date(), hijriDateOffset);
+      // Weekly reminders may be temporarily excluded by the calendar.
+      if (delay === null && !CONTEXT_REMINDER_KINDS.some((kind) => reminders[kind]?.enabled)) return;
+      const nextCheck = delay === null ? 86_400_000 : Math.max(1_000, delay + 100);
+      timerId = window.setTimeout(() => void notifyIfDue(), Math.min(MAX_TIMEOUT_MS, nextCheck));
     };
 
     const notifyIfDue = async () => {
@@ -246,30 +252,22 @@ export function useForegroundReminders({
       if (timerId !== undefined) window.clearTimeout(timerId);
       if (readNotificationPermission() !== "granted") return;
       const now = new Date();
-      const wasAlreadyNotified = (key: ReminderHistoryKey) => hasAlreadyNotified(key, now, progressDayStartHour);
-      const context = contextReminderPlan(reminders, location, now).find(
-        (event) =>
-          now.getTime() >= event.at && now.getTime() - event.at < REMINDER_WINDOW_MS && !wasAlreadyNotified(event.kind),
-      );
-      const due: DueReminder | null =
-        getDuePrayerReminder(reminders, location, now, wasAlreadyNotified) ??
-        getDueReminder(reminders, dailyCompletions, now, progressDayStartHour, wasAlreadyNotified) ??
-        (context
-          ? { kind: context.kind, category: context.kind === "friday" ? "friday_kahf" : "comprehensive_duas" }
-          : null);
+      const due = reminderOccurrences(
+        reminders,
+        dailyCompletions,
+        location,
+        progressDayStartHour,
+        now,
+        2,
+        hijriDateOffset,
+      ).find((event) => event.at <= now.getTime() && !wasDelivered(event, progressDayStartHour));
       if (!due) return scheduleNextCheck();
 
       isDelivering = true;
-      const delivered = await deliverNotification(
-        due,
-        language,
-        getProgressDayKey(now, progressDayStartHour),
-        () => !cancelled,
-      );
+      const delivered = await deliverOccurrence(due, language, progressDayStartHour, () => !cancelled);
       isDelivering = false;
       if (cancelled) return;
       if (delivered) {
-        recordNotification(reminderHistoryKey(due), now, progressDayStartHour);
         // Drain another reminder that shares the same minute before sleeping
         // until tomorrow (for example Fajr and the Morning collection).
         timerId = window.setTimeout(() => void notifyIfDue(), 250);
@@ -294,5 +292,5 @@ export function useForegroundReminders({
       window.removeEventListener("focus", reconcileWhenVisible);
       window.removeEventListener("azkar-notification-permission", reconcileWhenVisible);
     };
-  }, [dailyCompletions, language, location, progressDayStartHour, reminders]);
+  }, [dailyCompletions, language, location, progressDayStartHour, reminders, hijriDateOffset]);
 }

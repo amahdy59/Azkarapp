@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_APP_STATE } from "../state";
 import type { ReminderSettings } from "../types";
@@ -29,7 +29,7 @@ describe("native reminder delivery", () => {
     }));
   });
 
-  it("hands enabled reminders to Android instead of starting browser timers", async () => {
+  it("leaves Android scheduling to useNativeServices", async () => {
     const { useForegroundReminders } = await import("./useForegroundReminders");
     const now = new Date();
     now.setHours(now.getHours() + 1, 0, 0, 0);
@@ -51,15 +51,9 @@ describe("native reminder delivery", () => {
       }),
     );
 
-    await waitFor(() => expect(nativeNotifications.schedule).toHaveBeenCalledTimes(1));
-    const request = nativeNotifications.schedule.mock.calls[0]![0];
-    expect(request.notifications).toHaveLength(14);
-    expect(request.notifications[0]).toMatchObject({
-      title: "Morning adhkar",
-      body: "Open your adhkar when you’re ready to read.",
-      channelId: "azkarapp-reminders",
-      schedule: { allowWhileIdle: true, isExactNotification: true },
-    });
-    expect(nativeNotifications.createChannel).toHaveBeenCalledOnce();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    // useNativeServices is the sole native scheduling owner.
+    expect(nativeNotifications.schedule).not.toHaveBeenCalled();
+    expect(nativeNotifications.createChannel).not.toHaveBeenCalled();
   });
 });

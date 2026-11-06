@@ -1,3 +1,4 @@
+import { MushafDesktopHeader, MushafDesktopFooter, MushafFocusButton } from "../components/MushafReadingChrome";
 import { MushafThemeNotice } from "../components/MushafThemeNotice";
 import { trimMushafPrefetch } from "../content/mushafScheduler";
 import { progressFillStyle } from "../components/progressFillStyle";
@@ -983,6 +984,7 @@ export function KhatmahReaderScreen({
       direction={direction}
       side={mushafToolbarSide}
       compact={shell.railCompact}
+      navigationInHeader
       surahName={surahShortName}
       juzNumber={juzNumber}
       pageNumber={displayPage}
@@ -1179,6 +1181,43 @@ export function KhatmahReaderScreen({
           >
             <MushafPageViewer
               themeNotice={themeHud ? <MushafThemeNotice theme={themeHud} language={language} /> : undefined}
+              desktopHeader={
+                useRail && !isFocusMode ? (
+                  <MushafDesktopHeader
+                    language={language}
+                    direction={direction}
+                    toolbarSide={mushafToolbarSide}
+                    surahName={surahShortName}
+                    juzNumber={juzNumber}
+                    isFullscreen={isFullscreen}
+                    onBack={onBack}
+                    onToggleFullscreen={toggleFullscreen}
+                    onSurahs={() => {
+                      setIndexTab("surahs");
+                      setIsIndexOpen(true);
+                    }}
+                    onJuzs={() => {
+                      setIndexTab("juzs");
+                      setIsIndexOpen(true);
+                    }}
+                  />
+                ) : undefined
+              }
+              desktopFooter={
+                useRail && !isFocusMode ? (
+                  <MushafDesktopFooter
+                    language={language}
+                    direction={direction}
+                    firstPage={spreadReady && rightSide ? rightSide.page : displayPage}
+                    secondPage={spreadReady && leftSide ? leftSide.page : undefined}
+                    onJump={() => {
+                      setIndexTab("jump");
+                      setIsIndexOpen(true);
+                    }}
+                  />
+                ) : undefined
+              }
+
               lines={spreadReady && rightSide ? rightSide.lines : lines}
               language={language}
               pageNumber={spreadReady && rightSide ? rightSide.page : displayPage}
@@ -1220,7 +1259,16 @@ export function KhatmahReaderScreen({
               topRightControl={compactTranslation ? undefined : mobileTopRight}
               topCenterControl={compactTranslation ? undefined : mobileTopCenter}
               bottomLeftControl={mobileBottomLeft}
-              bottomCenterControl={isFocusMode ? focusHandle : mobileBottomCenter}
+              bottomCenterControl={
+                isFocusMode ? (
+                  focusHandle
+                ) : !useRail ? (
+                  <div className="mushaf-compact-focus">
+                    {mobileBottomCenter}
+                    <MushafFocusButton language={language} onEnter={() => setIsFocusMode(true)} />
+                  </div>
+                ) : undefined
+              }
               bottomRightControl={mobileBottomRight}
               onSurahClick={() => {
                 setIndexTab("surahs");

@@ -416,7 +416,7 @@ describe("KhatmahReaderScreen responsive chrome contract", () => {
         expect(screen.getByTestId("mushaf-rail-back")).toBeInTheDocument();
         expect(screen.getByTestId("mushaf-rail-page-bookmark")).toBeInTheDocument();
         expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
-        expect(screen.queryByTestId("mushaf-focus-enter")).not.toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-focus-toggle")).toBeInTheDocument();
         expect(screen.getByTestId("mushaf-rail-more")).toBeInTheDocument();
       } else {
         expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();

@@ -90,10 +90,11 @@ async function expectOutwardBack(control: Locator, rightEdge: boolean) {
     const path = node.querySelector("path")!;
     const start = path.getPointAtLength(0).matrixTransform(path.getScreenCTM()!);
     const tip = path.getPointAtLength(path.getTotalLength() / 2).matrixTransform(path.getScreenCTM()!);
-    return { pointsRight: tip.x > start.x, x: node.getBoundingClientRect().x };
+    const bounds = node.getBoundingClientRect();
+    return { pointsRight: tip.x > start.x, onRight: bounds.left + bounds.width / 2 > innerWidth / 2 };
   });
   expect(shape.pointsRight).toBe(rightEdge);
-  expect(shape.x > 195).toBe(rightEdge);
+  expect(shape.onRight).toBe(rightEdge);
   await expect(control.locator("svg")).toHaveCSS("transform", "none");
 }
 
@@ -397,7 +398,7 @@ for (const language of ["ar", "en"] as const) {
 }
 
 for (const side of ["left", "right"] as const) {
-  test(`Mushaf ${side} tool rail back points away from the page @cross-browser`, async ({ page }) => {
+  test(`Mushaf Back points outward beside the ${side} tool rail @cross-browser`, async ({ page }, info) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.addInitScript((side) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -411,6 +412,10 @@ for (const side of ["left", "right"] as const) {
       );
     }, side);
     await page.goto("/#/quran/42");
-    await expectOutwardBack(page.getByTestId("mushaf-rail-back"), side === "right");
+    const back = page.getByTestId("mushaf-rail-back");
+    await expectOutwardBack(back, side === "right");
+    const fullscreen = await page.getByTestId("mushaf-fullscreen-toggle").boundingBox();
+    expect((await back.boundingBox())!.x > fullscreen!.x).toBe(side === "right");
+    await page.screenshot({ path: info.outputPath(`outward-back-${side}.png`), scale: "css" });
   });
 }

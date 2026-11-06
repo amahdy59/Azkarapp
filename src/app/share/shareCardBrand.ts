@@ -32,9 +32,9 @@ export function drawShareBrand(
   ctx.scale(64 / 56, 64 / 56);
   ctx.translate(-540, -top);
   ctx.font = `700 32px ${SHARE_ARABIC_FONT}`;
-  const arabicWidth = ctx.measureText("وَذَكِّرْ").width;
+  const arabicWidth = ctx.measureText("وَذَكِّرْ").width;
   ctx.font = `600 14px ${SHARE_UI_FONT}`;
-  const wordWidth = Math.max(arabicWidth, ctx.measureText("WA ZAKER").width);
+  const wordWidth = Math.max(arabicWidth, ctx.measureText("wa-zaker").width);
   const wordRight = 540 - (wordWidth + 72) / 2 + wordWidth;
   const iconX = wordRight + 16;
   fillRoundedRect(ctx, iconX, top, 56, 56, 16, iconBackground);
@@ -52,12 +52,12 @@ export function drawShareBrand(
   ctx.direction = "rtl";
   ctx.fillStyle = foreground;
   ctx.font = `700 32px ${SHARE_ARABIC_FONT}`;
-  drawInkTop(ctx, "وَذَكِّرْ", wordRight, top);
-  const wordmark = ctx.measureText("وَذَكِّرْ");
+  drawInkTop(ctx, "وَذَكِّرْ", wordRight, top);
+  const wordmark = ctx.measureText("وَذَكِّرْ");
   const labelTop = top + wordmark.actualBoundingBoxAscent + wordmark.actualBoundingBoxDescent + 6;
   ctx.direction = "ltr";
   ctx.font = `600 14px ${SHARE_UI_FONT}`;
-  drawInkTop(ctx, "WA ZAKER", wordRight, Number.isFinite(labelTop) ? labelTop : top + 45);
+  drawInkTop(ctx, "wa-zaker", wordRight, Number.isFinite(labelTop) ? labelTop : top + 45);
   ctx.restore();
 }
 

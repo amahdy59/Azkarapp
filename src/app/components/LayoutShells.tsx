@@ -16,7 +16,7 @@ import {
   Sparkles,
   Sun,
 } from "./icons";
-import { PalmTreeMark } from "./RoutineGarden";
+import { CrescentMark } from "./CrescentMark";
 import { t } from "../i18n";
 import { LANGUAGE_LABELS } from "../languageOptions";
 import type { AppLanguage, ThemeMode } from "../types";
@@ -292,7 +292,7 @@ export function NavRail({ active, onChange, isArabic = false, ...utilities }: Na
         aria-label={t(language, "common.home")}
         className={`flex min-h-11 min-w-11 items-center justify-center p-2 mb-2 rounded-xl ${NAVIGATION_FOCUS} hover:bg-white/10 transition-colors`}
       >
-        <PalmTreeMark size={28} className="text-primary" />
+        <CrescentMark size={28} />
       </a>
 
       {tabs.map(({ id, label, Icon }) => {
@@ -377,7 +377,7 @@ export function NavSidebar({
           aria-label={t(language, "common.home")}
           className={`nav-sidebar-brand flex min-h-11 items-center gap-3 px-3 py-4 mb-2 border-b border-border/40 rounded-xl ${NAVIGATION_FOCUS}`}
         >
-          <PalmTreeMark size={32} className="text-primary shrink-0" />
+          <CrescentMark size={32} />
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-extrabold text-foreground font-sans">{t(language, "common.appName")}</span>
             <span className="text-xs font-semibold text-muted-foreground font-sans">

@@ -27,6 +27,7 @@ import {
   Share2,
 } from "./icons";
 import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
+import { EvidenceSource } from "./EvidenceSource";
 
 const ReminderShareModal = lazy(() =>
   import("./CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
@@ -679,15 +680,21 @@ function DailyEvidenceCardContent({
         </span>
         {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
         {evidence.sourceUrl && (
-          <a
-            data-testid="daily-evidence-source"
-            href={evidence.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`ms-auto inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
-          >
-            {reminderText(language, "home.viewEvidenceSource")}
-          </a>
+          <EvidenceSource
+            language={language}
+            testId="daily-evidence-source"
+            label={reminderText(language, "home.viewEvidenceSource")}
+            className={`ms-auto ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+            details={{
+              title: evidence.title || reminderLabel,
+              quotation: evidence.hadith,
+              reference: evidence.sourceReference ?? "",
+              grade: evidence.authenticity,
+              context: evidence.meaning ?? evidence.benefit,
+              sourceUrl: evidence.sourceUrl,
+              textLanguage: evidence.hadithInArabic ? "ar" : "en",
+            }}
+          />
         )}
         {evidence.sourceReference && (
           <span className={`text-xs ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`} dir="auto">

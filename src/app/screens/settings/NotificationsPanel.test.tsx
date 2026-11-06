@@ -4,6 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_APP_STATE } from "../../state";
 import { NotificationsPanel } from "./NotificationsPanel";
 
+function openReadiness() {
+  const details = screen.getByTestId("notification-permission-details") as HTMLDetailsElement;
+  if (!details.open) fireEvent.click(details.querySelector("summary")!);
+}
+
 describe("NotificationsPanel", () => {
   const originalNotification = window.Notification;
   const originalWorker = Object.getOwnPropertyDescriptor(navigator, "serviceWorker");
@@ -39,6 +44,7 @@ describe("NotificationsPanel", () => {
     expect(screen.getByText(/Delivery after the browser closes/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Review location and timezone" }));
     expect(onOpenLocation).toHaveBeenCalledOnce();
+    openReadiness();
     expect(screen.getByRole("button", { name: "Send a test notification" }).closest("section")).toContainElement(
       screen.getByTestId("reminder-readiness"),
     );
@@ -86,6 +92,7 @@ describe("NotificationsPanel", () => {
         onBack={vi.fn()}
       />,
     );
+    openReadiness();
     const button = screen.getByRole("button", { name: "Send a test notification" });
     fireEvent.click(button);
     expect(button).toBeDisabled();

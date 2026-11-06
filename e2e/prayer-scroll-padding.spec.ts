@@ -53,11 +53,16 @@ for (const language of ["ar", "en"] as const) {
     await scroll.evaluate((node) => (node.scrollTop = 180));
     await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
     await assertFit();
-    const countdown = sticky.locator("[data-prayer-compact-countdown]");
-    await expect(countdown).toHaveCSS("opacity", "1");
-    const countBox = (await countdown.boundingBox())!;
-    const cardBox = (await countdown.locator("xpath=ancestor::article").boundingBox())!;
-    expect(cardBox.y + cardBox.height - countBox.y - countBox.height).toBeGreaterThanOrEqual(15);
+    const compact = page.getByTestId("home-compact-prayer");
+    await expect(compact).toBeInViewport();
+    const action = compact.getByRole("button");
+    await expect(action).toBeVisible();
+    const actionBox = (await action.boundingBox())!;
+    const summaryBox = (await compact.boundingBox())!;
+    expect(actionBox.height).toBeGreaterThanOrEqual(44);
+    expect(summaryBox.y + summaryBox.height - actionBox.y - actionBox.height).toBeGreaterThanOrEqual(6);
+    expect(actionBox.x).toBeGreaterThan(summaryBox.x + 10);
+    expect(actionBox.x + actionBox.width).toBeLessThan(summaryBox.x + summaryBox.width - 10);
     await page.screenshot({ path: testInfo.outputPath(`padding-enlarged-${language}.png`), scale: "css" });
   });
 }

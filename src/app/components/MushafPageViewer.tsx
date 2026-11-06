@@ -19,7 +19,7 @@ import "./mushaf-magnification.css";
 import type { AppLanguage, MushafPageTheme, MushafTextScale, TextSizeOption } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
-import { Bookmark } from "./icons";
+import { Bookmark, ChevronLeft, ChevronRight } from "./icons";
 import { formatNumerals } from "../formatting";
 import { getJuzNumberForPage, getSurahDisplayName, getSurahNumberForPage } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
@@ -876,8 +876,8 @@ function MushafPageCanvas({
   onlySurah?: number;
 }) {
   const isFloating = isFloatingLayout ?? false;
-  const showPageFurnitureHead = !focusMode && (Boolean(spreadSide) || (!isFloating && showPageIdentity));
-  const showPageFurnitureFoot = !focusMode && (Boolean(spreadSide) || (!isFloating && showPageIdentity));
+  const showPageFurnitureHead = !focusMode && showPageIdentity && (Boolean(spreadSide) || !isFloating);
+  const showPageFurnitureFoot = !focusMode && showPageIdentity && (Boolean(spreadSide) || !isFloating);
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
   useEffect(() => {
@@ -1170,6 +1170,9 @@ export function MushafPageViewer({
   headerContent,
   footerContent,
   railContent,
+  desktopHeader,
+  desktopFooter,
+  pageTurnBounds = { first: 1, last: 604 },
   railSide = "right",
   progressBar,
   paperRef,
@@ -1221,6 +1224,9 @@ export function MushafPageViewer({
    * on a landscape screen height is the scarce dimension and width is not.
    */
   railContent?: ReactNode;
+  desktopHeader?: ReactNode;
+  desktopFooter?: ReactNode;
+  pageTurnBounds?: { first: number; last: number };
   railSide?: "right" | "left";
   /** Always visible, whatever the chrome is doing. */
   progressBar?: ReactNode;
@@ -1398,14 +1404,15 @@ export function MushafPageViewer({
   const useRail = Boolean(railContent);
   /* A spread needs each half to name itself; so does any layout where the
      chrome is not carrying the surah above the paper. */
-  const showPageIdentity = Boolean(facingPage) || useRail || !headerContent;
+  const showPageIdentity =
+    Boolean(facingContent) || (!desktopHeader && (Boolean(facingPage) || useRail || !headerContent));
   const isFloatingLayout = !useRail && !headerContent;
   const showBottomCenter =
     bottomCenterControl || (isFloatingLayout && !facingPage && showPageIdentity && showFloatingPageIndicator);
 
   return (
     <article
-      className={`mushaf-reader-viewer glass-reading relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
+      className={`mushaf-reader-viewer glass-reading relative flex h-full min-h-0 w-full transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
       style={
         {
           "--foreground": "var(--mushaf-ink)",
@@ -1416,6 +1423,10 @@ export function MushafPageViewer({
         } as CSSProperties
       }
       data-mushaf-chrome-mode={useRail ? "rail" : headerContent ? "bars" : "clean"}
+      data-desktop-chrome={Boolean(desktopHeader && useRail)}
+      data-rail-side={railSide}
+      data-focus-mode={focusMode}
+      data-reader-presentation={Boolean(desktopHeader || topCenterControl)}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
       aria-label={
@@ -1430,6 +1441,13 @@ export function MushafPageViewer({
       <h1 className="sr-only">
         {surahName} · {formattedJuz}
       </h1>
+
+      {desktopHeader && useRail && (
+        <div className="mushaf-desktop-top" data-theme-notice={Boolean(themeNotice)}>
+          {desktopHeader}
+          {themeNotice && <div className="mushaf-title-notice">{themeNotice}</div>}
+        </div>
+      )}
       {/* Live region announcing page changes to assistive technology */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {facingPage
@@ -1564,7 +1582,7 @@ export function MushafPageViewer({
           { ...paperStyle, "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)) } as CSSProperties
         }
         data-magnified={magnification > 100}
-        data-theme-notice={Boolean(themeNotice && !topCenterControl)}
+        data-theme-notice={Boolean(themeNotice && !topCenterControl && !desktopHeader)}
         role={magnification > 100 ? "region" : undefined}
         aria-label={magnification > 100 ? t(language, "mushaf.magnification") : undefined}
         tabIndex={magnification > 100 ? 0 : undefined}
@@ -1601,7 +1619,7 @@ export function MushafPageViewer({
             study mode is enabled; ayah-marker buttons remain operable in
             either mode, while the cohesive page regions below carry the
             normal reading experience. */}
-        {themeNotice && !topCenterControl && <div className="mushaf-paper-notice">{themeNotice}</div>}
+        {themeNotice && !topCenterControl && !desktopHeader && <div className="mushaf-paper-notice">{themeNotice}</div>}
         <div className="contents">
           <MushafPageCanvas
             lines={lines}
@@ -1688,6 +1706,30 @@ export function MushafPageViewer({
           </div>
         )}
       </div>
+
+      {!focusMode && !useRail && !facingContent && (onNext || onPrevious || onEdgeTap) && (
+        <nav className="mushaf-tablet-turns" aria-label={t(language, "mushaf.pageNavigation")}>
+          <button
+            type="button"
+            data-testid="mushaf-tablet-next"
+            aria-label={t(language, "common.next")}
+            disabled={pageNumber >= pageTurnBounds.last}
+            onClick={onNext ?? (() => onEdgeTap?.("left"))}
+          >
+            <ChevronLeft size={20} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            data-testid="mushaf-tablet-previous"
+            aria-label={t(language, "common.previous")}
+            disabled={pageNumber <= pageTurnBounds.first}
+            onClick={onPrevious ?? (() => onEdgeTap?.("right"))}
+          >
+            <ChevronRight size={20} aria-hidden="true" />
+          </button>
+        </nav>
+      )}
+      {desktopFooter && useRail && <div className="mushaf-desktop-bottom">{desktopFooter}</div>}
 
       {(bottomLeftControl || bottomRightControl || showBottomCenter) && (
         <div dir="ltr" className="mushaf-control-band mushaf-control-band--bottom">

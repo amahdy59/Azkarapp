@@ -18,12 +18,18 @@ describe("native reminder plan", () => {
     const now = new Date("2026-10-15T00:00:00Z");
     const plan = buildNativeReminderPlan(state, now);
     expect(plan).toHaveLength(7);
-    expect(plan[0]).toMatchObject({ title: "اقترب وقت صلاة الفجر", body: expect.stringContaining("١٠ دقائق") });
+    expect(plan[0]).toMatchObject({
+      title: expect.stringContaining("صلاة الفجر الساعة"),
+      body: expect.stringMatching(/مسلم|البخاري/),
+    });
+    expect(plan[0].route).toBe("#/prayer/fajr");
     expect(plan.every((entry) => entry.at > now.getTime())).toBe(true);
     expect(new Set(plan.map(({ id }) => id)).size).toBe(plan.length);
+    const rebuilt = buildNativeReminderPlan(state, new Date(now.getTime() + 60_000));
+    expect(rebuilt.find((entry) => entry.at === plan[0].at)).toEqual(plan[0]);
     expect(JSON.stringify(plan)).not.toMatch(/latitude|longitude|profile|email|credential/);
     state.settings.reminders.prayer.leadMinutes = 0;
-    expect(buildNativeReminderPlan(state, now)[0].title).toBe("حان وقت صلاة الفجر");
+    expect(buildNativeReminderPlan(state, now)[0].title).toBe(plan[0].title);
     expect(buildNativeReminderPlan(state, now)[0].at - plan[0].at).toBe(10 * 60_000);
     state.settings.reminders.prayer.enabled = false;
     expect(buildNativeReminderPlan(state, now)).toEqual([]);

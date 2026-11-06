@@ -50,6 +50,16 @@ for (const scenario of [
     const fontSize = () => line.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     const originalFont = await fontSize();
     const originalText = await paper.locator("[data-mushaf-column]").allTextContents();
+    const chromePosition = () =>
+      page
+        .locator(".mushaf-reader-viewer")
+        .evaluate((node) =>
+          [
+            ...node.querySelectorAll(":scope > :is(.mushaf-control-band, .mushaf-desktop-top, .mushaf-desktop-bottom)"),
+          ].map((bar) => [bar.getBoundingClientRect().top, bar.getBoundingClientRect().bottom]),
+        );
+    const originalChrome = await chromePosition();
+    expect(originalChrome).toHaveLength(2);
     const openSettings = async () => {
       const direct = page.getByTestId("mushaf-settings-trigger");
       if (await direct.isVisible()) await direct.click();
@@ -93,6 +103,7 @@ for (const scenario of [
       };
     });
     expect(scroll).toEqual({ horizontal: true, vertical: true, lastReachable: true });
+    await expect.poll(chromePosition).toEqual(originalChrome);
     await page.screenshot({ path: testInfo.outputPath(`mushaf-200-${scenario.width}.png`) });
     await openSettings();
     await page.getByRole("button", { name: scenario.language === "ar" ? "ملاءمة الصفحة" : "Fit page" }).click();

@@ -2,9 +2,21 @@
 
 ## Active phase
 
-[Balanced Mushaf reader](phases/MUSHAF_BALANCED_READER_2026_11_04.md) is the current owner-approved checkpoint. Preserve distinct capsule geometry and existing rail/menu semantics; improve notifications, page measure/centering and compact two-column index. The preceding button-family batch is deployed at f337183c.
+[Home date rail and pending release](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md) is the current owner-approved phase. The owner lifts the previous commit and publication hold and requests screenshots, exact-commit verification and production smoke.
+
+## Pending work included in this release
+
+[Notification usability and approved follow-ups](phases/NOTIFICATION_USABILITY_COMPLETION_2026_11_06.md) is the active owner-requested implementation. Work through its controlled checkpoints, retain all pending changes and the visual/commit review gate, and collect connected-device evidence where available.
+
+[Notification relevance and delivery](phases/NOTIFICATION_RELEVANCE_LOCAL_2026_11_05.md) is the current approved local implementation. The owner approved the catalogue subject to authenticity, prayer/zikr relevance and appropriate timing. Preserve the preceding Information/brand and Mushaf review candidates.
+
+[Team, help, notification settings and brand](phases/INFORMATION_BRAND_NOTIFICATION_SETTINGS_LOCAL_2026_11_05.md) is the preceding local review checkpoint. The presentation changes and preceding Mushaf refinements await owner review before any commit or push. Notification copy and schedules are tracked separately in the [approval catalogue](../NOTIFICATION_CATALOG_APPROVAL_2026_11_05.md).
 
 ## Preceding checkpoint
+
+[Approved Mushaf presentation](phases/MUSHAF_APPROVED_CHROME_LOCAL_2026_11_05.md) records the local phone, tablet and desktop reading changes and screenshot evidence. The preceding balanced-reader and CI fixes are deployed at 6d740d9b.
+
+[Notification review and programmer contacts](phases/NOTIFICATION_REVIEW_CONTACTS_LOCAL_2026_11_05.md) is the parallel owner-requested review checkpoint. The catalogue covers source-checked rotation, current and proposed timing/destinations, future good-deed sections and local contact credits. Notification implementation proceeds under the approved relevance phase above. The latest owner instruction prohibits committing as well as pushing before review; retain the completed local Mushaf evidence above.
 
 [Button family consistency](phases/BUTTON_FAMILY_CONSISTENCY_LOCAL_2026_11_04.md) is the current checkpoint: reusable configuration pills, shared role/state rules and cross-screen screenshot/keyboard regressions. Preserve the completed audio Mushaf/Progress-control work and preceding Glass/reader edits. The owner now authorizes completing and pushing the full pending batch; monitor Quality/Pages and verify production.
 

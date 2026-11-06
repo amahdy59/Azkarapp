@@ -2,7 +2,11 @@ import { useEffect, useState, type RefObject } from "react";
 import type { PrayerCountdownInterval } from "../prayerCountdown";
 
 /** Only the visible next card ticks; the Home/domain clock stays minute-based. */
-export function usePrayerCountdown(ref: RefObject<HTMLElement | null>, interval?: PrayerCountdownInterval) {
+export function usePrayerCountdown(
+  ref: RefObject<HTMLElement | null>,
+  interval?: PrayerCountdownInterval,
+  visible = true,
+) {
   const [reading, setReading] = useState(() => ({ now: Date.now(), endsAt: interval?.endsAt }));
   const startsAt = interval?.startsAt;
   const endsAt = interval?.endsAt;
@@ -14,7 +18,7 @@ export function usePrayerCountdown(ref: RefObject<HTMLElement | null>, interval?
     endsAt > startsAt;
 
   useEffect(() => {
-    if (!valid) return;
+    if (!valid || !visible) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let inView = typeof IntersectionObserver === "undefined";
     const tick = () => {
@@ -41,7 +45,7 @@ export function usePrayerCountdown(ref: RefObject<HTMLElement | null>, interval?
       observer?.disconnect();
       document.removeEventListener("visibilitychange", tick);
     };
-  }, [endsAt, ref, startsAt, valid]);
+  }, [endsAt, ref, startsAt, valid, visible]);
 
   // A card can become next hours after mount. Do not briefly display its old
   // mount-time reading while the new visibility observer delivers its callback.

@@ -143,6 +143,8 @@ export interface ReminderSettings {
   friday?: { enabled: boolean };
   fridayDua?: { enabled: boolean };
   beforeFajrDua?: { enabled: boolean };
+  fridaySalawat?: { enabled: boolean };
+  fastingPreparation?: { enabled: boolean };
   prayer: PrayerReminderSchedule;
   morning: ReminderSchedule;
   evening: ReminderSchedule;

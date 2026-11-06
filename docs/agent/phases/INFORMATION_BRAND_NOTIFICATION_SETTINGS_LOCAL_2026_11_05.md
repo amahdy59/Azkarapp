@@ -1,0 +1,7 @@
+# Team, help, notification settings and brand — local review
+
+Owner requests Mohamed Hussien's supplied LinkedIn, short accurate team bios and approachable thumbnails; Ahmed is a UX designer and AI workflow lead, Mohamed a senior Android developer. Simplify common user information/FAQ, improve notification-settings presentation, and unify the name as wa-zaker / وَذَكِّرْ. Avoid a palm as app logo. Earlier notification catalogue/text/timing approval gates remain; do not implement that proposal, commit or push.
+
+Plan before edits: inspect existing About/Help/Notifications and brand consumers, use verified public GitHub portraits as small bundled assets, reuse shared contact links/buttons, simplify FAQ with correct native/browser/offline guidance and real Settings destinations, visually group existing notification controls without changing scheduler or permission ownership, and reuse the existing installed crescent/star mark consistently. Preserve progress/garden palms as their existing metric symbols. Keep package IDs, stored keys, reviewed text and religious claims unchanged. Verify bilingual units, RTL/LTR responsive/enlarged screenshots, real navigation/focus/permission controls, quality and bundle gates. Return actual screenshots for owner approval before any commit.
+
+Review [the implementation and evidence report](../reports/INFORMATION_BRAND_NOTIFICATION_SETTINGS_LOCAL_2026_11_05_REPORT.md) alongside the separate [notification approval catalogue](../../NOTIFICATION_CATALOG_APPROVAL_2026_11_05.md).

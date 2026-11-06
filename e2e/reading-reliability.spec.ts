@@ -146,7 +146,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(title).not.toBeVisible();
       await page.reload();
       await expect(
-        page.getByRole("heading", { name: language === "ar" ? "حول تطبيق أذكار" : "About Azkar", exact: true }),
+        page.getByRole("heading", { name: language === "ar" ? "حول وَذَكِّرْ" : "About wa-zaker", exact: true }),
       ).toBeVisible();
       const unavailableManifest = page.waitForResponse(
         (response) => response.url().includes("/release-notes.json") && response.status() === 503,

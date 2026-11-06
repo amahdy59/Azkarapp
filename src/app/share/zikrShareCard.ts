@@ -185,7 +185,7 @@ type ResolvedZikrShareCardLabels = Required<Omit<ZikrShareCardLabels, "repetitio
 
 const DEFAULT_LABELS: Record<AppLanguage, ResolvedZikrShareCardLabels> = {
   ar: {
-    brandName: "وَذَكِّرْ",
+    brandName: "وَذَكِّرْ",
     benefit: "فائدة",
     translation: "المعنى",
     transliteration: "النطق",
@@ -196,7 +196,7 @@ const DEFAULT_LABELS: Record<AppLanguage, ResolvedZikrShareCardLabels> = {
     footer: "",
   },
   en: {
-    brandName: "Wa-Zaker",
+    brandName: "wa-zaker",
     benefit: "Benefit",
     translation: "Meaning",
     transliteration: "Pronunciation",
@@ -1013,8 +1013,8 @@ export async function prepareZikrShareCardFonts() {
   if (typeof document === "undefined" || !document.fonts) return;
   await Promise.allSettled([
     document.fonts.load(`600 62px ${ARABIC_ZIKR_FONT}`, "اللَّهُمَّ أَنْتَ رَبِّي"),
-    document.fonts.load(`700 46px ${ARABIC_UI_FONT}`, "وَذَكِّرْ"),
-    document.fonts.load(`700 46px ${LATIN_UI_FONT}`, "Wa-Zaker"),
+    document.fonts.load(`700 46px ${ARABIC_UI_FONT}`, "وَذَكِّرْ"),
+    document.fonts.load(`700 46px ${LATIN_UI_FONT}`, "wa-zaker"),
     document.fonts.ready,
   ]);
 }

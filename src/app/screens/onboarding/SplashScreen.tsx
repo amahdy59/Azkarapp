@@ -19,7 +19,7 @@ export function SplashScreen({ onDone, language }: { onDone: () => void; languag
       className="flex h-full flex-col items-center justify-between bg-background"
       role="status"
       aria-live="polite"
-      aria-label="Loading Azkar"
+      aria-label={t(language, "onboarding.loadingApp", { name: t(language, "common.appName") })}
     >
       <motion.div
         className="flex flex-1 flex-col items-center justify-center pb-16"

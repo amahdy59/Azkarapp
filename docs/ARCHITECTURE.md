@@ -839,3 +839,19 @@ The listening queue now composes the existing Radix popover in the actual queue 
 ## Balanced Mushaf presentation — 2026-11-04
 
 MushafThemeNotice is pure presentation of an already-applied theme. Both reader owners keep their existing cycle timer/state and pass the notice into MushafPageViewer chrome; no new storage/gesture owner is introduced. The shared viewer scopes bounded desktop canvas sizing to interactive readers, leaving audio excerpts and original line fitting unchanged. Paper/ink tokens explicitly protect the applied reading theme from app Glass overrides. NavigationModal retains Radix focus/history semantics and only changes dialog/card/tab presentation. Reviewed page data, identifiers, offline preparation, word geometry and controller boundaries remain unchanged.
+
+## Approved Mushaf chrome — local 2026-11-05
+
+MushafReadingChrome provides pure header, footer and compact Focus presentation. Both reader owners compose these into MushafPageViewer and retain ownership of navigation, focus, fullscreen and index state. The shared viewer places desktop chrome around its existing paper and rail, hides redundant Arabic spread furniture, preserves matching furniture for paired translation, and renders tablet page turns only when navigation callbacks exist. Reading-presentation attributes scope tablet framing away from readonly listening views. MushafToolRail omits navigation duplicated in the header. No new timers, observers, persisted fields, dependencies or content transformations are introduced. NavigationModal directs Surah/search entry to its existing search input while preserving portalled focus recovery.
+
+## Relevant dated notification delivery
+
+The approved notification catalogue supplies exact Arabic excerpts, faithful English meanings, captions and named references in notificationEvidence.json. notificationCopy selects within the relevant prayer/group by scheduled civil date. Dhuhr advance reminders exclude the after-zawal quotation. The title records the scheduled prayer clock time.
+
+reminderOccurrences supplies selected-location prayer instants, device-local routine clocks, completion suppression, deterministic keys, routes and bounded browser expiry. useNativeServices owns the Android queue. The former foreground native scheduler is now a read-only compatibility diagnostic. Replacement also cancels the old scheduler's marked alarms. Browser delivery uses Web Locks across tabs and dated storage/session claims. The protected same-origin notification tap path works through the imported worker script and desktop constructor fallback.
+
+### Notification settings and shared source previews
+
+Settings derives the next and following reminder names, delivery times and source previews from the same dated plan used for delivery. The selected prayer-location clock applies to prayer and contextual reminders. Routine clock fields use the device timezone. Android permission details query owned pending IDs and exact-alarm access, and request a rebuild through the existing native scheduling owner. Browser permission stays in a compact disclosure with its own delivery guidance. The save message uses the existing application persistence status.
+
+Home evidence, prayer virtues and notification previews share the portalled evidence sheet. Each caller supplies its reviewed quotation, reference, direction and optional direct source link. The sheet supports keyboard dismissal and focus return. Its protected surface keeps underlying lettering out of the reading area in Glass mode.

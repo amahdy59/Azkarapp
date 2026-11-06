@@ -1,3 +1,23 @@
+## 2026-11-05 — Approved relevant notification catalogue
+
+## 2026-11-06 — Home date rail and approved release
+
+The owner approves the revised Home reference and requests a smooth responsive handoff, fixed Mushaf header and footer, and visual evidence for each checkpoint. The latest instruction authorizes committing and pushing the complete pending batch. Keep the existing Glass, paper texture and theme settings. Phone Home compacts to the next prayer and an entry to all prayers, while wide Home keeps the five times. Preserve the selected calendar, prayer calculation, reading content, persistence, and prior release gates. The compact countdown uses the existing minute clock. See [the release phase](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md).
+
+The owner approves the notification catalogue conditional on authentic Quran/hadith, relevance to each prayer or featured zikr and appropriate timing. Implement the reviewed payloads with preserved conditions and references, stable dated rotation and corrected delivery/navigation. Pending-payload topics and new calendar/guide work retain their catalogue readiness gates. Implementation remains local under the preceding screenshot and commit review gate.
+
+## 2026-11-05 — Team, help, notification settings and brand
+
+The owner requests two programmer profiles with thumbnails, short bios, and LinkedIn and email links, a simpler FAQ, and a clearer Notifications settings page. The app name is wa-zaker in English and وَذَكِّرْ in Arabic. Reuse the installed web app's navy, gold crescent and star for app identity. Palms keep their progress and garden meaning. Notification delivery copy, rotation, timing, and new destinations still require separate catalogue approval. This working tree stays local for owner review before any commit or push.
+
+## 2026-11-05 — Notification approval package and programmer contact credits
+
+The owner requests an authentic-text rotation shortlist, time-relevant reminders with verified destinations and a broader sourced good-deed backlog, including missing sections. Review all notification wording, schedules, rotation and future sections before incorporation. Prepare requested local Information credits for Ahmed Mahdy and Mohamed Hussien, Ahmed's public LinkedIn and public email/contact actions. Public GitHub metadata supplies the requested colleague email; preserve Ahmed's existing support address. The owner explicitly requires approval **before any commit**, in addition to the preceding no-push gate. No notification code, scheduling or reviewed content changes are approved by drafting the catalogue.
+
+## 2026-11-05 — Approved Mushaf presentation and review before push
+
+The owner approves the latest desktop screenshot with grouped tools, visible Focus, top Surah/Juz navigation and one centered page-range capsule without the total. Remove duplicated desktop furniture and the redundant Quran tile. Apply the preceding approved mobile and tablet concepts with familiar capsules, clear Focus and quiet tablet framing. Preserve canonical page data, normal gestures, reading modes, audio and offline behavior. This supersedes the historical rail-only desktop and per-page desktop metadata contracts. The owner requires actual result screenshots and a code/visual audit before pushing. Keep this change local until that review.
+
 ## 2026-11-03 — Optional updates and mobile Masbaha settings
 
 The owner approves local implementation of background update preparation with explicit acceptance or Later, and a compact Masbaha settings button opening a sheet for dhikr and goals. Keep desktop selector behavior and the save/reset confirmation for an active count. The owner explicitly prohibits pushing this phase.
@@ -5378,3 +5398,7 @@ Owner follow-up: repair remaining Settings hover inconsistencies and make the li
 ## 2026-11-04 — Approved balanced Mushaf proposals
 
 Owner: apply all recommendations after image review, with explicit correction that Mushaf buttons retain their deliberately distinct existing capsule geometry, menus function as before and the color pill remains a transient notification matching the applied theme. Keep the desktop rail; refine the page measure/height and centering, safe-area breathing room and short two-column surah index with grouped tabs/search and unchanged navigation/bookmark semantics. Generated Qur’anic lettering is illustrative and must never replace reviewed data. Preserve manual zoom, canonical slots, offline/font fallback, reduced motion and large-text scrolling. This is the one active implementation checkpoint.
+
+## 2026-11-06 — Notification usability and optional catalogue choices
+
+The owner requests applying the notification usability and app recommendations. Show named upcoming reminders and their clocks, compact permission details, real Android readiness and a shared source preview. Preserve existing pre-Fajr opt-ins and require a choice for new readers. Add the ready Friday Salawat and Monday/Thursday preparation alerts as optional settings. Use the approved source excerpts and respect local prayer windows and the saved Hijri offset. Retain the local review gate and record physical-device evidence separately.

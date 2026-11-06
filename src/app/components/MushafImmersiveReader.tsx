@@ -1,3 +1,4 @@
+import { MushafDesktopHeader, MushafDesktopFooter, MushafFocusButton } from "./MushafReadingChrome";
 import { MushafThemeNotice } from "./MushafThemeNotice";
 import { trimMushafPrefetch } from "../content/mushafScheduler";
 import { progressFillStyle } from "./progressFillStyle";
@@ -533,12 +534,14 @@ export function MushafImmersiveReader({
    * rather than at the ends of the Mushaf, and the page shown as "last" is the
    * surah's last, not 604.
    */
+  const toolbarSide = mushafSettings?.toolbarSide ?? "right";
   const toolRail = (
     <MushafToolRail
       language={language}
       direction={direction}
-      side="right"
+      side={toolbarSide}
       compact={shell.railCompact}
+      navigationInHeader
       surahName={surahName}
       juzNumber={juzNumber}
       pageNumber={displayPage}
@@ -784,7 +787,48 @@ export function MushafImmersiveReader({
           )}
           <MushafPageViewer
             themeNotice={themeHud ? <MushafThemeNotice theme={themeHud} language={language} /> : undefined}
+            desktopHeader={
+              shell.rail && !isFocusMode ? (
+                <MushafDesktopHeader
+                  language={language}
+                  direction={direction}
+                  toolbarSide={toolbarSide}
+                  surahName={shortSurahName}
+                  juzNumber={juzNumber}
+                  isFullscreen={isFullscreen}
+                  onBack={onClose}
+                  onToggleFullscreen={toggleFullscreen}
+                  onSurahs={() => {
+                    setIndexTab("surahs");
+                    setIsIndexOpen(true);
+                  }}
+                  onJuzs={() => {
+                    setIndexTab("juzs");
+                    setIsIndexOpen(true);
+                  }}
+                />
+              ) : undefined
+            }
+            desktopFooter={
+              shell.rail && !isFocusMode ? (
+                <MushafDesktopFooter
+                  language={language}
+                  direction={direction}
+                  firstPage={displayPage}
+                  secondPage={hasSpread && leftResolved ? leftResolved.page : undefined}
+                  onJump={() => {
+                    setIndexTab("jump");
+                    setIsIndexOpen(true);
+                  }}
+                />
+              ) : undefined
+            }
+
             lines={lines}
+            pageTurnBounds={{
+              first: pageNumbers[0] ?? displayPage,
+              last: pageNumbers[pageNumbers.length - 1] ?? displayPage,
+            }}
             language={language}
             pageNumber={displayPage}
             pageTransitionDirection={slideDir > 0 ? "forward" : "backward"}
@@ -798,7 +842,7 @@ export function MushafImmersiveReader({
             showWordMeanings={wordMeaningsReady}
             highlightedVerseKey={playback.cue.verseKey}
             highlightedWord={playback.cue.word}
-            {...(shell.rail && !isFocusMode ? { railContent: toolRail, railSide: "right" as const } : {})}
+            {...(shell.rail && !isFocusMode ? { railContent: toolRail, railSide: toolbarSide } : {})}
             topLeftControl={mobileTopLeft}
             topRightControl={mobileTopRight}
             topCenterControl={mobileTopCenter}
@@ -806,9 +850,12 @@ export function MushafImmersiveReader({
             bottomCenterControl={
               isFocusMode ? (
                 <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} />
-              ) : (
-                mobileBottomCenter
-              )
+              ) : !shell.rail ? (
+                <div className="mushaf-compact-focus">
+                  {mobileBottomCenter}
+                  <MushafFocusButton language={language} onEnter={() => setIsFocusMode(true)} />
+                </div>
+              ) : undefined
             }
             bottomRightControl={mobileBottomRight}
             onSurahClick={() => {

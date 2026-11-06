@@ -1,0 +1,142 @@
+{
+  "P1": {
+    "arabic": "مَنْ صَلَّى الصُّبْحَ فَهُوَ فِي ذِمَّةِ اللَّهِ",
+    "english": "Whoever performs the dawn prayer is in Allah’s protection.",
+    "source": "muslim:657a",
+    "grade": "sahih"
+  },
+  "P2": {
+    "arabic": "إِنَّهَا سَاعَةٌ تُفْتَحُ فِيهَا أَبْوَابُ السَّمَاءِ وَأُحِبُّ أَنْ يَصْعَدَ لِي فِيهَا عَمَلٌ صَالِحٌ",
+    "english": "It is a time when heaven’s gates are opened, and I love for a righteous deed of mine to ascend then.",
+    "captionArabic": "بعد الزوال وقبل فريضة الظهر",
+    "captionEnglish": "After zawal, before obligatory Dhuhr",
+    "source": "tirmidhi:478",
+    "grade": "hasanGharibTirmidhi"
+  },
+  "P2b": {
+    "arabic": "مَنْ حَافَظَ عَلَى أَرْبَعِ رَكَعَاتٍ قَبْلَ الظُّهْرِ وَأَرْبَعٍ بَعْدَهَا حَرُمَ عَلَى النَّارِ",
+    "english": "Whoever regularly observes four rak‘ahs before Dhuhr and four afterwards will be forbidden to the Fire.",
+    "captionArabic": "فضل المحافظة على سنة الظهر المذكورة في الحديث",
+    "captionEnglish": "The virtue of regularly observing the stated Dhuhr Sunnah",
+    "source": "abudawud:1269",
+    "grade": "sahihAlbani"
+  },
+  "P3": {
+    "arabic": "مَنْ صَلَّى الْبَرْدَيْنِ دَخَلَ الْجَنَّةَ",
+    "english": "Whoever prays the two cool prayers will enter Paradise.",
+    "captionArabic": "البردان هما الفجر والعصر",
+    "captionEnglish": "The two cool prayers are Fajr and Asr",
+    "source": "bukhari:574",
+    "grade": "sahih"
+  },
+  "P4": {
+    "arabic": "لاَ تَزَالُ أُمَّتِي بِخَيْرٍ - أَوْ قَالَ عَلَى الْفِطْرَةِ - مَا لَمْ يُؤَخِّرُوا الْمَغْرِبَ إِلَى أَنْ تَشْتَبِكَ النُّجُومُ",
+    "english": "My community remains in goodness—or, he said, upon its natural disposition—while they do not delay Maghrib until the stars intertwine.",
+    "source": "abudawud:418",
+    "grade": "hasanSahihAlbani"
+  },
+  "P5": {
+    "arabic": "مَنْ صَلَّى الْعِشَاءَ فِي جَمَاعَةٍ فَكَأَنَّمَا قَامَ نِصْفَ اللَّيْلِ",
+    "english": "Whoever performs Isha in congregation is as though they stood in prayer for half the night.",
+    "source": "muslim:656a",
+    "grade": "sahih"
+  },
+  "P5b": {
+    "arabic": "بَشِّرِ الْمَشَّائِينَ فِي الظُّلَمِ إِلَى الْمَسَاجِدِ بِالنُّورِ التَّامِّ يَوْمَ الْقِيَامَةِ",
+    "english": "Give those who walk to mosques in darkness glad tidings of complete light on the Day of Resurrection.",
+    "source": "abudawud:561",
+    "grade": "sahihAlbani"
+  },
+  "R01": {
+    "arabic": "يَتَعَاقَبُونَ فِيكُمْ مَلاَئِكَةٌ بِاللَّيْلِ وَمَلاَئِكَةٌ بِالنَّهَارِ وَيَجْتَمِعُونَ فِي صَلاَةِ الْفَجْرِ وَصَلاَةِ الْعَصْرِ",
+    "english": "Angels take turns among you by night and day, gathering at the Fajr and Asr prayers.",
+    "source": "bukhari:555",
+    "grade": "sahih"
+  },
+  "Z1": {
+    "arabic": "وَمَنْ قَالَهَا مِنَ النَّهَارِ مُوقِنًا بِهَا، فَمَاتَ مِنْ يَوْمِهِ قَبْلَ أَنْ يُمْسِيَ، فَهُوَ مِنْ أَهْلِ الْجَنَّةِ",
+    "english": "Whoever says it during the day with certainty, then dies that day before evening, will be among the people of Paradise.",
+    "captionArabic": "سيد الاستغفار",
+    "captionEnglish": "Sayyid al-Istighfar",
+    "source": "bukhari:6306",
+    "grade": "sahih"
+  },
+  "Z2": {
+    "arabic": "قُلْ هُوَ اللَّهُ أَحَدٌ وَالْمُعَوِّذَتَيْنِ حِينَ تُمْسِي وَحِينَ تُصْبِحُ ثَلاَثَ مَرَّاتٍ تَكْفِيكَ مِنْ كُلِّ شَىْءٍ",
+    "english": "Recite Al-Ikhlas, Al-Falaq and An-Nas three times in the evening and morning; they will suffice you against everything.",
+    "captionArabic": "الإخلاص والفلق والناس",
+    "captionEnglish": "Al-Ikhlas, Al-Falaq and An-Nas",
+    "source": "abudawud:5082",
+    "grade": "hasanAlbani"
+  },
+  "Z3": {
+    "arabic": "مَنْ قَرَأَ بِالآيَتَيْنِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ فِي لَيْلَةٍ كَفَتَاهُ",
+    "english": "Whoever recites the last two verses of Al-Baqarah in a night, they will suffice them.",
+    "captionArabic": "آخر آيتين من البقرة",
+    "captionEnglish": "The last two verses of Al-Baqarah",
+    "source": "bukhari:5009",
+    "grade": "sahih"
+  },
+  "R03": {
+    "arabic": "لَقَدْ قُلْتُ بَعْدَكِ أَرْبَعَ كَلِمَاتٍ ثَلاَثَ مَرَّاتٍ لَوْ وُزِنَتْ بِمَا قُلْتِ مُنْذُ الْيَوْمِ لَوَزَنَتْهُنَّ",
+    "english": "I said four phrases three times after leaving you; weighed against all you have said today, they would outweigh it.",
+    "captionArabic": "ذكر «سبحان الله وبحمده عدد خلقه…» بصيغته كاملة ثلاث مرات",
+    "captionEnglish": "The complete ‘Subhan Allah wa bihamdihi, ‘adada khalqihi…’ remembrance, three times",
+    "source": "muslim:2726a",
+    "grade": "sahih"
+  },
+  "R04": {
+    "arabic": "لَمْ يَأْتِ أَحَدٌ يَوْمَ الْقِيَامَةِ بِأَفْضَلَ مِمَّا جَاءَ بِهِ إِلاَّ أَحَدٌ قَالَ مِثْلَ مَا قَالَ أَوْ زَادَ عَلَيْهِ",
+    "english": "No one will bring anything better on the Day of Resurrection except someone who said the same or more.",
+    "captionArabic": "«سبحان الله وبحمده» مائة مرة صباحًا ومساءً",
+    "captionEnglish": "‘Subhan Allah wa bihamdihi’ one hundred times in the morning and evening",
+    "source": "muslim:2692",
+    "grade": "sahih"
+  },
+  "R05": {
+    "arabic": "إِذَا أَخَذْتُمَا مَضَاجِعَكُمَا أَنْ تُكَبِّرَا اللَّهَ أَرْبَعًا وَثَلاَثِينَ وَتُسَبِّحَاهُ ثَلاَثًا وَثَلاَثِينَ وَتَحْمَدَاهُ ثَلاَثًا وَثَلاَثِينَ فَهُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ",
+    "english": "When you go to bed, magnify Allah thirty-four times, glorify Him thirty-three times and praise Him thirty-three times; that is better for you than a servant.",
+    "captionArabic": "التكبير والتسبيح والتحميد عند النوم",
+    "captionEnglish": "Takbir, tasbih and praise at bedtime",
+    "source": "muslim:2727a",
+    "grade": "sahih"
+  },
+  "T01": {
+    "arabic": "فَالْتَمِسُوهَا آخِرَ سَاعَةٍ بَعْدَ الْعَصْرِ",
+    "english": "Seek it in the last hour after Asr.",
+    "captionArabic": "في ساعة الإجابة يوم الجمعة",
+    "captionEnglish": "Concerning Friday’s time of response",
+    "source": "abudawud:1048",
+    "grade": "sahihAlbani"
+  },
+  "T02": {
+    "arabic": "مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ مَنْ يَسْأَلُنِي فَأُعْطِيَهُ مَنْ يَسْتَغْفِرُنِي فَأَغْفِرَ لَهُ",
+    "english": "Who calls upon Me so I may answer? Who asks Me so I may give? Who seeks My forgiveness so I may forgive?",
+    "captionArabic": "من حديث الثلث الأخير، فيما يرويه النبي ﷺ عن ربّه",
+    "captionEnglish": "From the last-third narration, reporting Allah’s words",
+    "source": "bukhari:1145",
+    "grade": "sahih"
+  },
+  "T04": {
+    "arabic": "فَأَكْثِرُوا عَلَىَّ مِنَ الصَّلاَةِ فِيهِ فَإِنَّ صَلاَتَكُمْ مَعْرُوضَةٌ عَلَىَّ",
+    "english": "Send abundant blessings upon me on that day, for your blessings are presented to me.",
+    "captionArabic": "في فضل الصلاة على النبي ﷺ يوم الجمعة",
+    "captionEnglish": "On sending blessings upon the Prophet ﷺ on Friday",
+    "source": "abudawud:1047",
+    "grade": "sahihAlbani"
+  },
+  "T06": {
+    "arabic": "تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ",
+    "english": "Deeds are presented on Mondays and Thursdays, and I like my deeds to be presented while I am fasting.",
+    "captionArabic": "غدًا فرصة للصيام لمن أراد واستطاع",
+    "captionEnglish": "Tomorrow is an opportunity to fast if you wish and are able",
+    "source": "tirmidhi:747",
+    "grade": "hasanGharibTirmidhi"
+  },
+  "T05": {
+    "arabic": "مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ النُّورُ مَا بَيْنَ الْجُمْعَتَيْنِ",
+    "english": "Whoever recites Al-Kahf on Friday will have light shine for them between the two Fridays.",
+    "source": "mishkat:2175",
+    "grade": "hasanAlbani"
+  }
+}

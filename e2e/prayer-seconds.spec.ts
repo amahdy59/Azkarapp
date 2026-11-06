@@ -78,12 +78,22 @@ for (const language of ["ar", "en"] as const) {
         node.scrollTop = 180;
       });
       await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      await expect(card.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
-      await expect(card.locator("[data-prayer-compact-countdown] .prayer-countdown-digits")).toHaveCSS(
-        "font-size",
-        "13px",
-      );
-      await assertFit();
+      if (width < 768) {
+        const compact = page.getByTestId("home-compact-prayer");
+        await expect(compact).toBeInViewport();
+        await expect(compact).toContainText(language === "ar" ? /[٠-٩]{2}:[٠-٩]{2}/u : /\d{2}:\d{2}/u);
+        await expect(compact.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
+      } else {
+        const compact = card.locator("[data-prayer-compact-countdown]");
+        await expect(compact).toHaveCSS("opacity", "1");
+        await expect(compact).toContainText(language === "ar" ? /[٠-٩]{2}:[٠-٩]{2}/u : /\d{2}:\d{2}/u);
+        await expect(compact.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
+        await expect(card.locator("[data-prayer-compact-countdown] .prayer-countdown-digits")).toHaveCSS(
+          "font-size",
+          "13px",
+        );
+        await assertFit();
+      }
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "200%";
       });

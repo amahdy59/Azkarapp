@@ -19,9 +19,11 @@ export function MushafFocusExit({ language, onExit }: { language: AppLanguage; o
         const reader = ref.current?.closest<HTMLElement>("[data-mushaf-reader]");
         onExit();
         requestAnimationFrame(() => {
-          const trigger = reader?.querySelector<HTMLElement>(
-            '[data-testid="mushaf-more-actions"], [data-testid="mushaf-immersive-more"], [data-testid="mushaf-rail-more"]',
-          );
+          const trigger =
+            reader?.querySelector<HTMLElement>('[data-testid="mushaf-focus-toggle"], [data-tool="focus"]') ??
+            reader?.querySelector<HTMLElement>(
+              '[data-testid="mushaf-more-actions"], [data-testid="mushaf-immersive-more"], [data-testid="mushaf-rail-more"]',
+            );
           (trigger ?? reader)?.focus({ preventScroll: true });
         });
       }}

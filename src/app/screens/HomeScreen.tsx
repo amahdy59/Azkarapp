@@ -29,8 +29,10 @@ import { createDailyPathIndex, getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
 import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import type { PrayerName } from "../content/prayerTimes";
-import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+import { formatPrayerTimeLabel, type PrayerName } from "../content/prayerTimes";
+import { PRAYER_ICON, PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+import { prayerDisplayName } from "../prayerPresentation";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
 import { useQuickRoutineShare } from "../hooks/useQuickRoutineShare";
@@ -158,6 +160,7 @@ export function HomeScreen({
   locationSettings,
   onResume,
   onOpenPrayerAdhkar,
+  onViewPrayers,
   mosquePrayerGoal,
   dailyPathStartDayKey,
   onOpenFridayMode,
@@ -200,6 +203,7 @@ export function HomeScreen({
   onResume: (category: CategoryId) => void;
   /** Opens that prayer's own adhkar, as the prayer screen's card does. */
   onOpenPrayerAdhkar?: (prayer: PrayerName) => void;
+  onViewPrayers?: (prayer: PrayerName) => void;
   mosquePrayerGoal?: number;
   dailyPathStartDayKey?: string;
   onMosquePrayerGoalChange?: (goal: number | undefined) => void;
@@ -518,6 +522,15 @@ export function HomeScreen({
   const homeStickyRef = useRef<HTMLDivElement>(null);
   const prayerPanelRef = useRef<HTMLElement>(null);
   const { condensed: prayerCardsCondensed, updateScroll: updatePrayerScroll } = useHomePrayerScroll();
+  const narrowPrayerRail = useMediaQuery("(width < 768px)");
+  const nextPrayer = prayerCardModels.find((model) => model.state === "next");
+  const NextPrayerIcon = nextPrayer && PRAYER_ICON[nextPrayer.prayer];
+  const showCompactPrayer = narrowPrayerRail && Boolean(onViewPrayers && nextPrayer);
+  const compactPrayerActive = showCompactPrayer && prayerCardsCondensed;
+  const secondaryDate = useMemo(
+    () => formatDisplayDate(now, language, calendarType === "hijri" ? "gregorian" : "hijri", hijriDateOffset, false),
+    [now, language, calendarType, hijriDateOffset],
+  );
 
   useEffect(() => {
     const scroll = homeScrollRef.current;
@@ -601,7 +614,8 @@ export function HomeScreen({
     if (dismissedAutoPrayer && dismissedAutoPrayer !== autoPrayer) setDismissedAutoPrayer(null);
   }, [autoPrayer, dismissedAutoPrayer]);
 
-  const prayerControlFocused = () => !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row button:focus");
+  const prayerControlFocused = () =>
+    !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row :is(button, a):focus");
   const handlePrayerOpen = (prayer: PrayerName | null) => {
     setSelectedPrayer(prayer);
     setDismissedAutoPrayer(prayer ? null : autoPrayer);
@@ -651,7 +665,7 @@ export function HomeScreen({
         className="home-content-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         onTouchStart={() => {
           if (
-            expandedPrayer === null &&
+            selectedPrayer === null &&
             document.activeElement instanceof HTMLElement &&
             document.activeElement.closest(".home-prayer-sticky-row button")
           ) {
@@ -665,7 +679,7 @@ export function HomeScreen({
             scrolledHomeRef.current = scrolled;
             setHasScrolledHomeContent(scrolled);
           }
-          updatePrayerScroll(top, expandedPrayer !== null || prayerControlFocused());
+          updatePrayerScroll(top, selectedPrayer !== null || prayerControlFocused());
         }}
       >
         {/* Sticky Header Overlay */}
@@ -673,8 +687,11 @@ export function HomeScreen({
           ref={homeStickyRef}
           onBlurCapture={(event) => {
             if (
-              !expandedPrayer &&
-              !(event.relatedTarget instanceof Element && event.relatedTarget.closest(".home-prayer-sticky-row button"))
+              !selectedPrayer &&
+              !(
+                event.relatedTarget instanceof Element &&
+                event.relatedTarget.closest(".home-prayer-sticky-row :is(button, a)")
+              )
             )
               updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0);
           }}
@@ -682,6 +699,7 @@ export function HomeScreen({
           data-scrolled={hasScrolledHomeContent || undefined}
           data-prayer-cards-condensed={prayerCardsCondensed || undefined}
           data-home-motion={reduceMotion ? "reduced" : undefined}
+          data-home-compact-prayer={showCompactPrayer || undefined}
           className="home-prayer-sticky pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible"
         >
           <header
@@ -700,17 +718,31 @@ export function HomeScreen({
           >
             <div
               data-testid="home-header-content"
-              className="home-layout-frame px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3"
+              className="home-layout-frame px-page mx-auto flex w-full max-w-7xl items-start justify-between gap-3"
             >
               <div
                 data-testid="hijri-date"
-                className={`min-w-0 flex-1 text-start text-label font-bold leading-tight sm:text-subtitle ${
+                className={`min-w-0 flex-1 pt-1 text-start text-label font-bold leading-tight sm:text-subtitle ${
                   homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
                 }`}
               >
                 <time className="block" dateTime={now.toISOString()} dir="auto">
                   {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
                 </time>
+                {secondaryDate && (
+                  <div
+                    className="home-date-secondary home-rail-fold"
+                    aria-hidden={prayerCardsCondensed || undefined}
+                    data-testid="home-secondary-date"
+                  >
+                    <span
+                      className={`block min-h-0 text-xs font-medium ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
+                      dir="auto"
+                    >
+                      {secondaryDate}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}>
                 <button
@@ -761,22 +793,69 @@ export function HomeScreen({
           </header>
           {showHeroContent && (
             <div className="home-layout-frame home-prayer-sticky-row pointer-events-auto mx-auto w-full max-w-7xl px-page">
-              <div data-testid="home-prayer-strip" className="relative z-10 mx-auto w-full min-w-0 overflow-visible">
-                <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
-                <PrayerTrackerCards
-                  models={prayerCardModels}
-                  language={language}
-                  direction={direction}
-                  records={prayerTracking}
-                  dayKey={todayKey}
-                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                  onOpen={handlePrayerOpen}
-                  onGlass={homeVisualEffects}
-                  summaryOnly
-                  compactSummary
-                  selectedPrayer={expandedPrayer}
-                />
+              <div className={showCompactPrayer ? "home-prayer-expanded home-rail-fold" : undefined}>
+                <div
+                  data-testid="home-prayer-strip"
+                  className="relative z-10 mx-auto w-full min-w-0 min-h-0"
+                  {...(compactPrayerActive ? { inert: "" } : {})}
+                >
+                  <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
+                  <PrayerTrackerCards
+                    models={prayerCardModels}
+                    language={language}
+                    direction={direction}
+                    records={prayerTracking}
+                    dayKey={todayKey}
+                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                    onOpen={handlePrayerOpen}
+                    onGlass={homeVisualEffects}
+                    summaryOnly
+                    compactSummary
+                    summaryCondensed={prayerCardsCondensed}
+                    selectedPrayer={expandedPrayer}
+                  />
+                </div>
               </div>
+              {showCompactPrayer && nextPrayer && NextPrayerIcon && (
+                <div className="home-prayer-mobile-fold home-rail-fold">
+                  <div className="min-h-0" {...(!compactPrayerActive ? { inert: "" } : {})}>
+                    <div
+                      data-testid="home-compact-prayer"
+                      className={`home-compact-prayer mx-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl border px-3 py-1.5 ${
+                        homeVisualEffects
+                          ? "hero-glass home-glass-surface text-on-media"
+                          : "border-border bg-card text-foreground"
+                      }`}
+                    >
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <NextPrayerIcon
+                          size={20}
+                          className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
+                          aria-hidden="true"
+                        />
+                        <div className="min-w-0 [overflow-wrap:anywhere]">
+                          <p className="text-sm font-bold leading-snug">
+                            {prayerDisplayName(nextPrayer.prayer, language, todayKey)} ·{" "}
+                            <bdi className="tabular-nums">{formatPrayerTimeLabel(nextPrayer.time, isArabic)}</bdi>
+                          </p>
+                          <p
+                            className={`text-xs tabular-nums ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
+                          >
+                            {nextPrayer.countdown ?? t(language, "prayerTracking.nextShort")}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className={`choice-pill home-header-path-button min-h-11 min-w-11 max-w-full rounded-xl px-2.5 text-xs font-bold [overflow-wrap:anywhere] ${NAVIGATION_FOCUS}`}
+                        onClick={() => onViewPrayers?.(nextPrayer.prayer)}
+                      >
+                        {t(language, "home.viewAllPrayers")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

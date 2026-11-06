@@ -23,18 +23,24 @@ for (const language of ["ar", "en"] as const) {
       await expect(strip.locator("[data-prayer-footer]").first()).toBeVisible();
       const originalCards = await strip.textContent();
       const scroll = sticky.locator("..");
+      const visibleStrip = width < 768 ? page.getByTestId("home-compact-prayer") : strip;
       // Down the page, then back up: the original row stays below its header.
       for (const position of [650, 350, 900]) {
         await scroll.evaluate((node, top) => {
           node.scrollTop = top;
         }, position);
         await expect.poll(() => scroll.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
-        await expect(strip).toBeInViewport();
+        await expect(visibleStrip).toBeInViewport();
         await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
         await expect(strip.locator("[data-prayer-footer]").first()).toBeHidden();
-        await expect(strip.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
+        if (width < 768) {
+          await expect(strip).toHaveAttribute("inert", "");
+          await expect(visibleStrip.getByRole("button")).toBeEnabled();
+        } else {
+          await expect(strip.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
+        }
         await expect(strip).toHaveText(originalCards!);
-        const geometry = await strip.evaluate((node) => {
+        const geometry = await visibleStrip.evaluate((node) => {
           const box = node.getBoundingClientRect();
           const header = document.querySelector('[data-testid="home-utility-header"]')!.getBoundingClientRect();
           const scroll = document.querySelector('[data-testid="home-sticky-prayers"]')!.parentElement!;
@@ -54,15 +60,25 @@ for (const language of ["ar", "en"] as const) {
         expect(geometry.padding).toBeGreaterThan(geometry.stickyHeight);
       }
       expect(
-        (await new AxeBuilder({ page }).include('[data-testid="home-prayer-strip"]').analyze()).violations,
+        (
+          await new AxeBuilder({ page })
+            .include(`[data-testid="${width < 768 ? "home-compact-prayer" : "home-prayer-strip"}"]`)
+            .analyze()
+        ).violations,
       ).toEqual([]);
       await page.screenshot({ path: testInfo.outputPath(`sticky-prayers-${language}-${width}.png`) });
       // Existing card actions and native keyboard operation remain usable while pinned.
       const current = strip.locator('[data-prayer-state="current"] button');
-      await current.focus();
-      await page.keyboard.press("Enter");
-      await expect(current).toHaveAttribute("aria-expanded", "true");
-      await expect(strip).toBeInViewport();
+      const compactAction = visibleStrip.getByRole("button");
+      if (width < 768) {
+        await compactAction.focus();
+        await expect(compactAction).toBeFocused();
+      } else {
+        await current.focus();
+        await page.keyboard.press("Enter");
+        await expect(current).toHaveAttribute("aria-expanded", "true");
+      }
+      await expect(visibleStrip).toBeInViewport();
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "200%";
       });
@@ -83,12 +99,16 @@ for (const language of ["ar", "en"] as const) {
       await scroll.evaluate((node) => {
         node.scrollTop = 0;
       });
-      await expect(strip).toBeInViewport();
+      await expect(visibleStrip).toBeInViewport();
       await expect(strip.locator("article")).toHaveCount(5);
-      // The open prayer remains stable during interaction, including at the top.
+      // A focused action or open prayer holds its layout, including at the top.
       await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      await current.click();
-      await current.evaluate((node) => (node as HTMLElement).blur());
+      if (width < 768) {
+        await compactAction.evaluate((node) => (node as HTMLElement).blur());
+      } else {
+        await current.click();
+        await current.evaluate((node) => (node as HTMLElement).blur());
+      }
       await scroll.evaluate((node) => {
         node.scrollTop = 12;
       });

@@ -38,8 +38,9 @@ describe("the app's name", () => {
   });
 
   it("is the same on the onboarding brand mark", () => {
-    expect(brandComponent).toContain(ENGLISH_NAME);
-    expect(brandComponent).toContain(ENGLISH_NAME.toUpperCase());
+    expect(brandComponent).toContain('t("en", "common.appName")');
+    expect(brandComponent).toContain('t("ar", "common.appName")');
+    expect(brandComponent).toContain("<CrescentMark");
   });
 
   it("keeps its tashkeel in Arabic", () => {
@@ -52,7 +53,26 @@ describe("the app's name", () => {
        nobody anything. */
     const name = ar.common.appName;
     expect(name.replace(/[ً-ْ]/g, "")).toBe("وذكر");
-    expect(name).toMatch(/[ً-ْ]/);
+    expect(name.normalize("NFC")).toBe("وَذَكِّرْ".normalize("NFC"));
+  });
+
+  it("matches the localized Android launcher labels and web artwork", () => {
+    const res = "android/app/src/main/res";
+    for (const [folder, name] of [
+      ["values", ENGLISH_NAME],
+      ["values-ar", ar.common.appName],
+    ]) {
+      const labels = readFileSync(`${res}/${folder}/strings.xml`, "utf8");
+      expect(labels).toContain(`<string name="app_name">${name}</string>`);
+      expect(labels).toContain(`<string name="title_activity_main">${name}</string>`);
+    }
+    const web = readFileSync("public/azkar-icon.svg", "utf8");
+    const android = readFileSync(`${res}/drawable/launcher_mark.xml`, "utf8");
+    const paths = [...web.matchAll(/<path d="([^"]+)"/g)];
+    expect(paths).toHaveLength(2);
+    for (const [, path] of paths) {
+      expect(android).toContain(`android:pathData="${path}"`);
+    }
   });
 
   it("leaves no superseded spelling behind", () => {

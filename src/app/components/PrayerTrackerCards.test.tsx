@@ -54,18 +54,20 @@ afterEach(() => {
 
 describe("PrayerTrackerCards", () => {
   it.each(["ar", "en"] as const)(
-    "shares one %s seconds clock across both visual copies without live announcements",
+    "runs one %s seconds clock when expanded and uses the minute model when condensed",
     (language) => {
       vi.useFakeTimers();
       const now = Date.parse("2026-10-20T10:00:00Z");
       vi.setSystemTime(now);
-      const { unmount } = render(
+      const minute = language === "ar" ? "باقي ٠٢:٢٦" : "02:26 left";
+      const models = modelsWithCurrent("dhuhr").map((model) =>
+        model.state === "next"
+          ? { ...model, countdown: minute, countdownInterval: { startsAt: now - 3600_000, endsAt: now + 8798_000 } }
+          : model,
+      );
+      const row = (summaryCondensed: boolean) => (
         <PrayerTrackerCards
-          models={modelsWithCurrent("dhuhr").map((model) =>
-            model.state === "next"
-              ? { ...model, countdownInterval: { startsAt: now - 3600_000, endsAt: now + 8798_000 } }
-              : model,
-          )}
+          models={models}
           language={language}
           direction={language === "ar" ? "rtl" : "ltr"}
           records={[]}
@@ -74,21 +76,31 @@ describe("PrayerTrackerCards", () => {
           onOpen={vi.fn()}
           summaryOnly
           compactSummary
-        />,
+          summaryCondensed={summaryCondensed}
+        />
       );
+      const { rerender, unmount } = render(row(false));
       const card = screen.getByTestId("prayer-card-asr");
       const time = card.querySelector('[id="prayer-summary-time-asr"]');
       expect(time?.querySelector("[data-prayer-time-digits]")).toHaveTextContent(language === "ar" ? "٤:٣١" : "4:31");
       expect(time).toHaveTextContent(language === "ar" ? "٤:٣١ م" : "4:31 PM");
-      expect(card.querySelectorAll("[data-prayer-countdown]")).toHaveLength(2);
+      expect(card.querySelectorAll("[data-prayer-countdown]")).toHaveLength(1);
       expect(vi.getTimerCount()).toBe(1);
-      expect(card.querySelector("[data-prayer-compact-countdown]")).toHaveAttribute("aria-hidden", "true");
+      const compact = card.querySelector("[data-prayer-compact-countdown]");
+      expect(compact).toHaveAttribute("aria-hidden", "true");
+      expect(compact).toHaveTextContent(minute);
+      expect(compact?.querySelector(".prayer-countdown-seconds, .prayer-countdown-ring")).toBeNull();
       expect(card.querySelector("[data-prayer-detail]")).toHaveTextContent(language === "ar" ? "٠٢:٢٦:٣٨" : "02:26:38");
       expect(card.querySelector("button")).toHaveAccessibleDescription(
         language === "ar" ? /الوقت المتبقي حتى العصر/ : /Time remaining until Asr/,
       );
       expect(card.querySelector("[aria-live], [role='progressbar'], [role='timer']")).toBeNull();
-      expect(card.querySelector(".prayer-countdown-digits")).toHaveAttribute("dir", "ltr");
+      expect(card.querySelector("[data-prayer-detail] .prayer-countdown-digits")).toHaveAttribute("dir", "ltr");
+      rerender(row(true));
+      expect(vi.getTimerCount()).toBe(0);
+      expect(card.querySelector("button")).toHaveAccessibleDescription(expect.stringContaining(minute));
+      rerender(row(false));
+      expect(vi.getTimerCount()).toBe(1);
       unmount();
       expect(vi.getTimerCount()).toBe(0);
       vi.useRealTimers();

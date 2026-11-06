@@ -9,7 +9,7 @@ export function compactAudioLiterals(): Plugin {
     apply: "build",
     enforce: "pre",
     transform(code, id) {
-      if (!/\/src\/app\/audio\/audioAssets(?:Core|Duas)\.ts$/.test(id.replaceAll("\\", "/"))) return;
+      if (!/\/src\/app\/(?:audio\/audioAssets(?:Core|Duas)|content\/azkar)\.ts$/.test(id.replaceAll("\\", "/"))) return;
       const source = ts.createSourceFile(id, code, ts.ScriptTarget.Latest, true);
       const values = new Map<string, { start: number; end: number }[]>();
       const visit = (node: ts.Node) => {
@@ -17,7 +17,7 @@ export function compactAudioLiterals(): Plugin {
           ts.isStringLiteral(node) &&
           ts.isPropertyAssignment(node.parent) &&
           node.parent.initializer === node &&
-          Buffer.byteLength(node.text) > 80
+          Buffer.byteLength(node.text) > 16
         ) {
           const occurrences = values.get(node.text) ?? [];
           occurrences.push({ start: node.getStart(source), end: node.end });

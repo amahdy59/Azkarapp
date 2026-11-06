@@ -60,6 +60,7 @@ export function MushafNavigationModal({
   const backDismiss = useOverlayBack(isOpen, onClose);
   const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   const [inputPage, setInputPage] = useState(currentPage.toString());
   const [expandedJuzs, setExpandedJuzs] = useState<Set<number>>(() => new Set([getJuzNumberForPage(currentPage)]));
 
@@ -198,10 +199,17 @@ export function MushafNavigationModal({
           dir={direction}
           data-dropdown-surface
           style={{ maxWidth: "min(36rem, calc(100vw - 1rem))" }}
-          onOpenAutoFocus={() => {
-            if (returnFocusRef.current?.isConnected) return;
-            if (document.activeElement instanceof HTMLElement && document.activeElement !== document.body) {
+          onOpenAutoFocus={(event) => {
+            if (
+              !returnFocusRef.current?.isConnected &&
+              document.activeElement instanceof HTMLElement &&
+              document.activeElement !== document.body
+            ) {
               returnFocusRef.current = document.activeElement;
+            }
+            if (initialTab === "surahs" && searchRef.current) {
+              event.preventDefault();
+              searchRef.current.focus();
             }
           }}
           onCloseAutoFocus={(event) => {
@@ -263,6 +271,7 @@ export function MushafNavigationModal({
                     <Search size={14} aria-hidden="true" />
                   </span>
                   <input
+                    ref={searchRef}
                     id="surah-search"
                     type="search"
                     value={searchQuery}

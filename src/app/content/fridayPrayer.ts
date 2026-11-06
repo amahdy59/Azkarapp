@@ -39,4 +39,5 @@ export const JUMUAH_VIRTUE: PrayerVirtue = {
     "“Whoever bathes, comes to Jumu‘ah, prays what is allotted to him, then listens quietly until the sermon ends and prays with the imam, is forgiven for the interval until the next Jumu‘ah and three additional days.”",
   referenceArabic: "صحيح مسلم ٨٥٧ أ",
   referenceEnglish: "Sahih Muslim 857a",
+  sourceUrl: "https://sunnah.com/muslim:857a",
 };
