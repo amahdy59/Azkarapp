@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-11-07",
+    "ar": [
+      "تحتاج الصفحة الرئيسية إلى بيانات أقل عند فتحها أول مرة، وتبقى سورة البقرة متاحة دون اتصال بعد تثبيت التطبيق.",
+      "عند تعديل موعد تذكير أو تغيير لغة التطبيق على أندرويد، يتحدّث التذكير المعني وتبقى بقية المواعيد كما هي.",
+      "يمكنك إعادة محاولة تنزيل المصحف إذا توقف، من دون تنزيل الصفحات والخطوط التي سبق التحقّق منها مجددًا."
+    ],
+    "en": [
+      "Home uses less data on a first visit, and you can still read Al-Baqarah offline after installing the app.",
+      "On Android, changing a reminder time or the app language updates the affected reminders and keeps the rest on schedule.",
+      "Retry a stalled Mushaf download and pick up from the pages and fonts the app already verified."
+    ]
+  },
+  {
     "release": "2026-11-06.6",
     "ar": [
       "يبدأ تحميل الصفحة الرئيسية مبكرًا، وتظل سورة البقرة متاحة للقراءة دون اتصال بعد تثبيت التطبيق.",

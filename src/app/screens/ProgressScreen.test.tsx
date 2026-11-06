@@ -1,5 +1,5 @@
 import { chooseProgressOption } from "../../test/progressSelect";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, onTestFinished, vi } from "vitest";
 import { act, render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { ProgressScreen } from "./ProgressScreen";
 import * as progressDomain from "../progress";
@@ -352,6 +352,11 @@ describe("ProgressScreen", () => {
   });
 
   it("switches the shared range between Day, Week, Month, and Year", async () => {
+    // Use a week with elapsed devotional days and no recorded Quran goal.
+    vi.setSystemTime(new Date(2026, 10, 6, 12));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     render(
       <ProgressScreen
         initialPeriod="day"

@@ -12,7 +12,21 @@ import "./styles/index.css";
 import { registerSW } from "virtual:pwa-register";
 import { applyServiceWorkerUpdate, prepareServiceWorkerUpdate } from "./app/pwaUpdate";
 
-const App = lazy(() => import("./app/App.tsx"));
+const App = lazy(() => {
+  // Start shell styles first so Home keeps the same cascade as normal navigation.
+  const application = import("./app/App.tsx");
+  let onboardingComplete = false;
+  try {
+    onboardingComplete = localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
+  } catch {
+    // An explicit Home route still works with storage disabled.
+  }
+  if (isHomeStartup(window.location.search, window.location.hash, onboardingComplete)) {
+    // The route owns loading and retry feedback if the early request fails.
+    void loadHomeScreen().catch(() => undefined);
+  }
+  return application;
+});
 const MarketingLanding = lazy(() => import("./app/screens/MarketingLanding.tsx"));
 const isMarketingLanding =
   window.location.pathname.replace(/\/$/, "").endsWith("/landing") ||
@@ -25,16 +39,6 @@ startPerformanceMonitoring();
 // Daily progress cleanup stays synchronous; optional cache maintenance runs after App commits.
 if (!isMarketingLanding) {
   pruneStaleFridayProgress();
-  let onboardingComplete = false;
-  try {
-    onboardingComplete = localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
-  } catch {
-    // An explicit Home route still works with storage disabled.
-  }
-  if (isHomeStartup(window.location.search, window.location.hash, onboardingComplete)) {
-    // The route owns loading and retry feedback if the early request fails.
-    void loadHomeScreen().catch(() => undefined);
-  }
 }
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
