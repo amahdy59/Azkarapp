@@ -5,7 +5,9 @@ for (const [language, width] of [
   ["ar", 390],
   ["en", 1440],
 ] as const) {
-  test(`cards share the Home routine frost ${language} ${width} @cross-browser`, async ({ page }, testInfo) => {
+  test(`cards share the Home routine frost and dense content uses stronger tint ${language} ${width} @cross-browser`, async ({
+    page,
+  }, testInfo) => {
     await page.setViewportSize({ width, height: 900 });
     await page.clock.setFixedTime(new Date("2026-10-18T08:00:00+03:00"));
     await page.addInitScript((language) => {
@@ -34,7 +36,7 @@ for (const [language, width] of [
     expect(material.tint).toBe("rgba(15, 23, 42, 0.24)");
     expect(material.frost).toBe("blur(22px) saturate(1.35)");
 
-    for (const route of ["home", "azkar", "progress", "settings/appearance"]) {
+    for (const route of ["home", "azkar", "progress", "settings/appearance", "settings/notifications"]) {
       await page.goto("/#/" + route);
       const scene = page.getByTestId("time-of-day-scene-window").last().locator("img");
       await expect.poll(() => scene.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
@@ -45,6 +47,9 @@ for (const [language, width] of [
               ".hero-glass.home-glass-surface:not(.home-glass-header):not(.home-glass-reading):not(.home-prayer-summary-card)",
             )
           : page.locator("[data-material-ui] [data-material-card]");
+      const expectsDenseCards = route === "progress" || route === "settings/notifications";
+      if (expectsDenseCards)
+        await expect(cards.and(page.locator('[data-material-card="dense"]')).first()).toBeVisible();
       await expect(cards.first()).toBeAttached();
       const surfaces = await cards.evaluateAll((nodes) =>
         nodes
@@ -57,7 +62,7 @@ for (const [language, width] of [
           .map((node) => {
             const style = getComputedStyle(node);
             const probe = document.createElement("span");
-            probe.style.backgroundColor = node.matches(".progress-records-surface.glass-reading")
+            probe.style.backgroundColor = node.matches('[data-material-card="dense"]')
               ? "color-mix(in srgb, var(--on-media-surface) 82%, transparent)"
               : "var(--glass-card-tint)";
             probe.style.backgroundImage = style.getPropertyValue("--paper-grain");
@@ -68,6 +73,7 @@ for (const [language, width] of [
               sheen: style.backgroundImage,
               frost: style.backdropFilter,
               expectedTint: expected.backgroundColor,
+              dense: node.matches('[data-material-card="dense"]'),
               expectedGrain: expected.backgroundImage,
             };
             probe.remove();
@@ -75,6 +81,9 @@ for (const [language, width] of [
           }),
       );
       expect(surfaces.length).toBeGreaterThan(0);
+      if (expectsDenseCards) {
+        expect(surfaces.some((surface) => surface.dense)).toBe(true);
+      }
       for (const surface of surfaces) {
         expect(surface.frost).toBe(material.frost);
         expect(surface.sheen).toContain(surface.expectedGrain);

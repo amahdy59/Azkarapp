@@ -7,6 +7,7 @@ import {
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { dashboardText } from "../src/app/i18n/progressDashboard";
 
 async function seed(page: Page, language: "ar" | "en", theme = "midnight", glass = true) {
   await page.clock.setFixedTime(new Date("2026-10-20T12:00:00+03:00"));
@@ -98,7 +99,9 @@ for (const language of ["ar", "en"] as const) {
     await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "custom");
     await page.getByTestId("progress-tab-overview").click();
     await expect(page.getByTestId("progress-empty-period")).toHaveCount(0);
-    await expect(page.getByTestId("progress-metric-pages")).toContainText(ar ? "٠" : "0");
+    const emptyPages = page.getByTestId("progress-metric-pages");
+    await expect(emptyPages.locator(".progress-metric-count")).toHaveText("—");
+    await expect(emptyPages).toContainText(dashboardText(language, "noMetricRecords"));
     await chooseProgressOption(dateButton, "day");
     await expect(page.getByTestId("progress-metric-pages")).toContainText(ar ? "٤" : "4");
     await openDates();

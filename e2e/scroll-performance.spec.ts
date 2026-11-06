@@ -122,8 +122,14 @@ for (const width of [390, 1440]) {
         .toBe(true);
       await page.evaluate(() => document.fonts.ready);
       const viewport = page.locator(".app-main-view");
-      await viewport.evaluate((root) => {
-        const region = [root, ...root.querySelectorAll<HTMLElement>("*")]
+      if (route === "azkar") await expect(page.getByTestId("category-card-morning")).toBeVisible();
+      await viewport.evaluate((root, route) => {
+        // The library's stationary header and horizontal rails are not its scroll owner.
+        const candidates =
+          route === "azkar"
+            ? [...root.querySelectorAll<HTMLElement>('[data-testid="library-content-scroll"]')]
+            : [root, ...root.querySelectorAll<HTMLElement>("*")];
+        const region = candidates
           .filter(
             (node) =>
               /auto|scroll/.test(getComputedStyle(node).overflowY) && node.scrollHeight > node.clientHeight + 100,
@@ -133,7 +139,7 @@ for (const width of [390, 1440]) {
           region.scrollTop = 0;
           region.setAttribute("data-glass-scroll-probe", "true");
         }
-      });
+      }, route);
       const region = page.locator('[data-glass-scroll-probe="true"]');
       await expect(region).toHaveCount(1);
       const trace = await page.evaluateHandle(() => {
@@ -168,7 +174,9 @@ for (const width of [390, 1440]) {
       await region.hover();
       const before = await region.evaluate((node) => node.scrollTop);
       await page.mouse.wheel(0, 180);
-      await expect.poll(() => region.evaluate((node) => node.scrollTop)).toBeGreaterThan(before + 50);
+      await expect
+        .poll(() => region.evaluate((node) => node.scrollTop), { message: `Wheel must scroll ${route}` })
+        .toBeGreaterThan(before + 50);
       const firstWheelTop = await region.evaluate((node) => node.scrollTop);
       await page.mouse.wheel(0, 180);
       // Short records can reach their native end on the first wheel. Require

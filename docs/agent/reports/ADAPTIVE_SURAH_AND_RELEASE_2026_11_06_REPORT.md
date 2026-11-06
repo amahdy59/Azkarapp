@@ -63,3 +63,11 @@ The Ubuntu package mirror delayed browser setup. The release keeps the complete 
 ## Recommended next step
 
 Confirm exact-commit Quality and Pages results and smoke the deployed application.
+
+## Release verification follow-up
+
+The release candidate passed 2,568 local unit tests, the frozen install, 28 pre-push browser smoke tests, the Pages build and production dependency audit. The artwork and listening sweep passed 42 cases across Chromium, Firefox and WebKit. A separate browser sweep passed 26 former release regressions, and the Firefox fallback layout sweep passed all eight cases.
+
+The first exact-commit CI run exposed three older browser expectations that still selected the prior progress copy, original calendar absence state or ordinary Glass tint. The updated checks assert the new accessible progress value, distinguish unavailable page counts from a recorded result, and verify the denser tint alongside identical frost and grain. The throttled scroll probe now locates the Library's stationary-content scroll owner explicitly and retains the original wheel and touch assertions.
+
+The lab scroll probe found longer frame intervals on Home under four-times CPU slowdown. The captures show responsive scroll and both Home prayer-header states. Physical-device frame pacing remains unverified.

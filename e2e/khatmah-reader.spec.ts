@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { chooseWirdOption } from "./helpers/wird";
+import { t } from "../src/app/i18n";
 
 test.beforeEach(async ({ page }) => {
   // The reader no longer talks to api.quran.com at all; blocking the remote
@@ -36,8 +37,11 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
       ),
     )
     .toBe(true);
-  const progress = page.getByRole("progressbar", { name: /أكملت ٠ من ٤/ });
+  const progress = page.getByRole("progressbar", { name: t("ar", "mushaf.todayReadingTitle"), exact: true });
   await expect(progress).toHaveAttribute("dir", "rtl");
+  await expect(progress).toHaveAttribute("aria-valuenow", "0");
+  await expect(progress).toHaveAttribute("aria-valuemax", "4");
+  await expect(progress).toHaveAttribute("aria-valuetext", t("ar", "mushaf.noPagesReadToday"));
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toBeVisible();
   await expect(page.getByRole("region", { name: "هذا الأسبوع" }).getByRole("listitem").first()).toContainText("السبت");
   const arabicAlignments = await page
@@ -90,7 +94,9 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect(mushafPage.locator("[data-mushaf-column] > div")).toHaveCount(15);
   const footerSeparation = await mushafPage.evaluate((article) => {
     const slots = [...article.querySelectorAll<HTMLElement>("[data-mushaf-column] > div")];
-    const folio = article.querySelector<HTMLElement>("[data-testid='mushaf-furniture-page-btn']");
+    const folio = article
+      .closest("[data-mushaf-reader]")
+      ?.querySelector<HTMLElement>("[data-testid='mushaf-furniture-page-btn']");
     const finalSlot = slots.at(-1);
     if (!folio || !finalSlot) return null;
     return {
@@ -187,7 +193,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   // Moving right goes back; the labelled controls keep the same semantics.
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
-  await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).dispatchEvent("click");
+  await pageNavigation.getByRole("button", { name: t("ar", "common.next"), exact: true }).dispatchEvent("click");
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 });
 
