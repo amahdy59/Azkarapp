@@ -13,7 +13,7 @@ export function NotificationUpcoming({
   language: AppLanguage;
   timeZone: string;
 }) {
-  const display = (event: ReminderOccurrence) => {
+  const display = (event: ReminderOccurrence, featured = false) => {
     const copy = notificationCopy(language, event, event.dateKey, event.prayerTime);
     const zone = ["morning", "evening", "before_sleep", "after_prayer"].includes(event.kind)
       ? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -26,9 +26,15 @@ export function NotificationUpcoming({
     }).format(event.at);
     return (
       <div key={event.key} className="min-w-0 border-t border-border/40 py-2 first:border-t-0">
-        <p className="text-sm font-semibold">{copy.title}</p>
-        <p className="text-sm text-muted-foreground">
-          {clock} · <bdi>{zone}</bdi>
+        <p className={featured ? "text-lg font-bold" : "text-sm font-semibold"}>{copy.title}</p>
+        <p
+          className={
+            featured
+              ? "font-semibold [overflow-wrap:anywhere]"
+              : "text-label text-muted-foreground [overflow-wrap:anywhere]"
+          }
+        >
+          <time dateTime={new Date(event.at).toISOString()}>{clock}</time> · <bdi>{zone}</bdi>
         </p>
         <EvidenceSource
           language={language}
@@ -45,13 +51,13 @@ export function NotificationUpcoming({
   };
   return (
     <div data-testid="notification-upcoming">
-      {events[0] ? display(events[0]) : <p className="text-sm">{t(language, "readiness.none")}</p>}
+      {events[0] ? display(events[0], true) : <p className="text-sm">{t(language, "readiness.none")}</p>}
       {events.length > 1 && (
         <details>
           <summary className="min-h-11 cursor-pointer rounded-lg py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
             {t(language, "notifications.upcoming")}
           </summary>
-          {events.slice(1, 4).map(display)}
+          {events.slice(1, 4).map((event) => display(event))}
         </details>
       )}
     </div>

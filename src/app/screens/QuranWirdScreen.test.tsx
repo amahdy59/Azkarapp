@@ -44,6 +44,22 @@ describe("QuranWirdScreen", () => {
     expect(screen.queryByRole("button", { name: /record a page/i })).not.toBeInTheDocument();
   });
 
+  it("describes an empty log and reading above the daily goal without inflating the progress scale", () => {
+    const props = renderScreen();
+    cleanup();
+    const { rerender } = render(<QuranWirdScreen {...props} wirdHistory={{}} />);
+    expect(screen.getByText("No pages recorded today")).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")[0]).toHaveAttribute("aria-valuenow", "0");
+    const today = getProgressDayKey(new Date(), 4);
+    rerender(<QuranWirdScreen {...props} wirdHistory={{ [today]: [20, 21, 22, 23, 24, 25] }} />);
+    expect(screen.getByText("6 pages read · 4-page goal reached")).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")[0]).toHaveAttribute("aria-valuenow", "4");
+    expect(screen.getAllByRole("progressbar")[0]).toHaveAttribute(
+      "aria-valuetext",
+      "6 pages read · 4-page goal reached",
+    );
+  });
+
   it("offers a draft mode for plan changes", async () => {
     const props = renderScreen();
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));

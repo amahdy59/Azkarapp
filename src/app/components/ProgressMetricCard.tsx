@@ -28,7 +28,7 @@ export function ProgressMetricCard({
   onExplore: () => void;
 }) {
   const hasDenominator = value.possible !== null && value.possible > 0;
-  const unknown = metric === "quranGoals" && !value.possible;
+  const unknown = valueText === "—";
   return (
     <div
       className="progress-metric-card surface-card-finish"

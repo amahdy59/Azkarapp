@@ -28,6 +28,7 @@ for (const language of ["ar", "en"] as const) {
         return { radius: style.borderRadius, border: style.borderColor, background: style.backgroundColor };
       });
       expect(readingPaint).toEqual(paint);
+      await expect(page.locator("[data-settings-subheading]")).toBeFocused();
       await medium.focus();
       await expect(medium).toBeFocused();
       await page.keyboard.press(language === "ar" ? "ArrowLeft" : "ArrowRight");

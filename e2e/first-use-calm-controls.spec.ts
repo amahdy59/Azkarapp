@@ -46,11 +46,24 @@ for (const language of ["ar", "en"] as const) {
     ).toEqual({ notifications: 0, storage: 0 });
     await expect
       .poll(() =>
-        page.evaluate(
-          () => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.reminders.beforeFajrDua?.enabled,
-        ),
+        page.evaluate(() => {
+          const reminders = JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.reminders;
+          return Object.fromEntries(
+            ["prayer", "morning", "evening", "before_sleep", "after_prayer", "beforeFajrDua"].map((kind) => [
+              kind,
+              reminders[kind]?.enabled,
+            ]),
+          );
+        }),
       )
-      .toBe(true);
+      .toEqual({
+        prayer: true,
+        morning: true,
+        evening: true,
+        before_sleep: true,
+        after_prayer: true,
+        beforeFajrDua: false,
+      });
     await setup.getByRole("button", { name: t(language, "notifications.requestPermission"), exact: true }).click();
     await expect(setup.getByText(t(language, "notifications.permissionDenied"), { exact: true })).toBeVisible();
     await setup.getByRole("button", { name: t(language, "firstUse.protectStorage"), exact: true }).click();

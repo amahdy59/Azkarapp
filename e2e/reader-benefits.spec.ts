@@ -26,7 +26,7 @@ for (const language of ["ar", "en"] as const) {
         }, language);
         await page.goto(`/#/azkar/${route}`);
         await expect(page.getByTestId("surah-reading-actions")).toBeVisible();
-        await expect(page.getByTestId("surah-reading-actions").locator(":scope > button")).toHaveCount(3);
+        await expect(page.getByTestId("reader-surah-controls").getByRole("button")).toHaveCount(3);
         await expect(page.getByTestId("reader-benefit-dock-button")).toHaveCount(0);
         await page.getByTestId("reader-mushaf-button").click();
         const mushaf = page.getByTestId("mushaf-immersive");

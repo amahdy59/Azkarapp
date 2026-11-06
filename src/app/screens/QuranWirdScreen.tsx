@@ -188,6 +188,12 @@ export function QuranWirdScreen({
   const goal = todayProgress.goal;
   const read = todayProgress.read;
   const remaining = todayProgress.remaining;
+  const progressValues = { read: formatNumerals(read, language), goal: formatNumerals(goal, language) };
+  const progressLabel = t(
+    language,
+    read === 0 ? "mushaf.noPagesReadToday" : read > goal ? "mushaf.exceededPageGoal" : "mushaf.completedCount",
+    progressValues,
+  );
 
   const repeatStart = plan.repeatStartPage ?? 1;
   const repeatEnd = plan.repeatEndPage ?? TOTAL_MUSHAF_PAGES;
@@ -379,7 +385,7 @@ export function QuranWirdScreen({
                       <span>{t(language, "mushaf.statusCompleted")}</span>
                     </>
                   ) : (
-                    <span>{t(language, "mushaf.statusInProgress")}</span>
+                    <span>{t(language, read === 0 ? "mushaf.notStarted" : "mushaf.statusInProgress")}</span>
                   )}
                 </span>
               )}
@@ -457,17 +463,12 @@ export function QuranWirdScreen({
                   </p>
                 </div>
 
-                <p className="mb-2 text-sm font-bold text-foreground">
-                  {t(language, "mushaf.completedCount", {
-                    read: formatNumerals(read, language),
-                    goal: formatNumerals(goal, language),
-                  })}
+                <p className={`mb-2 text-sm ${read === 0 ? "text-muted-foreground" : "font-bold text-foreground"}`}>
+                  {progressLabel}
                 </p>
                 <ProgressBar
-                  aria-label={t(language, "mushaf.todayProgress", {
-                    read: formatNumerals(read, language),
-                    goal: formatNumerals(goal, language),
-                  })}
+                  aria-label={t(language, "mushaf.todayReadingTitle")}
+                  aria-valuetext={progressLabel}
                   value={Math.min(read, goal)}
                   max={Math.max(goal, 1)}
                   height={8}

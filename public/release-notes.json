@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-06.2",
+  "release": "2026-11-06.3",
   "ar": [
-    "تظل الصلاة القادمة أمامك عند التمرير في الرئيسية، وتترك البطاقات مساحة أكبر لورد اليوم وتقويم التسجيلات.",
-    "تابع الكلمة المتلوّة بتظليل هادئ في المصحف، مع ثبات أشرطة القراءة أثناء تقليب الصفحات والتكبير.",
-    "يمكنك معاينة رسالة التذكير التالي قبل وصولها، وتفعيل تذكير الجمعة بالصلاة على النبي أو تذكيرات الاستعداد للصيام.",
-    "يظهر شعار الهلال والنجمة في وَذَكِّرْ، وتجد في صفحة «حول» معلومات الفريق وروابط الأسئلة الشائعة."
+    "تظل الصلاة القادمة أمامك عند التمرير في الرئيسية، وتستفيد من مساحة أكبر لورد اليوم والتقويم.",
+    "تتكيّف صور السور مع شاشتك، ويمكنك فتح المصحف مباشرةً ومتابعة الكلمة المتلوّة بتظليل هادئ، وتبقى الصفحة ثابتة عند توقّف القارئ لالتقاط أنفاسه.",
+    "تفرّق صفحات الورد والتقدّم بين عدم تسجيل صفحات وتحقيق الهدف أو تجاوزه.",
+    "عاين التذكير التالي وخيارات التنبيه، وتعرّف على الفريق وروابط المساعدة من صفحة «حول» بشعار وَذَكِّرْ الجديد."
   ],
   "en": [
-    "Keep the next prayer in view as you scroll Home, and find your place more easily in Quran Wird and the Progress calendar.",
-    "Follow the spoken word with a softer Mushaf highlight while the reading controls stay steady during page turns and zoom.",
-    "Preview your next reminder and choose whether to receive Friday salawat or fasting preparation reminders.",
-    "Find team contacts and answers to common questions in About, alongside the wa-zaker crescent and star."
+    "Keep the next prayer in view while scrolling Home, with more room for your daily routines and Progress calendar.",
+    "See surah artwork sized for your screen, open the Mushaf directly, and follow a softer word highlight while the page stays in place during pauses.",
+    "Quran Wird and Progress distinguish an empty reading log from reaching or passing your goal.",
+    "Preview your next reminder and review delivery options. Find team and help links in About alongside the new wa-zaker logo."
   ]
 }

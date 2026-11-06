@@ -51,12 +51,14 @@ for (const language of ["ar", "en"] as const) {
     const edit = plan.getByRole("button");
     await expect(edit).toBeVisible();
     const planBefore = await plan.boundingBox();
-    if (language === "ar")
-      expect(Math.abs(planBefore!.height - (await today.boundingBox())!.height)).toBeLessThanOrEqual(1);
+    const todayBefore = await today.boundingBox();
+    if (language === "ar") expect(Math.abs(planBefore!.y - todayBefore!.y)).toBeLessThanOrEqual(1);
+    else expect(planBefore!.y).toBeGreaterThanOrEqual(todayBefore!.y + todayBefore!.height);
     await edit.click();
     const planDialog = page.getByTestId("quran-plan-dialog");
     await expect(planDialog).toBeVisible();
     expect(await plan.boundingBox()).toEqual(planBefore);
+    expect(await today.boundingBox()).toEqual(todayBefore);
     await page.screenshot({ path: info.outputPath("plan-modal.png") });
     await page.keyboard.press("Escape");
     await expect(planDialog).toBeHidden();

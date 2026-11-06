@@ -70,8 +70,11 @@ for (const fallback of [false, true])
         else await expect(text.locator("[data-quran-word]").first()).toBeVisible();
         await page.evaluate(() => document.fonts.ready);
         const toggle = page.getByRole("switch", { name: "كلمات غريبة", exact: true });
+        const glyphSelector = fallback ? "[data-quran-word]" : "[data-quran-glyph]";
         for (const width of widths) {
           await page.setViewportSize({ width, height: 780 });
+          await expect(text.locator(glyphSelector).first()).toBeVisible();
+          await page.evaluate(() => document.fonts.ready);
           await expect.poll(() => text.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
           await text.evaluate(
             () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
@@ -87,6 +90,8 @@ for (const fallback of [false, true])
           }
         }
         await page.setViewportSize({ width: 390, height: 780 });
+        await expect(text.locator(glyphSelector).first()).toBeVisible();
+        await page.evaluate(() => document.fonts.ready);
         const scroll = page.locator(".reader-text-scroll:visible");
         await scroll.evaluate((el) => {
           el.scrollTop = 0;

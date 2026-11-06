@@ -25,6 +25,7 @@ export function progressHeatmapDay(
   if (dayKey > window.endKey) return { ...empty, kind: "future" };
   if (dayKey < window.startKey || (metric === "quranGoals" && row?.quranGoals == null))
     return { ...empty, kind: "unavailable" };
+  if (metric === "pages" && !row?.pages) return { ...empty, kind: "none" };
   const value = row?.[metric] ?? 0;
   const possible = metric === "pages" ? null : metric === "prayers" ? 5 : metric === "routines" ? 3 : 1;
   const level =

@@ -294,9 +294,37 @@ export function NotificationsPanel({
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
         <section
           className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+          data-material-card="dense"
           aria-labelledby="notification-permission"
         >
-          <details data-testid="notification-permission-details" open={permission === "granted" ? undefined : true}>
+          <dl className="space-y-3 text-sm" data-testid="reminder-readiness">
+            <div>
+              <dt className="flex items-center gap-2 font-semibold text-muted-foreground">
+                <Clock size={19} className="shrink-0 text-primary" aria-hidden="true" />
+                {t(language, "readiness.next")}
+              </dt>
+              <dd className="mt-1">
+                <NotificationUpcoming events={upcoming} language={language} timeZone={timeZone!} />
+              </dd>
+            </div>
+            <div>
+              <dt className="sr-only">{t(language, "readiness.location")}</dt>
+              <dd className="text-label text-muted-foreground [overflow-wrap:anywhere]">
+                {displayLocationName(locationSettings, language)} · <bdi>{timeZone}</bdi>
+              </dd>
+            </div>
+          </dl>
+
+          {onOpenLocation && (
+            <Button type="button" variant="pill" size="pill" className="mt-3 max-w-full" onClick={onOpenLocation}>
+              {t(language, "readiness.changeLocation")}
+            </Button>
+          )}
+          <details
+            className="mt-3 border-t border-border/60 pt-2"
+            data-testid="notification-permission-details"
+            open={permission === "granted" ? undefined : true}
+          >
             <summary className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
               {permission === "granted" ? (
                 <CheckCircle2 size={22} className="shrink-0 text-primary" />
@@ -408,36 +436,11 @@ export function NotificationsPanel({
               {t(language, isNativeAndroid() ? "readiness.native" : "readiness.browser")}
             </p>
           </details>
-          <dl
-            className="mt-4 space-y-3 rounded-2xl border border-border/40 bg-background/60 p-4 text-sm"
-            data-testid="reminder-readiness"
-          >
-            <div>
-              <dt className="flex items-center gap-2 text-muted-foreground">
-                <Clock size={19} className="shrink-0 text-primary" aria-hidden="true" />
-                {t(language, "readiness.next")}
-              </dt>
-              <dd className="mt-1">
-                <NotificationUpcoming events={upcoming} language={language} timeZone={timeZone!} />
-              </dd>
-            </div>
-            <div className="border-t border-border/40 pt-3">
-              <dt className="text-muted-foreground">{t(language, "readiness.location")}</dt>
-              <dd className="break-words">
-                {displayLocationName(locationSettings, language)} · <bdi>{timeZone}</bdi>
-              </dd>
-            </div>
-          </dl>
-
-          {onOpenLocation && (
-            <Button type="button" variant="pill" size="pill" className="mt-3 max-w-full" onClick={onOpenLocation}>
-              {t(language, "readiness.changeLocation")}
-            </Button>
-          )}
         </section>
 
         <section
           className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+          data-material-card="dense"
           aria-labelledby="prayer-reminders-title"
         >
           <div className="flex items-center gap-3">
@@ -554,7 +557,10 @@ export function NotificationsPanel({
             </h2>
             <p className="mt-1 text-label text-muted-foreground">{t(language, "notifications.deviceClock")}</p>
           </div>
-          <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
+          <div
+            className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised"
+            data-material-card="dense"
+          >
             {(["morning", "evening", "before_sleep", "after_prayer"] as const).map((kind) => (
               <ReminderScheduleRow
                 key={kind}

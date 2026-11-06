@@ -136,7 +136,7 @@ export function ProgressDashboard({
   );
   const quantity = (key: ProgressMetric) => {
     const value = values[key];
-    return key === "quranGoals" && !value.possible
+    return (key === "quranGoals" && !value.possible) || (key === "pages" && value.count === 0)
       ? "—"
       : value.possible === null
         ? formatNumerals(value.count, language)
@@ -335,7 +335,7 @@ export function ProgressDashboard({
           />
           <div className="progress-routine-column">
             <ProgressRoutineComparison values={values} language={language} />
-            <div className="progress-summary-card progress-rhythm-panel" data-material-card>
+            <div className="progress-summary-card progress-rhythm-panel" data-material-card="dense">
               <RecordedPagesChart
                 title={t(language, "home.recordedPagesRhythm")}
                 language={language}
@@ -347,24 +347,21 @@ export function ProgressDashboard({
                 )}
               />
             </div>
-            {view === "overview" &&
-              hasActivity &&
-              values.morning.days >= 3 &&
-              values.morning.count !== values.evening.count && (
-                <aside className="progress-insight-card" data-material-card aria-label={text(language, "insight")}>
-                  <Lightbulb className="progress-practice-icon" aria-hidden="true" />
-                  <div>
-                    <h3 className="text-sm font-bold">{text(language, "insight")}</h3>
-                    <p className="mt-1 text-sm leading-relaxed">
-                      {text(language, "routineInsight", {
-                        morning: formatNumerals(values.morning.count, language),
-                        evening: formatNumerals(values.evening.count, language),
-                      })}
-                    </p>
-                  </div>
-                </aside>
-              )}
           </div>
+          {hasActivity && values.morning.days >= 3 && values.morning.count !== values.evening.count && (
+            <aside className="progress-insight-card" data-material-card aria-label={text(language, "insight")}>
+              <Lightbulb className="progress-practice-icon" aria-hidden="true" />
+              <div>
+                <h3 className="text-sm font-bold">{text(language, "insight")}</h3>
+                <p className="mt-1 text-sm leading-relaxed">
+                  {text(language, "routineInsight", {
+                    morning: formatNumerals(values.morning.count, language),
+                    evening: formatNumerals(values.evening.count, language),
+                  })}
+                </p>
+              </div>
+            </aside>
+          )}
         </div>
       )}
       {view === "trends" && (
@@ -372,7 +369,7 @@ export function ProgressDashboard({
           <section
             className="progress-trend-card rounded-2xl border border-border bg-card p-4 sm:p-5"
             aria-labelledby={`${id}-trend`}
-            data-material-card
+            data-material-card="dense"
           >
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <h2 id={`${id}-trend`} className="text-lg font-bold">

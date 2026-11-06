@@ -48,6 +48,10 @@ describe("Progress heatmap and rolling dates", () => {
       value: 0,
       possible: 5,
     });
+    expect(progressHeatmapDay(undefined, "2026-10-14", "pages", range, window)).toMatchObject({
+      kind: "none",
+      value: null,
+    });
     expect(progressHeatmapDay(undefined, "2026-10-14", "quranGoals", range, window)).toMatchObject({
       kind: "unavailable",
       value: null,

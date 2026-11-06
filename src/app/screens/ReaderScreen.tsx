@@ -128,7 +128,11 @@ const READER_SIDEBAR_TOGGLE_CLASS =
 
 const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran-720.webp`;
 const SURAH_CARD_ORIGIN = "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/visuals/surah/2026-11-04";
-const SURAH_CARD_ART: Readonly<Partial<Record<number, string>>> = { 18: "al-kahf", 32: "as-sajdah", 67: "al-mulk" };
+const SURAH_CARD_ART: Readonly<Partial<Record<number, { name: string; focus: string }>>> = {
+  18: { name: "al-kahf", focus: "50% 55%" },
+  32: { name: "as-sajdah", focus: "54% 55%" },
+  67: { name: "al-mulk", focus: "50% 45%" },
+};
 
 const SharingPreview = lazy(() =>
   import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
@@ -812,81 +816,85 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <article
-      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation"}`}
+      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "reader-surah-entry" : "cursor-pointer touch-manipulation"}`}
     >
       {longSurah ? (
-        <div
-          className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 pb-5 pt-2"
-          data-testid="surah-reading-actions"
-        >
-          <h2 className="reader-surah-title" dir="auto" lang={language} data-testid="reader-zikr-title">
-            {readerZikrTitle}
-          </h2>
-          <figure className="reader-surah-artwork relative mb-1 w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
+        <div className="reader-surah-layout" data-testid="surah-reading-actions">
+          <div className="reader-surah-heading">
+            <h2 className="reader-surah-title" dir="auto" lang={language} data-testid="reader-zikr-title">
+              {readerZikrTitle}
+            </h2>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.currentTarget.focus({ preventScroll: true });
+                handleShare();
+              }}
+              aria-haspopup="dialog"
+              aria-label={t(language, "reader.shareCurrent")}
+              data-testid="reader-surah-share-button"
+              className={`flex size-11 items-center justify-center rounded-xl border border-border bg-card/80 text-foreground hover:bg-muted ${ACTION_FOCUS}`}
+            >
+              <ShareExport size={20} aria-hidden="true" />
+            </button>
+          </div>
+          <figure className="reader-surah-artwork w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
             <img
-              key={surahCardArt}
-              src={surahCardArt ? `${SURAH_CARD_ORIGIN}/${surahCardArt}-384.webp` : QURAN_CARD_IMAGE}
+              key={surahCardArt?.name}
+              src={surahCardArt ? `${SURAH_CARD_ORIGIN}/${surahCardArt.name}-384.webp` : QURAN_CARD_IMAGE}
               srcSet={
                 surahCardArt
-                  ? `${SURAH_CARD_ORIGIN}/${surahCardArt}-384.webp 384w, ${SURAH_CARD_ORIGIN}/${surahCardArt}-768.webp 768w`
+                  ? `${SURAH_CARD_ORIGIN}/${surahCardArt.name}-384.webp 384w, ${SURAH_CARD_ORIGIN}/${surahCardArt.name}-768.webp 768w`
                   : undefined
               }
-              sizes="(max-width: 416px) calc(100vw - 32px), 384px"
+              sizes="auto, (max-width: 576px) calc(100vw - 32px), 584px"
+              loading="lazy"
+              width={768}
+              height={576}
               onError={({ currentTarget }) => {
                 if (!currentTarget.srcset) return;
                 currentTarget.removeAttribute("srcset");
                 currentTarget.src = QURAN_CARD_IMAGE;
               }}
               alt=""
-              aria-hidden="true"
-              className="h-full w-full object-cover object-center opacity-75"
+              className="h-full w-full object-cover"
+              style={{ objectPosition: surahCardArt?.focus }}
               decoding="async"
             />
-            <div className="absolute inset-x-0 bottom-0 flex justify-center pb-3" aria-hidden="true">
-              <span className="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-card/90 text-primary shadow-soft backdrop-blur-sm">
-                <BookOpen size={22} />
-              </span>
-            </div>
+          </figure>
+          <div className="reader-surah-controls" data-testid="reader-surah-controls">
             <button
               type="button"
-              onClick={handleShare}
-              aria-label={t(language, "reader.shareCurrent")}
-              data-testid="reader-surah-share-button"
-              className={`absolute end-2 top-2 flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-muted ${ACTION_FOCUS}`}
+              onClick={() => setImmersiveOpen(true)}
+              data-testid="reader-mushaf-button"
+              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-primary px-4 py-2.5 text-subtitle font-bold text-primary-foreground transition-colors hover:bg-primary/90 ${ACTION_FOCUS}`}
             >
-              <ShareExport size={20} aria-hidden="true" />
+              <BookOpen size={20} className="shrink-0" aria-hidden="true" />
+              {t(language, "reader.readFromMushaf")}
             </button>
-          </figure>
-          <button
-            type="button"
-            onClick={surahAudio?.onToggle ?? onPlayAudio}
-            disabled={!audioAvailable}
-            aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary/10 px-6 py-4 text-subtitle font-bold text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
-          >
-            <Volume2 size={20} />
-            {t(language, "reader.listenToSurah")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setImmersiveOpen(true)}
-            data-testid="reader-mushaf-button"
-            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 text-subtitle font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <BookOpen size={20} />
-            {t(language, "reader.readFromMushaf")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!isDone) handleZikrCompletion(idx);
-              onAdvance(idx);
-            }}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border/60 bg-card px-6 py-4 text-subtitle font-bold text-foreground transition-colors hover:bg-muted"
-          >
-            <Check size={20} />
-            {t(language, "reader.readExternally")}
-          </button>
+            <button
+              type="button"
+              onClick={surahAudio?.onToggle ?? onPlayAudio}
+              disabled={!audioAvailable}
+              aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
+              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-primary/10 px-4 py-2.5 text-subtitle font-bold text-primary transition-colors hover:bg-primary/20 disabled:opacity-50 ${ACTION_FOCUS}`}
+            >
+              <Volume2 size={20} className="shrink-0" aria-hidden="true" />
+              {t(language, "reader.listenToSurah")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!isDone) handleZikrCompletion(idx);
+                onAdvance(idx);
+              }}
+              className={`mx-auto flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-label font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${ACTION_FOCUS}`}
+            >
+              <Check size={18} className="shrink-0" aria-hidden="true" />
+              {t(language, "reader.readExternally")}
+            </button>
+          </div>
+          {azkar.length > 1 && renderSurahNavigation()}
         </div>
       ) : (
         <>
@@ -1022,13 +1030,13 @@ export function ReaderScreen({
     );
   };
 
-  const renderSideNavigation = () => (
+  const renderSurahNavigation = () => (
     <div
-      className="pointer-events-none absolute inset-x-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-between md:flex"
+      className="reader-surah-navigation flex items-center justify-between border-t border-border/60 pt-2"
       data-testid="reader-side-navigation"
     >
-      <div className="pointer-events-auto">{renderNavigationButton("prev", false)}</div>
-      <div className="pointer-events-auto">{renderNavigationButton("next", false)}</div>
+      {renderNavigationButton("prev")}
+      {renderNavigationButton("next")}
     </div>
   );
 
@@ -1779,9 +1787,11 @@ export function ReaderScreen({
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
-                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ${longSurah ? "px-28" : "px-4 md:px-6"} py-2 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable both-edges]`}
+                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ${longSurah ? "" : "px-4 md:px-6"} py-2 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable both-edges]`}
                       >
-                        <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-1">
+                        <div
+                          className={`mx-auto flex min-h-full w-full flex-col py-1 ${longSurah ? "" : "reading-measure"}`}
+                        >
                           <div style={dragStyle} className="flex w-full flex-1 flex-col">
                             <ReadingTextTransition
                               entryId={z.id}
@@ -1800,7 +1810,6 @@ export function ReaderScreen({
                           </div>
                         </div>
                       </div>
-                      {longSurah && renderSideNavigation()}
                     </div>
 
                     {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}

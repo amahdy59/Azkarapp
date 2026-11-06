@@ -2,7 +2,9 @@
 
 ## Active phase
 
-[Home date rail and pending release](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md) is the current owner-approved phase. The owner lifts the previous commit and publication hold and requests screenshots, exact-commit verification and production smoke.
+[Adaptive surah entry and release](phases/ADAPTIVE_SURAH_AND_RELEASE_2026_11_06.md) is the current owner-approved phase.
+
+[Home date rail and pending release](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md) records the preceding owner-approved phase. The owner lifts the previous commit and publication hold and requests screenshots, exact-commit verification and production smoke.
 
 ## Pending work included in this release
 

@@ -22,8 +22,7 @@ for (const language of ["ar", "en"] as const) {
     await opener.click();
     const sheet = page.getByTestId("todays-path-sheet");
     const close = sheet.getByTestId("modal-close-button");
-    const bounds = (await close.boundingBox())!;
-    await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+    await close.hover();
     await page.mouse.down();
     await expect
       .poll(() =>

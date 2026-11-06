@@ -76,9 +76,9 @@ export function PagedQuranListeningReader({
     setFollow(true);
     setManualIndex(0);
   }, [entry.entryId, segment?.variantId]);
-  const ayah = Number(cue.verseKey?.split(":")[1]);
+  const ayah = Number(cue.followVerseKey?.split(":")[1]);
   const playingIndex =
-    cue.verseKey && Number(cue.verseKey.split(":")[0]) === entry.quranRange?.surah
+    cue.followVerseKey && Number(cue.followVerseKey.split(":")[0]) === entry.quranRange?.surah
       ? pages.findIndex((page) => ayah >= page.startAyah && ayah <= page.endAyah)
       : -1;
   const index = follow && timing && playingIndex >= 0 ? playingIndex : Math.min(manualIndex, pages.length - 1);
@@ -98,12 +98,13 @@ export function PagedQuranListeningReader({
     });
   }, [translation, result, page.startAyah, page.endAyah]);
   const hasWords = !error && Boolean(timing?.verses.some((verse) => verse.words?.length));
+  const inCueGap = cue.followVerseKey !== null && (!cue.verseKey || (words && cue.verseHasWords && !cue.word));
   const browse = (next: number) => {
     setFollow(false);
     setManualIndex(next);
   };
   useEffect(() => {
-    if (!follow || !result) return;
+    if (!follow || !result || inCueGap) return;
     const cueTarget =
       root.current?.querySelector<HTMLElement>('[data-playback-word="true"]') ??
       root.current?.querySelector<HTMLElement>("[data-playback-verse]");
@@ -146,6 +147,7 @@ export function PagedQuranListeningReader({
   }, [
     follow,
     result,
+    inCueGap,
     cue.verseKey,
     cue.word?.position,
     magnification,
@@ -163,7 +165,7 @@ export function PagedQuranListeningReader({
     const key = `${magnification}:${page.page}`;
     const changed = positionedZoom.current !== key;
     positionedZoom.current = key;
-    if (!changed && !follow) return;
+    if (!changed && (!follow || inCueGap)) return;
     let frame = 0;
     const position = () => {
       const current = follow
@@ -193,7 +195,7 @@ export function PagedQuranListeningReader({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [magnification, result, follow, page.page, entry.quranRange?.surah]);
+  }, [magnification, result, follow, inCueGap, page.page, entry.quranRange?.surah]);
   useEffect(() => {
     const viewport = root.current?.closest<HTMLElement>(".audio-expanded-text") ?? root.current;
     const pauseFollowing = () => {

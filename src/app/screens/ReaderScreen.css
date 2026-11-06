@@ -125,14 +125,17 @@
 .reader-surah-title {
   max-inline-size: 100%;
   color: #f0c14b;
-  font:
-    700 2rem / 1.6 Georgia,
-    serif;
+  font-size: clamp(1.75rem, 5.8cqw, 3rem);
+  font-weight: 700;
+  line-height: 1.42;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
 .reader-surah-title:lang(ar) {
   font-family: var(--font-mushaf);
+  font-size: clamp(2.15rem, 5.8cqw, 3.65rem);
+  font-weight: 400;
+  font-synthesis: none;
 }
 .theme-light .reader-surah-title {
   color: #835806;
@@ -144,5 +147,76 @@ html[data-app-material-resolved="glass"]:not(.high-contrast) .reader-surah-title
   color: var(--foreground);
 }
 .reader-surah-artwork {
+  grid-area: photo;
+  min-inline-size: 0;
   aspect-ratio: 4 / 3;
+  max-block-size: min(49dvh, 28rem);
+}
+
+@media (max-height: 720px) {
+  .reader-surah-artwork {
+    max-block-size: 35dvh;
+  }
+}
+
+.reader-surah-entry {
+  container: surah-entry / inline-size;
+}
+
+.reader-surah-layout {
+  display: grid;
+  grid-template:
+    "heading"
+    "photo"
+    "controls"
+    "navigation" / minmax(0, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-inline-size: 34rem;
+  padding-block: 0.25rem 1rem;
+}
+
+.reader-surah-heading {
+  grid-area: heading;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.625rem;
+  text-align: start;
+}
+
+.reader-surah-controls {
+  grid-area: controls;
+  display: grid;
+  gap: 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.reader-surah-navigation {
+  grid-area: navigation;
+}
+
+@container surah-entry (min-width: 50rem) {
+  .reader-surah-layout {
+    grid-template:
+      "photo heading" 1fr
+      "photo controls" 1fr
+      "navigation navigation" auto / minmax(0, 1.45fr) minmax(0, 1fr);
+    align-items: start;
+    max-inline-size: 68rem;
+    gap: 1rem clamp(1.5rem, 3cqw, 2.625rem);
+    margin-block-start: clamp(0.75rem, 5dvh, 4rem);
+    padding: clamp(1.25rem, 3cqw, 2.5rem);
+    border: 1px solid var(--border);
+    border-radius: 1.75rem;
+    background-color: color-mix(in srgb, var(--card) 70%, transparent);
+  }
+
+  .reader-surah-heading {
+    align-self: end;
+  }
+
+  .reader-surah-artwork {
+    align-self: center;
+  }
 }

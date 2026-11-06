@@ -31,7 +31,7 @@ export const ProgressRoutineComparison = memo(function ProgressRoutineComparison
   return (
     <section
       className="progress-summary-card progress-routine-comparison"
-      data-material-card
+      data-material-card="dense"
       data-testid="progress-routine-bars"
       aria-labelledby={`${id}-heading`}
     >

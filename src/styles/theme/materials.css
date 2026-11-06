@@ -87,8 +87,19 @@
       background-color: color-mix(in srgb, var(--on-media-surface) 82%, transparent);
       backdrop-filter: var(--glass-frost);
     }
+    /* Keep small chart and settings labels legible over bright photography.
+       This changes the owning surface's tint without introducing a filter. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] [data-material-card="dense"] {
+      background-color: color-mix(in srgb, var(--on-media-surface) 82%, transparent);
+    }
     html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] [data-material-elevation="flat"] {
       box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] .progress-metric-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px var(--primary);
+      }
     }
     /* Home's stronger reading tint also supports Quran pages and overlays.
        Glyphs, page geometry and reading interactions remain unchanged. */

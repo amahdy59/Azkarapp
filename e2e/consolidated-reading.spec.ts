@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
 
-test("Mushaf furniture follows the fitted primary Quran page without changing fifteen slots @cross-browser", async ({
+test("Mushaf chrome stays fixed while the fitted Quran page keeps fifteen slots @cross-browser", async ({
   page,
 }, info) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -21,15 +21,21 @@ test("Mushaf furniture follows the fitted primary Quran page without changing fi
   const canvas = page.locator('[data-mushaf-page="42"]');
   await expect(canvas).toHaveAttribute("data-mushaf-rendering", "qcf-v2");
   await expect(canvas.locator("[data-mushaf-column] > div")).toHaveCount(15);
-  await expect
-    .poll(() =>
-      canvas.evaluate((node) => {
-        const head = node.querySelector(".mushaf-page-furniture")!.getBoundingClientRect();
-        const body = node.querySelector("[data-mushaf-column]")!.getBoundingClientRect();
-        return Math.max(Math.abs(head.left - body.left), Math.abs(head.right - body.right));
-      }),
-    )
-    .toBeLessThanOrEqual(1);
+  const reader = page.locator("[data-mushaf-reader]");
+  const header = reader.locator(".mushaf-desktop-top");
+  const footer = reader.locator(".mushaf-desktop-bottom");
+  await expect(header).toBeVisible();
+  await expect(footer).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const before = [await header.boundingBox(), await footer.boundingBox()];
+  const column = (await canvas.locator("[data-mushaf-column]").boundingBox())!;
+  expect(column.width).toBeGreaterThan(0);
+  expect(column.y).toBeGreaterThanOrEqual(before[0]!.y + before[0]!.height - 1);
+  expect(column.y + column.height).toBeLessThanOrEqual(before[1]!.y + 1);
+  await reader.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.locator('[data-mushaf-page="43"] [data-mushaf-column] > div')).toHaveCount(15);
+  expect([await header.boundingBox(), await footer.boundingBox()]).toEqual(before);
   await page.screenshot({ path: info.outputPath("mushaf-primary-paper.png") });
 });
 

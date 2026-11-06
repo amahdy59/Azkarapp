@@ -81,27 +81,28 @@ function validInterval(value: { startMs: number; endMs: number }, lower: number,
   );
 }
 
-/** End-exclusive lookup deliberately returns no highlight during unannotated pauses. */
-function findInterval<T extends { startMs: number; endMs: number }>(items: readonly T[], ms: number): T | null {
+/** Latest interval to begin. Its end still bounds the actual highlight. */
+function findStartedInterval<T extends { startMs: number }>(items: readonly T[], ms: number): T | undefined {
   let low = 0;
-  let high = items.length - 1;
-  while (low <= high) {
+  let high = items.length;
+  while (low < high) {
     const mid = (low + high) >>> 1;
-    const item = items[mid]!;
-    if (ms < item.startMs) high = mid - 1;
-    else if (ms >= item.endMs) low = mid + 1;
-    else return item;
+    if (ms < items[mid]!.startMs) high = mid;
+    else low = mid + 1;
   }
-  return null;
+  return items[low - 1];
 }
 
 export function getQuranPlaybackCue(annotation: QuranTimingAnnotation | null, currentTime: number) {
   const ms = currentTime * 1000; // Media time already accounts for playback speed.
-  const verse = annotation && Number.isFinite(ms) ? findInterval(annotation.verses, ms) : null;
-  const word = verse ? findInterval(verse.words ?? [], ms) : null;
+  const started = annotation && Number.isFinite(ms) ? findStartedInterval(annotation.verses, ms) : undefined;
+  const verse = started && ms < started.endMs ? started : undefined;
+  const word = verse?.words && findStartedInterval(verse.words, ms);
   return {
+    followVerseKey: started?.verseKey ?? null,
     verseKey: verse?.verseKey ?? null,
-    word: word && verse ? { verseKey: verse.verseKey, position: word.position } : null,
+    verseHasWords: Boolean(verse?.words?.length),
+    word: word && verse && ms < word.endMs ? { verseKey: verse.verseKey, position: word.position } : null,
   };
 }
 

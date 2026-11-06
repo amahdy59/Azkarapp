@@ -25,6 +25,7 @@ function Passage({
   props,
   verseKey,
   word,
+  atRecordingStart,
   follow,
   followIntent,
 }: {
@@ -33,6 +34,7 @@ function Passage({
   props: QuranListeningReaderProps;
   verseKey: string | null;
   word: { verseKey: string; position: number } | null;
+  atRecordingStart: boolean;
   follow: boolean;
   followIntent: RefObject<boolean>;
 }) {
@@ -51,7 +53,7 @@ function Passage({
     [result, range],
   );
   useEffect(() => {
-    if (!follow || !result) return;
+    if (!follow || !result || (!verseKey && !atRecordingStart)) return;
     const outerViewport = root.current?.closest<HTMLElement>(".audio-expanded-text");
     if (!outerViewport) return;
     let frame = 0;
@@ -59,9 +61,10 @@ function Passage({
       if (!followIntent.current) return;
       const pageRange = props.entry.mushafPages?.find((item) => item.page === page);
       const ayah = Number(verseKey?.split(":")[1]);
-      const atOpening = !verseKey && page === props.entry.mushafPages?.[0]?.page;
+      const atOpening = atRecordingStart && page === props.entry.mushafPages?.[0]?.page;
       // A verse can straddle printed pages; without a word cue use its declared page.
-      if (!atOpening && !word && pageRange && (ayah < pageRange.startAyah || ayah > pageRange.endAyah)) return;
+      if (!atOpening && (!verseKey || (!word && pageRange && (ayah < pageRange.startAyah || ayah > pageRange.endAyah))))
+        return;
       let target = atOpening
         ? root.current?.querySelector<HTMLElement>(`[data-mushaf-surah-number="${range.surah}"]`)
         : word
@@ -108,7 +111,7 @@ function Passage({
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, [follow, followIntent, result, verseKey, word, page, props.entry.mushafPages, range.surah]);
+  }, [follow, followIntent, result, verseKey, word, atRecordingStart, page, props.entry.mushafPages, range.surah]);
   const typeScale = props.textScale === "small" ? 0.9 : props.textScale === "large" ? 1.08 : 1;
   const scale = (typeScale * (props.magnification ?? 100)) / 100;
   return (
@@ -315,7 +318,8 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
               props={props}
               verseKey={cue.verseKey}
               word={words ? cue.word : null}
-              follow={follow}
+              atRecordingStart={cue.followVerseKey === null}
+              follow={follow && !(words && cue.verseHasWords && !cue.word)}
               followIntent={followIntent}
             />
           ))}

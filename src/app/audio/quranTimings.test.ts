@@ -109,14 +109,18 @@ describe("reviewed Quran timing boundary", () => {
     expect(resolveQuranTiming({ ...segment, sha256: undefined }, [annotation])).toBeNull();
   });
   it("reconciles seeks, end-exclusive boundaries and gaps using media seconds", () => {
-    expect(getQuranPlaybackCue(annotation, 0.199).verseKey).toBeNull();
+    expect(getQuranPlaybackCue(annotation, 0.199)).toMatchObject({ verseKey: null, followVerseKey: null });
     expect(getQuranPlaybackCue(annotation, 0.2).word?.position).toBe(1);
     expect(getQuranPlaybackCue(annotation, 0.6).word).toBeNull();
     expect(getQuranPlaybackCue(annotation, 0.7).word?.position).toBe(2);
-    expect(getQuranPlaybackCue(annotation, 2).verseKey).toBeNull();
+    expect(getQuranPlaybackCue(annotation, 2)).toMatchObject({
+      verseKey: null,
+      followVerseKey: "67:1",
+      word: null,
+    });
     expect(getQuranPlaybackCue(annotation, 3).verseKey).toBe("67:2");
     expect(getQuranPlaybackCue(annotation, 0.4).verseKey).toBe("67:1");
-    expect(getQuranPlaybackCue(annotation, 5).verseKey).toBeNull();
+    expect(getQuranPlaybackCue(annotation, 5)).toMatchObject({ verseKey: null, followVerseKey: "67:2" });
     expect(getQuranPlaybackCue(annotation, NaN).verseKey).toBeNull();
     expect(getQuranPlaybackCue(null, 1).verseKey).toBeNull();
   });

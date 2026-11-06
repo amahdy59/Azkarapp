@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { registerLazyCollection } from "../content/azkar";
@@ -117,7 +117,7 @@ describe("the three surah readings", () => {
     renderReader("before_sleep", indexOf("before_sleep", id));
     leaveMushaf();
     expect(screen.queryByTestId("reader-benefit-dock-button")).not.toBeInTheDocument();
-    expect(screen.getByTestId("surah-reading-actions").querySelectorAll(":scope > button")).toHaveLength(3);
+    expect(within(screen.getByTestId("reader-surah-controls")).getAllByRole("button")).toHaveLength(3);
   });
   it("shows the reading aids the reader asked for, on the surahs too", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));

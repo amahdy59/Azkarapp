@@ -40,6 +40,15 @@ for (const profile of profiles) {
     await expect(disclosure).not.toHaveAttribute("open");
     await expect(upcoming).toContainText(language === "ar" ? "العصر" : "Asr");
     await expect(upcoming).toContainText("Africa/Cairo");
+    await expect(upcoming.locator("time").first()).toHaveAttribute("datetime", /^2026-11-05T/);
+    expect(
+      await disclosure.evaluate((node) =>
+        Boolean(
+          node.compareDocumentPosition(document.querySelector('[data-testid="reminder-readiness"]')!) &
+          Node.DOCUMENT_POSITION_PRECEDING,
+        ),
+      ),
+    ).toBe(true);
     const preview = upcoming.getByRole("link", { name: t(language, "notifications.preview") }).first();
     await expect(preview).toBeVisible();
     await page.screenshot({ path: info.outputPath("notification-settings.png") });

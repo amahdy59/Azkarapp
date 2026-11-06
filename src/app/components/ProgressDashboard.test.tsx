@@ -62,7 +62,9 @@ describe("ProgressDashboard", () => {
     const heatmap = screen.getByTestId("progress-heatmap");
     expect(heatmap.querySelector('[data-day="2026-10-19"]')).toHaveAttribute("data-kind", "recorded");
     expect(heatmap.querySelector('[data-day="2026-10-20"]')).toHaveAttribute("data-kind", "none");
-    expect(screen.getByTestId("progress-date-details")).toHaveTextContent("0 of 1");
+    const details = screen.getByTestId("progress-date-details");
+    expect(details).toHaveTextContent("No pages recorded");
+    expect(details).toHaveTextContent("0 of 1");
   });
   it("offers a real week action from a one-day trend without drawing a misleading line", () => {
     const onChooseWeek = vi.fn();

@@ -5402,3 +5402,7 @@ Owner: apply all recommendations after image review, with explicit correction th
 ## 2026-11-06 — Notification usability and optional catalogue choices
 
 The owner requests applying the notification usability and app recommendations. Show named upcoming reminders and their clocks, compact permission details, real Android readiness and a shared source preview. Preserve existing pre-Fajr opt-ins and require a choice for new readers. Add the ready Friday Salawat and Monday/Thursday preparation alerts as optional settings. Use the approved source excerpts and respect local prayer windows and the saved Hijri offset. Retain the local review gate and record physical-device evidence separately.
+
+## 2026-11-06 · Adaptive surah entry and surface hierarchy
+
+The owner approved the phone, tablet and desktop surah-entry recommendation and requested the accompanying progress, notification and dense-surface refinements, performance validation and deployment. Keep the earlier word-only Mushaf cue, fixed reading chrome and compact Home spacing. See [the approved phase](phases/ADAPTIVE_SURAH_AND_RELEASE_2026_11_06.md).

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
+import { t } from "../src/app/i18n";
 
 test.use({ serviceWorkers: "block" });
 
@@ -40,3 +41,69 @@ test("surah thumbnails load their hosted artwork and recover from an unavailable
   await expect(image).toHaveAttribute("src", /assets\/cards\/wird-quran-720.webp$/);
   await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.naturalWidth)).toBeGreaterThan(0);
 });
+
+for (const layout of [
+  { width: 320, height: 620, language: "en", enlarged: true },
+  { width: 390, height: 844, language: "ar", enlarged: false },
+  { width: 820, height: 1024, language: "ar", enlarged: false },
+  { width: 1440, height: 1000, language: "ar", enlarged: false },
+  { width: 1440, height: 1000, language: "en", enlarged: false },
+] as const) {
+  test(`surah artwork and actions fit ${layout.width}px in ${layout.language} @cross-browser`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize(layout);
+    await page.addInitScript(({ language }) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: { language, reduceMotion: true, themeMode: "midnight", appMaterial: "glass" },
+        }),
+      );
+    }, layout);
+    const position = getAzkarForMode("before_sleep", "complete").findIndex(({ id }) => id === "s-hm-110a") + 1;
+    await page.goto(`/#/azkar/before-sleep/${position}?mode=complete`);
+    if (layout.enlarged)
+      await page.locator("html").evaluate((node) => {
+        node.style.fontSize = "200%";
+      });
+    const hero = page.getByTestId("surah-reading-actions");
+    const photo = hero.locator("img");
+    const title = hero.getByTestId("reader-zikr-title");
+    const share = hero.getByTestId("reader-surah-share-button");
+    const controls = hero.getByTestId("reader-surah-controls");
+    await expect(photo).toBeVisible();
+    await expect.poll(() => photo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+    await page.evaluate(() => document.fonts.ready);
+    if (layout.language === "ar") {
+      await expect(title).toHaveCSS("font-weight", "400");
+      await expect(title).toHaveCSS("font-family", /Amiri/i);
+    }
+    const figure = hero.locator("figure");
+    await expect(figure.getByRole("button")).toHaveCount(0);
+    expect((await share.boundingBox())?.width).toBeGreaterThanOrEqual(44);
+    await expect(controls.getByRole("button").first()).toHaveAccessibleName(
+      t(layout.language, "reader.readFromMushaf"),
+    );
+    const [imageBox, titleBox] = [(await figure.boundingBox())!, (await title.boundingBox())!];
+    if (layout.width === 1440) {
+      expect(imageBox.width).toBeGreaterThan(440);
+      if (layout.language === "ar") expect(imageBox.x).toBeGreaterThan(titleBox.x + titleBox.width);
+      else expect(imageBox.x + imageBox.width).toBeLessThan(titleBox.x);
+    } else {
+      expect(imageBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
+      expect(imageBox.width).toBeGreaterThanOrEqual(layout.width < 400 ? layout.width - 64 : 500);
+    }
+    const nav = hero.getByTestId("reader-side-navigation");
+    await expect(nav.getByRole("button")).toHaveCount(2);
+    expect((await nav.boundingBox())!.y).toBeGreaterThanOrEqual(imageBox.y + imageBox.height);
+    expect(await hero.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+    await page.screenshot({ path: info.outputPath("surah-entry.png"), scale: "css" });
+    const read = controls.getByRole("button").first();
+    if (!layout.enlarged) await expect(read).toBeInViewport();
+    await read.scrollIntoViewIfNeeded();
+    await read.click();
+    await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
+  });
+}

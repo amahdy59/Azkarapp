@@ -14,7 +14,7 @@ import {
 import { progressHeatmapDay, progressHeatmapGrid, type HeatmapDay, type HeatmapMetric } from "../progressHeatmap";
 import type { AppLanguage } from "../types";
 import { useMediaQuery } from "../hooks/useMediaQuery";
-import { Calendar, ChevronLeft, ChevronRight } from "./icons";
+import { Calendar, Check, ChevronLeft, ChevronRight } from "./icons";
 import { ProgressSelectField } from "./ProgressSelectField";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 
@@ -45,7 +45,16 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
   const compact = useMediaQuery("(max-width: 599px)");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [metric, setMetric] = useState<HeatmapMetric>("routines");
-  const window = metricProgressRange(range, metric, now, dayStart, false, currentDay);
+  const windows = useMemo(
+    () => ({
+      routines: metricProgressRange(range, "routines", now, dayStart, false, currentDay),
+      prayers: metricProgressRange(range, "prayers", now, dayStart, false, currentDay),
+      pages: metricProgressRange(range, "pages", now, dayStart, false, currentDay),
+      quranGoals: metricProgressRange(range, "quranGoals", now, dayStart, false, currentDay),
+    }),
+    [range, now, dayStart, currentDay],
+  );
+  const window = windows[metric];
   const applied = currentDay ? window : range;
   const latestKey = window.endKey < applied.startKey ? applied.startKey : window.endKey;
   const [selection, setSelection] = useState<string | null>(null);
@@ -59,22 +68,27 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
   );
   const byDay = useMemo(() => new Map(records.map((row) => [row.dayKey, row])), [records]);
   const day = (dayKey: string, key = metric) =>
-    progressHeatmapDay(
-      byDay.get(dayKey),
-      dayKey,
-      key,
-      applied,
-      metricProgressRange(range, key, now, dayStart, false, currentDay),
-    );
-  const value = (entry: HeatmapDay) =>
-    entry.value === null
-      ? text(language, entry.kind === "outside" ? "outsideRange" : entry.kind === "future" ? "upcoming" : "unavailable")
-      : entry.possible === null
-        ? `${formatNumerals(entry.value, language)} ${text(language, "pagesUnit")}`
-        : text(language, "countOf", {
-            count: formatNumerals(entry.value, language),
-            total: formatNumerals(entry.possible, language),
-          });
+    progressHeatmapDay(byDay.get(dayKey), dayKey, key, applied, windows[key]);
+  const value = (entry: HeatmapDay, key = metric) => {
+    if (entry.value === null)
+      return text(
+        language,
+        entry.kind === "none"
+          ? "noPagesRecorded"
+          : entry.kind === "outside"
+            ? "outsideRange"
+            : entry.kind === "future"
+              ? "upcoming"
+              : "unavailable",
+      );
+    if (key === "quranGoals" && entry.value === 1) return text(language, "readingGoalReached");
+    return entry.possible === null
+      ? `${formatNumerals(entry.value, language)} ${text(language, "pagesUnit")}`
+      : text(language, "countOf", {
+          count: formatNumerals(entry.value, language),
+          total: formatNumerals(entry.possible, language),
+        });
+  };
   const selected = day(selectedKey);
   const fullDateFormat = useMemo(
     () =>
@@ -131,7 +145,7 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
             <div key={key} className="progress-date-detail-row">
               <dt>{text(language, `short_${key}`)}</dt>
               <dd className="font-semibold">
-                <bdi>{value(day(selectedKey, key))}</bdi>
+                <bdi>{value(day(selectedKey, key), key)}</bdi>
               </dd>
             </div>
           ))}
@@ -163,7 +177,7 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
   return (
     <section
       className="progress-summary-card progress-heatmap"
-      data-material-card
+      data-material-card="dense"
       data-testid="progress-heatmap"
       aria-labelledby={`${id}-heading`}
     >
@@ -317,7 +331,13 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
                       </span>
                       <time dateTime={key}>{number}</time>
                       <span className="heatmap-count" aria-hidden="true">
-                        {entry.value === null ? "—" : formatNumerals(entry.value, language)}
+                        {metric === "quranGoals" && entry.value === 1 ? (
+                          <Check size={14} />
+                        ) : entry.value === null ? (
+                          "—"
+                        ) : (
+                          formatNumerals(entry.value, language)
+                        )}
                       </span>
                     </button>
                   );

@@ -418,6 +418,7 @@
   gap: 1.25rem;
 }
 .progress-overview-support .progress-insight-card {
+  grid-column: 1 / -1;
   align-self: start;
 }
 .progress-month-overview {
@@ -844,6 +845,9 @@
 @container progress-dashboard (min-width: 64rem) {
   .progress-overview-support {
     align-items: stretch;
+  }
+  .progress-heatmap {
+    align-self: stretch;
   }
   .progress-routine-column {
     display: flex;

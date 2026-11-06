@@ -235,19 +235,11 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       );
       const active = player.locator('[data-playback-word="true"]');
       await expect(active).toHaveCount(1);
-      await expect
-        .poll(() =>
-          active.evaluate((word) => {
-            const style = getComputedStyle(word);
-            return (
-              style.outlineStyle === "solid" &&
-              parseFloat(style.outlineWidth) >= 2 &&
-              style.textDecorationLine.includes("underline")
-            );
-          }),
-        )
-        .toBe(true);
-      expect(await active.evaluate((word) => getComputedStyle(word).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+      await expect(active).toHaveCSS("outline-style", "none");
+      await expect(active).toHaveCSS("text-decoration-line", "none");
+      await expect(active).toHaveCSS("animation-name", "none");
+      await expect(active).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(player.locator("[data-quran-ayah][data-playback-word]")).toHaveCount(0);
       if (language === "en") {
         await expect(translation.locator('[aria-current="true"]')).toHaveAttribute(
           "data-translation-verse",
@@ -431,4 +423,57 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       await player.screenshot({ path: testInfo.outputPath(`${item.id}-mushaf-listening-desktop.png`) });
     });
   }
+}
+
+for (const { item, verseKey } of [
+  { item: listeningCases[0], verseKey: "2:13" },
+  { item: listeningCases[3], verseKey: "67:18" },
+] as const) {
+  test(`expanded Mushaf holds its later page through a breath in ${item.id} @cross-browser`, async ({ page }, info) => {
+    const player = await openListeningPage(page, item, "ar");
+    const viewport = player.locator(".audio-expanded-text");
+    const passage = player.locator(`[data-mushaf-page="${item.next}"]`);
+    const active = player.locator('[data-playback-word="true"]');
+    const { verses } = listeningTiming(item);
+    const index = verses.findIndex((verse) => verse.verseKey === verseKey);
+    const verse = verses[index]!;
+    const next = verses[index + 1]!;
+    expect(next.startMs).toBeGreaterThan(verse.endMs + 1);
+    const seek = (ms: number) =>
+      page.evaluate((ms) => {
+        const audio = (window as unknown as { __listeningAudio: HTMLAudioElement }).__listeningAudio;
+        audio.currentTime = ms / 1000;
+        audio.dispatchEvent(new Event("timeupdate"));
+      }, ms);
+    const settle = () =>
+      viewport.evaluate(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          }),
+      );
+
+    await seek(verse.words!.at(-1)!.startMs + 1);
+    await expect(passage.locator('[data-playback-word="true"]')).toHaveAttribute("data-listening-verse", verseKey);
+    await expect(active).toBeInViewport();
+    await settle();
+    const scrollTop = await viewport.evaluate((node) => node.scrollTop);
+    if (item.id !== "ir-baqarah") expect(scrollTop).toBeGreaterThan(0);
+
+    await seek((verse.endMs + next.startMs) / 2);
+    await expect(active).toHaveCount(0);
+    await settle();
+    await expect(passage).toBeInViewport();
+    expect(await viewport.evaluate((node) => node.scrollTop)).toBeCloseTo(scrollTop, 0);
+    await page.screenshot({ path: info.outputPath("breath-gap.png"), scale: "css" });
+
+    await seek(next.words![0]!.startMs + 1);
+    await expect(active).toHaveAttribute("data-listening-verse", next.verseKey);
+    await expect(active).toBeInViewport();
+    await page.screenshot({ path: info.outputPath("recitation-resumed.png"), scale: "css" });
+
+    await seek(0);
+    await expect(player.locator(`[data-mushaf-page="${item.first}"]`)).toBeInViewport();
+    await expect(active).toHaveCount(0);
+  });
 }
