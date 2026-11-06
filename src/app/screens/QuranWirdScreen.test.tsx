@@ -293,7 +293,8 @@ describe("QuranWirdScreen", () => {
     );
 
     expect(screen.getByText("21 of 21 completed")).toBeInTheDocument();
-    expect(screen.getByText("Today's Wird complete")).toBeInTheDocument();
+    expect(screen.getAllByText("Completed", { exact: true })).toHaveLength(1);
+    expect(screen.queryByText("Today's Wird complete")).not.toBeInTheDocument();
   });
 
   it("configures a custom plan with start page, target page, and duration days", async () => {

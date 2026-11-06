@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-06",
+  "release": "2026-11-06.2",
   "ar": [
-    "تظل الصلاة القادمة ووقتها أمامك عند التمرير في الرئيسية، ويمكنك فتح مواقيت الصلوات كلها من الهاتف.",
-    "يبقى شريطا المصحف في مكانهما أثناء تقليب الصفحات وتمرير الصفحة المكبّرة، ويشير زر الرجوع إلى حافة الشاشة.",
-    "اعرض موعد التذكير القادم وعاين رسالته، واختر التنبيه للصلاة على النبي يوم الجمعة أو للاستعداد لصيام الاثنين والخميس.",
-    "تعرّف على فريق وَذَكِّرْ واعثر على إجابات الأسئلة الشائعة من صفحة «حول»، مع ظهور شعار الهلال والنجمة في التطبيق."
+    "تظل الصلاة القادمة أمامك عند التمرير في الرئيسية، وتترك البطاقات مساحة أكبر لورد اليوم وتقويم التسجيلات.",
+    "تابع الكلمة المتلوّة بتظليل هادئ في المصحف، مع ثبات أشرطة القراءة أثناء تقليب الصفحات والتكبير.",
+    "يمكنك معاينة رسالة التذكير التالي قبل وصولها، وتفعيل تذكير الجمعة بالصلاة على النبي أو تذكيرات الاستعداد للصيام.",
+    "يظهر شعار الهلال والنجمة في وَذَكِّرْ، وتجد في صفحة «حول» معلومات الفريق وروابط الأسئلة الشائعة."
   ],
   "en": [
-    "Keep the next prayer and its time in view as you scroll Home, and open all prayer times from the compact phone row.",
-    "Mushaf controls stay in place as you turn pages or scroll a magnified page, and Back points toward the outer edge.",
-    "See when your next reminder is due, preview its message, and opt into Friday salawat or Monday and Thursday fasting preparation reminders.",
-    "Meet the wa-zaker team and find common answers in About, with the crescent and star marking the app."
+    "Keep the next prayer in view as you scroll Home, and find your place more easily in Quran Wird and the Progress calendar.",
+    "Follow the spoken word with a softer Mushaf highlight while the reading controls stay steady during page turns and zoom.",
+    "Preview your next reminder and choose whether to receive Friday salawat or fasting preparation reminders.",
+    "Find team contacts and answers to common questions in About, alongside the wa-zaker crescent and star."
   ]
 }

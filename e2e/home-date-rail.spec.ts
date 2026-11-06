@@ -51,6 +51,9 @@ for (const viewport of [
     await page.evaluate(() => document.fonts.ready);
     await expect(secondary).toBeVisible();
     await expect(summary).toBeHidden();
+    const context = page.getByTestId("home-context-grid");
+    await expect(context).toHaveCSS("row-gap", large ? "16px" : phone ? "8px" : "12px");
+    await expect(context).toHaveCSS("align-items", "flex-start");
     const anchor = async () => [
       (await date.boundingBox())!.y,
       (await progress.boundingBox())!.y,

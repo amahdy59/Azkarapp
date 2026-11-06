@@ -68,6 +68,7 @@ for (const scenario of [
       );
       const active = player.locator('[data-playback-word="true"]');
       await expect(active).toHaveCount(1);
+      await expect(active).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       const paint = await active.evaluate((word) => {
         const style = getComputedStyle(word);
         const neighbor = word
@@ -75,15 +76,15 @@ for (const scenario of [
           .querySelector('[data-playback-verse]:not([data-playback-word="true"])')!;
         return {
           outline: style.outlineStyle,
-          width: parseFloat(style.outlineWidth),
+          shadow: style.boxShadow,
           decoration: style.textDecorationLine,
           background: style.backgroundColor,
           neighbor: getComputedStyle(neighbor).backgroundColor,
         };
       });
-      expect(paint.outline).toBe("solid");
-      expect(paint.width).toBe(2);
-      expect(paint.decoration).toContain("underline");
+      expect(paint.outline).toBe("none");
+      expect(paint.shadow).toBe("none");
+      expect(paint.decoration).toBe("none");
       expect(paint.background).not.toBe("rgba(0, 0, 0, 0)");
       expect(paint.neighbor).toBe("rgba(0, 0, 0, 0)");
       const viewport = player.locator(".audio-expanded-text");
@@ -171,7 +172,12 @@ test("exact Mushaf glyphs retain word geometry and clear neighboring ayah ink @c
   await expect(paper).toHaveAttribute("data-mushaf-rendering", "qcf-v2");
   const word = paper.locator('[data-playback-word="true"]');
   await expect(word).toHaveCount(1);
-  await expect(word).toHaveCSS("outline-width", "2px");
+  await expect(word).toHaveCSS("outline-style", "none");
+  await expect(word).toHaveCSS("animation-name", "mushaf-word-arrive");
+  const marker = paper.locator('[data-current-ayah-marker="true"]');
+  await expect(marker).toHaveCount(1);
+  await expect(marker).toHaveCSS("outline-style", "none");
+  await expect(marker).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(paper.locator('[data-playback-verse]:not([data-playback-word="true"])').first()).toHaveCSS(
     "background-color",
     "rgba(0, 0, 0, 0)",
@@ -181,11 +187,14 @@ test("exact Mushaf glyphs retain word geometry and clear neighboring ayah ink @c
   const toggle = page.getByRole("button", { name: t("ar", "quranListening.estimatedWords"), exact: true });
   await toggle.click();
   await expect(word).toHaveCount(0);
+  await expect(marker).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await toggle.click();
   await expect(word).toHaveCount(1);
   await expect.poll(async () => (await word.boundingBox())!.width).toBeCloseTo(geometry!.width, 1);
   await expect.poll(async () => (await word.boundingBox())!.height).toBeCloseTo(geometry!.height, 1);
   await page.keyboard.press("Escape");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(word).toHaveCSS("animation-name", "none");
   await player.screenshot({ path: testInfo.outputPath("exact-glyphs-normal.png"), scale: "css" });
   await player.getByTestId("audio-focus-toggle").click();
   await expect(player).toHaveAttribute("data-listening-focus");

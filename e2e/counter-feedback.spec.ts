@@ -169,9 +169,9 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
         .first()
         .evaluate((node) => node.getBoundingClientRect().bottom);
       expect(prayerDetailBox.y).toBeCloseTo(cardBottom + 20, 0);
-      expect(primaryBox.width).toBeCloseTo((gridBox.width - 1.25 * rootSize) / 2, 0);
+      expect(primaryBox.width).toBeCloseTo((gridBox.width - rootSize) / 2, 0);
       expect(companionBox.width).toBeCloseTo(primaryBox.width, 0);
-      expect(primaryBox.y).toBeCloseTo(prayerDetailBox.y + prayerDetailBox.height + 1.25 * rootSize, 0);
+      expect(primaryBox.y).toBeCloseTo(prayerDetailBox.y + prayerDetailBox.height + 0.75 * rootSize, 0);
       expect(companionBox.y).toBeCloseTo(primaryBox.y, 0);
       expect(primaryBox.x + primaryBox.width).toBeCloseTo(gridBox.x + gridBox.width, 0);
       expect(companionBox.x).toBeCloseTo(gridBox.x, 0);
@@ -198,7 +198,7 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
       expect(tabletPrayerBox.width).toBeCloseTo(tabletGridBox.width, 0);
       expect(tabletPrayerBox.x).toBeCloseTo(tabletGridBox.x, 0);
       expect(tabletSummaryBox.width).toBeCloseTo(tabletGridBox.width, 0);
-      expect(tabletPrimaryBox.y).toBeCloseTo(tabletPrayerBox.y + tabletPrayerBox.height + rootSize, 0);
+      expect(tabletPrimaryBox.y).toBeCloseTo(tabletPrayerBox.y + tabletPrayerBox.height + 0.75 * rootSize, 0);
       expect(tabletCompanionBox.y).toBeCloseTo(tabletPrimaryBox.y, 0);
       expect(tabletPrimaryBox.width).toBeCloseTo((tabletGridBox.width - rootSize) / 2, 0);
       expect(tabletCompanionBox.width).toBeCloseTo(tabletPrimaryBox.width, 0);

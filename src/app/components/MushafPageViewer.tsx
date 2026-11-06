@@ -224,21 +224,11 @@ const MushafTextLine = memo(function MushafTextLine({
                 key={key}
                 aria-hidden="true"
                 data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
-                className={
-                  highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode
-                    ? "text-primary transition-colors"
-                    : undefined
-                }
               >
                 {useQcfGlyphs && w.qcfCode ? (
                   w.qcfCode
                 ) : (
-                  <AyahMarker
-                    number={w.verseKey.split(":")[1] || w.text}
-                    language={language}
-                    theme={_theme}
-                    isHighlighted={highlightedVerseKey === w.verseKey}
-                  />
+                  <AyahMarker number={w.verseKey.split(":")[1] || w.text} language={language} theme={_theme} />
                 )}
               </span>
             );
@@ -248,9 +238,7 @@ const MushafTextLine = memo(function MushafTextLine({
               <button
                 key={key}
                 type="button"
-                className={`inline-block shrink-0 select-none rounded-full border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors ${
-                  highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode ? "text-primary" : ""
-                }`}
+                className="inline-block shrink-0 select-none rounded-full border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 aria-current={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
@@ -281,12 +269,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 {useQcfGlyphs && w.qcfCode ? (
                   w.qcfCode
                 ) : (
-                  <AyahMarker
-                    number={w.verseKey.split(":")[1] || w.text}
-                    language={language}
-                    theme={_theme}
-                    isHighlighted={highlightedVerseKey === w.verseKey}
-                  />
+                  <AyahMarker number={w.verseKey.split(":")[1] || w.text} language={language} theme={_theme} />
                 )}
               </button>
             );
@@ -339,7 +322,7 @@ const MushafTextLine = memo(function MushafTextLine({
                   onAyahAction?.(w.verseKey);
                 }}
                 className={`relative inline shrink-0 cursor-pointer appearance-none rounded-sm border-0 p-0 underline underline-offset-4 transition-colors [font:inherit] hover:bg-primary/10 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  isOpen || isSpoken ? "bg-primary/15 text-foreground ring-2 ring-primary/55" : "text-foreground"
+                  isOpen ? "bg-primary/15 text-foreground ring-2 ring-primary/55" : "text-foreground"
                 }`}
                 style={{
                   lineHeight: "inherit",
@@ -352,7 +335,7 @@ const MushafTextLine = memo(function MushafTextLine({
                       }
                     : {}),
                   textDecorationColor: "color-mix(in srgb, var(--primary) 60%, transparent)",
-                  textDecorationStyle: isOpen || isSpoken ? "solid" : "dotted",
+                  textDecorationStyle: isOpen ? "solid" : "dotted",
                 }}
                 aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
               >

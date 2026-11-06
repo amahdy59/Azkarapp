@@ -256,6 +256,7 @@
   justify-content: space-between;
 }
 .progress-heatmap {
+  align-self: start;
   container: progress-calendar / inline-size;
 }
 .heatmap-heading > .progress-select-field {
@@ -268,9 +269,23 @@
 }
 .heatmap-layout {
   display: grid;
+  align-items: start;
   grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   margin-block-start: 0.75rem;
+}
+.heatmap-detail-rail {
+  display: grid;
+  min-inline-size: 0;
+  gap: 0.75rem;
+}
+.heatmap-legend-card {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--ds-radius-control);
+}
+.heatmap-legend-card .heatmap-scale {
+  margin-block-start: 0;
 }
 .heatmap-scroll {
   padding: 4px;

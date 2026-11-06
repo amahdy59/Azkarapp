@@ -868,9 +868,7 @@ export function HomeScreen({
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 sm:pb-6 lg:gap-5 lg:pb-8">
                 <div
                   data-testid="home-context-grid"
-                  className={`grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5 ${
-                    hasContextStackContent && !expandedPrayer ? "items-stretch" : "items-start"
-                  }`}
+                  className="grid w-full grid-cols-1 items-start gap-x-4 gap-y-2 md:grid-cols-2 md:gap-y-3"
                   dir={direction}
                 >
                   <div data-testid="home-prayer-column" className="contents">

@@ -75,7 +75,9 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
   expect(verseGeometry.leftPadding).toBeGreaterThanOrEqual(12);
   expect(verseGeometry.rightPadding).toBeGreaterThanOrEqual(12);
   await expect(page.locator("[data-playback-line]")).toHaveCount(0);
-  await expect(page.locator('.mushaf-paper [data-current-ayah-marker="true"]').first()).toBeVisible();
+  const marker = page.locator('.mushaf-paper [data-current-ayah-marker="true"]').first();
+  await expect(marker).toBeVisible();
+  await expect(marker).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await playVerse("2:16");
   await expect(meaning.locator('[aria-current="true"]')).toHaveAttribute("data-translation-verse", "2:16");
   await page.getByTestId("mushaf-rail-next").click();

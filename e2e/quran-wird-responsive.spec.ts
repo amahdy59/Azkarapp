@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { formatNumerals } from "../src/app/formatting";
+import { t } from "../src/app/i18n";
 
 for (const language of ["ar", "en"] as const) {
   test(`Quran wird uses readable tablet and desktop columns in ${language} @cross-browser`, async ({
@@ -67,7 +69,9 @@ for (const language of ["ar", "en"] as const) {
       if (width === 390) expect(planBox.y).toBeGreaterThan(todayBox.y + todayBox.height);
       else {
         expect(Math.abs(todayBox.y - planBox.y)).toBeLessThanOrEqual(1);
-        expect(Math.abs(todayBox.y + todayBox.height - planBox.y - planBox.height)).toBeLessThanOrEqual(1);
+        const weekBox = (await week.boundingBox())!;
+        const rowBottom = Math.max(todayBox.y + todayBox.height, planBox.y + planBox.height);
+        expect(weekBox.y - rowBottom).toBeCloseTo(16, 0);
         expect(await content.evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length)).toBe(2);
         expect(Math.abs(todayBox.x - planBox.x)).toBeGreaterThan(250);
         const first = (await week.getByRole("listitem").first().boundingBox())!;
@@ -116,5 +120,49 @@ for (const language of ["ar", "en"] as const) {
       [],
     );
     await page.screenshot({ path: testInfo.outputPath(`quran-wird-${language}-320-enlarged.png`), fullPage: true });
+  });
+}
+
+for (const [language, width] of [
+  ["ar", 1440],
+  ["en", 390],
+] as const) {
+  test(`Completed Quran Wird keeps one badge and Undo beside the resume action in ${language} @cross-browser`, async ({
+    page,
+  }, info) => {
+    const today = "2026-11-06";
+    await page.setViewportSize({ width, height: 960 });
+    await page.clock.setFixedTime(new Date(today + "T08:00:00+02:00"));
+    await page.addInitScript(
+      ({ language, today }) => {
+        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({
+            settings: { language, themeMode: "midnight", appMaterial: "glass", reduceMotion: true },
+            profile: { isGuest: true },
+            quranReadingPosition: { page: 7, surahNumber: 2, ayahNumber: 38, juzNumber: 1 },
+            quranWirdPlan: { kind: "daily", dailyPages: 4, startedDayKey: "2026-11-01" },
+            wirdHistory: { [today]: [1, 2, 3, 4, 5, 6] },
+            quranWirdDailyGoals: { [today]: 4 },
+            quranLastReadingEvent: { dayKey: today, pages: [5, 6] },
+          }),
+        );
+      },
+      { language, today },
+    );
+    await page.goto("/#/quran-wird");
+    const card = page.locator(".quran-today-card");
+    await expect(card.getByText(t(language, "mushaf.statusCompleted"), { exact: true })).toHaveCount(1);
+    await expect(card.getByText(t(language, "mushaf.wirdCompleteShort"), { exact: true })).toHaveCount(0);
+    await expect(
+      card.getByText(t(language, "mushaf.continueFromPage", { page: formatNumerals(7, language) }), { exact: true }),
+    ).toBeVisible();
+    const [resume, undo] = await card.getByRole("button").all();
+    const resumeBox = (await resume.boundingBox())!;
+    const undoBox = (await undo.boundingBox())!;
+    expect(undoBox.y - resumeBox.y - resumeBox.height).toBeCloseTo(8, 0);
+    expect(undoBox.height).toBeGreaterThanOrEqual(44);
+    await page.screenshot({ path: info.outputPath("completed-wird.png"), scale: "css" });
   });
 }

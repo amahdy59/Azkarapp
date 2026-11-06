@@ -61,6 +61,13 @@ for (const language of ["ar", "en"] as const) {
     await expect(date).toHaveText(dates!);
     for (const width of [834, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
+      const calendar = page.getByTestId("progress-heatmap");
+      const legend = calendar.getByTestId("progress-heatmap-legend");
+      const details = calendar.getByTestId("progress-date-details");
+      await expect(legend).toBeVisible();
+      const [dateBox, legendBox] = await Promise.all([details.boundingBox(), legend.boundingBox()]);
+      expect(legendBox!.y).toBeGreaterThanOrEqual(dateBox!.y + dateBox!.height);
+      expect(legendBox!.x).toBeGreaterThanOrEqual(dateBox!.x);
       const control = (await page.getByTestId("progress-filters-toggle").boundingBox())!;
       const tabs = (await page.getByRole("tablist").boundingBox())!;
       for (const tab of await page.getByRole("tab").all()) {
@@ -76,6 +83,8 @@ for (const language of ["ar", "en"] as const) {
       await page.screenshot({ path: info.outputPath(`heatmap-${language}-${width}.png`) });
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    await expect(heatmap.locator(".heatmap-detail-rail")).toHaveCount(0);
+    await expect(heatmap.getByTestId("progress-heatmap-legend")).toBeVisible();
     await recorded.click();
     const dateSheet = page.getByTestId("progress-date-sheet");
     await expect(dateSheet).toBeVisible();

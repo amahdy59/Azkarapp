@@ -685,13 +685,6 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   flex-wrap: wrap;
   justify-content: center;
 }
-.audio-listening-page [data-playback-verse]:not([data-playback-word="true"]) {
-  background-color: transparent;
-}
-.audio-listening-page:has([data-playback-word="true"]) [data-current-ayah-marker="true"] {
-  background-color: transparent;
-  outline: none;
-}
 .audio-expanded-meta:empty {
   display: none;
 }

@@ -332,6 +332,8 @@ export function QuranWirdScreen({
         ? t(language, "mushaf.repeatingSummary")
         : undefined;
   const canUndo = lastReadingEvent?.dayKey === todayKey && lastReadingEvent.pages.length > 0;
+  const showResumeAsTitle = !isRepeating && (remaining === 0 || targetStartPage === targetEndPage);
+  const resumePageLabel = t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) });
   const textAlignment = direction === "rtl" ? "text-right" : "text-left";
 
   return (
@@ -345,7 +347,7 @@ export function QuranWirdScreen({
         <div
           data-testid="quran-wird-content"
           data-header-scroll-owner=""
-          className={`quran-wird-overview fade-in grid min-h-0 w-full flex-1 grid-cols-1 gap-4 overflow-y-auto px-page pb-8 pt-3 ${textAlignment}`}
+          className={`quran-wird-overview fade-in grid min-h-0 w-full flex-1 grid-cols-1 gap-2 overflow-y-auto sm:gap-4 px-page pb-8 pt-3 ${textAlignment}`}
         >
           <section
             className="quran-today-card rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6"
@@ -395,9 +397,7 @@ export function QuranWirdScreen({
                     juz: formatNumerals(positionJuz, language),
                   })}
                 </p>
-                <p className="mt-1 text-sm font-medium text-muted-foreground">
-                  {t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) })}
-                </p>
+                <p className="mt-1 text-sm font-medium text-muted-foreground">{resumePageLabel}</p>
                 <button
                   type="button"
                   onClick={() => onContinue()}
@@ -428,10 +428,12 @@ export function QuranWirdScreen({
                             start: formatNumerals(repeatStart, language),
                             end: formatNumerals(repeatEnd, language),
                           })
-                        : t(language, "mushaf.pagesRange", {
-                            start: formatNumerals(targetStartPage, language),
-                            end: formatNumerals(targetEndPage, language),
-                          })}
+                        : showResumeAsTitle
+                          ? resumePageLabel
+                          : t(language, "mushaf.pagesRange", {
+                              start: formatNumerals(targetStartPage, language),
+                              end: formatNumerals(targetEndPage, language),
+                            })}
                     </p>
                     {isRepeating && (
                       <button
@@ -472,15 +474,8 @@ export function QuranWirdScreen({
                   direction={direction}
                 />
 
-                {remaining > 0 ? (
-                  <p className="mt-3 text-sm font-medium text-muted-foreground">
-                    {t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) })}
-                  </p>
-                ) : (
-                  <div className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-success/15 px-3 py-1 text-xs font-bold text-success">
-                    <Check size={14} strokeWidth={2.5} aria-hidden="true" />
-                    <span>{t(language, "mushaf.wirdCompleteShort")}</span>
-                  </div>
+                {remaining > 0 && !showResumeAsTitle && (
+                  <p className="mt-3 text-sm font-medium text-muted-foreground">{resumePageLabel}</p>
                 )}
 
                 <button
@@ -498,7 +493,7 @@ export function QuranWirdScreen({
               <button
                 type="button"
                 onClick={onUndoReadingEvent}
-                className="mt-2 flex min-h-11 items-center gap-2 rounded-xl px-3 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="mt-2 flex min-h-11 items-center gap-2 self-start rounded-xl px-3 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <Undo size={16} aria-hidden="true" />
                 {t(language, "mushaf.undoPages", {

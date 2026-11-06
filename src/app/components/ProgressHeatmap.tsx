@@ -142,6 +142,24 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
     metric === "pages"
       ? ["0", "1–4", "5–10", "11–20", "21+"]
       : Array.from({ length: metric === "prayers" ? 6 : metric === "routines" ? 4 : 2 }, (_, count) => String(count));
+  const legend = (
+    <>
+      <div className="heatmap-scale" aria-hidden="true">
+        {scale.map((label, index) => (
+          <span key={label}>
+            <i
+              className="heatmap-day"
+              data-level={metric === "pages" ? index : Math.ceil((index / (scale.length - 1)) * 4)}
+            />
+            {formatNumerals(label, language)}
+          </span>
+        ))}
+      </div>
+      <p className="mt-3 progress-help" data-testid="progress-heatmap-legend">
+        {text(language, metric === "pages" ? "pageHeatmapLegend" : "heatmapLegend")}
+      </p>
+    </>
+  );
   return (
     <section
       className="progress-summary-card progress-heatmap"
@@ -307,22 +325,14 @@ export const ProgressHeatmap = memo(function ProgressHeatmap({
               </div>
             </div>
           </div>
-          <div className="heatmap-scale" aria-hidden="true">
-            {scale.map((label, index) => (
-              <span key={label}>
-                <i
-                  className="heatmap-day"
-                  data-level={metric === "pages" ? index : Math.ceil((index / (scale.length - 1)) * 4)}
-                />
-                {formatNumerals(label, language)}
-              </span>
-            ))}
-          </div>
-          <p className="mt-3 progress-help" data-testid="progress-heatmap-legend">
-            {text(language, metric === "pages" ? "pageHeatmapLegend" : "heatmapLegend")}
-          </p>
+          {compact && legend}
         </div>
-        {!compact && details}
+        {!compact && (
+          <div className="heatmap-detail-rail">
+            {details}
+            <div className="heatmap-legend-card">{legend}</div>
+          </div>
+        )}
       </div>
       {compact && (
         <ResponsiveSheet
