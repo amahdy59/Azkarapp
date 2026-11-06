@@ -16,7 +16,9 @@ const Widgets = registerPlugin<{
 export function useNativeServices(state: AppStateSnapshot) {
   const latest = useRef(state);
   latest.current = state;
+  const rebuildReminders = useRef(false);
   const [generation, setGeneration] = useState(0);
+  const { language, reminders, location, progressDayStartHour, hijriDateOffset } = state.settings;
   const widgetState = isNativeAndroid()
     ? JSON.stringify({
         language: state.settings.language,
@@ -27,7 +29,14 @@ export function useNativeServices(state: AppStateSnapshot) {
       })
     : "";
   const reminderState = isNativeAndroid()
-    ? JSON.stringify({ settings: state.settings, dailyCompletions: state.dailyCompletions })
+    ? JSON.stringify({
+        language,
+        reminders,
+        location,
+        progressDayStartHour,
+        hijriDateOffset,
+        dailyCompletions: state.dailyCompletions,
+      })
     : "";
 
   useEffect(() => {
@@ -49,11 +58,15 @@ export function useNativeServices(state: AppStateSnapshot) {
     const refresh = () => {
       if (document.visibilityState === "visible") setGeneration((value) => value + 1);
     };
+    const rebuild = () => {
+      rebuildReminders.current = true;
+      refresh();
+    };
     const timer = window.setInterval(refresh, 60 * 60_000);
     document.addEventListener("visibilitychange", refresh);
     window.addEventListener("azkar-notification-permission", refresh);
     window.addEventListener("azkar-exact-alarm-permission", refresh);
-    window.addEventListener("azkar-retry-native-reminders", refresh);
+    window.addEventListener("azkar-retry-native-reminders", rebuild);
     return () => {
       active = false;
       void routeListener?.remove();
@@ -61,7 +74,7 @@ export function useNativeServices(state: AppStateSnapshot) {
       document.removeEventListener("visibilitychange", refresh);
       window.removeEventListener("azkar-notification-permission", refresh);
       window.removeEventListener("azkar-exact-alarm-permission", refresh);
-      window.removeEventListener("azkar-retry-native-reminders", refresh);
+      window.removeEventListener("azkar-retry-native-reminders", rebuild);
     };
   }, []);
 
@@ -78,7 +91,9 @@ export function useNativeServices(state: AppStateSnapshot) {
 
   useEffect(() => {
     if (!isNativeAndroid()) return;
-    void replaceNativeReminders(buildNativeReminderPlan(latest.current)).catch((error) =>
+    const rebuild = rebuildReminders.current;
+    rebuildReminders.current = false;
+    void replaceNativeReminders(buildNativeReminderPlan(latest.current), rebuild).catch((error) =>
       reportError(error, "native-reminders"),
     );
   }, [reminderState, generation]);

@@ -36,32 +36,64 @@ export async function refreshNativeExactAlarmPermission(request = false): Promis
 let queue = Promise.resolve();
 let revision = 0;
 let queueFailed = false;
+let rebuildRequested = false;
+
+function isOwnedReminder({ id, extra }: { id: number; extra?: { azkarappReminder?: boolean } }) {
+  return (id >= 10_000 && id < 20_000) || extra?.azkarappReminder === true;
+}
 
 export async function inspectNativeReminderQueue() {
   const pending = await LocalNotifications.getPending();
   return { failed: queueFailed, count: pending.notifications.filter(({ id }) => id >= 10_000 && id < 20_000).length };
 }
-export function replaceNativeReminders(plan: NativeReminder[]): Promise<void> {
+export function replaceNativeReminders(plan: NativeReminder[], rebuild = false): Promise<void> {
   const current = ++revision;
+  rebuildRequested ||= rebuild;
   queue = queue
     .catch(() => {})
     .then(async () => {
       if (!isNativeAndroid() || current !== revision) return;
-      const pending = await LocalNotifications.getPending();
-      const owned = pending.notifications.filter(
-        ({ id, extra }) => (id >= 10_000 && id < 20_000) || extra?.azkarappReminder === true,
-      );
-      if (owned.length) await LocalNotifications.cancel({ notifications: owned.map(({ id }) => ({ id })) });
+      const [pending, permission, exact] = await Promise.all([
+        LocalNotifications.getPending(),
+        refreshNativeNotificationPermission(),
+        refreshNativeExactAlarmPermission(),
+      ]);
       if (current !== revision) return;
-      if ((await refreshNativeNotificationPermission()) === "granted" && plan.length)
+
+      const now = Date.now();
+      const wanted = new Map(
+        (permission === "granted" ? plan : []).filter(({ at }) => at > now).map((entry) => [entry.id, entry]),
+      );
+      const owned = pending.notifications.filter(isOwnedReminder);
+      const previous = new Map(owned.map((entry) => [entry.id, entry]));
+      const removed = owned.filter(({ id }) => !wanted.has(id));
+      if (removed.length) await LocalNotifications.cancel({ notifications: removed.map(({ id }) => ({ id })) });
+      if (current !== revision) return;
+
+      // Android replaces a scheduled notification with the same ID. Retain
+      // identical alarms, especially those close to their delivery time.
+      const changed = [...wanted.values()].filter(({ id, at, route, title, body }) => {
+        if (at <= Date.now()) return false;
+        const saved = previous.get(id);
+        return (
+          rebuildRequested ||
+          saved?.title !== title ||
+          saved?.body !== body ||
+          saved.extra?.route !== route ||
+          saved.extra?.azkarappAt !== at ||
+          saved.extra?.azkarappExact !== exact
+        );
+      });
+      if (changed.length)
         await LocalNotifications.schedule({
-          notifications: plan.map(({ at, route, ...entry }) => ({
+          notifications: changed.map(({ at, route, ...entry }) => ({
             ...entry,
             largeBody: entry.body,
             schedule: { at: new Date(at), allowWhileIdle: true },
-            extra: { route },
+            extra: { route, azkarappAt: at, azkarappExact: exact },
           })),
         });
+      if (current === revision) rebuildRequested = false;
       queueFailed = false;
       window.dispatchEvent(new Event("azkar-reminder-queue"));
     })
