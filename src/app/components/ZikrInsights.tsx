@@ -1,6 +1,6 @@
 import type { AppLanguage, ZikrDayRecord } from "../types";
 import { getZikrItemInsights } from "../progressInsights";
-import { getAzkarForMode } from "../content/azkar";
+import { getAzkarForMode } from "../content/azkarCore";
 import { routeToHash } from "../routing";
 import { formatNumerals, formatPercentage } from "../formatting";
 import { progressText } from "../i18n/progressInsights";

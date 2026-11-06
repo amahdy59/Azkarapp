@@ -52,7 +52,7 @@ Azkarapp keeps reviewed devotional content in `src/app/content` and treats wordi
 
 ## Add an item to an existing collection
 
-1. Open the collection in `src/app/content/azkar.ts`, or its dedicated file such as `comprehensiveDuas.ts`.
+1. Open the collection in `src/app/content/azkarCore.ts`, or its dedicated file such as `comprehensiveDuas.ts`. The complete corpus exported by `azkar.ts` adds the separately loaded Al-Baqarah record.
 2. Copy a nearby `Zikr` object and change every field deliberately.
 3. Add or update the colocated tests in `azkar.test.ts` and `localizedZikr.test.ts`.
 4. Run `pnpm format`, `pnpm typecheck`, `pnpm test:run`, and `pnpm build`.

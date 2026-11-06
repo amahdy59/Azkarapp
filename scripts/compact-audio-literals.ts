@@ -9,7 +9,8 @@ export function compactAudioLiterals(): Plugin {
     apply: "build",
     enforce: "pre",
     transform(code, id) {
-      if (!/\/src\/app\/(?:audio\/audioAssets(?:Core|Duas)|content\/azkar)\.ts$/.test(id.replaceAll("\\", "/"))) return;
+      if (!/\/src\/app\/(?:audio\/audioAssets(?:Core|Duas)|content\/azkarCore)\.ts$/.test(id.replaceAll("\\", "/")))
+        return;
       const source = ts.createSourceFile(id, code, ts.ScriptTarget.Latest, true);
       const values = new Map<string, { start: number; end: number }[]>();
       const visit = (node: ts.Node) => {

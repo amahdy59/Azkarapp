@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { parseLocation, routeToHash } from "../routing";
 import type { LibraryRouteSection, ProgressRoutePeriod, RouteState, SettingsRoutePanel } from "../routing";
-import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkar";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkarCore";
 import { recordDiagnosticScreen, reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
@@ -16,7 +16,7 @@ function categoryFromShortcutUrl(): CategoryId | null {
 }
 
 export function isLazyRouteCategory(categoryId: CategoryId): boolean {
-  return categoryId === "comprehensive_duas" || categoryId === "friday_kahf";
+  return categoryId === "comprehensive_duas" || categoryId === "friday_kahf" || categoryId === "illness_ruqyah";
 }
 
 export async function loadLazyRouteCategory(categoryId: CategoryId) {
@@ -26,6 +26,8 @@ export async function loadLazyRouteCategory(categoryId: CategoryId) {
   } else if (categoryId === "friday_kahf") {
     const { FRIDAY_KAHF } = await import("../content/fridayKahf");
     registerLazyCollection(categoryId, FRIDAY_KAHF);
+  } else if (categoryId === "illness_ruqyah") {
+    await import("../content/azkar");
   }
 }
 

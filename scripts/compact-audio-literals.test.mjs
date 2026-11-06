@@ -49,11 +49,10 @@ test.each(["A repeated recording label for listeners", "Recording edition"])(
 );
 
 test("emitted Azkar data preserves the exact reviewed draft and its collection order", () => {
-  const id = "/repo/src/app/content/azkar.ts";
-  const original = readFileSync("src/app/content/azkar.ts", "utf8");
+  const id = "/repo/src/app/content/azkarCore.ts";
+  const original = readFileSync("src/app/content/azkarCore.ts", "utf8");
   const result = compactAudioLiterals().transform(original, id);
   const dependencies = {
-    "./baqarahSurah": { BAQARAH_SURAH },
     "./fastingRamadan": { FASTING_RAMADAN_AZKAR: [] },
     "./inPrayerSupplications": { IN_PRAYER_AZKAR: [] },
     "./contentReview": { applyContentReview: (drafts) => drafts },

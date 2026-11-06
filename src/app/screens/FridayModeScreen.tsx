@@ -33,7 +33,7 @@ import {
   type FridayPracticeId,
 } from "../fridayProgress";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
-import { registerLazyCollection } from "../content/azkar";
+import { registerLazyCollection } from "../content/azkarCore";
 
 registerLazyCollection("friday_kahf", FRIDAY_KAHF);
 

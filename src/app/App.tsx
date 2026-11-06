@@ -17,7 +17,9 @@ import {
 } from "./state";
 import { applyAppAppearance } from "./theme";
 import { scheduleStartupMaintenance } from "./startupMaintenance";
-import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkar";
+import { APPROVED_AUDIO_ASSIGNMENTS } from "./audio/audioAssignments";
+import { BAQARAH_METADATA } from "./content/baqarahMetadata";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkarCore";
 import { isPrayerName } from "./content/prayerTimes";
 import type {
   AppLanguage,
@@ -60,7 +62,7 @@ import {
   writeFridayDuaProgress,
 } from "./fridayProgress";
 
-const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
+import { loadHomeScreen, ONBOARDING_COMPLETE_KEY } from "./homeStartup";
 
 import { useAppRouting, isLazyRouteCategory } from "./hooks/useAppRouting";
 
@@ -104,9 +106,7 @@ import {
   type GrowthEvent,
 } from "./progress";
 
-const HomeScreen = retryableScreen(() =>
-  import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })),
-);
+const HomeScreen = retryableScreen(loadHomeScreen);
 const AzkarLibraryScreen = retryableScreen(() =>
   import("./screens/AzkarLibraryScreen").then((module) => ({ default: module.AzkarLibraryScreen })),
 );
@@ -1616,18 +1616,16 @@ function AppContent({
     void startAudio([activeZikr], "single", true, "ar");
   };
 
-  const baqarahZikr = useMemo(
-    () => getAzkarForMode("illness_ruqyah", "complete").find((item) => item.id === "ir-baqarah"),
-    [],
-  );
   const [queuedBaqarahContext, setQueuedBaqarahContext] = useState<string | null>(null);
   const baqarahContext = JSON.stringify([view, selectedLang, khatmahPage]);
   const queuedBaqarahAudio = queuedBaqarahContext !== null;
   const baqarahOwnsAudio =
-    audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === "ir-baqarah";
+    audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === BAQARAH_METADATA.id;
   const baqarahAudioStatus = queuedBaqarahAudio ? "loading" : baqarahOwnsAudio ? audioController!.state.status : "idle";
   const startBaqarahAudio = useCallback(() => {
-    if (!baqarahZikr || !audioController || !buildPlaybackPlan) return;
+    if (!audioController || !buildPlaybackPlan) return;
+    const baqarahZikr = getAzkarForMode(BAQARAH_METADATA.category).find((item) => item.id === BAQARAH_METADATA.id);
+    if (!baqarahZikr) return;
     const plan = buildPlaybackPlan({
       zikrs: [baqarahZikr],
       context: { category: "illness_ruqyah", routineMode: "complete", source: "single" },
@@ -1636,7 +1634,7 @@ function AppContent({
       audioLanguage: "ar",
     });
     audioController.startPlan(plan);
-  }, [baqarahZikr, audioController, buildPlaybackPlan]);
+  }, [audioController, buildPlaybackPlan]);
   useEffect(() => {
     if (!queuedBaqarahAudio) return;
     if (view !== "khatmah" || queuedBaqarahContext !== baqarahContext) {
@@ -1659,7 +1657,6 @@ function AppContent({
     startBaqarahAudio,
   ]);
   const toggleBaqarahAudio = () => {
-    if (!baqarahZikr) return;
     if (!audioController || !buildPlaybackPlan) {
       setQueuedBaqarahContext(baqarahContext);
       requestAudioModule();
@@ -2674,7 +2671,7 @@ function AppContent({
                   audioController={audioController}
                   textSize={textSize}
                   baqarahAudio={{
-                    available: Boolean(baqarahZikr?.audioAssetId),
+                    available: Boolean(APPROVED_AUDIO_ASSIGNMENTS[BAQARAH_METADATA.id]),
                     status: baqarahAudioStatus,
                     onToggle: toggleBaqarahAudio,
                   }}

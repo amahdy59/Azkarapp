@@ -20,7 +20,7 @@ import {
   getCollectionIntroduction,
   getRoutineStepCount,
   isRoutineCategory,
-} from "../content/azkar";
+} from "../content/azkarCore";
 import type { CategoryId, RitualGroupId, RoutineMode, Zikr } from "../types";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";

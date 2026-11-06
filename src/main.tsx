@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
 import { ScreenFallback } from "./app/components/ScreenFallback.tsx";
 import { pruneStaleFridayProgress } from "./app/fridayProgress.ts";
+import { isHomeStartup, loadHomeScreen, ONBOARDING_COMPLETE_KEY } from "./app/homeStartup.ts";
 import { createAppStateReader } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
 import { reportError, startPerformanceMonitoring } from "./lib/observability.ts";
@@ -24,6 +25,16 @@ startPerformanceMonitoring();
 // Daily progress cleanup stays synchronous; optional cache maintenance runs after App commits.
 if (!isMarketingLanding) {
   pruneStaleFridayProgress();
+  let onboardingComplete = false;
+  try {
+    onboardingComplete = localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
+  } catch {
+    // An explicit Home route still works with storage disabled.
+  }
+  if (isHomeStartup(window.location.search, window.location.hash, onboardingComplete)) {
+    // The route owns loading and retry feedback if the early request fails.
+    void loadHomeScreen().catch(() => undefined);
+  }
 }
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {

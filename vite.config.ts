@@ -423,7 +423,7 @@ export default defineConfig(({ mode, command }) => {
           // Other lazy chunk URLs are opaque; short hashed names avoid repeating
           // long component names across imports, preload lists and the offline manifest.
           chunkFileNames: (chunk) =>
-            /^(App$|audio(?:-|$)|FridayModeScreen$|MarketingLanding$|AudioContentReviewScreen$|QiblaScreen$)/.test(
+            /^(App$|HomeScreen$|baqarah$|audio(?:-|$)|FridayModeScreen$|MarketingLanding$|AudioContentReviewScreen$|QiblaScreen$)/.test(
               chunk.name,
             )
               ? "assets/[name]-[hash].js"
@@ -457,7 +457,8 @@ export default defineConfig(({ mode, command }) => {
              * corpus itself also remains outside the entry graph until the
              * lazy application shell requests a reading surface.
              */
-            if (id.endsWith("/src/app/content/azkar.ts")) return "content";
+            if (id.endsWith("/src/app/content/azkarCore.ts")) return "content";
+            if (id.endsWith("/src/app/content/baqarahMetadata.ts")) return "baqarah-metadata";
             if (id.endsWith("/src/app/content/baqarahSurah.ts")) return "baqarah";
             if (id.includes("node_modules/motion")) return "motion";
             if (id.endsWith("/src/app/audio/audioAssetsCore.ts")) return "audio-core";

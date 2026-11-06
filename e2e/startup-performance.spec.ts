@@ -103,7 +103,12 @@ test("Home opens under a six-times slower CPU and constrained connection", async
     resources: performance
       .getEntriesByType("resource")
       .filter((entry) => entry.name.endsWith(".js"))
-      .map((entry) => ({ file: entry.name.split("/").pop(), duration: Math.round(entry.duration) })),
+      .map((entry) => ({
+        file: entry.name.split("/").pop(),
+        start: entry.startTime,
+        end: (entry as PerformanceResourceTiming).responseEnd,
+        duration: Math.round(entry.duration),
+      })),
   }));
   await testInfo.attach("throttled-startup", {
     body: JSON.stringify(metrics, null, 2),
@@ -111,5 +116,9 @@ test("Home opens under a six-times slower CPU and constrained connection", async
   });
   console.log(JSON.stringify(metrics));
   expect(metrics.resources.some((resource) => /^audio(?:-|OfflineCache)/.test(resource.file ?? ""))).toBe(false);
+  expect(metrics.resources.some((resource) => /^baqarah-/.test(resource.file ?? ""))).toBe(false);
+  const shell = metrics.resources.find((resource) => /^App-/.test(resource.file ?? ""));
+  const home = metrics.resources.find((resource) => /^HomeScreen-/.test(resource.file ?? ""));
+  expect(home?.start).toBeLessThan(shell?.end ?? 0);
   expect(metrics.resources.some((resource) => /^ZikrComponents-/.test(resource.file ?? ""))).toBe(false);
 });

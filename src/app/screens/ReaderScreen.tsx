@@ -57,7 +57,7 @@ import {
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
-import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
+import { getAzkarForMode, isRoutineCategory } from "../content/azkarCore";
 import { isLongSurah } from "../content/mushafPages";
 import { getSurahMeta } from "../content/surahInfo";
 import { SurahArtwork } from "../components/SurahArtwork";

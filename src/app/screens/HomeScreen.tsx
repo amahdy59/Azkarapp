@@ -27,7 +27,12 @@ import { getReminderPlan, reminderCivilTime } from "../reminderPlan";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { createDailyPathIndex, getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
-import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
+import {
+  estimateCompletionMinutes,
+  getAzkarForMode,
+  getRoutineProgress,
+  isRoutineCategory,
+} from "../content/azkarCore";
 import { CATEGORIES } from "../content/categories";
 import { formatPrayerTimeLabel, type PrayerName } from "../content/prayerTimes";
 import { PRAYER_ICON, PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";

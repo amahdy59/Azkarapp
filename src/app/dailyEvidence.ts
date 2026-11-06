@@ -1,4 +1,5 @@
-import { ALL_AZKAR } from "./content/azkar";
+import { ALL_AZKAR, withBaqarah } from "./content/azkarCore";
+import { BAQARAH_METADATA } from "./content/baqarahMetadata";
 import { toArabicAttribution, toArabicBenefit, toArabicSourceReference } from "./content/attributionArabic";
 import type { AppLanguage, CategoryId, DayMomentContext, PrayerMomentContext, ReminderContext, Zikr } from "./types";
 import type { RelevantNowSource } from "./content/relevantNowLibrary";
@@ -72,7 +73,22 @@ export interface DailyEvidence {
  * that showed a hadith without saying who graded it would be the one place in
  * the app making a claim it could not support.
  */
-function isEligible(zikr: Zikr): boolean {
+type EvidenceEntry = Pick<
+  Zikr,
+  | "id"
+  | "category"
+  | "hadithText"
+  | "hadithTextEnglish"
+  | "benefit"
+  | "benefitArabic"
+  | "authenticityNote"
+  | "authenticityLevel"
+  | "sourceReference"
+  | "sourceReferenceArabic"
+  | "sourceUrl"
+>;
+
+function isEligible(zikr: EvidenceEntry): boolean {
   const grading = zikr.authenticityNote ?? "";
   return Boolean(
     zikr.hadithText &&
@@ -83,7 +99,8 @@ function isEligible(zikr: Zikr): boolean {
   );
 }
 
-const POOL: readonly Zikr[] = ALL_AZKAR.filter(isEligible);
+const EVIDENCE_ENTRIES = withBaqarah<EvidenceEntry>(ALL_AZKAR, BAQARAH_METADATA);
+const POOL = EVIDENCE_ENTRIES.filter(isEligible);
 
 /**
  * A stable 32-bit hash of the day key.
@@ -108,7 +125,7 @@ export function getDailyEvidence(dayKey: string, language: AppLanguage): DailyEv
 }
 
 /** One zikr's reviewed evidence, in the reader's language where it exists. */
-function shapeEvidence(zikr: Zikr, language: AppLanguage): DailyEvidence {
+function shapeEvidence(zikr: EvidenceEntry, language: AppLanguage): DailyEvidence {
   /* Every narration now has a reviewed English rendering, but the fallback
      stays: it is what makes adding one more a content change rather than a
      code change, and the card must not go blank if an entry arrives without
@@ -317,7 +334,7 @@ function shapeLibrarySource(
      a correction to it cannot leave two versions disagreeing. */
   if (source.zikrId) {
     const zikr =
-      POOL.find((entry) => entry.id === source.zikrId) ?? ALL_AZKAR.find((entry) => entry.id === source.zikrId);
+      POOL.find((entry) => entry.id === source.zikrId) ?? EVIDENCE_ENTRIES.find((entry) => entry.id === source.zikrId);
     if (!zikr) return null;
     return { ...shapeEvidence(zikr, language), benefit, takeaway: benefit, evidenceId: source.id };
   }
