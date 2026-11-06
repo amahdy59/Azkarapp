@@ -59,6 +59,8 @@ import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { isLongSurah } from "../content/mushafPages";
+import { getSurahMeta } from "../content/surahInfo";
+import { SurahArtwork } from "../components/SurahArtwork";
 import type { AudioController } from "../audio/AudioProvider";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
@@ -126,8 +128,6 @@ const READER_WIDE_HEADER_ACTION_CLASS =
 const READER_SIDEBAR_TOGGLE_CLASS =
   "flex size-11 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-card shadow-xs text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
-const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran-720.webp`;
-const SURAH_CARD_ORIGIN = "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/visuals/surah/2026-11-04";
 const SURAH_CARD_ART: Readonly<Partial<Record<number, { name: string; focus: string }>>> = {
   18: { name: "al-kahf", focus: "50% 55%" },
   32: { name: "as-sajdah", focus: "54% 55%" },
@@ -317,7 +317,10 @@ export function ReaderScreen({
       : `${category ? (isArabic ? category.nameArabic : category.name) : ""}`;
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
-  const surahCardArt = longSurah && z ? SURAH_CARD_ART[getQuranSurahNumber(z) ?? 0] : undefined;
+  const surahNumber = longSurah && z ? getQuranSurahNumber(z) : null;
+  const surahCardArt = surahNumber ? SURAH_CARD_ART[surahNumber] : undefined;
+  const surahMeta = surahNumber ? getSurahMeta(surahNumber) : undefined;
+  const readerHeaderTitle = longSurah && azkar.length === 1 ? t(language, "common.azkar") : displayCategoryName;
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const isShortSurah = Boolean(z?.isSurah) && !longSurah;
   const [localMeaningOnly, setLocalMeaningOnly] = useState(false);
@@ -837,31 +840,19 @@ export function ReaderScreen({
             >
               <ShareExport size={20} aria-hidden="true" />
             </button>
+            {surahMeta && (
+              <p className="reader-surah-meta text-sm font-semibold text-muted-foreground">
+                <span>{t(language, `mushaf.${surahMeta.revelationType}`)}</span>
+                <span aria-hidden="true" className="text-primary">
+                  •
+                </span>
+                <span>
+                  {t(language, "mushaf.ayahCount", { count: formatNumerals(surahMeta.versesCount, language) })}
+                </span>
+              </p>
+            )}
           </div>
-          <figure className="reader-surah-artwork w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
-            <img
-              key={surahCardArt?.name}
-              src={surahCardArt ? `${SURAH_CARD_ORIGIN}/${surahCardArt.name}-384.webp` : QURAN_CARD_IMAGE}
-              srcSet={
-                surahCardArt
-                  ? `${SURAH_CARD_ORIGIN}/${surahCardArt.name}-384.webp 384w, ${SURAH_CARD_ORIGIN}/${surahCardArt.name}-768.webp 768w`
-                  : undefined
-              }
-              sizes="auto, (max-width: 576px) calc(100vw - 32px), 584px"
-              loading="lazy"
-              width={768}
-              height={576}
-              onError={({ currentTarget }) => {
-                if (!currentTarget.srcset) return;
-                currentTarget.removeAttribute("srcset");
-                currentTarget.src = QURAN_CARD_IMAGE;
-              }}
-              alt=""
-              className="h-full w-full object-cover"
-              style={{ objectPosition: surahCardArt?.focus }}
-              decoding="async"
-            />
-          </figure>
+          <SurahArtwork key={surahCardArt?.name} name={surahCardArt?.name} focus={surahCardArt?.focus} />
           <div className="reader-surah-controls" data-testid="reader-surah-controls">
             <button
               type="button"
@@ -877,7 +868,7 @@ export function ReaderScreen({
               onClick={surahAudio?.onToggle ?? onPlayAudio}
               disabled={!audioAvailable}
               aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
-              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-primary/10 px-4 py-2.5 text-subtitle font-bold text-primary transition-colors hover:bg-primary/20 disabled:opacity-50 ${ACTION_FOCUS}`}
+              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl border border-border-control bg-card px-4 py-2.5 text-subtitle font-bold text-foreground transition-colors hover:bg-muted disabled:opacity-50 ${ACTION_FOCUS}`}
             >
               <Volume2 size={20} className="shrink-0" aria-hidden="true" />
               {t(language, "reader.listenToSurah")}
@@ -888,7 +879,7 @@ export function ReaderScreen({
                 if (!isDone) handleZikrCompletion(idx);
                 onAdvance(idx);
               }}
-              className={`mx-auto flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-label font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${ACTION_FOCUS}`}
+              className={`mx-auto flex min-h-11 max-w-full items-center justify-center gap-2 rounded-full border border-border-control px-4 py-2 text-label font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${ACTION_FOCUS}`}
             >
               <Check size={18} className="shrink-0" aria-hidden="true" />
               {t(language, "reader.readExternally")}
@@ -1649,7 +1640,7 @@ export function ReaderScreen({
               >
                 <ReaderSceneArt category={catId} />
                 <ReadingHeroToolbar
-                  title={displayCategoryName}
+                  title={readerHeaderTitle}
                   testId="reader-header-toolbar"
                   back={
                     <IconButton
@@ -1843,7 +1834,7 @@ export function ReaderScreen({
             <div data-reading-chrome>
               <Header
                 pageGutters={false}
-                title={displayCategoryName}
+                title={readerHeaderTitle}
                 style={{ paddingInline: 12 }}
                 titleStyle={{ lineHeight: 1.2 }}
                 onBack={onBack}

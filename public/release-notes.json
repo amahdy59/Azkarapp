@@ -1,15 +1,13 @@
 {
-  "release": "2026-11-06.3",
+  "release": "2026-11-06.4",
   "ar": [
-    "تظل الصلاة القادمة أمامك عند التمرير في الرئيسية، وتستفيد من مساحة أكبر لورد اليوم والتقويم.",
-    "تتكيّف صور السور مع شاشتك، ويمكنك فتح المصحف مباشرةً ومتابعة الكلمة المتلوّة بتظليل هادئ، وتبقى الصفحة ثابتة عند توقّف القارئ لالتقاط أنفاسه.",
-    "تفرّق صفحات الورد والتقدّم بين عدم تسجيل صفحات وتحقيق الهدف أو تجاوزه.",
-    "عاين التذكير التالي وخيارات التنبيه، وتعرّف على الفريق وروابط المساعدة من صفحة «حول» بشعار وَذَكِّرْ الجديد."
+    "شاهد صورًا أكبر لسور الكهف والسجدة والملك، مع اسم السورة وعدد آياتها وخيارات القراءة والاستماع في مكان واضح.",
+    "استفد من مساحة أكبر للآيات عند الاستماع، مع بقاء شريط العنوان وأدوات التشغيل في مكانهما أثناء التمرير.",
+    "تُحمَّل صور السور وبطاقة الجمعة وصور التقدّم بالحجم المناسب لشاشتك، وتتوفر نسخ مدمجة من صور السور دون اتصال بعد تثبيت التحديث."
   ],
   "en": [
-    "Keep the next prayer in view while scrolling Home, with more room for your daily routines and Progress calendar.",
-    "See surah artwork sized for your screen, open the Mushaf directly, and follow a softer word highlight while the page stays in place during pauses.",
-    "Quran Wird and Progress distinguish an empty reading log from reaching or passing your goal.",
-    "Preview your next reminder and review delivery options. Find team and help links in About alongside the new wa-zaker logo."
+    "See larger covers for Al-Kahf, As-Sajdah and Al-Mulk, with verse counts and clear reading and listening actions.",
+    "See more verses while listening. The title and playback controls stay in place as you scroll.",
+    "Surah covers, Friday artwork and Progress photos use sizes suited to your screen. Compact surah covers are available offline after the update installs."
   ]
 }

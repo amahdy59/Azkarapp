@@ -107,9 +107,13 @@ describe("the three surah readings", () => {
     leaveMushaf();
     const image = screen.getByTestId("surah-reading-actions").querySelector("img")!;
     expect(image.getAttribute("srcset")).toContain(`/${artwork}-768.webp 768w`);
+    expect(image.getAttribute("srcset")).toContain(`/${artwork}-416.webp 416w`);
+    expect(image).toHaveAttribute("fetchpriority", "high");
     expect(image).toHaveAttribute("alt", "");
     fireEvent.error(image);
     expect(image).not.toHaveAttribute("srcset");
+    expect(image.getAttribute("src")).toMatch(new RegExp(`/${artwork}-416\\.webp$`));
+    fireEvent.error(image);
     expect(image.getAttribute("src")).toMatch(/\/assets\/cards\/wird-quran-720\.webp$/);
   });
 

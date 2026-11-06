@@ -2,8 +2,8 @@
 
 The Friday card and the Benefits card shipped 1254x1254 PNGs at roughly 1.7 MB
 each -- 3.3 MB of a 5.8 MB precache, for two decorative images that render at a
-few hundred CSS pixels. Same pixels, better codec: no resize, no recrop, so the
-artwork itself is untouched (DEC-072).
+few hundred CSS pixels. The Friday image now uses three widths for the small
+icon and the larger card, with the original composition at every width.
 
 Sources live beside the background masters in source-assets/images/. Run from
 the repository root:
@@ -42,15 +42,17 @@ def export(name: str) -> None:
         image = image.convert("RGB")
         OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
-        avif_path = OUTPUT_ROOT / f"{name}.avif"
-        webp_path = OUTPUT_ROOT / f"{name}.webp"
-        image.save(avif_path, format="AVIF", quality=AVIF_QUALITY)
-        image.save(webp_path, format="WEBP", quality=WEBP_QUALITY, method=6)
-
-    original = source.stat().st_size
-    for path in (avif_path, webp_path):
-        size = path.stat().st_size
-        print(f"  {path.name:<26} {size / 1024:7.1f} KB  ({size / original:.1%} of source PNG)")
+        widths = (192, 384, 768) if name == "mosque_prophet" else (image.width,)
+        for width in widths:
+            variant = image.resize((width, width), Image.Resampling.LANCZOS) if width != image.width else image
+            stem = f"{name}-{width}" if len(widths) > 1 else name
+            avif_path = OUTPUT_ROOT / f"{stem}.avif"
+            webp_path = OUTPUT_ROOT / f"{stem}.webp"
+            variant.save(avif_path, format="AVIF", quality=AVIF_QUALITY)
+            print(f"  {avif_path.name:<26} {avif_path.stat().st_size / 1024:7.1f} KB")
+            if name != "mosque_prophet" or width <= 384:
+                variant.save(webp_path, format="WEBP", quality=WEBP_QUALITY, method=6)
+                print(f"  {webp_path.name:<26} {webp_path.stat().st_size / 1024:7.1f} KB")
 
 
 def main() -> None:

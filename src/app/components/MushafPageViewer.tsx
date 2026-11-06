@@ -887,6 +887,18 @@ function MushafPageCanvas({
 
   const lineDetails = useLineDetails(lines, pageNumber, onlySurah);
   const isOpening = OPENING_PAGES.has(pageNumber);
+  let listeningGeometry: CSSProperties | undefined;
+  if (onlySurah !== undefined) {
+    const firstLine = lineDetails.findIndex((line) => line.type !== "empty");
+    const lastLine = lineDetails.findLastIndex((line) => line.type !== "empty");
+    listeningGeometry = { flex: "none", blockSize: "var(--mushaf-listening-height)" };
+    if (!isOpening && firstLine >= 0) {
+      // Shorten the outside of the passage while keeping the ink in its
+      // original slots at the full page's fitted size.
+      listeningGeometry.marginBlockStart = `calc(var(--mushaf-listening-slot) * -${firstLine})`;
+      listeningGeometry.marginBlockEnd = `calc(var(--mushaf-listening-slot) * -${MUSHAF_LINES_PER_PAGE - 1 - lastLine})`;
+    }
+  }
   useLayoutEffect(() => retainQcfFonts([pageNumber]), [pageNumber]);
   const canvasRef = useLineFitter(
     // Retain the normal-page fit across enlargement. Restarting the fitter
@@ -922,7 +934,7 @@ function MushafPageCanvas({
       className={`relative ${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
         isFloating ? "" : "py-1 sm:py-2"
       }`}
-      style={{ containerType: "size" }}
+      style={{ containerType: "size", ...listeningGeometry }}
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
@@ -1888,10 +1900,11 @@ export function MushafListeningPage({
             "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
             width: `calc(100% * ${magnification / 100})`,
             maxWidth: "none",
-            height: `calc(max(36rem, 100cqh) * ${magnification / 100})`,
+            "--mushaf-listening-height": `calc(max(36rem, 100cqh) * ${magnification / 100})`,
           } as CSSProperties
         }
         aria-hidden="true"
+        data-listening-passage-paper={onlySurah !== undefined || undefined}
         className={`glass-reading audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
         dir="rtl"
         lang="ar"

@@ -411,7 +411,7 @@ export function FridayHomeCard({
       >
         <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
           <Mosque size={28} aria-hidden="true" />
-          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
+          <ProductImage name="mosque_prophet" loading="eager" sizes="64px" className="h-full w-full object-cover" />
         </span>
         <div className="min-w-0 flex-1 text-start">
           <h3
@@ -456,7 +456,12 @@ export function FridayHomeCard({
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
           <Mosque size={52} aria-hidden="true" />
-          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
+          <ProductImage
+            name="mosque_prophet"
+            loading="eager"
+            sizes="(min-width: 1280px) 224px, calc(100vw - 64px)"
+            className="h-full w-full object-cover"
+          />
         </div>
 
         <div className="min-w-0 text-start">

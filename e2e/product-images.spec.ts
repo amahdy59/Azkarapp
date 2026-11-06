@@ -65,10 +65,13 @@ test("the retired PNG illustrations are no longer served", async ({ page }) => {
       "image/",
     );
 
-    for (const extension of ["avif", "webp"]) {
-      const encoded = await page.request.get(`/images/${name}.${extension}`);
-      expect(encoded.status(), `${name}.${extension} should be served`).toBe(200);
-      expect(encoded.headers()["content-type"] ?? "").toContain(`image/${extension}`);
+    for (const stem of name === "mosque_prophet" ? [192, 384, 768].map((width) => `${name}-${width}`) : [name]) {
+      for (const extension of ["avif", "webp"]) {
+        if (stem === "mosque_prophet-768" && extension === "webp") continue;
+        const encoded = await page.request.get(`/images/${stem}.${extension}`);
+        expect(encoded.status(), `${stem}.${extension} should be served`).toBe(200);
+        expect(encoded.headers()["content-type"] ?? "").toContain(`image/${extension}`);
+      }
     }
   }
   for (const name of ["mosque_prophet", "benefits_zikr"]) {

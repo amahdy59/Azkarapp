@@ -288,6 +288,17 @@ export default defineConfig(({ mode, command }) => {
           ],
           runtimeCaching: [
             {
+              urlPattern:
+                /^https:\/\/pub-6e537fd865454e599c23a2bcfc22136e\.r2\.dev\/visuals\/surah\/2026-11-04\/[a-z-]+-768\.webp$/,
+              handler: "CacheFirst" as const,
+              method: "GET" as const,
+              options: {
+                cacheName: "azkar-surah-art-v1",
+                cacheableResponse: { statuses: [0, 200] },
+                expiration: { maxEntries: 3, maxAgeSeconds: 365 * 24 * 60 * 60 },
+              },
+            },
+            {
               // The loader owns checksum-verified offline storage. Do not let
               // the broad R2/audio rule cache an unverified response first.
               urlPattern: new RegExp(`^${reminderManifest.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`),

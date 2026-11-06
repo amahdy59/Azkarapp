@@ -855,3 +855,7 @@ reminderOccurrences supplies selected-location prayer instants, device-local rou
 Settings derives the next and following reminder names, delivery times and source previews from the same dated plan used for delivery. The selected prayer-location clock applies to prayer and contextual reminders. Routine clock fields use the device timezone. Android permission details query owned pending IDs and exact-alarm access, and request a rebuild through the existing native scheduling owner. Browser permission stays in a compact disclosure with its own delivery guidance. The save message uses the existing application persistence status.
 
 Home evidence, prayer virtues and notification previews share the portalled evidence sheet. Each caller supplies its reviewed quotation, reference, direction and optional direct source link. The sheet supports keyboard dismissal and focus return. Its protected surface keeps underlying lettering out of the reading area in Glass mode.
+
+### Surah cover delivery
+
+The Reader selects between a 416px same-origin WebP and the existing 768px versioned hosted WebP. The visible cover has high fetch priority. The compact versions ship in the offline precache, while larger immutable versions are cached on demand. The error path first tries the compact matching cover and then the packaged generic Quran artwork. Friday's small and expanded photo slots select responsive sizes. Progress card photos share the existing image variants, and authored sharing exports retain their original files.

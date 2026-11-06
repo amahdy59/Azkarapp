@@ -54,9 +54,20 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       );
       const textLine = passages.first().locator("[data-mushaf-line-content]").first();
       expect(await textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(10);
+      if (item.id === "friday-kahf") {
+        await expect(player).toHaveAttribute("data-listening-desk", "true");
+        await expect(player.locator(".audio-desk-title")).toBeVisible();
+        const opening = passages.first().locator("[data-mushaf-surah-number]");
+        const paper = passages.first().locator(".audio-listening-page");
+        expect((await opening.boundingBox())!.y - (await paper.boundingBox())!.y).toBeLessThan(64);
+      }
       await page.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-reading.png`) });
       await viewport.focus();
       const before = await passages.first().boundingBox();
+      const header = player.locator(".audio-expanded-header");
+      const footer = player.locator(".audio-expanded-controls");
+      const headerTop = (await header.boundingBox())!.y;
+      const footerTop = (await footer.boundingBox())!.y;
       await page.keyboard.press("ArrowDown");
       const resume = player.getByRole("button", { name: t(language, "quranListening.returnToVerse"), exact: true });
       await expect(resume).toBeVisible();
@@ -64,6 +75,10 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       // Footer recovery leaves the canonical page dimensions unchanged.
       const after = await passages.first().boundingBox();
       expect(after!.height).toBeCloseTo(before!.height, 1);
+      if (item.id === "friday-kahf") {
+        expect((await header.boundingBox())!.y).toBeCloseTo(headerTop, 1);
+        expect((await footer.boundingBox())!.y).toBeCloseTo(footerTop, 1);
+      }
       await resume.click();
       await expect(viewport).toBeFocused();
       await expect(resume).toHaveCount(0);

@@ -736,6 +736,109 @@ export function FloatingAudioPlayer({
     return renderCompact();
   }
 
+  const canonicalListening = Boolean(
+    currentEntry.contentKind === "quran" && currentEntry.quranRange && currentEntry.mushafPages?.length,
+  );
+  const listeningDesk = canonicalListening && totalTracks === 1 && !focusMode;
+  const focusToggle = (
+    <button
+      type="button"
+      ref={focusMode ? focusExitRef : focusEntryRef}
+      data-testid="audio-focus-toggle"
+      aria-pressed={focusMode}
+      aria-label={t(language, focusMode ? "reader.exitFocus" : "reader.enterFocus")}
+      onClick={() => setFocusMode(!focusMode)}
+      className={`audio-focus-toggle surface-control-finish flex min-h-11 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-sm font-semibold text-foreground ${ACTION_FOCUS}`}
+    >
+      {focusMode ? (
+        <Minimize size={20} className="control-cue" aria-hidden="true" />
+      ) : (
+        <Maximize size={20} className="control-cue" aria-hidden="true" />
+      )}
+      <span className="audio-context-label">
+        {t(language, focusMode ? "reader.exitFocusShort" : "reader.focusShort")}
+      </span>
+    </button>
+  );
+  const lockToggle = (
+    <button
+      type="button"
+      data-testid="audio-lock-controls"
+      aria-label={t(language, "audioPlayer.lockControls")}
+      title={t(language, "audioPlayer.lockControls")}
+      onClick={(event) => {
+        event.currentTarget.focus();
+        setControlsLocked(true);
+      }}
+      className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted ${ACTION_FOCUS}`}
+    >
+      <Lock size={18} className="control-cue" aria-hidden="true" />
+    </button>
+  );
+  const transport = (
+    <div className="audio-expanded-transport" data-tracks={totalTracks > 1 ? "multiple" : "single"} dir={direction}>
+      {totalTracks > 1 && (
+        <TransportButton
+          label={t(language, "audioPlayer.previousShort")}
+          ariaLabel={t(language, "audioPlayer.previous")}
+          onClick={controller.previous}
+          disabled={state.entryIndex === 0}
+        >
+          {/* data-rtl-flip mirrors the directional arrow in RTL context */}
+          <SkipBack size={20} aria-hidden="true" data-rtl-flip />
+        </TransportButton>
+      )}
+
+      <TransportButton
+        label={t(language, "audioPlayer.back10Short")}
+        ariaLabel={t(language, "audioPlayer.jumpBack10")}
+        onClick={() => jumpSeconds(-10)}
+        disabled={state.duration <= 0}
+      >
+        <span className="audio-ten-second-icon" aria-hidden="true">
+          <ClockRewind className="size-5" data-rtl-flip />
+          <span>{formatNumerals(10, language)}</span>
+        </span>
+      </TransportButton>
+
+      <button
+        style={{ borderRadius: 9999 }}
+        type="button"
+        onClick={isPlaying ? controller.pause : controller.play}
+        aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+        className={`flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 ${ACTION_FOCUS}`}
+      >
+        <span className="flex items-center justify-center">
+          {isPlaying ? <Pause size={24} aria-hidden="true" /> : <Play size={24} aria-hidden="true" />}
+        </span>
+      </button>
+
+      <TransportButton
+        label={t(language, "audioPlayer.forward10Short")}
+        ariaLabel={t(language, "audioPlayer.jumpForward10")}
+        onClick={() => jumpSeconds(10)}
+        disabled={state.duration <= 0}
+      >
+        <span className="audio-ten-second-icon" aria-hidden="true">
+          <ClockFastForward className="size-5" data-rtl-flip />
+          <span>{formatNumerals(10, language)}</span>
+        </span>
+      </TransportButton>
+
+      {totalTracks > 1 && (
+        <TransportButton
+          label={t(language, "audioPlayer.nextShort")}
+          ariaLabel={t(language, "audioPlayer.next")}
+          onClick={controller.next}
+          disabled={state.entryIndex === totalTracks - 1}
+        >
+          {/* data-rtl-flip mirrors the directional arrow in RTL context */}
+          <SkipForward size={20} aria-hidden="true" data-rtl-flip />
+        </TransportButton>
+      )}
+    </div>
+  );
+
   return (
     <AudioPlayerSurface
       fullScreen={focusMode}
@@ -751,6 +854,7 @@ export function FloatingAudioPlayer({
         dir={direction}
         data-variant="expanded"
         data-listening-focus={focusMode || undefined}
+        data-listening-desk={listeningDesk || undefined}
         onKeyDown={(event) => {
           event.stopPropagation();
           const viewport = readingTextRef.current;
@@ -804,6 +908,11 @@ export function FloatingAudioPlayer({
             >
               <X size={19} aria-hidden="true" />
             </button>
+            {listeningDesk && (
+              <p className="audio-desk-title" dir="auto">
+                {title}
+              </p>
+            )}
             <div
               className="audio-expanded-identity flex min-w-0 flex-wrap items-center justify-center gap-2 px-1"
               data-testid="audio-expanded-identity"
@@ -840,13 +949,10 @@ export function FloatingAudioPlayer({
                 className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
                 style={{
                   scrollbarGutter: "stable both-edges",
-                  paddingBlockStart:
-                    currentEntry.contentKind === "quran" && currentEntry.quranRange && currentEntry.mushafPages?.length
-                      ? 0
-                      : undefined,
+                  paddingBlockStart: canonicalListening ? 0 : undefined,
                 }}
               >
-                {currentEntry.contentKind === "quran" && currentEntry.quranRange && currentEntry.mushafPages?.length ? (
+                {canonicalListening ? (
                   <Suspense fallback={<p role="status">{t(language, "quranListening.loading")}</p>}>
                     <QuranListeningReader
                       key={currentEntry.entryId}
@@ -1091,41 +1197,19 @@ export function FloatingAudioPlayer({
               <span id={continuationDescriptionId} className="sr-only">
                 {t(language, "listening.autoContinueHelp")}
               </span>
-              <div className="audio-focus-actions">
-                <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
-                <button
-                  type="button"
-                  ref={focusMode ? focusExitRef : focusEntryRef}
-                  data-testid="audio-focus-toggle"
-                  aria-pressed={focusMode}
-                  aria-label={t(language, focusMode ? "reader.exitFocus" : "reader.enterFocus")}
-                  onClick={() => setFocusMode(!focusMode)}
-                  className={`audio-focus-toggle surface-control-finish flex min-h-11 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-sm font-semibold text-foreground ${ACTION_FOCUS}`}
-                >
-                  {focusMode ? (
-                    <Minimize size={20} className="control-cue" aria-hidden="true" />
-                  ) : (
-                    <Maximize size={20} className="control-cue" aria-hidden="true" />
-                  )}
-                  <span className="audio-context-label">
-                    {t(language, focusMode ? "reader.exitFocusShort" : "reader.focusShort")}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  data-testid="audio-lock-controls"
-                  aria-label={t(language, "audioPlayer.lockControls")}
-                  title={t(language, "audioPlayer.lockControls")}
-                  onClick={(event) => {
-                    event.currentTarget.focus();
-                    setControlsLocked(true);
-                  }}
-                  className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted ${ACTION_FOCUS}`}
-                >
-                  <Lock size={18} className="control-cue" aria-hidden="true" />
-                </button>
-              </div>
+              {!listeningDesk && (
+                <div className="audio-focus-actions">
+                  <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
+                  {focusToggle}
+                  {lockToggle}
+                </div>
+              )}
             </div>
+            {listeningDesk && (
+              <div className="audio-focus-actions audio-desk-recovery">
+                <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
+              </div>
+            )}
             {/* One waveform seek control with balanced time labels. */}
             <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
               <span dir="ltr" className={AUDIO_TIME_LABEL}>
@@ -1162,72 +1246,15 @@ export function FloatingAudioPlayer({
               </span>
             </div>
 
-            {/* Equal transport slots keep the play button centered. */}
-            <div
-              className="audio-expanded-transport"
-              data-tracks={totalTracks > 1 ? "multiple" : "single"}
-              dir={direction}
-            >
-              {totalTracks > 1 && (
-                <TransportButton
-                  label={t(language, "audioPlayer.previousShort")}
-                  ariaLabel={t(language, "audioPlayer.previous")}
-                  onClick={controller.previous}
-                  disabled={state.entryIndex === 0}
-                >
-                  {/* data-rtl-flip mirrors the directional arrow in RTL context */}
-                  <SkipBack size={20} aria-hidden="true" data-rtl-flip />
-                </TransportButton>
-              )}
-
-              <TransportButton
-                label={t(language, "audioPlayer.back10Short")}
-                ariaLabel={t(language, "audioPlayer.jumpBack10")}
-                onClick={() => jumpSeconds(-10)}
-                disabled={state.duration <= 0}
-              >
-                <span className="audio-ten-second-icon" aria-hidden="true">
-                  <ClockRewind className="size-5" data-rtl-flip />
-                  <span>{formatNumerals(10, language)}</span>
-                </span>
-              </TransportButton>
-
-              <button
-                style={{ borderRadius: 9999 }}
-                type="button"
-                onClick={isPlaying ? controller.pause : controller.play}
-                aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-                className={`flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 ${ACTION_FOCUS}`}
-              >
-                <span className="flex items-center justify-center">
-                  {isPlaying ? <Pause size={24} aria-hidden="true" /> : <Play size={24} aria-hidden="true" />}
-                </span>
-              </button>
-
-              <TransportButton
-                label={t(language, "audioPlayer.forward10Short")}
-                ariaLabel={t(language, "audioPlayer.jumpForward10")}
-                onClick={() => jumpSeconds(10)}
-                disabled={state.duration <= 0}
-              >
-                <span className="audio-ten-second-icon" aria-hidden="true">
-                  <ClockFastForward className="size-5" data-rtl-flip />
-                  <span>{formatNumerals(10, language)}</span>
-                </span>
-              </TransportButton>
-
-              {totalTracks > 1 && (
-                <TransportButton
-                  label={t(language, "audioPlayer.nextShort")}
-                  ariaLabel={t(language, "audioPlayer.next")}
-                  onClick={controller.next}
-                  disabled={state.entryIndex === totalTracks - 1}
-                >
-                  {/* data-rtl-flip mirrors the directional arrow in RTL context */}
-                  <SkipForward size={20} aria-hidden="true" data-rtl-flip />
-                </TransportButton>
-              )}
-            </div>
+            {listeningDesk ? (
+              <div className="audio-desk-transport">
+                {focusToggle}
+                {transport}
+                {lockToggle}
+              </div>
+            ) : (
+              transport
+            )}
 
             {audioOptionsHost &&
               createPortal(

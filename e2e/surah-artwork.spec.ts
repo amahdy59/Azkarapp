@@ -4,7 +4,26 @@ import { t } from "../src/app/i18n";
 
 test.use({ serviceWorkers: "block" });
 
-test("surah thumbnails load their hosted artwork and recover from an unavailable image @cross-browser", async ({
+test("a stalled large surah cover falls back to the matching offline cover", async ({ page }) => {
+  await page.setViewportSize({ width: 820, height: 1024 });
+  await page.addInitScript(() => localStorage.setItem("azkarapp.onboarding-complete.v1", "true"));
+  // Leave the hosted request pending. The local cover should paint while
+  // the connection is still stalled.
+  await page.route("**/visuals/surah/**", () => {});
+  await page.goto("/#/azkar/friday-kahf/1", { waitUntil: "domcontentloaded" });
+  const image = page.getByTestId("surah-reading-actions").locator("img");
+  await expect(image).not.toHaveAttribute("srcset");
+  await expect(image).toHaveAttribute("src", /al-kahf-416\.webp$/);
+  await expect
+    .poll(() =>
+      image.evaluate(
+        (node: HTMLImageElement) => node.complete && node.naturalWidth > 0 && node.currentSrc.endsWith("-416.webp"),
+      ),
+    )
+    .toBe(true);
+});
+
+test("surah covers load their own artwork and recover from an unavailable image @cross-browser", async ({
   page,
 }, info) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -30,11 +49,15 @@ test("surah thumbnails load their hosted artwork and recover from an unavailable
     const artworkBounds = (await image.boundingBox())!;
     expect(titleBounds.y + titleBounds.height).toBeLessThanOrEqual(artworkBounds.y);
     expect(artworkBounds.height).toBeGreaterThanOrEqual(200);
-    expect(artworkBounds.width / artworkBounds.height).toBeCloseTo(4 / 3, 1);
+    expect(artworkBounds.width / artworkBounds.height).toBeCloseTo(5 / 4, 1);
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.naturalWidth)).toBeGreaterThan(0);
-    expect(await image.evaluate((node: HTMLImageElement) => node.currentSrc)).toContain(`/${artwork}-`);
+    expect(await image.evaluate((node: HTMLImageElement) => node.currentSrc)).toMatch(
+      new RegExp(`/${artwork}-(416|768)\\.webp$`),
+    );
+    await expect(image).toHaveAttribute("fetchpriority", "high");
     await page.screenshot({ path: info.outputPath(`${artwork}.png`) });
   }
+  await page.route("**/assets/surah/v1/**", (route) => route.abort());
   await page.route("**/visuals/surah/**", (route) => route.abort());
   await page.reload();
   const image = page.getByTestId("surah-reading-actions").locator("img");
@@ -81,19 +104,36 @@ for (const layout of [
       await expect(title).toHaveCSS("font-family", /Amiri/i);
     }
     const figure = hero.locator("figure");
+    const metadata = hero.locator(".reader-surah-meta");
     await expect(figure.getByRole("button")).toHaveCount(0);
     expect((await share.boundingBox())?.width).toBeGreaterThanOrEqual(44);
     await expect(controls.getByRole("button").first()).toHaveAccessibleName(
       t(layout.language, "reader.readFromMushaf"),
     );
     const [imageBox, titleBox] = [(await figure.boundingBox())!, (await title.boundingBox())!];
+    expect((await metadata.boundingBox())!.y - (titleBox.y + titleBox.height)).toBeGreaterThanOrEqual(12);
+    if (layout.width < 1440) {
+      expect(
+        imageBox.y - ((await metadata.boundingBox())!.y + (await metadata.boundingBox())!.height),
+      ).toBeGreaterThanOrEqual(12);
+    }
+    expect(
+      Math.abs(
+        titleBox.x + titleBox.width / 2 - (await controls.boundingBox())!.x - (await controls.boundingBox())!.width / 2,
+      ),
+    ).toBeLessThanOrEqual(1);
     if (layout.width === 1440) {
       expect(imageBox.width).toBeGreaterThan(440);
       if (layout.language === "ar") expect(imageBox.x).toBeGreaterThan(titleBox.x + titleBox.width);
       else expect(imageBox.x + imageBox.width).toBeLessThan(titleBox.x);
     } else {
       expect(imageBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
-      expect(imageBox.width).toBeGreaterThanOrEqual(layout.width < 400 ? layout.width - 64 : 500);
+      if (layout.width < 400) {
+        expect(imageBox.x).toBeCloseTo(0, 0);
+        expect(imageBox.width).toBeCloseTo(layout.width, 0);
+      } else {
+        expect(imageBox.width).toBeGreaterThanOrEqual(500);
+      }
     }
     const nav = hero.getByTestId("reader-side-navigation");
     await expect(nav.getByRole("button")).toHaveCount(2);

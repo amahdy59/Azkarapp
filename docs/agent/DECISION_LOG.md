@@ -5406,3 +5406,7 @@ The owner requests applying the notification usability and app recommendations. 
 ## 2026-11-06 · Adaptive surah entry and surface hierarchy
 
 The owner approved the phone, tablet and desktop surah-entry recommendation and requested the accompanying progress, notification and dense-surface refinements, performance validation and deployment. Keep the earlier word-only Mushaf cue, fixed reading chrome and compact Home spacing. See [the approved phase](phases/ADAPTIVE_SURAH_AND_RELEASE_2026_11_06.md).
+
+## 2026-11-06 · Image-led surah covers and listening desk
+
+The owner supplied a visual reference for larger covers and authorized a verified release. Apply the same responsive composition to Al-Kahf, As-Sajdah and Al-Mulk. The layout draws from the reference while retaining the app's Glass and paper materials. This supersedes the prior cover dimensions and hosted artwork delivery. The approved listening desk applies to single-track canonical Quran listening. Keep the canonical full-page reader, text, playback and stored progress contracts. See [the phase brief](phases/SURAH_COVERS_AND_IMAGE_DELIVERY_2026_11_06.md).

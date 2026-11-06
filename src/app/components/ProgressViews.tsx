@@ -25,22 +25,22 @@ export interface QuranWirdTile {
 const WIRD_CARD_CONFIG = {
   morning: {
     subtitleKey: "progress.morningCardSubtitle",
-    image: "assets/cards/wird-morning-720.webp",
+    image: "assets/cards/wird-morning",
     badgeStyle: { backgroundColor: "#f59e0b", color: "#020617" },
   },
   evening: {
     subtitleKey: "progress.eveningCardSubtitle",
-    image: "assets/cards/wird-evening-720.webp",
+    image: "assets/cards/wird-evening",
     badgeStyle: { backgroundColor: "#6366f1", color: "#ffffff" },
   },
   before_sleep: {
     subtitleKey: "progress.sleepCardSubtitle",
-    image: "assets/cards/wird-sleep-720.webp",
+    image: "assets/cards/wird-sleep",
     badgeStyle: { backgroundColor: "#3b82f6", color: "#ffffff" },
   },
   quran: {
     subtitleKey: "progress.quranCardSubtitle",
-    image: "assets/cards/wird-quran-720.webp",
+    image: "assets/cards/wird-quran",
     badgeStyle: { backgroundColor: "#10b981", color: "#020617" },
   },
 } as const;
@@ -90,13 +90,22 @@ function WirdCategoryCard({
       }`}
     >
       {/* Visual Background Photo */}
-      <img
-        src={imageSrc}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
-      />
+      <picture>
+        <source
+          type="image/avif"
+          srcSet={`${imageSrc}-360.avif 360w, ${imageSrc}-720.avif 720w`}
+          sizes="auto, (min-width: 768px) 360px, 100vw"
+        />
+        <img
+          src={`${imageSrc}-360.webp`}
+          srcSet={`${imageSrc}-360.webp 360w, ${imageSrc}-720.webp 720w`}
+          sizes="auto, (min-width: 768px) 360px, 100vw"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
       {/* Translucent Glass Scrim & Ambient Overlay — inline style avoids generating new Tailwind gradient utilities */}
       <div
         aria-hidden="true"
