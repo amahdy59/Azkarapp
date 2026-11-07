@@ -1,15 +1,13 @@
 {
-  "release": "2026-11-07.4",
+  "release": "2026-11-07.5",
   "ar": [
-    "يبقى التاريخان ظاهرين عند تمرير الرئيسية، مع خط أكبر للتاريخ الثانوي.",
-    "يظهر الوقت المتبقي للصلاة القادمة بالساعات والدقائق في سطر واحد، مع مساحة أوسع عند تكبير النص.",
-    "احفظ صفحة المصحف بجانب اسم السورة، وادخل وضع التركيز من الزر أسفل الشاشة على الهاتف.",
-    "تصفّح فهرس المصحف داخل مساحة القراءة مع بقاء شريطي التنقل متاحين."
+    "تحسّن تشغيل التطبيق على أجهزة أندرويد الأقدم وأصبح عرض الواجهة أكثر استقرارًا.",
+    "أصبح تنزيل التسجيلات الصوتية للاستخدام دون اتصال أكثر موثوقية مع استئناف التنزيلات المتوقفة.",
+    "تم ضبط شريط الحالة والمسافات أعلى شاشة المصحف لتظهر أدوات القراءة في موضعها الصحيح."
   ],
   "en": [
-    "Both dates remain visible as you scroll Home, with larger text for the secondary date.",
-    "The time until the next prayer stays on one line in hours and minutes, with more room at enlarged text sizes.",
-    "On phones, bookmark beside the surah selector and enter Focus using the bottom button.",
-    "Browse the Mushaf index inside the reading area while both navigation bars stay accessible."
+    "App startup is more reliable on older Android devices, with steadier UI rendering.",
+    "Offline audio downloads are more reliable and can resume after an interrupted transfer.",
+    "The status bar and Mushaf top spacing are aligned so reading controls appear in the correct position."
   ]
 }

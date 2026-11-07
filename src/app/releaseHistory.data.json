@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-11-07.5",
+    "ar": [
+      "تحسّن تشغيل التطبيق على أجهزة أندرويد الأقدم وأصبح عرض الواجهة أكثر استقرارًا.",
+      "أصبح تنزيل التسجيلات الصوتية للاستخدام دون اتصال أكثر موثوقية مع استئناف التنزيلات المتوقفة.",
+      "تم ضبط شريط الحالة والمسافات أعلى شاشة المصحف لتظهر أدوات القراءة في موضعها الصحيح."
+    ],
+    "en": [
+      "App startup is more reliable on older Android devices, with steadier UI rendering.",
+      "Offline audio downloads are more reliable and can resume after an interrupted transfer.",
+      "The status bar and Mushaf top spacing are aligned so reading controls appear in the correct position."
+    ]
+  },
+  {
     "release": "2026-11-07.4",
     "ar": [
       "يبقى التاريخان ظاهرين عند تمرير الرئيسية، مع خط أكبر للتاريخ الثانوي.",
