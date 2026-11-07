@@ -19,7 +19,7 @@
   overscroll-behavior: contain;
 }
 .mushaf-index-inline .mushaf-index-panel {
-  min-block-size: min(8rem, 28dvh);
+  min-block-size: min(8rem, max(200px, 28dvh));
   overscroll-behavior: contain;
 }
 .mushaf-index-inline .mushaf-index-header h2 {

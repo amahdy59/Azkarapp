@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 const seed = Date.parse("2026-10-20T14:00:00+03:00");
 for (const language of ["ar", "en"] as const) {
-  for (const width of [320, 390, 1440]) {
+  for (const width of [320, 390, 768, 1440]) {
     test(`prayer countdown stays readable and updates by the minute ${language} ${width} @cross-browser`, async ({
       page,
     }, testInfo) => {
@@ -28,7 +28,7 @@ for (const language of ["ar", "en"] as const) {
       const card = page.locator('[data-density="summary"][data-prayer-state="next"]');
       const countdown = card.locator("[data-prayer-footer] .home-prayer-countdown-text");
       const wording = language === "ar" ? /متبقٍ.*[٠-٩]+\sد/u : /\d+m remaining/u;
-      await expect(countdown).toHaveCSS("font-size", width < 768 ? "13px" : "15px");
+      await expect(countdown).toHaveCSS("font-size", width <= 768 ? "13px" : "15px");
       await expect(countdown).toHaveText(wording);
       const fitsOneLine = (node: HTMLElement) => {
         const range = document.createRange();

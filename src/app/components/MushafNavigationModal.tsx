@@ -104,6 +104,7 @@ export function MushafNavigationModal({
   }, [isOpen, filteredSurahs]);
 
   const tabContentRef = useRef<HTMLDivElement>(null);
+  const inlineIndexRef = useRef<HTMLElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -139,10 +140,16 @@ export function MushafNavigationModal({
         const bounds = container.getBoundingClientRect();
         const current = target.getBoundingClientRect();
         container.scrollTop += current.top - bounds.top - (container.clientHeight - current.height) / 2;
+        const index = inlineIndexRef.current;
+        if (inline && index) {
+          const viewport = index.getBoundingClientRect();
+          const item = target.getBoundingClientRect();
+          if (item.bottom > viewport.bottom) index.scrollTop += Math.ceil(item.bottom - viewport.bottom);
+        }
       }
     });
     return () => cancelAnimationFrame(frame);
-  }, [isOpen, activeTab, searchQuery, currentPage]);
+  }, [isOpen, activeTab, searchQuery, currentPage, inline]);
 
   const handleJump = (page: number) => {
     const valid = Math.max(1, Math.min(604, Math.floor(page)));
@@ -192,15 +199,14 @@ export function MushafNavigationModal({
   ];
 
   const titleId = useId();
-  const inlineHeading = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!inline || !isOpen) return;
     const opener =
       returnFocusRef.current ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-    inlineHeading.current?.focus({ preventScroll: true });
+    inlineIndexRef.current?.focus({ preventScroll: true });
     const dismiss = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || event.defaultPrevented) return;
-      if (topOverlay() !== inlineHeading.current) return;
+      if (topOverlay() !== inlineIndexRef.current) return;
       event.preventDefault();
       event.stopPropagation();
       onClose();
@@ -620,7 +626,7 @@ export function MushafNavigationModal({
   if (inline) {
     return isOpen ? (
       <section
-        ref={inlineHeading}
+        ref={inlineIndexRef}
         tabIndex={-1}
         aria-labelledby={titleId}
         data-mushaf-inline-index

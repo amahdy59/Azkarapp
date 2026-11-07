@@ -258,7 +258,7 @@
 }
 .home-all-prayers-row {
   grid-auto-flow: column;
-  grid-auto-columns: max(min(8.75rem, calc(100% - 12px)), calc((100% - 2rem) / 5));
+  grid-auto-columns: max(min(8.25rem, calc(100% - 1.5rem)), calc((100% - 2rem) / 5));
   justify-content: safe center;
   scroll-padding-inline: 0.25rem;
   scrollbar-width: none;
@@ -270,7 +270,9 @@
 }
 
 .home-all-prayers-row:lang(en) {
-  grid-auto-columns: max(min(10.5rem, calc(100% - 12px)), calc((100% - 2rem) / 5));
+  /* Keep the ordinary carousel rhythm and make room for the full countdown
+     when the root text size grows. */
+  grid-auto-columns: max(min(calc(16.5rem - 132px), calc(100% - 12px)), calc((100% - 2rem) / 5));
 }
 
 @media (max-width: 359px) {
@@ -718,6 +720,9 @@
   display: inline-block;
   white-space: nowrap;
 }
+.home-prayer-countdown-text:lang(en) {
+  letter-spacing: -0.025em;
+}
 .home-prayer-summary-card[data-prayer-state="next"] .home-prayer-footer-content {
   padding-inline: 8px;
 }
@@ -738,10 +743,13 @@
   .home-prayer-status-pill > svg {
     display: none;
   }
+  .home-prayer-status-pill .home-prayer-countdown-text {
+    font-size: var(--text-label);
+  }
 }
 /* At enlarged text on the narrowest phones, give the time the whole row
    rather than shrinking type or clipping its period label. */
-@container (max-width: 7rem) {
+@container (max-width: calc(10rem - 48px)) {
   .home-prayer-timing > p {
     grid-column: 1 / -1;
     display: block;
@@ -921,6 +929,12 @@ html.reduce-transparency .home-photo-canvas:not(.home-force-glass) .home-prayer-
   line-height: 1.125rem;
   opacity: 0;
   transition: opacity 60ms linear;
+}
+@container (max-width: 9rem) {
+  .home-prayer-compact-countdown {
+    inset-inline: 8px;
+    text-align: center;
+  }
 }
 .home-prayer-sticky[data-prayer-cards-condensed]:not([data-home-compact-prayer]) .home-prayer-compact-countdown {
   opacity: 1;

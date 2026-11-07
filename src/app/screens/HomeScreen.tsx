@@ -813,6 +813,7 @@ export function HomeScreen({
                     summaryOnly
                     compactSummary
                     summaryCondensed={prayerCardsCondensed}
+                    separateCompactSummary={showCompactPrayer}
                     selectedPrayer={expandedPrayer}
                   />
                 </div>

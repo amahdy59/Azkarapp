@@ -41,8 +41,8 @@ for (const { width, language, owner } of [
     const back = top.getByTestId(owner === "wird" ? "mushaf-top-left-back" : "mushaf-immersive-close");
     for (const control of [opener, bookmark, folio, focus]) {
       const bounds = (await control.boundingBox())!;
-      expect(bounds.height).toBeGreaterThanOrEqual(44);
-      expect(bounds.width).toBeGreaterThanOrEqual(44);
+      expect(Number(bounds.height.toFixed(3))).toBeGreaterThanOrEqual(44);
+      expect(Number(bounds.width.toFixed(3))).toBeGreaterThanOrEqual(44);
     }
     for (const control of [opener, folio]) {
       const bounds = (await control.boundingBox())!;

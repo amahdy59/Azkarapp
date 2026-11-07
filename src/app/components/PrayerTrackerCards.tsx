@@ -202,6 +202,7 @@ function PrayerCard({
   onGlass,
   summaryOnly,
   summaryCondensed,
+  separateCompactSummary,
   selected,
   dayKey,
 }: {
@@ -213,6 +214,7 @@ function PrayerCard({
   onOpen?: (prayer: PrayerName | null) => void;
   summaryOnly?: boolean;
   summaryCondensed?: boolean;
+  separateCompactSummary?: boolean;
   selected?: boolean;
   dayKey: string;
 }) {
@@ -268,7 +270,7 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-${summaryCondensed && countdown ? "compact" : "detail"}-${prayer}${state !== "next" ? ` prayer-summary-record-${prayer}` : ""}`}
+          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-${summaryCondensed && countdown && !separateCompactSummary ? "compact" : "detail"}-${prayer}${state !== "next" ? ` prayer-summary-record-${prayer}` : ""}`}
           className="home-prayer-summary-button no-press grid min-h-16 min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,max-content)] justify-between gap-x-2.5 gap-y-1 rounded-xl outline-none transition-colors"
         >
           <div className="home-prayer-identity min-w-0 text-start" data-prayer-identity>
@@ -321,7 +323,7 @@ function PrayerCard({
               )}
             </p>
           </div>
-          {state === "next" && countdown && (
+          {state === "next" && countdown && !separateCompactSummary && (
             <span
               id={`prayer-summary-compact-${prayer}`}
               data-prayer-compact-countdown
@@ -539,6 +541,7 @@ export function PrayerTrackerCards({
   summaryOnly,
   compactSummary = false,
   summaryCondensed = false,
+  separateCompactSummary = false,
   selectedPrayer,
 }: {
   models: readonly PrayerCardModel[];
@@ -553,6 +556,7 @@ export function PrayerTrackerCards({
   summaryOnly?: boolean;
   compactSummary?: boolean;
   summaryCondensed?: boolean;
+  separateCompactSummary?: boolean;
   /** The Home summary whose shared detail panel is expanded below the strip. */
   selectedPrayer?: PrayerName | null;
 }) {
@@ -732,6 +736,7 @@ export function PrayerTrackerCards({
                   onOpen={onOpen}
                   summaryOnly={summaryOnly}
                   summaryCondensed={summaryCondensed}
+                  separateCompactSummary={separateCompactSummary}
                   selected={summaryOnly && model.prayer === selectedPrayer}
                 />
               );
