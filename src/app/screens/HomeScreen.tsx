@@ -1,3 +1,4 @@
+import "../components/ui/pill-controls.css";
 import { getTimeOfDayZikr, isDhuhaWindow, isFridayFeatureWindow, getHomeBackgroundCategory } from "../homeTime";
 export {
   getTimeOfDayZikr,
@@ -26,10 +27,17 @@ import { getReminderPlan, reminderCivilTime } from "../reminderPlan";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { createDailyPathIndex, getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
-import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
+import {
+  estimateCompletionMinutes,
+  getAzkarForMode,
+  getRoutineProgress,
+  isRoutineCategory,
+} from "../content/azkarCore";
 import { CATEGORIES } from "../content/categories";
-import type { PrayerName } from "../content/prayerTimes";
-import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+import { formatPrayerTimeLabel, type PrayerName } from "../content/prayerTimes";
+import { PRAYER_ICON, PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+import { prayerDisplayName } from "../prayerPresentation";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
 import { useQuickRoutineShare } from "../hooks/useQuickRoutineShare";
@@ -51,6 +59,8 @@ import type {
   QuranReadingPosition,
   QuranWirdPlan,
 } from "../types";
+
+import { NAVIGATION_FOCUS } from "../components/ui/controlStyles";
 
 const seenCompletions = new Set<string>();
 
@@ -155,6 +165,7 @@ export function HomeScreen({
   locationSettings,
   onResume,
   onOpenPrayerAdhkar,
+  onViewPrayers,
   mosquePrayerGoal,
   dailyPathStartDayKey,
   onOpenFridayMode,
@@ -163,6 +174,7 @@ export function HomeScreen({
   onOpenWirdBenefits,
   onOpenKhatmah,
   onOpenProgress,
+  onOpenMore,
   onOpenQibla,
   onOpenMasbaha,
   onContinueKhatmah,
@@ -196,6 +208,7 @@ export function HomeScreen({
   onResume: (category: CategoryId) => void;
   /** Opens that prayer's own adhkar, as the prayer screen's card does. */
   onOpenPrayerAdhkar?: (prayer: PrayerName) => void;
+  onViewPrayers?: (prayer: PrayerName) => void;
   mosquePrayerGoal?: number;
   dailyPathStartDayKey?: string;
   onMosquePrayerGoalChange?: (goal: number | undefined) => void;
@@ -205,6 +218,7 @@ export function HomeScreen({
   onOpenWirdBenefits?: () => void;
   onOpenKhatmah?: () => void;
   onOpenProgress?: () => void;
+  onOpenMore?: () => void;
   onOpenQibla?: () => void;
   onOpenMasbaha?: () => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
@@ -385,41 +399,66 @@ export function HomeScreen({
   /* Complete readings load after first paint from the verified R2/offline package,
      including the unchanged schedule and Quran records. Do not briefly show
      unverified legacy excerpts while this catalogue is being unpacked. */
+  const [catalogueFailed, setCatalogueFailed] = useState(false);
+  const [catalogueRetry, setCatalogueRetry] = useState(0);
   const [libraryEvidence, setLibraryEvidence] = useState<ReturnType<typeof getContextualEvidence>>(null);
   const [readingCatalogue, setReadingCatalogue] = useState<Awaited<
     ReturnType<typeof import("../content/reminderReadings").loadReminderReadings>
   > | null>(null);
   useEffect(() => {
     let cancelled = false;
+    let pending = false;
+    let failed = false;
     // Keep the current verified card until its replacement is ready. Clearing
     // it here briefly rotates through a contextual fallback on every refresh.
     const load = async () => {
-      const catalogue = await import("../content/reminderReadings");
-      if (cancelled) return;
-      const readings = await catalogue.loadReminderReadings();
-      if (cancelled) return;
-      setReadingCatalogue(readings);
-      setLibraryEvidence(
-        selectLibraryEvidence(
-          readings.library,
-          readings.verses,
-          reminderSlotKey,
-          language,
-          reminderContexts,
-          manualEvidenceOffset,
-        ),
-      );
+      if (cancelled || pending) return;
+      pending = true;
+      failed = false;
+      setCatalogueFailed(false);
+      try {
+        const catalogue = await import("../content/reminderReadings");
+        if (cancelled) return;
+        const readings = await catalogue.loadReminderReadings();
+        if (cancelled) return;
+        setReadingCatalogue(readings);
+        setLibraryEvidence(
+          selectLibraryEvidence(
+            readings.library,
+            readings.verses,
+            reminderSlotKey,
+            language,
+            reminderContexts,
+            manualEvidenceOffset,
+          ),
+        );
+      } catch {
+        failed = true;
+        if (!cancelled) setCatalogueFailed(true);
+      } finally {
+        pending = false;
+      }
     };
 
-    const cancelScheduled = scheduleIdleAfterPaint(() => void load().catch(() => undefined), {
+    // A failed first request used to hide the card until its next context slot.
+    // Retry on recovery intent, without a polling clock or overlapping requests.
+    const retry = () => {
+      if (failed && document.visibilityState === "visible") void load();
+    };
+    window.addEventListener("online", retry);
+    document.addEventListener("visibilitychange", retry);
+
+    const cancelScheduled = scheduleIdleAfterPaint(() => void load(), {
       timeout: 2000,
       fallbackDelay: 200,
     });
     return () => {
       cancelled = true;
       cancelScheduled();
+      window.removeEventListener("online", retry);
+      document.removeEventListener("visibilitychange", retry);
     };
-  }, [language, manualEvidenceOffset, reminderContexts, reminderSlotKey]);
+  }, [language, manualEvidenceOffset, reminderContexts, reminderSlotKey, catalogueRetry]);
 
   /* The library wins only where it is at least as specific as what the corpus
      found. Otherwise a Friday source would displace the Asr one the reader is
@@ -488,6 +527,15 @@ export function HomeScreen({
   const homeStickyRef = useRef<HTMLDivElement>(null);
   const prayerPanelRef = useRef<HTMLElement>(null);
   const { condensed: prayerCardsCondensed, updateScroll: updatePrayerScroll } = useHomePrayerScroll();
+  const narrowPrayerRail = useMediaQuery("(width < 768px)");
+  const nextPrayer = prayerCardModels.find((model) => model.state === "next");
+  const NextPrayerIcon = nextPrayer && PRAYER_ICON[nextPrayer.prayer];
+  const showCompactPrayer = narrowPrayerRail && Boolean(onViewPrayers && nextPrayer);
+  const compactPrayerActive = showCompactPrayer && prayerCardsCondensed;
+  const secondaryDate = useMemo(
+    () => formatDisplayDate(now, language, calendarType === "hijri" ? "gregorian" : "hijri", hijriDateOffset, false),
+    [now, language, calendarType, hijriDateOffset],
+  );
 
   useEffect(() => {
     const scroll = homeScrollRef.current;
@@ -571,7 +619,8 @@ export function HomeScreen({
     if (dismissedAutoPrayer && dismissedAutoPrayer !== autoPrayer) setDismissedAutoPrayer(null);
   }, [autoPrayer, dismissedAutoPrayer]);
 
-  const prayerControlFocused = () => !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row button:focus");
+  const prayerControlFocused = () =>
+    !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row :is(button, a):focus");
   const handlePrayerOpen = (prayer: PrayerName | null) => {
     setSelectedPrayer(prayer);
     setDismissedAutoPrayer(prayer ? null : autoPrayer);
@@ -580,10 +629,23 @@ export function HomeScreen({
     if (!prayer) updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0, prayerControlFocused());
   };
   const hasPrimaryContext = showCompletionCard || showRoutineCard;
-  const hasContextCompanion = Boolean(dailyEvidence);
+  const hasContextCompanion = Boolean(dailyEvidence) || !readingCatalogue;
   const hasContextStackContent = Boolean(hasPrimaryContext || dailyEvidence);
 
   /* The named scroll region must itself be keyboard-scrollable. */
+  const toolCardClass = `group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] ${NAVIGATION_FOCUS} ${
+    homeVisualEffects
+      ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
+      : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
+  }`;
+  const toolIconClass = `control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
+    homeVisualEffects
+      ? "border border-white/20 bg-white/10 text-on-media-accent"
+      : "border border-primary/30 bg-primary/10 text-primary"
+  }`;
+  const toolOpenClass = `inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
+    homeVisualEffects ? "text-on-media-accent" : "text-primary"
+  }`;
   return (
     <ScreenContainer
       dir={direction}
@@ -608,7 +670,7 @@ export function HomeScreen({
         className="home-content-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         onTouchStart={() => {
           if (
-            expandedPrayer === null &&
+            selectedPrayer === null &&
             document.activeElement instanceof HTMLElement &&
             document.activeElement.closest(".home-prayer-sticky-row button")
           ) {
@@ -622,7 +684,7 @@ export function HomeScreen({
             scrolledHomeRef.current = scrolled;
             setHasScrolledHomeContent(scrolled);
           }
-          updatePrayerScroll(top, expandedPrayer !== null || prayerControlFocused());
+          updatePrayerScroll(top, selectedPrayer !== null || prayerControlFocused());
         }}
       >
         {/* Sticky Header Overlay */}
@@ -630,8 +692,11 @@ export function HomeScreen({
           ref={homeStickyRef}
           onBlurCapture={(event) => {
             if (
-              !expandedPrayer &&
-              !(event.relatedTarget instanceof Element && event.relatedTarget.closest(".home-prayer-sticky-row button"))
+              !selectedPrayer &&
+              !(
+                event.relatedTarget instanceof Element &&
+                event.relatedTarget.closest(".home-prayer-sticky-row :is(button, a)")
+              )
             )
               updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0);
           }}
@@ -639,6 +704,7 @@ export function HomeScreen({
           data-scrolled={hasScrolledHomeContent || undefined}
           data-prayer-cards-condensed={prayerCardsCondensed || undefined}
           data-home-motion={reduceMotion ? "reduced" : undefined}
+          data-home-compact-prayer={showCompactPrayer || undefined}
           className="home-prayer-sticky pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible"
         >
           <header
@@ -657,25 +723,38 @@ export function HomeScreen({
           >
             <div
               data-testid="home-header-content"
-              className="home-layout-frame px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3"
+              className="home-layout-frame px-page mx-auto flex w-full max-w-7xl flex-wrap items-start justify-between gap-x-3 gap-y-1"
             >
               <div
                 data-testid="hijri-date"
-                className={`min-w-0 flex-1 text-start text-label font-bold leading-tight sm:text-subtitle ${
+                className={`min-w-0 grow basis-[min(100%,10rem)] pt-1 text-start text-label font-bold leading-tight sm:text-subtitle ${
                   homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
                 }`}
               >
                 <time className="block" dateTime={now.toISOString()} dir="auto">
                   {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
                 </time>
+                {secondaryDate && (
+                  <div data-testid="home-secondary-date">
+                    <span
+                      className={`block min-h-0 text-label font-medium ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
+                      dir="auto"
+                    >
+                      {secondaryDate}
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}>
+              <div className={`ms-auto shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}>
                 <button
                   type="button"
                   data-testid="home-header-routine-summary-mobile"
-                  onClick={() => setPathSheetOpen(true)}
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    setPathSheetOpen(true);
+                  }}
                   aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
-                  className="home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:hidden"
+                  className={`choice-pill home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold ${NAVIGATION_FOCUS} min-[600px]:hidden`}
                 >
                   <span className="flex items-center gap-1" aria-hidden="true">
                     <PalmTreeMark size={20} className="control-cue" strokeWidth={3} />
@@ -690,9 +769,12 @@ export function HomeScreen({
                 <button
                   type="button"
                   data-testid="home-header-routine-summary"
-                  onClick={() => setPathSheetOpen(true)}
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    setPathSheetOpen(true);
+                  }}
                   aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
-                  className="home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:flex"
+                  className={`choice-pill home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold ${NAVIGATION_FOCUS} min-[600px]:flex`}
                 >
                   <span className="hidden min-[900px]:inline" aria-hidden="true">
                     {t(language, "dailyPath.title")}
@@ -712,22 +794,69 @@ export function HomeScreen({
           </header>
           {showHeroContent && (
             <div className="home-layout-frame home-prayer-sticky-row pointer-events-auto mx-auto w-full max-w-7xl px-page">
-              <div data-testid="home-prayer-strip" className="relative z-10 mx-auto w-full min-w-0 overflow-visible">
-                <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
-                <PrayerTrackerCards
-                  models={prayerCardModels}
-                  language={language}
-                  direction={direction}
-                  records={prayerTracking}
-                  dayKey={todayKey}
-                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                  onOpen={handlePrayerOpen}
-                  onGlass={homeVisualEffects}
-                  summaryOnly
-                  compactSummary
-                  selectedPrayer={expandedPrayer}
-                />
+              <div className={showCompactPrayer ? "home-prayer-expanded home-rail-fold" : undefined}>
+                <div
+                  data-testid="home-prayer-strip"
+                  className="relative z-10 mx-auto w-full min-w-0 min-h-0"
+                  {...(compactPrayerActive ? { inert: "" } : {})}
+                >
+                  <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
+                  <PrayerTrackerCards
+                    models={prayerCardModels}
+                    language={language}
+                    direction={direction}
+                    records={prayerTracking}
+                    dayKey={todayKey}
+                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                    onOpen={handlePrayerOpen}
+                    onGlass={homeVisualEffects}
+                    summaryOnly
+                    compactSummary
+                    summaryCondensed={prayerCardsCondensed}
+                    separateCompactSummary={showCompactPrayer}
+                    selectedPrayer={expandedPrayer}
+                  />
+                </div>
               </div>
+              {showCompactPrayer && nextPrayer && NextPrayerIcon && (
+                <div className="home-prayer-mobile-fold home-rail-fold">
+                  <div className="min-h-0" {...(!compactPrayerActive ? { inert: "" } : {})}>
+                    <div
+                      data-testid="home-compact-prayer"
+                      className={`home-compact-prayer mx-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl border ${
+                        homeVisualEffects
+                          ? "hero-glass home-glass-surface text-on-media"
+                          : "border-border bg-card text-foreground"
+                      }`}
+                    >
+                      <div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
+                        <NextPrayerIcon
+                          size={20}
+                          className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
+                          aria-hidden="true"
+                        />
+                        <p className="min-w-0 text-sm font-bold leading-snug [overflow-wrap:anywhere]">
+                          {prayerDisplayName(nextPrayer.prayer, language, todayKey)} ·{" "}
+                          <bdi className="tabular-nums">{formatPrayerTimeLabel(nextPrayer.time, isArabic)}</bdi>
+                        </p>
+                        <p
+                          className={`col-span-2 text-xs tabular-nums whitespace-nowrap ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
+                          data-prayer-countdown-line
+                        >
+                          {nextPrayer.countdown ?? t(language, "prayerTracking.nextShort")}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className={`choice-pill home-header-path-button min-h-11 min-w-11 max-w-full rounded-xl px-2.5 text-xs font-bold [overflow-wrap:anywhere] ${NAVIGATION_FOCUS}`}
+                        onClick={() => onViewPrayers?.(nextPrayer.prayer)}
+                      >
+                        {t(language, "home.viewAllPrayers")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -740,9 +869,7 @@ export function HomeScreen({
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 sm:pb-6 lg:gap-5 lg:pb-8">
                 <div
                   data-testid="home-context-grid"
-                  className={`grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5 ${
-                    hasContextStackContent && !expandedPrayer ? "items-stretch" : "items-start"
-                  }`}
+                  className="grid w-full grid-cols-1 items-start gap-x-4 gap-y-2 md:grid-cols-2 md:gap-y-3"
                   dir={direction}
                 >
                   <div data-testid="home-prayer-column" className="contents">
@@ -840,6 +967,24 @@ export function HomeScreen({
                             onGlass={homeVisualEffects}
                           />
                         </div>
+                      ) : !readingCatalogue ? (
+                        <div
+                          className="w-full rounded-3xl border border-border bg-card p-4"
+                          data-testid="home-reminder-status"
+                        >
+                          <p role="status" className="text-sm text-muted-foreground">
+                            {t(language, catalogueFailed ? "home.reminderUnavailable" : "common.loading")}
+                          </p>
+                          {catalogueFailed && (
+                            <button
+                              type="button"
+                              className="mt-2 min-h-11 rounded-xl border border-border-control px-4 text-sm font-bold text-primary"
+                              onClick={() => setCatalogueRetry((value) => value + 1)}
+                            >
+                              {t(language, "mushaf.retry")}
+                            </button>
+                          )}
+                        </div>
                       ) : null}
                     </div>
                   )}
@@ -906,95 +1051,63 @@ export function HomeScreen({
           {(onOpenQibla || onOpenMasbaha) && (
             <div className="px-page mx-auto w-full">
               <div className={`grid grid-cols-1 gap-3 ${onOpenQibla && onOpenMasbaha ? "sm:grid-cols-2" : ""}`}>
-                {onOpenQibla && (
-                  <button
-                    type="button"
-                    onClick={onOpenQibla}
-                    data-testid="home-tool-qibla"
-                    className={`group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      homeVisualEffects
-                        ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
-                        : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <span
-                        className={`control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
-                          homeVisualEffects
-                            ? "border border-white/20 bg-white/10 text-on-media-accent"
-                            : "border border-primary/30 bg-primary/10 text-primary"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        <Compass size={22} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <span className="block text-subtitle font-extrabold text-foreground">
-                          {t(language, "qibla.title")}
-                        </span>
-                        <span className="block text-micro font-semibold text-muted-foreground">
-                          {locationSettings?.latitude != null && locationSettings?.longitude != null
-                            ? `${displayLocationName(locationSettings, language) || t(language, "qibla.currentLocation")} · ${formatNumerals(
-                                Math.round(getQiblaBearing(locationSettings.latitude, locationSettings.longitude)),
-                                language,
-                              )}°`
-                            : t(language, "more.qiblaDescription")}
-                        </span>
-                      </div>
-                    </div>
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
-                        homeVisualEffects ? "text-on-media-accent" : "text-primary"
-                      }`}
+                {[
+                  {
+                    id: "qibla",
+                    title: t(language, "qibla.title"),
+                    Icon: Compass,
+                    onClick: onOpenQibla,
+                    description:
+                      locationSettings?.latitude != null && locationSettings?.longitude != null
+                        ? `${displayLocationName(locationSettings, language) || t(language, "qibla.currentLocation")} · ${formatNumerals(Math.round(getQiblaBearing(locationSettings.latitude, locationSettings.longitude)), language)}°`
+                        : t(language, "more.qiblaDescription"),
+                  },
+                  {
+                    id: "masbaha",
+                    title: t(language, "counter.tasbeehTitle"),
+                    Icon: Sparkles,
+                    onClick: onOpenMasbaha,
+                    description: t(language, "more.masbahaDescription"),
+                  },
+                ]
+                  .filter((tool) => tool.onClick)
+                  .map(({ id, title, Icon, onClick, description }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={onClick}
+                      data-testid={`home-tool-${id}`}
+                      className={toolCardClass}
                     >
-                      <span>{t(language, "common.open")}</span>
-                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
-                    </span>
-                  </button>
-                )}
-
-                {onOpenMasbaha && (
-                  <button
-                    type="button"
-                    onClick={onOpenMasbaha}
-                    data-testid="home-tool-masbaha"
-                    className={`group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      homeVisualEffects
-                        ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
-                        : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <span
-                        className={`control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
-                          homeVisualEffects
-                            ? "border border-white/20 bg-white/10 text-on-media-accent"
-                            : "border border-primary/30 bg-primary/10 text-primary"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        <Sparkles size={22} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <span className="block text-subtitle font-extrabold text-foreground">
-                          {t(language, "counter.tasbeehTitle")}
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <span className={toolIconClass} aria-hidden="true">
+                          <Icon size={22} />
                         </span>
-                        <span className="block text-micro font-semibold text-muted-foreground">
-                          {t(language, "more.masbahaDescription")}
-                        </span>
+                        <div className="min-w-0 flex-1">
+                          <span className="block text-subtitle font-extrabold text-foreground">{title}</span>
+                          <span className="block text-micro font-semibold text-muted-foreground">{description}</span>
+                        </div>
                       </div>
-                    </div>
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
-                        homeVisualEffects ? "text-on-media-accent" : "text-primary"
-                      }`}
-                    >
-                      <span>{t(language, "common.open")}</span>
-                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
-                    </span>
-                  </button>
-                )}
+                      <span className={toolOpenClass}>
+                        <span>{t(language, "common.open")}</span>
+                        <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
+                      </span>
+                    </button>
+                  ))}
               </div>
+            </div>
+          )}
+          {onOpenMore && (
+            <div className="px-page mx-auto w-full">
+              <button
+                type="button"
+                data-testid="home-more"
+                onClick={onOpenMore}
+                className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm font-bold text-foreground hover:bg-muted ${NAVIGATION_FOCUS}`}
+              >
+                {t(language, "more.title")}
+                <ArrowNext size={18} data-rtl-flip aria-hidden="true" />
+              </button>
             </div>
           )}
           <footer className="px-page" data-testid="home-visitor-footer">

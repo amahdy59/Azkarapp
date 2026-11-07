@@ -167,6 +167,29 @@ describe("verified R2 catalogue loading", () => {
     return (await import("./reminderReadings")).loadReminderReadings;
   }
 
+  it("aborts a stalled packaged request and permits a clean retry", async () => {
+    const load = await freshLoader();
+    vi.useFakeTimers();
+    try {
+      const fetcher = vi
+        .fn()
+        .mockImplementationOnce(
+          (_url, { signal }: RequestInit) =>
+            new Promise((_resolve, reject) => {
+              signal!.addEventListener("abort", () => reject(new DOMException("Timed out", "AbortError")));
+            }),
+        )
+        .mockResolvedValueOnce(new Response(readFileSync("src/app/content/home-reminder-readings.bin")));
+      vi.stubGlobal("fetch", fetcher);
+      const first = expect(load()).rejects.toThrow("Timed out");
+      await vi.advanceTimersByTimeAsync(8000);
+      await first;
+      expect((await load()).library).toHaveLength(71);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("verifies pinned bytes before decoding, restores the schedule and reuses the verified result", async () => {
     const load = await freshLoader();
     const fetcher = vi.fn().mockResolvedValue(new Response(readFileSync("src/app/content/home-reminder-readings.bin")));
@@ -176,7 +199,10 @@ describe("verified R2 catalogue loading", () => {
     expect(result.verses).toHaveLength(18);
     expect(result.withReminderReading({ ...evidence, evidenceId: "H16" }, "ar").hadith).toBe(readings.H16.arabic);
     expect(await load()).toBe(result);
-    expect(fetcher).toHaveBeenCalledExactlyOnceWith(manifest.url, { credentials: "omit" });
+    expect(fetcher).toHaveBeenCalledExactlyOnceWith(expect.stringContaining("home-reminder-readings.bin"), {
+      credentials: "omit",
+      signal: expect.any(AbortSignal),
+    });
   });
 
   it.each(["network", "truncated", "corrupted"])("rejects a %s package and allows a clean retry", async (failure) => {

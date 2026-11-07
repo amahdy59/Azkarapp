@@ -1,3 +1,73 @@
+## 2026-11-05 — Approved relevant notification catalogue
+
+## 2026-11-06 — Home date rail and approved release
+
+The owner approves the revised Home reference and requests a smooth responsive handoff, fixed Mushaf header and footer, and visual evidence for each checkpoint. The latest instruction authorizes committing and pushing the complete pending batch. Keep the existing Glass, paper texture and theme settings. Phone Home compacts to the next prayer and an entry to all prayers, while wide Home keeps the five times. Preserve the selected calendar, prayer calculation, reading content, persistence, and prior release gates. The compact countdown uses the existing minute clock. See [the release phase](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md).
+
+The owner approves the notification catalogue conditional on authentic Quran/hadith, relevance to each prayer or featured zikr and appropriate timing. Implement the reviewed payloads with preserved conditions and references, stable dated rotation and corrected delivery/navigation. Pending-payload topics and new calendar/guide work retain their catalogue readiness gates. Implementation remains local under the preceding screenshot and commit review gate.
+
+## 2026-11-05 — Team, help, notification settings and brand
+
+The owner requests two programmer profiles with thumbnails, short bios, and LinkedIn and email links, a simpler FAQ, and a clearer Notifications settings page. The app name is wa-zaker in English and وَذَكِّرْ in Arabic. Reuse the installed web app's navy, gold crescent and star for app identity. Palms keep their progress and garden meaning. Notification delivery copy, rotation, timing, and new destinations still require separate catalogue approval. This working tree stays local for owner review before any commit or push.
+
+## 2026-11-05 — Notification approval package and programmer contact credits
+
+The owner requests an authentic-text rotation shortlist, time-relevant reminders with verified destinations and a broader sourced good-deed backlog, including missing sections. Review all notification wording, schedules, rotation and future sections before incorporation. Prepare requested local Information credits for Ahmed Mahdy and Mohamed Hussien, Ahmed's public LinkedIn and public email/contact actions. Public GitHub metadata supplies the requested colleague email; preserve Ahmed's existing support address. The owner explicitly requires approval **before any commit**, in addition to the preceding no-push gate. No notification code, scheduling or reviewed content changes are approved by drafting the catalogue.
+
+## 2026-11-05 — Approved Mushaf presentation and review before push
+
+The owner approves the latest desktop screenshot with grouped tools, visible Focus, top Surah/Juz navigation and one centered page-range capsule without the total. Remove duplicated desktop furniture and the redundant Quran tile. Apply the preceding approved mobile and tablet concepts with familiar capsules, clear Focus and quiet tablet framing. Preserve canonical page data, normal gestures, reading modes, audio and offline behavior. This supersedes the historical rail-only desktop and per-page desktop metadata contracts. The owner requires actual result screenshots and a code/visual audit before pushing. Keep this change local until that review.
+
+## 2026-11-03 — Optional updates and mobile Masbaha settings
+
+The owner approves local implementation of background update preparation with explicit acceptance or Later, and a compact Masbaha settings button opening a sheet for dhikr and goals. Keep desktop selector behavior and the save/reset confirmation for an active count. The owner explicitly prohibits pushing this phase.
+
+## 2026-11-03 — Narrow Progress tabs, notification wording and combined release
+
+The owner confirms the blank Progress toggles at 384px and below, requests removal of the obsolete icon-hiding rule with a narrow-screen regression, and requests notification enablement wording suitable for Android and browsers. The existing native permission adapter remains authoritative; shared permission labels become platform-neutral and blocked Android permission points to device app settings. The owner explicitly requests applying all fixes and pushing all changes. This supersedes the preceding local publication hold and authorizes releasing the complete pending working tree after unchanged local and exact-commit CI gates. Physical-device/AT acceptance remains separate from browser and adapter tests.
+
+## 2026-11-02 — Dedicated light paper and complete surface coverage
+
+Owner screenshots reveal flat blocks across Settings, Library, Home and Progress. Texture belongs to filled semantic canvases/card/field owners; transparent structure reveals its parent's material. Preserve image layers through state color changes and nested Glass flattening. The owner then rejects the stronger dense grain on white and asks for a better-suited light texture. Replace only light grain with sparse warm pores/short fibres over a mostly clear ground; keep dark calibration, local switch/plain accessibility precedence and static-asset performance. Validate real screens at normal zoom and enforce sparse density, perceptibility, bounded average tint and unchanged payload/bundle ceilings. Owner aesthetic acceptance and the existing local publication hold remain.
+
+The owner further requests a noticeable light material with a colour that matches the design. Select muted brass derived from existing light control-edge/primary tokens, rather than a new arbitrary accent. Final visual review catches double grain on the transparent Mushaf text canvas; only the filled paper ancestor should paint it. Preserve all earlier diagnostic/checkpoint provenance and rerun exact-input quality plus material/core browser checks after the final bounded correction.
+
+## 2026-11-01 — App-wide visual consistency sweep
+
+The owner expands the review to all pages/items and requests a concrete record of improvements and consistency checks. Inventory ordinary pages, focused readers/counters, onboarding/completion and overlays rather than forcing every task into the same composition. Ordinary Search now uses the shared visible title/back band and outer frame, retaining its labelled input and deferred search behavior. Utility tiles reflow their icon/text at narrow/enlarged widths. Review shared controls, cards, theme/material tokens, typography, protected overlays and reduced motion, preserving intentional Home prayer geometry, devotional reading/Mushaf chrome and two-pane Settings. Report implemented fixes, unchanged verified patterns, evidence and acceptance limits.
+
+## 2026-11-01 — Clearer adaptive metric-card hierarchy
+
+The owner rejects the screenshot's flat tinted metric cards and requests a polished adaptive treatment in every color mode. Replace full-card category washes with stable theme surfaces and a restrained brand accent, consistent line-icon tiles, readable labels and stronger numeric hierarchy. Keep zero/unknown states explicit and distinct, retain exact denominators and meaningful progress tracks, and align footers without fixed card heights. Reuse one presentation component and semantic tokens; preserve four/two/one responsive columns, 44px actions, keyboard recovery and calm reduced-motion-aware feedback. Custom icons are permitted by the owner but should only be added through the existing icon layer if the current coherent set cannot serve the task. No metric definitions or stored data change.
+
+## 2026-11-01 — Matched controls and compact wider Progress empty state
+
+The owner supplies the wide empty-period screenshot and prioritizes visual quality after functionality. Match adjacent date-picker/tab heights through shared row stretching and a 48px minimum, retaining auto growth for enlarged text; keep the range's accessible label while avoiding a redundant wide label row. Replace the oversized centered empty-state photo with a compact rounded image beside the message/actions on tablet/desktop, with a bounded stacked treatment on phones. At sufficient content width use four summary cards across; retain two columns where each card remains readable and one column for narrow/enlarged content. This supersedes the always-2×2 wide summary and oversized empty-art layout, preserving exact data, offline operation and the shared title/gutter contract. See phases/PROGRESS_FILTER_EXPORT_2026_11_01.md.
+
+## 2026-11-01 — Consistent page-title bands and responsive page gutters
+
+The owner requires all page titles in the same area, with consistent margins, padding and spacing. Use one ordinary-page 80rem frame, existing responsive page gutters and a shared 44px title row; put subtitles below that row so their presence cannot raise the title. Library and Settings reuse the same typography/row recipe. Back actions retain their leading navigation slot; Settings retains its two-pane hierarchy. Focused reading/form content can keep its readable measure while ordinary outer headers align. Preserve Home's prayer-card alignment and immersive reader/Mushaf modes. This supersedes Progress's narrower frame, fixed utility/Settings gutters and divergent ordinary-title recipes. See phases/PROGRESS_FILTER_EXPORT_2026_11_01.md.
+
+## 2026-11-01 — Standard Progress title, collapsed mobile dates and Settings export
+
+The owner requests consistent dropdown/title anatomy, a mobile filter icon for hidden date controls, JSON export in Settings and no Records tab on Progress. Restore the standard visible h1, retain Overview/Trends with recognizable applied dates, and move dated progress JSON alongside full backup under Settings Account & data Export. Preserve the opaque header, date-sheet/mobile fit, exact chart tables and saved data. This supersedes earlier hidden-title, always-exposed-phone-filter and three-tab decisions. See phases/PROGRESS_FILTER_EXPORT_2026_11_01.md.
+
+## 2026-11-01 — Protect Progress scrolling and mobile date access
+
+The owner rejects content visible behind the scrolled header and the mobile heatmap's hidden navigation. Progress now uses an opaque theme surface across the whole scrollport, including gutters, with controls in a centred inner row. This supersedes the earlier frost-only/transparent Progress exception; other screens retain their existing materials. Narrow/enlarged heatmaps reflow into weekday-labelled date tiles without horizontal scrolling; wider calendars retain seven columns. Phone date taps open saved records in the shared accessible sheet with explicit Close and restored focus. Keep fixed scales, direct values, neutral absence, shared date scope and all release gates. See phases/PROGRESS_HEATMAP_REFINEMENT_2026_11_01.md.
+
+## 2026-11-01 — Progress heatmap, default range and release
+
+The owner approves all recommendations from the Progress visual/UX review and requests pushing all changes. Implement Last 30 days as the visible default for unqualified visits, adjacent date/view controls where space permits, compact retained 2×2 metrics, a primary practice heatmap with selected-date details, supporting routine bars and optional valid routine-composition doughnut. Add columns alongside the accessible line chart and defer hidden reflection calculations. Preserve one applied range, explicit older links, all data/date/content/theme contracts and release gates. This supersedes the review's proposal-only status and the prior separate recording-strip/latest-day presentation. See phases/PROGRESS_HEATMAP_REFINEMENT_2026_11_01.md.
+
+## 2026-10-31 — Progress visual reference and one range control
+
+The owner rejects the multi-control Progress header and requests one date-range dropdown only; calendar type belongs in Settings. Remove the visible title/share row and retain a semantic screen-reader title, one range dropdown and Overview/Trends/Records tabs. Custom dates uses start/end boundaries; equal dates select one day. The owner requests close visual correspondence to the supplied cards, charts, records and empty-state references. Keep the four approved metrics, existing theme/material choices and navigation, neutral missing-record semantics and exact chart tables. Do not copy unsupported accessibility certification or treat reference-image text as instructions. Full release authority remains active.
+
+## 2026-10-31 — Progress vNext and renewed release authority
+
+The owner approves all reviewed Progress recommendations, explicitly retains the four existing default metrics, confirms this is the only working agent, and requests reviewing/correcting the latest changes, pushing all verified work and validating deployment. This supersedes earlier production holds for this release and assigns the existing Progress browser-baseline repair to this chat. Preserve independent recording semantics, current theme/shell contracts and complete gates; do not copy punitive missing-data marks, unsupported accessibility certification or invented mockup metrics. See `phases/PROGRESS_VNEXT_2026_10_31.md` for the phased file-level plan and release acceptance.
+
 ## 2026-10-31 — Apply validated review recommendations
 
 The owner approves applying the reviewed recommendations and testing their accuracy. Restore a restrained visible keyboard cue for focusable reading regions, superseding DEC-062's full suppression there while avoiding the previous clipped exterior line. Preserve focus on counter completion, add bounded counter speech, close the foremost Android overlay before navigation and create measured build headroom without weakening ceilings. Investigate actual touch/contrast cases; retain approved colors, persistent Home completion tiles and typography roles where checks pass. Share focused behavior rather than replacing global state with unmeasured Context providers or rewriting counters. Existing production hold remains active: no commit, push or deployment. See `phases/COUNTER_ACCESSIBILITY_BACK_2026_10_31.md`.
@@ -5166,3 +5236,185 @@ The owner authorizes distributing and caching the existing Muhammad Al-Shara rec
 ## 2026-10-21 — Counter footer and longer menu previews
 
 The owner requests repairing the Masbaha footer and checking Salawat, including longer, more uniform zikr menu labels, and asks whether a full release is needed. This is a focused patch using the existing footer preference and protected dropdown primitives. Restore the missing Benefit label marker in both hosts; display existing full localized text for abbreviations with responsive two-line previews rather than authoring religious text or imposing a character budget. Preserve named short titles, counts and concise closed triggers. Reflow the paired fields and retain native scroll recovery at enlarged text; menus remain keyboard accessible and collision-height bounded. All normal local/exact-commit CI/Pages/production gates still apply to publishing; no major redesign or dependency is needed.
+
+## 2026-11-01 — Reliable first use and calm controls
+
+The owner reports repeated update failures on wa-zaker.com and requests first-use permission guidance, default-selected prayer/main-routine/Friday/pre-Fajr reminders, daily dua reading restart and a quieter palm dialog plus Home-inspired pill consistency. Preserve explicit existing reminder choices and all history/saved content. Browser permission remains reader/device-controlled; first-use setup is optional and ordinary saving works without it. Apply the daily reading reset to Comprehensive duas, retaining same-day resumption, situational collections and weekly Al-Kahf. Growth rules become one initially closed disclosure; shared pill paint preserves tabs/radios, keyboard/focus/contrast and reduced motion. No server push service, religious wording or new dependency is authorized by this implementation. Standing release authority and intact exact-commit gates remain. See phases/RELIABLE_FIRST_USE_AND_CALM_CONTROLS_2026_11_01.md.
+
+Owner continuation supersedes the preceding Comprehensive-only scope: “restart all daily,” with the explicit exception “Keep Al-Kahf’s weekly reset.” All other zikr/dua tallies, partial counts and collection-reader positions restart daily, including travel/illness; recorded history, saved items, bookmarks and the main Mushaf position are preserved. The owner also requests a more appealing Library Search and filters disclosure. Use a readable wrapping context chip, one label/icon/chevron, native disclosure interaction and existing theme/focus/target/reflow contracts; preserve its controls and filter values.
+
+The owner further requests accurate cross-device display of “تذكير لك الآن,” with accessibility, visual/UX quality, maintainability and performance. Preserve reviewed content and contextual timing, repair confirmed transient-load/reflow issues and add three-engine responsive/source/meaning/refresh evidence. The existing standing publication authority supersedes the older local-only reminder phase hold.
+
+The owner's subsequent interaction review requests consistent feedback by control type and smooth, well-tested Home animation. Retain the shared press/release, icon cues, native values, finite transitions and both still alternatives. Shared icon-sized Button and sheet/modal/drawer Close actions join the existing compact icon recipe; no per-control listener/timer or competing motion system. Verify actual Home transitions, repeated action/cancellation, pointer/keyboard and disabled/reduced-motion behavior across engines. See phases/INTERACTION_REVIEW_2026_11_01.md.
+
+The owner requests faster testing and current quality guidance without conflicts. Add explicit Home/reminders focus groups and refresh scheduling weights from all nine reports of the last successful deployed Quality commit, keeping retry costs and refusing incomplete/failed/duplicate/missing-project data. Preserve every assertion, project, coverage threshold, budget and exact-commit release gate; update the current behavior-to-test mapping. Stop an in-progress final check before changing its inputs, then freeze the complete tree for one final valid pass. See phases/TEST_EXECUTION_REFRESH_2026_11_01.md and its report.
+
+## 2026-11-01 — Readiness, data safety and seamless headers
+
+The owner approves applying the reviewed recommendations and searching for header backgrounds like the expanded-listening screenshot. Extend existing reminder test/permission/location controls and backup/sync/download boundaries with truthful independent status. Add coarse privacy-safe screen attribution and measured startup evidence before speculative cache changes. Make non-overlapping audio and Glass sheet headers share their owning surface; retain sticky/portalled text occlusion and all accessibility fallbacks. Preserve the existing Home primary action/focus-stable reminder and collect human comprehension acceptance. Maintain one active phase pointer and separate CI retry investigation from product defects. Real-phone, TalkBack/VoiceOver and closed-app delivery require actual device evidence and cannot be inferred from automation. Existing release authority and complete gates apply. See phases/READINESS_SAFETY_SURFACES_2026_11_01.md.
+
+## 2026-11-02 — Audio improvements and pre-release review
+
+The owner requests applying all pending recommendations and identifying remaining improvements before release. Implement the agreed fixed-label المتابعة التلقائية switch, repetition clarity, optional queue, device-only validated paused resume and sleep timer using existing media/persistence/component boundaries. Preserve original devotional content, prescribed repetition and ritual-round completion rules, offline reading/downloads and complete release gates. The implementation stays local for the pre-release assessment; no new publication is part of this phase. Actual phone/assistive-technology acceptance remains outstanding and cannot be substituted with browser emulation. See phases/AUDIO_CLARITY_CONTINUITY_2026_11_02.md.
+
+## 2026-11-02 — Prayer-inspired cards and modal filters
+
+The owner requests consistent prayer-inspired Progress/app cards, controls and pills, and clarifies that the duplicated controls refer to date/filter actions. Keep one Progress header date opener and passive selected context at every width; move date controls to the shared modal rather than pushing content down. Keep the independent metric-customization action visibly labelled and visually distinct. Use the prayer pills/icons for pronounced gloss, quieter card borders/inset edges and existing Glass reflections. Compact Library search/groups use a shared sheet with reflowing choices and retained screen-owned values; wider controls stay exposed. Correct shared protected-menu stacking above the modal scrim. This supersedes the prior adjacent wide date/tabs and phone native in-flow filter disclosure. Preserve the pending local audio work, all calculations/content/persistence and standard release gates; publication remains pending pre-release review.
+
+The owner rejects the still-boxy Progress metrics and requests rounder edges plus images before implementation. Generate Arabic light and English Glass reference images first; then follow their centred card hierarchy and existing 1.75rem large-card radius, retaining actual product strings/data, one full-card keyboard action, matching rounded focus outline and natural enlarged-text reflow. The illustrations are design references, not shipped bitmap controls or evidence of accessibility compliance.
+
+The owner then selects the generated English dark Glass image as the design reference. Apply its independent rounded card silhouette and centred icon/value hierarchy, remove the redundant outer overview frame, and reuse the denser existing exact-records tint for Glass card legibility. Keep actual semantics, content, typography, scene selection and single-header-date/opaque-sticky contracts.
+
+The owner requests sleeker icons following Untitled UI. Reuse the already-installed official package through icons.ts and remove custom prayer-rug/beads/mosque glyphs from Progress's metric mapping. Use consistent 24px/native 2px round line icons, preserving labels, decorative semantics, metric identity and target geometry. No new dependency or global icon-system replacement.
+
+## 2026-11-02 — Smooth navigation and Month default
+
+The owner rejects abrupt Collections/Saved and Quran/Library arrivals and requests smoother performant transitions. Repair demonstrated loading/motion competition with one bounded owner, preserve purposeful motion and both still preferences, and keep navigation/focus/content/offline contracts. Month becomes the default for every unqualified Progress entry including primary navigation; this explicitly supersedes the rolling-range default above. Explicit period links remain authoritative. Review and recommend a clearer Progress arrangement and Mushaf improvements; broader redesign remains a recommendation until selected. Preserve the current publication hold and pending local work.
+
+The owner subsequently approves compact metric spacing, hover repair, consistent wide calendar/routine panels and Quran overview card/alignment improvements. Remove repeated tracking/faith disclaimers from screens while retaining accurate status, calculations and reviewed content. Quran overview loses its title Back/Continue-arrow glyph; ordinary shared title Back hides only with an actual rail/sidebar, while compact/immersive/nested recovery remains. The owner supplies the current Settings grouping as the positive visual anchor and requests a complete consistent hover/press/focus/selection/loading/cancellation/reduced-motion plan. These are documented in OWNER_DESIGN_BRIEF_2026_11_02.md and the current MOTION_SYSTEM matrix. The owner explicitly rejects moving Library filters beside Search: keep the full-width Search field above filters. All comments, references and implementation/recommendation boundaries must stay traceable. No publication is authorized.
+
+The owner then reports a split/truncated weekday in the Quran overview week card and requests layout polish. Remove fixed label-width/empty-icon waste; preserve full weekday wording, Saturday-first order and factual reading data. Use compact wide tiles and naturally reflowed narrow/enlarged rows, with no passive-card hover affordance. Record the sixth owner reference and verify label line boxes and overflow across engines.
+
+## 2026-11-02 — Consolidation-only planning gate
+
+Owner explicitly stops further app implementation and requests a complete recent-comment checklist before judging the changes. Preserve local drafts; do not commit or publish. Consolidate stronger eased hover/icon/toggle feedback, faint-to-strong outlines, spacing/form/menu consistency, metric/plan modals, audio control polish, Quran imagery placement, Mushaf header/juz alignment with fidelity-preserving spacing review, ayah/translation Quran typography/no extra rules/sticky chrome/full per-verse sharing, and the recurring “تذكير لك الآن” loading failure. The reminder failure is high priority but its cause is not established. See CONSOLIDATED_REVIEW_CHECKLIST_2026_11_02.md; app changes remain gated on owner review.
+
+## 2026-11-02 — All checklist implementation approved
+
+Owner says to begin implementing all consolidated requirements/fixes. This lifts the consolidation-only implementation gate and approves the proposed scoped methods while retaining the separate local publication hold, content/fidelity contracts and complete quality gates. Follow phases/CONSOLIDATED_IMPLEMENTATION_2026_11_02.md sequentially; physical acceptance is not inferred from browser tests.
+
+## 2026-11-02 — Reading symmetry and recorded-page visuals
+
+During implementation the owner requests removing visible keyboard instructions/help that disrupt symmetry, stronger consistent segmented-pill hover, useful chart content in the empty plan/routine-column areas, and corresponding design-system updates. Retain keyboard help in More, use a shared read-only recorded-page distribution with actual elapsed dates, and preserve content/data/quiet reading contracts. Reference screenshots are preserved with the owner evidence.
+
+The owner rejects the new mini-chart/heatmap clarity and the Library descriptive subtitle. Improve explicit units/totals/weekday-date labels, empty zero baselines, compact calendar cells with month context outside and a naturally sized inspector. Preserve exact values, fixed bands, keyboard and selected-day semantics. Remove the redundant subtitle in both languages.
+
+The owner also requests stretching the recorded-page plot/panel to align its lower edge with the neighboring wide summary card. Use flexible plot height in the paired composition and compact natural height when stacked; keep selected-date inspectors content-sized. Preserve actual counts and no synthetic filling data.
+
+## 2026-11-02 — Evidence-led final-touch implementation
+
+After the testing-only recommendations report, the owner authorizes applying the recommendations, improving quality, updating tests/contracts and increasing useful animation, microinteractions and hover feedback. Follow `phases/FINAL_TOUCH_QUALITY_MOTION_2026_11_02.md` in scoped checkpoints. This supersedes the report-only implementation hold, while publication remains on hold. Retain exact content, offline verification, persistence/merge ownership, existing tools/budgets and both reduced-motion alternatives; native persistent file migration/device acceptance remains separately bounded.
+
+## 2026-11-02 — Paper-grain visual treatment
+
+The owner requests dust/speckled paper grain across all color themes. Use one small pre-rendered repeating surface texture. Preserve the earlier performance contract by avoiding full-shell turbulence/blend overlays or animated noise. Keep functional text/controls sharp, protected dropdown surfaces opaque and accessibility/plain-material fallbacks intact. This is authorized local implementation under the existing publication hold.
+
+The owner subsequently requests an enable/disable setting after visual/performance refinement. Add Paper texture in Appearance using the existing Settings switch. Default enabled, preserve the explicit device choice across reload and foreign-state merges, and retain accessibility precedence with clear contextual copy. Reuse current normalization/local persistence and do not introduce a remote schema or new storage mechanism.
+
+Owner reports no visible grain in the local preview and explicitly requests a noticeable refined treatment. Inspection confirmed Paper texture on but the Windows reduced-transparency media preference suppressed it. Separate static background grain from the OS frosting preference: OS reduced transparency still controls translucent material effects, while static grain remains governed by its own switch, app Reduce transparency, high contrast, forced colors and print. Tune ink/fibre strength for normal-zoom visibility and verify the actual preview, including card overrides.
+
+The owner rejects the dense texture, especially on light backgrounds, requests online research and supplies https://creativemahdy.space/ as the visual reference. Inspect its actual card styles: the observed reference uses grayscale fractal grain at 4% opacity on light cards and 7% on dark. Replace the earlier black/white random speckle with fine grayscale material, pre-rendered into two small theme-specific tiles to avoid live filters. Preserve the switch, local preference and accessibility precedence. Source research informs the technique; owner aesthetic acceptance remains open.
+
+## 2026-11-02 — Owner follow-up: shared states, Masbaha, default look and focus mode
+
+The owner explicitly requests a global hover/border repair, responsive Masbaha controls, exclusive navigation selection, dropdown option hover, intact routine-pill labels, clearer Settings grouping and continued requirement tracking. Fresh defaults are Arabic, navy Midnight, Paper texture enabled, medium text size, the middle Clear zikr font and icons-only reading tools. This supersedes the earlier English/Humanist/labelled defaults only when a setting is absent or invalid; preserve explicit saved choices. Navigation labels remain separate. Move standalone counting keyboard help into More, preserving shortcuts and focus recovery.
+
+The latest light material keeps reference-inspired fine neutral frequency, increases pore definition through a tonal cut and reduces average wash. Do not restore rejected coarse brass particles. Current assets total 13,105 bytes within the original 14KB guard. Owner aesthetic acceptance remains open.
+
+The Mushaf small-page defect is reproduced after phone-to-desktop resizing with Reduce Motion: a globally nonzero transition duration inadvertently transitions layout and leaves old fitted measures in synchronous reads. Set layout transitions to zero; retain purposeful non-reading feedback separately. Match Juz/Surah/folio capsules, reclaim chrome clearance, and expose existing focus mode through More with a labelled 44px exit. Preserve fifteen-slot/source geometry, reading position and offline behavior. These changes remain local under the publication hold.
+
+## 2026-11-02 — Complete outstanding local requirements
+
+The owner asks to apply the remaining requirements locally after the status review. Complete the reading-boundary repair, confirmed narrow/enlarged control defects, combined automated verification and tracker reconciliation in the current phase. Keep the publication hold. Explicit Tab entry retains viewport indication, while counting/volume/pointer events do not create a reading boundary. No reviewed content, persisted data contract, dependency or native-storage migration is authorized by this presentation continuation. Human visual and physical-device acceptance remain separately recorded.
+
+## 2026-11-02 — Local index, bilingual card and counting-menu alignment
+
+Owner screenshots authorize a scoped alignment checkpoint: remove the Mushaf index's outer tab boundary, align controls/search/results; align bilingual reader header/cards/footer; match zikr menu width to its trigger like the target picker. Retain selected/focus semantics, opaque portalled collision-bounded surfaces and enlarged-label reflow. Keep exact reviewed text, fifteen-slot Mushaf contracts, navigation/bookmark/share and persistence behavior. Publication remains held. Automated geometry evidence does not assert aesthetic perfection or physical/AT acceptance.
+
+## 2026-11-02 — Grain accepted and adaptive navigation approved
+
+The owner accepts the procedural light grain. The owner then approves implementing the navigation recommendation with Settings permanently retained: compact/medium Home, Quran, Azkar, Qibla, Settings; add Masbaha only when the navigation container has 36rem available, so enlarged text recovers to five items. Keep the Home Masbaha card and More fallback. Progress is secondary on compact screens via Today's path and More; keep existing Progress URLs and wide-navigation access. Add a discoverable Home More action; expose utilities in wide rail/sidebar with one active selection. Stable container thresholds govern optional visibility, not screen content, scrolling or audio state. Existing immersive reading/focus exclusions remain. No content, data, routing-system replacement or publication. Physical-device acceptance remains separate.
+
+## 2026-11-03 — Dark paper strength and audio/Mushaf recommendations
+
+The owner requests a modest dark-paper increase and asks for audio-footer and Mushaf performance recommendations. Increase only the authored dark/Glass tile's opacity calibration, preserve accepted light-paper bytes, static paint ownership, existing asset/bundle ceilings and accessibility opt-outs. Inspect and report audio/download proposals separately; the existing queue/repetition/continuation semantics and canonical Mushaf reference remain authoritative. Preserve pending optional-update/Masbaha work. The owner's explicit local-only/no-push instruction remains in force.
+
+## 2026-11-03 — Quran entry font/size stability
+
+The owner asks to continue locally and reports a brief font/size change when opening Quran pages and Quran-containing azkar. Repair avoidable warm-entry fallback and partially initialized spreads, start critical resources together and add small navigation-intent warm-up. Keep exact content, fifteen-line geometry, offline data, immediate readable fallback and late-font recovery. Do not hide loading with artificial waits or add a new cache/dependency. All changes remain local, with publication prohibited.
+
+## 2026-11-03 — Audio focus controls and Mushaf performance
+
+The owner approves compact queue and repetition context, Play next, and independent audio focus and control lock. The owner also approves foreground Mushaf request priority, bounded decoded-font retention and independent offline status checks. See the local audio footer and Mushaf performance phase.
+
+## 2026-11-03 — Labelled auto-play and subtle audio hover
+
+The owner rejects the large queue selector and icon-only continuation switch. Give the switch a visible concise label and spare width, bound queue/repeat to their content, and retain the one-row arrangement. Use an audio-scoped tint and small icon cue for hover, with keyboard focus and reduced-motion alternatives. Simplify the timer description and group its field. The local-only instruction applies.
+
+## 2026-11-03 — Flat audio menu and quiet collection headers
+
+The owner rejects cards within the audio options panel and the deeply inset scrollbar. This supersedes the preceding rail-under-Close alignment: keep a fixed header, flat labelled sections, section dividers and an edge scrollbar with consistent content gutters. Input fields retain their boundaries. Remove individual title/action background fills from decorated collection headers and the Back control finish while preserving the shared contrast surface and keyboard indicators. Retain all previous footer, optional update, Masbaha and Mushaf work locally. No commit, push or deployment.
+
+The owner then requests less scrolling: pair speed and volume when labels fit, stack them for enlarged text, preserve full-width voice/timer fields, and move supporting timer/device prose into Playback help. Keep ordinary phone options visible without scrolling, related text controls together and unsupported iOS volume rows absent. Native disclosure and all controls retain keyboard access and 44px targets.
+
+## 2026-11-03 — Final auto-play copy and compact keyboard menus
+
+The owner chooses تلقائي for the visible Arabic auto-play label; keep the full accessible name. Keyboard-help entries leave compact zikr, Masbaha and Friday menus below their existing 768px wide-header boundary. This supersedes earlier phone-menu discoverability guidance. Actual keyboard shortcuts and wide-menu access remain. Existing Mushaf rail-only keyboard help retains its contract. Consolidate previous comments and preserve the publication hold.
+
+## 2026-11-03 — Menu dismissal and notification writing
+
+The owner requests outside-pointer dismissal, flat visual groups without headings and clear bilingual reminder messages. Keep the existing prayer/route contracts and validated device cache. Verify saved Mushaf page/font reuse after a fresh document load. Continue showing readable fallback on genuinely uncached entries, pending evidence of a repeat download or a different cold-entry policy. Changes remain local.
+
+## 2026-11-03 — Mushaf bands and compact embedded surahs
+
+The owner reports that phone controls can cover the first line and prefers a compact embedded surah without the decorative title. The phone controls now reserve actual in-flow space outside the paper, including translation tools and the focus exit. For short surahs inside zikr groups this supersedes the ornamental presentation in DEC-127. Preserve the basmalah, named accessible group, existing text and source layout in the full Mushaf. Keep the implementation local.
+
+## 2026-11-03 — Stable first-visit lettering, size catalog and hover review
+
+The owner approves brief bounded preparation then stable readable fallback for the visit, a measured versioned Mushaf size catalog, the mobile Progress sticky-header repair and an app-wide hover review. This supersedes earlier immediate-fallback/late-upgrade presentation. Reuse existing data/font caches and explicit retry. Shared icons use a smaller 1.05 cue, audio retains 1.035, and card pointer feedback uses a quiet inset tint with keyboard focus boundaries. The latest instruction keeps the working tree local.
+
+## Owner correction · 2026-11-04 Glass and reader presentation
+
+The owner requests the Quran Wird heading remain stationary, 4:3 surah thumbnails with gold names above, reader vibration controls, consistent card translucency and removal of whole-control hover fading. This supersedes the brightness and full-card hover-tint guidance in the previous motion checkpoint. Shared ordinary cards use the Glass card material, exact-record reading and protected overlays retain their dedicated legibility treatment.
+
+## Owner correction — 2026-11-04 local Mushaf listening space
+
+The owner requests verifying prior comment completion and local improvements to audio Mushaf: remove the redundant visible page number, move current-ayah recovery to footer tools, use whitespace efficiently in Focus and emphasize the word rather than the whole ayah. Move page selection into Audio options to retain browsing. Use stationary ink with a stronger fill/outline/underline, retaining marker fallback and semantic verse state. Remove obsolete floating-button clearance. Preserve the pending Glass/reader batch. The latest local-only request takes precedence over publication instructions quoted in the pasted historical conversation; do not commit, push or deploy this checkpoint.
+
+## Owner follow-up — 2026-11-04 footer pill space and dark-paper evidence
+
+The owner shows a large empty gap in the auto-play pill and requests improving the entire row. Remove its fixed/growing width, size it to the label/track, center the utility controls with consistent gaps, and preserve label/count visibility and targets. This supersedes the earlier relative-width preference that auto-play be wider than queue. Capture the row at phone/narrow/enlarged/desktop sizes. The owner also requests concrete stronger-paper evidence: compare the previous committed tile, current stronger local tile and off on identical dark/Midnight solid/Glass screens. No additional texture increase, publication or new product scope.
+
+## Owner follow-up — 2026-11-04 homogeneous Progress heading
+
+The owner shows Progress's distinctive dark heading and requests consistency with other screen headers. The existing shared Header is retained; remove Progress-only opaque background-variable and 54px filter sizing overrides. Apply the same clear-at-rest/frosted-on-scroll Glass material to its outer sticky controls, retaining full-width coverage, title/type/gutters, date identity, enlarged layout and all solid/accessibility fallbacks. The owner request supersedes the earlier always-opaque/no-frost Progress presentation only. Screenshot comparison uses the actual Quran Wird header as reference and verifies both resting/scrolled paint and sticky hit-testing across RTL/LTR, narrow/200%, tablet and desktop. No data, religious content or publication changes.
+
+## Owner correction — 2026-11-04 equal Progress control frames
+
+The owner identifies unequal button sizes and slight icon misalignment in the latest Progress screenshot. The preceding standard 44px filter correction matched the inner tab target but missed the 54px outer frame. Match the complete frame through a shared content-sized grid row and choice-pill surface; the square filter follows that actual row height, including enlarged labels. Normalize the three glyphs to 20px and prevent flex shrinking (Firefox exposed this at labelled widths). This supersedes only the standalone icon-size part of the prior heading decision; shared material/type/sticky/filter semantics remain. Verify actual outer edges, icon geometry, matched surfaces, hit-testing, RTL/LTR and 320/600/enlarged/wide screenshots locally. No publication.
+
+## Owner release authority — 2026-11-04 button consistency and full pending batch
+
+The owner requests continuing the Choose metrics/shared-button work and explicitly instructs pushing **all changes**. This supersedes the earlier local-only holds for the pending Glass/reader, audio Mushaf/Progress-control and button-family checkpoints. Finish visual/keyboard regressions, fresh bilingual release notes, complete local hook gates and commit the full reviewed batch to main. Monitor all triggered workflows, inspect every failed job and remediate minimally until Quality verify and Pages build/deploy pass and the exact release is live. Keep native signing/device/AT acceptance distinct; no force push, skipped hook, weaker assertion, content change or dependency replacement.
+
+## Owner agreement — 2026-11-04 shared button families
+
+The owner requests Choose metrics match the pill controls, consistent button appearance across the app, updated testing and design-system rules. Implement a shared neutral pill action and migrate equivalent configuration/navigation actions; replace copied Progress dialog buttons with shared primary/neutral/ghost roles. Keep tab selection, destructive confirmations, Settings rows, reading/counting/audio transport, native fields and protected menus semantically distinct. No blanket button selector or universal shape/size replacement. The design matrix defines family geometry, role hierarchy, focus/hover/disabled/motion rules and audit limits; cross-screen browser screenshots/paint/keyboard tests cover actual Progress, Quran and Settings usage. The subsequent explicit push-all instruction authorizes release after verification.
+
+## 2026-11-04 — Settings row feedback and trigger-anchored queue
+
+Owner follow-up: repair remaining Settings hover inconsistencies and make the listening menu originate at its own dropdown button. Keep the current control-family checkpoint and existing push-all authority. Settings row hover uses a local whole-row inset tint with stable ink/opacity/geometry and persistent separators; enabled-row press must not fade the whole row. Listening queue uses the existing portalled Radix popup anchored to its trigger, protected opaque material, collision/height bounds, and current-recording focus/reveal after positioning. Retain selection/playback/checkpoint behavior and keyboard recovery. Do not reduce test assertions to match regressions. Reconcile superseded material assertions, repair translation-column top alignment and verify async Quran/font readiness before geometry measurements.
+
+## 2026-11-04 — Approved balanced Mushaf proposals
+
+Owner: apply all recommendations after image review, with explicit correction that Mushaf buttons retain their deliberately distinct existing capsule geometry, menus function as before and the color pill remains a transient notification matching the applied theme. Keep the desktop rail; refine the page measure/height and centering, safe-area breathing room and short two-column surah index with grouped tabs/search and unchanged navigation/bookmark semantics. Generated Qur’anic lettering is illustrative and must never replace reviewed data. Preserve manual zoom, canonical slots, offline/font fallback, reduced motion and large-text scrolling. This is the one active implementation checkpoint.
+
+## 2026-11-06 — Notification usability and optional catalogue choices
+
+The owner requests applying the notification usability and app recommendations. Show named upcoming reminders and their clocks, compact permission details, real Android readiness and a shared source preview. Preserve existing pre-Fajr opt-ins and require a choice for new readers. Add the ready Friday Salawat and Monday/Thursday preparation alerts as optional settings. Use the approved source excerpts and respect local prayer windows and the saved Hijri offset. Retain the local review gate and record physical-device evidence separately.
+
+## 2026-11-06 · Adaptive surah entry and surface hierarchy
+
+The owner approved the phone, tablet and desktop surah-entry recommendation and requested the accompanying progress, notification and dense-surface refinements, performance validation and deployment. Keep the earlier word-only Mushaf cue, fixed reading chrome and compact Home spacing. See [the approved phase](phases/ADAPTIVE_SURAH_AND_RELEASE_2026_11_06.md).
+
+## 2026-11-06 · Image-led surah covers and listening desk
+
+The owner supplied a visual reference for larger covers and authorized a verified release. Apply the same responsive composition to Al-Kahf, As-Sajdah and Al-Mulk. The layout draws from the reference while retaining the app's Glass and paper materials. This supersedes the prior cover dimensions and hosted artwork delivery. The approved listening desk applies to single-track canonical Quran listening. Keep the canonical full-page reader, text, playback and stored progress contracts. See [the phase brief](phases/SURAH_COVERS_AND_IMAGE_DELIVERY_2026_11_06.md).
+
+## 2026-11-06 · Home startup, reminders and downloads
+
+The owner approves the startup audit recommendations and requests reliable notification updates and Android and desktop downloads. Preserve the existing offline installation promise, the exact reviewed Al-Baqarah text and evidence, and the reminder schedule and consent rules. Measure the full Home path, reconcile owned native alarms against the current plan, and retain verified file checkpoints when a download stalls. See [the phase brief](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md).
+
+## 2026-11-07 · Persistent Home dates and phone Mushaf index
+
+The owner approves keeping the slightly larger secondary date visible during scroll, replacing the expanded prayer ring and seconds with the localized minute countdown, and applying the reference Mushaf control placement and in-content index on phones. Preserve the wider reader presentation and canonical pages. See [the phase brief](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md).

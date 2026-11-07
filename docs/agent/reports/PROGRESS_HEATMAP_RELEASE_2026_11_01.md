@@ -1,0 +1,114 @@
+# Phase Report — Progress calendar, charts and release, 2026-11-01
+
+## Objective
+
+Apply the owner's approved Progress visual/UX review, integrate all pending changes and publish through the complete main/Quality/Pages release process. Authority: `../phases/PROGRESS_HEATMAP_REFINEMENT_2026_11_01.md` and the owner's explicit “apply all recommendations and push all changes.”
+
+## Scope completed
+
+The implementation replaces the presence strip/latest-day duplication with a practice recording calendar and selected-date details, compacts the retained four independent metric cards, aligns dates/tabs where space permits, defaults unqualified visits to Last 30 days, adds routine bars and an optional valid routine-composition doughnut, and adds columns alongside the existing line chart. The same applied range owns all views and JSON export. Explicit period links, unknown goals, civil/devotional boundaries and complete-day comparisons remain intact.
+
+The working-tree baseline already contained Progress vNext visual/header, exact-data, export, test and build refinements. Those are integrated under the owner's all-changes release instruction. The reviewed native-reminder fixture pins Date at noon to avoid a next-hour fixture wrapping at midnight. Vite shortens opaque lazy, generated-font and stylesheet names while preserving App/audio diagnostics, the main stylesheet role, public font paths and the four intentionally excluded low-traffic precache routes. Unused former-toolbar copy and obsolete header machinery are removed; no chunk boundary, test, inventory, coverage or budget ceiling is weakened.
+
+## Files changed
+
+- Progress range/facts and routing: progressDashboard.ts, routing.ts, useAppRouting.ts and their relevant tests.
+- Presentation: ProgressScreen.tsx, progress-screen.css, ProgressDashboard, ProgressRangeToolbar, ProgressSelectField, RecordingTimeline and ProgressRecordsTable, including retained pending refinements and tests.
+- Added progressHeatmap.ts with pure cell/grid rules, ProgressHeatmap and ProgressRoutineComparison, with domain/component tests. Removed the superseded ProgressRecordingPattern presentation; its earlier tested domain helper remains available.
+- Browser evidence/regressions: new progress-heatmap.spec.ts and updated Progress, navigation, accessibility, compact-filter, read-only-statistics, quiet-garden and manual-checklist contracts. Snapshot-specific cases explicitly request Day rather than depending on the former default.
+- Architecture, Design System, Quality Checklist, active phase/index/decision log, this report, the earlier review/vNext report, release manifest/offline history, Vite configuration and measured bundle baseline.
+
+## Components added or modified
+
+ProgressHeatmap renders fixed-scale practice cells with 44px native date actions, localized months/week starts, roving physical-arrow/Home/End keyboard selection and exact date details. Year/long custom selections explore a bounded month instead of mounting an unbounded history. Unknown goal data remains unavailable; absence is a saved-record statement, never a claim of missed worship. Page bands stay fixed at 0, 1–4, 5–10, 11–20, 21+.
+
+ProgressRoutineComparison uses matching elapsed-date denominators for morning/evening/bedtime bars. Its disclosed doughnut partitions actual saved completions only, with direct counts/shares and an accessible description. Empty totals have an honest empty state. RecordingTimeline's column/line display retains its value units, 0–100% rate/count-zero axes, missing-data gaps, slider, pointer/RTL keys and exact bucket table. Month/Last30 use daily points; long custom/year buckets remain bounded.
+
+ProgressDetails mounts the existing optional domain calculations only while disclosed; the selected topic remains visit-local in its screen owner. ProgressScreen retains its clock identity until a civil/devotional date or boundary setting changes. Memoized calendar/comparison components reuse stable data through unrelated minute/header updates.
+
+## User-visible changes
+
+Last 30 days and its exact dates are visible on arrival, with existing explicit Day/Week/Month/Year links retained. Tablet/desktop controls share a row in logical language order; narrow/enlarged layouts stack and preserve reachable tabs. Four approved summary metrics retain their meaning and 2×2 grouping with quieter denominators. A primary heatmap shows practice-specific records and date details; routine bars/composition and one subordinate factual insight support it. Details, exact records and exports continue to use the same dates.
+
+## Accessibility work
+
+Native controls, semantic heading/tab structure, exact values independent of colour, selected/focus states, 44px dates, labelled horizontal-scroll recovery, future/out-of-range action handling and keyboard exploration are retained or added. The initial browser pass exposed invalid nested definition-list markup in routine bars and an unnecessarily long narrow English heading; both were corrected without reducing checks. SVG charts have descriptive equivalents and direct exact labels/tables. Protected select portals and app/OS motion preferences remain in use.
+
+Automated checks and screenshots do not establish complete WCAG compliance or physical-device/screen-reader acceptance.
+
+## Tests added or updated
+
+Meaningful regressions cover rolling windows across leap/year/DST boundaries, explicit route round-trips, fixed page bands, unknown/zero/future/outside distinctions, bounded long calendars, weekday/RTL keys, month exploration, equal-denominator bars, valid/empty composition, column gaps and exact data, deferred reflection work and date-boundary invalidation. Browser tests exercise default range/scope, adjacent toolbar geometry, calendar keyboard/pointer selection, composition, columns/line choice, 320px/200% recovery, native read-only records and automated accessibility.
+
+## Commands run
+
+| Command/check                                      | Recorded result before final release gates                                                                                                                                                                                                                                   |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Toolchain                                          | Node v24.15.0 and pnpm 11.19.0 match the repository.                                                                                                                                                                                                                         |
+| `pnpm install --frozen-lockfile`                   | Passed, exit 0. No dependency changes.                                                                                                                                                                                                                                       |
+| Focused ten-file unit run                          | Initial ten-file runs passed 82/83 tests. The final twelve-file run passed all 97 tests, including explicit Day/Quran and default-route integration cases, exit 0.                                                                                                           |
+| Follow-up screen/timeline tests                    | 2 files, 21 tests passed, exit 0, including default/deferred calculations.                                                                                                                                                                                                   |
+| Scoped ESLint, Prettier and diff whitespace checks | Passed after fixing a hook dependency and correctly locating the native-scroll lint annotation.                                                                                                                                                                              |
+| Focused Chromium browser pass                      | 22 passed; two new cases selected an all-zero prayer line and incorrectly used a nonzero SVG bounding-box visibility assertion. The cases now select recorded routine history and retain the column/line behavior assertion. Earlier semantic/reflow failures were repaired. |
+| `pnpm build:pages`                                 | Passed all build, utility and unchanged bundle ceilings, exit 0.                                                                                                                                                                                                             |
+| `pnpm audit:prod`                                  | No known vulnerabilities, exit 0.                                                                                                                                                                                                                                            |
+
+Final local `pnpm check`, complete affected Chromium checks, selected Firefox/WebKit checks, hook-enforced fast browser/Pages gates and exact-commit CI/deployment results are supplied in the final release response and Actions logs. They are not inferred from the earlier checkpoints in this report. Failed or superseded development attempts remain in ignored `output/progress-heatmap-*.log` files; no assertion, test or gate was skipped to turn them green.
+
+## Visual/manual evidence
+
+The review's before/toolbar-preview images are in `output/playwright/progress-review-2026-11-01-*.png`. New browser tests produce Arabic/English 834/1440 Overview, phone composition and 320px/200% images under their Playwright output directories. VNext/read-only/responsive tests retain additional language/theme/layout captures. These use deterministic synthetic history, not personal records. Fresh implemented screenshots with dense sample records are in output/progress-implemented-2026-11-01/ (desktop-ar.png, heatmap-ar.png, phone-heatmap-ar.png and phone-bars-doughnut-ar.png), and were shared with the owner. Release evidence is retained under ignored output paths and CI artifacts.
+
+Additional integration verification: the broad Chromium pass completed 95 cases successfully and identified five menu/count/clock expectation failures, subsequently repaired. A 121-case cross-engine pass completed 118 successfully and exposed two WebKit selected-tab contrast cases plus the weekly clock fixture. Both WebKit contrast reproductions then passed. The clock test now resynchronizes visibility and proves the actual partial-week counts, including the real morning record and its exact table value. The first complete check passed 333 of 335 unit files and found six Day-default assumptions plus one route expectation, repaired in the final focused unit pass. Its total-output budget failure was repaired through repeated-name/dead-code/copy reduction, with every ceiling retained. The final targeted browser run then passed all 18 cases across Chromium, Firefox and WebKit (4.2m), including the corrected weekly values. A configuration type guard was added for unnamed emitted assets. Final complete gates remain required.
+
+## Performance evidence
+
+Final measured Pages build: main stylesheet 165,523 bytes / 28,435 gzip; initial route graph 174,185 gzip; deferred Progress stylesheet 13,379 bytes / 3,077 gzip; total output 12,576,679 bytes. Compared with the recorded baseline, initial-route gzip falls by 648 bytes, main CSS rises by 1,911 raw while its gzip falls by 20 bytes. The deliberate baseline refresh records those values; every ceiling remains unchanged. Calendar rendering is bounded, history indexing is reused and closed reflection work is unmounted. No field INP or representative-device speedup is claimed from these structural/build measurements.
+
+## Documentation updated
+
+Architecture, Design System and Quality Checklist explain the new typed default/range, responsive toolbar, calendar/chart semantics and verification requirements. The active phase/index/decision log record approval and supersession. Three fresh bilingual release-note entries describe only changes since the last deployed notes; the matching offline archive is regenerated. The earlier review remains historical proposal evidence, now approved by the subsequent decision.
+
+## Decisions recorded
+
+The owner explicitly approves all review recommendations and publication of all pending changes. This includes the new rolling preset and replacement of the old recording strip/latest-day composition. The optional doughnut is implemented as secondary disclosed detail and never combines incompatible metrics. No new persisted preference, schema, religious interpretation or runtime dependency is introduced.
+
+## Keyboard visibility follow-up before deployment
+
+A post-push 320px/200% keyboard diagnostic found a new roving-focus date outside the calendar's horizontal viewport (button x 297.6–343.3, viewport x 45–275). The agent canceled the still-running first CI candidate before deployment, restored native focus scrolling for calendar arrows and added exact horizontal-visibility assertions in both languages. The final release uses fresh notes stamp 2026-11-01.2 and must pass complete local/exact-commit gates again. This is a focused accessibility correction, not a reduced assertion or deployment-trigger-only push. The new focus assertions passed in Arabic/English across Chromium/Firefox/WebKit. A concurrent local rerun then exhausted available machine memory in unit/type/build processes and timed out one separate calendar case; verification uses the existing serial gate and an isolated reproduction without changing assertions, timeouts, coverage or limits.
+
+The small 4× CPU runtime lab is preserved in output/progress-heatmap-runtime-lab.json and .md. Thirty-day and 1,200-day synthetic histories showed similar tab-switch costs; date selection ranged 89–215ms and Overview remount about 606–609ms measured to a second animation frame. These are limited lab samples, not field INP or a before/after performance claim. Physical-device profiling remains outstanding.
+
+## Exact-commit CI toolbar regression correction
+
+The eb6a3eb3 candidate passed the complete local serial gate (290.3s), 28 hook smoke cases and Pages build. CI's responsive shard then passed 154 cases and failed two references to the removed visible title header. The phone/tablet regression now asserts the approved date control and tabs, an explicitly opaque toolbar background matching the screen surface, and its original pinned scrollport geometry. Both affected local cases passed (2 tests, 29.1s). Chromium's other failures identified matching old nested-header assertions and daily-prayer fixtures still using the unqualified route. Glass checks now verify both current toolbar groups remain transparent with no nested blur; daily-prayer/scroll fixtures explicitly request Day. This follow-up changes tests and this report only; the release's application behavior, screenshots, bilingual notes and stamp remain unchanged. Complete exact-commit gates remain required for the corrected candidate.
+
+## Known limitations or remaining risks
+
+Manual physical-device and assistive-technology acceptance remain outstanding. Long history is explored by month; the selected page/export range remains unchanged. Synthetic browser data is not user research, and build/structural improvements do not establish field performance.
+
+## Owner scrolling and mobile correction
+
+The owner rejected header bleed-through and unclear mobile heatmap navigation before deployment. This supersedes the earlier transparent/frost-only Progress and horizontal-calendar fallback descriptions above. The sticky wrapper now covers the full scrollport and gutters; supported Glass uses the existing opaque on-media ground because its ordinary background token is intentionally transparent. A centred inner row preserves adjacent controls, with explicit internal focus clearance at enlarged text. Other screens retain their materials.
+
+The calendar fits seven 44px date columns where space permits and reflows smaller/enlarged containers into weekday-labelled tiles without horizontal scrolling. Activity selection fills narrow layouts. Dates and saved count/denominator use distinct type roles; fixed labelled swatches explain intensity. Tapping a phone date opens exact practice facts in the shared sheet, with visible Close, Escape/native-back recovery and restored date focus. Wider views retain inline detail. Up/down keyboard exploration follows the actual rendered columns. No persisted data or range semantics change.
+
+Updated regressions exercise every date's horizontal fit/44px bounds, mobile sheet details and focus recovery, full-width header opacity and gutter hit coverage while scrolling in both directions. The initial correction's 20 units passed and its calendar/sheet cases passed all three engines; opacity assertions correctly exposed the transparent Glass token and old mobile outer padding. The revised run passed 19 of 21 cases and exposed the same 4px English focus clipping in Firefox/WebKit, corrected through the existing focus-reveal boundary. Selected tab state now uses a direct static surface and immediate ink to avoid transient white-on-gold text; unrelated motion remains active. Broader exact-data/menu/contrast/reflow and release gates remain required; final results accompany the release response and Actions evidence.
+
+Fresh sample-data phone captures are mobile-correction-heatmap.png and mobile-correction-details.png under output/progress-implemented-2026-11-01/. They supersede the earlier phone/header design screenshots. Architecture, design, checklist, decision log, active phase and fresh four-entry bilingual release notes record this owner correction. The new release stamp is 2026-11-01.3.
+
+The final targeted browser selection passed all 81 cases (11.3m), covering Chromium, Firefox, WebKit and the phone/tablet projects. It retains opacity, gutter hit coverage, exact geometry, contrast, reflow, keyboard, date-sheet, sharing/export and scroll assertions. Native focus visibility is polled to allow the existing post-focus animation-frame reconciliation, with the same 1px bounds; oversized month screenshots reveal their heading instead of attempting to centre the entire section. The missing secondary progress-card share action is restored inside the disclosed daily Reflection, with unit and PNG browser coverage; the header remains free of sharing actions.
+
+The subsequent size cleanup reuses one calendar formatter's date parts and removes an unassociated instruction duplicating the labelled detail selector. Targeted units passed all 21 cases, including actual-column keyboard movement and the restored sharing callback. Pages build passed with total output 12,578,370 bytes (4,542 bytes below the unchanged ceiling), main CSS 165,523 bytes / 28,435 gzip, and initial route 174,184 gzip. The main stylesheet matches the existing baseline and the initial graph is one byte smaller; no baseline or ceiling increase is needed. The final calendar/header cross-engine reproof passed all 21 cases (1.9m), and cleanup units passed all 21 again (13.01s). The header leaves physical safe-area reservation to the existing app shell. Complete local/exact-commit gates remain required and are reported with the release outcome.
+
+The first complete local gate then caught a possibly absent weekday label under strict indexed access and a normal relative-base build 278 bytes above the total-output ceiling; the Pages absolute-base build above had passed. The lookup now uses a safe guard, and internal calendar CSS names drop the redundant Progress prefix while public test IDs remain stable. No assertion, type rule, coverage requirement or budget is relaxed. Both build modes and exact final inputs must pass again before publication.
+
+After those final fixes, the normal relative-base build passed its bundle gate and all 21 calendar/header browser cases passed again across the three engines (2.0m). The complete final local and exact-commit CI/deployment outcomes are supplied in the final release response.
+
+## Out-of-scope findings
+
+No reviewed devotional content, saved progress, synchronization schema, audio bytes or native runtime behavior was changed by the Progress refinement.
+
+## Recommended next step
+
+After verified deployment, complete physical-device and human screen-reader acceptance with the published release. Further visual changes should follow observed usage and explicit owner feedback.

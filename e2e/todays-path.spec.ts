@@ -79,15 +79,13 @@ test("the path automatically explains all reward tiers without configuration", a
   await page.screenshot({ path: testInfo.outputPath("automatic-path-phone.png") });
 });
 
-test("the day's record is explained without loss or faith-scoring language", async ({ page }) => {
+test("the day's record keeps its growth guide without repeated disclaimer prose", async ({ page }) => {
   await openHome(page);
   await page.getByTestId("home-header-routine-summary").click();
   const summary = page.getByTestId("todays-path-summary");
-  await expect(summary).toBeVisible();
-
-  const text = (await summary.textContent()) ?? "";
-  expect(text).toMatch(/what you recorded/i);
-  expect(text).toMatch(/does not measure faith or reward/i);
+  await page.getByTestId("path-growth-guide").locator("summary").click();
+  await expect(summary).toHaveCount(0);
+  const text = (await page.getByTestId("path-growth-guide").textContent()) ?? "";
   // Never phrased as failure, loss, or a streak about to die.
   expect(text).not.toMatch(/lost|failed|don't break|dies/i);
 });

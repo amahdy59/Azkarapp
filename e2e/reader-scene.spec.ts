@@ -147,6 +147,7 @@ for (const language of ["ar", "en"] as const) {
         document.documentElement.style.fontSize = "200%";
       });
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      await expect(page.locator(headerSelector(390))).toBeVisible();
       expect((await new AxeBuilder({ page }).include(headerSelector(390)).analyze()).violations).toEqual([]);
       await page.emulateMedia({ forcedColors: "active" });
       await expect(page.getByTestId("reader-scene")).toBeHidden();

@@ -65,6 +65,8 @@ for (const language of ["ar", "en"] as const) {
       await page.goto(route);
       const region = page.locator(".reader-text-scroll");
       await region.focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
       await page.keyboard.press("ArrowDown");
       await expect(region).toBeFocused();
       expect(await region.evaluate((node) => getComputedStyle(node).boxShadow)).toContain("inset");
@@ -75,6 +77,8 @@ for (const language of ["ar", "en"] as const) {
     await page.emulateMedia({ forcedColors: "active" });
     const region = page.locator(".reader-text-scroll");
     await region.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
     await page.keyboard.press("ArrowDown");
     await expect(region).toHaveCSS("outline-style", "solid");
     await expect(region).toHaveCSS("outline-offset", "-2px");

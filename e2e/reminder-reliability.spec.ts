@@ -16,7 +16,7 @@ for (const language of ["ar", "en"] as const) {
     }, language);
     await page.goto("/#/settings/notifications");
     await expect(page.getByText(t(language, "notifications.permissionDenied"))).toBeVisible();
-    await expect(page.getByText(t(language, "notifications.availabilityShort"))).toBeVisible();
+    await expect(page.getByText(t(language, "readiness.browser"))).toBeVisible();
     await page.evaluate(() => {
       Object.defineProperty(Notification, "permission", { configurable: true, value: "granted" });
       window.dispatchEvent(new Event("focus"));
@@ -27,6 +27,11 @@ for (const language of ["ar", "en"] as const) {
     await toggle.focus();
     await page.keyboard.press("Space");
     await expect(toggle).toHaveAttribute("aria-checked", "true");
+    const morningTime = page.locator("#morning-reminder-time");
+    await expect(morningTime).toBeEnabled();
+    await morningTime.fill("06:15");
+    await expect(morningTime).toHaveValue("06:15");
+    await toggle.focus();
     const thumb = toggle.locator(".settings-toggle-thumb");
     await expect
       .poll(() => thumb.evaluate((el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).m41))
@@ -44,6 +49,7 @@ for (const language of ["ar", "en"] as const) {
       .toBeGreaterThan(0.01);
     await page.keyboard.press("Space");
     await expect(toggle).toHaveAttribute("aria-checked", "false");
+    await expect(morningTime).toBeDisabled();
     await expect.poll(() => thumb.evaluate((el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).m41)).toBe(0);
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";
@@ -54,7 +60,10 @@ for (const language of ["ar", "en"] as const) {
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "";
     });
-    await page.getByText(t(language, "notifications.availabilityShort")).scrollIntoViewIfNeeded();
+    const disclosure = page.getByTestId("notification-permission-details");
+    await expect(disclosure).not.toHaveAttribute("open");
+    await disclosure.locator("summary").click();
+    await page.getByText(t(language, "readiness.browser")).scrollIntoViewIfNeeded();
     await page.screenshot({ path: info.outputPath(`reminders-${language}.png`) });
     await page.evaluate(() => {
       Object.defineProperty(Notification, "permission", { configurable: true, value: "denied" });

@@ -4,7 +4,7 @@ import "./CompletionScreen.css";
 import { Check, Home, Share2 } from "../components/icons";
 import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";
-import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
+import { getAzkarForMode, isRoutineCategory } from "../content/azkarCore";
 import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";

@@ -29,7 +29,7 @@ export function MushafMagnificationControl({
           onChange={(event) => onChange(Number(event.currentTarget.value))}
           aria-describedby={hintId}
           aria-valuetext={`${formatNumerals(value, language)}%`}
-          className="h-11 min-w-0 flex-1 accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="h-11 min-w-0 flex-1 accent-primary"
         />
         <output htmlFor={controlId} className="text-sm tabular-nums" dir="ltr">
           {formatNumerals(value, language)}%

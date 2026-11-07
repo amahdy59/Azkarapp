@@ -14,6 +14,7 @@ test("onboarding offers a visible skip action for pointer and keyboard users", a
   await skip.focus();
   await expect(skip).toBeFocused();
   await skip.click();
+  await page.getByTestId("first-use-setup").getByRole("button", { name: "Continue to Home" }).click();
 
   await expect(page.getByTestId("nav-home").first()).toBeVisible();
   await expect(page.locator('#main-content[data-view="home"]')).toBeVisible();
@@ -251,6 +252,9 @@ test("Library Benefits entry and section tabs stay inside the content boundary a
         regionOverflow: region.scrollWidth - region.clientWidth,
         offenders: [...region.querySelectorAll<HTMLElement>("*")]
           .filter((element) => !element.closest(".overflow-x-auto"))
+          // Icon-only filters retain clipped assistive text; its descendants
+          // do not paint or contribute to the content's scroll geometry.
+          .filter((element) => !element.closest(".sr-only"))
           /* Decorative paint inside a frame that clips it. The prayer scene's
              halo is a 9rem circle centred on the moon, so on a 320px card it
              reaches past the edge and is cut off there — which is what a sky
@@ -308,7 +312,7 @@ test("Friday mode omits the removed supporting copy and remains overflow-free", 
   }
 });
 
-test("Friday dua progress starts weekly even when the canonical collection was completed", async ({ page }) => {
+test("Friday dua reading starts daily independently and retains weekly activity", async ({ page }) => {
   const canonicalDuaIds = [
     ...Array.from({ length: 35 }, (_, index) => `friday-dua-${String(index + 1).padStart(2, "0")}`),
     ...Array.from({ length: 12 }, (_, index) => `comprehensive-dua-${index + 36}`),
@@ -333,10 +337,12 @@ test("Friday dua progress starts weekly even when the canonical collection was c
     return {
       canonical: state.completed?.comprehensive_duas ?? [],
       weekly: fridayKey ? JSON.parse(localStorage.getItem(fridayKey) ?? "[]") : [],
+      daily: JSON.parse(localStorage.getItem("azkarapp.friday-dua-reading.v1") ?? "{}").ids,
     };
   });
   expect(persisted.canonical).toHaveLength(47);
   expect(persisted.weekly).toEqual(["friday-dua-01"]);
+  expect(persisted.daily).toEqual(["friday-dua-01"]);
 });
 
 test("before-sleep preparation reports progress and completion", async ({ page }) => {

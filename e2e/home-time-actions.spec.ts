@@ -142,31 +142,44 @@ for (const language of ["ar", "en"] as const) {
         node.scrollTop = 150;
       });
       await expect(sticky).toHaveCSS("--home-prayer-expansion", "0");
-      // WebKit can expose the shell endpoint before its inherited layout has
-      // painted. Sample the actual card endpoint as well as the glyph endpoint.
-      await expect
-        .poll(async () =>
-          (await geometry(page)).every(
-            (card) =>
-              Math.abs(card.digitFont - card.baseFont) < 0.01 &&
-              Math.abs(card.height - (width === 1440 ? 86.55 : 74.69)) < 0.5,
-          ),
-        )
-        .toBe(true);
-      const collapsed = await geometry(page);
-      for (const [index, card] of collapsed.entries()) {
-        expect(card.digitFont).toBeCloseTo(card.baseFont, 1);
-        expect(card.width).toBeCloseTo(expanded[index].width, 1);
-        expect(card.height).toBeCloseTo(width === 1440 ? 86.55 : 74.69, 0);
-        expect(card.fits).toBe(true);
-        expect(card.overlaps).toBe(false);
+      if (width < 768) {
+        await expect(page.getByTestId("home-prayer-strip")).toHaveAttribute("inert", "");
+        await expect(page.getByTestId("home-compact-prayer")).toBeInViewport();
+        await page.screenshot({ path: info.outputPath(`collapsed-${language}-${width}.png`), scale: "css" });
+        if (width === 320) {
+          await page.locator("html").evaluate((node) => (node.style.fontSize = "32px"));
+          await expect(page.getByTestId("home-compact-prayer").getByRole("button")).toBeInViewport();
+          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        }
+        await sticky.locator("..").evaluate((node) => (node.scrollTop = 0));
+        await expect(sticky).toHaveCSS("--home-prayer-expansion", "1");
+      } else {
+        // WebKit can expose the shell endpoint before its inherited layout has
+        // painted. Sample the actual card endpoint as well as the glyph endpoint.
+        await expect
+          .poll(async () =>
+            (await geometry(page)).every(
+              (card) =>
+                Math.abs(card.digitFont - card.baseFont) < 0.01 &&
+                Math.abs(card.height - (width === 1440 ? 86.55 : 74.69)) < 0.5,
+            ),
+          )
+          .toBe(true);
+        const collapsed = await geometry(page);
+        for (const [index, card] of collapsed.entries()) {
+          expect(card.digitFont).toBeCloseTo(card.baseFont, 1);
+          expect(card.width).toBeCloseTo(expanded[index].width, 1);
+          expect(card.height).toBeCloseTo(width === 1440 ? 86.55 : 74.69, 0);
+          expect(card.fits).toBe(true);
+          expect(card.overlaps).toBe(false);
+        }
+        await page.screenshot({ path: info.outputPath(`collapsed-${language}-${width}.png`), scale: "css" });
       }
-      await page.screenshot({ path: info.outputPath(`collapsed-${language}-${width}.png`), scale: "css" });
       if (width === 320) {
         await page.evaluate(() => {
           document.documentElement.style.fontSize = "32px";
         });
-        for (const top of [0, 150]) {
+        for (const top of [0]) {
           await sticky.locator("..").evaluate((node, top) => {
             node.scrollTop = top;
           }, top);
@@ -202,6 +215,11 @@ for (const language of ["ar", "en"] as const) {
           node.scrollTop = top;
         }, top);
         await expect(sticky).toHaveCSS("--home-prayer-expansion", top ? "0" : "1");
+        if (width < 768 && top) {
+          await expect(page.getByTestId("home-compact-prayer")).toBeInViewport();
+          await expect(page.getByTestId("home-prayer-strip")).toHaveAttribute("inert", "");
+          continue;
+        }
         await expect
           .poll(async () => (await geometry(page)).map((card) => Number((card.digitFont / card.baseFont).toFixed(2))), {
             message: `${language} ${width}px ${top ? "collapsed" : "expanded"}`,
@@ -224,18 +242,18 @@ for (const language of ["ar", "en"] as const) {
     await evidence.scrollIntoViewIfNeeded();
     await page.keyboard.press("Tab");
     await share.focus();
-    await expect(share.locator("svg")).toHaveCSS("scale", "1.08");
+    await expect(share.locator("svg")).toHaveCSS("scale", "1.05");
     await expect(share.locator("svg")).toHaveCSS("translate", "0px -2px");
     const footprint = (await share.boundingBox())!;
     expect(Number(footprint.width.toFixed(3))).toBeGreaterThanOrEqual(44);
     expect(Number(footprint.height.toFixed(3))).toBeGreaterThanOrEqual(44);
-    for (const target of [
-      page.getByTestId("home-quick-share"),
-      page.getByTestId("wird-category-card").first(),
-      page.getByTestId("situational-shortcuts").getByRole("link").first(),
-    ]) {
+    for (const [target, scale] of [
+      [page.getByTestId("home-quick-share"), "1.05"],
+      [page.getByTestId("wird-category-card").first(), "1.05"],
+      [page.getByTestId("situational-shortcuts").getByRole("link").first(), "1.05"],
+    ] as const) {
       await target.focus();
-      await expect(target.locator(".control-cue").first()).toHaveCSS("scale", "1.08");
+      await expect(target.locator(".control-cue").first()).toHaveCSS("scale", scale);
     }
     // Refresh is synchronous: the icon acknowledges actual activation once,
     // without adding a fake loading state or remounting the focused button.

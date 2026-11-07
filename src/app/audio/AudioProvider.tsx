@@ -1,3 +1,9 @@
+import {
+  readListeningBookmark,
+  recordingFingerprint,
+  restoreListeningPlan,
+  saveListeningBookmark,
+} from "./listeningBookmark";
 import { isNativeAndroid } from "../native/platform";
 import { nativeAudioSource } from "../native/cachedAudio";
 import {
@@ -50,6 +56,11 @@ function enrichPlanVoices(plan: PlaybackPlan): PlaybackPlan {
 }
 
 export interface AudioController {
+  sleepDeadline?: number | null;
+  setSleepTimer?: (minutes: number | null) => void;
+  canResumeListening?: boolean;
+  resumeListening?: () => Promise<boolean>;
+  dismissResume?: () => void;
   autoAdvance: boolean;
   setAutoAdvance: (enabled: boolean) => void;
   state: ReturnType<typeof createInitialAudioState>;
@@ -94,6 +105,10 @@ export function AudioProvider({
    */
   onControllerReady?: (controller: AudioController) => void;
 }) {
+  const [sleepDeadline, setSleepDeadline] = useState<number | null>(null);
+  const sleepDeadlineRef = useRef<number | null>(null);
+  const [canResumeListening, setCanResumeListening] = useState(() => Boolean(readListeningBookmark()));
+  const resumeRequest = useRef(0);
   const [preferences, setPreferences] = useState(loadAudioPreferences);
   const preferencesRef = useRef(preferences);
   const [autoAdvance, setAutoAdvanceState] = useState(preferences.autoAdvance ?? true);
@@ -110,6 +125,8 @@ export function AudioProvider({
   const stateRef = useRef(state);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const getPlaybackTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
+  const pausedByTimer = useRef(false);
+  const bookmarkSuppressed = useRef(false);
   const generationRef = useRef(0);
   const removeListenersRef = useRef<() => void>(() => undefined);
 
@@ -247,7 +264,10 @@ export function AudioProvider({
       repetitionIndex: number,
       autoPlay: boolean,
       requestedVoice?: string,
+      startSeconds?: number,
     ) => {
+      resumeRequest.current++;
+      let resumeSeconds = startSeconds;
       let entry = plan.entries[entryIndex];
       if (!entry) return;
       const voiceId = chooseVoice(entry, requestedVoice);
@@ -292,28 +312,47 @@ export function AudioProvider({
         audio.addEventListener(event, listener as EventListener);
       const off = (event: keyof HTMLMediaElementEventMap, listener: () => void) =>
         audio.removeEventListener(event, listener as EventListener);
+      const applyResumeTime = () => {
+        if (resumeSeconds === undefined || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+        audio.currentTime = Math.max(0, Math.min(resumeSeconds, Math.max(0, audio.duration - 0.1)));
+        resumeSeconds = undefined;
+        dispatch({ type: "time", currentTime: audio.currentTime, generation });
+      };
       const handlers = {
         loadstart: () => isCurrent() && dispatch({ type: "status", status: "loading", generation }),
         loadedmetadata: () => {
           if (!isCurrent()) return;
           window.clearTimeout(metadataTimer);
+          applyResumeTime();
           dispatch({ type: "duration", duration: Number.isFinite(audio.duration) ? audio.duration : 0, generation });
         },
         canplay: () => {
           if (!isCurrent()) return;
           window.clearTimeout(metadataTimer);
-          if (stateRef.current.status !== "playing") dispatch({ type: "status", status: "ready", generation });
+          if (stateRef.current.status !== "playing")
+            dispatch({ type: "status", status: autoPlay && !pausedByTimer.current ? "ready" : "paused", generation });
         },
-        playing: () => isCurrent() && dispatch({ type: "status", status: "playing", generation }),
+        playing: () => {
+          if (!isCurrent()) return;
+          if (pausedByTimer.current) {
+            audio.pause();
+            dispatch({ type: "status", status: "paused", generation });
+          } else dispatch({ type: "status", status: "playing", generation });
+        },
         pause: () => {
           if (isCurrent() && !audio.ended && stateRef.current.status !== "error") {
             dispatch({ type: "status", status: "paused", generation });
           }
         },
-        waiting: () => isCurrent() && dispatch({ type: "status", status: "buffering", generation }),
-        stalled: () => isCurrent() && dispatch({ type: "status", status: "buffering", generation }),
+        waiting: () =>
+          isCurrent() && !pausedByTimer.current && dispatch({ type: "status", status: "buffering", generation }),
+        stalled: () =>
+          isCurrent() && !pausedByTimer.current && dispatch({ type: "status", status: "buffering", generation }),
         timeupdate: () => isCurrent() && dispatch({ type: "time", currentTime: audio.currentTime, generation }),
-        ended: () => isCurrent() && advanceAfterEnded(plan, entryIndex, segmentIndex, repetitionIndex, voiceId),
+        ended: () =>
+          isCurrent() &&
+          !pausedByTimer.current &&
+          advanceAfterEnded(plan, entryIndex, segmentIndex, repetitionIndex, voiceId),
         error: () => {
           if (!isCurrent()) return;
           window.clearTimeout(metadataTimer);
@@ -323,9 +362,11 @@ export function AudioProvider({
             error: { ...mapMediaError(audio), assetId: entry.audioAssetId, variantId: segment.variantId },
           });
         },
-        durationchange: () =>
-          isCurrent() &&
-          dispatch({ type: "duration", duration: Number.isFinite(audio.duration) ? audio.duration : 0, generation }),
+        durationchange: () => {
+          if (!isCurrent()) return;
+          applyResumeTime();
+          dispatch({ type: "duration", duration: Number.isFinite(audio.duration) ? audio.duration : 0, generation });
+        },
       };
       for (const [event, handler] of Object.entries(handlers)) on(event as keyof HTMLMediaElementEventMap, handler);
       removeListenersRef.current = () => {
@@ -337,7 +378,7 @@ export function AudioProvider({
       const startSource = () => {
         audio.src = sourceUrl;
         audio.load();
-        if (autoPlay) {
+        if (autoPlay && !pausedByTimer.current) {
           try {
             void audio.play().catch((error: unknown) => {
               if (generationRef.current === generation)
@@ -368,6 +409,9 @@ export function AudioProvider({
 
   const startPlan = useCallback(
     (plan: PlaybackPlan, options?: { initialEntryIndex?: number; autoPlay?: boolean }) => {
+      resumeRequest.current++;
+      pausedByTimer.current = false;
+      bookmarkSuppressed.current = false;
       if (plan.entries.length === 0) return false;
       const rawIndex = options?.initialEntryIndex ?? 0;
       const entryIndex = rawIndex >= 0 && rawIndex < plan.entries.length ? rawIndex : 0;
@@ -390,7 +434,9 @@ export function AudioProvider({
   );
 
   const play = useCallback(() => {
+    pausedByTimer.current = false;
     const current = stateRef.current;
+    if (current.announcement === "sleep-timer-ended") dispatch({ type: "announce", announcement: "" });
     if (!current.plan) return;
     if (current.status === "error") {
       loadAt(
@@ -423,7 +469,130 @@ export function AudioProvider({
     dispatch({ type: "status", status: "paused", generation: generationRef.current });
   }, [dispatch]);
 
+  const checkpoint = useCallback(() => {
+    const current = stateRef.current;
+    if (
+      bookmarkSuppressed.current ||
+      !current.plan ||
+      !current.currentVoiceId ||
+      current.status === "loading" ||
+      current.status === "error"
+    )
+      return;
+    const fingerprint = recordingFingerprint(
+      current.plan,
+      current.entryIndex,
+      current.segmentIndex,
+      current.currentVoiceId,
+    );
+    if (!fingerprint) return;
+    if (
+      current.status === "ended" &&
+      current.entryIndex === current.plan.entries.length - 1 &&
+      current.currentTime >= current.duration
+    ) {
+      saveListeningBookmark(null);
+      setCanResumeListening(false);
+      return;
+    }
+    const saved = saveListeningBookmark({
+      version: 1,
+      savedAt: Date.now(),
+      context: current.plan.context,
+      ids: current.plan.entries.map((entry) => entry.zikrId),
+      mode: current.plan.entries.some((entry) => entry.playbackMode === "repeat-prescribed-count")
+        ? "repeat-prescribed-count"
+        : "play-once",
+      voice: current.currentVoiceId,
+      entry: current.entryIndex,
+      segment: current.segmentIndex,
+      repetition: current.repetitionIndex,
+      seconds: audioRef.current?.currentTime ?? current.currentTime,
+      fingerprint,
+    });
+    if (saved) setCanResumeListening(true);
+  }, []);
+  useEffect(() => {
+    let lastWrite = 0;
+    const timed = () => {
+      if (Date.now() - lastWrite >= 5000) {
+        lastWrite = Date.now();
+        checkpoint();
+      }
+    };
+    const audio = audioRef.current;
+    audio?.addEventListener("timeupdate", timed);
+    audio?.addEventListener("pause", checkpoint);
+    window.addEventListener("pagehide", checkpoint);
+    const hidden = () => {
+      if (document.visibilityState === "hidden") checkpoint();
+    };
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      audio?.removeEventListener("timeupdate", timed);
+      audio?.removeEventListener("pause", checkpoint);
+      window.removeEventListener("pagehide", checkpoint);
+      document.removeEventListener("visibilitychange", hidden);
+    };
+  }, [checkpoint, state.plan]);
+  const setSleepTimer = useCallback((minutes: number | null) => {
+    const deadline = minutes !== null && [15, 30, 60].includes(minutes) ? Date.now() + minutes * 60_000 : null;
+    sleepDeadlineRef.current = deadline;
+    setSleepDeadline(deadline);
+  }, []);
+  useEffect(() => {
+    if (sleepDeadline === null) return;
+    const expire = () => {
+      if (sleepDeadlineRef.current !== null && Date.now() >= sleepDeadlineRef.current) {
+        pausedByTimer.current = true;
+        pause();
+        checkpoint();
+        dispatch({ type: "announce", announcement: "sleep-timer-ended" });
+        sleepDeadlineRef.current = null;
+        setSleepDeadline(null);
+      }
+    };
+    const timer = window.setTimeout(expire, Math.max(0, sleepDeadline - Date.now()));
+    window.addEventListener("pageshow", expire);
+    document.addEventListener("visibilitychange", expire);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("pageshow", expire);
+      document.removeEventListener("visibilitychange", expire);
+    };
+  }, [sleepDeadline, pause, checkpoint, dispatch]);
+  const dismissResume = useCallback(() => {
+    resumeRequest.current++;
+    bookmarkSuppressed.current = true;
+    saveListeningBookmark(null);
+    setCanResumeListening(false);
+  }, []);
+  const resumeListening = useCallback(async () => {
+    const request = ++resumeRequest.current;
+    const bookmark = readListeningBookmark();
+    if (!bookmark) {
+      dismissResume();
+      return false;
+    }
+    const plan = await restoreListeningPlan(bookmark, preferencesRef.current);
+    if (request !== resumeRequest.current) return false;
+    if (!plan) {
+      dismissResume();
+      return false;
+    }
+    bookmarkSuppressed.current = false;
+    loadAt(plan, bookmark.entry, bookmark.segment, bookmark.repetition, false, bookmark.voice, bookmark.seconds);
+    return true;
+  }, [loadAt, dismissResume]);
+
+  useEffect(() => {
+    if (state.status === "ended") checkpoint();
+  }, [state.status, checkpoint]);
+
   const stop = useCallback(() => {
+    checkpoint();
+    resumeRequest.current++;
+    setSleepTimer(null);
     generationRef.current += 1;
     removeListenersRef.current();
     const audio = audioRef.current;
@@ -433,7 +602,16 @@ export function AudioProvider({
       audio.currentTime = 0;
     }
     dispatch({ type: "stop", playbackRate: preferencesRef.current.playbackRate });
-  }, [dispatch]);
+  }, [checkpoint, dispatch, setSleepTimer]);
+
+  useEffect(() => {
+    const clear = () => {
+      dismissResume();
+      stop();
+    };
+    window.addEventListener("azkar-private-data-cleared", clear);
+    return () => window.removeEventListener("azkar-private-data-cleared", clear);
+  }, [dismissResume, stop]);
 
   useEffect(() => stop, [stop]);
 
@@ -621,7 +799,7 @@ export function AudioProvider({
       const current = stateRef.current;
       if (!current.plan) return;
       const nextPlan = withPlaybackMode(current.plan, mode);
-      loadAt(nextPlan, current.entryIndex, 0, 0, true, current.currentVoiceId ?? undefined);
+      loadAt(nextPlan, current.entryIndex, 0, 0, current.status === "playing", current.currentVoiceId ?? undefined);
     },
     [loadAt],
   );
@@ -633,6 +811,11 @@ export function AudioProvider({
     null;
   const controller = useMemo<AudioController>(
     () => ({
+      sleepDeadline,
+      setSleepTimer,
+      canResumeListening,
+      resumeListening,
+      dismissResume,
       autoAdvance,
       setAutoAdvance,
       state,
@@ -660,6 +843,11 @@ export function AudioProvider({
       setPlaybackMode,
     }),
     [
+      sleepDeadline,
+      setSleepTimer,
+      canResumeListening,
+      resumeListening,
+      dismissResume,
       autoAdvance,
       setAutoAdvance,
       currentEntry,

@@ -1,3 +1,5 @@
+import { retainQcfFonts } from "../content/qcfMushaf";
+import "../../styles/theme/wordPopover.css";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 import { AyahMarker } from "./AyahMarker";
 import {
@@ -17,7 +19,7 @@ import "./mushaf-magnification.css";
 import type { AppLanguage, MushafPageTheme, MushafTextScale, TextSizeOption } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
-import { Bookmark } from "./icons";
+import { Bookmark, ChevronLeft, ChevronRight } from "./icons";
 import { formatNumerals } from "../formatting";
 import { getJuzNumberForPage, getSurahDisplayName, getSurahNumberForPage } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
@@ -222,21 +224,11 @@ const MushafTextLine = memo(function MushafTextLine({
                 key={key}
                 aria-hidden="true"
                 data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
-                className={
-                  highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode
-                    ? "text-primary transition-colors"
-                    : undefined
-                }
               >
                 {useQcfGlyphs && w.qcfCode ? (
                   w.qcfCode
                 ) : (
-                  <AyahMarker
-                    number={w.verseKey.split(":")[1] || w.text}
-                    language={language}
-                    theme={_theme}
-                    isHighlighted={highlightedVerseKey === w.verseKey}
-                  />
+                  <AyahMarker number={w.verseKey.split(":")[1] || w.text} language={language} theme={_theme} />
                 )}
               </span>
             );
@@ -246,9 +238,7 @@ const MushafTextLine = memo(function MushafTextLine({
               <button
                 key={key}
                 type="button"
-                className={`inline-block shrink-0 select-none rounded-full border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors ${
-                  highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode ? "text-primary" : ""
-                }`}
+                className="inline-block shrink-0 select-none rounded-full border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 aria-current={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
@@ -279,12 +269,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 {useQcfGlyphs && w.qcfCode ? (
                   w.qcfCode
                 ) : (
-                  <AyahMarker
-                    number={w.verseKey.split(":")[1] || w.text}
-                    language={language}
-                    theme={_theme}
-                    isHighlighted={highlightedVerseKey === w.verseKey}
-                  />
+                  <AyahMarker number={w.verseKey.split(":")[1] || w.text} language={language} theme={_theme} />
                 )}
               </button>
             );
@@ -337,7 +322,7 @@ const MushafTextLine = memo(function MushafTextLine({
                   onAyahAction?.(w.verseKey);
                 }}
                 className={`relative inline shrink-0 cursor-pointer appearance-none rounded-sm border-0 p-0 underline underline-offset-4 transition-colors [font:inherit] hover:bg-primary/10 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  isOpen || isSpoken ? "bg-primary/15 text-foreground ring-2 ring-primary/55" : "text-foreground"
+                  isOpen ? "bg-primary/15 text-foreground ring-2 ring-primary/55" : "text-foreground"
                 }`}
                 style={{
                   lineHeight: "inherit",
@@ -350,7 +335,7 @@ const MushafTextLine = memo(function MushafTextLine({
                       }
                     : {}),
                   textDecorationColor: "color-mix(in srgb, var(--primary) 60%, transparent)",
-                  textDecorationStyle: isOpen || isSpoken ? "solid" : "dotted",
+                  textDecorationStyle: isOpen ? "solid" : "dotted",
                 }}
                 aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
               >
@@ -369,17 +354,7 @@ const MushafTextLine = memo(function MushafTextLine({
               data-listening-verse={readOnly ? w.verseKey : undefined}
               data-playback-word={isWordHighlighted ? "true" : undefined}
               data-listening-word={isWordHighlighted ? "" : undefined}
-              style={
-                isWordHighlighted
-                  ? {
-                      color: "color-mix(in srgb, var(--primary) 85%, var(--foreground))",
-                      boxShadow: "0 0 6px color-mix(in srgb, var(--primary) 35%, transparent)",
-                    }
-                  : undefined
-              }
-              className={`shrink-0 transition-colors ${
-                isWordHighlighted ? "rounded-md bg-primary/25 text-primary ring-1 ring-primary/50" : "rounded-sm"
-              }`}
+              className="shrink-0 rounded-sm"
               aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -487,18 +462,15 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
         return;
       }
 
-      // Always measure natural type against the available page. Inherited
-      // line heights and late font swaps cannot reliably be divided by the
-      // previous fit, and doing so can progressively shrink a scrolling page.
+      // Measure natural type, never an earlier fitted page. Reduce Motion
+      // must keep layout transitions at zero so these synchronous reads are
+      // current after both font and viewport changes.
       page.style.setProperty("--mushaf-measure", "100%");
       page.style.setProperty("--mushaf-fit", "1");
-
-      for (let i = 0; i < contents.length; i++) {
-        const content = contents[i]!;
+      for (const content of contents) {
         content.style.transform = "";
         content.style.justifyContent = "";
       }
-
       const available = first.clientWidth;
       const slotHeight = (first.parentElement as HTMLElement | null)?.clientHeight ?? 0;
       if (available <= 0 || slotHeight <= 0) return;
@@ -700,7 +672,10 @@ function PageFurnitureHead({
   onJuzClick?: () => void;
 }) {
   return (
-    <div className="mushaf-page-furniture flex shrink-0 items-center justify-between gap-2" dir="rtl">
+    <div
+      className="mushaf-page-furniture grid shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1"
+      dir="rtl"
+    >
       {onJuzClick ? (
         <button
           type="button"
@@ -709,12 +684,14 @@ function PageFurnitureHead({
             onJuzClick();
           }}
           data-testid="mushaf-furniture-juz-btn"
-          className="mushaf-page-furniture__juz arabic-ui min-h-11 min-w-0 shrink cursor-pointer truncate rounded-full px-2 py-0.5 transition-colors hover:bg-foreground/10 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="mushaf-page-furniture__juz group flex h-11 min-w-0 max-w-full cursor-pointer items-center justify-self-start rounded-full px-1 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
         >
-          {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+          <span className="mushaf-furniture-pill arabic-ui">
+            {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+          </span>
         </button>
       ) : (
-        <span className="mushaf-page-furniture__juz arabic-ui min-w-0 shrink truncate" aria-hidden="true">
+        <span className="mushaf-furniture-pill arabic-ui justify-self-start" aria-hidden="true">
           {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
         </span>
       )}
@@ -729,15 +706,10 @@ function PageFurnitureHead({
             data-testid="mushaf-furniture-surah-btn"
             className="mushaf-page-furniture__cartouche group flex h-11 min-w-11 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <span className="arabic-ui inline-flex h-8 max-w-full items-center justify-center truncate rounded-full border border-border/80 bg-card/90 px-3 text-xs font-bold leading-none text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
-              {getSurahDisplayName(surahNumber, language)}
-            </span>
+            <span className="mushaf-furniture-pill arabic-ui">{getSurahDisplayName(surahNumber, language)}</span>
           </button>
         ) : (
-          <span
-            className="mushaf-page-furniture__cartouche arabic-ui inline-flex h-8 items-center justify-center truncate rounded-full border border-border/80 bg-card/90 px-3 text-xs font-bold leading-none text-foreground shadow-xs"
-            aria-hidden="true"
-          >
+          <span className="mushaf-furniture-pill arabic-ui" aria-hidden="true">
             {getSurahDisplayName(surahNumber, language)}
           </span>
         ))}
@@ -773,7 +745,7 @@ function PageFurnitureFoot({
     return () => window.clearTimeout(timer);
   }, [pageNumber]);
 
-  const pillClassName = `inline-flex h-8 min-w-[2.75rem] items-center justify-center rounded-full border px-3 text-xs font-bold tabular-nums shadow-xs backdrop-blur-md transition-colors duration-300 ${
+  const pillClassName = `mushaf-furniture-pill min-w-[2.75rem] tabular-nums ${
     highlighted
       ? "border-primary/50 bg-card text-primary font-black"
       : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
@@ -844,9 +816,8 @@ function MushafPageCanvas({
   spreadSide,
   textScale,
   showPageIdentity,
-  hasTopCenterControl: _hasTopCenterControl = false,
-  hasFloatingControls = false,
   isFloatingLayout = false,
+  focusMode = false,
   onAyahAction,
   highlightedVerseKey,
   readOnly = false,
@@ -876,9 +847,8 @@ function MushafPageCanvas({
    * with the chrome hidden, the page is the only thing that can say where it is.
    */
   showPageIdentity: boolean;
-  hasTopCenterControl?: boolean;
-  hasFloatingControls?: boolean;
   isFloatingLayout?: boolean;
+  focusMode?: boolean;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
   readOnly?: boolean;
@@ -888,9 +858,9 @@ function MushafPageCanvas({
   onPageClick?: () => void;
   onlySurah?: number;
 }) {
-  const isFloating = isFloatingLayout ?? hasFloatingControls ?? false;
-  const showPageFurnitureHead = Boolean(spreadSide) || (!isFloating && showPageIdentity);
-  const showPageFurnitureFoot = Boolean(spreadSide) || (!isFloating && showPageIdentity);
+  const isFloating = isFloatingLayout ?? false;
+  const showPageFurnitureHead = !focusMode && showPageIdentity && (Boolean(spreadSide) || !isFloating);
+  const showPageFurnitureFoot = !focusMode && showPageIdentity && (Boolean(spreadSide) || !isFloating);
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
   useEffect(() => {
@@ -917,6 +887,19 @@ function MushafPageCanvas({
 
   const lineDetails = useLineDetails(lines, pageNumber, onlySurah);
   const isOpening = OPENING_PAGES.has(pageNumber);
+  let listeningGeometry: CSSProperties | undefined;
+  if (onlySurah !== undefined) {
+    const firstLine = lineDetails.findIndex((line) => line.type !== "empty");
+    const lastLine = lineDetails.findLastIndex((line) => line.type !== "empty");
+    listeningGeometry = { flex: "none", blockSize: "var(--mushaf-listening-height)" };
+    if (!isOpening && firstLine >= 0) {
+      // Shorten the outside of the passage while keeping the ink in its
+      // original slots at the full page's fitted size.
+      listeningGeometry.marginBlockStart = `calc(var(--mushaf-listening-slot) * -${firstLine})`;
+      listeningGeometry.marginBlockEnd = `calc(var(--mushaf-listening-slot) * -${MUSHAF_LINES_PER_PAGE - 1 - lastLine})`;
+    }
+  }
+  useLayoutEffect(() => retainQcfFonts([pageNumber]), [pageNumber]);
   const canvasRef = useLineFitter(
     // Retain the normal-page fit across enlargement. Restarting the fitter
     // measures its previously fitted frame and cancels part of the zoom.
@@ -951,18 +934,7 @@ function MushafPageCanvas({
       className={`relative ${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
         isFloating ? "" : "py-1 sm:py-2"
       }`}
-      style={{
-        containerType: "size",
-        ...(isFloating
-          ? {
-              // Reserve the new floating footer without taking space from the
-              // existing fifteen-line minimum on short, scrolling viewports.
-              minHeight: "calc(32rem + 2.65rem)",
-              paddingTop: "var(--mushaf-top-clearance, 3.25rem)",
-              paddingBottom: "calc(3.25rem + env(safe-area-inset-bottom))",
-            }
-          : {}),
-      }}
+      style={{ containerType: "size", ...listeningGeometry }}
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
@@ -1048,10 +1020,7 @@ function MushafPageCanvas({
           </div>
         </div>
       ) : (
-        <div
-          className="mushaf-page-frame relative z-10 mx-auto flex h-full w-full flex-col"
-          style={spreadSide ? { maxWidth: "min(100%, 72cqh)" } : undefined}
-        >
+        <div className="mushaf-page-frame relative z-10 mx-auto flex h-full w-full flex-col">
           {showPageFurnitureHead && (
             <PageFurnitureHead
               surahNumber={pageSurahNumber}
@@ -1196,11 +1165,15 @@ export function MushafPageViewer({
   headerContent,
   footerContent,
   railContent,
+  desktopHeader,
+  desktopFooter,
+  pageTurnBounds = { first: 1, last: 604 },
   railSide = "right",
   progressBar,
   paperRef,
   verticalGestures = false,
   showFloatingPageIndicator = true,
+  focusMode = false,
   pageTransitionDirection,
   reduceMotion = false,
   hapticFeedback = false,
@@ -1214,8 +1187,12 @@ export function MushafPageViewer({
   onJuzClick,
   onPageClick,
   topLeftControl,
+  phoneBookmark,
+  inlineIndex,
+  inlineIndexOpen = false,
   topRightControl,
   topCenterControl,
+  themeNotice,
   bottomLeftControl,
   bottomCenterControl,
   bottomRightControl,
@@ -1245,6 +1222,9 @@ export function MushafPageViewer({
    * on a landscape screen height is the scarce dimension and width is not.
    */
   railContent?: ReactNode;
+  desktopHeader?: ReactNode;
+  desktopFooter?: ReactNode;
+  pageTurnBounds?: { first: number; last: number };
   railSide?: "right" | "left";
   /** Always visible, whatever the chrome is doing. */
   progressBar?: ReactNode;
@@ -1253,6 +1233,7 @@ export function MushafPageViewer({
   /** Vertical shortcuts yield to native scrolling when the paper overflows. */
   verticalGestures?: boolean;
   showFloatingPageIndicator?: boolean;
+  focusMode?: boolean;
   /**
    * Applied to the paper, for a caller that moves it under the thumb.
    *
@@ -1274,8 +1255,12 @@ export function MushafPageViewer({
   onJuzClick?: () => void;
   onPageClick?: () => void;
   topLeftControl?: ReactNode;
+  phoneBookmark?: ReactNode;
+  inlineIndex?: ReactNode;
+  inlineIndexOpen?: boolean;
   topRightControl?: ReactNode;
   topCenterControl?: ReactNode;
+  themeNotice?: ReactNode;
   bottomLeftControl?: ReactNode;
   bottomCenterControl?: ReactNode;
   bottomRightControl?: ReactNode;
@@ -1300,7 +1285,9 @@ export function MushafPageViewer({
     };
     align();
     const observer = new ResizeObserver(align);
-    observer.observe(arabicFrame);
+    // Spread changes can alter frame padding while the fitted text measure
+    // stays constant. Observe that outer edge, not only the content box.
+    observer.observe(arabicFrame, { box: "border-box" });
     return () => observer.disconnect();
   }, [facingContent, facingPage, pageNumber]);
 
@@ -1418,23 +1405,30 @@ export function MushafPageViewer({
   const useRail = Boolean(railContent);
   /* A spread needs each half to name itself; so does any layout where the
      chrome is not carrying the surah above the paper. */
-  const showPageIdentity = Boolean(facingPage) || useRail || !headerContent;
+  const showPageIdentity =
+    Boolean(facingContent) || (!desktopHeader && (Boolean(facingPage) || useRail || !headerContent));
   const isFloatingLayout = !useRail && !headerContent;
-  const hasFloatingControls =
-    isFloatingLayout &&
-    Boolean(
-      topLeftControl ||
-      topRightControl ||
-      topCenterControl ||
-      bottomLeftControl ||
-      bottomRightControl ||
-      bottomCenterControl,
-    );
+  const showBottomCenter =
+    bottomCenterControl || (isFloatingLayout && !facingPage && showPageIdentity && showFloatingPageIndicator);
 
   return (
     <article
-      className={`glass-reading relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
+      className={`mushaf-reader-viewer glass-reading relative flex h-full min-h-0 w-full transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
+      style={
+        {
+          "--foreground": "var(--mushaf-ink)",
+          backgroundColor: "var(--mushaf-paper)",
+          color: "var(--mushaf-ink)",
+          backgroundImage: "var(--paper-grain, none)",
+          backdropFilter: "none",
+        } as CSSProperties
+      }
       data-mushaf-chrome-mode={useRail ? "rail" : headerContent ? "bars" : "clean"}
+      data-desktop-chrome={Boolean(desktopHeader && useRail)}
+      data-rail-side={railSide}
+      data-focus-mode={focusMode}
+      data-phone-controls={Boolean(inlineIndex)}
+      data-reader-presentation={Boolean(desktopHeader || topCenterControl)}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
       aria-label={
@@ -1449,6 +1443,13 @@ export function MushafPageViewer({
       <h1 className="sr-only">
         {surahName} · {formattedJuz}
       </h1>
+
+      {desktopHeader && useRail && (
+        <div className="mushaf-desktop-top" data-theme-notice={Boolean(themeNotice)}>
+          {desktopHeader}
+          {themeNotice && <div className="mushaf-title-notice">{themeNotice}</div>}
+        </div>
+      )}
       {/* Live region announcing page changes to assistive technology */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {facingPage
@@ -1478,7 +1479,7 @@ export function MushafPageViewer({
           </button>
         </nav>
       )}
-      {isBookmarked && !topCenterControl && (
+      {isBookmarked && !topCenterControl && !(inlineIndex && focusMode) && (
         <div
           className={`pointer-events-none absolute end-4 z-20 flex items-center justify-center text-primary drop-shadow-md ${
             headerContent && !useRail ? "top-14" : "top-2"
@@ -1490,83 +1491,52 @@ export function MushafPageViewer({
         </div>
       )}
 
-      {/* 4 Corner Integrated Controls for Mobile Portrait */}
-      {topLeftControl && (
+      {(topLeftControl || topRightControl || topCenterControl) && (
         <div
-          data-testid="mushaf-corner-top-left"
-          className="pointer-events-auto absolute left-2.5 z-30 flex items-center justify-center"
-          style={{ top: "0.6rem" }}
-        >
-          {topLeftControl}
-        </div>
-      )}
-
-      {topCenterControl && (
-        <div
-          data-testid="mushaf-control-top-center"
           dir="ltr"
-          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-1.5"
-          style={{
-            top: "0.6rem",
-            maxWidth: "calc(100vw - 7.5rem)",
-          }}
+          className="mushaf-control-band mushaf-control-band--top"
+          data-phone-bookmark={Boolean(phoneBookmark)}
         >
-          {isBookmarked && (
-            <span
-              className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-primary/50 bg-card/90 px-2 text-primary shadow-xs backdrop-blur-md"
-              role="img"
-              aria-label={t(language, "mushaf.bookmarkSaved")}
-              title={t(language, "mushaf.bookmarkSaved")}
+          {topLeftControl && (
+            <div
+              data-testid="mushaf-corner-top-left"
+              className="col-start-1 row-start-1 flex min-w-0 justify-center gap-1.5"
             >
-              <Bookmark size={15} className="fill-primary text-primary" aria-hidden="true" />
-            </span>
+              {topLeftControl}
+              {phoneBookmark}
+            </div>
           )}
-          {topCenterControl}
-        </div>
-      )}
 
-      {topRightControl && (
-        <div
-          data-testid="mushaf-corner-top-right"
-          className="pointer-events-auto absolute right-2.5 z-30 flex items-center justify-center"
-          style={{ top: "0.6rem" }}
-        >
-          {topRightControl}
-        </div>
-      )}
-
-      {bottomLeftControl && (
-        <div
-          data-testid="mushaf-corner-bottom-left"
-          className="pointer-events-auto absolute left-2.5 z-30 flex items-center justify-center"
-          style={{ bottom: "max(0.6rem, env(safe-area-inset-bottom))" }}
-        >
-          {bottomLeftControl}
-        </div>
-      )}
-
-      {(bottomCenterControl || (isFloatingLayout && !facingPage && showPageIdentity && showFloatingPageIndicator)) && (
-        <div
-          data-testid="mushaf-control-bottom-center"
-          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center"
-          style={{
-            bottom: "max(0.6rem, env(safe-area-inset-bottom))",
-            maxWidth: "calc(100vw - 7.5rem)",
-          }}
-        >
-          {bottomCenterControl ?? (
-            <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} floating />
+          {topCenterControl && (
+            <div
+              data-testid="mushaf-control-top-center"
+              className="relative col-start-2 row-start-1 flex min-w-0 justify-center gap-1.5"
+              data-theme-notice={Boolean(themeNotice)}
+              dir="ltr"
+            >
+              {isBookmarked && !phoneBookmark && (
+                <span
+                  className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-primary/50 bg-card/90 px-2 text-primary shadow-xs backdrop-blur-md"
+                  role="img"
+                  aria-label={t(language, "mushaf.bookmarkSaved")}
+                  title={t(language, "mushaf.bookmarkSaved")}
+                >
+                  <Bookmark size={15} className="fill-primary text-primary" aria-hidden="true" />
+                </span>
+              )}
+              <span className="mushaf-title-control flex min-w-0 items-center justify-center">{topCenterControl}</span>
+              {themeNotice && <div className="mushaf-title-notice">{themeNotice}</div>}
+            </div>
           )}
-        </div>
-      )}
 
-      {bottomRightControl && (
-        <div
-          data-testid="mushaf-corner-bottom-right"
-          className="pointer-events-auto absolute right-2.5 z-30 flex items-center justify-center"
-          style={{ bottom: "max(0.6rem, env(safe-area-inset-bottom))" }}
-        >
-          {bottomRightControl}
+          {topRightControl && (
+            <div
+              data-testid="mushaf-corner-top-right"
+              className="col-start-3 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {topRightControl}
+            </div>
+          )}
         </div>
       )}
 
@@ -1617,9 +1587,14 @@ export function MushafPageViewer({
         key={`${pageNumber}:${facingPage?.pageNumber ?? "single"}`}
         ref={paperRef}
         style={
-          { ...paperStyle, "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)) } as CSSProperties
+          {
+            ...paperStyle,
+            display: inlineIndexOpen ? "none" : undefined,
+            "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
+          } as CSSProperties
         }
         data-magnified={magnification > 100}
+        data-theme-notice={Boolean(themeNotice && !topCenterControl && !desktopHeader)}
         role={magnification > 100 ? "region" : undefined}
         aria-label={magnification > 100 ? t(language, "mushaf.magnification") : undefined}
         tabIndex={magnification > 100 ? 0 : undefined}
@@ -1656,6 +1631,7 @@ export function MushafPageViewer({
             study mode is enabled; ayah-marker buttons remain operable in
             either mode, while the cohesive page regions below carry the
             normal reading experience. */}
+        {themeNotice && !topCenterControl && !desktopHeader && <div className="mushaf-paper-notice">{themeNotice}</div>}
         <div className="contents">
           <MushafPageCanvas
             lines={lines}
@@ -1670,9 +1646,8 @@ export function MushafPageViewer({
             textScale={textScale}
             magnification={magnification}
             showPageIdentity={showPageIdentity}
-            hasTopCenterControl={Boolean(topCenterControl)}
-            hasFloatingControls={hasFloatingControls}
             isFloatingLayout={isFloatingLayout}
+            focusMode={focusMode}
             onAyahAction={onAyahAction}
             highlightedVerseKey={highlightedVerseKey}
             highlightedWord={highlightedWord}
@@ -1696,8 +1671,8 @@ export function MushafPageViewer({
                 textScale={textScale}
                 magnification={magnification}
                 showPageIdentity={showPageIdentity}
-                hasFloatingControls={false}
                 isFloatingLayout={false}
+                focusMode={focusMode}
                 onAyahAction={onAyahAction}
                 highlightedVerseKey={highlightedVerseKey}
                 highlightedWord={highlightedWord}
@@ -1714,22 +1689,12 @@ export function MushafPageViewer({
                 className={`relative mushaf-spread__page mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
                   isFloatingLayout ? "" : "py-1 sm:py-2"
                 }`}
-                style={{
-                  containerType: "size",
-                  ...(isFloatingLayout
-                    ? {
-                        minHeight: "calc(32rem + 2.65rem)",
-                        paddingTop: "3.25rem",
-                        paddingBottom: "calc(3.25rem + env(safe-area-inset-bottom))",
-                      }
-                    : {}),
-                }}
+                style={{ containerType: "size" }}
                 data-mushaf-meaning=""
               >
                 <div
                   ref={meaningFrameRef}
                   className="mushaf-page-frame relative z-10 mx-auto flex h-full w-full min-h-0 flex-col"
-                  style={{ maxWidth: "min(100%, 72cqh)" }}
                 >
                   {facingContent}
                 </div>
@@ -1753,6 +1718,65 @@ export function MushafPageViewer({
           </div>
         )}
       </div>
+
+      {inlineIndex}
+
+      {!inlineIndexOpen && !focusMode && !useRail && !facingContent && (onNext || onPrevious || onEdgeTap) && (
+        <nav className="mushaf-tablet-turns" aria-label={t(language, "mushaf.pageNavigation")}>
+          <button
+            type="button"
+            data-testid="mushaf-tablet-next"
+            aria-label={t(language, "common.next")}
+            disabled={pageNumber >= pageTurnBounds.last}
+            onClick={onNext ?? (() => onEdgeTap?.("left"))}
+          >
+            <ChevronLeft size={20} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            data-testid="mushaf-tablet-previous"
+            aria-label={t(language, "common.previous")}
+            disabled={pageNumber <= pageTurnBounds.first}
+            onClick={onPrevious ?? (() => onEdgeTap?.("right"))}
+          >
+            <ChevronRight size={20} aria-hidden="true" />
+          </button>
+        </nav>
+      )}
+      {desktopFooter && useRail && <div className="mushaf-desktop-bottom">{desktopFooter}</div>}
+
+      {(bottomLeftControl || bottomRightControl || showBottomCenter) && (
+        <div dir="ltr" className="mushaf-control-band mushaf-control-band--bottom">
+          {bottomLeftControl && (
+            <div
+              data-testid="mushaf-corner-bottom-left"
+              className="col-start-1 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {bottomLeftControl}
+            </div>
+          )}
+
+          {showBottomCenter && (
+            <div
+              data-testid="mushaf-control-bottom-center"
+              className="col-start-2 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {bottomCenterControl ?? (
+                <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} floating />
+              )}
+            </div>
+          )}
+
+          {bottomRightControl && (
+            <div
+              data-testid="mushaf-corner-bottom-right"
+              className="col-start-3 row-start-1 flex min-w-0 justify-center gap-1.5"
+            >
+              {bottomRightControl}
+            </div>
+          )}
+        </div>
+      )}
 
       {!useRail && footerContent && (
         <div
@@ -1895,10 +1919,11 @@ export function MushafListeningPage({
             "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
             width: `calc(100% * ${magnification / 100})`,
             maxWidth: "none",
-            height: `calc(max(36rem, calc(100cqh - 3rem)) * ${magnification / 100})`,
+            "--mushaf-listening-height": `calc(max(36rem, 100cqh) * ${magnification / 100})`,
           } as CSSProperties
         }
         aria-hidden="true"
+        data-listening-passage-paper={onlySurah !== undefined || undefined}
         className={`glass-reading audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
         dir="rtl"
         lang="ar"

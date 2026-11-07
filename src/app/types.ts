@@ -139,6 +139,12 @@ export interface PrayerReminderSchedule {
 }
 
 export interface ReminderSettings {
+  /** Optional for backwards compatibility; legacy choices stay off until selected. */
+  friday?: { enabled: boolean };
+  fridayDua?: { enabled: boolean };
+  beforeFajrDua?: { enabled: boolean };
+  fridaySalawat?: { enabled: boolean };
+  fastingPreparation?: { enabled: boolean };
   prayer: PrayerReminderSchedule;
   morning: ReminderSchedule;
   evening: ReminderSchedule;
@@ -287,6 +293,8 @@ export interface UserSettingsState {
   readerMeaningOnly?: boolean;
   /** Blurred materials go solid. See the .reduce-transparency rules. */
   reduceTransparency: boolean;
+  /** Device-only decorative paper texture; absent legacy values default to enabled. */
+  paperTexture?: boolean;
   appMaterial?: "system" | "glass" | "solid";
   homeMaterial?: "inherit" | "system" | "glass" | "solid";
   /** Optional Home daily-wird photography; independent of transparency. */

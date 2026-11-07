@@ -17,25 +17,35 @@ export function ProductImage({
   name,
   className = "",
   loading = "lazy",
+  sizes,
 }: {
   name: ProductImageName;
   className?: string;
   /** The LCP hero should pass "eager"; everything else stays lazy. */
   loading?: "lazy" | "eager";
+  sizes?: string;
 }) {
-  const base = homeArtworkUrl(`images/${name}`);
+  const responsive = name === "mosque_prophet";
+  const base = responsive ? `${import.meta.env.BASE_URL}images/${name}` : homeArtworkUrl(`images/${name}`);
+  const srcSet = (format: "avif" | "webp") =>
+    responsive
+      ? (format === "avif" ? [192, 384, 768] : [192, 384])
+          .map((width) => `${base}-${width}.${format} ${width}w`)
+          .join(", ")
+      : `${base}.${format}`;
   return (
     <picture
       className="absolute inset-0 block bg-cover bg-center"
       style={{ backgroundImage: `url(${base}-placeholder.webp)` }}
     >
-      <source srcSet={`${base}.avif`} type="image/avif" />
-      <source srcSet={`${base}.webp`} type="image/webp" />
+      <source srcSet={srcSet("avif")} sizes={sizes} type="image/avif" />
       <img
-        src={`${base}.webp`}
+        src={`${base}${responsive ? "-384" : ""}.webp`}
+        srcSet={responsive ? srcSet("webp") : undefined}
+        sizes={sizes}
         alt=""
-        width={1254}
-        height={1254}
+        width={responsive ? 768 : 1254}
+        height={responsive ? 768 : 1254}
         loading={loading}
         decoding="async"
         onError={(event) => {

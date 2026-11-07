@@ -1,3 +1,4 @@
+import { COUNTER_PICKER_TRIGGER } from "./devotionalPickerStyles";
 import type { AuthenticZikrItem } from "../content/authenticAzkar";
 import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
@@ -40,10 +41,10 @@ export function AuthenticZikrPicker({
           <button
             type="button"
             data-testid="counter-zikr-filter"
-            className="interactive-elem flex min-h-[44px] w-full items-center justify-between gap-2 sm:gap-3 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-label sm:text-sm font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className={COUNTER_PICKER_TRIGGER}
             title={selectedFullText}
           >
-            <span className="min-w-0 flex-1 truncate text-start" dir="auto">
+            <span className="min-w-0 flex-1 whitespace-normal break-words py-2 text-start" dir="auto">
               {selectedLabel}
             </span>
             <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -53,7 +54,7 @@ export function AuthenticZikrPicker({
           tabIndex={0}
           align="start"
           collisionPadding={16}
-          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 overflow-y-auto"
+          className="counter-selection-menu overflow-y-auto"
           style={{ maxHeight: "min(70dvh, var(--radix-dropdown-menu-content-available-height))" }}
         >
           <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">

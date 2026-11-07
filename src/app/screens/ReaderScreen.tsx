@@ -14,6 +14,7 @@ import {
 import "../../styles/animations/ZikrAnimations.css";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
+import { useReadingFocusIndicator } from "../hooks/useReadingFocusIndicator";
 import { prefixZikrId, SITUATIONAL_SESSION_CATEGORY_IDS } from "../progress";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
@@ -28,7 +29,7 @@ import {
   ReaderOptionsSection,
 } from "../components/ReaderOptions";
 import { useWakeLock } from "../hooks/useWakeLock";
-import { isCounterShortcutBlocked } from "../keyboardShortcuts";
+import { COMPACT_TOUCH_KEYBOARD_HELP_QUERY, isCounterShortcutBlocked } from "../keyboardShortcuts";
 import {
   BookOpen,
   ArrowPrevious,
@@ -51,12 +52,15 @@ import {
   Share2,
   Keyboard,
   Translate,
+  Smartphone,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
-import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
+import { getAzkarForMode, isRoutineCategory } from "../content/azkarCore";
 import { isLongSurah } from "../content/mushafPages";
+import { getSurahMeta } from "../content/surahInfo";
+import { SurahArtwork } from "../components/SurahArtwork";
 import type { AudioController } from "../audio/AudioProvider";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
@@ -75,7 +79,7 @@ import { Header } from "../components/LayoutShells";
 import { ReaderSceneArt } from "../components/ReaderSceneArt";
 import { ReadingHeroToolbar } from "../components/ReadingHeroToolbar";
 import { AppearanceMenu } from "../components/AppearanceMenu";
-import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
+import { QuranPrelude } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 import {
@@ -85,7 +89,7 @@ import {
 } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { QuranWordPopover } from "../components/QuranWordPopover";
-import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
+import { getQuranSurahNumber, getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { AzkarListItem } from "../components/AzkarListItem";
 import {
@@ -99,6 +103,19 @@ import {
 import { AzkarListLayout } from "../components/AzkarListLayout";
 import { getReadingFontSize } from "./readingTypography";
 
+const COLLECTION_MENU_ACTION =
+  "flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
+const READER_TOOL_LABEL = "reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]";
+
+const READER_OVERFLOW_ACTION =
+  "flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted";
+
+const READER_MENU_TRIGGER =
+  "ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1";
+
+const ACTION_FOCUS = "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
 /**
  * Same three steps, same labels and same order as Settings → Accessibility →
 /** Shared ghost icon-button treatment for every control in the phone header row. */
@@ -111,7 +128,11 @@ const READER_WIDE_HEADER_ACTION_CLASS =
 const READER_SIDEBAR_TOGGLE_CLASS =
   "flex size-11 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-card shadow-xs text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
-const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran-720.webp`;
+const SURAH_CARD_ART: Readonly<Partial<Record<number, { name: string; focus: string }>>> = {
+  18: { name: "al-kahf", focus: "50% 55%" },
+  32: { name: "as-sajdah", focus: "54% 55%" },
+  67: { name: "al-mulk", focus: "50% 45%" },
+};
 
 const SharingPreview = lazy(() =>
   import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
@@ -155,6 +176,7 @@ export function ReaderScreen({
   isDone,
   collectionCompletedCount,
   hapticFeedback,
+  onHapticFeedbackChange,
   reduceMotion = false,
   showTranslation,
   showTransliteration,
@@ -208,6 +230,7 @@ export function ReaderScreen({
   isDone: boolean;
   collectionCompletedCount: number;
   hapticFeedback: boolean;
+  onHapticFeedbackChange?: (value: boolean) => void;
   reduceMotion?: boolean;
   showTranslation: boolean;
   showTransliteration: boolean;
@@ -294,8 +317,12 @@ export function ReaderScreen({
       : `${category ? (isArabic ? category.nameArabic : category.name) : ""}`;
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
+  const surahNumber = longSurah && z ? getQuranSurahNumber(z) : null;
+  const surahCardArt = surahNumber ? SURAH_CARD_ART[surahNumber] : undefined;
+  const surahMeta = surahNumber ? getSurahMeta(surahNumber) : undefined;
+  const readerHeaderTitle = longSurah && azkar.length === 1 ? t(language, "common.azkar") : displayCategoryName;
   /** A surah short enough to be read here rather than in the Mushaf view. */
-  const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
+  const isShortSurah = Boolean(z?.isSurah) && !longSurah;
   const [localMeaningOnly, setLocalMeaningOnly] = useState(false);
   const translationOnly = readerMeaningOnly ?? localMeaningOnly;
   const readingRegionId = useId();
@@ -361,6 +388,7 @@ export function ReaderScreen({
   const [shareMessage, setShareMessage] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [collectionShareOpen, setCollectionShareOpen] = useState(false);
+  const compactTouch = useMediaQuery(COMPACT_TOUCH_KEYBOARD_HELP_QUERY);
   const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
   useEffect(() => {
@@ -382,7 +410,7 @@ export function ReaderScreen({
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   const readerMainRef = useRef<HTMLDivElement | null>(null);
-  const readingScrollRef = useRef<HTMLDivElement | null>(null);
+  const readingScrollRef = useReadingFocusIndicator();
   const restoreReadingFocusOnAdvanceRef = useRef(false);
   const activeNavigatorItemRef = useRef<HTMLDivElement | null>(null);
 
@@ -402,7 +430,7 @@ export function ReaderScreen({
       (focusMode ? focusExitRef.current : readingScrollRef.current)?.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
-  }, [focusMode]);
+  }, [focusMode, readingScrollRef]);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -590,7 +618,7 @@ export function ReaderScreen({
         restoreReadingFocusOnAdvanceRef.current = false;
       }
     }
-  }, [idx]);
+  }, [idx, readingScrollRef]);
 
   useEffect(() => {
     const activeItem = activeNavigatorItemRef.current;
@@ -709,6 +737,7 @@ export function ReaderScreen({
     audioModeActive,
     focusMode,
     canDockCollection,
+    readingScrollRef,
   ]);
 
   if (!z || !category) {
@@ -762,13 +791,18 @@ export function ReaderScreen({
           type="button"
           data-testid="reader-language-toggle"
           aria-controls={readingRegionId}
+          onFocus={(event) => {
+            if (window.matchMedia("(max-height: 560px)").matches) {
+              event.currentTarget.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" });
+            }
+          }}
           onClick={(event) => {
             event.stopPropagation();
             setLocalMeaningOnly(!translationOnly);
             onReaderMeaningOnlyChange?.(!translationOnly);
             if (readingScrollRef.current) readingScrollRef.current.scrollTop = 0;
           }}
-          className="inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 py-2 text-label font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className={`inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 py-2 text-label font-semibold text-foreground ${ACTION_FOCUS}`}
         >
           <Translate size={18} className="shrink-0" aria-hidden="true" />
           <span className="inline-grid min-w-0 [overflow-wrap:anywhere]">
@@ -785,66 +819,73 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <article
-      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation"}`}
+      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "reader-surah-entry" : "cursor-pointer touch-manipulation"}`}
     >
       {longSurah ? (
-        <div
-          className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 pb-5 pt-2"
-          data-testid="surah-reading-actions"
-        >
-          <figure className="relative mb-1 h-32 w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
-            <img
-              src={QURAN_CARD_IMAGE}
-              alt=""
-              aria-hidden="true"
-              className="h-full w-full object-cover object-center opacity-75"
-              decoding="async"
-            />
-            <div className="absolute inset-x-0 bottom-0 flex justify-center pb-3" aria-hidden="true">
-              <span className="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-card/90 text-primary shadow-soft backdrop-blur-sm">
-                <BookOpen size={22} />
-              </span>
-            </div>
+        <div className="reader-surah-layout" data-testid="surah-reading-actions">
+          <div className="reader-surah-heading">
+            <h2 className="reader-surah-title" dir="auto" lang={language} data-testid="reader-zikr-title">
+              {readerZikrTitle}
+            </h2>
             <button
               type="button"
-              onClick={handleShare}
+              onClick={(event) => {
+                event.currentTarget.focus({ preventScroll: true });
+                handleShare();
+              }}
+              aria-haspopup="dialog"
               aria-label={t(language, "reader.shareCurrent")}
               data-testid="reader-surah-share-button"
-              className="absolute end-2 top-2 flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={`flex size-11 items-center justify-center rounded-xl border border-border bg-card/80 text-foreground hover:bg-muted ${ACTION_FOCUS}`}
             >
               <ShareExport size={20} aria-hidden="true" />
             </button>
-          </figure>
-          <button
-            type="button"
-            onClick={surahAudio?.onToggle ?? onPlayAudio}
-            disabled={!audioAvailable}
-            aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary/10 px-6 py-4 text-subtitle font-bold text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
-          >
-            <Volume2 size={20} />
-            {t(language, "reader.listenToSurah")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setImmersiveOpen(true)}
-            data-testid="reader-mushaf-button"
-            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 text-subtitle font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <BookOpen size={20} />
-            {t(language, "reader.readFromMushaf")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!isDone) handleZikrCompletion(idx);
-              onAdvance(idx);
-            }}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border/60 bg-card px-6 py-4 text-subtitle font-bold text-foreground transition-colors hover:bg-muted"
-          >
-            <Check size={20} />
-            {t(language, "reader.readExternally")}
-          </button>
+            {surahMeta && (
+              <p className="reader-surah-meta text-sm font-semibold text-muted-foreground">
+                <span>{t(language, `mushaf.${surahMeta.revelationType}`)}</span>
+                <span aria-hidden="true" className="text-primary">
+                  •
+                </span>
+                <span>
+                  {t(language, "mushaf.ayahCount", { count: formatNumerals(surahMeta.versesCount, language) })}
+                </span>
+              </p>
+            )}
+          </div>
+          <SurahArtwork key={surahCardArt?.name} name={surahCardArt?.name} focus={surahCardArt?.focus} />
+          <div className="reader-surah-controls" data-testid="reader-surah-controls">
+            <button
+              type="button"
+              onClick={() => setImmersiveOpen(true)}
+              data-testid="reader-mushaf-button"
+              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-primary px-4 py-2.5 text-subtitle font-bold text-primary-foreground transition-colors hover:bg-primary/90 ${ACTION_FOCUS}`}
+            >
+              <BookOpen size={20} className="shrink-0" aria-hidden="true" />
+              {t(language, "reader.readFromMushaf")}
+            </button>
+            <button
+              type="button"
+              onClick={surahAudio?.onToggle ?? onPlayAudio}
+              disabled={!audioAvailable}
+              aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
+              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl border border-border-control bg-card px-4 py-2.5 text-subtitle font-bold text-foreground transition-colors hover:bg-muted disabled:opacity-50 ${ACTION_FOCUS}`}
+            >
+              <Volume2 size={20} className="shrink-0" aria-hidden="true" />
+              {t(language, "reader.listenToSurah")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!isDone) handleZikrCompletion(idx);
+                onAdvance(idx);
+              }}
+              className={`mx-auto flex min-h-11 max-w-full items-center justify-center gap-2 rounded-full border border-border-control px-4 py-2 text-label font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${ACTION_FOCUS}`}
+            >
+              <Check size={18} className="shrink-0" aria-hidden="true" />
+              {t(language, "reader.readExternally")}
+            </button>
+          </div>
+          {azkar.length > 1 && renderSurahNavigation()}
         </div>
       ) : (
         <>
@@ -866,11 +907,11 @@ export function ReaderScreen({
             </section>
           ) : (
             <>
-              {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
-
               <div
-                className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
-                data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
+                className={isShortSurah ? "w-full max-w-[42rem]" : "contents"}
+                data-testid={isShortSurah ? "canonical-surah-passage" : undefined}
+                role={isShortSurah ? "group" : undefined}
+                aria-label={isShortSurah ? (readerZikrTitle ?? z.surahNameArabic) : undefined}
               >
                 {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none" />}
 
@@ -962,8 +1003,8 @@ export function ReaderScreen({
         aria-label={label}
         className={
           inDock
-            ? "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/60 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            : "adaptive-counter-nav devotional-secondary-action flex min-h-12 min-w-11 min-[360px]:w-[88px] shrink-0 items-center justify-center min-[360px]:justify-between gap-1 rounded-xl px-2 border border-border/60 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            ? "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/60 bg-card text-foreground shadow-sm transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "adaptive-counter-nav devotional-secondary-action flex min-h-12 min-w-11 min-[360px]:w-[88px] shrink-0 items-center justify-center min-[360px]:justify-between gap-1 rounded-xl px-2 border border-border/60 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         }
       >
         {isPrevious ? (
@@ -980,13 +1021,13 @@ export function ReaderScreen({
     );
   };
 
-  const renderSideNavigation = () => (
+  const renderSurahNavigation = () => (
     <div
-      className="pointer-events-none absolute inset-x-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-between md:flex"
+      className="reader-surah-navigation flex items-center justify-between border-t border-border/60 pt-2"
       data-testid="reader-side-navigation"
     >
-      <div className="pointer-events-auto">{renderNavigationButton("prev", false)}</div>
-      <div className="pointer-events-auto">{renderNavigationButton("next", false)}</div>
+      {renderNavigationButton("prev")}
+      {renderNavigationButton("next")}
     </div>
   );
 
@@ -1052,7 +1093,7 @@ export function ReaderScreen({
                   <button
                     type="button"
                     data-testid="routine-mode-filter"
-                    className="flex min-h-[44px] flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className={`flex min-h-[44px] flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground ${ACTION_FOCUS}`}
                   >
                     <span className="flex items-center gap-2">
                       <SlidersHorizontal size={14} className="text-muted-foreground" />
@@ -1079,7 +1120,7 @@ export function ReaderScreen({
                 type="button"
                 onClick={onRepeat}
                 data-testid="reader-repeat-collection"
-                className="interactive-elem flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary shadow-xs transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className={`interactive-elem flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary shadow-xs transition-colors hover:bg-primary/20 ${ACTION_FOCUS}`}
               >
                 <RefreshCw size={16} className="shrink-0" aria-hidden="true" />
                 <span>
@@ -1111,7 +1152,7 @@ export function ReaderScreen({
               <button
                 type="button"
                 onClick={onReset}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className={COLLECTION_MENU_ACTION}
                 aria-label={t(language, "category.resetProgress")}
                 title={t(language, "category.resetProgress")}
               >
@@ -1123,7 +1164,7 @@ export function ReaderScreen({
               type="button"
               data-testid="reader-sidebar-share"
               onClick={() => setCollectionShareOpen(true)}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={COLLECTION_MENU_ACTION}
               aria-label={t(language, "shareStoryPack.actionButtonAria")}
               title={t(language, "shareStoryPack.actionButton")}
             >
@@ -1134,7 +1175,7 @@ export function ReaderScreen({
               <button
                 type="button"
                 onClick={onPlayAllAudio}
-                className="flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-sm font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-primary"
+                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-sm font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 ${ACTION_FOCUS} dark:text-primary`}
                 aria-label={t(language, "category.playAllAudio")}
                 title={
                   audioCoverage
@@ -1244,9 +1285,7 @@ export function ReaderScreen({
         className={`min-w-0 flex-1 ${audioModeActive ? "" : "shadow-sm"}`}
       >
         <Headphones size={20} className="shrink-0" aria-hidden="true" />
-        <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-          {t(language, "reader.menuAudio")}
-        </span>
+        <span className={READER_TOOL_LABEL}>{t(language, "reader.menuAudio")}</span>
       </DevotionalAction>
     );
   };
@@ -1269,9 +1308,7 @@ export function ReaderScreen({
       className="min-w-0 flex-1 shadow-sm"
     >
       <Lightbulb size={20} aria-hidden="true" />
-      <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-        {t(language, "reader.referencesButton")}
-      </span>
+      <span className={READER_TOOL_LABEL}>{t(language, "reader.referencesButton")}</span>
     </DevotionalAction>
   );
 
@@ -1354,9 +1391,7 @@ export function ReaderScreen({
                 className="min-w-[5rem] flex-1 shadow-sm"
               >
                 <Share2 size={20} aria-hidden="true" />
-                <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-                  {t(language, "reader.shareAction")}
-                </span>
+                <span className={READER_TOOL_LABEL}>{t(language, "reader.shareAction")}</span>
               </DevotionalAction>
             </div>
           </ReaderFooterTools>
@@ -1382,6 +1417,18 @@ export function ReaderScreen({
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => {
     return (
       <ReaderOptionsContext.Provider value={{ sheet: false, close: () => {} }}>
+        {layout === "desktop" && !compactTouch && (
+          <ReaderOptionsAction
+            data-testid="reader-help-trigger"
+            onSelect={() => {
+              collectionMenuRequested.current = true;
+              setKeyboardHelpOpen(true);
+            }}
+          >
+            <Keyboard size={16} aria-hidden="true" />
+            <span>{t(language, "reader.keyboardShortcuts")}</span>
+          </ReaderOptionsAction>
+        )}
         {!canDockCollection && onSelectZikr && azkar.length > 1 && (
           <ReaderOptionsAction
             onSelect={() => {
@@ -1396,10 +1443,7 @@ export function ReaderScreen({
 
         {/* 4. Saved state and reading recovery */}
         <div>
-          <ReaderOptionsAction
-            onClick={handleToggleSaved}
-            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-          >
+          <ReaderOptionsAction onClick={handleToggleSaved} className={READER_OVERFLOW_ACTION}>
             <Bookmark
               key={String(isSaved)}
               size={16}
@@ -1417,11 +1461,22 @@ export function ReaderScreen({
                 onClick={toggleSound}
                 keepOpen
                 data-testid={`reader-counter-sound-toggle-${layout}`}
-                className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                className={READER_OVERFLOW_ACTION}
               >
                 {soundEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
                 <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
               </ReaderOptionsAction>
+              {onHapticFeedbackChange && (
+                <ReaderOptionsAction
+                  onClick={() => onHapticFeedbackChange(!hapticFeedback)}
+                  keepOpen
+                  data-testid={`reader-counter-vibration-toggle-${layout}`}
+                  className={READER_OVERFLOW_ACTION}
+                >
+                  <Smartphone size={16} aria-hidden="true" />
+                  <span>{t(language, hapticFeedback ? "counter.disableVibration" : "counter.enableVibration")}</span>
+                </ReaderOptionsAction>
+              )}
               <ReaderOptionsAction
                 onClick={handleResetCounter}
                 className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -1454,7 +1509,7 @@ export function ReaderScreen({
           <ReaderOptionsAction
             onClick={onViewAllAzkar ?? onBack}
             data-testid="reader-view-all-azkar"
-            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            className={READER_OVERFLOW_ACTION}
           >
             <List size={16} aria-hidden="true" />
             <span>{t(language, "reader.viewAllAzkar")}</span>
@@ -1585,7 +1640,7 @@ export function ReaderScreen({
               >
                 <ReaderSceneArt category={catId} />
                 <ReadingHeroToolbar
-                  title={displayCategoryName}
+                  title={readerHeaderTitle}
                   testId="reader-header-toolbar"
                   back={
                     <IconButton
@@ -1602,20 +1657,6 @@ export function ReaderScreen({
                     className="flex min-w-0 flex-wrap items-center justify-end gap-2"
                     data-testid="reader-hero-actions"
                   >
-                    <button
-                      type="button"
-                      data-testid="reader-help-trigger"
-                      aria-label={t(language, "reader.keyboardShortcuts")}
-                      title={t(language, "reader.keyboardShortcuts")}
-                      aria-expanded={keyboardHelpOpen}
-                      className={READER_WIDE_HEADER_ACTION_CLASS}
-                      onClick={(event) => {
-                        event.currentTarget.focus({ preventScroll: true });
-                        setKeyboardHelpOpen((prev) => !prev);
-                      }}
-                    >
-                      <Keyboard size={20} aria-hidden="true" />
-                    </button>
                     {renderAppearanceMenu(READER_WIDE_HEADER_ACTION_CLASS)}
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
@@ -1694,13 +1735,13 @@ export function ReaderScreen({
                   data-testid="reader-card"
                   {...surfaceProps}
                 >
-                  {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+                  {((!isShortSurah && !longSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
                     <div
                       data-testid="reader-entry-tools"
                       data-prevent-count="true"
                       className="reader-entry-tools--wide shrink-0 pt-1 pb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"
                     >
-                      {!showSurahChrome && readerZikrTitle && (
+                      {!isShortSurah && !longSurah && readerZikrTitle && (
                         <h2
                           className="max-w-full shrink-0 truncate text-start text-sm font-extrabold leading-relaxed text-foreground"
                           dir="auto"
@@ -1716,7 +1757,7 @@ export function ReaderScreen({
                           role="switch"
                           aria-checked={showDifficultWords}
                           onClick={() => setShowDifficultWords((v) => !v)}
-                          className="ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
+                          className={READER_MENU_TRIGGER}
                           aria-label={t(language, "settings.showDifficultWords")}
                           title={t(language, "settings.showDifficultWords")}
                         >
@@ -1737,9 +1778,11 @@ export function ReaderScreen({
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
-                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ${longSurah ? "px-28" : "px-4 md:px-6"} py-2 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable both-edges]`}
+                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ${longSurah ? "" : "px-4 md:px-6"} py-2 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable both-edges]`}
                       >
-                        <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-1">
+                        <div
+                          className={`mx-auto flex min-h-full w-full flex-col py-1 ${longSurah ? "" : "reading-measure"}`}
+                        >
                           <div style={dragStyle} className="flex w-full flex-1 flex-col">
                             <ReadingTextTransition
                               entryId={z.id}
@@ -1758,7 +1801,6 @@ export function ReaderScreen({
                           </div>
                         </div>
                       </div>
-                      {longSurah && renderSideNavigation()}
                     </div>
 
                     {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}
@@ -1791,7 +1833,8 @@ export function ReaderScreen({
           <>
             <div data-reading-chrome>
               <Header
-                title={displayCategoryName}
+                pageGutters={false}
+                title={readerHeaderTitle}
                 style={{ paddingInline: 12 }}
                 titleStyle={{ lineHeight: 1.2 }}
                 onBack={onBack}
@@ -1807,20 +1850,6 @@ export function ReaderScreen({
                   // a per-zikr primary. Both share the header's ghost
                   // icon-button treatment so the row reads as one set.
                   <div className="flex items-center gap-1" data-testid="reader-actions">
-                    <button
-                      type="button"
-                      data-testid="reader-help-trigger"
-                      aria-label={t(language, "reader.keyboardShortcuts")}
-                      title={t(language, "reader.keyboardShortcuts")}
-                      aria-expanded={keyboardHelpOpen}
-                      className={`${READER_HEADER_ACTION_CLASS} max-md:hidden`}
-                      onClick={(event) => {
-                        event.currentTarget.focus({ preventScroll: true });
-                        setKeyboardHelpOpen((prev) => !prev);
-                      }}
-                    >
-                      <Keyboard size={18} aria-hidden="true" />
-                    </button>
                     {renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
 
                     <DropdownMenu dir={direction}>
@@ -1876,13 +1905,13 @@ export function ReaderScreen({
               data-testid="reader-card"
               {...surfaceProps}
             >
-              {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+              {((!isShortSurah && !longSurah && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
                 <div
                   data-testid="reader-entry-tools"
                   data-prevent-count="true"
                   className="px-5 pt-2.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1"
                 >
-                  {!showSurahChrome && readerZikrTitle && (
+                  {!isShortSurah && !longSurah && readerZikrTitle && (
                     <h2
                       className="max-w-full shrink-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
                       dir="auto"
@@ -1901,7 +1930,7 @@ export function ReaderScreen({
                         e.stopPropagation();
                         setShowDifficultWords((v) => !v);
                       }}
-                      className="ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
+                      className={READER_MENU_TRIGGER}
                       aria-label={t(language, "settings.showDifficultWords")}
                       title={t(language, "settings.showDifficultWords")}
                     >
@@ -2060,20 +2089,24 @@ export function ReaderScreen({
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/95 px-4 py-2.5 shadow-lg backdrop-blur-md text-foreground transition-all duration-200"
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/95 px-4 py-2.5 shadow-lg backdrop-blur-md text-foreground fade-in transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-standard"
           dir={direction}
         >
           <span className="text-sm font-medium">{t(language, "reader.resetCounter")}</span>
           <button
             type="button"
             onClick={handleUndoReset}
-            className="interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-sm font-bold text-primary transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+            className={`interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-sm font-bold text-primary transition-colors ${ACTION_FOCUS} cursor-pointer`}
           >
             {t(language, "common.undo")}
           </button>
         </div>
       )}
       <CounterKeyboardHelp
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          requestAnimationFrame(() => readerMenuRef.current?.focus({ preventScroll: true }));
+        }}
         compact
         language={language}
         direction={direction}

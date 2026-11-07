@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 /**
  * Automated evidence for rows of the Manual release record in
  * `docs/QUALITY_CHECKLIST.md` that do not actually require a human.
@@ -188,17 +189,16 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
   test(`mobile headings: ${viewport.name} keeps Progress titles readable without clipping`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await seedAndOpen(page);
-    await page.getByTestId("nav-progress").click();
+    await openProgress(page);
 
-    // The page title is the shared header h1, which now wraps rather than
-    // truncates. Day/Week stay on one line; the descriptive Month/Year chart
-    // heading may use two complete lines at narrow widths.
-    await expectUnclippedHeading(
-      page.getByRole("heading", { name: "Progress", exact: true, level: 1 }),
-      `${viewport.name} page title`,
-    );
+    // Progress uses the standard visible title with one semantic h1.
+    // Content headings still need full readable geometry.
+    const title = page.getByRole("heading", { name: "Progress", exact: true, level: 1 });
+    await expect(title).toHaveCount(1);
+    await expect(title).toBeVisible();
+    await expect(page.getByTestId("shared-screen-header")).toHaveCount(1);
 
-    const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
+    const period = page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true });
     for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
       await chooseProgressOption(period, value);
       const heading = page.getByTestId("progress-primary-heading");
@@ -212,9 +212,9 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
 test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable without clipping", async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 924 });
   await seedAndOpen(page, { language: "ar" });
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
 
-  const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
+  const period = page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true });
   for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
     await chooseProgressOption(period, value);
     const heading = page.getByTestId("progress-primary-heading");
@@ -450,7 +450,16 @@ test("keyboard: the core flow is reachable with a visible focus indicator and no
         style.boxShadow !== "none" || Boolean(visualFocusStyle && visualFocusStyle.boxShadow !== "none");
       return {
         key: `${el.tagName}:${el.getAttribute("data-testid") ?? el.textContent?.trim().slice(0, 24) ?? ""}`,
-        visible: hasOutline || hasShadowRing,
+        visible:
+          hasOutline ||
+          hasShadowRing ||
+          ["::before", "::after"].some((pseudo) => {
+            const paint = getComputedStyle(el, pseudo);
+            return (
+              paint.content !== "none" &&
+              ((paint.outlineStyle !== "none" && parseFloat(paint.outlineWidth) > 0) || paint.boxShadow !== "none")
+            );
+          }),
         unobscured:
           rect.top >= 0 &&
           rect.bottom <= window.innerHeight &&

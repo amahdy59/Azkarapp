@@ -4,6 +4,7 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import type { AppLanguage } from "../types";
 import { formatNumerals, formatPercentage } from "../formatting";
 import { progressText } from "../i18n/progressInsights";
+import { dashboardText } from "../i18n/progressDashboard";
 import { getTimelineChange, type InsightPeriod, type InsightTimelinePoint } from "../progressInsights";
 
 export interface RecordingTimelineSeries {
@@ -27,6 +28,7 @@ export function RecordingTimeline({
   valueKind = "rate",
   countUnit,
   bucketDescription,
+  chartDisplay = "line",
 }: {
   series: readonly RecordingTimelineSeries[];
   language: AppLanguage;
@@ -39,6 +41,7 @@ export function RecordingTimeline({
   valueKind?: "rate" | "count";
   countUnit?: string;
   bucketDescription?: string;
+  chartDisplay?: "line" | "columns";
 }) {
   const id = useId();
   const rtl = language === "ar";
@@ -46,6 +49,7 @@ export function RecordingTimeline({
   const rangeRef = useRef<HTMLInputElement>(null);
   const [seriesId, setSeriesId] = useState(series[0]?.id ?? "");
   const [pointIndex, setPointIndex] = useState<number | null>(null);
+  const [tableOpen, setTableOpen] = useState(false);
   const active = series.find((item) => item.id === seriesId) ?? series[0];
   const points = active?.points ?? [];
   const selectedIndex = Math.min(pointIndex ?? points.length - 1, points.length - 1);
@@ -75,7 +79,7 @@ export function RecordingTimeline({
           ? point.recorded === points[0]!.recorded
           : point.recorded * points[0]!.possible === points[0]!.recorded * point.possible),
     );
-  const plotHeight = flat ? "7rem" : "11rem";
+  const plotHeight = flat ? "7rem" : points.length === 1 ? "9rem" : "13rem";
   const maximum =
     valueKind === "count" ? Math.max(4, Math.ceil(Math.max(0, ...points.map((point) => point.recorded)) / 4) * 4) : 100;
   const x = (index: number) => {
@@ -169,6 +173,12 @@ export function RecordingTimeline({
                     {title} · {active?.label}
                   </title>
                   <desc id={`${id}-chart-desc`}>{points.map(pointText).join("; ")}</desc>
+                  <defs>
+                    <linearGradient id={`${id}-area`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.24" />
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.02" />
+                    </linearGradient>
+                  </defs>
                   {[8, 96, 184].map((height, index) => (
                     <line
                       key={height}
@@ -182,19 +192,43 @@ export function RecordingTimeline({
                       vectorEffect="non-scaling-stroke"
                     />
                   ))}
-                  {segments
-                    .filter((segment) => segment.length > 1)
-                    .map((segment) => (
-                      <polyline
-                        key={segment[0]!.index}
-                        data-testid="recording-time-line"
-                        points={segment.map(({ point, index }) => `${x(index)},${y(point)}`).join(" ")}
-                        stroke="var(--primary)"
-                        fill="none"
-                        strokeWidth="2"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    ))}
+                  {chartDisplay === "line" &&
+                    segments
+                      .filter((segment) => segment.length > 1)
+                      .map((segment) => (
+                        <g key={segment[0]!.index}>
+                          <polygon
+                            aria-hidden="true"
+                            points={`${x(segment[0]!.index)},184 ${segment.map(({ point, index }) => `${x(index)},${y(point)}`).join(" ")} ${x(segment.at(-1)!.index)},184`}
+                            fill={`url(#${id}-area)`}
+                          />
+                          <polyline
+                            data-testid="recording-time-line"
+                            points={segment.map(({ point, index }) => `${x(index)},${y(point)}`).join(" ")}
+                            stroke="var(--primary)"
+                            fill="none"
+                            strokeWidth="3"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                        </g>
+                      ))}
+                  {chartDisplay === "columns" &&
+                    points.map(
+                      (point, index) =>
+                        !missing(point) && (
+                          <rect
+                            key={point.startKey}
+                            data-testid="recording-time-column"
+                            x={x(index) - Math.min(12, 180 / points.length) / 2}
+                            y={y(point)}
+                            width={Math.min(12, 180 / points.length)}
+                            height={Math.max(point.recorded > 0 ? 1 : 0, 184 - y(point))}
+                            rx="2"
+                            fill="var(--primary)"
+                            opacity={index === selectedIndex ? 1 : 0.7}
+                          />
+                        ),
+                    )}
                   <line
                     x1={x(selectedIndex)}
                     x2={x(selectedIndex)}
@@ -216,14 +250,32 @@ export function RecordingTimeline({
                         style={{
                           left: `${x(index) / 5}%`,
                           top: `${y(point) / 1.92}%`,
-                          width: index === selectedIndex ? 10 : 6,
-                          height: index === selectedIndex ? 10 : 6,
+                          width: index === selectedIndex ? 14 : 11,
+                          height: index === selectedIndex ? 14 : 11,
                           transform: "translate(-50%, -50%)",
                         }}
                       />
                     ),
                 )}
 
+                {points.length <= 7 &&
+                  points.map(
+                    (point, index) =>
+                      !missing(point) && (
+                        <span
+                          key={`label-${point.startKey}`}
+                          aria-hidden="true"
+                          className="recording-point-label"
+                          style={{
+                            left: `${x(index) / 5}%`,
+                            top: `${y(point) / 1.92}%`,
+                            transform: `translate(${index === 0 ? (rtl ? "-100%" : "0") : index === points.length - 1 ? (rtl ? "0" : "-100%") : "-50%"}, ${y(point) < 40 ? "60%" : "-160%"})`,
+                          }}
+                        >
+                          {value(point)}
+                        </span>
+                      ),
+                  )}
                 {points.length > 1 && (
                   <button
                     type="button"
@@ -329,6 +381,83 @@ export function RecordingTimeline({
         <p className="text-sm leading-relaxed text-muted-foreground">
           {progressText(language, "insights.noCompleteDays")}
         </p>
+      )}
+      {points.length > 0 && (
+        <details onToggle={(event) => setTableOpen(event.currentTarget.open)}>
+          <summary className="progress-disclosure progress-focus">{dashboardText(language, "chartTable")}</summary>
+          {tableOpen && (
+            <div className="space-y-2 pb-3">
+              <p id={`${id}-table-help`} className="progress-help">
+                {dashboardText(language, "chartTableHelp")}
+              </p>
+              <div
+                className="overflow-x-auto rounded-lg border border-border progress-focus"
+                role="region"
+                aria-label={dashboardText(language, "chartTable")}
+                // Native horizontal scrolling remains available at enlarged text.
+                // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                tabIndex={0}
+              >
+                <table className="w-full text-start text-sm" aria-describedby={`${id}-table-help`}>
+                  <caption className="sr-only">
+                    {title} · {dashboardText(language, "chartTable")}
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col" className="p-3 text-start">
+                        {dashboardText(language, "date")}
+                      </th>
+                      <th scope="col" className="p-3 text-start">
+                        {valueKind === "count" && countUnit ? countUnit : dashboardText(language, "recorded")}
+                      </th>
+                      {valueKind === "rate" && (
+                        <>
+                          <th scope="col" className="p-3 text-start">
+                            {dashboardText(language, "opportunities")}
+                          </th>
+                          <th scope="col" className="p-3 text-start">
+                            {dashboardText(language, "recordingRate")}
+                          </th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {points.map((point) => (
+                      <tr key={point.startKey}>
+                        <th scope="row" className="p-3 text-start font-semibold">
+                          {point.label}
+                          {point.partial && (
+                            <span className="block text-xs font-normal">
+                              {progressText(language, "insights.partialBucket")}
+                            </span>
+                          )}
+                        </th>
+                        <td className="p-3 tabular-nums">
+                          <bdi>{formatNumerals(point.recorded, language)}</bdi>
+                        </td>
+                        {valueKind === "rate" && (
+                          <>
+                            <td className="p-3 tabular-nums">
+                              <bdi>
+                                {point.possible
+                                  ? formatNumerals(point.possible, language)
+                                  : dashboardText(language, "unavailable")}
+                              </bdi>
+                            </td>
+                            <td className="p-3 tabular-nums">
+                              <bdi>{missing(point) ? dashboardText(language, "unavailable") : value(point)}</bdi>
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </details>
       )}
       <details className="text-xs text-muted-foreground">
         <summary className="min-h-11 cursor-pointer py-3 font-semibold progress-focus">

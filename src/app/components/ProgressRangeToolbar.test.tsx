@@ -1,155 +1,97 @@
 import { chooseProgressOption } from "../../test/progressSelect";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ProgressRangeToolbar } from "./ProgressRangeToolbar";
-afterEach(() => vi.unstubAllGlobals());
-
-function setup() {
+function setup(period: "month" | "custom" = "month") {
   const props = {
-    period: "month" as const,
+    period,
     range: { startKey: "2026-10-01", endKey: "2026-10-31" },
     today: "2026-10-20",
     language: "en" as const,
     calendar: "gregorian" as const,
     onPeriod: vi.fn(),
-    onCalendar: vi.fn(),
     onCustom: vi.fn(),
-    onMonth: vi.fn(),
-    onPrevious: vi.fn(),
-    onNext: vi.fn(),
-    onToday: vi.fn(),
-    nextDisabled: true,
   };
   render(<ProgressRangeToolbar {...props} />);
   return props;
 }
-const edit = () => chooseProgressOption(screen.getByRole("combobox", { name: "Period" }), "custom");
-const setDate = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
-
+async function edit() {
+  await chooseProgressOption(screen.getByRole("combobox", { name: "Date range" }), "custom");
+  await screen.findByLabelText("Start date");
+}
+const date = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
 describe("ProgressRangeToolbar", () => {
-  it("opens the shared date action, applies one day and restores its focus", () => {
+  it("shows one date-range dropdown without local calendar or navigation controls", () => {
+    setup();
+    expect(screen.getAllByRole("combobox")).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: "Today" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Show dates in")).not.toBeInTheDocument();
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("Oct");
+  });
+  it("applies a preset directly", async () => {
     const props = setup();
-    const trigger = screen.getByRole("button", { name: /Choose dates:/ });
-    fireEvent.click(trigger);
-    fireEvent.click(screen.getByRole("radio", { name: "One date" }));
-    setDate("Gregorian date", "2026-10-03");
-    expect(screen.queryByLabelText("End date")).not.toBeInTheDocument();
+    await chooseProgressOption(screen.getByRole("combobox"), "week");
+    expect(props.onPeriod).toHaveBeenCalledExactlyOnceWith("week");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+  it("offers Edit dates for an applied custom range without applying a draft", async () => {
+    const props = setup("custom");
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown" });
+    const option = await screen.findByRole("option", { name: "Edit dates" });
+    expect(option).toHaveAttribute("data-progress-value", "editDates");
+    fireEvent.click(option);
+    await screen.findByLabelText("Start date");
+    expect(screen.getByLabelText("Start date")).toHaveValue("2026-10-01");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(props.onCustom).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByRole("combobox")).toHaveFocus());
+  });
+  it("clips the draft end to today without applying it", async () => {
+    const props = setup();
+    await edit();
+    expect(screen.getByLabelText("End date")).toHaveValue("2026-10-20");
+    expect(props.onCustom).not.toHaveBeenCalled();
+  });
+  it("applies one day through equal range boundaries and restores focus", async () => {
+    const props = setup();
+    await edit();
+    date("Start date", "2026-10-03");
+    date("End date", "2026-10-03");
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(props.onCustom).toHaveBeenCalledExactlyOnceWith({ startKey: "2026-10-03", endKey: "2026-10-03" });
-    expect(trigger).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole("combobox")).toHaveFocus());
   });
-  it("validates a chosen month and applies it through the calendar-month boundary", () => {
+  it("rejects reversed dates and preserves the selection", async () => {
     const props = setup();
-    fireEvent.click(screen.getByRole("button", { name: /Choose dates:/ }));
-    fireEvent.click(screen.getByRole("radio", { name: "Month" }));
-    setDate("Gregorian month", "2026-11");
+    await edit();
+    date("Start date", "2026-10-09");
+    date("End date", "2026-10-02");
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("End date");
+    expect(props.onCustom).not.toHaveBeenCalled();
+  });
+  it("rejects future dates", async () => {
+    const props = setup();
+    await edit();
+    date("End date", "2026-10-21");
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(screen.getByRole("alert")).toHaveTextContent("future");
-    expect(props.onMonth).not.toHaveBeenCalled();
-    setDate("Gregorian month", "2024-02");
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(props.onMonth).toHaveBeenCalledExactlyOnceWith("2024-02");
     expect(props.onCustom).not.toHaveBeenCalled();
   });
-  it("collapses completed phone presets but keeps Custom drafts open across calendar changes", async () => {
-    vi.stubGlobal("innerWidth", 390);
+  it("cancels drafts without applying them", async () => {
     const props = setup();
-    const disclosure = screen.getByTestId("progress-range-disclosure");
-    const summary = disclosure.querySelector("summary")!;
-    expect(disclosure).not.toHaveAttribute("open");
-    fireEvent.click(summary);
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Period" }), "week");
-    expect(props.onPeriod).toHaveBeenCalledWith("week");
-    expect(disclosure).not.toHaveAttribute("open");
-    expect(summary).toHaveFocus();
-    fireEvent.click(summary);
     await edit();
-    setDate("Start date", "2026-10-09");
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Calendar", exact: true }), "hijri");
-    expect(disclosure).toHaveAttribute("open");
-    expect(screen.getByLabelText("Start date")).toHaveValue("2026-10-09");
-    expect(props.onCustom).not.toHaveBeenCalled();
+    date("Start date", "2026-10-09");
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(disclosure).not.toHaveAttribute("open");
-    await waitFor(() => expect(screen.getByRole("button", { name: /Choose dates:/ })).toHaveFocus());
+    expect(props.onCustom).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByRole("combobox")).toHaveFocus());
   });
-  it("keeps drafts unapplied and clips the default Custom end to today", async () => {
+  it("rejects missing dates", async () => {
     const props = setup();
     await edit();
-    expect(screen.getByLabelText("Start date")).toHaveValue("2026-10-01");
-    expect(screen.getByLabelText("End date")).toHaveValue("2026-10-20");
-    setDate("Start date", "2026-10-08");
-    expect(props.onCustom).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(screen.queryByLabelText("Start date")).not.toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: "Period" })).toHaveFocus();
-    expect(props.onCustom).not.toHaveBeenCalled();
-  });
-  it("announces reversed and future errors, then applies only valid inclusive dates", async () => {
-    const props = setup();
-    await edit();
-    setDate("Start date", "2026-10-19");
-    setDate("End date", "2026-10-18");
+    date("Start date", "");
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(screen.getByRole("alert")).toHaveTextContent("End date must be on or after start date");
-    expect(screen.getByLabelText("End date")).toHaveAttribute("aria-invalid", "true");
-    setDate("End date", "2026-10-21");
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(screen.getByRole("alert")).toHaveTextContent("future days");
+    expect(screen.getByRole("alert")).toHaveTextContent("valid dates");
     expect(props.onCustom).not.toHaveBeenCalled();
-    setDate("End date", "2026-10-20");
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(props.onCustom).toHaveBeenCalledExactlyOnceWith({ startKey: "2026-10-19", endKey: "2026-10-20" });
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: "Period" })).toHaveFocus();
-  });
-  it("rejects missing dates and preserves the applied range while editing", async () => {
-    const props = setup();
-    const before = screen.getByRole("status").textContent;
-    await edit();
-    setDate("Start date", "");
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(screen.getByRole("alert")).toHaveTextContent("Enter two valid dates");
-    expect(screen.getByRole("status").textContent).toBe(before);
-    expect(props.onCustom).not.toHaveBeenCalled();
-  });
-  it("keeps navigation and calendar changes explicit with a disabled future action", async () => {
-    const props = setup();
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Period" }), "week");
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Show dates in" }), "hijri");
-    fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
-    fireEvent.click(screen.getByRole("button", { name: "Next period" }));
-    fireEvent.click(screen.getByRole("button", { name: "Today" }));
-    expect(props.onPeriod).toHaveBeenCalledWith("week");
-    expect(props.onCalendar).toHaveBeenCalledWith("hijri");
-    expect(props.onPrevious).toHaveBeenCalledOnce();
-    expect(props.onToday).toHaveBeenCalledOnce();
-    expect(props.onNext).not.toHaveBeenCalled();
-  });
-  it("allows an applied Custom range to be edited without losing it on cancel", () => {
-    const onCustom = vi.fn();
-    render(
-      <ProgressRangeToolbar
-        period="custom"
-        range={{ startKey: "2026-10-02", endKey: "2026-10-04" }}
-        today="2026-10-20"
-        language="ar"
-        calendar="hijri"
-        onPeriod={vi.fn()}
-        onCalendar={vi.fn()}
-        onCustom={onCustom}
-        onPrevious={vi.fn()}
-        onNext={vi.fn()}
-        onToday={vi.fn()}
-        nextDisabled={false}
-      />,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "تعديل التواريخ" }));
-    expect(screen.getByLabelText("تاريخ البداية")).toHaveValue("2026-10-02");
-    expect(screen.getByText(/أدخل التواريخ بالتقويم الميلادي/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "إلغاء" }));
-    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "custom");
-    expect(onCustom).not.toHaveBeenCalled();
   });
 });

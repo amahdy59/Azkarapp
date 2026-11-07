@@ -94,11 +94,28 @@ describe("dated prayer interval", () => {
     expect(dhuhr.isOpenable).toBe(true);
     const fajr = models.find((model) => model.prayer === "fajr")!;
     expect(fajr.state).toBe("next");
-    expect(fajr.countdown).toMatch(/^\d\d:\d\d left$/);
-    expect(fajr.remainingPercent).toBeGreaterThan(0);
-    const timeline = getPrayerTimeline(new Date("2026-10-14T23:00:00+03:00"), DEFAULT_LOCATION);
-    expect(fajr.countdownInterval).toEqual({ startsAt: timeline.current.at, endsAt: timeline.next.at });
-    expect(models.filter((model) => model.countdownInterval)).toHaveLength(1);
+    expect(fajr.countdown).toMatch(/^\d+h \d+m remaining$/);
+    expect(models.filter((model) => model.countdown)).toHaveLength(1);
+  });
+
+  it.each([
+    ["en", "Under 1 min"],
+    ["ar", "أقل من دقيقة"],
+  ] as const)("labels the final minute in %s before the dated prayer boundary", (language, label) => {
+    const { next } = getPrayerTimeline(new Date("2026-10-14T23:00:00+03:00"), DEFAULT_LOCATION);
+    const nextModel = (now: number) =>
+      buildPrayerCardModels(new Date(now), language, DEFAULT_LOCATION).find((model) => model.prayer === next.prayer);
+    expect(nextModel(next.at - 59_000)?.countdown).toBe(label);
+    expect(nextModel(next.at - 60_000)?.countdown).not.toBe(label);
+    expect(nextModel(next.at)?.state).toBe("current");
+  });
+
+  it("keeps a minute countdown through the same hour", () => {
+    const { next } = getPrayerTimeline(new Date("2026-10-14T23:00:00+03:00"), DEFAULT_LOCATION);
+    const nextModel = buildPrayerCardModels(new Date(next.at - 150_000), "en", DEFAULT_LOCATION).find(
+      (model) => model.prayer === next.prayer,
+    );
+    expect(nextModel?.countdown).toBe("2m remaining");
   });
 
   it("recovers invalid timezone input without losing the timing overview", () => {

@@ -1,3 +1,4 @@
+import { openMasbahaSettings } from "./helpers/masbaha-settings";
 import { expect, test } from "@playwright/test";
 import { t } from "../src/app/i18n";
 
@@ -38,8 +39,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("theme-option-midnight")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.goto("/#/counter");
-      await page.getByTestId("counter-target-filter").click();
-      await page.getByRole("menuitem", { name: t(language, "counter.custom"), exact: true }).click();
+      if (width < 600) {
+        const sheet = await openMasbahaSettings(page);
+        await sheet.getByRole("radio", { name: t(language, "counter.custom"), exact: true }).check();
+      } else {
+        await page.getByTestId("counter-target-filter").click();
+        await page.getByRole("menuitem", { name: t(language, "counter.custom"), exact: true }).click();
+      }
       await expect(page.getByRole("dialog")).toBeVisible();
       await expect(page.getByRole("dialog")).toHaveCSS("animation-name", "none");
       const ordinaryButtons = page.locator('[data-slot="button"]');

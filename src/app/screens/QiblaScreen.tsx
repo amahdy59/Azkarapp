@@ -327,7 +327,7 @@ export function QiblaScreen({
           onBack={onBack}
           language={language}
         />
-        <div className="grid w-full content-start items-start gap-4 px-page py-4 lg:grid-cols-[minmax(20rem,1fr)_minmax(16rem,0.7fr)]">
+        <div className="grid w-full min-w-0 grid-cols-1 content-start items-start gap-4 px-page py-4 [overflow-wrap:anywhere] lg:grid-cols-[minmax(20rem,1fr)_minmax(16rem,0.7fr)]">
           <section
             className="flex flex-col items-center rounded-3xl border border-border/50 bg-card p-4 shadow-raised sm:p-6"
             aria-labelledby="qibla-bearing"
@@ -409,7 +409,7 @@ export function QiblaScreen({
             )}
           </section>
 
-          <aside className="flex flex-col gap-3">
+          <aside className="flex min-w-0 flex-col gap-4">
             <section className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
               <div className="flex items-start gap-3">
                 <span

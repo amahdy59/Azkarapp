@@ -11,6 +11,11 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/content/quranReadiness.test.ts",
+  "src/app/native/liveUpdate.consent.test.ts",
+  // Vaul/Radix focus-scope state must not carry across unrelated overlay suites.
+  "src/app/components/ResponsiveFilters.test.tsx",
+  "src/app/progressExport.test.ts",
   "src/app/share/curatedRoutineCards.test.ts",
   "src/app/content/reminderReadings.test.ts",
   "src/app/components/PrayerTrackerStats.test.tsx",
@@ -19,6 +24,7 @@ export const ISOLATED_SUITES = [
   "src/app/components/AppSceneBackground.test.tsx",
   "src/app/share/quickRoutineShare.test.ts",
   "src/app/native/reminders.test.ts",
+  "src/app/screens/settings/NotificationsPanel.native.test.tsx",
   "src/app/native/saveFile.test.ts",
   "src/app/hooks/useForegroundReminders.lifecycle.test.ts",
   "src/app/screens/ProgressScreen.periodNavigation.test.tsx",

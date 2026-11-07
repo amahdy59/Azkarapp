@@ -1,7 +1,7 @@
+import { checkMasbahaSettings } from "./helpers/masbaha-settings";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
-import { AUTHENTIC_AZKAR_COLLECTION } from "../src/app/content/authenticAzkar";
 
 for (const language of ["ar", "en"] as const) {
   for (const route of ["/counter", "/friday/salawat"]) {
@@ -61,10 +61,14 @@ for (const language of ["ar", "en"] as const) {
         path: info.outputPath(`${language}-${route === "/counter" ? "masbaha" : "salawat"}-icons.png`),
       });
 
-      const trigger = page.getByTestId(route === "/counter" ? "counter-zikr-filter" : "salawat-formula-filter");
+      const trigger = page.getByTestId("salawat-formula-filter");
       for (const enlarged of [false, true]) {
         await page.setViewportSize({ width: enlarged ? 320 : 390, height: 844 });
         if (enlarged) await page.locator("html").evaluate((root) => (root.style.fontSize = "200%"));
+        if (route === "/counter") {
+          await checkMasbahaSettings(page, language);
+          continue;
+        }
         await trigger.click();
         const menu = page.getByRole("menu");
         await expect(menu).toBeVisible();
@@ -77,11 +81,13 @@ for (const language of ["ar", "en"] as const) {
           )
           .toBe(true);
         expect(await menu.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
-        expect(
-          await menu
-            .getByRole("menuitemradio")
-            .evaluateAll((nodes) => nodes.every((node) => node.getBoundingClientRect().height >= 64)),
-        ).toBe(true);
+        await expect
+          .poll(() =>
+            menu
+              .getByRole("menuitemradio")
+              .evaluateAll((nodes) => nodes.every((node) => node.getBoundingClientRect().height >= 64)),
+          )
+          .toBe(true);
         expect(
           await menu.evaluate(
             (node) => node.hasAttribute("data-dropdown-surface") && node.closest(".app-shell") === null,
@@ -101,12 +107,6 @@ for (const language of ["ar", "en"] as const) {
             );
           }),
         ).toBe(true);
-        if (route === "/counter") {
-          const item = AUTHENTIC_AZKAR_COLLECTION[2]!;
-          const option = page.getByTestId(`zikr-option-${item.id}`);
-          await expect(option).toContainText(language === "ar" ? item.textAr : item.textEn);
-          await expect(option.locator(".devotional-picker-preview")).toHaveCSS("-webkit-line-clamp", "2");
-        }
         await page.screenshot({
           path: info.outputPath(
             `${language}-${route === "/counter" ? "masbaha" : "salawat"}-menu-${enlarged ? "200" : "100"}.png`,
@@ -142,6 +142,9 @@ for (const language of ["ar", "en"] as const) {
       for (const action of await actions.all()) {
         await expect(action.locator(".reader-tool-label")).toBeVisible();
         await action.focus();
+        await action.evaluate((node) =>
+          node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }),
+        );
         await expect(action).toBeInViewport({ ratio: 1 });
         expect(await action.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
       }

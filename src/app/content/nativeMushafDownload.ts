@@ -99,24 +99,32 @@ async function fetchNativeAudioStream(url: string, signal?: AbortSignal) {
         const responseContentType = headerValue(headers, "content-type");
         if (responseContentType) contentType = responseContentType;
         const contentRange = headerValue(headers, "content-range");
-        const rangeMatch = contentRange?.match(/bytes\s+(\d+)-(\d+)\/(\d+)/i);
-        if (rangeMatch) {
+        const bytes = toBytes(result.data);
+        if (!bytes.byteLength || bytes.byteLength > AUDIO_RANGE_BYTES)
+          throw new DOMException("Invalid audio range size", "DataError");
+        if (result.status === 206) {
+          const rangeMatch = contentRange?.match(/^bytes\s+(\d+)-(\d+)\/(\d+)$/i);
+          if (!rangeMatch) throw new DOMException("Missing Content-Range", "DataError");
           const rangeStart = Number(rangeMatch[1]);
           const rangeEnd = Number(rangeMatch[2]);
           const expectedTotal = Number(rangeMatch[3]);
-          if (totalBytes !== undefined && totalBytes !== expectedTotal) throw new Error("Audio resource changed");
+          if (totalBytes !== undefined && totalBytes !== expectedTotal)
+            throw new DOMException("Audio resource changed", "DataError");
+          if (
+            !Number.isSafeInteger(expectedTotal) ||
+            rangeStart !== nextByte ||
+            rangeEnd !== rangeStart + bytes.byteLength - 1 ||
+            rangeEnd >= expectedTotal
+          )
+            throw new DOMException("Invalid audio range", "DataError");
           totalBytes = expectedTotal;
-          if (rangeStart !== nextByte || rangeEnd < rangeStart) throw new Error("Invalid audio range");
-        } else if (result.status === 200) {
-          const length = Number(headerValue(headers, "content-length"));
-          if (!Number.isFinite(length) || nextByte !== 0) throw new Error("Audio ranges unsupported");
-          totalBytes = length;
         } else {
-          throw new Error("Missing Content-Range");
+          const length = Number(headerValue(headers, "content-length"));
+          if (length !== bytes.byteLength || nextByte !== 0)
+            throw new DOMException("Audio ranges unsupported", "DataError");
+          totalBytes = length;
         }
 
-        const bytes = toBytes(result.data);
-        if (!bytes.byteLength || bytes.byteLength > AUDIO_RANGE_BYTES) throw new Error("Invalid audio range size");
         nextByte += bytes.byteLength;
         controller.enqueue(bytes);
         if (nextByte >= totalBytes) {
@@ -162,9 +170,8 @@ export async function fetchNativeBinaryResource(
 
   const bytes = toBytes(result.data);
   const contentType = result.headers["content-type"] ?? result.headers["Content-Type"] ?? "font/woff2";
-  const body = new Uint8Array(bytes.byteLength);
-  body.set(bytes);
-  return new Response(body.buffer as ArrayBuffer, {
+  const body = bytes.buffer instanceof ArrayBuffer ? (bytes as Uint8Array<ArrayBuffer>) : new Uint8Array(bytes);
+  return new Response(body, {
     status: result.status,
     headers: { "content-type": contentType },
   });

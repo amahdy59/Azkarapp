@@ -1,5 +1,375 @@
 [
   {
+    "release": "2026-11-07.4",
+    "ar": [
+      "يبقى التاريخان ظاهرين عند تمرير الرئيسية، مع خط أكبر للتاريخ الثانوي.",
+      "يظهر الوقت المتبقي للصلاة القادمة بالساعات والدقائق في سطر واحد، مع مساحة أوسع عند تكبير النص.",
+      "احفظ صفحة المصحف بجانب اسم السورة، وادخل وضع التركيز من الزر أسفل الشاشة على الهاتف.",
+      "تصفّح فهرس المصحف داخل مساحة القراءة مع بقاء شريطي التنقل متاحين."
+    ],
+    "en": [
+      "Both dates remain visible as you scroll Home, with larger text for the secondary date.",
+      "The time until the next prayer stays on one line in hours and minutes, with more room at enlarged text sizes.",
+      "On phones, bookmark beside the surah selector and enter Focus using the bottom button.",
+      "Browse the Mushaf index inside the reading area while both navigation bars stay accessible."
+    ]
+  },
+  {
+    "release": "2026-11-07",
+    "ar": [
+      "تحتاج الصفحة الرئيسية إلى بيانات أقل عند فتحها أول مرة، وتبقى سورة البقرة متاحة دون اتصال بعد تثبيت التطبيق.",
+      "عند تعديل موعد تذكير أو تغيير لغة التطبيق على أندرويد، يتحدّث التذكير المعني وتبقى بقية المواعيد كما هي.",
+      "يمكنك إعادة محاولة تنزيل المصحف إذا توقف، من دون تنزيل الصفحات والخطوط التي سبق التحقّق منها مجددًا."
+    ],
+    "en": [
+      "Home uses less data on a first visit, and you can still read Al-Baqarah offline after installing the app.",
+      "On Android, changing a reminder time or the app language updates the affected reminders and keeps the rest on schedule.",
+      "Retry a stalled Mushaf download and pick up from the pages and fonts the app already verified."
+    ]
+  },
+  {
+    "release": "2026-11-06.6",
+    "ar": [
+      "يبدأ تحميل الصفحة الرئيسية مبكرًا، وتظل سورة البقرة متاحة للقراءة دون اتصال بعد تثبيت التطبيق.",
+      "تتحدّث تذكيرات أندرويد عند تغيير مواعيدها أو لغتها، وتبقى التذكيرات الأخرى في مواعيدها.",
+      "إذا تعثّر تنزيل المصحف، يمكنك المحاولة مجددًا مع الاحتفاظ بالملفات التي اكتمل تنزيلها والتحقّق منها."
+    ],
+    "en": [
+      "Home starts loading earlier. Al-Baqarah remains available offline after installation.",
+      "Android reminders update when you change their times or language, while other reminders keep their schedules.",
+      "If a Mushaf download stalls, retry and keep the files that already downloaded and passed verification."
+    ]
+  },
+  {
+    "release": "2026-11-06.5",
+    "ar": [
+      "تملأ صور الكهف والسجدة والملك عرض الهاتف، ويظهر اسم السورة وتفاصيلها بمسافات أوضح على الشاشات الصغيرة والكبيرة.",
+      "تابع الآيات مع شريط تشغيل ثابت ومساحة أوسع للقراءة، واعرض الترجمة بجانب النص على الشاشة الواسعة.",
+      "تُعرض صور الجمعة والتقدّم بأحجام مناسبة للشاشة، وتظهر نسخة مدمجة من صورة السورة إذا تعذّر تحميل الصورة الكبيرة."
+    ],
+    "en": [
+      "See edge-to-edge artwork on phones for Al-Kahf, As-Sajdah and Al-Mulk, with more space between the title and details.",
+      "Follow the verses with a stationary playback dock and more reading room. On wide screens, keep the translation beside the Arabic.",
+      "Friday and Progress photos use screen-appropriate sizes, and surah artwork falls back to a compact offline copy when the large cover is unavailable."
+    ]
+  },
+  {
+    "release": "2026-11-06.3",
+    "ar": [
+      "تظل الصلاة القادمة أمامك عند التمرير في الرئيسية، وتستفيد من مساحة أكبر لورد اليوم والتقويم.",
+      "تتكيّف صور السور مع شاشتك، ويمكنك فتح المصحف مباشرةً ومتابعة الكلمة المتلوّة بتظليل هادئ، وتبقى الصفحة ثابتة عند توقّف القارئ لالتقاط أنفاسه.",
+      "تفرّق صفحات الورد والتقدّم بين عدم تسجيل صفحات وتحقيق الهدف أو تجاوزه.",
+      "عاين التذكير التالي وخيارات التنبيه، وتعرّف على الفريق وروابط المساعدة من صفحة «حول» بشعار وَذَكِّرْ الجديد."
+    ],
+    "en": [
+      "Keep the next prayer in view while scrolling Home, with more room for your daily routines and Progress calendar.",
+      "See surah artwork sized for your screen, open the Mushaf directly, and follow a softer word highlight while the page stays in place during pauses.",
+      "Quran Wird and Progress distinguish an empty reading log from reaching or passing your goal.",
+      "Preview your next reminder and review delivery options. Find team and help links in About alongside the new wa-zaker logo."
+    ]
+  },
+  {
+    "release": "2026-11-06.2",
+    "ar": [
+      "تظل الصلاة القادمة أمامك عند التمرير في الرئيسية، وتترك البطاقات مساحة أكبر لورد اليوم وتقويم التسجيلات.",
+      "تابع الكلمة المتلوّة بتظليل هادئ في المصحف، مع ثبات أشرطة القراءة أثناء تقليب الصفحات والتكبير.",
+      "يمكنك معاينة رسالة التذكير التالي قبل وصولها، وتفعيل تذكير الجمعة بالصلاة على النبي أو تذكيرات الاستعداد للصيام.",
+      "يظهر شعار الهلال والنجمة في وَذَكِّرْ، وتجد في صفحة «حول» معلومات الفريق وروابط الأسئلة الشائعة."
+    ],
+    "en": [
+      "Keep the next prayer in view as you scroll Home, and find your place more easily in Quran Wird and the Progress calendar.",
+      "Follow the spoken word with a softer Mushaf highlight while the reading controls stay steady during page turns and zoom.",
+      "Preview your next reminder and choose whether to receive Friday salawat or fasting preparation reminders.",
+      "Find team contacts and answers to common questions in About, alongside the wa-zaker crescent and star."
+    ]
+  },
+  {
+    "release": "2026-11-06",
+    "ar": [
+      "تظل الصلاة القادمة ووقتها أمامك عند التمرير في الرئيسية، ويمكنك فتح مواقيت الصلوات كلها من الهاتف.",
+      "يبقى شريطا المصحف في مكانهما أثناء تقليب الصفحات وتمرير الصفحة المكبّرة، ويشير زر الرجوع إلى حافة الشاشة.",
+      "اعرض موعد التذكير القادم وعاين رسالته، واختر التنبيه للصلاة على النبي يوم الجمعة أو للاستعداد لصيام الاثنين والخميس.",
+      "تعرّف على فريق وَذَكِّرْ واعثر على إجابات الأسئلة الشائعة من صفحة «حول»، مع ظهور شعار الهلال والنجمة في التطبيق."
+    ],
+    "en": [
+      "Keep the next prayer and its time in view as you scroll Home, and open all prayer times from the compact phone row.",
+      "Mushaf controls stay in place as you turn pages or scroll a magnified page, and Back points toward the outer edge.",
+      "See when your next reminder is due, preview its message, and opt into Friday salawat or Monday and Thursday fasting preparation reminders.",
+      "Meet the wa-zaker team and find common answers in About, with the crescent and star marking the app."
+    ]
+  },
+  {
+    "release": "2026-11-05",
+    "ar": [
+      "تبقى خيارات تصميم بطاقات الأذكار في مكانها على الهاتف أثناء تجهيز المعاينة.",
+      "يمكنك اختيار البطاقات المعتمدة بينما يجري تجهيز معاينة التصميم المخصص.",
+      "تظل خيارات البطاقات ثابتة أثناء التحميل حتى عند تكبير النص إلى الضعف."
+    ],
+    "en": [
+      "Artwork choices stay in place on phones while remembrance card previews load.",
+      "Select the supplied cards while the custom design preview is being prepared.",
+      "Artwork choices stay steady during loading with text enlarged to 200%."
+    ]
+  },
+  {
+    "release": "2026-11-04.9",
+    "ar": [
+      "ابحث عن السور في فهرس أصغر بعمودين، مع مساحة أوسع للنتائج عند تكبير النص.",
+      "استمتع بصفحة مصحف متوازنة على الكمبيوتر وهوامش مريحة، مع الحفاظ على أزرار المصحف المعتادة والتكبير اليدوي.",
+      "تعرّف على لون الصفحة الجديد من إشعار مطابق له بعيدًا عن الآيات، واستعد أدوات التركيز بلوحة المفاتيح."
+    ],
+    "en": [
+      "Find surahs in a smaller two-column index, with more results space when text is enlarged.",
+      "Read a balanced desktop Mushaf page with comfortable margins, familiar Mushaf controls and manual zoom.",
+      "Recognize the newly applied page theme from a matching notification clear of the verses, with reliable keyboard recovery from Focus."
+    ]
+  },
+  {
+    "release": "2026-11-04.8",
+    "ar": [
+      "تصفّح فهرس السور في عمودين داخل نافذة أصغر، مع بحث ثابت وأسماء واضحة حتى عند تكبير النص.",
+      "اقرأ المصحف على الكمبيوتر بمقاس أكثر اتزانًا ومساحة مريحة حول الصفحة، مع بقاء أدواته المألوفة والتكبير اليدوي.",
+      "شاهد تأكيد تغيير لون الصفحة بنفس ألوان المظهر الجديد، بعيدًا عن الآيات، مع احتفاظ المصحف بأزراره المميزة."
+    ],
+    "en": [
+      "Browse surahs in a compact two-column index with separate search and readable names when text is enlarged.",
+      "Read a balanced desktop Mushaf page with comfortable margins while keeping familiar tools and manual zoom.",
+      "See page-color confirmations in the newly applied theme, clear of the verses, while retaining the Mushaf’s distinct buttons."
+    ]
+  },
+  {
+    "release": "2026-11-04.7",
+    "ar": [
+      "استمع واقرأ بمساحة مصحف أوسع وتمييز واضح للكلمة، وأعد الآية الحالية من أدوات التركيز والقفل.",
+      "اختر مقاييس التقدم وعدّل خطة القرآن بأزرار متناسقة وعناوين ثابتة وأدوات متراصفة.",
+      "افتح قائمة الاستماع بجانب زرها، وتنقّل في الإعدادات بتأثير مرور ثابت لا يخفي الفواصل أو يبهت النص.",
+      "شاهد صور سور أطول بعناوين ذهبية وملمسًا ورقيًا داكنًا أوضح وبطاقات زجاجية ألطف، واضبط اهتزاز القارئ."
+    ],
+    "en": [
+      "Listen and read with more Mushaf space, a clear word cue and current-ayah recovery beside Focus and Lock.",
+      "Choose Progress metrics and edit your Quran plan with matching buttons, steady headings and aligned tools.",
+      "Open the listening queue beside its button and browse Settings with stable hover feedback that preserves text and dividers.",
+      "See taller surah artwork with gold titles, clearer dark paper and softer Glass cards, and adjust Reader vibration."
+    ]
+  },
+  {
+    "release": "2026-11-04.6",
+    "ar": [
+      "اقرأ المصحف أثناء الاستماع بمساحة أوسع وتمييز أوضح للكلمة، مع العودة للآية الحالية بجانب أدوات التركيز والقفل.",
+      "استخدم أزرارًا متناسقة لاختيار مقاييس التقدم وتعديل خطة القرآن، مع عناوين ثابتة وعناصر تحكم متراصفة.",
+      "شاهد صورًا أكبر للكهف والسجدة والملك، مع اسم السورة بالذهبي فوق الصورة، وتحكّم باهتزاز العداد من خيارات القارئ.",
+      "استمتع بملمس ورقي أوضح في الأوضاع الداكنة وبطاقات زجاجية متناسقة وحواف ألطف وتأثيرات مرور أكثر هدوءًا."
+    ],
+    "en": [
+      "Read along with more Mushaf space and a clearer word highlight, with current-ayah recovery beside Focus and Lock.",
+      "Use consistent buttons to choose Progress metrics and edit your Quran plan, with fixed headings and aligned controls.",
+      "See taller Al-Kahf, As-Sajdah and Al-Mulk artwork with gold titles, and control counter vibration from Reader options.",
+      "Enjoy stronger dark paper, consistent Glass cards, softer scrolling edges and calmer hover feedback."
+    ]
+  },
+  {
+    "release": "2026-11-04.4",
+    "ar": [
+      "اختر تثبيت التحديث أو تأجيله، مع تذكيرات أوضح للصلاة والأوراد.",
+      "استمع بعناصر تحكم في صف واحد، ومساحة أوسع للتشغيل التلقائي، وقفل متاح في وضع التركيز.",
+      "اقرأ القرآن دون تبدّل مفاجئ للخط، واحفظ صفحات المصحف وخطوطها دون اتصال مع عرض حجمها.",
+      "صور مميزة للكهف والسجدة والملك، وإعدادات مسبحة أسهل، وعنوان تقدم ثابت وخيارات لا تتحرك أثناء النقر."
+    ],
+    "en": [
+      "Choose to install or defer updates, with clearer prayer and reading reminders.",
+      "Listen with controls in one row, more room for autoplay, and a lock available in Focus mode.",
+      "Read Quran text without a sudden font change and save Mushaf pages and fonts offline with their sizes shown.",
+      "Find distinct Al-Kahf, As-Sajdah and Al-Mulk artwork, simpler Masbaha settings, a fixed Progress heading and stationary menu options."
+    ]
+  },
+  {
+    "release": "2026-11-04.3",
+    "ar": [
+      "حدّث التطبيق في الوقت المناسب لك أو أجّل التحديث، مع عناوين أوضح لتذكيرات الصلاة والأوراد.",
+      "تحكّم في الاستماع من صف مرتب، مع مساحة أوضح للتشغيل التلقائي وإمكانية القفل داخل وضع التركيز.",
+      "اقرأ القرآن بخط ثابت، واحفظ صفحات المصحف وخطوطها دون اتصال مع معرفة حجم التنزيل.",
+      "تعرّف على الكهف والسجدة والملك بصور مميزة، واضبط المسبحة بسهولة وتابع تقدمك بعنوان ثابت وقوائم أكثر استقرارًا."
+    ],
+    "en": [
+      "Update when it suits you or defer, with clearer titles for prayer and reading reminders.",
+      "Manage listening from one organized row, with clearer autoplay spacing and locking available in Focus mode.",
+      "Read Quran text with a stable font and save Mushaf pages and fonts offline with download sizes shown.",
+      "Recognize Al-Kahf, As-Sajdah and Al-Mulk by their artwork, adjust Masbaha easily, and review Progress with a fixed heading and steadier menus."
+    ]
+  },
+  {
+    "release": "2026-11-04.2",
+    "ar": [
+      "اختر وقت تثبيت التحديث أو أجّله، واقرأ عناوين أوضح لتذكيرات الصلاة والأوراد.",
+      "استخدم عناصر استماع مرتبة في صف واحد، مع مساحة أوضح للتشغيل التلقائي وقفل متاح داخل وضع التركيز.",
+      "استمتع بخط قرآني ثابت أثناء القراءة، وحفظ صفحات المصحف وخطوطها دون اتصال مع عرض حجم التنزيل.",
+      "اضبط المسبحة من زر إعدادات واحد، وتابع تقدمك بعنوان ثابت، واختر من القوائم دون تحرّك الخيارات أثناء النقر."
+    ],
+    "en": [
+      "Choose when to install an update or defer it, with clearer titles for prayer and reading reminders.",
+      "Use a single row of listening controls, with more room for autoplay and a lock available in Focus mode.",
+      "Read Quran text with a stable font and save Mushaf pages and fonts offline with download sizes shown.",
+      "Adjust Masbaha from one settings button, keep the Progress heading visible, and select menu options without them moving during a click."
+    ]
+  },
+  {
+    "release": "2026-11-04",
+    "ar": [
+      "ثبّت التحديث عندما يناسبك أو أجّله، وتعرّف بسهولة على الصلاة أو الورد المقصود من عنوان التذكير.",
+      "تحكّم في قائمة الاستماع والتكرار والتشغيل التلقائي من صف واحد، واقفل عناصر التحكم وافتحها أثناء وضع التركيز.",
+      "اقرأ القرآن دون تغيّر مفاجئ في الخط بعد ظهور النص، واعرف حجم صفحات المصحف وخطوطها قبل حفظها للقراءة دون اتصال.",
+      "اضبط هدف المسبحة والذكر من زر إعدادات واحد على الهاتف، وراجع تقدمك مع بقاء العنوان ظاهرًا أثناء التمرير."
+    ],
+    "en": [
+      "Install updates when convenient or choose Later, and see which prayer or reading a reminder is for from its title.",
+      "Manage your queue, repeats, and autoplay from one row, and lock or unlock the playback controls in Focus mode.",
+      "Read Quran text without a sudden font change after it appears, and see how much space Mushaf pages and fonts take before saving them for offline reading.",
+      "Change your Masbaha phrase and target from one settings button on mobile, and keep the Progress heading in view as you scroll."
+    ]
+  },
+  {
+    "release": "2026-11-03.2",
+    "ar": [
+      "استخدم تبويبات التقدم بأيقونات واضحة حتى عند عرض الشاشة الصغير وتكبير النص.",
+      "تجد خيار تفعيل الإشعارات واضحًا للتطبيق والمتصفح، مع إرشادات أندرويد عند حظر الإذن.",
+      "استمتع بتنقل وقراءة أوضح وخلفية ورقية اختيارية، ومرشحات تاريخ مقروءة وتركيز واضح عند ضبط حجم الصفحة بلوحة المفاتيح.",
+      "تستمر تنزيلات الصوت أثناء تنقلك داخل التطبيق، ويمكنك تحديد صفحات المصحف أو جزء لتنزيله."
+    ],
+    "en": [
+      "Use clearly visible Progress tab icons on small screens, including with enlarged text.",
+      "Find a clear Enable notifications option for the app and browser, with Android guidance when permission is blocked.",
+      "Enjoy clearer navigation and reading, optional paper texture, readable date filters, and visible keyboard focus when adjusting page size.",
+      "Audio downloads continue during in-app navigation, with a choice of Mushaf pages or a juz to save."
+    ]
+  },
+  {
+    "release": "2026-11-01.8",
+    "ar": [
+      "راجع التذكير القادم والموقع وإذن الإشعارات واختبر التنبيهات من ملخص واحد.",
+      "تعرّف على حالة الحفظ والمزامنة والتوفر دون اتصال، وصدّر نسخة احتياطية مباشرة.",
+      "استمتع بخلفية أكثر انسجامًا في مشغل الصوت والنوافذ، مع استئناف أوضح للتنزيلات المتعثرة."
+    ],
+    "en": [
+      "Review your next reminder, location and notification permission, and test alerts together.",
+      "Check saving, synchronization and offline availability, with direct access to a restorable backup.",
+      "Enjoy seamless listening and sheet headers, with clearer recovery for interrupted downloads."
+    ]
+  },
+  {
+    "release": "2026-11-01.7",
+    "ar": [
+      "أزرار المجموعات والمحفوظات في المكتبة بمحاذاة أدق مع العنوان على الهاتف.",
+      "أزرار مشاركة الآيات تحافظ على حجمها المناسب عند تكبير النص دون امتداد خارج الشاشة.",
+      "أزرار اختيار مستديرة بمسافات متوازنة ومظهر متناسق، مع وصول واضح باللمس ولوحة المفاتيح."
+    ],
+    "en": [
+      "Library Collections and Saved choices align more precisely with the title on phones.",
+      "Ayah-sharing icon actions keep their intended size with enlarged text, without overflowing the screen.",
+      "Rounded choices retain balanced spacing, consistent surfaces and clear touch and keyboard access."
+    ]
+  },
+  {
+    "release": "2026-11-01.6",
+    "ar": [
+      "تطبيق التحديثات أكثر موثوقية على الاتصالات البطيئة، مع حماية التقدم والملفات المحفوظة.",
+      "إعداد اختياري عند البداية للإشعارات وحماية التخزين، مع تذكيرات الصلاة والأذكار والجمعة وما قبل الفجر مختارة للمستخدم الجديد.",
+      "ابدأ مجموعات الأذكار والأدعية من جديد كل يوم، مع بقاء الكهف أسبوعيًا وحفظ السجلات والمحفوظات.",
+      "ملخص نخلة أبسط، وأزرار وفلاتر أكثر تناسقًا، وتحسين عرض «تذكير لك الآن» واستعادته بعد انقطاع الاتصال."
+    ],
+    "en": [
+      "Apply updates more reliably on slower connections while keeping saved progress and downloads safe.",
+      "Optional first-use notification and storage setup, with prayer, daily adhkar, Friday and pre-Fajr reminders selected for new readers.",
+      "Start zikr and dua collections afresh each day; Al-Kahf stays weekly, and history and saved items remain safe.",
+      "A simpler palm summary, consistent control feedback and filters, and a more resilient Relevant now card across screen sizes."
+    ]
+  },
+  {
+    "release": "2026-11-01.5",
+    "ar": [
+      "تصفح صفحات بعناوين وهوامش متناسقة، وبطاقات تقدم أوضح، وعناوين إعدادات تقرأها بسهولة عند تكبير النص.",
+      "استخدم تبويبي التقدم وزر تصفية التاريخ على الهاتف، مع رأس يحمي المحتوى أثناء التمرير.",
+      "افتح تفاصيل أيام التقويم دون تمرير جانبي، ونزّل من الإعدادات نسخة احتياطية كاملة أو بيانات تقدم لفترة تختارها.",
+      "راجع آخر ٣٠ يومًا تلقائيًا، وقارن تسجيلات الأوراد بالأشرطة والتوزيع، وتصفح الاتجاهات بالأعمدة أو الخطوط."
+    ],
+    "en": [
+      "Browse consistent page titles and spacing, clearer Progress cards, and readable Settings headings when text is enlarged.",
+      "Use two Progress tabs and a phone date-filter button, with a header that keeps scrolling content covered.",
+      "Open calendar day details without sideways scrolling, and download a full backup or dated Progress data from Settings.",
+      "See the last 30 days by default, compare routine recordings with bars and breakdowns, and explore column or line trends."
+    ]
+  },
+  {
+    "release": "2026-11-01.4",
+    "ar": [
+      "عناوين وهوامش متناسقة، وبطاقات تقدم أوضح تتكيف مع المظهر وحجم الشاشة، مع تبويبين وزر لتصفية التاريخ على الهاتف.",
+      "تصفح تقويم التسجيلات دون تمرير جانبي، وافتح تفاصيل التاريخ على الهاتف مع رأس يغطي المحتوى أثناء التمرير.",
+      "من الإعدادات، نزّل نسخة احتياطية كاملة أو بيانات التقدم بصيغة JSON لفترة تختارها.",
+      "ابدأ بآخر ٣٠ يومًا، وقارن الأوراد بالأشرطة وتوزيع السجلات واختر الأعمدة أو الخطوط."
+    ],
+    "en": [
+      "Consistent page titles and gutters, clearer Progress cards that adapt to your theme and screen, two tabs and a phone date-filter button.",
+      "Browse dates without sideways scrolling, open phone date details and keep scrolling content covered behind the header.",
+      "In Settings, download a full app backup or Progress JSON for dates you choose.",
+      "Start with the last 30 days, compare routine bars and breakdowns, and choose columns or lines."
+    ]
+  },
+  {
+    "release": "2026-11-01.3",
+    "ar": [
+      "يبقى نطاق التاريخ والتبويبات واضحين أثناء التمرير، دون ظهور السجلات خلفهما.",
+      "تصفح تقويم التسجيلات دون تمرير جانبي، واضغط على تاريخ لعرض تفاصيله على الهاتف.",
+      "تفتح صفحة التقدم على آخر ٣٠ يومًا، ببطاقات مختصرة وفترة وتبويبات متجاورة على الشاشات الكبيرة.",
+      "قارن الأوراد بالأشرطة وتوزيع السجلات، واختر الأعمدة أو الخطوط وصدّر بيانات الفترة كاملة."
+    ],
+    "en": [
+      "Date controls and tabs stay clear while scrolling, with records fully covered behind them.",
+      "Browse recording dates without sideways scrolling, and tap a date for its details on your phone.",
+      "Progress starts with the last 30 days, compact summaries and adjacent tablet/desktop filters and tabs.",
+      "Compare routine bars and breakdowns, switch chart styles and export exact records for the whole selected period."
+    ]
+  },
+  {
+    "release": "2026-11-01.2",
+    "ar": [
+      "استكشف تقويم تسجيلاتك بالفأرة ولوحة المفاتيح، مع بقاء التاريخ المختار ظاهرًا عند تكبير النص.",
+      "تفتح صفحة التقدم على آخر ٣٠ يومًا، ببطاقات مختصرة وفترة وتبويبات متجاورة على الشاشات الكبيرة.",
+      "قارن الأوراد بالأشرطة وتوزيع السجلات، واختر الأعمدة أو الخطوط وصدّر بيانات الفترة كاملة."
+    ],
+    "en": [
+      "Explore recording dates by pointer or keyboard, with the focused date staying visible under enlarged text.",
+      "Progress starts with the last 30 days, compact summaries and adjacent tablet/desktop filters and tabs.",
+      "Compare routine bars and breakdowns, switch chart styles and export exact records for the whole selected period."
+    ]
+  },
+  {
+    "release": "2026-11-01",
+    "ar": [
+      "استكشف تقويم تسجيلاتك واختر تاريخًا لعرض تفاصيله والبيانات غير المتاحة.",
+      "تفتح صفحة التقدم على آخر ٣٠ يومًا، ببطاقات مختصرة وفترة وتبويبات متجاورة على الشاشات الكبيرة.",
+      "قارن الأوراد بالأشرطة وتوزيع السجلات، واختر الأعمدة أو الخطوط وصدّر بيانات الفترة كاملة."
+    ],
+    "en": [
+      "Explore your recording calendar and select a date for its details and unavailable data.",
+      "Progress starts with the last 30 days, compact summaries and adjacent tablet/desktop filters and tabs.",
+      "Compare routine bars and breakdowns, switch chart styles and export exact records for the whole selected period."
+    ]
+  },
+  {
+    "release": "2026-10-31.3",
+    "ar": [
+      "إصلاح تنزيل ملفات الصوت المضغوطة لتفتح بسلاسة على ويندوز وكافة الأجهزة.",
+      "استقرار حفظ التنزيلات الصوتية والمصحف والتحقق من اكتمالها بعد تحديث الصفحة.",
+      "تحسين تجاوب شريط فترات الإنجاز وقوائم التصفية عند تكبير الخط والشاشات الصغيرة.",
+      "ضبط دقة أبعاد أزرار الوصول السريع وتجاوبها السلس مع اللمس والتنقل."
+    ],
+    "en": [
+      "Fixed audio ZIP downloads so archives open smoothly on Windows and all platforms.",
+      "Reliable offline audio and Mushaf caching that persists verification after page reload.",
+      "Enhanced progress range toolbar and responsive filters under enlarged text and narrow screens.",
+      "Refined shortcut touch target dimensions and navigation layout for seamless accessibility."
+    ]
+  },
+  {
     "release": "2026-10-31.2",
     "ar": [
       "إصلاح تنزيل ملفات الصوت المضغوطة لتفتح بسلاسة على ويندوز وكافة الأجهزة.",

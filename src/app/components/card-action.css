@@ -1,0 +1,66 @@
+/* One recipe for actionable cards/rows. Native whole-card press stays global;
+   only fixed pseudo-element actions press the badge instead. */
+[data-card-action] {
+  --control-cue-scale: var(--motion-icon-hover-scale);
+  --control-cue-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-card-action]:not(:disabled, [aria-disabled="true"], [data-disabled]):focus-visible .control-cue {
+  scale: var(--control-cue-scale);
+}
+@media (hover: hover) and (pointer: fine) {
+  [data-card-action]:not(:disabled, [aria-disabled="true"], [data-disabled]):hover .control-cue {
+    scale: var(--control-cue-scale);
+  }
+}
+.no-press[data-card-action]:not(:disabled, [aria-disabled="true"], [data-disabled]):is(
+    :active:not([data-key-released]),
+    [data-key-pressed]
+  )
+  .control-cue {
+  scale: 0.98;
+}
+.reduce-motion [data-card-action] .control-cue {
+  scale: 1 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-card-action] .control-cue {
+    scale: 1 !important;
+  }
+}
+
+/* Paint changes never resize the target or establish a new containing block.
+   An inset tint preserves each Solid/Glass surface and its contrast tokens. */
+.surface-card-finish.surface-card-finish {
+  border-color: color-mix(in srgb, var(--border) 45%, transparent);
+}
+:where([data-card-action]),
+.surface-card-finish:has(.progress-metric-link) {
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+:is([data-card-action]:not(.no-press), .surface-card-finish:has(.progress-metric-link)):is(
+  :focus-visible,
+  :has(:focus-visible)
+) {
+  border-color: var(--primary);
+  box-shadow:
+    inset 0 0 0 1px var(--primary),
+    inset 0 0 0 999px color-mix(in srgb, var(--primary) 10%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+  :is([data-card-action]:not(.no-press), .surface-card-finish:has(.progress-metric-link)):not(
+      :disabled,
+      [aria-disabled="true"],
+      [data-disabled]
+    ):not(:focus-visible):not(:has(:focus-visible)):hover {
+    box-shadow: inset 0 1px 0 color-mix(in srgb, currentColor 12%, transparent);
+    filter: none;
+  }
+}
+@media (forced-colors: active) {
+  [data-card-action]:hover {
+    outline: 2px solid Highlight;
+  }
+}

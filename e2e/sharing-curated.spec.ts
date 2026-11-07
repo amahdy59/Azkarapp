@@ -2,6 +2,7 @@ import { sharingStep } from "./helpers/sharing";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
+import { t } from "../src/app/i18n";
 
 function storedZipImages(archive: Buffer) {
   const entries: { name: string; bytes: Buffer }[] = [];
@@ -37,7 +38,7 @@ for (const category of ["morning", "evening", "before_sleep"] as const) {
     await modal.getByRole("button", { name: "البطاقات المعتمدة", exact: true }).click();
     await sharingStep(modal, "share");
     const extension = category === "before_sleep" ? "jpg" : "webp";
-    const image = modal.getByRole("img").first();
+    const image = modal.getByTestId("sharing-preview").locator(".sharing-preview-image img");
     await expect(image).toBeVisible();
     await expect(image).toHaveAttribute("src", /^blob:/u);
     await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(900);
@@ -192,8 +193,61 @@ test("all supplied curated images are available on the first offline visit after
         }),
       );
     });
-    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152, 139375, 150392]);
+    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152, 131054, 141687]);
   } finally {
     await context.setOffline(false);
   }
 });
+
+for (const { language, width, enlarged } of [
+  { language: "ar", width: 390, enlarged: false },
+  { language: "en", width: 320, enlarged: true },
+] as const) {
+  test(`first sharing preview keeps artwork choices under the pointer at ${width}px ${language} @cross-browser`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.addInitScript(
+      ({ language, enlarged }) => {
+        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({ settings: { language, reduceMotion: true }, profile: { isGuest: true } }),
+        );
+        if (enlarged)
+          document.addEventListener("DOMContentLoaded", () => (document.documentElement.style.fontSize = "32px"));
+      },
+      { language, enlarged },
+    );
+    // Hold fonts used by the real renderer so its first image arrives mid-click.
+    let releaseFonts!: () => void;
+    const fontsReleased = new Promise<void>((resolve) => (releaseFonts = resolve));
+    await page.route(/\.(woff2?|ttf)(\?|$)/u, async (route) => {
+      await fontsReleased;
+      await route.continue();
+    });
+    try {
+      await page.goto("/#/azkar/before-sleep", { waitUntil: "domcontentloaded" });
+      await page.getByTestId("share-collection-button").click();
+      const modal = page.getByTestId("collection-share-modal");
+      const preview = modal.getByTestId("sharing-preview");
+      const image = preview.locator(".sharing-preview-image img");
+      const choice = modal.getByRole("button", { name: t(language, "shareStudio.curatedTab"), exact: true });
+      await expect(image).toHaveCount(0);
+      await choice.scrollIntoViewIfNeeded();
+      const before = (await choice.boundingBox())!;
+      await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
+      await page.mouse.down();
+      releaseFonts();
+      await expect(image).toBeVisible();
+      const after = (await choice.boundingBox())!;
+      await page.mouse.up();
+      await expect(choice).toHaveAttribute("aria-pressed", "true");
+      expect(Math.abs(after.y - before.y)).toBeLessThanOrEqual(1);
+      await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.naturalWidth)).toBe(900);
+      await page.screenshot({ path: testInfo.outputPath("supplied-artwork-selected.png") });
+    } finally {
+      releaseFonts();
+    }
+  });
+}

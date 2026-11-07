@@ -1,3 +1,6 @@
+import "./toggle-track.css";
+import "./card-action.css";
+import "./settings-rows.css";
 import React, { useId } from "react";
 import { ChevronDown, ChevronNext } from "./icons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -9,7 +12,7 @@ export interface SettingsRowProps {
   description?: string;
   labelColor?: string;
   right?: React.ReactNode;
-  onPress?: () => void;
+  onPress?: React.MouseEventHandler<HTMLButtonElement>;
   hasDivider?: boolean;
   current?: boolean;
   testId?: string;
@@ -29,48 +32,51 @@ export function SettingsRowItem({
 }: SettingsRowProps) {
   const content = (
     <>
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ background: iconBg }}>
+      <div
+        className="surface-control-finish control-cue flex size-10 shrink-0 items-center justify-center rounded-xl"
+        style={{ backgroundColor: iconBg }}
+      >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
         <p
-          className={`min-w-0 flex-1 break-normal text-start font-sans text-subtitle md:text-base leading-snug ${current ? "font-bold text-primary" : "font-semibold text-foreground"}`}
+          className={`min-w-0 flex-1 [overflow-wrap:anywhere] text-start font-sans text-subtitle md:text-base leading-snug ${current ? "font-bold text-primary" : "font-semibold text-foreground"}`}
           style={{ color: current ? undefined : labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
         >
           {label}
         </p>
-        {description && <p className="mt-0.5 text-start text-sm text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mt-0.5 [overflow-wrap:anywhere] text-start text-sm text-muted-foreground">{description}</p>
+        )}
       </div>
       {right}
     </>
   );
 
   return (
-    <div className="relative">
+    <div className="settings-row-item relative">
       {onPress ? (
         <button
           type="button"
           onClick={onPress}
+          data-card-action
           data-testid={testId}
           aria-current={current ? "page" : undefined}
-          className={`relative flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow,opacity] active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${
-            current ? "bg-primary/10" : "bg-card"
-          }`}
-          style={{ background: current ? "color-mix(in srgb, var(--primary) 10%, var(--card))" : "var(--card)" }}
+          className="relative flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          style={{ backgroundColor: current ? "color-mix(in srgb, var(--primary) 10%, var(--card))" : undefined }}
         >
           {current && <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1 bg-primary" />}
           {content}
         </button>
       ) : (
-        <div
-          className="flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3"
-          style={{ background: "var(--card)" }}
-        >
-          {content}
-        </div>
+        <div className="flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3">{content}</div>
       )}
       {hasDivider && (
-        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 68, insetInlineEnd: 0 }} />
+        <div
+          aria-hidden="true"
+          className="settings-row-divider absolute bottom-0 h-px bg-border"
+          style={{ insetInlineStart: 68, insetInlineEnd: 0 }}
+        />
       )}
     </div>
   );
@@ -102,28 +108,28 @@ export function SettingsSelectRow({
   const labelId = useId();
 
   return (
-    <div className="relative">
+    <div className="settings-row-item relative">
       <div
-        className="group relative flex min-h-16 w-full items-center gap-3 px-4 py-3 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring"
-        style={{ background: "var(--card)" }}
+        data-card-action
+        className="settings-select-control group relative flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring"
       >
         <span
           aria-hidden="true"
-          className="flex size-10 shrink-0 items-center justify-center rounded-[var(--ds-radius-control)]"
-          style={{ background: iconBg }}
+          className="surface-control-finish control-cue flex size-10 shrink-0 items-center justify-center rounded-[var(--ds-radius-control)]"
+          style={{ backgroundColor: iconBg }}
         >
           {icon}
         </span>
         <span
           id={labelId}
-          className="min-w-0 flex-1 text-start font-sans text-base font-semibold"
+          className="min-w-0 flex-1 [overflow-wrap:anywhere] text-start font-sans text-base font-semibold"
           style={{ color: "var(--foreground)" }}
         >
           {label}
         </span>
-        <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
+        <div className="settings-row-value flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
           <p
-            className="truncate font-sans text-subtitle"
+            className="min-w-0 [overflow-wrap:anywhere] font-sans text-subtitle"
             style={{ color: "var(--foreground)", opacity: 0.9 }}
             title={value}
           >
@@ -162,7 +168,7 @@ export function SettingsSelectRow({
       {hasDivider && (
         <div
           aria-hidden="true"
-          className="absolute bottom-0 h-px bg-border"
+          className="settings-row-divider absolute bottom-0 h-px bg-border"
           style={{ insetInlineStart: 68, insetInlineEnd: 0 }}
         />
       )}
@@ -176,9 +182,9 @@ export function RowChevron() {
 
 export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {
   return (
-    <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
+    <div className="settings-row-value flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
       <p
-        className="truncate text-subtitle font-sans"
+        className="min-w-0 [overflow-wrap:anywhere] text-subtitle font-sans"
         style={{ color: "var(--foreground)", opacity: 0.9 }}
         title={value}
       >
@@ -229,30 +235,35 @@ export function SettingsToggleRow({
   hasDivider?: boolean;
 }) {
   return (
-    <div className="relative">
+    <div className="settings-row-item settings-toggle-row relative">
       <button
         type="button"
         role="switch"
         aria-label={label}
         aria-checked={checked}
+        data-card-action
         onClick={onChange}
-        className="flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+        className="settings-toggle-control flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span
           aria-hidden="true"
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-          style={{ background: iconBg }}
+          className="surface-control-finish control-cue flex size-10 shrink-0 items-center justify-center rounded-xl"
+          style={{ backgroundColor: iconBg }}
         >
           {icon}
         </span>
-        <span className="min-w-0 flex-1">
+        <span className="min-w-0 flex-1 break-words">
           <span className="block font-sans text-base font-semibold text-foreground">{label}</span>
           {description && <span className="mt-1 block text-xs leading-5 text-muted-foreground">{description}</span>}
         </span>
         <ToggleTrack checked={checked} />
       </button>
       {hasDivider && (
-        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 68, insetInlineEnd: 0 }} />
+        <div
+          aria-hidden="true"
+          className="settings-row-divider absolute bottom-0 h-px bg-border"
+          style={{ insetInlineStart: 68, insetInlineEnd: 0 }}
+        />
       )}
     </div>
   );

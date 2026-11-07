@@ -18,8 +18,8 @@ describe("AzkarLibraryScreen", () => {
         savedZikrIds={new Set()}
       />,
     );
-    expect(container.querySelector(".stagger-enter")).not.toBeNull();
-    await waitFor(() => expect(container.querySelector(".stagger-enter")).toBeNull(), { timeout: 2000 });
+    expect(container.querySelector(".library-panel")).not.toBeNull();
+    expect(container.querySelector(".stagger-enter")).toBeNull();
     const input = screen.getByRole("textbox", { name: "Search azkar and duas" });
     fireEvent.change(input, { target: { value: "sleep" } });
     expect(screen.getAllByTestId("matching-zikr-card").length).toBeGreaterThan(0);
@@ -253,7 +253,7 @@ describe("AzkarLibraryScreen", () => {
     expect(input).toHaveAttribute("dir", "auto");
   });
 
-  it("normalizes unvocalized Arabic search and finds vocalized azkar in-page", () => {
+  it("normalizes unvocalized Arabic search and finds vocalized azkar in-page", async () => {
     const onZikr = vi.fn();
     render(
       <AzkarLibraryScreen
@@ -274,7 +274,7 @@ describe("AzkarLibraryScreen", () => {
 
     const matchingZikrCards = screen.getAllByTestId("matching-zikr-card");
     expect(matchingZikrCards.length).toBeGreaterThan(0);
-    expect(normalizeSearchText(matchingZikrCards[0].textContent!)).toContain("حسبي الله");
+    await waitFor(() => expect(normalizeSearchText(matchingZikrCards[0].textContent!)).toContain("حسبي الله"));
 
     fireEvent.click(matchingZikrCards[0]);
     expect(onZikr).toHaveBeenCalled();

@@ -1,4 +1,43 @@
+## Local completion evidence — 2026-11-02
+
+reader-focus-intent covers real Tab/Space and pointer/menu journeys in the three counting flows, with browser-simulated volume keys and Forced Colors. enlarged-control-reflow checks 320px/200% title/label/tally geometry, contained navigation, category copy and account/notification controls in Arabic/English. The controls selector includes both; reader's existing reader-* pattern includes focus intent. Preserve source snapshot provenance for full quality, affected cross-engine features, core smoke, Pages, audit and browser inventory. Keep owner visual and physical hardware/AT acceptance distinct.
+
 # Test and Evidence Strategy
+
+## Final-touch quality and motion — 2026-11-02
+
+`paper-grain.spec.ts` verifies the static texture in every app theme/material, asset loading, still geometry, actual Mushaf navigation and plain high-contrast/transparency/forced-color/print fallbacks. The Windows reduced-transparency preference must not hide an enabled static texture: it still disables frosting/material effects, while the app's explicit Reduce transparency, High contrast and Paper texture choices retain plain-surface control. The OS-preference case is separately asserted. Juz selection reuses the existing searchable picker for thirty choices, retaining pointer/keyboard/search and opaque bounded popup checks at 320px/200%.
+
+`final-touch-quality.spec.ts` covers ordered narrow chart geometry/counts, download navigation continuity with explicit cancel, shared button focus/hover and both still modes. Audio download recovery retains ZIP cancellation focus assertions. Targeted units exercise observer/frame coalescing, session ownership/hidden updates/private clear, corrupt-byte repair, cancelled status scans, resolved voices and selected Mushaf acquisition. The working-tree CSS inventory has a temporary-repository regression. These augment existing tests; full quality/coverage, Pages and core smoke remain required. Native storage/process-death and real assistive technology remain manual device evidence.
+
+## Current shared-surface and audio review — 2026-11-02
+
+Use shared-card-finish for rounded metrics, protected nested menus, stationary phone filters, actual focus return, and default/app/OS motion. Card arrival must not replay on an ordinary disclosure render. Use mobile-sharing-filters and progress-dashboard for preset/custom-date application, cancellation, retained values and data/export assertions. audio-continuity covers the visible continuation switch, paused queue selection, return focus after selection/Escape, sleep controls and reload/resume. Retain the audio integrity/control-lock/offline suites and the short-Reader WebKit retry intake. Navigation's Qibla calibration remains a native details/summary check; Library's portalled filter trigger must not replace unrelated disclosure selectors.
+
+Both `pnpm test:e2e:feature progress` and `controls` select shared-card-finish; `audio` already selects audio-continuity through its existing file pattern. Feature-map tests retain these identities. Full CI inventory and release-gate coverage remain unchanged.
+
+Progress restores its known date opener in the modal close-autofocus callback, after focus containment releases; touch activation cannot be assumed to focus a button. The queue explicitly focuses its trigger before opening so the shared modal captures its return target. Keep the browser focus assertions and do not replace them with synthetic test-side focus. Preserve before/after failure reports separately. The current publication hold remains in DECISION_LOG; local verification is not exact-commit CI or deployment evidence.
+
+## Deployed readiness coverage
+
+Use settings-readiness-surfaces for separate saving/sync/offline status, reminder summary, keyboard navigation, enlarged layout and actual backup output. audio-expanded-layout verifies the transparent non-overlapping toolbar; header-frost-fallback keeps passing-content protection. Keep physical acceptance in DEVICE_ACCEPTANCE.md and unresolved retry identities in FLAKY_TESTS.md. One active phase pointer lives at the top of INDEX.md; historical phase records retain their evidence and authority.
+
+## Current behavior and efficient execution — 2026-11-01
+
+Finish application, test and documentation inputs before the final quality pass. Exact-content receipts expire after 24 hours and bind the installed lockfile, Node/platform and build environment; a changed input runs the full gate again. Never create or edit receipts by hand. During development use targeted unit tests and explicit `pnpm test:e2e:feature home` / `reminders` / other feature selections, with `--list`, engine and grep filters. These are development aids; frozen install, complete check, core browser smoke and Pages build remain in the hook. Complete browser inventory/engines run once in mandatory exact-commit CI, and Pages waits for that result. Full local browser runs remain diagnostics when requested or needed for unresolved failures.
+
+| Current contract                                                                                                               | Primary regression                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| First-use permission requests require separate gestures; fresh-only presets; refusal permits reading                           | first-use-calm-controls and FirstUseSetup/contextReminders units                |
+| All collection reading tallies/partials/pages reset daily, Al-Kahf remains weekly; historical Friday activity is independent   | state/progress/fridayProgress units, first-use-calm-controls and pre-phase-nine |
+| Verified Relevant now source/meaning, focus-pinned reading, responsive material/reflow, transient recovery and offline caching | reminder-responsive, contextual-reminder-plan and reminderReadings units        |
+| Full wrapping filter/context and shared tab/radio/compact-icon feedback                                                        | first-use-calm-controls, compact-icon-feedback and shared control units         |
+| Finite Home refresh/actions, smooth/reversible prayer geometry and both motion preferences                                     | home-time-actions, home-prayer-motion and motion-control-polish                 |
+| Actual waiting-worker activation, slow download and cancellation                                                               | pwaUpdate units and real two-build pwa-update-flow                              |
+
+Independent appearance cases have their own browser-test identities; shared suite setup/serial contracts remain intact. Do not hide load failures by deleting assertions or repeatedly rerunning an unchanged passing matrix. Inspect trace/network/page state, reproduce the exact failed case on a fresh preview, and retain both results. Avoid overlapping heavy local suites when memory pressure distorts evidence. Use `E2E_REPORT_PATH` for separate diagnostic reports; include retries and runner errors in timing analysis.
+
+The duration scheduler uses all nine successful CI reports. `scripts/update-browser-timing-baseline.mjs` requires exact commit/run provenance, rejects failed/incomplete/duplicate/missing-project data and retains retry time. Re-run `pnpm test:e2e:inventory` after updating weights or adding tests: every current identity must still appear exactly once. Timing data never changes release assertions, budgets or acceptance.
 
 ## Testing layers
 

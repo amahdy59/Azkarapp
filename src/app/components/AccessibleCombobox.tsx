@@ -1,3 +1,4 @@
+import "./form-controls.css";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import "./accessible-combobox.css";
@@ -51,6 +52,21 @@ export function AccessibleCombobox({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || !(event.target instanceof Node) || !popupRef.current?.contains(event.target))
+        return;
+      event.preventDefault();
+      event.stopPropagation();
+      setIsOpen(false);
+      triggerRef.current?.focus();
+    };
+    window.addEventListener("keydown", escape, true);
+    return () => window.removeEventListener("keydown", escape, true);
+  }, [isOpen]);
 
   const selectedOption = useMemo(() => options.find((opt) => String(opt.id) === String(value)), [options, value]);
 
@@ -99,6 +115,7 @@ export function AccessibleCombobox({
 
     if (event.key === "Escape") {
       event.preventDefault();
+      event.stopPropagation();
       setIsOpen(false);
       triggerRef.current?.focus();
       return;
@@ -186,8 +203,9 @@ export function AccessibleCombobox({
           </button>
         </Popover.Trigger>
 
-        <Popover.Portal>
+        <Popover.Portal container={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}>
           <Popover.Content
+            ref={popupRef}
             data-slot="combobox-content"
             data-dropdown-surface=""
             aria-labelledby={`${comboboxId}-label`}
@@ -195,11 +213,12 @@ export function AccessibleCombobox({
             align="start"
             sideOffset={6}
             collisionPadding={8}
+            collisionBoundary={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}
             onOpenAutoFocus={(event) => {
               event.preventDefault();
               searchInputRef.current?.focus();
             }}
-            className="accessible-combobox-popup z-50 flex flex-col overflow-hidden rounded-2xl border border-border-control p-2 text-popover-foreground shadow-overlay"
+            className="accessible-combobox-popup z-[110] flex flex-col overflow-hidden rounded-2xl border border-border-control p-2 text-popover-foreground shadow-overlay"
           >
             {/* Search bar inside dropdown */}
             <div className="relative mb-2 shrink-0">
@@ -267,6 +286,7 @@ export function AccessibleCombobox({
                       role="option"
                       tabIndex={-1}
                       aria-selected={isSelected}
+                      onMouseDown={(event) => event.preventDefault()}
                       onClick={() => handleSelect(option)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -275,7 +295,6 @@ export function AccessibleCombobox({
                           handleSelect(option);
                         }
                       }}
-                      onMouseEnter={() => setActiveIndex(index)}
                       className={`flex min-h-11 shrink-0 cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-2 text-start transition-colors ${
                         isSelected
                           ? "bg-primary/10 text-primary font-bold"

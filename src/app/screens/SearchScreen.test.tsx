@@ -41,6 +41,8 @@ describe("SearchScreen", () => {
     expect(input).toHaveAttribute("dir", "auto");
     expect(input.labels?.[0]).toBeVisible();
     expect(input.labels?.[0]).toHaveTextContent("Search azkar and duas");
+    expect(screen.getByRole("heading", { name: "Search", level: 1 })).toBeVisible();
+    expect(screen.getAllByRole("button", { name: "Back" })).toHaveLength(1);
   });
 
   it("starts an empty Arabic query in RTL and follows the entered language", () => {

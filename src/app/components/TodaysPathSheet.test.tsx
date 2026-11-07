@@ -31,12 +31,17 @@ describe("TodaysPathSheet", () => {
     expect(text.indexOf("Dhikr")).toBeLessThan(text.indexOf("Qur'an wird"));
     expect(text.indexOf("Qur'an wird")).toBeLessThan(text.indexOf("Prayers in congregation"));
     expect(screen.getByText("2 of 5 at the mosque")).toBeInTheDocument();
-    expect(screen.getByText(/does not measure faith or reward/i)).toBeInTheDocument();
+    expect(screen.getByTestId("todays-path-sheet").querySelectorAll("dl dt svg")).toHaveLength(3);
+    expect(screen.queryByText(/does not measure faith or reward/i)).not.toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     expect(screen.getByText("Updates automatically from your recorded practice")).toBeInTheDocument();
     expect(screen.getByText(/plus 3 prayers at the mosque/)).toBeInTheDocument();
     expect(screen.getByText(/plus all 5 prayers at the mosque/)).toBeInTheDocument();
+    expect(screen.getByTestId("path-growth-guide")).not.toHaveAttribute("open");
+    expect(screen.getByText(/plus all 5 prayers at the mosque/)).not.toBeVisible();
+    fireEvent.click(screen.getByText("How your palm grows"));
+    expect(screen.getByTestId("path-growth-guide")).toHaveAttribute("open");
   });
 
   it.each(["palm", "golden", "oasis"] as const)("identifies the earned %s tier in text", (palmTier) => {

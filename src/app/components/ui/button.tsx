@@ -1,24 +1,26 @@
 import * as React from "react";
+import "../action-feedback.css";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "./utils";
+import { PILL_ACTION } from "./controlStyles";
 
 const buttonVariants = cva(
   // Note: sizes use min-h, never a fixed height. Arabic labels run longer than
   // their English counterparts and text can scale to 200%; a fixed height
   // clips wrapped labels. font-semibold matches the app's button convention
   // (docs/DESIGN_SYSTEM.md geometry and control contract).
-  "inline-flex min-h-11 shrink-0 touch-manipulation items-center justify-center gap-2 rounded-xl text-center text-sm leading-normal font-semibold transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:block [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 outline-none focus-visible:ring-ring focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "ui-action-cue inline-flex min-h-11 min-w-0 max-w-full shrink-0 whitespace-normal break-words touch-manipulation items-center justify-center gap-2 rounded-xl text-center text-sm leading-normal font-semibold transition-[color,background-color,border-color,box-shadow,opacity] disabled:pointer-events-none disabled:opacity-50 [&_svg]:block [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 outline-none focus-visible:ring-ring focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive",
-        outline:
-          "border border-border-control bg-background text-foreground hover:bg-muted hover:text-foreground",
+        outline: "border border-border-control bg-background text-foreground hover:bg-muted hover:text-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        pill: PILL_ACTION,
         ghost: "hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
@@ -27,6 +29,7 @@ const buttonVariants = cva(
         sm: "min-h-11 gap-1.5 px-3 py-2",
         lg: "min-h-12 px-6 py-2",
         icon: "size-11 gap-0 rounded-full p-0",
+        pill: "min-h-[54px] rounded-full px-4 py-2",
       },
     },
     defaultVariants: {
@@ -44,8 +47,22 @@ const Button = React.forwardRef<
     }
 >(function Button({ className, variant, size, asChild = false, ...props }, ref) {
   const Comp = asChild ? Slot : "button";
+  const resolvedSize = size ?? (variant === "pill" ? "pill" : "default");
 
-  return <Comp ref={ref} data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+  return (
+    <Comp
+      ref={ref}
+      data-slot="button"
+      data-variant={variant ?? "default"}
+      data-size={resolvedSize}
+      data-press-compact={resolvedSize === "icon" || undefined}
+      className={cn(
+        variant !== "ghost" && variant !== "link" && variant !== "pill" && "surface-control-finish",
+        buttonVariants({ variant, size: resolvedSize, className }),
+      )}
+      {...props}
+    />
+  );
 });
 
 export { Button, buttonVariants };

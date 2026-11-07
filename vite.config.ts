@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
 import { ignoreGeneratedWatchPath } from "./scripts/generated-watch-paths";
 import { compactBuildManifest } from "./scripts/compact-build-manifest";
+import { compactAudioLiterals } from "./scripts/compact-audio-literals";
 import reminderManifest from "./src/app/content/homeReminderManifest.json";
 
 /**
@@ -204,6 +205,7 @@ export default defineConfig(({ mode, command }) => {
       react(),
       tailwindcss(),
       unwrapColorMixGuards(),
+      compactAudioLiterals(),
       compactBuildManifest(),
       contentSecurityPolicy(audioBaseUrl, cloudflareApiUrl, liveUpdateManifestUrl),
       VitePWA({
@@ -256,9 +258,11 @@ export default defineConfig(({ mode, command }) => {
           ],
         },
         workbox: {
+          importScripts: ["notification-navigation.js"],
           globPatterns: [
             "**/*.{js,css,html,svg,png,webp,avif,woff2}",
             "**/release-history-*.bin",
+            "**/home-reminder-readings-*.bin",
             "assets/cards/routine-{morning,evening}-*.webp",
             "assets/cards/routine-before_sleep-*.jpg",
             "data/mushaf/{42,49,75,76,207,603,604}.json",
@@ -283,6 +287,17 @@ export default defineConfig(({ mode, command }) => {
             "**/QiblaScreen-*.js",
           ],
           runtimeCaching: [
+            {
+              urlPattern:
+                /^https:\/\/pub-6e537fd865454e599c23a2bcfc22136e\.r2\.dev\/visuals\/surah\/2026-11-04\/[a-z-]+-768\.webp$/,
+              handler: "CacheFirst" as const,
+              method: "GET" as const,
+              options: {
+                cacheName: "azkar-surah-art-v1",
+                cacheableResponse: { statuses: [0, 200] },
+                expiration: { maxEntries: 3, maxAgeSeconds: 365 * 24 * 60 * 60 },
+              },
+            },
             {
               // The loader owns checksum-verified offline storage. Do not let
               // the broad R2/audio rule cache an unverified response first.
@@ -404,7 +419,28 @@ export default defineConfig(({ mode, command }) => {
           // shared-chunk logic place their exclusive dependencies (the
           // manifest, the reducer) alongside them and keep genuinely shared
           // code out.
+          // Keep diagnostic names for the deferred application/audio contracts.
+          // Other lazy chunk URLs are opaque; short hashed names avoid repeating
+          // long component names across imports, preload lists and the offline manifest.
+          chunkFileNames: (chunk) =>
+            /^(App$|HomeScreen$|baqarah$|audio(?:-|$)|FridayModeScreen$|MarketingLanding$|AudioContentReviewScreen$|QiblaScreen$)/.test(
+              chunk.name,
+            )
+              ? "assets/[name]-[hash].js"
+              : "assets/[hash].js",
+          // Generated font and lazy stylesheet names repeat in CSS, preload graphs and manifests.
+          // Public font paths and the offline-excluded route names above remain stable.
+          // Retain the main index role used by the measured stylesheet budget.
+          assetFileNames: (asset) => {
+            const name = asset.names[0] ?? "";
+            return /\.(css|woff2)$/.test(name) && !["index.css", "style.css"].includes(name)
+              ? "assets/[hash][extname]"
+              : "assets/[name]-[hash][extname]";
+          },
           manualChunks(id) {
+            // The helper is shared by startup and deferred imports. Folding it
+            // into audio makes every entry import the entire audio subsystem.
+            if (id.includes("vite/preload-helper")) return "preload-helper";
             // Platform detection is shared with startup. Do not let the lazy
             // audio owner's manual chunk absorb it and pull audio into Home.
             if (id.endsWith("/src/app/native/platform.ts") || id.includes("node_modules/@capacitor/core/"))
@@ -421,7 +457,8 @@ export default defineConfig(({ mode, command }) => {
              * corpus itself also remains outside the entry graph until the
              * lazy application shell requests a reading surface.
              */
-            if (id.endsWith("/src/app/content/azkar.ts")) return "content";
+            if (id.endsWith("/src/app/content/azkarCore.ts")) return "content";
+            if (id.endsWith("/src/app/content/baqarahMetadata.ts")) return "baqarah-metadata";
             if (id.endsWith("/src/app/content/baqarahSurah.ts")) return "baqarah";
             if (id.includes("node_modules/motion")) return "motion";
             if (id.endsWith("/src/app/audio/audioAssetsCore.ts")) return "audio-core";

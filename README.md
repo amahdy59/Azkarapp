@@ -1,10 +1,14 @@
 # Azkarapp
 
+Themes share a subtle static paper-grain background on pages, cards and Quran surfaces. Appearance → Paper texture controls the effect and remembers the device's choice. The small cached tile sits beneath content; accessibility/plain-material fallbacks remain untextured.
+
+Offline audio downloads continue during in-app navigation and expose progress/cancel when returning to Downloads. Readers can choose Mushaf pages or a juz as well as the full pack, and see resolved voices before audio transfer. Shared action icons have eased hover/focus feedback with still alternatives; narrow saved-page charts keep all seven dates in chronological rows. These refinements remain local pending owner review; they do not promise background transfers after closing the app.
+
 Home prayer times are larger inside the same expanded cards and return to their original size when collapsed. Share, Refresh, routine/Wird and shortcut actions have consistent keyboard/pointer feedback, with immediate still alternatives under Reduce Motion.
 
-Mushaf colour swipes can be switched off in Reading Settings; the device remembers the choice. Progress keeps the chosen date first, with secondary calendar settings and a clearer exact-records surface.
+Mushaf colour swipes can be switched off in Reading Settings; the device remembers the choice. Progress opens on Month and keeps the selected period visible, with one header date action that opens a modal without moving the cards. Library Search stays full width above its filters. Returning to a loaded Library or Quran overview avoids a repeated loading flash; tab changes use one restrained arrival.
 
-Mushaf reading tools hide/show with one centre tap; tap the same highlighted word or its explanation to close it. Vertical swipes move forwards/backwards through Mushaf-only page colours, with visible choices and Follow app available in Reading options. Progress separates Overview, Trends and Records while retaining one selected date range; tap a summary card to inspect its trend.
+Mushaf reading tools hide/show with one centre tap; tap the same highlighted word or its explanation to close it. Vertical swipes move forwards/backwards through Mushaf-only page colours, with visible choices and Follow app available in Reading options. Progress has Overview and Trends with one shared date range; tap a rounded summary card to inspect its trend, or a calendar day to inspect its saved records.
 
 ## Isolated browser backend
 
@@ -42,7 +46,7 @@ An owner-approved Capacitor Android host retains the web application and its off
 
 ### Android live UI updates
 
-The Android shell includes the Capacitor Live Update plugin, but the update source is free and self-hosted on GitHub Pages. At startup, the app acknowledges the current bundle, fetches `live-updates/manifest.json`, and compares its bundle ID with the active bundle. A newer Android-mode web bundle is downloaded with a SHA-256 checksum, staged for the next reload, and offered through the normal update prompt. If the device is offline or the manifest/download/checksum is invalid, the bundled app continues to work normally. A bundle that fails to become ready is rolled back and blocked automatically.
+The Android shell includes the Capacitor Live Update plugin, but the update source is free and self-hosted on GitHub Pages. At startup, the app acknowledges the current bundle, fetches `live-updates/manifest.json`, and compares its bundle ID with the active bundle. A newer Android-mode web bundle is downloaded with a SHA-256 checksum and offered through the normal update prompt. Accepting the update selects the bundle and reloads the app. If the device is offline or the manifest/download/checksum is invalid, the bundled app continues to work normally. A bundle that fails to become ready is rolled back and blocked automatically.
 
 Live updates are limited to binary-compatible web changes: React/JavaScript, CSS, static UI content, and reviewed web assets. Native Android code, Capacitor plugins, permissions, manifest changes, or storage contracts still require a new Play Store APK/AAB. The first store release containing the Live Update plugin must be installed before OTA updates can be tested.
 
@@ -56,21 +60,6 @@ pnpm build:live-update
 `build:live-update` creates `.live-update-build/` with the Android-mode web assets, then writes `dist/live-updates/manifest.json` and its checksum-verified ZIP. The native app uses `https://amahdy59.github.io/Azkarapp/live-updates/manifest.json` by default. Override the manifest or bundle host at native build/deployment time with `VITE_NATIVE_LIVE_UPDATE_MANIFEST_URL` or `VITE_NATIVE_LIVE_UPDATE_BASE_URL`. Before deploying, update `public/release-notes.json` with the new release stamp and current user-facing notes.
 
 The [Android developer handoff](docs/ANDROID_DEVELOPER_HANDOFF.md) maps the shared code and native adapters, identifies the remaining persistent native-file storage work, and defines the device/Play acceptance sequence.
-
-### Android live UI updates
-
-The Android shell includes the Capacitor Live Update plugin, but the update source is free and self-hosted on GitHub Pages. At startup, the app acknowledges the current bundle, fetches `live-updates/manifest.json`, and compares its bundle ID with the active bundle. A newer Android-mode web bundle is downloaded with a SHA-256 checksum, staged for the next reload, and offered through the normal update prompt. If the device is offline or the manifest/download/checksum is invalid, the bundled app continues to work normally. A bundle that fails to become ready is rolled back and blocked automatically.
-
-Live updates are limited to binary-compatible web changes: React/JavaScript, CSS, static UI content, and reviewed web assets. Native Android code, Capacitor plugins, permissions, manifest changes, or storage contracts still require a new Play Store APK/AAB. The first store release containing the Live Update plugin must be installed before OTA updates can be tested.
-
-The Pages deployment workflow publishes the bundle after the Quality gate succeeds on `main`:
-
-```bash
-pnpm build:pages
-pnpm build:live-update
-```
-
-`build:live-update` creates `.live-update-build/` with the Android-mode web assets, then writes `dist/live-updates/manifest.json` and its checksum-verified ZIP. The native app uses `https://amahdy59.github.io/Azkarapp/live-updates/manifest.json` by default. Override the manifest or bundle host at native build/deployment time with `VITE_NATIVE_LIVE_UPDATE_MANIFEST_URL` or `VITE_NATIVE_LIVE_UPDATE_BASE_URL`. Before deploying, update `public/release-notes.json` with the new release stamp and current user-facing notes.
 
 ## Technology
 
@@ -104,11 +93,13 @@ Use `nvm use` before setup when Node does not match `.nvmrc`. Install pnpm 11.19
 
 The frozen install activates the tracked pre-push hook. It verifies the toolchain and dependency graph, reuses an unchanged local quality pass or runs `pnpm check`, then runs core browser smoke tests and the Pages build before Git can push. The full browser suite runs in CI before deployment.
 
-During development, select a feature with `pnpm test:e2e:feature reader` (also `quran`, `audio`, `progress`, `controls`, `settings`, `sharing`, `offline`, or `persistence`). Pass ordinary Playwright filters, for example `pnpm test:e2e:feature persistence --grep reload --project=desktop-firefox-smoke`. These commands retain the selected specs' existing browser projects; they are development aids, not release gates. Select affected features and engines locally, including for broad changes; the mandatory exact-commit CI matrix supplies complete release coverage. Both audio and Quran groups include continuous-surah and paired-meaning regressions.
+During development, select a feature with `pnpm test:e2e:feature reader` (also `home`, `reminders`, `quran`, `audio`, `progress`, `controls`, `settings`, `sharing`, `offline`, or `persistence`). Pass ordinary Playwright filters, for example `pnpm test:e2e:feature persistence --grep reload --project=desktop-firefox-smoke`. Home includes prayer motion/actions and reminder reading; reminders includes optional first-use setup, daily reading reset, contextual/offline recovery and real worker updates. These commands retain the selected specs' existing browser projects; they are development aids, not release gates. Select affected features and engines locally, including for broad changes; the mandatory exact-commit CI matrix supplies complete release coverage. Both audio and Quran groups include continuous-surah and paired-meaning regressions.
 
 For a small Library/control alignment change, start with `pnpm test:e2e:feature controls --project=desktop-chromium --grep 'Library|segmented controls'`, then check the affected cases in Firefox/WebKit when their layout differs. For Progress changes, use `pnpm test:e2e:feature progress --project=desktop-chromium`; retain other engines and device profiles when the change affects them. Add `--list` first when checking which cases a filter selects. Finish code, tests and documentation, then push through the tracked hook once. Avoid duplicating the full CI matrix locally, rerunning successful unchanged gates, or editing tracked files after the final quality pass: those patterns cost time without adding evidence. Full local runs remain available when explicitly requested or a failure cannot be resolved with targeted reproduction.
 
 Quality runs non-browser checks once, then executes the complete browser inventory across nine Linux jobs: three desktop Chromium shards, three WebKit shards, two Firefox shards, and mobile/tablet Chromium. Each job installs only the engines its projects need. `pnpm test:e2e:inventory` proves that every current test appears exactly once. `Quality / verify` requires all jobs and all nine reports, merges results and preserves failures/timings before Pages can deploy. `pnpm test:timings` reports browser and file totals as well as the slowest individual cases.
+
+Refresh scheduling weights from all nine browser timing artifacts of a successful Quality run with `node scripts/update-browser-timing-baseline.mjs <40-character-commit> <run-id> <report-path>...`. The tool rejects failed/incomplete reports, duplicate project/files and missing projects, and includes retry costs. These weights only balance jobs; new tests remain in the complete inventory. Use CI timings rather than mixing slower local Windows measurements into Linux scheduling. The baseline currently records deployed commit 4b620316, Quality 41335950799 (2,675 cases).
 
 Finish code, tests and documentation before running `pnpm check`; its unchanged-snapshot pass can then be reused by the push hook for 24 hours. Run affected feature tests during development and let the hook enforce the final local gates once. CI still runs the complete suite fresh for every release.
 
@@ -303,3 +294,7 @@ Documentation sources of truth:
 ### Audio validation during development
 
 Local pnpm check validates audio catalog metadata offline. Use pnpm validate:audio for audio-host/catalog changes and live recording verification; Quality CI requires this full live validation before every release. pnpm validate:audio:local performs the same structural checks without network probes.
+
+## Local adaptive navigation checkpoint
+
+Phone/tablet navigation keeps Home, Quran, Azkar, Qibla and Settings visible. Masbaha additionally appears when the bar has room; its Home card remains available. Progress is reachable through Today's path and More, and stays in wide navigation. Home provides a More action. These owner-approved refinements remain local under the publication hold.

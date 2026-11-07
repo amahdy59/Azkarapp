@@ -1,4 +1,98 @@
+## Home startup and offline acquisition — 2026-11-06
+
+Home launches start the shell import before starting the overlapping Home import. This preserves the normal order of the shell and Home styles, including Glass and reduced transparency. Both callers share one Home import promise and the regular screen boundary owns localized loading and retry feedback. The startup bundle check walks the entry, shell and Home graphs together. Home uses reviewed Al-Baqarah metadata for its evidence rotation, while the complete text, transliteration, translation and page boundaries load through the full collection or listening paths. The install cache retains the complete reading chunk and the Ruqyah route hydrates before rendering.
+
+Explicit Mushaf downloads bound each active resource request. A stall ends the job and leaves independently verified page and font files available on retry. The Android audio bridge checks each response's declared byte range against the returned bytes before advancing. Downloaded audio still requires full-file size and checksum verification before publication.
+
+## Local optional update and Masbaha settings
+
+Release metadata can announce a new browser build while its offline shell is still preparing. Preparation checks or awaits the service worker without activating it. A ready worker goes straight to activation after the reader accepts, then uses the existing bounded handover and one-time stale-worker recovery. Later applies the existing per-release deferral while downloads finish. The Android host keeps the downloaded bundle as a candidate in memory and selects it for the next load only on acceptance. The plugin continues to own bundle validation and rollback.
+
+The compact Masbaha settings sheet holds only draft dhikr and goal values. Apply delegates to the screen's current target or switch workflow. A changed dhikr with an active count still requires its save/reset confirmation. The screen continues to own persisted counts and targets.
+
+## Combined release recovery — 2026-11-03
+
+AccessibleCombobox consumes Escape from its own popup at window capture before parent document-level dismissal, preserving the enclosing plan dialog and restoring its trigger. Compact ResponsiveSheet defers protected-dropdown Escape. This is transient overlay ownership only; no route, stored state or native permission boundary changes. Header subtitles scale their leading with font size; Progress date context uses a block box for correct enlarged-text measurement.
+
+## Reading viewport focus intent — local completion
+
+useReadingFocusIndicator owns only a transient DOM presentation marker. Collection readers and useStandaloneReadingFocus share it; document capture listeners distinguish deliberate Tab entry from counting/device/pointer events without preventing native events or altering focus, shortcuts, saved counts or persistence. Listeners resolve the current ref, clear on focus exit/window blur and clean up on unmount. No data schema or global persisted modality is introduced.
+
 # Application architecture
+
+Paper texture is a device-only appearance preference normalized through the existing state boundary and retained from the local base during foreign snapshot merges. The explicit remote-settings whitelist omits it. Appearance switches update App-owned state, atomic appearance application sets `data-paper-texture`, and one CSS token gates the shared static PNG. Reload/reset uses existing persistence; no new storage, timer, remote schema or texture renderer is introduced.
+
+Final-touch downloads use a small document-owned external store (`src/app/downloads/downloadSession.ts`) for the active controller, truthful progress and one completion notice. Route unmount does not abort offline playback acquisition; explicit cancellation/private-data clearing does. Reload requires explicit resume using existing verified-file checkpoints. No job URL/content or new application-state schema is persisted. ZIP/file handoff remains screen/gesture-owned and ZIP work cancels on departure. Status refreshes cancel stale scans and yield between file verifications; actual resolved voices and optional page/juz selection use existing content/download boundaries. Native persistent-file migration remains a separate Android handoff stage.
+
+Quran word/HUD styles load from their owning reader components rather than the global stylesheet. The unused-CSS inventory includes non-ignored untracked working-tree files, preventing false cleanup recommendations during local development.
+
+Bilingual Quran uses one ordered ayah list as its scroll owner between stationary in-flow header/footer controls. AyahMushafText reuses reviewed per-page glyphs/fallback; direct verse Share opens the existing AyahInteractionSheet in its full share studio without a duplicate export system. Modal plan pickers portal within the owning dialog with bounded collision geometry so focus and text opacity stay protected.
+
+## Stable screen return and Month entry — 2026-11-02 (local review)
+
+retryableScreen retains only successfully loaded component code and shares an in-flight import. Rejected imports clear pending state so explicit retry still works; unmounted instances cannot set their state. Screen-local/user data is not cached. Repeat Library/Quran visits mount the downloaded screen directly instead of inserting a loading placeholder for a resolved import. Their one local opacity arrival replaces a competing route snapshot; Library section history still round-trips, with local panel feedback and no whole-page transition. Shared tabs use immediate selected paint and a stationary finite finish. Their finish stays in the existing pill stylesheet; shared card-action/panel/ordinary-header recipes load with their reusable components, and Quran arrival loads with its screen. Keep feature-only presentation out of the startup theme without changing motion or visual semantics. Unqualified Progress and primary navigation default to Month, preserving explicit period URLs and all date/calculation/storage semantics.
+
+## Stationary filter surfaces — 2026-11-02 (local review)
+
+ProgressScreen keeps one header date action, selected range context and view tabs in its sticky owner. The existing ProgressRangeToolbar/custom-date validation runs inside the shared Modal; selection closes back to the opener without adding in-flow geometry. Metric selection remains a separate labelled action opening the shared protected Modal with draft/apply/cancel/reset and explicit focus return. ResponsiveFilters portals phone controls into ResponsiveSheet while query/group ownership stays in AzkarLibraryScreen; wide controls remain direct. Shared Card/control paint is presentation only, with protected menus on layer 110 above sheets/modals on 100. No persisted progress, routing, calendar, normalization or remote schema changes.
+
+## Audio continuity boundary — 2026-11-02 (local review)
+
+AudioProvider owns device-only listening checkpoints and a session-only sleep deadline. listeningBookmark validates its version, age, IDs, context and positions and rebuilds through buildPlaybackPlan/current reviewed assets before offset restoration; no raw URL/content is restored from local storage. Clear-private/local-data signals stop playback and cancel pending restores before storage removal. Sleep expiry pauses and never emits completion. Settings receives capability callbacks; presentation components perform no storage/network operations. Shared AudioQueueSheet delegates selection to the existing controller and preserves paused state. No app-state/account schema or runtime dependency change.
+
+## Readiness and safety summaries — 2026-11-01
+
+Settings Notifications groups actual permission, next configured reminder, selected location/timezone, existing test and platform limitations. The summary reuses getNextReminderDelay and explicitly allows completion-based suppression; it is configuration visibility, not confirmed OS alarm registration. The test does not guarantee later delivery. Account data receives actual local-save results from App, confirmed account sync time and paired-device transfer state independently. Offline shell readiness requires the native bundle or active worker plus cached app-shell HTML; optional audio/full Mushaf readiness remains in Downloads. No persistence schema, database or merge behavior changed.
+
+Telemetry emits only allowlisted coarse screen names. Routing records committed hash transitions in a bounded 64-entry monotonic timeline. Buffered interaction entries retain the screen at their start; navigation LCP/CLS/TTFB retain the entry screen. Scope is explicit. Existing collector CLS thousandths, DNT, absent-endpoint behavior and error privacy remain intact. These diagnostics do not establish complete standard web-vitals lifecycle parity or field acceptance.
+
+## Reliable updates and first-use setup — 2026-11-01
+
+Web update attempts allow 120 seconds for offline download/install, independently of the four-second activation handover. The controller observer starts before messaging the registration's current waiting worker. AbortController cancels expired/superseded attempts and removes listeners; late completions cannot activate or reload. Existing stale-worker recovery still preserves user-download caches and saved state.
+
+The production custom domain returned a four-hour HTTP cache lifetime for sw.js during diagnosis. Cloudflare Pages `_headers` now explicitly requires fresh worker/release-manifest responses; fingerprinted assets retain their existing delivery. Verify the actual custom-domain headers after publication. GitHub Pages does not interpret this Cloudflare-specific file.
+
+New installations preselect prayer, four routine reminders, Friday reading (09:00), Friday dua (60 minutes before Maghrib) and pre-Fajr dua (20 minutes before Fajr) when completing onboarding. Stored settings are never overwritten; missing new optional settings remain off. The deferred FirstUseSetup screen provides separate explicit notification/storage actions, location/notification Settings links and optional Continue/Close. Ordinary saving needs no browser permission. Context reminders use existing selected-location prayer/timezone helpers and browser timer/history boundaries plus the native seven-day queue. Native contextual IDs remain inside the existing cancellable 10000–19999 range. Browser closure limitations remain; no server push service is implied.
+
+Every zikr/dua collection joins daily current-tally rollover on boot, midnight and foreground reconciliation, including situational collections, lazy dua partial counts and collection-reader page positions. Same-day entries resume and event collections retain their explicit New session action. Al-Kahf alone retains its weekly cycle, including its lazy reader identity and page position. Saved IDs, sessions, historical daily records, bookmarks and the independent main Mushaf position remain unchanged. This is a reading convenience, not a new daily religious obligation.
+
+The Friday companion's dua reader uses one dated device-local current tally, cleared on sign-out and read as empty after midnight. Its independent weekly activity remains monotonic and synchronized: a fresh reading or tally undo does not erase the historical activity record. Friday practice records and Al-Kahf keep their existing cycle.
+
+Home's checksum-identical compressed reminder package is shipped as a deferred app asset and precached. It no longer depends on the external R2 host for first acquisition. Reads still verify pinned byte length/checksum before decoding and retain the existing verified cache; an 8-second abort releases stalled acquisition for retry. First-load failure has localized visible status/retry instead of a silent missing card. No religious source, schedule or package byte is changed.
+
+Build-only audio literal interning shares identical long string values in the two existing manifest modules, leaving reviewed authoring files and every exported object unchanged. Actual-manifest round-trip tests cover all text, hashes, variants, attribution and review metadata. This creates room for the local reminder asset within the unchanged output ceiling; no browser decoder, data format, dependency, media-controller or persistence change is introduced.
+
+Home retains the verified current reminder while a replacement loads. Failed first catalogue acquisition retries on online/visible recovery, guarded against overlapping work and removed on context change/unmount. Successful minute ticks reuse the existing verified promise/cache; there is no polling retry or additional clock. Reviewed source selection, timing, checksums and focus-pinned reading remain authoritative.
+
+## Ordinary-page layout consistency — 2026-11-01
+
+The shared Header defaults to the ordinary 80rem page frame and responsive page gutter. A shared CSS title recipe reserves a 44px row with subtitles below it; Library and Settings reuse that recipe without replacing their scroll owners or heading hierarchy. Search now uses the same visible header and frame while preserving its native field label and deferred search/index logic. Progress keeps its full-scrollport opaque wrapper and moves the common measure/gutter onto its inner controls, matching its body. Utility content uses the same frame/gutter; Category keeps its narrower form body below an ordinary outer header. ReadingScreenChrome/Reader explicitly opt into compact devotional geometry; immersive Mushaf and Home prayer alignment remain separate intentional contracts. Layout checks compare measured coordinates and reflow across ordinary routes in both directions and enlarged text.
+
+ProgressMetricCard contains reusable presentation only: normalized values, metric identity, localized quantity/caption and navigation arrive from ProgressDashboard. Theme tokens and CSS container queries own color, hierarchy and reflow. No storage/network request, extra index, animation clock or dependency is added. Existing icon exports and the shared ProgressBar supply the symbol and bounded fill feedback.
+
+## Progress title/filter/export refinement — 2026-11-01
+
+The owner replaces three Progress tabs with Overview and Trends and restores the shared visible Header. At the existing 600px compact boundary, the date editor is initially hidden behind an accessible filter action; the applied range remains in the title subtitle. Completed preset/custom choices close the filters and restore focus to their visible opener. Wider screens keep adjacent date/two-tab controls. The opaque full-width sticky wrapper and native focus-clearance boundary remain authoritative.
+
+Settings Account & data owns a shared DataExportMenu sheet offering the existing normalized/restorable full backup separately from dated progress JSON. The app passes a snapshot-bound async callback; progressExport loads only on export intent and reuses existing index/range/unknown-goal rules plus the native-aware file dispatcher. The Progress page no longer mounts its former Records table or file-export UI. Exact chart tables, calendar date details, data schemas and persistence remain intact. Shared form labels, native date fields and protected select primitives supply the same control anatomy.
+
+Compact Settings subheaders retain a 16 CSS px maximum inline gutter and fixed 8px Back/title gap, so enlarged text keeps its reading width beside the 44px Back action. Downloads storage-details headings/status and diagnostic label/value rows wrap independently at narrow enlarged widths; no clipping or storage-behavior change is introduced.
+
+## Progress mobile and scrolling correction — 2026-11-01
+
+The owner supersedes the frost-only Progress header. One opaque full-scrollport sticky wrapper owns an unconstrained inner control row, protecting gutters and keeping enlarged controls reachable in its bounded scroll area. The body owns page gutters separately. Heatmap cells reflow through a named container query instead of horizontal scrolling; physical up/down keys follow actual rendered columns. Phone date activation opens exact records in ResponsiveSheet with native close/focus recovery, while wider layouts retain inline detail. Fixed colour scales and date/month exploration preserve the shared range and persisted data.
+
+## Progress recording calendar and rolling range — 2026-11-01
+
+The approved heatmap refinement supersedes the separate seven-day presence strip/latest-day list. Unqualified Progress visits default to the typed `last30` rolling range; explicit `day`, `week`, `month`, `year` and `last30` links round-trip. A selected range owns Overview, Trends, Records and JSON export; heatmap date/month exploration never changes it. Last 30 days is thirty inclusive civil dates, with existing per-practice devotional/civil clipping and complete-day comparison rules applied afterwards.
+
+ProgressHeatmap consumes the existing normalized daily index and uses pure fixed-band/weekday helpers in progressHeatmap.ts. It defaults to Daily azkar, exposes exact selected-date details, preserves unknown Quran goals and neutral absence/future states, and bounds long selections to one month of interactive cells with year/month exploration. ProgressRoutineComparison shows equal-scale routine recording bars and an optional composition of saved completions only. RecordingTimeline supports columns and lines with the same units, gaps, keyboard/pointer/RTL exploration and exact bucket tables. Month/Last30 use daily buckets; long custom/year aggregation remains bounded.
+
+ProgressScreen retains a date-clock identity until its civil/devotional boundary changes, so minute ticks do not invalidate range/history derivations. Optional ProgressDetails mounts its existing reflection calculations only when disclosed and preserves the visit-local topic choice. Memoized calendar/comparison presentation reuses stable inputs. No storage/schema, synchronization, content or dependency changes.
+
+## Progress single-range control — 2026-11-01
+
+The owner-approved compact Progress header supersedes the older multi-control date toolbar below. ProgressRangeToolbar exposes one protected shared selector for Day, Week, Month, Year and Custom dates. Calendar type comes from Settings; no local calendar override, period arrows, Today action or filter disclosure remains. Custom dates edits validated start/end drafts in ResponsiveSheet; equal boundaries select one day. Apply/Cancel/Escape restore focus to the selector. One applied range still owns Overview, Trends, Records and JSON export, with existing civil/devotional boundaries and complete-day comparisons. The h1 remains available to assistive technology without visible title/share chrome; detailed reflection retains sharing. No persisted or synchronized format changes.
 
 ## Android interaction reliability — 2026-10-31
 
@@ -215,6 +309,8 @@ AyahShareStudio uses the same cached local Saheeh International loader as Quran 
 ### Verified Quran snippet lettering (2026-10-11)
 
 `useQuranSnippet` resolves explicit passage/evidence identities through the existing Mushaf loader. `excerptWordMapping` validates consecutive source tokens against the cited Uthmani words; only display normalization is applied, including orthographic joins. `QuranGlyphSlice` paints page-specific QCF glyphs while preserving the original accessible source and offsets. Unverified text or unavailable fonts use the shared Unicode fallback. A late font notification upgrades the fallback without blocking reading.
+
+Quran entry stability (2026-11-03, local): the shared listening/snippet hook reads the validated in-memory page and decoded-font readiness synchronously for its initial/page-change render, rather than discarding ready content. Cold font and page acquisition start together. Full and immersive Mushaf readers initialize both already-ready spread faces through `getReadyMushafPage`; no cached single-page-to-spread handoff is needed. App-owned navigation intent lazily warms at most two page/font pairs from a category or the next two reader entries through `quranReadiness`, reusing the same deduplicated loaders. Hidden screens, Data Saver and 2G skip speculative requests. This does not add a cache or persistence schema, block reading on fonts, or remove late-font/offline fallback recovery.
 
 The daily page fonts and JSON for 42, 49, 603 and 604 are precached for first offline use after installation. `scripts/prepare-daily-quran-fonts.mjs` refreshes dated assets and records provider URLs and hashes; updates must also change the local font directory in `qcfMushaf.ts`. Image exports prepare separate verified drawing data and preserve the original text payload. Quran Foundation credentials are not bundled or used for font loading.
 
@@ -713,3 +809,59 @@ Progress time-series source arrays retain ascending date order. RecordingTimelin
 ## Device-only Mushaf colour shortcut — 2026-10-20
 
 `mushafColorGestures` is an optional normalized local snapshot field, defaulting to enabled for existing readers. App owns and persists the choice and supplies it to both Mushaf hosts. Incoming account snapshots preserve the local value; the explicit remote payload allowlist omits it. Disabling removes the vertical colour callbacks and fitting-paper gesture override, preserving horizontal turns, explicit colours and native scrolling. No remote schema or reviewed content changes.
+
+## Visit-local listening focus — 2026-11-02
+
+FloatingAudioPlayer owns ephemeral focus state independently of persisted settings/progress and playback. AudioPlayerSurface retains the same portal host and text subtree while expanding to the viewport; focus does not pause/stop or rebuild the plan. It temporarily makes covered shell siblings inert/aria-hidden, restores their previous attributes on exit/unmount, and bounds Tab recovery within the visible reading surface. Escape first exits focus and restores its trigger; a later Escape collapses the ordinary player. Playback errors reveal controls again. Shared ResponsiveFilters adds an optional compact icon trigger while retaining its existing sheet, controlled values and focus return. No new dependency, persistence or synchronization boundary is introduced.
+
+## Responsive navigation utility composition — 2026-11-02
+
+BottomNav and NavRail receive prepared Qibla/Masbaha callbacks and an exclusive activeUtility from App; visual navigation does not mutate persisted activeTab or add route types. Existing native hrefs preserve modified-click behavior. Primary NavTab remains unchanged. A CSS container query controls Masbaha visibility without listeners or state churn. App's existing push and primary Progress handler preserve URL/back/audio-lock behavior. Home exposes More via a callback; More composes a Progress ToolCard using existing routes and localized copy. No persisted state or network changes.
+
+### Audio focus and Mushaf downloads
+
+Focus mode retains its exit and accidental-touch lock actions. The footer shows compact queue and repetition context, a fixed Play next switch and an active timer indicator. Repeat settings open from the repetition control. The shared lock overlay returns focus to the lock button after unlocking.
+
+Mushaf requests share a priority queue that reserves foreground capacity. Queued speculation can be discarded when the reader moves. Explicit downloads retain their cancellation and resume path. Mounted page renderers retain their decoded fonts, with a twelve-face target for the remaining pool. Eviction preserves Cache Storage. Downloads publishes Mushaf and audio status independently, revalidates cached bodies in cancellable batches, and displays a versioned session hint while checking. Actual byte totals count validated payloads. Remaining sizes use known bundled pairs and a conservative estimate for remote pairs.
+
+## Stable Quran font settlement and measured Mushaf sizes — local
+
+Visible Quran pages and identified snippets choose their typeface after page/font preparation, bounded by the existing 1.2-second font wait. They retain that choice until navigation or explicit retry. The decoded font/cache may finish in the background for the next visit. The shared page resolver and snippet hook retain warm-cache first renders and foreground priority. Late-font subscriptions no longer replace visible word boxes. Identified inline passages expose a short preparation status before exact glyphs or readable Unicode. This supersedes the earlier automatic late-font recovery presentation.
+
+The generated mushafAssetSizes catalog records the 604 shipped JSON lengths and remote WOFF2 Content-Length values. A content-derived version invalidates old status summaries. Download status sums missing page/font resources separately and reports verified stored bytes independently. Generation records remote ETags in ignored output evidence. CI tests compare all shipped page lengths and bundled font lengths against the catalog. Refresh the catalog when the source or shipped resources change. Quota preflight retains its 15% overhead allowance and actual transfer notifications use received bytes.
+
+## Local Mushaf listening recovery — 2026-11-04
+
+FloatingAudioPlayer owns a stable footer recovery host beside Focus/Lock. Both Quran listening readers portal ListeningResumeButton there and restore focus to the reading region on resuming. The paged selector stays in the existing Audio options preferences portal. Recovery changes following only; audio position, controller, recording/timing identity, persisted progress and offline boundaries are unchanged. Page sizing no longer reserves header controls or an overlaid recovery button. Playback verse attributes remain available for scroll fallback and accessible semantics while listening paint is restricted to the timed word (or the existing marker without a word cue).
+
+Progress keeps one outer sticky controls owner for its shared Header and date/view actions. That owner now follows the ordinary header's resolved material rules; the nested Header does not add a second frosted layer. Removing the local background-variable override does not change progress state, date filtering, scroll measurements or persisted settings. The standard icon token owns filter sizing.
+
+## Shared configuration actions — 2026-11-04
+
+Button exposes a pill variant backed by PILL_ACTION and the existing choice-pill CSS family. The default pill size is a 54px minimum with flexible label height. ProgressDashboard, Quran plan editing and relevant Settings navigation compose it without altering data/state responsibilities. Progress's filter uses the same pure paint recipe inside its content-sized action frame. Primary/secondary/ghost confirmation roles use shared Button variants; domain transport/counter, Settings rows and protected menu primitives retain their established geometry/semantics. No state/network/storage calls are added to reusable visual components.
+
+The listening queue now composes the existing Radix popover in the actual queue trigger's root, rather than an independently centered Modal. The protected portalled surface remains a named dialog with a separate header and bounded scrolling body. A local ResizeObserver reveals the current recording after the positioning primitive resolves available height; cleanup cancels its frame/observer. Queue selection, media state, persistence and content remain owned by the existing controller. Settings row hover is local paint only; dividers remain stable and enabled rows do not fade on press.
+
+## Balanced Mushaf presentation — 2026-11-04
+
+MushafThemeNotice is pure presentation of an already-applied theme. Both reader owners keep their existing cycle timer/state and pass the notice into MushafPageViewer chrome; no new storage/gesture owner is introduced. The shared viewer scopes bounded desktop canvas sizing to interactive readers, leaving audio excerpts and original line fitting unchanged. Paper/ink tokens explicitly protect the applied reading theme from app Glass overrides. NavigationModal retains Radix focus/history semantics and only changes dialog/card/tab presentation. Reviewed page data, identifiers, offline preparation, word geometry and controller boundaries remain unchanged.
+
+## Approved Mushaf chrome — local 2026-11-05
+
+MushafReadingChrome provides pure header, footer and compact Focus presentation. Both reader owners compose these into MushafPageViewer and retain ownership of navigation, focus, fullscreen and index state. The shared viewer places desktop chrome around its existing paper and rail, hides redundant Arabic spread furniture, preserves matching furniture for paired translation, and renders tablet page turns only when navigation callbacks exist. Reading-presentation attributes scope tablet framing away from readonly listening views. MushafToolRail omits navigation duplicated in the header. No new timers, observers, persisted fields, dependencies or content transformations are introduced. NavigationModal directs Surah/search entry to its existing search input while preserving portalled focus recovery.
+
+## Relevant dated notification delivery
+
+The approved notification catalogue supplies exact Arabic excerpts, faithful English meanings, captions and named references in notificationEvidence.json. notificationCopy selects within the relevant prayer/group by scheduled civil date. Dhuhr advance reminders exclude the after-zawal quotation. The title records the scheduled prayer clock time.
+
+reminderOccurrences supplies selected-location prayer instants, device-local routine clocks, completion suppression, deterministic keys, routes and bounded browser expiry. useNativeServices owns the Android queue. The former foreground native scheduler is now a read-only compatibility diagnostic. Replacement also cancels the old scheduler's marked alarms. Browser delivery uses Web Locks across tabs and dated storage/session claims. The protected same-origin notification tap path works through the imported worker script and desktop constructor fallback.
+
+### Notification settings and shared source previews
+
+Settings derives the next and following reminder names, delivery times and source previews from the same dated plan used for delivery. The selected prayer-location clock applies to prayer and contextual reminders. Routine clock fields use the device timezone. Android permission details query owned pending IDs and exact-alarm access, and request a rebuild through the existing native scheduling owner. Browser permission stays in a compact disclosure with its own delivery guidance. The save message uses the existing application persistence status.
+
+Home evidence, prayer virtues and notification previews share the portalled evidence sheet. Each caller supplies its reviewed quotation, reference, direction and optional direct source link. The sheet supports keyboard dismissal and focus return. Its protected surface keeps underlying lettering out of the reading area in Glass mode.
+
+### Surah cover delivery
+
+The Reader selects between a 416px same-origin WebP and the existing 768px versioned hosted WebP. The visible cover has high fetch priority. The compact versions ship in the offline precache, while larger immutable versions are cached on demand. The error path first tries the compact matching cover and then the packaged generic Quran artwork. Friday's small and expanded photo slots select responsive sizes. Progress card photos share the existing image variants, and authored sharing exports retain their original files.

@@ -1,0 +1,119 @@
+/* One quiet inset family for compact view/mode choices and Home's palm pill. */
+.tab-selection-finish {
+  animation: fade-in var(--motion-duration-fast) var(--motion-ease-enter) both;
+}
+.compact-sheet-header {
+  padding-inline: 16px;
+  column-gap: 8px;
+}
+.section-view-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(44px, auto));
+  align-self: flex-start;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 4px;
+}
+.section-view-tabs .section-view-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 44px;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--text-sm);
+  font-weight: 800;
+}
+.section-view-tabs .section-tab-label {
+  white-space: nowrap;
+}
+/* A neighboring action matches the complete tab frame, not its inset option.
+   The grid row follows labels as they grow, without fixed-size overrides. */
+.section-view-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 8px;
+  max-inline-size: 100%;
+}
+.section-view-actions > .section-view-action {
+  inline-size: auto;
+  block-size: 100%;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  aspect-ratio: 1;
+}
+@media (width < 600px) {
+  .section-view-tabs .section-view-tab {
+    padding: 0;
+  }
+  .section-view-tabs .section-tab-label {
+    display: none;
+  }
+}
+.choice-pill {
+  border: 1px solid var(--border-control);
+  border-radius: 999px;
+  background-color: var(--muted);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+.choice-pill-action {
+  color: var(--foreground);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.choice-pill-action:active:not(:disabled, [aria-disabled="true"], [aria-busy="true"]) {
+  background-color: color-mix(in srgb, var(--primary) 20%, var(--muted));
+}
+.choice-pill .choice-pill-option {
+  min-block-size: 44px;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted-foreground);
+}
+.choice-pill .choice-pill-option[aria-selected="true"],
+.choice-pill .choice-pill-option[data-state="checked"] {
+  background: var(--primary);
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.1), transparent 52%, rgb(2 6 23 / 0.05));
+  color: var(--primary-foreground);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+@media (forced-colors: active) {
+  .choice-pill {
+    border: 1px solid ButtonText;
+  }
+  .choice-pill .choice-pill-option[aria-selected="true"],
+  .choice-pill .choice-pill-option[data-state="checked"] {
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
+  }
+}
+
+.choice-pill .choice-pill-option {
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+}
+@media (hover: hover) and (pointer: fine) {
+  .choice-pill-action:not(:disabled, [aria-disabled="true"], [aria-busy="true"]):hover {
+    background-color: color-mix(in srgb, var(--primary) 12%, var(--muted));
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
+  .choice-pill .choice-pill-option:not(:disabled):hover {
+    box-shadow: inset 0 0 0 1px var(--primary);
+    background-color: color-mix(in srgb, var(--primary) 12%, var(--muted));
+  }
+  .choice-pill .choice-pill-option:is([aria-selected="true"], [data-state="checked"]):hover {
+    background-color: color-mix(in srgb, var(--primary) 92%, var(--primary-foreground));
+    color: var(--primary-foreground);
+  }
+  .choice-pill .choice-pill-option:not(:disabled, :focus-visible):hover {
+    outline: 1px solid var(--primary);
+    outline-offset: -2px;
+  }
+  .choice-pill .choice-pill-option:is([aria-selected="true"], [data-state="checked"]):not(:focus-visible):hover {
+    outline-color: var(--primary-foreground);
+  }
+}

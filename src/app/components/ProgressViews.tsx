@@ -25,22 +25,22 @@ export interface QuranWirdTile {
 const WIRD_CARD_CONFIG = {
   morning: {
     subtitleKey: "progress.morningCardSubtitle",
-    image: "assets/cards/wird-morning-720.webp",
+    image: "assets/cards/wird-morning",
     badgeStyle: { backgroundColor: "#f59e0b", color: "#020617" },
   },
   evening: {
     subtitleKey: "progress.eveningCardSubtitle",
-    image: "assets/cards/wird-evening-720.webp",
+    image: "assets/cards/wird-evening",
     badgeStyle: { backgroundColor: "#6366f1", color: "#ffffff" },
   },
   before_sleep: {
     subtitleKey: "progress.sleepCardSubtitle",
-    image: "assets/cards/wird-sleep-720.webp",
+    image: "assets/cards/wird-sleep",
     badgeStyle: { backgroundColor: "#3b82f6", color: "#ffffff" },
   },
   quran: {
     subtitleKey: "progress.quranCardSubtitle",
-    image: "assets/cards/wird-quran-720.webp",
+    image: "assets/cards/wird-quran",
     badgeStyle: { backgroundColor: "#10b981", color: "#020617" },
   },
 } as const;
@@ -85,18 +85,27 @@ function WirdCategoryCard({
       data-recommended-now={showRecommended ? "true" : undefined}
       data-category={categoryKey}
       data-testid="wird-category-card"
-      className={`hero-glass home-glass-surface group relative flex min-h-48 flex-col overflow-hidden rounded-3xl border border-white/20 p-4 text-start shadow-raised transition-all duration-standard ease-standard hover:border-white/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 sm:min-h-[13.5rem] lg:min-h-[14.5rem] ${
+      className={`hero-glass home-glass-surface group relative flex min-h-48 flex-col overflow-hidden rounded-3xl border border-white/20 p-4 text-start shadow-raised transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-standard ease-standard hover:border-white/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 sm:min-h-[13.5rem] lg:min-h-[14.5rem] ${
         isCompleted ? "ring-2 ring-success/60" : ""
       }`}
     >
       {/* Visual Background Photo */}
-      <img
-        src={imageSrc}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
-      />
+      <picture>
+        <source
+          type="image/avif"
+          srcSet={`${imageSrc}-360.avif 360w, ${imageSrc}-720.avif 720w`}
+          sizes="auto, (min-width: 768px) 360px, 100vw"
+        />
+        <img
+          src={`${imageSrc}-360.webp`}
+          srcSet={`${imageSrc}-360.webp 360w, ${imageSrc}-720.webp 720w`}
+          sizes="auto, (min-width: 768px) 360px, 100vw"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
       {/* Translucent Glass Scrim & Ambient Overlay — inline style avoids generating new Tailwind gradient utilities */}
       <div
         aria-hidden="true"

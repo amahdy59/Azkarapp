@@ -11,9 +11,13 @@ import type {
   ZikrFontOption,
 } from "../../types";
 import type { SettingsSubScreen } from "./SettingsPanels";
+import type { ProgressRange } from "../../progressDashboard";
 
 /** The screen's application-facing contract, kept separate from its responsive panel composition. */
 export interface SettingsScreenProps {
+  localSaveStatus?: "pending" | "saved" | "error";
+  onRetrySave?: () => void;
+  onRetrySync?: () => void;
   onReviewUpdate?: () => void;
   audioController: AudioController | null;
   themeMode: ThemeMode;
@@ -36,6 +40,8 @@ export interface SettingsScreenProps {
   reduceMotion: boolean;
   reduceTransparency: boolean;
   homeWirdImages?: boolean;
+  paperTexture?: boolean;
+  onPaperTextureChange?: (value: boolean) => void;
   appMaterial?: "system" | "glass" | "solid";
   onAppMaterialChange?: (value: "system" | "glass" | "solid") => void;
   homeMaterial?: "inherit" | "system" | "glass" | "solid";
@@ -75,6 +81,7 @@ export interface SettingsScreenProps {
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
+  onExportProgress?: (range: ProgressRange) => Promise<void>;
   onRestoreData: (raw: string) => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;

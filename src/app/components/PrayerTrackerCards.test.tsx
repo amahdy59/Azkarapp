@@ -54,18 +54,18 @@ afterEach(() => {
 
 describe("PrayerTrackerCards", () => {
   it.each(["ar", "en"] as const)(
-    "shares one %s seconds clock across both visual copies without live announcements",
+    "uses the same %s minute countdown in both states without a seconds clock",
     (language) => {
       vi.useFakeTimers();
       const now = Date.parse("2026-10-20T10:00:00Z");
       vi.setSystemTime(now);
-      const { unmount } = render(
+      const minute = language === "ar" ? "متبقٍ ٢ س ٢٦ د" : "2h 26m remaining";
+      const models = modelsWithCurrent("dhuhr").map((model) =>
+        model.state === "next" ? { ...model, countdown: minute } : model,
+      );
+      const row = (summaryCondensed: boolean) => (
         <PrayerTrackerCards
-          models={modelsWithCurrent("dhuhr").map((model) =>
-            model.state === "next"
-              ? { ...model, countdownInterval: { startsAt: now - 3600_000, endsAt: now + 8798_000 } }
-              : model,
-          )}
+          models={models}
           language={language}
           direction={language === "ar" ? "rtl" : "ltr"}
           records={[]}
@@ -74,21 +74,28 @@ describe("PrayerTrackerCards", () => {
           onOpen={vi.fn()}
           summaryOnly
           compactSummary
-        />,
+          summaryCondensed={summaryCondensed}
+        />
       );
+      const { rerender, unmount } = render(row(false));
       const card = screen.getByTestId("prayer-card-asr");
       const time = card.querySelector('[id="prayer-summary-time-asr"]');
       expect(time?.querySelector("[data-prayer-time-digits]")).toHaveTextContent(language === "ar" ? "٤:٣١" : "4:31");
       expect(time).toHaveTextContent(language === "ar" ? "٤:٣١ م" : "4:31 PM");
-      expect(card.querySelectorAll("[data-prayer-countdown]")).toHaveLength(2);
-      expect(vi.getTimerCount()).toBe(1);
-      expect(card.querySelector("[data-prayer-compact-countdown]")).toHaveAttribute("aria-hidden", "true");
-      expect(card.querySelector("[data-prayer-detail]")).toHaveTextContent(language === "ar" ? "٠٢:٢٦:٣٨" : "02:26:38");
-      expect(card.querySelector("button")).toHaveAccessibleDescription(
-        language === "ar" ? /الوقت المتبقي حتى العصر/ : /Time remaining until Asr/,
-      );
+      expect(card.querySelectorAll("[data-prayer-countdown]")).toHaveLength(0);
+      expect(vi.getTimerCount()).toBe(0);
+      const compact = card.querySelector("[data-prayer-compact-countdown]");
+      expect(compact).toHaveAttribute("aria-hidden", "true");
+      expect(compact).toHaveTextContent(minute);
+      expect(compact?.querySelector(".prayer-countdown-seconds, .prayer-countdown-ring")).toBeNull();
+      expect(card.querySelector("[data-prayer-detail]")).toHaveTextContent(minute);
+      expect(card.querySelector("button")).toHaveAccessibleDescription(expect.stringContaining(minute));
       expect(card.querySelector("[aria-live], [role='progressbar'], [role='timer']")).toBeNull();
-      expect(card.querySelector(".prayer-countdown-digits")).toHaveAttribute("dir", "ltr");
+      rerender(row(true));
+      expect(vi.getTimerCount()).toBe(0);
+      expect(card.querySelector("button")).toHaveAccessibleDescription(expect.stringContaining(minute));
+      rerender(row(false));
+      expect(vi.getTimerCount()).toBe(0);
       unmount();
       expect(vi.getTimerCount()).toBe(0);
       vi.useRealTimers();
@@ -97,9 +104,7 @@ describe("PrayerTrackerCards", () => {
   it.each(["ar", "en"] as const)("exposes a text countdown without a redundant %s progress bar", (language) => {
     render(
       <PrayerTrackerCards
-        models={modelsWithCurrent("dhuhr").map((model) =>
-          model.state === "next" ? { ...model, remainingPercent: 25 } : model,
-        )}
+        models={modelsWithCurrent("dhuhr")}
         language={language}
         direction={language === "ar" ? "rtl" : "ltr"}
         records={[]}
@@ -123,9 +128,7 @@ describe("PrayerTrackerCards", () => {
   it("uses concise saved-location and future-state footers without adding actions", () => {
     render(
       <PrayerTrackerCards
-        models={modelsWithCurrent("dhuhr").map((model) =>
-          model.state === "next" ? { ...model, remainingPercent: 60 } : model,
-        )}
+        models={modelsWithCurrent("dhuhr")}
         language="en"
         direction="ltr"
         records={[
@@ -211,7 +214,7 @@ describe("PrayerTrackerCards", () => {
   });
   it("shows all five prayers in order with a labelled countdown and today's recordable state", () => {
     const models = modelsWithCurrent("isha").map((model): PrayerCardModel =>
-      model.prayer === "fajr" ? { ...model, state: "next", countdown: "06:00 left", remainingPercent: 60 } : model,
+      model.prayer === "fajr" ? { ...model, state: "next", countdown: "06:00 left" } : model,
     );
     render(
       <PrayerTrackerCards

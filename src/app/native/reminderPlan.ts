@@ -1,10 +1,6 @@
-import { getEstimatedPrayerTimes, PRAYER_NAMES } from "../content/prayerTimes";
-import { DEFAULT_LOCATION } from "../content/prayerCalculation";
-import { getProgressDayKey } from "../progress";
-import { t } from "../i18n";
-import { formatNumerals } from "../formatting";
+import { notificationCopy } from "../notificationCopy";
+import { reminderOccurrences } from "../reminderOccurrences";
 import type { AppStateSnapshot } from "../types";
-import { locationTime, locationCalendarDate } from "../content/locationTime";
 
 export { locationTime, locationCalendarDate } from "../content/locationTime";
 
@@ -16,55 +12,34 @@ export interface NativeReminder {
   route: string;
 }
 
-/** A bounded, replaceable seven-day queue. Native storage contains no coordinates or profile. */
+const EVENT_KINDS = [
+  "prayer:fajr",
+  "prayer:dhuhr",
+  "prayer:asr",
+  "prayer:maghrib",
+  "prayer:isha",
+  "morning",
+  "evening",
+  "before_sleep",
+  "after_prayer",
+  "friday",
+  "fridayDua",
+  "beforeFajrDua",
+  "fridaySalawat",
+  "fastingPreparation",
+] as const;
+
+/** The sole active Android queue, rebuilt serially by replaceNativeReminders. */
 export function buildNativeReminderPlan(state: AppStateSnapshot, now = new Date()): NativeReminder[] {
-  const { language, reminders, location, progressDayStartHour } = state.settings;
-  const zone = location?.timeZone ?? DEFAULT_LOCATION.timeZone ?? "UTC";
-  const first = locationCalendarDate(now, zone);
-  const result: NativeReminder[] = [];
-  let id = 10_000;
-  for (let day = 0; day < 7; day++) {
-    const date = new Date(first);
-    date.setDate(date.getDate() + day);
-    const times = getEstimatedPrayerTimes(date, location);
-    const add = (at: number, title: string, body: string, route: string) => {
-      const nextId = id++;
-      if (at > now.getTime()) result.push({ id: nextId, title, body, at, route });
-    };
-    if (reminders.prayer.enabled)
-      for (const prayer of PRAYER_NAMES) {
-        if (reminders.prayer.prayers && !reminders.prayer.prayers.includes(prayer)) continue;
-        const name = t(language, `notifications.${prayer}`);
-        add(
-          locationTime(date, times[prayer], zone) - reminders.prayer.leadMinutes * 60_000,
-          t(language, "notifications.prayerReminderTitle", { prayer: name }),
-          t(language, "notifications.prayerReminderBody", {
-            prayer: name,
-            minutes: formatNumerals(reminders.prayer.leadMinutes, language),
-          }),
-          "#/azkar/after-prayer",
-        );
-      }
-    for (const kind of ["morning", "evening", "before_sleep", "after_prayer"] as const) {
-      if (!reminders[kind].enabled) continue;
-      // Routine reminders follow the user's device clock, matching the web contract.
-      const local = new Date(now);
-      local.setDate(local.getDate() + day);
-      const [hours = 0, minutes = 0] = reminders[kind].time.split(":").map(Number);
-      local.setHours(hours, minutes, 0, 0);
-      const key = getProgressDayKey(local, progressDayStartHour);
-      if (
-        reminders.onlyWhenIncomplete &&
-        state.dailyCompletions.some((entry) => entry.category === kind && entry.dayKey === key)
-      )
-        continue;
-      add(
-        local.getTime(),
-        t(language, `notifications.${kind}Title`),
-        `${t(language, "notifications.reminderPrefix")} ${t(language, `notifications.${kind}Title`)}`,
-        `#/azkar/${kind.replaceAll("_", "-")}`,
-      );
-    }
-  }
-  return result.sort((a, b) => a.at - b.at);
+  const { language, reminders, location, progressDayStartHour, hijriDateOffset } = state.settings;
+  return reminderOccurrences(reminders, state.dailyCompletions, location, progressDayStartHour, now, 7, hijriDateOffset)
+    .filter((event) => event.at > now.getTime())
+    .map((event) => {
+      const { title, body } = notificationCopy(language, event, event.dateKey, event.prayerTime);
+      const kind = event.kind === "prayer" ? (`prayer:${event.prayer}` as const) : event.kind;
+      // A 32-day ring is collision-free within the seven-day replacement queue.
+      const day = Math.floor(Date.parse(event.dateKey + "T12:00:00Z") / 86_400_000);
+      const id = 10_000 + (((day % 32) + 32) % 32) * 16 + EVENT_KINDS.indexOf(kind);
+      return { id, title, body, at: event.at, route: event.route };
+    });
 }

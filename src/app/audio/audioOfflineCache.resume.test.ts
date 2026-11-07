@@ -6,6 +6,7 @@ import {
   downloadAudioForZikrs,
   getAudioDownloadStatus,
   getAudioDownloadStatuses,
+  getAudioDownloadVoices,
   removeAudioForZikrs,
   getSavedAudioFiles,
   prepareSavedAudioFile,
@@ -135,6 +136,61 @@ describe("complete audio archives", () => {
 });
 
 describe("verified offline audio", () => {
+  it("preserves cached data after transient body-read errors", async () => {
+    const remove = vi.fn();
+    vi.mocked(caches.open).mockResolvedValueOnce({
+      match: async () => ({
+        status: 200,
+        headers: new Headers({ "content-type": "audio/mpeg" }),
+        arrayBuffer: async () => {
+          throw new Error("temporary cache read failure");
+        },
+      }),
+      delete: remove,
+    } as unknown as Cache);
+    expect((await getAudioDownloadStatus([zikrs[0]!], DEFAULT_AUDIO_PREFERENCES)).completed).toBe(0);
+    expect(remove).not.toHaveBeenCalled();
+  });
+  it("drains a corrupt-file check before publishing a concurrent verified replacement", async () => {
+    files.set(fixtures.urls[0]!, response([9, 2, 3]));
+    let release!: (hash: ArrayBuffer) => void;
+    vi.mocked(crypto.subtle.digest).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = resolve;
+        }),
+    );
+    const status = getAudioDownloadStatus([zikrs[0]!], DEFAULT_AUDIO_PREFERENCES);
+    await vi.waitFor(() => expect(release).toBeDefined());
+    const transfer = downloadAudioForZikrs([zikrs[0]!], DEFAULT_AUDIO_PREFERENCES);
+    expect(fetchMock).not.toHaveBeenCalled();
+    release(new Uint8Array(32).fill(1).buffer);
+    await Promise.all([status, transfer]);
+    expect(files.has(fixtures.urls[0]!)).toBe(true);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect((await getAudioDownloadStatus([zikrs[0]!], DEFAULT_AUDIO_PREFERENCES)).completed).toBe(1);
+  });
+  it("shows deduplicated resolved voices and cancels a stale scan before verification", async () => {
+    expect(getAudioDownloadVoices(zikrs, DEFAULT_AUDIO_PREFERENCES)).toEqual([{ id: "voice", name: "Test reciter" }]);
+    files.set(fixtures.urls[0]!, response());
+    const controller = new AbortController();
+    controller.abort();
+    await expect(
+      getAudioDownloadStatuses([zikrs], DEFAULT_AUDIO_PREFERENCES, { signal: controller.signal }),
+    ).rejects.toThrow();
+    expect(crypto.subtle.digest).not.toHaveBeenCalled();
+  });
+  it("removes definitely corrupt bytes once and preserves healthy recordings", async () => {
+    files.set(fixtures.urls[0]!, response([9, 2, 3]));
+    files.set(fixtures.urls[1]!, response());
+    expect((await getAudioDownloadStatus(zikrs, DEFAULT_AUDIO_PREFERENCES)).completed).toBe(1);
+    expect(files.has(fixtures.urls[0]!)).toBe(false);
+    expect(files.has(fixtures.urls[1]!)).toBe(true);
+    expect(crypto.subtle.digest).toHaveBeenCalledTimes(2);
+    await getAudioDownloadStatus(zikrs, DEFAULT_AUDIO_PREFERENCES);
+    expect(crypto.subtle.digest).toHaveBeenCalledTimes(3);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
   it("lists only verified cached files and exports the chosen recording without network or cache removal", async () => {
     files.set(fixtures.urls[0]!, response());
     files.set(fixtures.urls[1]!, response([9, 2, 3]));

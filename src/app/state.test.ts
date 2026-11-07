@@ -18,6 +18,36 @@ import {
 import { getProgressDayKey, shiftProgressDayKey } from "./progress";
 
 describe("app state persistence", () => {
+  it("starts with the owner's Arabic night-paper reading defaults without replacing saved choices", () => {
+    const fresh = normalizeAppState({}).settings;
+    expect(fresh).toMatchObject({
+      language: "ar",
+      themeMode: "midnight",
+      paperTexture: true,
+      zikrFont: "clear",
+      textSize: "medium",
+      readerToolLabels: false,
+    });
+    const saved = normalizeAppState({
+      settings: { language: "en", themeMode: "light", paperTexture: false, zikrFont: "naskh", readerToolLabels: true },
+    }).settings;
+    expect(saved).toMatchObject({
+      language: "en",
+      themeMode: "light",
+      paperTexture: false,
+      zikrFont: "naskh",
+      readerToolLabels: true,
+    });
+  });
+  it("normalizes and remembers the local paper texture choice across reload and foreign merges", () => {
+    expect(normalizeAppState({}).settings.paperTexture).toBe(true);
+    expect(normalizeAppState({ settings: { paperTexture: "false" } }).settings.paperTexture).toBe(true);
+    const local = normalizeAppState({ settings: { paperTexture: false } });
+    expect(saveAppState(local)).toBe(true);
+    expect(loadAppState().settings.paperTexture).toBe(false);
+    expect(mergeAppStates(local, DEFAULT_APP_STATE).settings.paperTexture).toBe(false);
+    expect(mergeAppStates(DEFAULT_APP_STATE, local).settings.paperTexture).toBe(true);
+  });
   it("migrates the combined Ruqyah bookmark and completion to all three surahs without changing history", () => {
     const session = {
       id: "before-ruqyah-split",
@@ -84,10 +114,41 @@ describe("app state persistence", () => {
     });
   });
 
-  it("resets daily partial counts at rollover but retains situational progress", () => {
-    expect(resetDailyPartialCounts({ "m-hm-77m": 1, "ap-tasbeeh-subhanallah": 30, "travel-progress": 12 })).toEqual({
-      "travel-progress": 12,
+  it("resets all known collection counts daily but retains weekly Al-Kahf and unknown forward-compatible values", () => {
+    expect(
+      resetDailyPartialCounts({
+        "m-hm-77m": 1,
+        "ap-tasbeeh-subhanallah": 30,
+        "tr-ref-1": 12,
+        "friday-kahf": 1,
+        unknown: 2,
+      }),
+    ).toEqual({
+      "friday-kahf": 1,
+      unknown: 2,
     });
+  });
+  it("restarts Comprehensive duas next day while preserving saved items and sessions", () => {
+    const session = {
+      id: "dua-history",
+      category: "comprehensive_duas",
+      completedAt: "2026-10-20T12:00:00Z",
+      completedCount: 1,
+      totalCount: 10,
+      durationSeconds: 30,
+      isComplete: false,
+    };
+    const state = normalizeAppState({
+      lastActiveDayKey: "2000-01-01",
+      completed: { comprehensive_duas: ["comprehensive-dua-01"], travel: ["tr-hm-1"] },
+      partialZikrCounts: { "comprehensive-dua-01": 2, "friday-dua-01": 1, "travel-progress": 5 },
+      savedZikrIds: ["comprehensive-dua-01"],
+      sessions: [session],
+    });
+    expect(state.completed.comprehensive_duas).toEqual([]);
+    expect(state.partialZikrCounts).toEqual({ "travel-progress": 5 });
+    expect(state.savedZikrIds).toContain("comprehensive-dua-01");
+    expect(state.sessions).toContainEqual(session);
   });
 
   it("returns defaults when storage is empty", () => {
@@ -165,6 +226,7 @@ describe("app state persistence", () => {
       "azkarapp.prayer_times_cache.2026-08-09.30.0.31.2.5",
       "azkarapp.prayer_time_zone.30.0.31.2",
       "azkarapp.last-successful-sync.v1",
+      "azkarapp.listening-bookmark.v1",
       "azkar.audio-preferences.v1",
       "azkar.audio-content-review.v1",
       "sb-project-ref-auth-token",
@@ -185,14 +247,21 @@ describe("app state persistence", () => {
   });
 
   it("clears account-private caches on sign-out without erasing device preferences", () => {
+    window.localStorage.setItem(
+      "azkarapp.friday-dua-reading.v1",
+      '{"dayKey":"2026-11-01","ids":["comprehensive-dua-01"]}',
+    );
     window.localStorage.setItem("azkarapp_recent_searches_ar", '["private"]');
     window.localStorage.setItem("azkarapp.prayer_times_cache.2026-08-09.30.0.31.2.5", "{}");
     window.localStorage.setItem("azkarapp.prayer_time_zone.30.0.31.2", "Africa/Cairo");
     window.localStorage.setItem("azkar.audio-preferences.v1", '{"voice":"reader"}');
     window.localStorage.setItem("azkar.audio-downloads.v1", "{}");
 
+    window.localStorage.setItem("azkarapp.listening-bookmark.v1", "private reading");
     clearPrivateStoredAppData();
+    expect(window.localStorage.getItem("azkarapp.listening-bookmark.v1")).toBeNull();
 
+    expect(window.localStorage.getItem("azkarapp.friday-dua-reading.v1")).toBeNull();
     expect(window.localStorage.getItem("azkarapp_recent_searches_ar")).toBeNull();
     expect(window.localStorage.getItem("azkarapp.prayer_times_cache.2026-08-09.30.0.31.2.5")).toBeNull();
     expect(window.localStorage.getItem("azkarapp.prayer_time_zone.30.0.31.2")).toBeNull();
@@ -448,11 +517,19 @@ describe("app state persistence", () => {
         ...DEFAULT_APP_STATE.completed,
         morning: ["m-hm-75a"],
         travel: ["tr-ref-1"],
+        friday_kahf: ["friday-kahf"],
       },
+      surahReadingPages: { "friday-kahf": 295, "ir-ref-5a": 604, "q-mulk": 563 },
+      khatmahPage: 100,
+      mushafBookmarks: [50],
     });
 
     expect(state.completed.morning).toEqual([]);
-    expect(state.completed.travel).toEqual(["tr-ref-1"]);
+    expect(state.completed.travel).toEqual([]);
+    expect(state.completed.friday_kahf).toEqual(["friday-kahf"]);
+    expect(state.surahReadingPages).toEqual({ "friday-kahf": 295 });
+    expect(state.khatmahPage).toBe(100);
+    expect(state.mushafBookmarks).toEqual([50]);
     expect(state.lastActiveDayKey).toBe(todayKey);
   });
 
@@ -866,9 +943,9 @@ describe("explicit Home material", () => {
 });
 
 describe("reader footer label preference", () => {
-  it("defaults legacy and invalid values to labelled controls and retains icons-only", () => {
-    expect(normalizeAppState({}).settings.readerToolLabels).toBe(true);
-    expect(normalizeAppState({ settings: { readerToolLabels: "false" } }).settings.readerToolLabels).toBe(true);
+  it("defaults absent and invalid values to icons and retains explicit label choices", () => {
+    expect(normalizeAppState({}).settings.readerToolLabels).toBe(false);
+    expect(normalizeAppState({ settings: { readerToolLabels: "false" } }).settings.readerToolLabels).toBe(false);
     const icons = normalizeAppState({ settings: { readerToolLabels: false } });
     expect(icons.settings.readerToolLabels).toBe(false);
     expect(

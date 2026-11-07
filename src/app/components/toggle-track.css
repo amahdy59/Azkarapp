@@ -1,0 +1,51 @@
+.settings-toggle-track {
+  direction: ltr;
+}
+.settings-toggle-row {
+  container: settings-toggle / inline-size;
+}
+/* At enlarged text, give the label its own line rather than a one-letter column. */
+@container settings-toggle (max-width: 12rem) {
+  .settings-toggle-control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .settings-toggle-control > .control-cue {
+    display: none;
+  }
+  .settings-toggle-control > .settings-toggle-track {
+    justify-self: end;
+  }
+}
+.settings-toggle-track:dir(rtl) {
+  direction: rtl;
+}
+.settings-toggle-thumb {
+  transform: translateX(0);
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.settings-toggle-track[data-checked="true"] > .settings-toggle-thumb {
+  transform: translateX(calc(2.75rem - 26px));
+}
+
+.settings-toggle-track:dir(rtl)[data-checked="true"] > .settings-toggle-thumb {
+  transform: translateX(calc(26px - 2.75rem));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-toggle-thumb {
+    transition-duration: 0.01ms;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [role="switch"]:not(:disabled, [aria-disabled="true"]):hover .settings-toggle-track {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+  }
+}
+[role="switch"]:focus-visible .settings-toggle-track {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+}

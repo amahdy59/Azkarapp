@@ -153,7 +153,7 @@ export function WirdBenefitsScreen({
           all, so cards surfaced in a strip above the filter and down both
           sides of it. A sibling of the scroll region cannot be scrolled over
           at any width, and needs no bleed to prove it. */}
-      <div className="page-content-center shrink-0 px-5 pb-3 pt-3" data-testid="wird-benefits-filter-bar">
+      <div className="page-content-center shrink-0 pb-3 pt-3" data-testid="wird-benefits-filter-bar">
         <TabList
           value={activeSection}
           onChange={setActiveSection}
@@ -175,12 +175,12 @@ export function WirdBenefitsScreen({
         role="region"
         aria-label={t(language, "wirdBenefits.title")}
         tabIndex={0}
-        className="page-content-center min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="page-content-center min-h-0 flex-1 overflow-y-auto pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         data-testid="wird-benefits-scroll-region"
       >
         <section
           {...tabPanelProps("wird-benefits", activeSection)}
-          className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
           data-testid={`wird-benefits-panel-${activeSection}`}
         >
           <div className="grid gap-3.5 lg:grid-cols-2" data-testid="wird-benefits-list">

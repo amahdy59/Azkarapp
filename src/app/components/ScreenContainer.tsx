@@ -1,5 +1,6 @@
 import { type ReactNode, type HTMLAttributes } from "react";
 import { useScreenFocus } from "../hooks/useScreenFocus";
+import "./scroll-edge.css";
 
 interface ScreenContainerProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;

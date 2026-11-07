@@ -1,0 +1,79 @@
+/* Static neutral grain: soft procedural white wove paper in light mode,
+   fine fractal with a modest opacity gain in dark. No live filter, overlay or animation. */
+:root {
+  --paper-grain-light: url("../../assets/paper-grain-light.png?no-inline");
+  --paper-grain-dark: url("../../assets/paper-grain-dark.png?no-inline");
+  --paper-grain: var(--paper-grain-dark);
+}
+.theme-light {
+  --paper-grain: var(--paper-grain-light);
+}
+/* The enabled light material uses warm ivory stock instead of glaring white.
+   Switching texture off restores the original light palette. */
+@media screen and (forced-colors: none) {
+  html[data-paper-texture="on"]:not(.high-contrast, .reduce-transparency).theme-light,
+  html[data-paper-texture="on"]:not(.high-contrast, .reduce-transparency) .theme-light {
+    --background: #f2f0eb;
+    --card: #fbf9f5;
+    --popover: #fbf9f5;
+  }
+}
+:is(.theme-dark, .theme-midnight, .theme-oled),
+html[data-app-material-resolved="glass"] :is(.app-shell, [role="dialog"], [data-dropdown-surface]),
+.home-photo-canvas .hero-glass {
+  --paper-grain: var(--paper-grain-dark);
+}
+.home-photo-canvas:has(.hero-glass.home-glass-header) {
+  --paper-grain: var(--paper-grain-dark);
+}
+/* Paint each filled canvas/card, never transparent structural wrappers. Child
+   backgrounds must change background-color rather than reset this image. */
+.app-viewport,
+.app-shell,
+[role="dialog"],
+[data-dropdown-surface],
+.app-shell
+  :is(
+    .bg-background,
+    .app-sidebar,
+    .app-rail,
+    .bottom-nav,
+    .choice-pill,
+    .bg-card,
+    .paper-surface,
+    .home-glass-inset,
+    .nav-sidebar-item[aria-current],
+    [data-material-card],
+    .glass-reading,
+    .bilingual-reader,
+    .bilingual-reader-header,
+    .bilingual-reader-footer,
+    .progress-screen-controls,
+    .progress-date-details,
+    .heatmap-day,
+    .home-prayer-summary-card,
+    .home-prayer-sticky[data-scrolled],
+    .field-shell,
+    .audio-player-surface,
+    .adaptive-counter-surface,
+    [data-slot="select-trigger"],
+    [data-dropdown-surface]
+  ) {
+  background-image: var(--paper-grain);
+}
+:is(.high-contrast, .reduce-transparency, [data-paper-texture="off"]) *,
+:root:is(.high-contrast, .reduce-transparency, [data-paper-texture="off"]) {
+  --paper-grain: none !important;
+}
+@media (forced-colors: active) {
+  :root,
+  :root * {
+    --paper-grain: none !important;
+  }
+}
+@media print {
+  :root,
+  :root * {
+    --paper-grain: none !important;
+  }
+}

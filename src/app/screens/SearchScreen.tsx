@@ -1,13 +1,13 @@
 import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useDeferredValue, useId, useMemo, useState } from "react";
-import { ArrowPrevious, Search, X } from "../components/icons";
+import { Search, X } from "../components/icons";
 import { ZIKR_LABELS } from "../content/azkar";
 import { SEARCHABLE_AZKAR, resolveSearchResultIndex } from "../content/searchCatalog";
 import { CATEGORIES } from "../content/categories";
 import type { AppLanguage, CategoryId } from "../types";
 import { StatePanel } from "../components/StatePanel";
-import { IconButton } from "../components/LayoutShells";
+import { Header } from "../components/LayoutShells";
 import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 import { useScreenFocus } from "../hooks/useScreenFocus";
@@ -165,14 +165,13 @@ export function SearchScreen({
       : t(language, "search.resultsPlural", { count: String(results.length), query: q });
 
   return (
-    <div className="flex flex-col h-full bg-background slide-in-from-right" dir={direction}>
-      <h1 className="sr-only">{t(language, "search.inputAriaLabel")}</h1>
+    <div
+      className="mx-auto flex h-full min-h-0 w-full max-w-[var(--content-page)] flex-col bg-background slide-in-from-right"
+      dir={direction}
+    >
+      <Header title={t(language, "search.title")} onBack={onBack} language={language} />
       {/* Search bar */}
       <div className="flex shrink-0 items-end gap-3 px-page py-3">
-        <IconButton onClick={onBack} label={t(language, "common.back")} className="shrink-0">
-          <ArrowPrevious size={20} className="text-foreground" />
-        </IconButton>
-
         <div className="min-w-0 flex-1">
           <label htmlFor={searchInputId} className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
             {t(language, "search.inputAriaLabel")}
@@ -333,7 +332,7 @@ export function SearchScreen({
         {results.length > visibleCount && (
           <button
             type="button"
-            className="mt-3 min-h-11 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="mt-3 min-h-11 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
             onClick={() => setResultPage({ query: deferredQuery, count: visibleCount + RESULT_BATCH_SIZE })}
           >
             {t(language, "search.loadMore", {

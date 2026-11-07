@@ -1,6 +1,88 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator } from "@playwright/test";
 import { t } from "../src/app/i18n";
+import { getAzkarForMode } from "../src/app/content/azkar";
+
+test("Mushaf controls stay clear of the paper with safe areas and short windows @cross-browser", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route("https://verses.quran.foundation/**", (route) => route.abort());
+  await page.addInitScript(() => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "ar", themeMode: "midnight", reduceMotion: true },
+        profile: { isGuest: true },
+      }),
+    );
+  });
+  await page.goto("/#/quran/4");
+  const paper = page.locator(".mushaf-paper");
+  const header = page.locator(".mushaf-control-band--top");
+  const footer = page.locator(".mushaf-control-band--bottom");
+  await expect(paper).toBeVisible();
+  await page.locator("html").evaluate((node) => {
+    node.style.setProperty("--mushaf-safe-top", "48px");
+    node.style.setProperty("--mushaf-safe-bottom", "24px");
+  });
+  await expect(header).toHaveCSS("padding-block-start", "48px");
+  await expect(footer).toHaveCSS("padding-block-end", "24px");
+  const expectPaperSeparation = async () => {
+    const reading = (await paper.boundingBox())!;
+    const end = (await footer.boundingBox())!;
+    expect(reading.y + reading.height).toBeLessThanOrEqual(end.y + 1);
+    if (await header.count()) {
+      const start = (await header.boundingBox())!;
+      expect(start.y + start.height).toBeLessThanOrEqual(reading.y + 1);
+    }
+  };
+  await expectPaperSeparation();
+  await expect(paper.locator("[data-mushaf-column] > div")).toHaveCount(15);
+  await page.screenshot({ path: info.outputPath("mushaf-safe-area.png") });
+  await page.goto("/#/quran/42");
+  await expect(paper.locator('[data-mushaf-page="42"][data-mushaf-rendering="qcf-v2"]')).toBeVisible();
+  await expectPaperSeparation();
+  await page.setViewportSize({ width: 320, height: 540 });
+  await page.locator("html").evaluate((node) => {
+    node.style.fontSize = "200%";
+  });
+  await expectPaperSeparation();
+  await paper.evaluate((node) => {
+    node.scrollTop = node.scrollHeight;
+  });
+  expect(await paper.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+  await expectPaperSeparation();
+  await paper.click({ position: { x: 150, y: 100 } });
+  await expect(page.getByTestId("mushaf-focus-exit")).toBeVisible();
+  await expectPaperSeparation();
+});
+
+test("short zikr surah fits with basmalah and no decorative title @cross-browser", async ({ page }, info) => {
+  await page.setViewportSize({ width: 320, height: 600 });
+  await page.addInitScript(() => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "ar", routineModes: { before_sleep: "complete" }, reduceMotion: true },
+        profile: { isGuest: true },
+      }),
+    );
+  });
+  const position = getAzkarForMode("before_sleep", "complete").findIndex(({ id }) => id === "s-hm-99-ikhlas") + 1;
+  expect(position).toBeGreaterThan(0);
+  await page.goto(`/#/azkar/before-sleep/${position}`);
+  const passage = page.getByTestId("canonical-surah-passage");
+  await expect(passage).toHaveAccessibleName(/سورة/);
+  await expect(passage.getByTestId("quran-basmalah")).toBeVisible();
+  await expect(page.getByTestId("quran-surah-header")).toHaveCount(0);
+  await page.evaluate(() => document.fonts.ready);
+  const scroll = page.locator(".reader-text-scroll");
+  await expect.poll(() => scroll.evaluate((node) => node.scrollHeight - node.clientHeight)).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: info.outputPath("short-zikr-surah.png") });
+});
 
 async function expectOutwardBack(control: Locator, rightEdge: boolean) {
   await expect(control).toBeVisible();
@@ -8,10 +90,11 @@ async function expectOutwardBack(control: Locator, rightEdge: boolean) {
     const path = node.querySelector("path")!;
     const start = path.getPointAtLength(0).matrixTransform(path.getScreenCTM()!);
     const tip = path.getPointAtLength(path.getTotalLength() / 2).matrixTransform(path.getScreenCTM()!);
-    return { pointsRight: tip.x > start.x, x: node.getBoundingClientRect().x };
+    const bounds = node.getBoundingClientRect();
+    return { pointsRight: tip.x > start.x, onRight: bounds.left + bounds.width / 2 > innerWidth / 2 };
   });
   expect(shape.pointsRight).toBe(rightEdge);
-  expect(shape.x > 195).toBe(rightEdge);
+  expect(shape.onRight).toBe(rightEdge);
   await expect(control.locator("svg")).toHaveCSS("transform", "none");
 }
 
@@ -284,22 +367,28 @@ for (const language of ["ar", "en"] as const) {
     await colourGestures.click();
     await expect(colourGestures).toHaveAttribute("aria-checked", "false");
     await settings.getByTestId("modal-close-button").click();
+    await expect(settings).not.toBeVisible();
     await expect
       .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).mushafColorGestures))
       .toBe(false);
     const paper = page.locator(".mushaf-paper");
     const theme = await page.getByRole("article").first().getAttribute("data-theme");
-    const origin = await paper.evaluate((node) => {
-      const bounds = node.getBoundingClientRect();
-      for (const offset of [12, bounds.width - 12, bounds.width * 0.4]) {
-        const x = bounds.x + offset,
-          y = bounds.y + bounds.height * 0.65;
-        const target = document.elementFromPoint(x, y);
-        if (target && node.contains(target) && !target.closest("button, [role=button]"))
-          return { x, y, height: bounds.height };
-      }
-      throw new Error("No ordinary paper target");
-    });
+    const sampleOrigin = () =>
+      paper.evaluate((node) => {
+        const bounds = node.getBoundingClientRect();
+        for (const offset of [12, bounds.width - 12, bounds.width * 0.4]) {
+          const x = bounds.x + offset,
+            y = bounds.y + bounds.height * 0.65;
+          const target = document.elementFromPoint(x, y);
+          if (target && node.contains(target) && !target.closest("button, [role=button]"))
+            return { x, y, height: bounds.height };
+        }
+        return null;
+      });
+    // WebKit can keep the exiting modal backdrop above its now-hidden content.
+    // Sample actual hit testing after that protected surface releases the paper.
+    await expect.poll(sampleOrigin).not.toBeNull();
+    const origin = (await sampleOrigin())!;
     await page.mouse.move(origin.x, origin.y);
     await page.mouse.down();
     await page.mouse.move(origin.x, origin.y - origin.height * 0.25, { steps: 8 });
@@ -309,7 +398,7 @@ for (const language of ["ar", "en"] as const) {
 }
 
 for (const side of ["left", "right"] as const) {
-  test(`Mushaf ${side} tool rail back points away from the page @cross-browser`, async ({ page }) => {
+  test(`Mushaf Back points outward beside the ${side} tool rail @cross-browser`, async ({ page }, info) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.addInitScript((side) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -323,6 +412,10 @@ for (const side of ["left", "right"] as const) {
       );
     }, side);
     await page.goto("/#/quran/42");
-    await expectOutwardBack(page.getByTestId("mushaf-rail-back"), side === "right");
+    const back = page.getByTestId("mushaf-rail-back");
+    await expectOutwardBack(back, side === "right");
+    const fullscreen = await page.getByTestId("mushaf-fullscreen-toggle").boundingBox();
+    expect((await back.boundingBox())!.x > fullscreen!.x).toBe(side === "right");
+    await page.screenshot({ path: info.outputPath(`outward-back-${side}.png`), scale: "css" });
   });
 }

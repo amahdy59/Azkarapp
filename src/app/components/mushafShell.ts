@@ -55,6 +55,8 @@ export const RAIL_CONTENT_HEIGHT = 530;
 export const PAPER_ASPECT = 0.62;
 
 /** Height the two horizontal chrome bars take when they are the chrome. */
+export const MUSHAF_PHONE_QUERY = "(max-width: 599px)";
+
 export const BARS_HEIGHT = 112;
 
 /**

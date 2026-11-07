@@ -145,8 +145,9 @@ export function ReadingScreenChrome({
 
   return (
     <>
-      <div className="w-full">
+      <div className="reading-compact-header w-full">
         <Header
+          pageGutters={false}
           title={title}
           onBack={onBack}
           language={language}

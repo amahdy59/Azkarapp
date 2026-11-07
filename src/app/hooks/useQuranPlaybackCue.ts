@@ -19,6 +19,7 @@ export function useQuranPlaybackCue(
       const cue = getQuranPlaybackCue(timing, readTime());
       setLive((previous) =>
         previous?.timing === timing &&
+        previous.cue.followVerseKey === cue.followVerseKey &&
         previous.cue.verseKey === cue.verseKey &&
         previous.cue.word?.position === cue.word?.position
           ? previous
@@ -43,7 +44,10 @@ export function useQuranPlaybackCue(
   }, [timing, playing, readTime, currentTime]);
   // Reconcile seeks and pause immediately, even between native timeupdate events.
   const cue = getQuranPlaybackCue(timing, readTime ? readTime() : currentTime);
-  return live?.timing === timing && live.cue.verseKey === cue.verseKey && live.cue.word?.position === cue.word?.position
+  return live?.timing === timing &&
+    live.cue.followVerseKey === cue.followVerseKey &&
+    live.cue.verseKey === cue.verseKey &&
+    live.cue.word?.position === cue.word?.position
     ? live.cue
     : cue;
 }

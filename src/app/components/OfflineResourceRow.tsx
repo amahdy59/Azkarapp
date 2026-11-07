@@ -64,7 +64,8 @@ export function OfflineResourceRow({
   const removeRequestedRef = useRef(false);
   return (
     <section
-      className={compact ? "space-y-2 py-2" : "space-y-3 py-4"}
+      className={compact ? "offline-resource space-y-2 py-2" : "offline-resource space-y-3 py-4"}
+      data-transfer-state={active ? "active" : total > 0 && completed >= total ? "ready" : "idle"}
       aria-labelledby={`${id}-title`}
       data-testid={`offline-resource-${id}`}
     >

@@ -1,12 +1,18 @@
+import { openProgress } from "./helpers/open-progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { chooseProgressOption } from "./helpers/progress";
+import { t } from "../src/app/i18n";
 
 async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.goto("/");
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
   // Tier-agnostic: the shell mounts BottomNav, NavRail or NavSidebar by width.
   await expect(page.getByRole("navigation")).toBeVisible();
 }
@@ -153,7 +159,7 @@ test("initial flow has no automatically detectable WCAG A/AA violations", async 
   await page.goto("/");
   await expect(page.locator("#main-content")).toBeVisible();
   // Wait for the splash screen to finish by looking for the Language screen content
-  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: t("ar", "onboarding.chooseLanguage") })).toBeVisible();
   await expectNoWcagViolations(page);
 });
 
@@ -167,7 +173,7 @@ test("skip link moves keyboard focus to the main content", async ({ page }) => {
 
 test("reduced motion reveals the skip link immediately when focused", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: t("ar", "onboarding.chooseLanguage") })).toBeVisible();
   await page.locator("html").evaluate((element) => element.classList.add("reduce-motion"));
 
   const skipLink = page.locator(".skip-link");
@@ -190,8 +196,8 @@ test("search results expose concise accessible names", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
   const searchInput = page.getByRole("textbox", { name: "Search azkar and duas" });
-  const filters = page.getByTestId("library-filter-disclosure");
-  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
+  if (page.viewportSize()!.width < 600)
+    await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   await searchInput.fill("sleep");
   await searchInput.press("Enter");
 
@@ -206,8 +212,8 @@ test("search results expose concise accessible names", async ({ page }) => {
 test("library filtering announces the collection result count", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
-  const filters = page.getByTestId("library-filter-disclosure");
-  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
+  if (page.viewportSize()!.width < 600)
+    await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   await page.getByRole("textbox", { name: "Search azkar and duas" }).fill("sleep");
 
   await expect(page.getByTestId("library-filter-status")).toHaveText("1 collection matches “sleep”");
@@ -216,9 +222,9 @@ test("library filtering announces the collection result count", async ({ page })
 
 test("Progress tabs expose a logical level-two heading in every view", async ({ page }) => {
   await enterEnglishGuestMode(page);
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
 
-  const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
+  const period = page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true });
   for (const value of ["day", "week", "month", "year"] as const) {
     await chooseProgressOption(period, value);
     await expect(page.getByTestId("progress-primary-heading")).toHaveRole("heading", { level: 2 });

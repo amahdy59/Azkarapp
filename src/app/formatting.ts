@@ -24,12 +24,17 @@ export function formatRatio(current: number | string, total: number | string, la
   return `${formatNumerals(current, language)} / ${formatNumerals(total, language)}`;
 }
 
-export function formatHijriDate(date: Date = new Date(), language: AppLanguage = "ar", offsetDays = 0): string {
+export function formatHijriDate(
+  date: Date = new Date(),
+  language: AppLanguage = "ar",
+  offsetDays = 0,
+  includeWeekday = true,
+): string {
   try {
     const locale = language === "ar" ? "ar-SA-u-ca-islamic-umalqura" : "en-US-u-ca-islamic-umalqura";
     const adjustedDate = offsetDays !== 0 ? new Date(date.getTime() + offsetDays * 86_400_000) : date;
     const formatter = new Intl.DateTimeFormat(locale, {
-      weekday: "long",
+      weekday: includeWeekday ? "long" : undefined,
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -73,12 +78,13 @@ export function formatDisplayDate(
   language: AppLanguage = "ar",
   calendarType: "hijri" | "gregorian" = "hijri",
   offsetDays = 0,
+  includeWeekday = true,
 ): string {
   if (calendarType === "gregorian") {
     try {
       const locale = language === "ar" ? "ar-EG" : "en-US";
       const formatter = new Intl.DateTimeFormat(locale, {
-        weekday: "long",
+        weekday: includeWeekday ? "long" : undefined,
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -89,7 +95,7 @@ export function formatDisplayDate(
       return date.toLocaleDateString();
     }
   }
-  return formatHijriDate(date, language, offsetDays);
+  return formatHijriDate(date, language, offsetDays, includeWeekday);
 }
 
 export function formatPercentage(value: number, language: AppLanguage) {

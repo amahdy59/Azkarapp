@@ -121,3 +121,162 @@
 .reader-language-toolbar button {
   scroll-margin-block: 8px;
 }
+
+.reader-surah-title {
+  max-inline-size: 100%;
+  color: #f0c14b;
+  font-size: clamp(1.75rem, 5cqw, 3rem);
+  font-weight: 700;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.reader-surah-title:lang(ar) {
+  font-family: var(--font-mushaf);
+  font-size: clamp(2.25rem, 7.2cqw, 3.65rem);
+  font-weight: 400;
+  font-synthesis: none;
+}
+.theme-light .reader-surah-title {
+  color: #835806;
+}
+html[data-app-material-resolved="glass"]:not(.high-contrast) .reader-surah-title {
+  color: #f0c14b;
+}
+.high-contrast .reader-surah-title {
+  color: var(--foreground);
+}
+.reader-surah-artwork {
+  grid-area: photo;
+  min-inline-size: 0;
+  aspect-ratio: 5 / 4;
+  max-block-size: clamp(11rem, calc(100dvh - 23rem), 36rem);
+}
+
+.reader-surah-artwork picture {
+  display: block;
+  block-size: 100%;
+}
+
+.reader-surah-entry {
+  container: surah-entry / inline-size;
+}
+
+.reader-surah-layout {
+  display: grid;
+  grid-template:
+    "heading"
+    "photo"
+    "controls"
+    "navigation" / minmax(0, 1fr);
+  gap: clamp(0.75rem, 2dvh, 1.25rem);
+  width: 100%;
+  max-inline-size: 45rem;
+  padding-block: 0.5rem 1rem;
+}
+
+.reader-surah-heading {
+  grid-area: heading;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  column-gap: 0.25rem;
+  row-gap: 0.875rem;
+  text-align: center;
+}
+
+.reader-surah-heading .reader-surah-title {
+  grid-area: 1 / 2;
+}
+
+.reader-surah-heading button {
+  grid-area: 1 / 3;
+  inline-size: 44px;
+  block-size: 44px;
+}
+
+.reader-surah-meta {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.reader-surah-controls {
+  grid-area: controls;
+  display: grid;
+  gap: 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.reader-surah-navigation {
+  grid-area: navigation;
+}
+
+/* At doubled text on small phones the heading needs the whole line. */
+@container surah-entry (width < 11rem) {
+  .reader-surah-heading .reader-surah-title {
+    grid-column: 1 / -1;
+    line-height: 1.3;
+  }
+
+  .reader-surah-heading .reader-surah-title:not(:lang(ar)) {
+    font-size: 1.5rem;
+  }
+
+  .reader-surah-heading button {
+    grid-row: 2;
+  }
+
+  .reader-surah-meta {
+    grid-row: 2;
+  }
+}
+
+@media (width < 600px) {
+  .reader-surah-entry {
+    padding-inline: 0;
+  }
+
+  .reader-surah-layout > :not(.reader-surah-artwork) {
+    margin-inline: 1rem;
+  }
+
+  .reader-surah-layout .reader-surah-artwork {
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+
+@container surah-entry (min-width: 36rem) and (width < 48rem) {
+  .reader-surah-layout {
+    max-inline-size: min(45rem, calc(clamp(14rem, 100dvh - 32rem, 36rem) * 1.25));
+  }
+}
+
+@container surah-entry (min-width: 48rem) {
+  .reader-surah-layout {
+    grid-template:
+      "photo heading" 1fr
+      "photo controls" 1fr
+      "navigation navigation" auto / minmax(0, 1.75fr) minmax(16rem, 1fr);
+    align-items: start;
+    max-inline-size: 84rem;
+    gap: 1rem clamp(1.5rem, 4cqw, 3.5rem);
+    margin-block-start: clamp(0.75rem, 3dvh, 2.5rem);
+  }
+
+  .reader-surah-heading {
+    align-self: end;
+  }
+
+  .reader-surah-artwork {
+    align-self: center;
+    max-block-size: clamp(15rem, 69dvh, 46rem);
+  }
+}

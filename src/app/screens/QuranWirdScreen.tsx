@@ -1,11 +1,15 @@
+import { RecordedPagesChart } from "../components/RecordedPagesChart";
+import { recordedPageRhythm } from "../recordedPageRhythm";
+import { Modal, SheetHeader } from "../components/ResponsiveSheet";
 import "./quran-wird-screen.css";
+import "../components/surface-panel.css";
 import { Button } from "../components/ui/button";
 import { SelectField } from "../components/SelectField";
 import { useMemo, useRef, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { ArrowNext, BookOpen, Check, Minus, Plus, RotateCcw, Undo } from "../components/icons";
+import { BookOpen, Calendar, Check, Minus, Plus, RotateCcw, Undo } from "../components/icons";
 import { getJuzNumberForPage, getSurahDisplayName, JUZS, SURAHS } from "../content/surahInfo";
 import { AccessibleCombobox, type ComboboxOption } from "../components/AccessibleCombobox";
 import {
@@ -154,7 +158,6 @@ export function QuranWirdScreen({
   wirdHistory,
   quranWirdDailyGoals = {},
   lastReadingEvent,
-  onBack,
   onContinue,
   onPlanChange,
   onUndoReadingEvent,
@@ -185,6 +188,12 @@ export function QuranWirdScreen({
   const goal = todayProgress.goal;
   const read = todayProgress.read;
   const remaining = todayProgress.remaining;
+  const progressValues = { read: formatNumerals(read, language), goal: formatNumerals(goal, language) };
+  const progressLabel = t(
+    language,
+    read === 0 ? "mushaf.noPagesReadToday" : read > goal ? "mushaf.exceededPageGoal" : "mushaf.completedCount",
+    progressValues,
+  );
 
   const repeatStart = plan.repeatStartPage ?? 1;
   const repeatEnd = plan.repeatEndPage ?? TOTAL_MUSHAF_PAGES;
@@ -240,14 +249,11 @@ export function QuranWirdScreen({
   const monthStartedAt = plan.startedDayKey ? new Date(`${plan.startedDayKey}T12:00:00`) : now;
   const currentPlanMonth = planCalendar ? monthLabel(monthStartedAt, planCalendar, language) : "";
   const week = useMemo(() => currentSaturdayWeekKeys(now, progressDayStartHour), [now, progressDayStartHour]);
-  const firstPlan =
-    !plan.startedDayKey && position.page === 1 && Object.values(wirdHistory).every((pages) => !pages.length);
-  const [isDrafting, setIsDrafting] = useState(firstPlan);
+  const [isDrafting, setIsDrafting] = useState(false);
   const editButton = useRef<HTMLButtonElement>(null);
   const planForm = useRef<HTMLFormElement>(null);
   const closeDraft = () => {
     setIsDrafting(false);
-    requestAnimationFrame(() => editButton.current?.focus({ preventScroll: true }));
   };
   const [draftPlan, setDraftPlan] = useState<QuranWirdPlan>(() =>
     plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan,
@@ -332,27 +338,44 @@ export function QuranWirdScreen({
         ? t(language, "mushaf.repeatingSummary")
         : undefined;
   const canUndo = lastReadingEvent?.dayKey === todayKey && lastReadingEvent.pages.length > 0;
+  const showResumeAsTitle = !isRepeating && (remaining === 0 || targetStartPage === targetEndPage);
+  const resumePageLabel = t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) });
   const textAlignment = direction === "rtl" ? "text-right" : "text-left";
 
   return (
-    <ScreenContainer dir={direction} screenName={t(language, "mushaf.wirdTitle")} className="overflow-y-auto">
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
-        <Header pageGutters title={t(language, "mushaf.wirdTitle")} onBack={onBack} language={language} />
+    <ScreenContainer
+      dir={direction}
+      screenName={t(language, "mushaf.wirdTitle")}
+      className="quran-wird-screen overflow-hidden"
+    >
+      <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
+        <Header pageGutters title={t(language, "mushaf.wirdTitle")} language={language} />
         <div
           data-testid="quran-wird-content"
-          className={`quran-wird-overview grid w-full grid-cols-1 gap-4 px-page pb-8 pt-3 ${textAlignment}`}
+          data-header-scroll-owner=""
+          className={`quran-wird-overview fade-in grid min-h-0 w-full flex-1 grid-cols-1 gap-2 overflow-y-auto sm:gap-4 px-page pb-8 pt-3 ${textAlignment}`}
         >
           <section
-            className="rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6"
+            className="quran-today-card rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6"
             aria-labelledby="wird-today-title"
           >
+            <img
+              className="quran-continuation-art"
+              src={`${import.meta.env.BASE_URL}assets/cards/wird-quran-720.webp`}
+              width={720}
+              height={540}
+              alt=""
+            />
             <div className="mb-3 flex items-center justify-between gap-2">
-              <h2 id="wird-today-title" className="text-xl font-extrabold text-foreground">
+              <h2 id="wird-today-title" className="surface-panel-heading font-extrabold text-foreground">
+                <span className="surface-panel-icon surface-control-finish" aria-hidden="true">
+                  <BookOpen size={20} />
+                </span>
                 {t(language, "mushaf.todayReadingTitle")}
               </h2>
               {!isFreeReading && !goalResult.expired && (
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                  className={`surface-control-finish inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
                     remaining === 0 ? "bg-success/15 text-success" : "bg-primary/10 text-primary"
                   }`}
                 >
@@ -362,7 +385,7 @@ export function QuranWirdScreen({
                       <span>{t(language, "mushaf.statusCompleted")}</span>
                     </>
                   ) : (
-                    <span>{t(language, "mushaf.statusInProgress")}</span>
+                    <span>{t(language, read === 0 ? "mushaf.notStarted" : "mushaf.statusInProgress")}</span>
                   )}
                 </span>
               )}
@@ -380,17 +403,14 @@ export function QuranWirdScreen({
                     juz: formatNumerals(positionJuz, language),
                   })}
                 </p>
-                <p className="mt-1 text-sm font-medium text-muted-foreground">
-                  {t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) })}
-                </p>
+                <p className="mt-1 text-sm font-medium text-muted-foreground">{resumePageLabel}</p>
                 <button
                   type="button"
                   onClick={() => onContinue()}
-                  className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="surface-control-finish mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <BookOpen size={18} aria-hidden="true" />
                   {t(language, "mushaf.continueReading")}
-                  <ArrowNext size={18} data-rtl-flip aria-hidden="true" />
                 </button>
               </>
             ) : goalResult.expired ? (
@@ -399,7 +419,7 @@ export function QuranWirdScreen({
                 <button
                   type="button"
                   onClick={() => setIsDrafting(true)}
-                  className="mt-3 min-h-11 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="surface-control-finish mt-3 min-h-11 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   {t(language, "mushaf.adjustPlan")}
                 </button>
@@ -414,10 +434,12 @@ export function QuranWirdScreen({
                             start: formatNumerals(repeatStart, language),
                             end: formatNumerals(repeatEnd, language),
                           })
-                        : t(language, "mushaf.pagesRange", {
-                            start: formatNumerals(targetStartPage, language),
-                            end: formatNumerals(targetEndPage, language),
-                          })}
+                        : showResumeAsTitle
+                          ? resumePageLabel
+                          : t(language, "mushaf.pagesRange", {
+                              start: formatNumerals(targetStartPage, language),
+                              end: formatNumerals(targetEndPage, language),
+                            })}
                     </p>
                     {isRepeating && (
                       <button
@@ -441,42 +463,29 @@ export function QuranWirdScreen({
                   </p>
                 </div>
 
-                <p className="mb-2 text-sm font-bold text-foreground">
-                  {t(language, "mushaf.completedCount", {
-                    read: formatNumerals(read, language),
-                    goal: formatNumerals(goal, language),
-                  })}
+                <p className={`mb-2 text-sm ${read === 0 ? "text-muted-foreground" : "font-bold text-foreground"}`}>
+                  {progressLabel}
                 </p>
                 <ProgressBar
-                  aria-label={t(language, "mushaf.todayProgress", {
-                    read: formatNumerals(read, language),
-                    goal: formatNumerals(goal, language),
-                  })}
+                  aria-label={t(language, "mushaf.todayReadingTitle")}
+                  aria-valuetext={progressLabel}
                   value={Math.min(read, goal)}
                   max={Math.max(goal, 1)}
                   height={8}
                   direction={direction}
                 />
 
-                {remaining > 0 ? (
-                  <p className="mt-3 text-sm font-medium text-muted-foreground">
-                    {t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) })}
-                  </p>
-                ) : (
-                  <div className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-success/15 px-3 py-1 text-xs font-bold text-success">
-                    <Check size={14} strokeWidth={2.5} aria-hidden="true" />
-                    <span>{t(language, "mushaf.wirdCompleteShort")}</span>
-                  </div>
+                {remaining > 0 && !showResumeAsTitle && (
+                  <p className="mt-3 text-sm font-medium text-muted-foreground">{resumePageLabel}</p>
                 )}
 
                 <button
                   type="button"
                   onClick={() => onContinue()}
-                  className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="surface-control-finish mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <BookOpen size={18} aria-hidden="true" />
                   {t(language, "mushaf.continueReading")}
-                  <ArrowNext size={18} data-rtl-flip aria-hidden="true" />
                 </button>
               </>
             )}
@@ -485,7 +494,7 @@ export function QuranWirdScreen({
               <button
                 type="button"
                 onClick={onUndoReadingEvent}
-                className="mt-2 flex min-h-11 items-center gap-2 rounded-xl px-3 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="mt-2 flex min-h-11 items-center gap-2 self-start rounded-xl px-3 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <Undo size={16} aria-hidden="true" />
                 {t(language, "mushaf.undoPages", {
@@ -500,38 +509,39 @@ export function QuranWirdScreen({
             className="rounded-3xl border border-border bg-card p-5 shadow-xs sm:p-6"
             aria-labelledby="wird-plan-title"
           >
-            <div className="mb-4 flex items-start justify-between">
-              <div>
-                <h2 id="wird-plan-title" className="text-base font-extrabold text-foreground">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0 flex-1 basis-40">
+                <h2 id="wird-plan-title" className="surface-panel-heading font-extrabold text-foreground">
+                  <span className="surface-panel-icon surface-control-finish" aria-hidden="true">
+                    <Calendar size={20} />
+                  </span>
                   {t(language, "mushaf.planTitle")}
                 </h2>
-                {!isDrafting && (
+                {
                   <>
                     {isMonthPlan && <p className="mt-1 text-lg font-extrabold text-foreground">{currentPlanMonth}</p>}
                     <p className="mt-1 text-sm font-medium text-muted-foreground">{planLabel(language, plan)}</p>
                   </>
-                )}
+                }
               </div>
-              {!isDrafting && (
-                <button
+              {
+                <Button
                   ref={editButton}
                   type="button"
+                  variant="pill"
+                  size="pill"
+                  data-testid="wird-edit-plan"
                   onClick={() => {
                     setDraftPlan(plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan);
                     setIsDrafting(true);
-                    requestAnimationFrame(() => {
-                      planForm.current?.scrollIntoView({ block: "nearest" });
-                      planForm.current?.querySelector<HTMLElement>('[role="combobox"]')?.focus({ preventScroll: true });
-                    });
                   }}
-                  className="min-h-11 rounded-xl px-3 text-sm font-bold text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   {t(language, "mushaf.editPlan")}
-                </button>
-              )}
+                </Button>
+              }
             </div>
 
-            {!isDrafting && isMonthPlan && (
+            {isMonthPlan && (
               <div className="border-t border-border/60 pt-4">
                 <div className="mb-2 flex items-center justify-between gap-3 text-sm font-bold text-foreground">
                   <span>{t(language, "mushaf.monthProgress")}</span>
@@ -553,13 +563,13 @@ export function QuranWirdScreen({
               </div>
             )}
 
-            {!isDrafting && !isMonthPlan && !isFreeReading && (
+            {!isMonthPlan && !isFreeReading && (
               <div className="border-t border-border/60 pt-4">
                 <p className="mb-3 text-xs font-bold text-muted-foreground">
                   {t(language, "mushaf.overallProgressTitle")}
                 </p>
                 <div className="quran-wird-totals grid gap-2.5">
-                  <div className="rounded-2xl border border-border/70 bg-muted/30 p-3">
+                  <div className="paper-surface rounded-2xl border border-border/70 bg-muted/30 p-3">
                     <p className="text-xs font-bold text-muted-foreground">{t(language, "mushaf.overallPagesRead")}</p>
                     <p className="mt-1 text-sm font-black text-foreground">
                       <bdi dir="ltr">
@@ -568,7 +578,7 @@ export function QuranWirdScreen({
                       </bdi>
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-border/70 bg-muted/30 p-3">
+                  <div className="paper-surface rounded-2xl border border-border/70 bg-muted/30 p-3">
                     <p className="text-xs font-bold text-muted-foreground">{t(language, "mushaf.completedJuzs")}</p>
                     <p className="mt-1 text-sm font-black text-foreground">
                       <bdi dir="ltr">
@@ -595,12 +605,47 @@ export function QuranWirdScreen({
                 </div>
               </div>
             )}
+            <RecordedPagesChart
+              title={t(language, "home.recordedPagesRhythm")}
+              language={language}
+              points={recordedPageRhythm(
+                plan.startedDayKey ?? "0000-01-01",
+                todayKey,
+                todayKey,
+                new Map(Object.entries(wirdHistory).map(([key, pages]) => [key, new Set(pages).size])),
+              )}
+            />
+          </section>
 
-            {isDrafting && (
+          <Modal
+            open={isDrafting}
+            onClose={closeDraft}
+            title={t(language, "mushaf.readingPlanLabel")}
+            language={language}
+            direction={direction}
+            showCloseButton={false}
+            className="filter-sheet"
+            testId="quran-plan-dialog"
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              planForm.current?.querySelector<HTMLElement>('[role="combobox"]')?.focus({ preventScroll: true });
+            }}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              editButton.current?.focus({ preventScroll: true });
+            }}
+          >
+            <SheetHeader
+              title={t(language, "mushaf.readingPlanLabel")}
+              language={language}
+              onClose={closeDraft}
+              className="filter-sheet-header"
+            />
+            <div className="min-h-0 overflow-y-auto p-3">
               <form
                 ref={planForm}
                 aria-label={t(language, "mushaf.readingPlanLabel")}
-                className="quran-wird-plan-form flex min-w-0 flex-col gap-3 border-t border-border/60 pt-4"
+                className="quran-wird-plan-form flex min-w-0 flex-col gap-3"
                 onSubmit={(event) => {
                   event.preventDefault();
                   onPlanChange(normalizedDraft);
@@ -1093,16 +1138,18 @@ export function QuranWirdScreen({
                   </Button>
                 </div>
               </form>
-            )}
-          </section>
-
+            </div>
+          </Modal>
           {!isFreeReading && !isMonthPlan && (
             <section
               className="quran-wird-week rounded-3xl border border-border bg-card p-5 shadow-xs sm:p-6"
               aria-labelledby="wird-week-title"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h2 id="wird-week-title" className="text-base font-extrabold text-foreground">
+                <h2 id="wird-week-title" className="surface-panel-heading font-extrabold text-foreground">
+                  <span className="surface-panel-icon surface-control-finish" aria-hidden="true">
+                    <Calendar size={20} />
+                  </span>
                   {t(language, "mushaf.thisWeek")}
                 </h2>
                 <span className="text-xs font-bold text-muted-foreground">
@@ -1138,25 +1185,22 @@ export function QuranWirdScreen({
                     <div
                       key={dayKey}
                       role="listitem"
-                      className={`flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors ${
-                        dayKey === todayKey ? "bg-muted font-bold" : "hover:bg-muted/40"
-                      }`}
+                      className="quran-wird-week-day"
+                      aria-current={dayKey === todayKey ? "date" : undefined}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="w-12 text-sm font-bold text-foreground">{dayLabel}</span>
+                      <span className="quran-wird-week-label text-sm font-bold text-foreground">{dayLabel}</span>
+                      <div className="quran-wird-week-result flex items-center gap-2">
+                        <bdi dir="ltr" className="text-sm font-bold text-muted-foreground">
+                          {dayEligible && dayKey <= todayKey && dayGoal > 0
+                            ? `${formatNumerals(count, language)} / ${formatNumerals(dayGoal, language)}`
+                            : t(language, "mushaf.noReading")}
+                        </bdi>
                         {complete ? (
                           <span className="flex size-5 items-center justify-center rounded-full bg-success text-success-foreground">
                             <Check size={12} strokeWidth={3} aria-hidden="true" />
                           </span>
-                        ) : (
-                          <span className="size-5" aria-hidden="true" />
-                        )}
+                        ) : null}
                       </div>
-                      <bdi dir="ltr" className="text-sm font-bold text-muted-foreground">
-                        {dayEligible && dayKey <= todayKey && dayGoal > 0
-                          ? `${formatNumerals(count, language)} / ${formatNumerals(dayGoal, language)}`
-                          : t(language, "mushaf.noReading")}
-                      </bdi>
                     </div>
                   );
                 })}

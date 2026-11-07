@@ -125,6 +125,23 @@ describe("native Mushaf downloads", () => {
     },
   );
 
+  it("rejects inconsistent range metadata without retrying or requesting another chunk", async () => {
+    native.isNativePlatform.mockReturnValue(true);
+    native.getPlatform.mockReturnValue("android");
+    native.get.mockResolvedValue({
+      status: 206,
+      headers: { "content-type": "audio/mpeg", "content-range": "bytes 0-4/7" },
+      data: btoa("four"),
+    });
+    const variant = { id: "bad-range", mimeType: "audio/mpeg", byteSize: 7 } as AudioVariant;
+    await expect(
+      transferAudio("https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/test.mp3", variant, {
+        onTransfer: vi.fn(),
+      }),
+    ).rejects.toMatchObject({ code: "integrity" });
+    expect(native.get).toHaveBeenCalledOnce();
+  });
+
   it("preserves native HTTP errors and Retry-After instead of presenting audio", async () => {
     native.isNativePlatform.mockReturnValue(true);
     native.getPlatform.mockReturnValue("android");

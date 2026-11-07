@@ -1,5 +1,15 @@
 # Content authoring guide
 
+## Approved notification evidence
+
+The owner approves the notification catalogue conditional on authentic sources, relevance and appropriate timing. notificationEvidence.json stores only selected ready Arabic quotations from the V2/catalogue approval tables, with source URLs and named grading. Its English text is a faithful rendering of meaning. notificationCopy.test.ts compares every Arabic excerpt with its approved row. Group captions retain the named zikr, repetition count and time conditions. The Asr pool retains both Fajr and Asr wherever the narration concerns both. Dhuhr's after-zawal text is excluded from advance reminders. Friday dua is bounded after Asr and before Maghrib, and the pre-Fajr quotation is used only inside the last third.
+
+The approved ready subset uses P1, P2, P2b, P3, P4, P5, P5b, R01, Z1, Z2, Z3, R03, R04, R05, T01, T02 and T05. The longer or attribution-sensitive alternatives remain in the catalogue. Pending new guides, calendar eligibility, payloads and new reminder types retain their recorded prerequisites. Existing reviewed collection, Benefits and Home records are untouched.
+
+## Local reminder acquisition — 2026-11-02
+
+The owner-approved reliability correction now ships and precaches the existing checksum-identical compressed reminder package as a deferred Vite asset. This supersedes the historical external-only delivery and first-online-acquisition statements below. Reviewed source modules, schedule, mappings, pinned checksum and verified cache keys are unchanged. Acquisition is bounded to eight seconds and failed acquisition can be retried explicitly. Existing immutable R2 copies remain available to older clients; this correction requires no content edit or upload.
+
 ## Collection citation and concise-meaning review — 2026-10-18
 
 The owner requests closing the session gaps and removing app/methodological disclaimers from hadith meanings. Nine bilingual meanings are simplified without altering narration bytes or source metadata; prior cautions remain in `agent/evidence/meaning-editorial-notes-2026-10-18.json`. Cite interpretation and grading through existing reference fields rather than inserting implementation caveats into the meaning. `reviewedCollectionCitations.json` now carries precise bilingual references and links for 165 verified original identities, preserving older English citations. The 20 alternative Home mappings remain excluded from collection correction and are individually listed in `agent/evidence/collection-citation-review-2026-10-18.json`; source-specific independent review is still needed for their original semantics.
@@ -42,7 +52,7 @@ Azkarapp keeps reviewed devotional content in `src/app/content` and treats wordi
 
 ## Add an item to an existing collection
 
-1. Open the collection in `src/app/content/azkar.ts`, or its dedicated file such as `comprehensiveDuas.ts`.
+1. Open the collection in `src/app/content/azkarCore.ts`, or its dedicated file such as `comprehensiveDuas.ts`. The complete corpus exported by `azkar.ts` adds the separately loaded Al-Baqarah record.
 2. Copy a nearby `Zikr` object and change every field deliberately.
 3. Add or update the colocated tests in `azkar.test.ts` and `localizedZikr.test.ts`.
 4. Run `pnpm format`, `pnpm typecheck`, `pnpm test:run`, and `pnpm build`.
@@ -193,3 +203,5 @@ The owner requests full Benefits narrations locally. benefitsHadithReadings.json
 The canonical zikr/dua coverage regression verifies nonempty existing English meanings across the eager corpus and lazy comprehensive duas, and checks ordinary Arabic sharing exposes those exact translations. No new religious wording, translation, transliteration, grading or source interpretation was authored in this UI phase.
 
 Arabic Benefits and Wird sharing now receive the existing English meaning that their adapters previously omitted; Quran meaning remains available in both interface languages. The verified Home reading catalogue exposes its already source-compared English narration as optional sharing data (translationForSharing); this does not turn it into an automatically displayed Arabic-screen translation or change R2 bytes. Partial glossary/translation/pronunciation coverage is described honestly. Presets must never select an unavailable section. New or missing authored material still follows the source-review process above.
+
+The optional Friday Salawat and fasting preparation notifications use catalogue excerpts T04 and T06. Captions preserve the Friday context and the voluntary nature of preparing for a fast. Their previews expose the same quotation, grading and reference as the delivered reminder. Existing Home and prayer evidence retains its reviewed source fields when shown in the shared sheet.

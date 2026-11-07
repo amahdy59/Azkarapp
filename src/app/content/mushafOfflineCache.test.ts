@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
+import { getMushafDownloadBytes, getMushafAssetBytes } from "./downloadStorage";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "./mushafOfflineCache";
 import { FONT_CACHE_NAME, MUSHAF_CACHE_NAME, getMushafPageUrl, getQcfFontUrl } from "./qcfMushaf";
 
@@ -30,9 +31,32 @@ vi.mock("./nativeMushafDownload", () => ({
   fetchNativeBinaryResource: (url: string, signal?: AbortSignal) => fetch(url, { signal }),
 }));
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 describe("mushafOfflineCache", () => {
+  it("downloads only selected pages and fonts, deduplicates the range, and rejects invalid input before fetching", async () => {
+    const { stores } = installCaches();
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL) => new Response(String(input).includes(".woff2") ? fontBytes : pageBytes),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const progress = vi.fn();
+    await downloadMushaf({ pages: [42, 43, 42], onProgress: progress });
+    expect(stores.get(MUSHAF_CACHE_NAME)?.size).toBe(2);
+    expect(stores.get(FONT_CACHE_NAME)?.size).toBe(2);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(progress).toHaveBeenLastCalledWith(
+      2,
+      2,
+      2 * (new TextEncoder().encode(pageBytes).byteLength + fontBytes.byteLength),
+    );
+    await expect(downloadMushaf({ pages: [0, 605] })).rejects.toThrow("Invalid Mushaf");
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
   it("reports cached Mushaf pages and fonts and caches every requested page and font", async () => {
     const { open, deleteFn, stores } = installCaches();
     const pageCache = await open(MUSHAF_CACHE_NAME);
@@ -44,10 +68,12 @@ describe("mushafOfflineCache", () => {
       vi.fn(async (input: RequestInfo | URL) => new Response(String(input).includes(".woff2") ? fontBytes : pageBytes)),
     );
 
-    await expect(getMushafDownloadStatus()).resolves.toEqual({
+    await expect(getMushafDownloadStatus()).resolves.toMatchObject({
+      downloadedBytes: new TextEncoder().encode(pageBytes).byteLength + fontBytes.byteLength,
       downloadedPages: 1,
       downloadedFonts: 1,
       totalPages: 604,
+      remainingBytes: getMushafDownloadBytes(2, 604),
       isComplete: false,
     });
 
@@ -82,6 +108,7 @@ describe("mushafOfflineCache", () => {
       downloadedPages: 0,
       downloadedFonts: 1,
       isComplete: false,
+      remainingBytes: getMushafDownloadBytes(1, 604) - getMushafAssetBytes(1).font - getMushafAssetBytes(2).page,
     });
     expect(await pages.match(getMushafPageUrl(1))).toBeUndefined();
     expect(await fonts.match(getQcfFontUrl(2))).toBeUndefined();
@@ -121,10 +148,9 @@ describe("mushafOfflineCache", () => {
     });
     vi.stubGlobal(
       "fetch",
-      vi.fn((input: RequestInfo | URL) => {
-        const url = String(input);
-        return Promise.resolve(new Response("", { status: url.includes("/fonts/") ? 503 : 200 }));
-      }),
+      vi.fn(async (input: RequestInfo | URL) =>
+        String(input).includes(".woff2") ? new Response(null, { status: 503 }) : new Response(pageBytes),
+      ),
     );
 
     await expect(downloadMushaf()).rejects.toThrow(/Mushaf font \d+ failed: 503/);
@@ -133,5 +159,27 @@ describe("mushafOfflineCache", () => {
     for (const [, options] of vi.mocked(fetch).mock.calls) {
       expect(options?.signal?.aborted).toBe(true);
     }
+  });
+
+  it("times out a stalled font and retries only the missing part of the page", async () => {
+    vi.useFakeTimers();
+    const { open } = installCaches();
+    const pages = await open(MUSHAF_CACHE_NAME);
+    await pages.put(getMushafPageUrl(1), new Response(pageBytes));
+    const fetchMock = vi.fn(
+      (_url: string, { signal }: RequestInit) =>
+        new Promise<Response>((_, reject) =>
+          signal!.addEventListener("abort", () => reject(signal!.reason), { once: true }),
+        ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = expect(downloadMushaf({ pages: [1] })).rejects.toMatchObject({ name: "TimeoutError" });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
+    await vi.advanceTimersByTimeAsync(30_000);
+    await result;
+    fetchMock.mockResolvedValue(new Response(fontBytes));
+    await downloadMushaf({ pages: [1] });
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([getQcfFontUrl(1), getQcfFontUrl(1)]);
+    await expect(getMushafDownloadStatus()).resolves.toMatchObject({ downloadedPages: 1, downloadedFonts: 1 });
   });
 });

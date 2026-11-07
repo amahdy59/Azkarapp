@@ -5,6 +5,22 @@ import { acquireAudioControlLock } from "../audioControlLock";
 
 afterEach(() => window.history.replaceState(null, "", "/"));
 
+it("defaults every unqualified Progress entry to Month and preserves explicit rolling links", () => {
+  window.history.replaceState(null, "", "/#/progress");
+  const { result } = renderHook(() =>
+    useAppRouting({
+      routineModes: { morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" },
+      hasCompletedOnboarding: true,
+      reduceMotion: true,
+    }),
+  );
+  expect(result.current.progressPeriod).toBe("month");
+  act(() => result.current.navigateProgressPeriod("last30"));
+  expect(result.current.progressPeriod).toBe("last30");
+  act(() => result.current.handleNavTab("progress"));
+  expect(result.current.progressPeriod).toBe("month");
+});
+
 it("blocks internal navigation while listening is locked without pushing a history trap", () => {
   window.history.replaceState({ view: "home" }, "", "/#/home");
   const { result } = renderHook(() =>

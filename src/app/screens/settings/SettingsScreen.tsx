@@ -7,6 +7,7 @@ import { shouldReduceMotion } from "../../motionPreferences";
 import { useLayoutMode } from "../../hooks/useLayoutMode";
 import { useScreenFocus } from "../../hooks/useScreenFocus";
 import "./SettingsScreen.css";
+import "../../components/scroll-edge.css";
 import type { SettingsScreenProps } from "./SettingsScreen.types";
 import {
   AppearancePanel,
@@ -29,6 +30,9 @@ import {
 } from "./SettingsPanels";
 
 export function SettingsScreen({
+  localSaveStatus,
+  onRetrySave,
+  onRetrySync,
   onReviewUpdate,
   audioController,
   themeMode,
@@ -51,6 +55,8 @@ export function SettingsScreen({
   reduceMotion,
   reduceTransparency,
   homeWirdImages = false,
+  paperTexture = true,
+  onPaperTextureChange,
   appMaterial = "solid",
   onAppMaterialChange,
   homeMaterial = "inherit",
@@ -90,6 +96,7 @@ export function SettingsScreen({
   onActivateAccount,
   onSignOut,
   onExportData,
+  onExportProgress,
   onRestoreData,
   onResetPreferences,
   onClearLocalData,
@@ -175,7 +182,7 @@ export function SettingsScreen({
   return (
     <div
       data-testid="settings-screen"
-      className="relative mx-auto flex h-full w-full max-w-[80rem] flex-col overflow-hidden bg-background"
+      className="settings-screen relative mx-auto flex h-full w-full max-w-[var(--content-page)] flex-col overflow-hidden bg-background"
       dir={direction}
     >
       {isTwoPaneLayout ? (
@@ -282,6 +289,8 @@ export function SettingsScreen({
             homeMaterial={homeMaterial}
             onHomeMaterialChange={onHomeMaterialChange}
             homeWirdImages={homeWirdImages}
+            paperTexture={paperTexture}
+            onPaperTextureChange={onPaperTextureChange}
             onHomeWirdImagesChange={onHomeWirdImagesChange}
             reduceTransparency={reduceTransparency}
             onReduceTransparencyChange={onReduceTransparencyChange}
@@ -377,6 +386,13 @@ export function SettingsScreen({
       case "notifications":
         return (
           <NotificationsPanel
+            hijriDateOffset={hijriDateOffset}
+            localSaveStatus={localSaveStatus}
+            onRetrySave={onRetrySave}
+            dailyCompletions={dailyCompletions}
+            progressDayStartHour={progressDayStartHour}
+            locationSettings={locationSettings}
+            onOpenLocation={() => openSubPanel("location")}
             language={language}
             reminders={reminders}
             onRemindersChange={onRemindersChange}
@@ -401,6 +417,10 @@ export function SettingsScreen({
       case "account-data":
         return (
           <AccountDataPanel
+            localSaveStatus={localSaveStatus}
+            onRetrySave={onRetrySave}
+            onRetrySync={onRetrySync}
+            onOpenDownloads={() => openSubPanel("downloads")}
             language={language}
             isGuest={isGuest}
             isSyncing={isSyncing}
@@ -412,6 +432,7 @@ export function SettingsScreen({
             onActivateAccount={onActivateAccount}
             onSignOut={onSignOut}
             onExportData={onExportData}
+            onExportProgress={onExportProgress}
             onRestoreData={onRestoreData}
             onResetPreferences={onResetPreferences}
             onClearLocalData={onClearLocalData}

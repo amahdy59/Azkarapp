@@ -65,8 +65,10 @@ for (const language of ["ar", "en"] as const) {
     await paper.dispatchEvent("pointermove", { ...gesture, clientY: 300 });
     await paper.dispatchEvent("pointerup", { ...gesture, clientY: 300 });
     const hud = page.getByTestId("mushaf-theme-hud");
-    await expect(hud.getByText(t(language, "mushaf.glassActive"))).toBeVisible();
-    await expect(hud.locator(".mushaf-theme-hud-surface")).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
+    await expect(hud).toHaveAttribute("data-notice-theme", "midnight");
+    await expect(hud).toContainText(t(language, "mushaf.themeMidnight"));
+    await expect(hud).toHaveCSS("background-color", "rgb(16, 27, 58)");
+    await expect(hud).toHaveCSS("backdrop-filter", "none");
     await page.getByTestId("mushaf-more-actions").click();
     // The status disappears when the effective surface is solid or high contrast.
     await page.locator("html").evaluate((root) => {

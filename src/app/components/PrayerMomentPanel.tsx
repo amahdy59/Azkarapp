@@ -11,6 +11,7 @@ import { HomeCard } from "./HomeCard";
 import { PrayerActionsCard } from "./PrayerActionsCard";
 import { dateFromProgressDayKey } from "../progress";
 import { formatDisplayDate } from "../formatting";
+import { EvidenceSource } from "./EvidenceSource";
 
 export const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
   fajr: Sunrise,
@@ -156,6 +157,17 @@ export function PrayerMomentPanel({
                     {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
                   </span>
                 </p>
+                <EvidenceSource
+                  language={language}
+                  className={accentText}
+                  details={{
+                    title: t(language, "prayerMoment.virtueTitle", { prayer: name }),
+                    quotation: isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic),
+                    reference: isArabic ? virtue.referenceArabic : virtue.referenceEnglish,
+                    textLanguage: isArabic || !virtue.textEnglish ? "ar" : "en",
+                    sourceUrl: virtue.sourceUrl,
+                  }}
+                />
               </div>
             </section>
           )}

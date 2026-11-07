@@ -1,0 +1,46 @@
+.progress-styled-records {
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+  padding: 0.5rem;
+}
+.progress-styled-records td,
+.progress-styled-records tbody th {
+  background: color-mix(in srgb, var(--muted) 25%, var(--card));
+}
+.progress-styled-records tr > :first-child {
+  border-start-start-radius: var(--radius-lg);
+  border-end-start-radius: var(--radius-lg);
+}
+.progress-styled-records tr > :last-child {
+  border-start-end-radius: var(--radius-lg);
+  border-end-end-radius: var(--radius-lg);
+}
+.progress-record-mini {
+  block-size: 0.3rem;
+  margin-block-start: 0.35rem;
+  background: var(--muted);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.progress-record-mini > span {
+  display: block;
+  block-size: 100%;
+  background: var(--primary);
+  border-radius: inherit;
+}
+.progress-record-column {
+  min-inline-size: 6rem;
+}
+.progress-record-column:first-child {
+  min-inline-size: 7rem;
+}
+.progress-styled-records thead button {
+  flex-wrap: wrap;
+}
+@media (max-width: 47.999rem) {
+  .progress-records-pagination {
+    inline-size: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

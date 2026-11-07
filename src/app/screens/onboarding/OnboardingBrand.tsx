@@ -1,35 +1,29 @@
 import React from "react";
+import { CrescentMark } from "../../components/CrescentMark";
 import { Check } from "../../components/icons";
-
-export function BrandCrescent({ size = 96 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-hidden="true">
-      <path d="M84 57.5A35 35 0 1 1 43.3 16.8 27 27 0 0 0 84 57.5Z" fill="currentColor" />
-    </svg>
-  );
-}
+import { t } from "../../i18n";
 
 export function BrandLockup({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flex flex-col items-center text-primary" role="img" aria-label="wa-zaker">
-      <BrandCrescent size={compact ? 44 : 96} />
+    <div className="flex flex-col items-center gap-1 text-primary">
+      <CrescentMark size={compact ? 44 : 96} />
       <p
-        className={`arabic-ui ${
-          compact ? "-mt-1 text-xl font-bold leading-7" : "-mt-1 text-[2.625rem] font-bold leading-[56px]"
-        }`}
+        className={`arabic-ui ${compact ? "text-xl font-bold leading-7" : "text-[2.625rem] font-bold leading-[56px]"}`}
         lang="ar"
         dir="rtl"
       >
-        وَذَكِّرْ
+        {t("ar", "common.appName")}
       </p>
       <p
+        lang="en"
+        dir="ltr"
         className={
           compact
             ? "text-[0.5625rem] font-bold tracking-[0.72px] text-foreground"
             : "text-title font-bold tracking-[1.4px] text-foreground"
         }
       >
-        {compact ? "WA-ZAKER" : "wa-zaker"}
+        {t("en", "common.appName")}
       </p>
     </div>
   );
@@ -47,13 +41,15 @@ export function WelcomeArtwork({ arabic = false }: { arabic?: boolean }) {
         <span key={index} className="absolute size-[5px] rounded-full bg-primary" style={{ left, top }} />
       ))}
       <div className="absolute left-1/2 top-[43%] -translate-x-1/2 -translate-y-1/2 text-primary">
-        <BrandCrescent size={arabic ? 124 : 140} />
+        <CrescentMark size={arabic ? 108 : 120} />
       </div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-primary">
         <p className="arabic-ui text-[2.375rem] font-bold leading-[44px]" lang="ar">
-          وَذَكِّرْ
+          {t("ar", "common.appName")}
         </p>
-        <p className="text-micro font-bold tracking-[1.2px]">WA-ZAKER</p>
+        <p className="text-micro font-bold tracking-[1.2px]" lang="en" dir="ltr">
+          {t("en", "common.appName")}
+        </p>
       </div>
     </div>
   );

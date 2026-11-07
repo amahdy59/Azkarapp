@@ -46,3 +46,8 @@ describe("prayer virtues", () => {
     expect(PRAYER_VIRTUE_CLOSING_ARABIC).toContain("تَقَبَّلَ اللهُ مِنَّا وَمِنْكُمْ");
   });
 });
+
+it("links the Dhuhr quotation about Ramadan to the matching narration variant", () => {
+  const virtue = getPrayerVirtues("dhuhr").find((item) => item.referenceEnglish === "Sahih Muslim 233");
+  expect(virtue?.sourceUrl).toBe("https://sunnah.com/muslim:233c");
+});

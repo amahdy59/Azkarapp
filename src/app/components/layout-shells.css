@@ -1,0 +1,43 @@
+/* Only ordinary headers mark their Back wrapper; immersive reading keeps its
+   recovery action. Actual rail/sidebar presence owns wide navigation. */
+.app-shell:has(.app-sidebar, .app-rail) .shared-header-back {
+  display: none;
+}
+.bottom-nav [data-navigation-optional] {
+  display: none;
+}
+@container compact-navigation (min-width: 36rem) {
+  .bottom-nav [data-navigation-optional] {
+    display: flex;
+  }
+}
+
+/* At enlarged text, tools keep their targets while the title gets its own row. */
+.reading-compact-header {
+  container: reading-header / inline-size;
+}
+@container reading-header (max-width: 22rem) {
+  .shared-screen-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .shared-screen-header > :nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .shared-screen-header h1 {
+    line-height: 1.6;
+    padding-block: 2px;
+  }
+  .shared-screen-header > :last-child {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .shared-screen-header button {
+    inline-size: 44px;
+    min-inline-size: 44px;
+    block-size: 44px;
+    min-block-size: 44px;
+  }
+}

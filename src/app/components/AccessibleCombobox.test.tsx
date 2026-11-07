@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AccessibleCombobox } from "./AccessibleCombobox";
+import { Modal } from "./ResponsiveSheet";
 
 const testOptions = [
   { id: 1, label: "Al-Fatihah", secondaryLabel: "1–1", badge: 1 },
@@ -9,6 +10,37 @@ const testOptions = [
 ];
 
 describe("AccessibleCombobox", () => {
+  it("keeps options stationary under the pointer while keyboard navigation scrolls", () => {
+    const onChange = vi.fn();
+    render(<AccessibleCombobox label="Surah" options={testOptions} value={1} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const option = screen.getAllByRole("option")[2]!;
+    const scroll = vi.fn();
+    option.scrollIntoView = scroll;
+    fireEvent.mouseEnter(option);
+    expect(scroll).not.toHaveBeenCalled();
+    expect(fireEvent.mouseDown(option)).toBe(false);
+    expect(screen.getByRole("textbox")).toHaveFocus();
+    fireEvent.keyDown(screen.getByRole("listbox"), { key: "End" });
+    expect(scroll).toHaveBeenCalledWith({ block: "nearest" });
+    fireEvent.click(option);
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(18);
+  });
+
+  it("keeps Escape inside the picker so its parent dialog remains open", async () => {
+    const closeParent = vi.fn();
+    render(
+      <Modal open onClose={closeParent} title="Reading plan" direction="ltr">
+        <AccessibleCombobox label="Surah" value={1} options={testOptions} onChange={vi.fn()} />
+      </Modal>,
+    );
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Escape" });
+    expect(closeParent).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.queryByRole("textbox")).not.toBeInTheDocument());
+    expect(screen.getByRole("combobox")).toHaveFocus();
+    expect(screen.getByRole("dialog", { name: "Reading plan" })).toBeVisible();
+  });
   it("finds a Quran choice by its other-language name and selects it with the keyboard", () => {
     const onChange = vi.fn();
     render(

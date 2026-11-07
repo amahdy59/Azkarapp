@@ -4,22 +4,60 @@ type TelemetryEvent =
       name: string;
       source: string;
       path: string;
+      screen: string;
       timestamp: string;
     }
   | {
       type: "metric";
       name: "CLS" | "INP" | "LCP" | "TTFB";
       value: number;
+      scope: "navigation" | "interaction";
       path: string;
+      screen: string;
       timestamp: string;
     };
 
 type LayoutShiftEntry = PerformanceEntry & { value: number; hadRecentInput: boolean };
 type InteractionEntry = PerformanceEntry & { duration: number; interactionId?: number };
 
+/** Only coarse product screens are permitted; never include content IDs or searches. */
+export function diagnosticScreen(hash = window.location.hash): string {
+  const route = (hash.split(/[?&]/, 1)[0] ?? "").split("/").filter(Boolean);
+  const first = route[1]; // the leading # is a separate segment
+  if (first === "azkar") return route.length > 3 ? "reader" : route.length > 2 ? "collection" : "library";
+  const allowed = new Set([
+    "home",
+    "progress",
+    "settings",
+    "quran",
+    "quran-wird",
+    "search",
+    "qibla",
+    "friday",
+    "counter",
+    "prayer",
+    "benefits",
+    "more",
+    "completion",
+  ]);
+  return first && allowed.has(first) ? first : "unknown";
+}
+
+const screenTimeline: { at: number; screen: string }[] = [];
+export function recordDiagnosticScreen() {
+  const screen = diagnosticScreen();
+  if (screenTimeline.at(-1)?.screen === screen) return;
+  screenTimeline.push({ at: performance.now(), screen });
+  if (screenTimeline.length > 64) screenTimeline.shift();
+}
+function interactionScreen(at: number) {
+  return screenTimeline.findLast((entry) => entry.at <= at)?.screen ?? "unknown";
+}
+
 function baseEvent() {
   return {
     path: window.location.pathname,
+    screen: diagnosticScreen(),
     timestamp: new Date().toISOString(),
   };
 }
@@ -58,12 +96,21 @@ export function reportError(error: unknown, source: string) {
   send(createErrorEvent(error, source));
 }
 
-function reportMetric(name: Extract<TelemetryEvent, { type: "metric" }>["name"], value: number) {
-  send({ type: "metric", name, value: Math.round(value), ...baseEvent() });
+function reportMetric(name: Extract<TelemetryEvent, { type: "metric" }>["name"], value: number, screen: string) {
+  send({
+    type: "metric",
+    name,
+    value: Math.round(value),
+    ...baseEvent(),
+    screen,
+    scope: name === "INP" ? "interaction" : "navigation",
+  });
 }
 
 /** Lightweight performance diagnostics; never include persistent or account identifiers. */
 export function startPerformanceMonitoring() {
+  const navigationScreen = diagnosticScreen();
+  recordDiagnosticScreen();
   const observers: PerformanceObserver[] = [];
   const observedTypes = new Set<string>();
   let cls = 0;
@@ -75,7 +122,7 @@ export function startPerformanceMonitoring() {
   let lastInteraction = 0;
   // INP discards one outlier per 50 interactions. Ten candidates bound memory
   // even during long counter sessions; duplicate event entries share one ID.
-  const interactions = new Map<number, number>();
+  const interactions = new Map<number, { duration: number; screen: string }>();
   const onWindowError = (event: ErrorEvent) => reportError(event.error, "window-error");
   const onUnhandledRejection = (event: PromiseRejectionEvent) => reportError(event.reason, "unhandled-rejection");
   window.addEventListener("error", onWindowError);
@@ -118,9 +165,11 @@ export function startPerformanceMonitoring() {
         if (id <= 0) continue;
         firstInteraction = Math.min(firstInteraction, id);
         lastInteraction = Math.max(lastInteraction, id);
-        interactions.set(id, Math.max(interactions.get(id) ?? 0, entry.duration));
+        const previous = interactions.get(id);
+        if (!previous || entry.duration > previous.duration)
+          interactions.set(id, { duration: entry.duration, screen: interactionScreen(entry.startTime) });
         if (interactions.size > 10) {
-          const shortest = [...interactions].sort((a, b) => a[1] - b[1])[0]!;
+          const shortest = [...interactions].sort((a, b) => a[1].duration - b[1].duration)[0]!;
           interactions.delete(shortest[0]);
         }
       }
@@ -129,18 +178,18 @@ export function startPerformanceMonitoring() {
   );
 
   const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-  if (navigation) reportMetric("TTFB", navigation.responseStart);
+  if (navigation) reportMetric("TTFB", navigation.responseStart, navigationScreen);
 
   const flush = () => {
-    if (lcp > 0) reportMetric("LCP", lcp);
+    if (lcp > 0) reportMetric("LCP", lcp, navigationScreen);
     // Preserve the collector's historical CLS unit: thousandths of a score.
-    if (observedTypes.has("layout-shift")) reportMetric("CLS", cls * 1000);
-    const durations = [...interactions.values()].sort((a, b) => b - a);
+    if (observedTypes.has("layout-shift")) reportMetric("CLS", cls * 1000, navigationScreen);
+    const durations = [...interactions.values()].sort((a, b) => b.duration - a.duration);
     const count =
       (performance as Performance & { interactionCount?: number }).interactionCount ??
       (lastInteraction > 0 ? (lastInteraction - firstInteraction) / 7 + 1 : 0);
     const inp = durations[Math.min(durations.length - 1, Math.floor(count / 50))];
-    if (inp !== undefined) reportMetric("INP", inp);
+    if (inp !== undefined) reportMetric("INP", inp.duration, inp.screen);
   };
   const onVisibility = () => {
     if (document.visibilityState === "hidden") flush();

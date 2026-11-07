@@ -1,7 +1,9 @@
 import { useControlFeedback } from "./hooks/useControlFeedback";
+import { recommendedReminders } from "./contextReminders";
 import { useNativeServices } from "./hooks/useNativeServices";
 import { useQueuedAudioAction } from "./hooks/useQueuedAudioAction";
 import "../styles/theme/materials.css";
+import "../styles/theme/paper-grain.css";
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   fromCompletedSets,
@@ -10,11 +12,14 @@ import {
   toCompletedSets,
   resetDailyPartialCounts,
   resetDailyMasbahaState,
+  resetDailySurahPages,
   type StoredSession,
 } from "./state";
 import { applyAppAppearance } from "./theme";
 import { scheduleStartupMaintenance } from "./startupMaintenance";
-import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkar";
+import { APPROVED_AUDIO_ASSIGNMENTS } from "./audio/audioAssignments";
+import { BAQARAH_METADATA } from "./content/baqarahMetadata";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkarCore";
 import { isPrayerName } from "./content/prayerTimes";
 import type {
   AppLanguage,
@@ -48,6 +53,8 @@ import {
   mergeFridayCycles,
   onFridayProgressChange,
   readFridayCycle,
+  readDailyFridayDuaProgress,
+  writeDailyFridayDuaProgress,
   writeFridayCycle,
   type FridayCycleProgress,
   getFridayCycleKey,
@@ -55,7 +62,7 @@ import {
   writeFridayDuaProgress,
 } from "./fridayProgress";
 
-const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
+import { loadHomeScreen, ONBOARDING_COMPLETE_KEY } from "./homeStartup";
 
 import { useAppRouting, isLazyRouteCategory } from "./hooks/useAppRouting";
 
@@ -99,9 +106,7 @@ import {
   type GrowthEvent,
 } from "./progress";
 
-const HomeScreen = retryableScreen(() =>
-  import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })),
-);
+const HomeScreen = retryableScreen(loadHomeScreen);
 const AzkarLibraryScreen = retryableScreen(() =>
   import("./screens/AzkarLibraryScreen").then((module) => ({ default: module.AzkarLibraryScreen })),
 );
@@ -177,6 +182,9 @@ function warmMushafReader(page: number) {
 const SplashScreen = lazy(() =>
   import("./screens/onboarding/SplashScreen").then((module) => ({ default: module.SplashScreen })),
 );
+const FirstUseSetup = lazy(() =>
+  import("./screens/onboarding/FirstUseSetup").then((module) => ({ default: module.FirstUseSetup })),
+);
 const EnglishOnboarding1Screen = lazy(() =>
   import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding1Screen })),
 );
@@ -222,6 +230,14 @@ function AppContent({
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
 }) {
   const [initialState] = useState(loadStartupState ?? loadAppState);
+  const [isNewInstallation] = useState(() => {
+    try {
+      return window.localStorage.getItem("azkarapp.state.v1") === null;
+    } catch {
+      return true;
+    }
+  });
+  const [firstUseSetupOpen, setFirstUseSetupOpen] = useState(false);
   useEffect(scheduleStartupMaintenance, []);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
@@ -343,6 +359,8 @@ function AppContent({
     installPrompt,
     isInstalling,
     isUpdating,
+    updateReady,
+    isPreparingUpdate,
     pwaError,
     pwaStatus,
     releaseNotes,
@@ -379,6 +397,7 @@ function AppContent({
   const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "inherit");
   const resolvedHomeMaterial = homeMaterial === "inherit" ? appMaterial : homeMaterial;
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
+  const [paperTexture, setPaperTexture] = useState(initialState.settings.paperTexture ?? true);
   const [homeWirdImages, setHomeWirdImages] = useState(initialState.settings.homeWirdImages);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
   const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
@@ -664,12 +683,10 @@ function AppContent({
     try {
       setIsFridayDuasLoading(true);
       setFridayDuasError(false);
-      const cycle = getFridayCycleKey();
       const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
       registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
       const duaIds = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction).map((dua) => dua.id);
-      const stored = readFridayDuaProgress(duaIds, cycle);
-      writeFridayDuaProgress(stored, cycle);
+      const stored = readDailyFridayDuaProgress(duaIds);
       setFridayDuaTotalCount(duaIds.length);
       setFridayDuaCompletedIds(stored);
       return true;
@@ -699,6 +716,7 @@ function AppContent({
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
   const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
   const [remoteSyncReady, setRemoteSyncReady] = useState(false);
+  const [localSaveStatus, setLocalSaveStatus] = useState<"pending" | "saved" | "error">("pending");
   const [persistenceError, setPersistenceError] = useState(false);
   const [persistenceNoticeDismissed, setPersistenceNoticeDismissed] = useState(false);
 
@@ -761,6 +779,7 @@ function AppContent({
         reduceMotion,
         readerToolLabels,
         readerMeaningOnly,
+        paperTexture,
         reduceTransparency,
         homeWirdImages,
         appMaterial,
@@ -819,6 +838,7 @@ function AppContent({
       highContrast,
       isGuest,
       homeWirdImages,
+      paperTexture,
       appMaterial,
       homeMaterial,
       phone,
@@ -968,7 +988,10 @@ function AppContent({
       const next = new Set(previous);
       if (shouldComplete) next.add(zikrId);
       else next.delete(zikrId);
-      writeFridayDuaProgress(next);
+      writeDailyFridayDuaProgress(next);
+      // Starting/undoing today's reading must not erase earlier weekly activity.
+      const allIds = getAzkarForMode("comprehensive_duas").map((zikr) => zikr.id);
+      writeFridayDuaProgress(new Set([...readFridayDuaProgress(allIds), ...next]));
       return next;
     });
   }, []);
@@ -976,7 +999,7 @@ function AppContent({
   const resetFridayDuaProgress = useCallback(() => {
     const next = new Set<string>();
     setFridayDuaCompletedIds(next);
-    writeFridayDuaProgress(next);
+    writeDailyFridayDuaProgress(next);
   }, []);
 
   // The fridayDuaFlow state is cleared manually when navigating away (e.g. via nav tabs or back button)
@@ -1155,13 +1178,15 @@ function AppContent({
   }, [audioCompletionSequence]);
 
   const markOnboardingComplete = useCallback(() => {
+    if (isNewInstallation) setReminders((current) => recommendedReminders(current));
+    setFirstUseSetupOpen(true);
     setHasCompletedOnboarding(true);
     try {
       window.localStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
     } catch {
       // Storage failure non-fatal
     }
-  }, []);
+  }, [isNewInstallation]);
 
   const applyStateSnapshot = useCallback((state: AppStateSnapshot) => {
     setSelectedLang(state.settings.language);
@@ -1179,6 +1204,7 @@ function AppContent({
     setAppMaterial(state.settings.appMaterial ?? "solid");
     setHomeMaterial(state.settings.homeMaterial ?? "inherit");
     setHomeWirdImages(state.settings.homeWirdImages);
+    setPaperTexture(state.settings.paperTexture ?? true);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
     setColorBlindSupport(state.settings.colorBlindSupport);
@@ -1312,6 +1338,7 @@ function AppContent({
     progressDayStartHour,
     language: selectedLang,
     location: locationSettings,
+    hijriDateOffset,
   });
 
   const reconcileDailyProgress = useCallback(() => {
@@ -1321,15 +1348,10 @@ function AppContent({
     activeProgressDayRef.current = currentDayKey;
     setActiveProgressDay(currentDayKey);
     setCompleted((previous) => resetDailyRoutineProgress(previous));
+    setFridayDuaCompletedIds(new Set());
     setPartialZikrCounts(resetDailyPartialCounts);
     setMasbahaState((previous) => (previous ? resetDailyMasbahaState(previous, currentDayKey) : previous));
-    setSurahReadingPages((current) => {
-      if (!current["s-hm-110a"] && !current["s-hm-110b"]) return current;
-      const next = { ...current };
-      delete next["s-hm-110a"];
-      delete next["s-hm-110b"];
-      return next;
-    });
+    setSurahReadingPages(resetDailySurahPages);
   }, [progressDayStartHour]);
 
   useEffect(() => {
@@ -1373,6 +1395,7 @@ function AppContent({
         reduceMotion,
         readerToolLabels,
         reduceTransparency,
+        paperTexture,
         appMaterial,
         forceRtl,
         colorBlindSupport,
@@ -1390,6 +1413,7 @@ function AppContent({
     reduceMotion,
     readerToolLabels,
     reduceTransparency,
+    paperTexture,
     appMaterial,
     selectedLang,
     textSize,
@@ -1397,10 +1421,12 @@ function AppContent({
   ]);
 
   const handlePersistenceResult = useCallback((saved: boolean) => {
+    setLocalSaveStatus(saved ? "saved" : "error");
     setPersistenceError(!saved);
     if (saved) setPersistenceNoticeDismissed(false);
   }, []);
-  useAppStatePersistence(appStateSnapshot, handlePersistenceResult);
+  const handleSavePending = useCallback(() => setLocalSaveStatus("pending"), []);
+  useAppStatePersistence(appStateSnapshot, handlePersistenceResult, handleSavePending);
   /**
    * The Mushaf is a reading surface, not a screen with a menu bar.
    *
@@ -1429,6 +1455,20 @@ function AppContent({
     ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];
+  useEffect(() => {
+    if (view !== "category" && view !== "reader") return;
+    const candidates = view === "category" ? azkar : azkar.slice(activeIdx + 1, activeIdx + 3);
+    if (!candidates.some((entry) => entry.canonicalKey || entry.mushafPages?.length)) return;
+    let active = true;
+    void import("./content/quranReadiness")
+      .then((module) => {
+        if (active) module.warmQuranPassages(candidates);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [view, azkar, activeIdx]);
   const isAudioPlayerDockedInReader =
     view === "reader" &&
     !readerInMushafMode &&
@@ -1576,18 +1616,16 @@ function AppContent({
     void startAudio([activeZikr], "single", true, "ar");
   };
 
-  const baqarahZikr = useMemo(
-    () => getAzkarForMode("illness_ruqyah", "complete").find((item) => item.id === "ir-baqarah"),
-    [],
-  );
   const [queuedBaqarahContext, setQueuedBaqarahContext] = useState<string | null>(null);
   const baqarahContext = JSON.stringify([view, selectedLang, khatmahPage]);
   const queuedBaqarahAudio = queuedBaqarahContext !== null;
   const baqarahOwnsAudio =
-    audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === "ir-baqarah";
+    audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === BAQARAH_METADATA.id;
   const baqarahAudioStatus = queuedBaqarahAudio ? "loading" : baqarahOwnsAudio ? audioController!.state.status : "idle";
   const startBaqarahAudio = useCallback(() => {
-    if (!baqarahZikr || !audioController || !buildPlaybackPlan) return;
+    if (!audioController || !buildPlaybackPlan) return;
+    const baqarahZikr = getAzkarForMode(BAQARAH_METADATA.category).find((item) => item.id === BAQARAH_METADATA.id);
+    if (!baqarahZikr) return;
     const plan = buildPlaybackPlan({
       zikrs: [baqarahZikr],
       context: { category: "illness_ruqyah", routineMode: "complete", source: "single" },
@@ -1596,7 +1634,7 @@ function AppContent({
       audioLanguage: "ar",
     });
     audioController.startPlan(plan);
-  }, [baqarahZikr, audioController, buildPlaybackPlan]);
+  }, [audioController, buildPlaybackPlan]);
   useEffect(() => {
     if (!queuedBaqarahAudio) return;
     if (view !== "khatmah" || queuedBaqarahContext !== baqarahContext) {
@@ -1619,7 +1657,6 @@ function AppContent({
     startBaqarahAudio,
   ]);
   const toggleBaqarahAudio = () => {
-    if (!baqarahZikr) return;
     if (!audioController || !buildPlaybackPlan) {
       setQueuedBaqarahContext(baqarahContext);
       requestAudioModule();
@@ -1724,7 +1761,21 @@ function AppContent({
       layoutMode === "medium");
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
+  // Utility pages have their own sidebar entry. Smaller nav variants must
+  // not pretend that the previously visited primary destination is current.
+  const activeNavigationTab = view === "custom_counter" || view === "qibla" || view === "more" ? undefined : activeTab;
 
+  const utilityNavigation = {
+    activeUtility: view === "custom_counter" ? ("masbaha" as const) : view === "qibla" ? ("qibla" as const) : undefined,
+    onOpenQibla: () => {
+      setFridayDuaFlow(false);
+      push("qibla");
+    },
+    onOpenMasbaha: () => {
+      setFridayDuaFlow(false);
+      push("custom_counter");
+    },
+  };
   const handleNavigationTab = (tab: NavTab) => {
     setFridayDuaFlow(false);
     if (tab === "home" && view === "home") {
@@ -1772,7 +1823,7 @@ function AppContent({
             them underneath the rail on the expanded and large tiers. */}
         <div className="app-status">
           {playAllAction.pending && (
-            <p className="sync-status" role="status">
+            <p className="sr-only" role="status">
               {t(selectedLang, "audioPlayer.loading")}
             </p>
           )}
@@ -1805,24 +1856,19 @@ function AppContent({
         </div>
 
         {/* Adaptive navigation — only one renders at a time */}
-        {showRail && <NavRail active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />}
+        {showRail && (
+          <NavRail
+            active={activeNavigationTab}
+            {...utilityNavigation}
+            onChange={handleNavigationTab}
+            isArabic={isArabic}
+          />
+        )}
         {showSidebar && (
           <NavSidebar
-            active={activeTab}
-            activeUtility={view === "custom_counter" ? "masbaha" : view === "qibla" ? "qibla" : undefined}
+            active={activeNavigationTab}
+            {...utilityNavigation}
             onChange={handleNavigationTab}
-            onOpenQuran={() => {
-              setFridayDuaFlow(false);
-              push("khatmah_overview");
-            }}
-            onOpenMasbaha={() => {
-              setFridayDuaFlow(false);
-              push("custom_counter");
-            }}
-            onOpenSettings={() => {
-              setFridayDuaFlow(false);
-              push("settings");
-            }}
             isArabic={isArabic}
             themeMode={themeMode}
             onThemeModeChange={setThemeMode}
@@ -1840,6 +1886,9 @@ function AppContent({
             className="app-main-view flex-1 overflow-hidden flex flex-col"
           >
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
+              {firstUseSetupOpen && view === "home" && (
+                <FirstUseSetup language={selectedLang} onClose={() => setFirstUseSetupOpen(false)} />
+              )}
               {/* Phase 2 — onboarding flow */}
               {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
               {view === "onboard1" && (
@@ -1992,6 +2041,10 @@ function AppContent({
                     }
                   }}
                   onOpenPrayerAdhkar={(prayer) => resumeCategory("after_prayer", prayer)}
+                  onViewPrayers={(prayer) => {
+                    setActivePrayer(prayer);
+                    push("prayer");
+                  }}
                   mosquePrayerGoal={mosquePrayerGoal}
                   dailyPathStartDayKey={dailyPathStartDayKey}
                   onMosquePrayerGoalChange={setMosquePrayerGoal}
@@ -2010,9 +2063,10 @@ function AppContent({
                   }}
                   onOpenWirdBenefits={() => push("wird_benefits")}
                   onOpenKhatmah={() => push("khatmah_overview")}
-                  onOpenProgress={() => push("progress")}
-                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
-                  onOpenMasbaha={() => push("custom_counter")}
+                  onOpenProgress={() => handleNavigationTab("progress")}
+                  onOpenMore={() => push("more")}
+                  onOpenQibla={showQiblaShortcut ? utilityNavigation.onOpenQibla : undefined}
+                  onOpenMasbaha={utilityNavigation.onOpenMasbaha}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                 />
@@ -2021,9 +2075,10 @@ function AppContent({
                 <MoreScreen
                   language={selectedLang}
                   direction={layoutDirection}
-                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
-                  onOpenMasbaha={() => push("custom_counter")}
+                  onOpenQibla={showQiblaShortcut ? utilityNavigation.onOpenQibla : undefined}
+                  onOpenMasbaha={utilityNavigation.onOpenMasbaha}
                   onOpenSettings={() => push("settings")}
+                  onOpenProgress={() => handleNavigationTab("progress")}
                 />
               )}
               {view === "qibla" && (
@@ -2266,6 +2321,7 @@ function AppContent({
                         : getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory).size
                   }
                   hapticFeedback={hapticFeedback}
+                  onHapticFeedbackChange={setHapticFeedback}
                   reduceMotion={reduceMotion}
                   showTranslation={showTranslation}
                   showTransliteration={showTransliteration}
@@ -2478,6 +2534,9 @@ function AppContent({
               )}
               {view === "settings" && (
                 <SettingsScreen
+                  localSaveStatus={localSaveStatus}
+                  onRetrySave={() => handlePersistenceResult(saveAppState(appStateSnapshot))}
+                  onRetrySync={retrySync}
                   onReviewUpdate={hasWaitingUpdate ? handleReviewUpdate : undefined}
                   audioController={audioController}
                   themeMode={themeMode}
@@ -2529,6 +2588,8 @@ function AppContent({
                   onReduceMotionChange={setReduceMotion}
                   onReduceTransparencyChange={setReduceTransparency}
                   onHomeWirdImagesChange={setHomeWirdImages}
+                  paperTexture={paperTexture}
+                  onPaperTextureChange={setPaperTexture}
                   onHapticFeedbackChange={setHapticFeedback}
                   onForceRtlChange={setForceRtl}
                   onColorBlindSupportChange={setColorBlindSupport}
@@ -2539,6 +2600,10 @@ function AppContent({
                   onActivateAccount={handleOpenAccountAuth}
                   onSignOut={handleSignOut}
                   onExportData={handleExportData}
+                  onExportProgress={async (range) => {
+                    const { saveProgressExport } = await import("./progressExport");
+                    await saveProgressExport(appStateSnapshot, range);
+                  }}
                   onRestoreData={handleRestoreData}
                   onResetPreferences={handleResetPreferences}
                   onClearLocalData={handleClearLocalData}
@@ -2606,7 +2671,7 @@ function AppContent({
                   audioController={audioController}
                   textSize={textSize}
                   baqarahAudio={{
-                    available: Boolean(baqarahZikr?.audioAssetId),
+                    available: Boolean(APPROVED_AUDIO_ASSIGNMENTS[BAQARAH_METADATA.id]),
                     status: baqarahAudioStatus,
                     onToggle: toggleBaqarahAudio,
                   }}
@@ -2721,19 +2786,29 @@ function AppContent({
                 body={t(selectedLang, "persistence.body")}
                 actionLabel={t(selectedLang, "persistence.retry")}
                 dismissLabel={t(selectedLang, "common.dismiss")}
-                onAction={() => setPersistenceError(!saveAppState(appStateSnapshot))}
+                onAction={() => handlePersistenceResult(saveAppState(appStateSnapshot))}
                 onDismiss={() => setPersistenceNoticeDismissed(true)}
               />
             ) : updateAvailable ? (
               <PwaNotice
-                title={t(selectedLang, "pwa.updateTitle")}
+                title={t(selectedLang, updateReady ? "pwa.updateTitle" : "pwa.preparingTitle")}
                 actionRef={updateActionRef}
                 body={t(selectedLang, "pwa.deferHint")}
                 items={releaseNotes?.[selectedLang]}
-                actionLabel={t(selectedLang, "pwa.refresh")}
+                actionLabel={t(
+                  selectedLang,
+                  updateReady ? "pwa.refresh" : isPreparingUpdate ? "pwa.preparing" : "pwa.retryPreparation",
+                )}
+                actionDisabled={isPreparingUpdate}
                 dismissLabel={t(selectedLang, "pwa.later")}
                 isActionLoading={isUpdating}
-                statusMessage={isUpdating ? t(selectedLang, "pwa.updating") : undefined}
+                statusMessage={
+                  isUpdating
+                    ? t(selectedLang, "pwa.updating")
+                    : isPreparingUpdate
+                      ? t(selectedLang, "pwa.preparingBody")
+                      : undefined
+                }
                 errorMessage={pwaError}
                 onAction={applyUpdate}
                 onDismiss={dismissUpdate}
@@ -2764,7 +2839,12 @@ function AppContent({
         {/* Bottom nav — compact and medium only, shown in its own grid area */}
         {showBottomNavArea && (
           <div className="app-bottom-nav">
-            <BottomNav active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />
+            <BottomNav
+              active={activeNavigationTab}
+              {...utilityNavigation}
+              onChange={handleNavigationTab}
+              isArabic={isArabic}
+            />
           </div>
         )}
       </div>

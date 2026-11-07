@@ -14,6 +14,7 @@ describe("MoreScreen", () => {
     const onOpenQibla = vi.fn();
     const onOpenMasbaha = vi.fn();
     const onOpenSettings = vi.fn();
+    const onOpenProgress = vi.fn();
     render(
       <MoreScreen
         language="en"
@@ -21,14 +22,17 @@ describe("MoreScreen", () => {
         onOpenQibla={onOpenQibla}
         onOpenMasbaha={onOpenMasbaha}
         onOpenSettings={onOpenSettings}
+        onOpenProgress={onOpenProgress}
       />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Qibla/ }));
     fireEvent.click(screen.getByRole("button", { name: /Masbaha/ }));
     fireEvent.click(screen.getByRole("button", { name: /^Settings/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^Progress/ }));
     expect(onOpenQibla).toHaveBeenCalledOnce();
     expect(onOpenMasbaha).toHaveBeenCalledOnce();
     expect(onOpenSettings).toHaveBeenCalledOnce();
+    expect(onOpenProgress).toHaveBeenCalledOnce();
   });
 });

@@ -1,0 +1,7 @@
+# Balanced Mushaf reader — owner approved 2026-11-04
+
+The owner reviewed visual proposals and now requests applying all recommendations. The latest corrections take precedence over generated sketches: retain existing Mushaf capsule geometry and desktop rail/menu behavior; the color pill is transient theme-change feedback, never a new picker. Preserve reviewed content, fifteen canonical slots, gestures, manual zoom, bookmarks, search, tabs and keyboard recovery.
+
+Plan: (1) share theme notification presentation between both readers, render it in the existing chrome rather than above verses, match the applied paper/ink/grain with accessible fallbacks; (2) add safe breathing room and center/bound desktop pages by both height and width while retaining mobile sizing, spreads and enlarged scrolling; (3) replace full-height index with a centered bounded dialog, compact two-column surah cards and shared grouped tabs, reverting to one column only when enlarged labels cannot fit; (4) add/update real browser geometry/content/control/menu/notification regressions, collect RTL/LTR/mobile/focus/desktop screenshots, run relevant unit/browser tests and full quality/build gates; (5) document results and complete authorized release if publishing.
+
+Generated scripture is never a content source. No runtime dependencies, religious content edits, persistence schema, audio timing or native-host changes.

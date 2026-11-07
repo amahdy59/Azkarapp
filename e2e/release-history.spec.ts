@@ -40,7 +40,7 @@ for (const language of ["ar", "en"] as const) {
     await page.keyboard.press("Enter");
     await expect(disclosure).toHaveAttribute("open", "");
     await expect(disclosure.getByRole("list")).toBeVisible();
-    await page.keyboard.press("Space");
+    await summary.press("Space");
     await expect(disclosure).not.toHaveAttribute("open");
     await expect(summary).toBeFocused();
     expect(await page.locator("details").count()).toBe(19);

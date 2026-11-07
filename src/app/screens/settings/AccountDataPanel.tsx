@@ -1,4 +1,6 @@
-import { useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { isNativeAndroid } from "../../native/platform";
+import { retryDeviceSync, useDeviceSyncStatus } from "../../deviceSyncStatus";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
 import { Check, Database, Download, LogOut, RotateCcw, Upload, User, Wifi } from "../../components/icons";
@@ -7,8 +9,14 @@ import type { AppLanguage } from "../../types";
 import { useDeviceLinkStatus } from "../../hooks/useDeviceLinkStatus";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
 import { QrSyncPanel } from "./QrSyncPanel";
+import { DataExportMenu } from "./DataExportMenu";
+import type { ProgressRange } from "../../progressDashboard";
 
 export function AccountDataPanel({
+  localSaveStatus = "pending",
+  onRetrySave,
+  onRetrySync,
+  onOpenDownloads,
   language,
   isGuest,
   isSyncing,
@@ -20,12 +28,17 @@ export function AccountDataPanel({
   onActivateAccount,
   onSignOut,
   onExportData,
+  onExportProgress,
   onRestoreData,
   onResetPreferences,
   onClearLocalData,
   onDeleteAccount,
   onBack,
 }: {
+  localSaveStatus?: "pending" | "saved" | "error";
+  onRetrySave?: () => void;
+  onRetrySync?: () => void;
+  onOpenDownloads?: () => void;
   language: AppLanguage;
   isGuest: boolean;
   isSyncing: boolean;
@@ -37,30 +50,73 @@ export function AccountDataPanel({
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
+  onExportProgress?: (range: ProgressRange) => Promise<void>;
   onRestoreData: (raw: string) => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;
   onDeleteAccount: () => void;
   onBack: () => void;
 }) {
-  const syncStatusLabel =
-    syncStatus === "offline"
-      ? t(language, "accountData.savedOffline")
-      : syncError
-        ? t(language, "accountData.needsAttention")
-        : isSyncing
-          ? t(language, "accountData.syncing")
-          : t(language, "accountData.upToDate");
-  const lastSyncLabel = lastSuccessfulSyncAt
-    ? new Intl.DateTimeFormat(language === "ar" ? "ar" : "en", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      }).format(new Date(lastSuccessfulSyncAt))
-    : "";
+  const lastSyncLabel =
+    lastSuccessfulSyncAt && Number.isFinite(Date.parse(lastSuccessfulSyncAt))
+      ? new Intl.DateTimeFormat(language === "ar" ? "ar" : "en", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date(lastSuccessfulSyncAt))
+      : "";
 
   const hasCloudflareDevice = useDeviceLinkStatus();
+  const deviceSync = useDeviceSyncStatus();
+  const [offlineShell, setOfflineShell] = useState<"checking" | "ready" | "unknown">("checking");
+  useEffect(() => {
+    let active = true;
+    const check = async () => {
+      try {
+        if (isNativeAndroid()) return "ready" as const;
+        if (!("serviceWorker" in navigator) || !("caches" in window)) return "unknown" as const;
+        const registration = await navigator.serviceWorker.getRegistration(import.meta.env.BASE_URL);
+        if (!registration?.active) return "unknown" as const;
+        const names = (await caches.keys()).filter((name) => name.startsWith("workbox-precache-"));
+        for (const name of names) {
+          const cache = await caches.open(name);
+          if (await cache.match(`${import.meta.env.BASE_URL}index.html`, { ignoreSearch: true }))
+            return "ready" as const;
+        }
+      } catch {
+        /* Availability is unknown, never inferred from connectivity alone. */
+      }
+      return "unknown" as const;
+    };
+    let request = 0;
+    const refresh = () => {
+      const token = ++request;
+      void check().then((state) => {
+        if (active && token === request) setOfflineShell(state);
+      });
+    };
+    refresh();
+    window.addEventListener("focus", refresh);
+    navigator.serviceWorker?.addEventListener?.("controllerchange", refresh);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refresh);
+      navigator.serviceWorker?.removeEventListener?.("controllerchange", refresh);
+    };
+  }, []);
+  const accountState = isGuest
+    ? "localOnly"
+    : syncError || syncStatus === "needs-attention"
+      ? "attention"
+      : isSyncing || syncStatus === "syncing"
+        ? "syncing"
+        : syncStatus === "offline"
+          ? "offline"
+          : lastSyncLabel
+            ? "synced"
+            : "unconfirmed";
   const restoreInputRef = useRef<HTMLInputElement>(null);
   const [restoreError, setRestoreError] = useState("");
+  const [exportOpen, setExportOpen] = useState(false);
 
   const handleRestoreFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -99,16 +155,6 @@ export function AccountDataPanel({
                   <span>{t(language, "settings.anonymousSyncBadge")}</span>
                 </div>
               )}
-              {!isGuest && (
-                <p className="mt-2 text-xs font-semibold text-foreground">
-                  {t(language, "accountData.syncStatus")}: {syncStatusLabel}
-                </p>
-              )}
-              {!isGuest && lastSyncLabel && (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {t(language, "settings.lastSuccessfulSync")}: {lastSyncLabel}
-                </p>
-              )}
             </div>
           </div>
           <Button
@@ -119,6 +165,62 @@ export function AccountDataPanel({
           >
             {t(language, isGuest ? "accountData.signIn" : "accountData.signOut")}
           </Button>
+        </Card>
+
+        <Card as="section" padding="lg">
+          <h2 className="text-base font-semibold">{t(language, "dataSafety.title")}</h2>
+          <dl className="mt-4 space-y-4 text-sm" data-testid="data-safety-summary">
+            <div>
+              <dt className="font-semibold">{t(language, "dataSafety.local")}</dt>
+              <dd className="mt-1 text-muted-foreground">{t(language, `dataSafety.${localSaveStatus}`)}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold">{t(language, "dataSafety.account")}</dt>
+              <dd className="mt-1 text-muted-foreground">
+                {t(language, `dataSafety.${accountState}`)}
+                {!isGuest && lastSyncLabel && (
+                  <span className="block">
+                    {t(language, "settings.lastSuccessfulSync")}: {lastSyncLabel}
+                  </span>
+                )}
+              </dd>
+            </div>
+            {hasCloudflareDevice && (
+              <div>
+                <dt className="font-semibold">{t(language, "dataSafety.paired")}</dt>
+                <dd className="mt-1 text-muted-foreground">{t(language, `dataSafety.device${deviceSync}`)}</dd>
+              </div>
+            )}
+            <div>
+              <dt className="font-semibold">{t(language, "dataSafety.offlineTitle")}</dt>
+              <dd className="mt-1 text-muted-foreground">{t(language, `dataSafety.shell${offlineShell}`)}</dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-label text-muted-foreground">{t(language, "dataSafety.downloadsHelp")}</p>
+          <p className="mt-2 text-label text-muted-foreground">{t(language, "dataSafety.backupHelp")}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {localSaveStatus === "error" && onRetrySave && (
+              <Button variant="outline" onClick={onRetrySave}>
+                {t(language, "dataSafety.retrySave")}
+              </Button>
+            )}
+            {!isGuest && (accountState === "attention" || accountState === "unconfirmed") && onRetrySync && (
+              <Button variant="outline" onClick={onRetrySync}>
+                {t(language, "syncStatus.retry")}
+              </Button>
+            )}
+            {hasCloudflareDevice && deviceSync === "error" && (
+              <Button variant="outline" onClick={retryDeviceSync}>
+                {t(language, "syncStatus.retry")}
+              </Button>
+            )}
+            <Button onClick={onExportData}>{t(language, "dataSafety.backup")}</Button>
+            {onOpenDownloads && (
+              <Button variant="pill" size="pill" onClick={onOpenDownloads}>
+                {t(language, "dataSafety.downloads")}
+              </Button>
+            )}
+          </div>
         </Card>
 
         <QrSyncPanel language={language} />
@@ -146,7 +248,7 @@ export function AccountDataPanel({
             title={t(language, "accountData.exportTitle")}
             body={t(language, "accountData.exportBody")}
             action={t(language, "accountData.exportAction")}
-            onPress={onExportData}
+            onPress={() => setExportOpen(true)}
           />
           <input
             ref={restoreInputRef}
@@ -194,6 +296,13 @@ export function AccountDataPanel({
           )}
         </div>
       </div>
+      <DataExportMenu
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        language={language}
+        onBackup={onExportData}
+        onProgress={onExportProgress}
+      />
     </div>
   );
 }

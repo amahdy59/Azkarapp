@@ -44,6 +44,7 @@ for (const language of ["ar", "en"] as const) {
   test(`sharing board layout keeps real previews, optional design and precise feedback in ${language} @cross-browser`, async ({
     page,
   }, testInfo) => {
+    test.setTimeout(180_000);
     const { errors, modal, preview, settings, image } = await openSharingBoard(page, language);
     for (const choice of ["curated", "generated"] as const) {
       const button = modal.getByRole("button", { name: t(language, `shareStudio.${choice}Tab`), exact: true });

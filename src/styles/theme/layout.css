@@ -14,7 +14,6 @@
    while enlarged labels get real columns instead of splitting Arabic words. */
 @container compact-navigation (max-width: 18rem) {
   .bottom-nav {
-    min-height: calc(8.5rem + env(safe-area-inset-bottom));
     height: auto;
   }
 
@@ -144,14 +143,34 @@
   }
 }
 
-/* Content Max-Width Containers */
-@media (min-width: 37.5rem) {
-  .page-content-center {
-    max-width: var(--content-dashboard);
-    margin-inline: auto;
-    width: 100%;
-    padding-inline: 1.5rem;
+/* Ordinary pages share an outer frame and responsive gutters. Focused text
+   and forms may use a narrower inner reading measure. */
+.page-header-frame {
+  max-inline-size: var(--content-page);
+  margin-inline: auto;
+}
+.page-title {
+  display: grid;
+  align-content: center;
+  min-block-size: var(--ds-control-height-compact);
+  min-inline-size: 0;
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+@media (min-width: 40rem) {
+  .page-title {
+    font-size: var(--text-2xl);
   }
+}
+.page-content-center {
+  max-width: var(--content-dashboard);
+  margin-inline: auto;
+  width: 100%;
+  padding-inline: var(--spacing-page);
 }
 
 /* Nav Rail & Sidebar Styles */
@@ -303,7 +322,7 @@
 .hero-glass.home-glass-surface {
   /* Pale gold preserves small citation/control contrast on bright scenery. */
   --on-media-accent: var(--home-glass-accent);
-  --home-glass-tint: rgb(15 23 42 / 0.48);
+  --home-glass-tint: var(--glass-card-tint);
   background-color: var(--home-glass-tint);
   background-image: linear-gradient(135deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.01) 60%);
   backdrop-filter: blur(18px) saturate(120%);
@@ -328,8 +347,8 @@
 }
 
 .stagger-enter {
-  opacity: 0;
-  animation: stagger-enter var(--motion-duration-entrance) var(--motion-ease-enter) forwards;
+  opacity: 1;
+  animation: stagger-enter var(--motion-duration-entrance) var(--motion-ease-enter) backwards;
 }
 .reduce-motion .stagger-enter {
   animation: none !important;
@@ -434,19 +453,40 @@
   --mushaf-frame-pad: clamp(0.5rem, 4.5cqi, 2.75rem);
   max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)));
   padding-inline: var(--mushaf-frame-pad);
-  padding-block: clamp(0.1rem, 0.45cqh, 0.35rem);
+  padding-block: 0;
 }
 
 /* The page is the screen at every width. It never becomes a card laid on a
    second background; a facing spread is separated only by its quiet gutter. */
 
 .mushaf-page-furniture {
-  height: 5.2%;
+  height: 2.75rem;
   min-height: 2.75rem;
   font-size: clamp(8px, min(2.4cqi, 1.5cqh), 13px);
   font-weight: 700;
   line-height: 1;
-  opacity: 0.72;
+}
+
+.mushaf-furniture-pill {
+  display: inline-flex;
+  height: 2rem;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding-inline: 0.75rem;
+  background-color: var(--card);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: var(--shadow-xs);
+}
+.group:is(:hover, :active) > .mushaf-furniture-pill {
+  border-color: var(--primary);
+  background-color: var(--muted);
 }
 
 .mushaf-page-furniture__cartouche {
@@ -499,6 +539,34 @@
    axis back, or `pan-y` above would leave it unscrollable on touch. */
 .reader-swipe-surface [data-allows-horizontal-pan="true"] {
   touch-action: pan-x;
+}
+
+.mushaf-control-band {
+  display: grid;
+  flex: none;
+  grid-template-columns: minmax(44px, 1fr) minmax(0, auto) minmax(44px, 1fr);
+  align-items: center;
+  padding: 2px 10px;
+}
+.mushaf-control-band--top {
+  padding-block-start: max(2px, var(--mushaf-safe-top, env(safe-area-inset-top)));
+}
+.mushaf-control-band--bottom {
+  padding-block-end: max(2px, var(--mushaf-safe-bottom, env(safe-area-inset-bottom)));
+}
+.mushaf-control-band--translation {
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  padding-inline: 4px;
+}
+.mushaf-control-band .col-start-1 {
+  justify-self: start;
+}
+.mushaf-control-band .col-start-3 {
+  justify-self: end;
+}
+.mushaf-control-band .col-start-2 > button {
+  flex-shrink: 1;
+  max-inline-size: 100%;
 }
 
 .mushaf-paper {

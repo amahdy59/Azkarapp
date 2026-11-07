@@ -1,5 +1,13 @@
 # Prayer times, location, timezone, and DST
 
+## Reminder readiness — 2026-11-01
+
+Settings → Notifications now brings the existing permission and test action together with the next configured instant, selected location/timezone and location recovery link. It reuses the current scheduler’s next-delay boundary and formats the instant in the displayed timezone. Completed routines may be suppressed by the existing only-incomplete setting. This is not confirmation of a pending native alarm or future delivery; Android and browser limitations are explained separately. No calculation, scheduling, content or saved preference contract changes.
+
+## First-use reminder selection — 2026-11-01
+
+New installations select prayer and main routine reminders during onboarding, with explicit OS/browser permission still required. Existing users retain saved choices. Optional Friday reading uses 09:00 on Friday, Friday dua 60 minutes before Maghrib, and pre-Fajr dua 20 minutes before Fajr, in the chosen prayer location's date-specific IANA timezone. These product reminder choices match existing contextual reading windows, not new religious-source interpretations. Taps open Al-Kahf or Comprehensive duas. Native contextual entries use the cancellable seven-day queue; web suspension/closure still requires a separate push service for dependable closed-app delivery.
+
 ## Larger expanded Home times — 2026-10-21
 
 Owner follow-ups: the Now pill shares the routine CTA's semantic primary/foreground colors with a static gloss. Remaining-time digits increase from 14px to 15px in the footer and from 12px to 13px in the condensed copy, with the same 18px compact line footprint. The ring becomes a clean, thicker arc without clock hands and retains clockwise elapsed-interval fill: empty at the interval start and full when the next prayer is due. This is decorative redundancy for the exact numeric countdown, not a new timer or completion signal.
@@ -51,7 +59,7 @@ The Home overview shows all five prayer timings in their usual order. Each bound
 
 The five trackable prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha. The same calculation also exposes Sunrise (Shrouk) as supporting Fajr-window context; it is never treated as a sixth prayer or given tracking controls.
 
-Prayer reminders are opt-in and use the same locally calculated times and adjustments shown on Home. The Android app pre-schedules a rolling 14-day window with native OS alarms, so delivery does not depend on JavaScript running and alarms are restored by the OS after reboot. Android notification permission is required; exact timing also depends on Android's exact-alarm access and device power-management policy. The app refreshes the window when it opens and when reminder settings, completion state, language, or location changes. The PWA keeps its browser timer/service-worker behavior; browser suspension means dependable delivery after the PWA is completely closed still requires a connected server Push API service.
+Prayer reminders are opt-in and use the same locally calculated times and adjustments shown on Home. The Android app pre-schedules a rolling seven-day window with native OS alarms, so delivery does not depend on JavaScript running and alarms are restored by the OS after reboot. Android notification permission is required; exact timing also depends on Android's exact-alarm access and device power-management policy. The app refreshes the window when it opens and when reminder settings, completion state, language, or location changes. The PWA keeps its browser timer/service-worker behavior; browser suspension means dependable delivery after the PWA is completely closed still requires a connected server Push API service.
 
 Home also uses the same calculated boundaries for its featured collection: Morning from Fajr to Asr, Evening from Asr to Isha, and Before Sleep from Isha to the following Fajr. The preferred Evening reading window is communicated as after Asr until Maghrib.
 
@@ -226,3 +234,15 @@ The owner-approved card refinement moves the reading route into a separate butto
 ## Prayer evidence alignment and secondary record context — 2026-10-18, local only
 
 The owner requests removing the visible record line, aligning virtue with the title and keeping its citation inline. Move the same explicit time/dayKey/date label into the existing information sheet; no date assignment or calculation change. On wide cards, align the evidence heading at the prayer title top edge and span its column alongside the title/checklist. Fajr sunrise remains directly beneath its title. Append the unchanged source as a smaller inline span after the complete quotation; allow natural wrapping when the final line has insufficient room, never truncate or alter devotional text. Keep the established narrow disclosure, reading button, semantic colors, Glass/fallbacks and keyboard targets. This supersedes the earlier upper evidence-column record line. No push.
+
+Browser and Android delivery share Arabic and English notification copy. The title identifies the prayer or reading. A prayer reminder at its scheduled time uses a due-now title. An advance reminder gives the selected lead time. Reading reminders describe the destination, while the test notification confirms test receipt only. Existing calculation, time, permission, route and delivery policies are preserved.
+
+## Approved notification relevance
+
+Prayer reminders now share dated selected-location instants between browser and Android, including the correct civil date and DST offset. Routine reminders retain device-clock choices. The local Android queue has one scheduling owner and removes alarms from the former competing scheduler. Copy rotation uses the scheduled prayer date and retains prayer-specific narration conditions. Titles record the calculated prayer clock time rather than a countdown that could become stale.
+
+Browser delivery expires after at most five minutes. Advance-prayer messages expire by the prayer instant. Friday dua stays after Asr and before Maghrib. The twenty-minute pre-Fajr reminder uses the last-third quotation only if that instant is inside the calculated previous-Maghrib-to-Fajr last third. Native OS delays still require physical-device acceptance.
+
+### Optional contextual alerts
+
+Pre-Fajr dua requires an explicit choice for new readers. Previously saved choices continue to apply. Friday Salawat and Monday/Thursday fasting preparation start off. The Friday alert uses 10:00 in the selected prayer location, after sunrise and outside the immediate prayer window. Preparation uses 45 minutes after Asr on Sunday or Wednesday, with the full delivery window at least 30 minutes before Maghrib. These are app reminder times. The fasting check uses the saved Hijri offset and the existing conservative margin around Ramadan, Eid and Tashriq. Dates without reliable eligibility are skipped.

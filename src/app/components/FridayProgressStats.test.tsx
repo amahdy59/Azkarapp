@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getFridaySummary } from "../fridaySummary";
 import { FridayProgressStats } from "./FridayProgressStats";
+import { t } from "../i18n";
+import { formatRatio } from "../formatting";
 
 vi.mock("../fridaySummary", () => ({ getFridaySummary: vi.fn() }));
 beforeEach(() => {
@@ -43,5 +45,39 @@ describe("Friday period records", () => {
     vi.mocked(getFridaySummary).mockClear();
     rerender(<FridayProgressStats {...props} activeTab="year" displayDate={new Date(2027, 0, 2, 12)} />);
     expect(getFridaySummary).not.toHaveBeenCalled();
+  });
+});
+
+describe("Friday progress presentation", () => {
+  it.each(["ar", "en"] as const)("preserves exact ratios with accessible transform-based fills in %s", (language) => {
+    vi.mocked(getFridaySummary).mockReturnValue({
+      practicesDone: 2,
+      practicesTotal: 4,
+      kahfOpened: true,
+      salawatCount: 10,
+      salawatTarget: 100,
+    });
+    const direction = language === "ar" ? "rtl" : "ltr";
+    render(
+      <FridayProgressStats
+        activeTab="week"
+        displayDate={new Date(2026, 9, 16, 12)}
+        now={new Date(2026, 9, 20, 12)}
+        range={{ startKey: "2026-10-16", endKey: "2026-10-16" }}
+        language={language}
+        calendarType="gregorian"
+        direction={direction}
+      />,
+    );
+    const practices = screen.getByRole("progressbar", { name: t(language, "friday.practicesDone") });
+    expect(practices).toHaveAttribute("aria-valuenow", "2");
+    expect(practices).toHaveAttribute("aria-valuemax", "4");
+    expect(practices).toHaveAttribute("aria-valuetext", formatRatio(2, 4, language));
+    expect(practices).toHaveAttribute("dir", direction);
+    const kahf = screen.getByRole("progressbar", { name: t(language, "friday.kahfOpened") });
+    expect(kahf).toHaveAttribute("aria-valuenow", "1");
+    expect(kahf).toHaveAttribute("aria-valuemax", "1");
+    for (const track of [practices, kahf])
+      expect(track.querySelector<HTMLElement>('[data-slot="progress-fill"]')?.style.width).toBe("");
   });
 });

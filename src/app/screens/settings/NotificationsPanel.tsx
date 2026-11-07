@@ -1,6 +1,14 @@
+import { reminderOccurrences } from "../../reminderOccurrences";
+import { useNotificationReadiness } from "../../hooks/useNotificationReadiness";
+import { NotificationUpcoming } from "../../components/NotificationUpcoming";
+import type { DailyCollectionCompletion } from "../../types";
+import { displayLocationName } from "../../content/prayerLocations";
+import { DEFAULT_LOCATION } from "../../content/prayerCalculation";
+import type { LocationSettings } from "../../types";
 import { isNativeAndroid } from "../../native/platform";
+import { CONTEXT_REMINDER_KINDS } from "../../contextReminders";
 import { refreshNativeNotificationPermission } from "../../native/reminders";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   readNotificationPermission,
   requestNotificationPermission,
@@ -11,12 +19,14 @@ import { ToggleTrack } from "../../components/SettingsRow";
 import { FIELD_CONTROL_CLASS } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { Bell, CheckCircle2, ChevronDown } from "../../components/icons";
+import { Bell, CheckCircle2, ChevronDown, Clock } from "../../components/icons";
 import { t } from "../../i18n";
 import { formatNumerals } from "../../formatting";
 
 import type { AppLanguage, PrayerName, PrayerReminderLeadMinutes, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
+
+const EMPTY_COMPLETIONS: DailyCollectionCompletion[] = [];
 
 type ReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
 
@@ -39,17 +49,19 @@ function ReminderScheduleRow({
   schedule,
   onToggle,
   onTimeChange,
+  busy,
 }: {
   kind: ReminderKind;
   language: AppLanguage;
   schedule: ReminderSettings[ReminderKind];
   onToggle: () => void;
   onTimeChange: (time: string) => void;
+  busy: boolean;
 }) {
   const label = t(language, `notifications.${kind}`);
   return (
-    <div className="border-b border-border/40 p-4 last:border-b-0">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border/40 p-4 last:border-b-0">
+      <div className="flex min-w-0 flex-[1_1_15rem] items-center gap-3">
         <span
           className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
           aria-hidden="true"
@@ -67,14 +79,15 @@ function ReminderScheduleRow({
           role="switch"
           aria-label={label}
           aria-checked={schedule.enabled}
+          disabled={busy}
           onClick={onToggle}
-          className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
         >
           <ToggleTrack checked={schedule.enabled} />
         </button>
       </div>
       <label
-        className="mt-4 flex flex-col gap-1.5 text-label font-bold text-foreground"
+        className="flex min-w-0 flex-[1_1_9rem] flex-col gap-1 text-label font-semibold text-foreground"
         htmlFor={`${kind}-reminder-time`}
       >
         <span>{t(language, "notifications.timeLabel")}</span>
@@ -97,12 +110,57 @@ export function NotificationsPanel({
   reminders,
   onRemindersChange,
   onBack,
+  locationSettings,
+  onOpenLocation,
+  dailyCompletions = EMPTY_COMPLETIONS,
+  progressDayStartHour = 4,
+  hijriDateOffset = 0,
+  localSaveStatus,
+  onRetrySave,
 }: {
+  localSaveStatus?: "pending" | "saved" | "error";
+  onRetrySave?: () => void;
+  dailyCompletions?: DailyCollectionCompletion[];
+  progressDayStartHour?: number;
+  hijriDateOffset?: number;
+  locationSettings?: LocationSettings;
+  onOpenLocation?: () => void;
   language: AppLanguage;
   reminders: ReminderSettings;
   onRemindersChange: (value: ReminderSettings) => void;
   onBack: () => void;
 }) {
+  const latestReminders = useRef(reminders);
+  latestReminders.current = reminders;
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible") setNow(new Date());
+    };
+    const timer = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
+  const timeZone = locationSettings?.timeZone || DEFAULT_LOCATION.timeZone;
+  const upcoming = useMemo(
+    () =>
+      reminderOccurrences(
+        reminders,
+        dailyCompletions,
+        locationSettings,
+        progressDayStartHour,
+        now,
+        7,
+        hijriDateOffset,
+      ).filter((event) => event.at > now.getTime()),
+    [reminders, dailyCompletions, locationSettings, progressDayStartHour, now, hijriDateOffset],
+  );
+  const nativeReady = useNotificationReadiness();
   const isArabic = language === "ar";
   const [permission, setPermission] = useState<BrowserNotificationPermission>(readNotificationPermission);
   const [isRequesting, setIsRequesting] = useState(false);
@@ -190,8 +248,8 @@ export function NotificationsPanel({
 
   const updateSchedule = (kind: ReminderKind, update: Partial<ReminderSettings[ReminderKind]>) => {
     onRemindersChange({
-      ...reminders,
-      [kind]: { ...reminders[kind], ...update },
+      ...latestReminders.current,
+      [kind]: { ...latestReminders.current[kind], ...update },
     });
   };
 
@@ -202,7 +260,7 @@ export function NotificationsPanel({
       setPermissionAttemptBlocked(true);
       return;
     }
-    updateSchedule(kind, { enabled: enabling });
+    if (mounted.current) updateSchedule(kind, { enabled: enabling });
   };
 
   const togglePrayerReminder = async () => {
@@ -212,7 +270,11 @@ export function NotificationsPanel({
       setPermissionAttemptBlocked(true);
       return;
     }
-    onRemindersChange({ ...reminders, prayer: { ...reminders.prayer, enabled: enabling } });
+    if (mounted.current)
+      onRemindersChange({
+        ...latestReminders.current,
+        prayer: { ...latestReminders.current.prayer, enabled: enabling },
+      });
   };
 
   const anyReminderEnabled =
@@ -220,71 +282,165 @@ export function NotificationsPanel({
     reminders.morning.enabled ||
     reminders.evening.enabled ||
     reminders.before_sleep.enabled ||
-    reminders.after_prayer.enabled;
+    reminders.after_prayer.enabled ||
+    CONTEXT_REMINDER_KINDS.some((kind) => reminders[kind]?.enabled);
+
+  const nativeQueueEmpty = nativeReady.status === "ready" && nativeReady.count === 0 && upcoming.length > 0;
+  const nativeQueueNeedsRetry = nativeReady.status === "error" || nativeQueueEmpty;
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "notifications.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        <p className="text-sm text-muted-foreground">{t(language, "notifications.availabilityShort")}</p>
-
         <section
           className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+          data-material-card="dense"
           aria-labelledby="notification-permission"
         >
-          <div className="flex items-start gap-3">
-            <span
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
-              aria-hidden="true"
-            >
-              {permission === "granted" ? (
-                <CheckCircle2 size={22} className="text-primary" />
-              ) : (
-                <Bell size={22} className="text-primary" />
-              )}
-            </span>
-            <div className="min-w-0 flex-1">
-              <h2 id="notification-permission" className="text-title font-semibold text-foreground">
-                {t(language, "notifications.permission")}
-              </h2>
-              <p className="mt-1 text-sm leading-[22px] text-muted-foreground">
-                {permissionCopy(permission, language)}
-              </p>
+          <dl className="space-y-3 text-sm" data-testid="reminder-readiness">
+            <div>
+              <dt className="flex items-center gap-2 font-semibold text-muted-foreground">
+                <Clock size={19} className="shrink-0 text-primary" aria-hidden="true" />
+                {t(language, "readiness.next")}
+              </dt>
+              <dd className="mt-1">
+                <NotificationUpcoming events={upcoming} language={language} timeZone={timeZone!} />
+              </dd>
             </div>
-          </div>
+            <div>
+              <dt className="sr-only">{t(language, "readiness.location")}</dt>
+              <dd className="text-label text-muted-foreground [overflow-wrap:anywhere]">
+                {displayLocationName(locationSettings, language)} · <bdi>{timeZone}</bdi>
+              </dd>
+            </div>
+          </dl>
 
-          {permission === "default" && (
-            <Button
-              type="button"
-              onClick={() => void requestPermission()}
-              disabled={isRequesting}
-              className="mt-4 w-full"
-            >
-              {isRequesting
-                ? t(language, "notifications.requestingPermission")
-                : t(language, "notifications.requestPermission")}
+          {onOpenLocation && (
+            <Button type="button" variant="pill" size="pill" className="mt-3 max-w-full" onClick={onOpenLocation}>
+              {t(language, "readiness.changeLocation")}
             </Button>
           )}
+          <details
+            className="mt-3 border-t border-border/60 pt-2"
+            data-testid="notification-permission-details"
+            open={permission === "granted" ? undefined : true}
+          >
+            <summary className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+              {permission === "granted" ? (
+                <CheckCircle2 size={22} className="shrink-0 text-primary" />
+              ) : (
+                <Bell size={22} className="shrink-0 text-primary" />
+              )}
+              <h2 id="notification-permission" className="min-w-0 flex-1 text-sm font-semibold">
+                {permissionCopy(permission, language)}
+                {permission === "granted" &&
+                  isNativeAndroid() &&
+                  nativeReady.status !== "checking" &&
+                  (nativeQueueNeedsRetry || nativeReady.exact !== "granted") && (
+                    <span className="mt-1 block font-normal text-muted-foreground">
+                      {t(language, "notifications.androidNeedsReview")}
+                    </span>
+                  )}
+              </h2>
+              <ChevronDown size={16} className="shrink-0" aria-hidden="true" />
+            </summary>
+            {permission === "granted" && (
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-4 w-full"
+                disabled={isTesting}
+                onClick={() => void sendTestNotification()}
+              >
+                {t(language, isTesting ? "notifications.testSending" : "notifications.testNotification")}
+              </Button>
+            )}
+            {testStatus && (
+              <p className="mt-2 text-label text-muted-foreground" role="status">
+                {testStatus}
+              </p>
+            )}
+            {permission === "default" && (
+              <Button
+                type="button"
+                onClick={() => void requestPermission()}
+                disabled={isRequesting}
+                className="mt-4 w-full"
+              >
+                {isRequesting
+                  ? t(language, "notifications.requestingPermission")
+                  : t(language, "notifications.requestPermission")}
+              </Button>
+            )}
 
-          {hasRequestError && (
-            <p className="mt-3 text-sm text-destructive" role="alert">
-              {t(language, "notifications.permissionError")}
+            {hasRequestError && (
+              <p className="mt-3 text-sm text-destructive" role="alert">
+                {t(language, "notifications.permissionError")}
+              </p>
+            )}
+            {(permission === "denied" || permission === "unsupported") && (
+              <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-label leading-5 text-foreground">
+                {t(
+                  language,
+                  isNativeAndroid()
+                    ? "notifications.nativePermissionBlockedAction"
+                    : "notifications.permissionBlockedAction",
+                )}
+              </p>
+            )}
+            {permissionAttemptBlocked && (
+              <p className="mt-3 text-sm font-semibold text-destructive" role="alert">
+                {t(language, "notifications.permissionRequired")}
+              </p>
+            )}
+            {isNativeAndroid() && (
+              <div className="mt-3 space-y-2 text-sm" data-testid="native-reminder-readiness">
+                <p role="status">
+                  {t(
+                    language,
+                    nativeReady.status === "error"
+                      ? "notifications.queueError"
+                      : nativeReady.status === "checking"
+                        ? "common.loading"
+                        : "notifications.queueCount",
+                    { count: formatNumerals(nativeReady.count, language) },
+                  )}
+                </p>
+                {nativeReady.status !== "checking" && (
+                  <p>
+                    {t(
+                      language,
+                      nativeReady.exact === "granted" ? "notifications.exactGranted" : "notifications.exactNeeded",
+                    )}
+                  </p>
+                )}
+                {nativeReady.status !== "checking" && nativeReady.exact !== "granted" && (
+                  <Button variant="outline" onClick={() => void nativeReady.refresh(true)}>
+                    {t(language, "notifications.allowExact")}
+                  </Button>
+                )}
+                {nativeQueueNeedsRetry && permission === "granted" && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      window.dispatchEvent(new Event("azkar-retry-native-reminders"));
+                      void nativeReady.refresh();
+                    }}
+                  >
+                    {t(language, "mushaf.retry")}
+                  </Button>
+                )}
+              </div>
+            )}
+            <p className="mt-3 text-label text-muted-foreground">
+              {t(language, isNativeAndroid() ? "readiness.native" : "readiness.browser")}
             </p>
-          )}
-          {(permission === "denied" || permission === "unsupported") && (
-            <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-label leading-5 text-foreground">
-              {t(language, "notifications.permissionBlockedAction")}
-            </p>
-          )}
-          {permissionAttemptBlocked && (
-            <p className="mt-3 text-sm font-semibold text-destructive" role="alert">
-              {t(language, "notifications.permissionRequired")}
-            </p>
-          )}
+          </details>
         </section>
 
         <section
           className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+          data-material-card="dense"
           aria-labelledby="prayer-reminders-title"
         >
           <div className="flex items-center gap-3">
@@ -298,14 +454,18 @@ export function NotificationsPanel({
               <h2 id="prayer-reminders-title" className="text-title font-bold text-foreground">
                 {t(language, "notifications.prayerReminders")}
               </h2>
+              <p className="mt-1 text-label font-normal text-muted-foreground">
+                {t(language, "notifications.prayerRemindersHint")}
+              </p>
             </span>
             <button
               type="button"
               role="switch"
               aria-label={t(language, "notifications.prayerReminders")}
               aria-checked={reminders.prayer.enabled}
+              disabled={isRequesting}
               onClick={() => void togglePrayerReminder()}
-              className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
             >
               <ToggleTrack checked={reminders.prayer.enabled} />
             </button>
@@ -345,11 +505,17 @@ export function NotificationsPanel({
               </SelectContent>
             </Select>
           </div>
+          {reminders.prayer.enabled && reminders.prayer.prayers?.length === 0 && (
+            <p className="mt-3 text-sm text-destructive" role="status">
+              {t(language, "notifications.choosePrayer")}
+            </p>
+          )}
+          <p className="mt-3 text-label text-muted-foreground">{t(language, "notifications.locationClock")}</p>
           <fieldset className="mt-4 space-y-2">
             <legend className="text-label font-bold text-foreground">
               {t(language, "notifications.prayerSelection")}
             </legend>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,7.5rem),1fr))] gap-2">
               {(["fajr", "dhuhr", "asr", "maghrib", "isha"] as const).map((prayer: PrayerName) => {
                 const selected = reminders.prayer.prayers?.includes(prayer) ?? true;
                 return (
@@ -382,22 +548,6 @@ export function NotificationsPanel({
               })}
             </div>
           </fieldset>
-          {permission === "granted" && (
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-4 w-full"
-              disabled={isTesting}
-              onClick={() => void sendTestNotification()}
-            >
-              {t(language, isTesting ? "notifications.testSending" : "notifications.testNotification")}
-            </Button>
-          )}
-          {testStatus && (
-            <p className="mt-2 text-label text-muted-foreground" role="status">
-              {testStatus}
-            </p>
-          )}
         </section>
 
         <section aria-labelledby="gentle-reminders-title">
@@ -405,14 +555,19 @@ export function NotificationsPanel({
             <h2 id="gentle-reminders-title" className="text-title font-bold text-foreground">
               {t(language, "notifications.scheduleTitle")}
             </h2>
+            <p className="mt-1 text-label text-muted-foreground">{t(language, "notifications.deviceClock")}</p>
           </div>
-          <div className="overflow-hidden rounded-2xl border border-border/40 bg-card">
+          <div
+            className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised"
+            data-material-card="dense"
+          >
             {(["morning", "evening", "before_sleep", "after_prayer"] as const).map((kind) => (
               <ReminderScheduleRow
                 key={kind}
                 kind={kind}
                 language={language}
                 schedule={reminders[kind]}
+                busy={isRequesting}
                 onToggle={() => void toggleSchedule(kind)}
                 onTimeChange={(time) => updateSchedule(kind, { time })}
               />
@@ -445,14 +600,71 @@ export function NotificationsPanel({
             </p>
           )}
         </section>
+        <section
+          className="rounded-3xl border border-border/40 bg-card p-4"
+          aria-label={t(language, "notifications.specialReminders")}
+        >
+          <h2 className="mb-2 text-title font-bold">{t(language, "notifications.specialReminders")}</h2>
+          {CONTEXT_REMINDER_KINDS.map((kind) => (
+            <div key={kind} className="flex items-center gap-3 border-b border-border/40 py-3 last:border-b-0">
+              <div className="min-w-0 flex-1">
+                <p className="font-bold">{t(language, `notifications.${kind}`)}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t(language, kind === "beforeFajrDua" ? "notifications.overnightHelp" : `notifications.${kind}Help`)}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-label={t(language, `notifications.${kind}`)}
+                aria-checked={reminders[kind]?.enabled === true}
+                disabled={isRequesting}
+                className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+                onClick={async () => {
+                  const enabling = !reminders[kind]?.enabled;
+                  if (enabling && (permission === "default" ? await requestPermission() : permission) !== "granted") {
+                    setPermissionAttemptBlocked(true);
+                    return;
+                  }
+                  if (mounted.current) onRemindersChange({ ...latestReminders.current, [kind]: { enabled: enabling } });
+                }}
+              >
+                <ToggleTrack checked={reminders[kind]?.enabled === true} />
+              </button>
+            </div>
+          ))}
+        </section>
+        {localSaveStatus && (
+          <div role="status" className="text-sm text-muted-foreground">
+            {t(
+              language,
+              localSaveStatus === "saved"
+                ? "notifications.saved"
+                : localSaveStatus === "pending"
+                  ? "notifications.saving"
+                  : "notifications.saveError",
+            )}
+            {localSaveStatus === "error" && onRetrySave && (
+              <Button variant="outline" onClick={onRetrySave}>
+                {t(language, "mushaf.retry")}
+              </Button>
+            )}
+          </div>
+        )}
         <details className="group border-t border-border/40">
-          <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring">
             {t(language, "settings.moreDetails")}
             <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
           </summary>
-          <p className="text-sm text-muted-foreground">
-            {t(language, isNativeAndroid() ? "notifications.nativeAvailabilityBody" : "notifications.availabilityBody")}
-          </p>
+          <div className="space-y-2 pb-2 text-label text-muted-foreground">
+            <p>
+              {t(
+                language,
+                isNativeAndroid() ? "notifications.nativeAvailabilityBody" : "notifications.availabilityBody",
+              )}
+            </p>
+            <p>{t(language, "readiness.testHelp")}</p>
+          </div>
         </details>
       </div>
     </div>

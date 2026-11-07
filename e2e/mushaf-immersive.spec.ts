@@ -64,7 +64,7 @@ test.describe("immersive mushaf mode", () => {
     // control is reachable in order.
     await page.getByTestId("mushaf-rail-back").focus();
     const reached: string[] = [];
-    for (let index = 0; index < 10; index += 1) {
+    for (let index = 0; index < 16; index += 1) {
       reached.push(await page.evaluate(() => document.activeElement?.getAttribute("data-testid") ?? ""));
       await page.keyboard.press("Tab");
     }

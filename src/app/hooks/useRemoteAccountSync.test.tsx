@@ -40,7 +40,7 @@ function deferred<T>() {
 function privateState(profile: AppStateSnapshot["profile"]): AppStateSnapshot {
   return {
     ...DEFAULT_APP_STATE,
-    settings: { ...DEFAULT_APP_STATE.settings, themeMode: "light" },
+    settings: { ...DEFAULT_APP_STATE.settings, language: "en", themeMode: "light" },
     profile,
     completed: {
       ...DEFAULT_APP_STATE.completed,

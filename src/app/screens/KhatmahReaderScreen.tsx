@@ -1,3 +1,7 @@
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { MushafDesktopHeader, MushafDesktopFooter, MushafFocusButton } from "../components/MushafReadingChrome";
+import { MushafThemeNotice } from "../components/MushafThemeNotice";
+import { trimMushafPrefetch } from "../content/mushafScheduler";
 import { progressFillStyle } from "../components/progressFillStyle";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -30,7 +34,13 @@ import {
   Translate,
   MoreVertical,
 } from "../components/icons";
-import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "../components/mushafShell";
+import {
+  MUSHAF_PHONE_QUERY,
+  PAPER_ASPECT,
+  getNextMushafTheme,
+  spreadStart,
+  useMushafShell,
+} from "../components/mushafShell";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafLoadingPlaceholder } from "../components/MushafLoadingPlaceholder";
@@ -39,6 +49,7 @@ import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
 import { MUSHAF_RAIL_WIDTH, MushafToolRail, type SurahAudioControl } from "../components/MushafToolRail";
 import { MushafQuickMenu } from "../components/MushafQuickMenu";
+import { MushafFocusExit } from "../components/MushafFocusExit";
 import { QuranPageTranslationPanel } from "../components/QuranPageTranslationPanel";
 import { MushafTranslationControls } from "../components/MushafTranslationControls";
 import { QuranBilingualStreamView } from "../components/QuranBilingualStreamView";
@@ -54,15 +65,11 @@ import { getProgressDayKey } from "../progress";
 import { useNow } from "../hooks/useNow";
 import { getQuranWirdDayProgress } from "./quranWirdGoal";
 import {
-  getCachedMushafPage,
-  isQcfFontReady,
-  loadMushafPage,
+  getReadyMushafPage,
   loadCanonicalAyahText,
-  loadQcfFont,
-  pageHasQcfGlyphs,
   prefetchMushafPage,
   resolveSpreadQcfMode,
-  subscribeQcfFontLoaded,
+  resolveMushafPage,
   type MushafVerseData,
 } from "../content/qcfMushaf";
 import { reportError } from "../../lib/observability";
@@ -72,7 +79,6 @@ const LAST_PAGE = 604;
 const SWIPE_THRESHOLD = 60;
 /** Only incomplete drags settle; committed turns use the viewer's animation. */
 const PAPER_SETTLE = "transform var(--motion-duration-fast) var(--motion-ease-standard)";
-const FONT_WAIT_MS = 1200;
 
 const COMPLETION_NOTICE_MS = 4000;
 
@@ -101,24 +107,6 @@ interface ResolvedPage {
   /** Settled with the page, never after it: flipping this later reflowed the
    *  whole canvas as the Unicode fallback gave way to QCF. */
   qcf: boolean;
-}
-
-async function resolveMushafPage(page: number): Promise<ResolvedPage> {
-  // Start the only cold reading resource before waiting for local page data.
-  const font = isQcfFontReady(page) ? Promise.resolve(true) : loadQcfFont(page);
-  const data = await loadMushafPage(page);
-  let timer: number | undefined;
-  const qcf =
-    pageHasQcfGlyphs(data) &&
-    (isQcfFontReady(page) ||
-      (await Promise.race([
-        font,
-        new Promise<boolean>((resolve) => {
-          timer = window.setTimeout(() => resolve(false), FONT_WAIT_MS);
-        }),
-      ])));
-  window.clearTimeout(timer);
-  return { page, data, qcf };
 }
 
 export function KhatmahReaderScreen({
@@ -202,42 +190,42 @@ export function KhatmahReaderScreen({
 
   const [theme, setTheme] = useState<MushafTheme>(initialTheme);
   const resolvedTheme = theme === "follow-app" ? appTheme : theme;
-  const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
-    const cached = getCachedMushafPage(currentPage);
-    if (!cached) return null;
-    const hasQcfGlyphs = pageHasQcfGlyphs(cached);
-    if (hasQcfGlyphs && !isQcfFontReady(currentPage)) return null;
-    return { page: currentPage, data: cached, qcf: hasQcfGlyphs };
-  });
+  const [resolved, setResolved] = useState<ResolvedPage | null>(() => getReadyMushafPage(currentPage));
   const settledPage = useRef(resolved?.page ?? currentPage);
   const [pageTransitionDirection, setPageTransitionDirection] = useState<"forward" | "backward" | undefined>();
-  const [other, setOther] = useState<ResolvedPage | null>(null);
-  const [fontRevision, setFontRevision] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
+  const isPhone = useMediaQuery(MUSHAF_PHONE_QUERY);
+  const closeIndex = useCallback(() => setIsIndexOpen(false), []);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
   const [isLoadingWordMeanings, setIsLoadingWordMeanings] = useState(false);
   const [completionSeen, setCompletionSeen] = useState<string | null>(null);
-  const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
-    null,
-  );
+  const [activeAyah, setActiveAyah] = useState<{
+    verseKey: string;
+    text: string | null;
+    pageNumber: number;
+    action?: "details" | "share";
+  } | null>(null);
   const [highlightedVerseKey, setHighlightedVerseKey] = useState<string | null>(null);
   const ayahRequestId = useRef(0);
 
-  const handleAyahAction = useCallback((verseKey: string, pageNumber: number) => {
-    const requestId = ++ayahRequestId.current;
-    setActiveAyah({ verseKey, text: null, pageNumber });
-    void loadCanonicalAyahText(verseKey, pageNumber)
-      .then((text) => {
-        if (ayahRequestId.current === requestId) setActiveAyah({ verseKey, text, pageNumber });
-      })
-      .catch((error) => {
-        reportError(error, "mushaf-ayah-text");
-        if (ayahRequestId.current === requestId) setActiveAyah(null);
-      });
-  }, []);
+  const handleAyahAction = useCallback(
+    (verseKey: string, pageNumber: number, action: "details" | "share" = "details") => {
+      const requestId = ++ayahRequestId.current;
+      setActiveAyah({ verseKey, text: null, pageNumber, action });
+      void loadCanonicalAyahText(verseKey, pageNumber)
+        .then((text) => {
+          if (ayahRequestId.current === requestId) setActiveAyah({ verseKey, text, pageNumber, action });
+        })
+        .catch((error) => {
+          reportError(error, "mushaf-ayah-text");
+          if (ayahRequestId.current === requestId) setActiveAyah(null);
+        });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!highlightedVerseKey) return;
@@ -286,15 +274,12 @@ export function KhatmahReaderScreen({
     !showPageTranslation &&
     (internalLayout === "spread" || (internalLayout === "auto" && autoSpreadRoom));
   const useRail = shell.rail;
-
-  // Re-resolve both visible pages when a timed-out QCF font finishes later.
-  useEffect(() => {
-    return subscribeQcfFontLoaded((page) => {
-      const right = spreadStart(currentPage);
-      const left = right + 1 <= LAST_PAGE ? right + 1 : null;
-      if (page === currentPage || page === right || page === left) setFontRevision((value) => value + 1);
-    });
-  }, [currentPage]);
+  const [other, setOther] = useState<ResolvedPage | null>(() => {
+    if (!spreadRoom) return null;
+    const right = spreadStart(currentPage);
+    const left = right + 1 <= LAST_PAGE ? right + 1 : null;
+    return left === null ? null : getReadyMushafPage(currentPage === right ? left : right);
+  });
 
   const paperRef = useRef<HTMLDivElement>(null);
   const readerRootRef = useRef<HTMLDivElement>(null);
@@ -305,23 +290,7 @@ export function KhatmahReaderScreen({
    * preference honoured.
    */
   const [isFocusMode, setIsFocusMode] = useState(false);
-  const compactTranslation = showPageTranslation && !pairedMeaning && readingMode === "mushaf";
-  const translationToolbarRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const toolbar = translationToolbarRef.current;
-    const root = readerRootRef.current;
-    if (!toolbar || !root || !compactTranslation || isFocusMode) return;
-    const measure = () =>
-      root.style.setProperty("--mushaf-top-clearance", `${toolbar.getBoundingClientRect().height}px`);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(toolbar);
-    return () => {
-      observer.disconnect();
-      root.style.removeProperty("--mushaf-top-clearance");
-    };
-  }, [compactTranslation, isFocusMode]);
-
+  const compactTranslation = !isFocusMode && showPageTranslation && !pairedMeaning && readingMode === "mushaf";
   const togglePageTranslation = () => {
     if (!showPageTranslation) setCompactMeaningPane("english");
     setShowPageTranslation(!showPageTranslation);
@@ -513,7 +482,7 @@ export function KhatmahReaderScreen({
     return () => {
       active = false;
     };
-  }, [currentPage, language, reloadToken, spreadRoom, fontRevision]);
+  }, [currentPage, language, reloadToken, spreadRoom]);
 
   /**
    * A page counts itself once it has actually been read.
@@ -591,6 +560,8 @@ export function KhatmahReaderScreen({
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
   }, [onRecordPages, quranWirdPlan?.kind, todayKey, visiblePages, wirdGoal, wirdHistory]);
 
+  useEffect(() => trimMushafPrefetch([currentPage - 1, currentPage, currentPage + 1]), [currentPage]);
+
   // Warm the two most likely next turns immediately. Page JSON is local and
   // the corresponding QCF fonts are the only cold resource, so waiting for
   // the current page to settle before starting these requests made quick
@@ -618,13 +589,13 @@ export function KhatmahReaderScreen({
     const timer = window.setTimeout(() => {
       if (spreadRoom && leftNumber !== null) {
         for (let offset = 2; offset <= 4; offset++) {
-          if (leftNumber + offset <= LAST_PAGE) prefetchMushafPage(leftNumber + offset);
-          if (rightNumber - offset >= 1) prefetchMushafPage(rightNumber - offset);
+          if (leftNumber + offset <= LAST_PAGE) prefetchMushafPage(leftNumber + offset, "prefetch");
+          if (rightNumber - offset >= 1) prefetchMushafPage(rightNumber - offset, "prefetch");
         }
       } else {
         for (let offset = 2; offset <= 3; offset++) {
-          if (currentPage + offset <= LAST_PAGE) prefetchMushafPage(currentPage + offset);
-          if (currentPage - offset >= 1) prefetchMushafPage(currentPage - offset);
+          if (currentPage + offset <= LAST_PAGE) prefetchMushafPage(currentPage + offset, "prefetch");
+          if (currentPage - offset >= 1) prefetchMushafPage(currentPage - offset, "prefetch");
         }
       }
     }, 100);
@@ -812,7 +783,8 @@ export function KhatmahReaderScreen({
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
-    if (event.target instanceof Element && event.target.closest(".quran-page-meaning")) return;
+    if (event.target instanceof Element && event.target.closest(".quran-page-meaning, [data-mushaf-inline-index]"))
+      return;
     if ((event.target as HTMLElement).closest("button, a, input, label, select, textarea, [role='switch']")) return;
     drag.current = {
       pointerId: event.pointerId,
@@ -859,11 +831,12 @@ export function KhatmahReaderScreen({
   const isRtl = direction === "rtl";
   const MobileBackIcon = isRtl ? ArrowRight : ArrowLeft;
 
+  const inlineIndex = isPhone && readingMode === "mushaf" && !compactTranslation;
   const mobileBack =
     (!useRail || compactTranslation) && !isFocusMode ? (
       <button
         type="button"
-        onClick={onBack}
+        onClick={inlineIndex && isIndexOpen ? closeIndex : onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
         className={
@@ -910,6 +883,35 @@ export function KhatmahReaderScreen({
       </button>
     ) : undefined;
 
+  const indexPanel = (
+    <MushafNavigationModal
+      isOpen={isIndexOpen}
+      inline={inlineIndex}
+      initialTab={indexTab}
+      currentPage={currentPage}
+      onClose={closeIndex}
+      onSelectPage={selectPage}
+      language={language}
+      direction={direction}
+      bookmarks={initialBookmarks}
+      verseBookmarks={initialVerseBookmarks}
+      onSelectVerseBookmark={(bookmark) => setHighlightedVerseKey(bookmark.verseKey)}
+    />
+  );
+  const focusHandle = <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} iconOnly={isPhone} />;
+  const phoneFocus = isFocusMode ? (
+    focusHandle
+  ) : (
+    <MushafFocusButton
+      language={language}
+      iconOnly
+      onEnter={() => {
+        closeIndex();
+        setIsFocusMode(true);
+      }}
+    />
+  );
+
   const mobileTopLeft = isRtl ? mobileMore : mobileBack;
   const mobileTopRight = isRtl ? mobileBack : mobileMore;
 
@@ -919,7 +921,7 @@ export function KhatmahReaderScreen({
         type="button"
         onClick={() => {
           setIndexTab("jump");
-          setIsIndexOpen(true);
+          setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "jump"));
         }}
         data-testid="mushaf-furniture-page-btn"
         aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(currentPage, language) })}
@@ -938,7 +940,7 @@ export function KhatmahReaderScreen({
         dir={direction}
         onClick={() => {
           setIndexTab("surahs");
-          setIsIndexOpen(true);
+          setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "surahs"));
         }}
         data-testid="mushaf-top-center-index"
         aria-label={t(language, "mushaf.indexTitle")}
@@ -963,7 +965,7 @@ export function KhatmahReaderScreen({
       </button>
     ) : undefined;
 
-  const mobileBottomLeft =
+  const mobileBookmark =
     !useRail && !isFocusMode ? (
       <button
         type="button"
@@ -995,7 +997,10 @@ export function KhatmahReaderScreen({
         aria-checked={showWordMeanings}
         aria-busy={isLoadingWordMeanings}
         disabled={isLoadingWordMeanings}
-        onClick={() => void toggleWordMeanings()}
+        onClick={() => {
+          if (inlineIndex) closeIndex();
+          void toggleWordMeanings();
+        }}
         data-testid="mushaf-difficult-words-switch"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
@@ -1022,6 +1027,7 @@ export function KhatmahReaderScreen({
       direction={direction}
       side={mushafToolbarSide}
       compact={shell.railCompact}
+      navigationInHeader
       surahName={surahShortName}
       juzNumber={juzNumber}
       pageNumber={displayPage}
@@ -1050,25 +1056,6 @@ export function KhatmahReaderScreen({
         playback.available ? { enabled: playback.follow, onToggle: playback.toggleFollowing } : undefined
       }
     />
-  );
-
-  /** The one thing left on screen in focus mode: a hairline handle at the foot
-   *  of the page, wide enough to hit and quiet enough to forget. It sits in the
-   *  same place whichever chrome it replaced, so there is one thing to learn. */
-  const focusHandle = (
-    <button
-      type="button"
-      onClick={() => setIsFocusMode(false)}
-      data-testid="mushaf-focus-exit"
-      aria-label={t(language, "mushaf.focusModeExit")}
-      title={t(language, "mushaf.focusModeExit")}
-      className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-    >
-      <span
-        aria-hidden="true"
-        className="h-0.5 w-10 rounded-full bg-muted-foreground transition-colors group-hover:bg-primary"
-      />
-    </button>
   );
 
   const wirdProgressBar =
@@ -1103,6 +1090,7 @@ export function KhatmahReaderScreen({
           view, which is exactly the deep link or reload case. */}
       <div
         ref={readerRootRef}
+        data-mushaf-reader
         tabIndex={-1}
         className={`relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background text-foreground outline-none theme-${resolvedTheme}`}
         onPointerDown={readingMode === "mushaf" && pageMagnification === 100 ? onPointerDown : undefined}
@@ -1134,16 +1122,11 @@ export function KhatmahReaderScreen({
           </div>
         )}
 
-        {pageData && compactTranslation && !isFocusMode && (
+        {pageData && compactTranslation && (
           <div
-            ref={translationToolbarRef}
             data-testid="mushaf-translation-toolbar"
             dir="ltr"
-            className="absolute inset-x-0 top-0 z-30 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center bg-background px-1"
-            /* The app shell already reserves the status-bar inset. Adding it
-               here as well left an oversized blank band above the Mushaf
-               toolbar on devices with a reported top safe area. */
-            style={{ paddingTop: 4, paddingBottom: 4 }}
+            className="mushaf-control-band mushaf-control-band--top mushaf-control-band--translation bg-background"
           >
             <div className="flex justify-center">{mobileTopLeft}</div>
             <MushafTranslationControls
@@ -1160,7 +1143,6 @@ export function KhatmahReaderScreen({
             hidden={compactMeaningPane !== "english"}
             style={{
               display: compactMeaningPane !== "english" ? "none" : undefined,
-              paddingTop: "var(--mushaf-top-clearance, 52px)",
             }}
             className="flex min-h-0 flex-1 flex-col px-2 sm:px-4"
           >
@@ -1222,6 +1204,7 @@ export function KhatmahReaderScreen({
               onUpdateVerseBookmarks?.(next);
             }}
             onAyahAction={handleAyahAction}
+            onShareAyah={(verseKey, page) => handleAyahAction(verseKey, page, "share")}
             showWordMeanings={showWordMeanings}
             onPaginate={paginate}
             atFirstPage={currentPage <= 1}
@@ -1238,6 +1221,44 @@ export function KhatmahReaderScreen({
             style={{ display: compactTranslation && compactMeaningPane === "english" ? "none" : undefined }}
           >
             <MushafPageViewer
+              themeNotice={themeHud ? <MushafThemeNotice theme={themeHud} language={language} /> : undefined}
+              desktopHeader={
+                useRail && !isFocusMode ? (
+                  <MushafDesktopHeader
+                    language={language}
+                    direction={direction}
+                    toolbarSide={mushafToolbarSide}
+                    surahName={surahShortName}
+                    juzNumber={juzNumber}
+                    isFullscreen={isFullscreen}
+                    onBack={onBack}
+                    onToggleFullscreen={toggleFullscreen}
+                    onSurahs={() => {
+                      setIndexTab("surahs");
+                      setIsIndexOpen(true);
+                    }}
+                    onJuzs={() => {
+                      setIndexTab("juzs");
+                      setIsIndexOpen(true);
+                    }}
+                  />
+                ) : undefined
+              }
+              desktopFooter={
+                useRail && !isFocusMode ? (
+                  <MushafDesktopFooter
+                    language={language}
+                    direction={direction}
+                    firstPage={spreadReady && rightSide ? rightSide.page : displayPage}
+                    secondPage={spreadReady && leftSide ? leftSide.page : undefined}
+                    onJump={() => {
+                      setIndexTab("jump");
+                      setIsIndexOpen(true);
+                    }}
+                  />
+                ) : undefined
+              }
+
               lines={spreadReady && rightSide ? rightSide.lines : lines}
               language={language}
               pageNumber={spreadReady && rightSide ? rightSide.page : displayPage}
@@ -1278,8 +1299,22 @@ export function KhatmahReaderScreen({
               topLeftControl={compactTranslation ? undefined : mobileTopLeft}
               topRightControl={compactTranslation ? undefined : mobileTopRight}
               topCenterControl={compactTranslation ? undefined : mobileTopCenter}
-              bottomLeftControl={mobileBottomLeft}
-              bottomCenterControl={mobileBottomCenter}
+              phoneBookmark={isPhone && !compactTranslation ? mobileBookmark : undefined}
+              inlineIndex={inlineIndex ? indexPanel : undefined}
+              inlineIndexOpen={inlineIndex && isIndexOpen}
+              bottomLeftControl={isPhone ? phoneFocus : mobileBookmark}
+              bottomCenterControl={
+                isPhone ? (
+                  mobileBottomCenter
+                ) : isFocusMode ? (
+                  focusHandle
+                ) : !useRail ? (
+                  <div className="mushaf-compact-focus">
+                    {mobileBottomCenter}
+                    <MushafFocusButton language={language} onEnter={() => setIsFocusMode(true)} />
+                  </div>
+                ) : undefined
+              }
               bottomRightControl={mobileBottomRight}
               onSurahClick={() => {
                 setIndexTab("surahs");
@@ -1305,13 +1340,13 @@ export function KhatmahReaderScreen({
               verticalGestures={pageMagnification === 100 && colorGestures}
               magnification={pageMagnification}
               showFloatingPageIndicator={!isFocusMode}
+              focusMode={isFocusMode}
               pageTransitionDirection={pageTransitionDirection}
               reduceMotion={reduceMotion}
               hapticFeedback={hapticFeedback}
               textScale={mushafTextScale}
               onAyahAction={handleAyahAction}
             />
-            {isFocusMode && focusHandle}
           </div>
         ) : null}
         {isFocusMode && (
@@ -1331,6 +1366,7 @@ export function KhatmahReaderScreen({
       </div>
 
       <AyahInteractionSheet
+        initialAction={activeAyah?.action}
         isOpen={activeAyah !== null}
         onClose={() => {
           ayahRequestId.current += 1;
@@ -1354,34 +1390,6 @@ export function KhatmahReaderScreen({
           onUpdateVerseBookmarks?.(next);
         }}
       />
-
-      {/* Theme cycle HUD feedback */}
-      {themeHud && (
-        <div
-          role="status"
-          aria-live="polite"
-          data-testid="mushaf-theme-hud"
-          className="pointer-events-none absolute inset-x-0 top-16 z-30 flex justify-center px-4"
-        >
-          <div className="mushaf-theme-hud-surface inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-border px-4 py-2 text-xs font-bold text-popover-foreground shadow-overlay">
-            <span
-              className="size-3 rounded-full border border-border"
-              style={{
-                backgroundColor: themeHud === "light" ? "#fdfbf7" : themeHud === "midnight" ? "#0b1220" : "#18181b",
-              }}
-              aria-hidden="true"
-            />
-            <span className="mushaf-material-hint hidden">{t(language, "mushaf.glassActive")}</span>
-            <span>
-              {themeHud === "light"
-                ? t(language, "mushaf.themeLight")
-                : themeHud === "midnight"
-                  ? t(language, "mushaf.themeMidnight")
-                  : t(language, "mushaf.themeDark")}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Wird completed */}
       {wirdComplete && completionSeen === todayKey && (
@@ -1457,6 +1465,7 @@ export function KhatmahReaderScreen({
         }
         surahAudio={activeAudioControl}
         onSelectReadingMode={setReadingMode}
+        onEnterFocusMode={() => setIsFocusMode(true)}
         mushafLayout={internalLayout}
         onSelectLayout={handleSelectLayout}
         showLayoutOptions={shell.spreadRoom}
@@ -1484,18 +1493,7 @@ export function KhatmahReaderScreen({
       />
 
       {/* Index & Navigation Modal */}
-      <MushafNavigationModal
-        isOpen={isIndexOpen}
-        initialTab={indexTab}
-        currentPage={currentPage}
-        onClose={() => setIsIndexOpen(false)}
-        onSelectPage={selectPage}
-        language={language}
-        direction={direction}
-        bookmarks={initialBookmarks}
-        verseBookmarks={initialVerseBookmarks}
-        onSelectVerseBookmark={(bookmark) => setHighlightedVerseKey(bookmark.verseKey)}
-      />
+      {!inlineIndex && indexPanel}
     </ScreenContainer>
   );
 }

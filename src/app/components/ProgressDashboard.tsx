@@ -1,26 +1,32 @@
+import { RecordedPagesChart } from "./RecordedPagesChart";
+import { recordedPageRhythm } from "../recordedPageRhythm";
+import { t } from "../i18n";
 import { ProgressSelectField } from "./ProgressSelectField";
 import {
   BarChart3,
   BookOpen,
   CheckCircle2,
-  ChevronRight,
   Moon,
   MoonStar,
-  Mosque,
-  PrayerBeads,
-  PrayerRug,
-  SlidersHorizontal,
+  Building,
+  ClockCheck,
+  Feather,
+  Repeat,
   Sun,
   Sunrise,
+  Lightbulb,
+  Sprout,
 } from "./icons";
 import { ProgressBar } from "./ProgressBar";
-import { useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import type { AppLanguage } from "../types";
 import type { CalendarType } from "../calendarPeriods";
 import { dashboardText as text } from "../i18n/progressDashboard";
 import { formatNumerals, formatPercentage } from "../formatting";
+import { getProgressDayKey } from "../progress";
 import {
   DEFAULT_PROGRESS_METRICS,
+  compareProgressMetric,
   PROGRESS_METRICS,
   dashboardProgressTimeline,
   formatProgressRange,
@@ -34,22 +40,24 @@ import {
   type ProgressRange,
 } from "../progressDashboard";
 import { RecordingTimeline } from "./RecordingTimeline";
-import { ProgressRecordsTable } from "./ProgressRecordsTable";
+import { ProgressHeatmap } from "./ProgressHeatmap";
+import { ProgressRoutineComparison } from "./ProgressRoutineComparison";
+import { ProgressMetricCard } from "./ProgressMetricCard";
 import { IconButton } from "./LayoutShells";
+import { Button } from "./ui/button";
 import { ChevronUp, ChevronDown } from "./icons";
+import { Modal, SheetHeader } from "./ResponsiveSheet";
 
-const action =
-  "progress-dashboard-action min-h-11 rounded-lg border border-border-control px-3 py-2 text-sm font-semibold progress-focus disabled:opacity-50";
 const summary = "progress-disclosure";
-export type ProgressDashboardView = "overview" | "trends" | "records";
+export type ProgressDashboardView = "overview" | "trends";
 const METRIC_ICONS = {
-  prayers: PrayerRug,
-  routines: PrayerBeads,
+  prayers: ClockCheck,
+  routines: Feather,
   pages: BookOpen,
   quranGoals: CheckCircle2,
-  mosque: Mosque,
+  mosque: Building,
   rawatib: Sunrise,
-  adhkar: PrayerBeads,
+  adhkar: Repeat,
   morning: Sun,
   evening: Moon,
   sleep: MoonStar,
@@ -65,11 +73,9 @@ export function ProgressDashboard({
   currentDay,
   language,
   calendar,
-  onExport,
   view = "overview",
   onShowTrend,
   onChooseWeek,
-  emptyActions,
 }: {
   records: readonly ProgressDailyRecord[];
   range: ProgressRange;
@@ -80,11 +86,9 @@ export function ProgressDashboard({
   currentDay: boolean;
   language: AppLanguage;
   calendar: CalendarType;
-  onExport: () => Promise<void>;
   view?: ProgressDashboardView;
   onShowTrend?: () => void;
   onChooseWeek?: () => void;
-  emptyActions?: ReactNode;
 }) {
   const id = useId();
   const [metrics, setMetrics] = useState<readonly ProgressMetric[]>(DEFAULT_PROGRESS_METRICS);
@@ -92,13 +96,7 @@ export function ProgressDashboard({
   const [choosing, setChoosing] = useState(false);
   const chooseButton = useRef<HTMLButtonElement>(null);
   const [metric, setMetric] = useState<ProgressMetric>("prayers");
-  const exportKey = `${range.startKey}:${range.endKey}:${currentDay}:${calendar}`;
-  const [exportState, setExportState] = useState<{ key: string; state: "idle" | "saving" | "saved" | "error" }>({
-    key: exportKey,
-    state: "idle",
-  });
-  const save = exportState.key === exportKey ? exportState.state : "idle";
-  const setSave = (state: typeof exportState.state) => setExportState({ key: exportKey, state });
+  const [chartDisplay, setChartDisplay] = useState<"line" | "columns">("columns");
   const values = useMemo(
     () =>
       Object.fromEntries(
@@ -123,17 +121,22 @@ export function ProgressDashboard({
   );
   const previous = summarizeProgressMetric(records, matched.previous, metric);
   const selected = summarizeProgressMetric(records, matched.current, metric);
-  const canCompare =
-    matched.days >= 3 &&
-    previous.count > 0 &&
-    (metric !== "quranGoals" || (selected.possible === previous.possible && Boolean(selected.possible)));
+  const comparison = compareProgressMetric(selected, previous, metric);
+  const comparisonValue = (value: typeof selected) =>
+    comparison?.kind === "rate"
+      ? text(language, "rateValue", {
+          rate: formatPercentage(Math.round((value.count / value.possible!) * 1000) / 10, language),
+          count: formatNumerals(value.count, language),
+          total: formatNumerals(value.possible!, language),
+        })
+      : `${formatNumerals(value.count, language)} ${text(language, "pagesUnit")}`;
   const scopedRows = useMemo(
     () => scopeProgressDailyRecords(records, range, now, dayStart, currentDay),
     [records, range, now, dayStart, currentDay],
   );
   const quantity = (key: ProgressMetric) => {
     const value = values[key];
-    return key === "quranGoals" && !value.possible
+    return (key === "quranGoals" && !value.possible) || (key === "pages" && value.count === 0)
       ? "—"
       : value.possible === null
         ? formatNumerals(value.count, language)
@@ -154,51 +157,61 @@ export function ProgressDashboard({
   return (
     <div className="progress-dashboard space-y-5" data-testid="progress-dashboard">
       {view === "overview" && (
-        <section aria-labelledby={`${id}-overview`}>
-          <div className="flex flex-wrap items-start justify-between gap-2">
+        <section className="progress-summary-card progress-overview-summary" aria-labelledby={`${id}-overview`}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2
               id={`${id}-overview`}
               data-testid="progress-primary-heading"
-              className="min-w-0 flex-1 text-lg font-bold"
+              className="min-w-0 flex-1 basis-40 text-lg font-bold"
             >
               {text(language, "overview")}
             </h2>
-            <button
+            <Button
               ref={chooseButton}
               type="button"
-              className={`${action} flex min-w-11 shrink-0 items-center justify-center gap-2 text-xs`}
-              style={{ inlineSize: "auto" }}
+              variant="pill"
+              size="pill"
+              data-testid="progress-choose-metrics"
+              className="min-w-11"
               title={text(language, "choose")}
               aria-expanded={choosing}
+              aria-haspopup="dialog"
               aria-controls={`${id}-choices`}
               onClick={() => {
                 setDraft(metrics);
                 setChoosing(!choosing);
               }}
             >
-              <SlidersHorizontal size={18} aria-hidden="true" />
-              <span className="sr-only sm:not-sr-only">{text(language, "choose")}</span>
-            </button>
+              <BarChart3 className="size-5" aria-hidden="true" />
+              <span>{text(language, "choose")}</span>
+            </Button>
           </div>
-          <p className="mt-1 max-w-prose progress-help">{text(language, "overviewHelp")}</p>
           <p className="mt-2 text-xs text-muted-foreground">
             {text(language, "currentRange", {
               range: values.prayers.days ? formatProgressRange(values.prayers.range, language, calendar) : "—",
             })}
           </p>
-          {!hasActivity && (
-            <div className="my-3 rounded-xl border border-border bg-muted/30 p-3" data-testid="progress-empty-period">
-              <p className="text-sm font-semibold">{text(language, "emptyPeriod")}</p>
-              <p className="mt-1 progress-help">{text(language, "emptyPeriodHelp")}</p>
-              {emptyActions && <div className="mt-2 flex flex-wrap gap-2">{emptyActions}</div>}
-            </div>
-          )}
-          {choosing && (
-            <fieldset
-              id={`${id}-choices`}
-              className="my-3 min-w-0 space-y-3 rounded-xl border border-border bg-card p-3"
-            >
-              <legend className="px-1 text-sm font-bold">{text(language, "choose")}</legend>
+          <Modal
+            open={choosing}
+            onClose={() => setChoosing(false)}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              chooseButton.current?.focus({ preventScroll: true });
+            }}
+            title={text(language, "choose")}
+            language={language}
+            direction={language === "ar" ? "rtl" : "ltr"}
+            showCloseButton={false}
+            className="filter-sheet"
+            testId="progress-metric-dialog"
+          >
+            <SheetHeader
+              title={text(language, "choose")}
+              language={language}
+              onClose={() => setChoosing(false)}
+              className="filter-sheet-header"
+            />
+            <fieldset id={`${id}-choices`} className="min-h-0 min-w-0 space-y-3 overflow-y-auto p-3">
               <p className="progress-help">{text(language, "chooseHelp")}</p>
               <div className="progress-metric-choices">
                 {PROGRESS_METRICS.map((key) => (
@@ -247,105 +260,116 @@ export function ProgressDashboard({
                   : text(language, "chooseOne")}
               </p>
               <div className="flex flex-wrap gap-2">
-                <button
+                <Button
                   type="button"
-                  className={action}
+                  size="pill"
                   disabled={!draft.length}
                   onClick={() => {
                     setMetrics(draft);
                     setChoosing(false);
-                    chooseButton.current?.focus();
                   }}
                 >
                   {text(language, "apply")}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={action}
+                  variant="pill"
+                  size="pill"
                   onClick={() => {
                     setChoosing(false);
-                    chooseButton.current?.focus();
                   }}
                 >
                   {text(language, "cancel")}
-                </button>
-                <button type="button" className={action} onClick={() => setDraft(DEFAULT_PROGRESS_METRICS)}>
+                </Button>
+                <Button type="button" variant="ghost" size="pill" onClick={() => setDraft(DEFAULT_PROGRESS_METRICS)}>
                   {text(language, "reset")}
-                </button>
+                </Button>
               </div>
             </fieldset>
-          )}
+          </Modal>
           <dl className="progress-overview-grid mt-3" data-testid="progress-overview">
             {metrics.map((key) => {
-              const Icon = METRIC_ICONS[key];
               const value = values[key];
-              return (
-                <div
-                  key={key}
-                  className="relative min-w-0 rounded-xl border border-border bg-card p-3 sm:p-4"
-                  data-material-card
-                  data-testid={`progress-metric-${key}`}
-                >
-                  <dt className="text-xs font-semibold leading-relaxed text-muted-foreground">
-                    <button
-                      type="button"
-                      className="progress-metric-link flex min-h-11 w-full items-center gap-2 text-start"
-                      aria-label={text(language, "explore", { metric: text(language, key) })}
-                      onClick={() => {
-                        setMetric(key);
-                        onShowTrend?.();
-                      }}
-                    >
-                      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <Icon size={18} aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0 flex-1">{text(language, `short_${key}`)}</span>
-                      <ChevronRight size={14} aria-hidden="true" className="shrink-0 rtl:rotate-180" />
-                    </button>
-                  </dt>
-                  <dd className="mt-1 break-words text-xl font-bold tabular-nums">
-                    <bdi>{quantity(key)}</bdi>
-                  </dd>
-                  {value.possible !== null && value.possible > 0 && (
-                    <dd className="mt-3">
-                      <ProgressBar
-                        value={Math.min(value.count, value.possible)}
-                        max={value.possible}
-                        height={5}
-                        aria-label={text(language, key)}
-                        aria-valuetext={quantity(key)}
-                      />
-                    </dd>
-                  )}
-                  <dd className="mt-1 text-micro leading-relaxed text-muted-foreground">
-                    {key === "pages"
+              const caption =
+                key === "quranGoals"
+                  ? text(language, value.possible ? "knownGoalDays" : "noGoals")
+                  : value.count === 0
+                    ? text(language, "noMetricRecords")
+                    : key === "pages"
                       ? text(language, "pagesUnit")
-                      : key === "quranGoals"
-                        ? text(language, values[key].possible ? "knownGoalDays" : "noGoals")
-                        : values[key].possible
-                          ? formatPercentage(Math.round((values[key].count / values[key].possible!) * 100), language)
-                          : "—"}
-                  </dd>
-                  {(values[key].range.startKey !== values.prayers.range.startKey ||
-                    values[key].range.endKey !== values.prayers.range.endKey) && (
-                    <dd className="mt-2 text-micro leading-relaxed text-muted-foreground">
-                      {text(language, "currentRange", {
-                        range: values[key].days ? formatProgressRange(values[key].range, language, calendar) : "—",
-                      })}
-                    </dd>
-                  )}
-                </div>
+                      : value.possible
+                        ? formatPercentage(Math.round((value.count / value.possible) * 100), language)
+                        : "—";
+              return (
+                <ProgressMetricCard
+                  key={key}
+                  metric={key}
+                  value={value}
+                  valueText={quantity(key)}
+                  caption={caption}
+                  language={language}
+                  icon={METRIC_ICONS[key]}
+                  rangeLabel={
+                    value.range.startKey !== values.prayers.range.startKey ||
+                    value.range.endKey !== values.prayers.range.endKey
+                      ? text(language, "currentRange", {
+                          range: value.days ? formatProgressRange(value.range, language, calendar) : "—",
+                        })
+                      : undefined
+                  }
+                  onExplore={() => {
+                    setMetric(key);
+                    onShowTrend?.();
+                  }}
+                />
               );
             })}
           </dl>
         </section>
+      )}
+      {view === "overview" && (
+        <div className="progress-overview-support">
+          <ProgressHeatmap
+            key={`${range.startKey}:${range.endKey}:${currentDay}:${calendar}`}
+            {...{ records, range, now, dayStart, currentDay, language, calendar, period, displayDate }}
+          />
+          <div className="progress-routine-column">
+            <ProgressRoutineComparison values={values} language={language} />
+            <div className="progress-summary-card progress-rhythm-panel" data-material-card="dense">
+              <RecordedPagesChart
+                title={t(language, "home.recordedPagesRhythm")}
+                language={language}
+                points={recordedPageRhythm(
+                  range.startKey,
+                  range.endKey,
+                  getProgressDayKey(now, dayStart),
+                  new Map(records.map((record) => [record.dayKey, record.pages])),
+                )}
+              />
+            </div>
+          </div>
+          {hasActivity && values.morning.days >= 3 && values.morning.count !== values.evening.count && (
+            <aside className="progress-insight-card" data-material-card aria-label={text(language, "insight")}>
+              <Lightbulb className="progress-practice-icon" aria-hidden="true" />
+              <div>
+                <h3 className="text-sm font-bold">{text(language, "insight")}</h3>
+                <p className="mt-1 text-sm leading-relaxed">
+                  {text(language, "routineInsight", {
+                    morning: formatNumerals(values.morning.count, language),
+                    evening: formatNumerals(values.evening.count, language),
+                  })}
+                </p>
+              </div>
+            </aside>
+          )}
+        </div>
       )}
       {view === "trends" && (
         <>
           <section
             className="progress-trend-card rounded-2xl border border-border bg-card p-4 sm:p-5"
             aria-labelledby={`${id}-trend`}
-            data-material-card
+            data-material-card="dense"
           >
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <h2 id={`${id}-trend`} className="text-lg font-bold">
@@ -361,13 +385,25 @@ export function ProgressDashboard({
                 options={PROGRESS_METRICS.map((key) => ({ value: key, label: text(language, `short_${key}`) }))}
               />
             </div>
+            {period !== "day" && (
+              <div className="progress-chart-display mb-3">
+                <ProgressSelectField
+                  label={text(language, "chartDisplay")}
+                  value={chartDisplay}
+                  onChange={setChartDisplay}
+                  language={language}
+                  icon={BarChart3}
+                  options={(["columns", "line"] as const).map((value) => ({ value, label: text(language, value) }))}
+                />
+              </div>
+            )}
             {period === "day" ? (
               <div className="space-y-3">
                 <p className="text-sm leading-relaxed text-muted-foreground">{text(language, "dayView")}</p>
                 {onChooseWeek && (
-                  <button type="button" className={action} onClick={onChooseWeek}>
+                  <Button type="button" variant="pill" size="pill" onClick={onChooseWeek}>
                     {text(language, "viewWeek")}
-                  </button>
+                  </Button>
                 )}
               </div>
             ) : (
@@ -384,10 +420,11 @@ export function ProgressDashboard({
                     },
                   ]}
                   language={language}
-                  period={period === "custom" ? "month" : period}
+                  period={period === "custom" || period === "last30" ? "month" : period}
                   title={text(language, metric)}
                   testId="progress-main-trend"
                   hideSeriesControls
+                  chartDisplay={chartDisplay}
                   valueKind={metric === "pages" ? "count" : "rate"}
                   countUnit={text(language, "pagesUnit")}
                   bucketDescription={text(language, metric === "pages" ? "countBuckets" : "rateBuckets")}
@@ -397,31 +434,62 @@ export function ProgressDashboard({
                     ? text(language, "completeRange", { range: formatProgressRange(complete, language, calendar) })
                     : text(language, "noComplete")}
                 </p>
-                <div className="mt-4 border-t border-border pt-4" data-testid="progress-period-comparison">
-                  <h3 className="text-sm font-semibold">{text(language, "comparison")}</h3>
-                  {canCompare ? (
+                <div className="progress-comparison-card" data-testid="progress-period-comparison">
+                  <h3 className="flex items-center gap-2 text-base font-bold">
+                    <BarChart3 size={22} className="text-primary" aria-hidden="true" />
+                    {text(language, "comparison")}
+                  </h3>
+                  {comparison ? (
                     <div className="mt-2 space-y-1">
-                      <p className="text-sm font-bold">
+                      <p className="progress-comparison-change text-lg font-bold">
+                        <Sprout size={26} aria-hidden="true" />
                         {text(
                           language,
-                          selected.count > previous.count
-                            ? "more"
-                            : selected.count < previous.count
-                              ? "fewer"
-                              : "unchanged",
-                          { count: formatNumerals(Math.abs(selected.count - previous.count), language) },
+                          comparison.kind === "rate"
+                            ? Math.abs(comparison.change) < 0.05
+                              ? "rateUnchanged"
+                              : comparison.change > 0
+                                ? "rateHigher"
+                                : "rateLower"
+                            : comparison.change > 0
+                              ? "more"
+                              : comparison.change < 0
+                                ? "fewer"
+                                : "unchanged",
+                          { count: formatNumerals(Math.round(Math.abs(comparison.change) * 10) / 10, language) },
                         )}
                       </p>
+                      {comparison.kind === "rate" && (
+                        <div className="progress-comparison-bars">
+                          {[
+                            { label: "currentPeriod" as const, value: comparison.currentRate },
+                            { label: "previousPeriod" as const, value: comparison.previousRate },
+                          ].map(({ label, value }) => (
+                            <div key={label}>
+                              <span>{text(language, label)}</span>
+                              <ProgressBar
+                                value={value}
+                                max={100}
+                                height={8}
+                                aria-label={text(language, label)}
+                                aria-valuetext={formatPercentage(Math.round(value * 10) / 10, language)}
+                                fillColor={label === "currentPeriod" ? "var(--primary)" : "var(--muted-foreground)"}
+                              />
+                              <bdi>{formatPercentage(Math.round(value * 10) / 10, language)}</bdi>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         {text(language, "matched", { days: formatNumerals(matched.days, language) })}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatProgressRange(matched.previous, language, calendar)} ·{" "}
-                        {text(language, "previousValue", { count: formatNumerals(previous.count, language) })}
+                        <bdi>{text(language, "previousValue", { count: comparisonValue(previous) })}</bdi>
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatProgressRange(matched.current, language, calendar)} ·{" "}
-                        {text(language, "currentValue", { count: formatNumerals(selected.count, language) })}
+                        <bdi>{text(language, "currentValue", { count: comparisonValue(selected) })}</bdi>
                       </p>
                     </div>
                   ) : (
@@ -463,43 +531,6 @@ export function ProgressDashboard({
           </details>
         </>
       )}
-      {view === "records" && (
-        <section aria-labelledby={`${id}-records`} className="space-y-3">
-          <h2 id={`${id}-records`} className="text-lg font-bold">
-            {text(language, "records")}
-          </h2>
-          <>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                className={action}
-                disabled={save === "saving"}
-                onClick={async () => {
-                  setSave("saving");
-                  try {
-                    await onExport();
-                    setSave("saved");
-                  } catch {
-                    setSave("error");
-                  }
-                }}
-              >
-                {text(language, "export")}
-              </button>
-              <span role="status" aria-atomic="true" className="text-xs text-muted-foreground">
-                {save === "idle" ? "" : text(language, save)}
-              </span>
-            </div>
-          </>
-          <ProgressRecordsTable
-            key={`${range.startKey}-${range.endKey}-${currentDay}`}
-            records={scopedRows}
-            metrics={metrics}
-            language={language}
-            calendar={calendar}
-          />
-        </section>
-      )}
       {view !== "trends" && (
         <details className="rounded-xl border border-border bg-card px-4 sm:px-5">
           <summary className={summary}>
@@ -510,8 +541,6 @@ export function ProgressDashboard({
             <p>{text(language, "boundaryHelp", { hour: formatNumerals(dayStart, language) })}</p>
             <p>{text(language, "goalHelp")}</p>
             <p>{text(language, "chronological")}</p>
-            <p>{text(language, "recordsHelp")}</p>
-            <p>{text(language, "exportHelp")}</p>
           </div>
         </details>
       )}

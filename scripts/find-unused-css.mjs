@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 
 /**
  * Reports hand-written CSS classes that nothing references.
@@ -25,14 +25,20 @@ import { execSync } from "node:child_process";
  * `@layer components` for call sites that do not exist yet, which is a
  * legitimate answer — so this prints and exits zero.
  */
-const cssFiles = execSync('git ls-files "src/**/*.css"', { encoding: "utf8" }).trim().split("\n").filter(Boolean);
+const workingFiles = [
+  ...new Set(
+    execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard", "src", "e2e", "*.html"], {
+      encoding: "utf8",
+    })
+      .split("\0")
+      .filter((file) => file && existsSync(file)),
+  ),
+];
+const cssFiles = workingFiles.filter((file) => file.startsWith("src/") && file.endsWith(".css"));
 // Pathspecs, not globs: git's `*` already spans `/`, so a `**/` segment
 // demands a subdirectory and quietly skips whatever sits at the root of the
 // directory — which is every e2e spec. Naming the directories matches both.
-const allSources = execSync('git ls-files "src" "e2e" "*.html"', { encoding: "utf8" })
-  .trim()
-  .split("\n")
-  .filter((file) => /\.(ts|tsx|html)$/.test(file));
+const allSources = workingFiles.filter((file) => /\.(ts|tsx|html)$/.test(file));
 
 const isTest = (file) => file.startsWith("e2e/") || /\.test\.tsx?$/.test(file);
 const read = (files) => files.map((file) => readFileSync(file, "utf8")).join("\n");

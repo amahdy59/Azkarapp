@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { registerLazyCollection } from "../content/azkar";
@@ -97,11 +97,31 @@ function leaveMushaf() {
 }
 
 describe("the three surah readings", () => {
+  it.each([
+    ["friday-kahf", "al-kahf"],
+    ["s-hm-110a", "as-sajdah"],
+    ["s-hm-110b", "al-mulk"],
+  ])("uses responsive artwork and recovers offline for %s", (id, artwork) => {
+    if (id === "friday-kahf") renderKahf();
+    else renderReader("before_sleep", indexOf("before_sleep", id));
+    leaveMushaf();
+    const image = screen.getByTestId("surah-reading-actions").querySelector("img")!;
+    expect(image.getAttribute("srcset")).toContain(`/${artwork}-768.webp 768w`);
+    expect(image.getAttribute("srcset")).toContain(`/${artwork}-416.webp 416w`);
+    expect(image).toHaveAttribute("fetchpriority", "high");
+    expect(image).toHaveAttribute("alt", "");
+    fireEvent.error(image);
+    expect(image).not.toHaveAttribute("srcset");
+    expect(image.getAttribute("src")).toMatch(new RegExp(`/${artwork}-416\\.webp$`));
+    fireEvent.error(image);
+    expect(image.getAttribute("src")).toMatch(/\/assets\/cards\/wird-quran-720\.webp$/);
+  });
+
   it.each(["s-hm-110a", "s-hm-110b"])("keeps benefits out of the reading choices for %s", (id) => {
     renderReader("before_sleep", indexOf("before_sleep", id));
     leaveMushaf();
     expect(screen.queryByTestId("reader-benefit-dock-button")).not.toBeInTheDocument();
-    expect(screen.getByTestId("surah-reading-actions").querySelectorAll(":scope > button")).toHaveLength(3);
+    expect(within(screen.getByTestId("reader-surah-controls")).getAllByRole("button")).toHaveLength(3);
   });
   it("shows the reading aids the reader asked for, on the surahs too", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
@@ -191,8 +211,9 @@ describe("the three surah readings", () => {
 
   it("shows a short surah as canonical Quran without an ornamental card", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-99-ikhlas"));
-    expect(screen.getByText(/سُورَةُ/)).toBeInTheDocument();
-    expect(screen.getByTestId("canonical-surah-passage")).toBeInTheDocument();
+    expect(screen.queryByTestId("quran-surah-header")).not.toBeInTheDocument();
+    expect(screen.getByTestId("canonical-surah-passage")).toHaveAccessibleName(/ikhlas/i);
+    expect(screen.getByTestId("quran-basmalah")).toBeInTheDocument();
     expect(document.querySelector(".quran-passage")).toBeNull();
     expect(screen.getByRole("switch", { name: "Rare words" })).toHaveAttribute("aria-checked", "false");
   });

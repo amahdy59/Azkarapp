@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -102,7 +103,15 @@ for (const language of ["en", "ar"] as const) {
     await page.setViewportSize({ width: 1280, height: 900 });
     await seedReturningGardenUser(page, { language, completedToday: [] });
     await openReturningHome(page);
-    await page.getByTestId("nav-progress").click();
+    await openProgress(page);
+    await chooseProgressOption(
+      page.getByRole("combobox", {
+        name: language === "ar" ? "نطاق التاريخ" : "Date range",
+        exact: true,
+        includeHidden: true,
+      }),
+      "day",
+    );
     await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
     await chooseProgressDetail(page, "routines");
 
@@ -135,15 +144,15 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   await page.setViewportSize({ width: 320, height: 700 });
   await seedReturningGardenUser(page, { language: "ar", completedToday: [], textSize: "large" });
   await openReturningHome(page);
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
 
-  const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
-  await page.getByTestId("progress-range-disclosure").locator("summary").click();
+  const period = page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true });
+  if (!(await period.isVisible())) await page.getByTestId("progress-filters-toggle").click();
   await period.click();
   const options = page.getByRole("option");
-  await expect(options).toHaveCount(5);
+  await expect(options).toHaveCount(6);
   for (const option of await options.all()) {
     const box = await option.boundingBox();
     expect(box).not.toBeNull();
@@ -151,7 +160,7 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   }
   await page.keyboard.press("Escape");
   await chooseProgressOption(period, "month");
-  await expect(page.getByTestId("today-garden-card").getByRole("heading", { name: /rhythm|إيقاع/ })).toBeVisible();
+  await expect(page.getByTestId("today-garden-card").getByTestId("progress-primary-heading")).toBeVisible();
   await expect(page.getByRole("table")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 
@@ -200,7 +209,7 @@ test("three completed main collections stay concise and explain the palm on dema
   await expect(garden.getByRole("button", { name: "How a palm is earned" })).toHaveCount(0);
   await garden.getByTestId("open-wird-benefits").click();
   await expect(page.getByRole("heading", { name: "How a palm is earned" })).toHaveCount(0);
-  await page.goto("/#/progress");
+  await page.goto("/#/progress/day");
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
   await chooseProgressDetail(page, "reflection");
@@ -235,9 +244,12 @@ test("month view shows routine patterns without the removed summary card", async
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
-  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "month");
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "month",
+  );
 
-  await expect(page.getByTestId("today-garden-card").getByRole("heading", { name: /rhythm|إيقاع/ })).toBeVisible();
+  await expect(page.getByTestId("today-garden-card").getByTestId("progress-primary-heading")).toBeVisible();
   await expect(page.getByRole("table")).toHaveCount(0);
   await expect(page.getByText("Longest Streak", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Adherence", { exact: true })).toHaveCount(0);
@@ -268,6 +280,10 @@ test("both Home and Progress keep prayer tracking outside the wird card", async 
   await chooseProgressDetail(page, "prayers");
   const prayerGroup = page.getByTestId("progress-prayer-group");
   await expect(prayerGroup).toBeVisible();
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "day",
+  );
   await expect(prayerGroup.getByTestId("prayer-progress-summary").getByRole("listitem")).toHaveCount(5);
   await expect(prayerGroup.locator("input, table")).toHaveCount(0);
   await expect(progressGarden).toHaveCount(0);
@@ -285,7 +301,10 @@ test("weekly charts convey complete-day recording values through accessible text
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
-  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "week");
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "week",
+  );
 
   const garden = page.getByTestId("today-garden-card");
   await expect(garden.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(
@@ -300,11 +319,30 @@ test("weekly charts convey complete-day recording values through accessible text
   await expect(garden).toContainText("Quran");
   await expect(page.getByRole("table")).toHaveCount(0);
   await expect(garden).toContainText("3 complete days");
-  await page.getByRole("button", { name: "Previous period", exact: true }).click();
-  await expect(garden).toContainText("7 complete days");
-  await expect(garden.getByRole("list").getByRole("img")).toHaveCount(3);
+  await page.clock.setFixedTime(new Date("2026-10-12T12:00:00Z"));
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await chooseProgressOption(
+    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
+    "week",
+  );
+  // Monday has one complete day in the Sunday-start week; moving the test
+  // clock alone does not fire the visibility/minute events used by the app.
+  await expect(garden).toContainText("1 complete days");
+  await page.clock.setFixedTime(new Date("2026-10-17T12:00:00+03:00"));
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect(garden).toContainText("6 complete days");
+  await expect(garden.locator("[data-testid^=insight-]").getByRole("img")).toHaveCount(3);
   await expect(garden.getByTestId("routine-trends").getByRole("img")).toBeVisible();
-  // A correctly flat SVG line has a zero-height geometry box despite its
-  // visible stroke. Assert the rendered plot and all seven exact zero points.
-  await expect(garden.getByTestId("recording-time-line")).toHaveAttribute("points", /^(?:[\d.]+,184\s?){7}$/);
+  // The October 14 morning record now belongs to this six-day complete scope.
+  // Preserve its real 1/3 rate while every other date remains zero.
+  const points = (await garden.getByTestId("recording-time-line").getAttribute("points"))!
+    .split(" ")
+    .map((point) => Number(point.split(",")[1]));
+  expect(points).toHaveLength(6);
+  expect(points.filter((value) => value === 184)).toHaveLength(5);
+  expect(points[3]).toBeCloseTo(184 - 176 / 3);
+  await garden.getByTestId("routine-trends").getByText("Exact chart data", { exact: true }).click();
+  const exact = garden.getByRole("table");
+  await expect(exact.getByRole("rowheader")).toHaveCount(6);
+  await expect(exact.getByRole("row").nth(4)).toContainText("33%");
 });

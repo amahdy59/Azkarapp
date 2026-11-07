@@ -3,15 +3,30 @@ import { createRoot } from "react-dom/client";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
 import { ScreenFallback } from "./app/components/ScreenFallback.tsx";
 import { pruneStaleFridayProgress } from "./app/fridayProgress.ts";
+import { isHomeStartup, loadHomeScreen, ONBOARDING_COMPLETE_KEY } from "./app/homeStartup.ts";
 import { createAppStateReader } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
 import { reportError, startPerformanceMonitoring } from "./lib/observability.ts";
 import "./styles/index.css";
 
 import { registerSW } from "virtual:pwa-register";
-import { applyServiceWorkerUpdate } from "./app/pwaUpdate";
+import { applyServiceWorkerUpdate, prepareServiceWorkerUpdate } from "./app/pwaUpdate";
 
-const App = lazy(() => import("./app/App.tsx"));
+const App = lazy(() => {
+  // Start shell styles first so Home keeps the same cascade as normal navigation.
+  const application = import("./app/App.tsx");
+  let onboardingComplete = false;
+  try {
+    onboardingComplete = localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
+  } catch {
+    // An explicit Home route still works with storage disabled.
+  }
+  if (isHomeStartup(window.location.search, window.location.hash, onboardingComplete)) {
+    // The route owns loading and retry feedback if the early request fails.
+    void loadHomeScreen().catch(() => undefined);
+  }
+  return application;
+});
 const MarketingLanding = lazy(() => import("./app/screens/MarketingLanding.tsx"));
 const isMarketingLanding =
   window.location.pathname.replace(/\/$/, "").endsWith("/landing") ||
@@ -100,6 +115,38 @@ const updateServiceWorker =
         },
       });
 
+// Preparation never grants consent to activate: Later keeps this build running.
+let preparationAttempt: AbortController | undefined;
+window.addEventListener("azkar-prepare-update", () => {
+  if (import.meta.env.MODE === "android") return;
+  preparationAttempt?.abort();
+  const attempt = new AbortController();
+  preparationAttempt = attempt;
+  const timer = window.setTimeout(() => attempt.abort(new Error("Update preparation timed out")), 120_000);
+  const aborted = new Promise<never>((_, reject) => {
+    attempt.signal.addEventListener("abort", () => reject(attempt.signal.reason), { once: true });
+  });
+  void Promise.race([
+    prepareServiceWorkerUpdate(
+      () => navigator.serviceWorker?.getRegistration?.() ?? Promise.resolve(undefined),
+      attempt.signal,
+    ),
+    aborted,
+  ])
+    .then((registration) => {
+      if (registration && !registration.waiting) throw new Error("Update is not ready yet");
+      window.dispatchEvent(new Event("azkar-update-available"));
+    })
+    .catch(() => {
+      if (preparationAttempt === attempt) window.dispatchEvent(new Event("azkar-update-preparation-failed"));
+    })
+    .finally(() => {
+      window.clearTimeout(timer);
+      if (preparationAttempt === attempt) preparationAttempt = undefined;
+    });
+});
+
+let updateAttempt: AbortController | undefined;
 window.addEventListener("azkar-apply-update", () => {
   if (import.meta.env.MODE === "android") {
     void import("./app/native/liveUpdate")
@@ -110,14 +157,24 @@ window.addEventListener("azkar-apply-update", () => {
       });
     return;
   }
+  updateAttempt?.abort();
+  const attempt = new AbortController();
+  updateAttempt = attempt;
   let timeoutId = 0;
   const timeout = new Promise<never>((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error("Service worker update timed out")), 15_000);
+    // Installation downloads the complete offline shell; mobile connections
+    // need more than the old 15s handover-only allowance.
+    timeoutId = window.setTimeout(() => {
+      const error = new Error("Service worker update timed out");
+      attempt.abort(error);
+      reject(error);
+    }, 120_000);
   });
   void Promise.race([
     applyServiceWorkerUpdate({
-      getRegistration: () => navigator.serviceWorker.getRegistration(),
+      getRegistration: () => navigator.serviceWorker?.getRegistration?.() ?? Promise.resolve(undefined),
       updateServiceWorker,
+      signal: attempt.signal,
       reload: () => window.location.reload(),
       /* Four seconds is a handover, not a download: the new worker has already
          installed and precached by this point, and all that remains is for it
@@ -126,21 +183,34 @@ window.addEventListener("azkar-apply-update", () => {
       awaitHandover: () =>
         new Promise<boolean>((resolve) => {
           const timer = window.setTimeout(() => {
-            navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
-            resolve(false);
+            finish(false);
           }, 4000);
-          function onControllerChange() {
+          function finish(changed: boolean) {
             window.clearTimeout(timer);
-            resolve(true);
+            navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+            attempt.signal.removeEventListener("abort", onAbort);
+            resolve(changed);
+          }
+          function onAbort() {
+            finish(false);
+          }
+          function onControllerChange() {
+            finish(true);
           }
           navigator.serviceWorker.addEventListener("controllerchange", onControllerChange, { once: true });
+          attempt.signal.addEventListener("abort", onAbort, { once: true });
         }),
     }),
     timeout,
   ])
     .catch((error) => {
+      if (updateAttempt !== attempt) return;
       reportError(error, "pwa-update");
       window.dispatchEvent(new Event("azkar-update-failed"));
     })
-    .finally(() => window.clearTimeout(timeoutId));
+    .finally(() => {
+      window.clearTimeout(timeoutId);
+      attempt.abort();
+      if (updateAttempt === attempt) updateAttempt = undefined;
+    });
 });

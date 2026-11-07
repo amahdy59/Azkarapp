@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_APP_STATE } from "../state";
 import { getEstimatedPrayerTimes } from "../content/prayerTimes";
+import type { LocationSettings, PrayerName } from "../types";
 import {
   getLocationBasedReminders,
   getDuePrayerReminder,
@@ -12,15 +13,19 @@ import {
 
 const morningTime = new Date(2026, 6, 17, 7, 30, 30);
 
+function cairoPrayerInstant(day: 17 | 18, prayer: PrayerName, location?: LocationSettings) {
+  const time = getEstimatedPrayerTimes(new Date(2026, 6, day, 12), location)[prayer];
+  // These fixtures use Cairo's July clock regardless of the device/runner zone.
+  return new Date(`2026-07-${day}T${time}:00+03:00`).getTime();
+}
+
 describe("getDueReminder", () => {
   it("reminds for each prayer at the selected lead time", () => {
     const reminders = {
       ...DEFAULT_APP_STATE.settings.reminders,
       prayer: { enabled: true, leadMinutes: 15 as const },
     };
-    const date = new Date(2026, 6, 17, 12);
-    const asr = getEstimatedPrayerTimes(date).asr.split(":").map(Number);
-    date.setHours(asr[0]!, asr[1]! - 15, 30, 0);
+    const date = new Date(cairoPrayerInstant(17, "asr") - 15 * 60_000 + 30_000);
 
     expect(getDuePrayerReminder(reminders, undefined, date)).toEqual({
       kind: "prayer",
@@ -35,9 +40,9 @@ describe("getDueReminder", () => {
       ...DEFAULT_APP_STATE.settings.reminders,
       prayer: { enabled: true, leadMinutes: 10 as const },
     };
-    const date = new Date(2026, 6, 17, 12);
-    const dhuhr = getEstimatedPrayerTimes(date).dhuhr.split(":").map(Number);
-    date.setHours(dhuhr[0]!, dhuhr[1]! - 10, 30, 0);
+    const at = cairoPrayerInstant(17, "dhuhr") - 10 * 60_000;
+    const date = new Date(at);
+    expect(getDuePrayerReminder(reminders, undefined, new Date(at - 1))).toBeNull();
 
     expect(getDuePrayerReminder(reminders, undefined, date)).toEqual({
       kind: "prayer",
@@ -129,12 +134,7 @@ describe("efficient reminder scheduling", () => {
       ...DEFAULT_APP_STATE.settings.reminders,
       prayer: { enabled: true, leadMinutes: 15 as const },
     };
-    const date = new Date(2026, 6, 17, 12);
-    const [hours, minutes] = getEstimatedPrayerTimes(date).asr.split(":").map(Number);
-    const reminderAt = new Date(date);
-    reminderAt.setHours(hours!, minutes!, 0, 0);
-    reminderAt.setMinutes(reminderAt.getMinutes() - 15);
-    const now = new Date(reminderAt.getTime() - 30 * 60_000);
+    const now = new Date(cairoPrayerInstant(17, "asr") - (15 + 30) * 60_000);
 
     expect(getNextReminderDelay(reminders, undefined, now)).toBe(30 * 60_000);
   });
@@ -264,13 +264,11 @@ describe("native Android reminder schedules", () => {
       before_sleep: { enabled: false, time: "22:00" },
       prayer: { enabled: true, leadMinutes: 10 as const },
     };
-    const now = new Date(2026, 6, 17, 0, 0);
+    const now = new Date("2026-07-17T00:00:00+03:00");
     const scheduled = getUpcomingNativeReminders(reminders, [], "en", location, now, 2);
-    const fajr = scheduled.find(({ kind, at }) => kind === "prayer:fajr" && at.getDate() === 18)!;
-    const expected = getEstimatedPrayerTimes(new Date(2026, 6, 18, 12), location).fajr;
-    const [hours, minutes] = expected.split(":").map(Number);
-    const expectedAt = new Date(2026, 6, 18, hours!, minutes! - 10);
+    const fajr = scheduled.find(({ kind, dayKey }) => kind === "prayer:fajr" && dayKey === "2026-07-18");
+    const expectedAt = new Date(cairoPrayerInstant(18, "fajr", location) - 10 * 60_000);
 
-    expect(fajr.at.getTime()).toBe(expectedAt.getTime());
+    expect(fajr?.at).toEqual(expectedAt);
   });
 });

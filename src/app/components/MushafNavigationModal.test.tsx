@@ -231,7 +231,7 @@ describe("MushafNavigationModal", () => {
     expect(screen.getByRole("button", { name: "٤٩" })).toBeInTheDocument();
   });
 
-  it("renders surahs in a 2-column grid with compact page tags", () => {
+  it("renders responsive surah results with compact page tags", () => {
     render(
       <MushafNavigationModal
         isOpen={true}
@@ -245,7 +245,7 @@ describe("MushafNavigationModal", () => {
 
     const fatihahBtn = screen.getByText("الفاتحة").closest("button");
     expect(fatihahBtn).toBeInTheDocument();
-    expect(fatihahBtn?.parentElement).toHaveClass("grid-cols-2");
+    expect(fatihahBtn?.parentElement).toHaveClass("mushaf-index-surahs");
     // Verify compact page tag
     expect(screen.getByText("ص ١")).toBeInTheDocument();
     expect(screen.getByText("ص ٢")).toBeInTheDocument();

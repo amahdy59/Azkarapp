@@ -1,9 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { readNotificationPermission, showBrowserNotification } from "./notifications";
+import { notificationTarget, readNotificationPermission, showBrowserNotification } from "./notifications";
 
 const originalWorker = Object.getOwnPropertyDescriptor(navigator, "serviceWorker");
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
   if (originalWorker) Object.defineProperty(navigator, "serviceWorker", originalWorker);
   else Reflect.deleteProperty(navigator, "serviceWorker");
 });
@@ -32,6 +33,20 @@ describe("browser notification delivery", () => {
     const { construct } = setup();
     expect(await showBrowserNotification("Reminder", {})).toBe(true);
     expect(construct).toHaveBeenCalledOnce();
+  });
+  it("opens the intended route on a constructor notification click", async () => {
+    const { construct } = setup();
+    const close = vi.fn();
+    const notification = { close, onclick: undefined as (() => void) | undefined };
+    construct.mockImplementation(function () {
+      return notification;
+    });
+    vi.spyOn(window, "focus").mockImplementation(() => {});
+    await showBrowserNotification("Asr", { data: { url: "/#/prayer/asr" } });
+    notification.onclick!();
+    expect(close).toHaveBeenCalledOnce();
+    expect(window.location.hash).toBe("#/prayer/asr");
+    window.location.hash = "";
   });
   it("reports unavailable mobile delivery instead of hanging", async () => {
     const { construct } = setup();
@@ -68,5 +83,13 @@ describe("browser notification delivery", () => {
     setup();
     Reflect.deleteProperty(window, "Notification");
     expect(readNotificationPermission()).toBe("unsupported");
+  });
+  it("accepts internal prayer and routine routes and rejects foreign or malformed targets", () => {
+    expect(notificationTarget("/#/prayer/asr")).toContain("#/prayer/asr");
+    expect(notificationTarget("/#/azkar/before-sleep")).toContain("#/azkar/before-sleep");
+    expect(notificationTarget("https://example.com/#/prayer/asr")).toBeNull();
+    expect(notificationTarget("/other/#/prayer/asr")).toBeNull();
+    expect(notificationTarget("/#/missing")).toBeNull();
+    expect(notificationTarget("javascript:alert(1)")).toBeNull();
   });
 });

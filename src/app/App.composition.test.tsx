@@ -116,6 +116,9 @@ describe("App Composition and Routing", () => {
     });
     window.history.replaceState(null, "", "/");
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    // These routing/audio assertions exercise explicit English UI. Fresh
+    // Arabic defaults have separate acceptance coverage.
+    window.localStorage.setItem("azkarapp.state.v1", JSON.stringify({ settings: { language: "en" } }));
   });
 
   afterEach(() => {
@@ -176,7 +179,7 @@ describe("App Composition and Routing", () => {
     await user.keyboard("{Alt>}{4}{/Alt}");
 
     expect(await screen.findByRole("heading", { name: /progress/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
-    expect(window.location.hash).toBe("#/progress");
+    expect(window.location.hash).toBe("#/progress/month");
   });
 
   it("handles browser back/forward buttons (popstate)", async () => {

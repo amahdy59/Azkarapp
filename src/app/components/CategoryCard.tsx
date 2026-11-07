@@ -1,3 +1,4 @@
+import "./card-action.css";
 import { CatIcon } from "./CatIcon";
 import { Check } from "./icons";
 import { ProgressBar } from "./ProgressBar";
@@ -39,13 +40,13 @@ export function CategoryCard({
   const isComplete = completedCount >= totalCount && totalCount > 0;
   const isStarted = completedCount > 0;
 
-  const className = `interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start no-underline shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`;
+  const className = `surface-card-finish interactive-elem flex min-h-[82px] w-full items-center gap-[16px] rounded-3xl border border-border/40 bg-card p-[18px] text-start no-underline shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`;
   const style = index !== undefined ? { animationDelay: `${Math.min(Math.max(0, index), 5) * 40}ms` } : undefined;
   const content = (
     <>
       <span
         data-slot="category-icon"
-        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10"
+        className="surface-control-finish control-cue flex size-[44px] shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10"
         aria-hidden="true"
       >
         <CatIcon type={icon} size={24} color="var(--primary)" />
@@ -69,7 +70,7 @@ export function CategoryCard({
                 aria-label={progressText || ""}
               />
             )}
-            <span className="flex items-center gap-1.5 text-label text-muted-foreground">
+            <span className="flex flex-wrap items-center gap-1.5 text-label text-muted-foreground">
               {/* A shape, not just the chevron's hue, marks a finished
                   collection — colour alone is not a sufficient cue. */}
               {isComplete && <Check size={15} className="shrink-0 text-primary" aria-hidden="true" />}
@@ -107,6 +108,7 @@ export function CategoryCard({
     };
     return (
       <a
+        data-card-action
         data-material-card
         href={href}
         data-testid={`category-card-${id}`}
@@ -123,6 +125,7 @@ export function CategoryCard({
 
   return (
     <button
+      data-card-action
       data-material-card
       type="button"
       data-testid={`category-card-${id}`}

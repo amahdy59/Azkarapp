@@ -2,6 +2,7 @@ import { Fragment, type HTMLAttributes } from "react";
 import { getQcfFontFamily } from "../content/qcfMushaf";
 import type { AppLanguage } from "../types";
 import { AyahMarker } from "./AyahMarker";
+import { t } from "../i18n";
 import { useQuranSnippet } from "../hooks/useQuranSnippet";
 
 export type QuranSnippet = NonNullable<ReturnType<typeof useQuranSnippet>>;
@@ -82,6 +83,12 @@ export function QuranVerseText({
   wordAttributes?: QuranWordAttributes;
 }) {
   const snippet = useQuranSnippet(text, canonicalKey);
+  if (snippet === undefined)
+    return (
+      <span role="status" aria-busy="true" className="text-sm text-muted-foreground">
+        {t(language, "common.loading")}
+      </span>
+    );
   return snippet ? (
     <QuranGlyphSlice
       text={text}

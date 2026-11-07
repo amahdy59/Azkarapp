@@ -1,0 +1,7 @@
+# Notification approval package and programmer contacts — local
+
+The owner requests authentic-hadith notification rotation, current time-based reminder inventory, proposed fasting/Friday/pre-Fajr and broader good-deed reminders with proper app destinations, including topics with no current section. All notification copy, schedules, rotation and new sections require approval before implementation/commit. The owner also requests local programmer credits for Ahmed Mahdy and Mohamed Hussien, Ahmed's LinkedIn and email contact/bug/feature actions. **No commit or push before approval.** Preserve the preceding completed local Mushaf work and its screenshot gate.
+
+Plan: inspect existing scheduling, content, routes and About primitives; verify primary narration sources/grades and public contact details; prepare a catalogue distinguishing existing functionality from proposed alerts/new destinations; prepare the explicitly requested contact UI locally with native links and shared buttons; test bilingual contact behavior, narrow/enlarged geometry and accessibility; capture screenshots; return the approval package. Notification code and reviewed devotional content remain unchanged.
+
+The catalogue is `docs/NOTIFICATION_CATALOG_APPROVAL_2026_11_05.md`; the earlier V2 shortlist supplies the existing quoted pool. Browser category-slug/click handling and duplicate delivery are documented proposed fixes, not changes performed during this review. The report is `docs/agent/reports/NOTIFICATION_REVIEW_CONTACTS_LOCAL_2026_11_05_REPORT.md`.

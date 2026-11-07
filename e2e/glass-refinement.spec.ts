@@ -33,7 +33,7 @@ for (const [language, width] of [
       });
     };
     for (const route of ["home", "azkar", "progress", "settings/appearance"]) {
-      await page.goto("/#/" + route);
+      await page.goto("/#/" + (route === "progress" ? "progress/day" : route));
       const scene = page.getByTestId("time-of-day-scene-window").last().locator("img");
       await expect.poll(() => scene.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
       await expect(scene).toHaveCSS("opacity", "1");
@@ -51,7 +51,10 @@ for (const [language, width] of [
           page.getByTestId(route === "home" ? "home-utility-header" : "progress-sticky-controls"),
         ).toHaveAttribute("data-scrolled", "true");
         if (route === "progress")
-          await expect(page.getByTestId("progress-sticky-controls")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+          await expect(page.getByTestId("progress-sticky-controls")).toHaveCSS(
+            "background-color",
+            "rgba(15, 23, 42, 0.36)",
+          );
         await capture(route + "-scrolled");
       }
     }
@@ -77,6 +80,8 @@ for (const [language, width] of [
         );
       }, language);
       await page.goto("/#/" + route);
+      if (route === "progress")
+        await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("aria-expanded", "false");
       const scope = page.locator(
         width === 1440 && route.startsWith("settings")
           ? route === "settings"
@@ -161,17 +166,32 @@ for (const [language, width] of [
         node.scrollTop = 120;
       });
       await expect(header).toHaveAttribute("data-scrolled", "true");
-      if (route === "progress") {
-        await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-        expect(await material()).toEqual(restingMaterial);
-      } else {
-        await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-        expect(await material()).not.toEqual(restingMaterial);
-      }
+      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
+      expect(await material()).not.toEqual(restingMaterial);
       await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       if (route === "progress") {
-        await expect(header.locator(".shared-screen-header")).toHaveCSS("backdrop-filter", "none");
-        await expect(header.locator(".shared-screen-header")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        for (const content of [header.getByTestId("progress-filters-toggle"), header.getByRole("tablist")]) {
+          await expect(content).toBeVisible();
+          await expect(content).toHaveCSS("backdrop-filter", "none");
+          if ((await content.getAttribute("role")) === "tablist") {
+            await expect(content).toHaveClass(/choice-pill/);
+            const muted = await content.evaluate((node) => {
+              const probe = document.createElement("span");
+              probe.style.backgroundColor = "var(--muted)";
+              node.append(probe);
+              const color = getComputedStyle(probe).backgroundColor;
+              probe.remove();
+              return color;
+            });
+            await expect(content).toHaveCSS("background-color", muted);
+          } else {
+            await expect(content).toHaveClass(/choice-pill/);
+            await expect(content).toHaveCSS(
+              "background-color",
+              await header.getByRole("tablist").evaluate((node) => getComputedStyle(node).backgroundColor),
+            );
+          }
+        }
       }
       await header.evaluate((node) => {
         const probe = document.createElement("div");
@@ -214,7 +234,7 @@ for (const [language, width] of [
         }, top);
         if (elevated) await expect(header).toHaveAttribute("data-scrolled", "true");
         else await expect(header).not.toHaveAttribute("data-scrolled");
-        if (elevated && route !== "progress") expect(await material()).not.toEqual(restingMaterial);
+        if (elevated) expect(await material()).not.toEqual(restingMaterial);
         else expect(await material()).toEqual(restingMaterial);
         await expect(header).toHaveCSS("backdrop-filter", elevated ? "blur(32px) saturate(1.35)" : "none");
       }

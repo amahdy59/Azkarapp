@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { getProgressDayKey } from "./progress";
 import {
   dashboardProgressBuckets,
+  compareProgressMetric,
+  progressRecordingPattern,
   exportProgressDashboard,
   scopeProgressDailyRecords,
   dashboardProgressTimeline,
@@ -25,6 +27,50 @@ const empty: ProgressDashboardInput = {
   quranWirdDailyGoals: {},
 };
 describe("focused Progress range and independent facts", () => {
+  it("shows recording presence only inside civil/devotional scopes and keeps target-only days distinct", () => {
+    const rows = indexProgressDashboard(
+      {
+        ...empty,
+        dailyCompletions: [{ dayKey: "2026-10-19", category: "morning", timeZone: "Africa/Cairo" }],
+        prayerTracking: [{ dayKey: "2026-10-20", prayer: "fajr", location: "home" }],
+        quranWirdDailyGoals: { "2026-10-18": 4 },
+        wirdHistory: { "2026-10-21": [1] },
+      },
+      "2026-10-19",
+    );
+    expect(progressRecordingPattern(rows, range, now, 3, false)).toEqual([
+      { dayKey: "2026-10-18", kind: "target" },
+      { dayKey: "2026-10-19", kind: "activity" },
+      { dayKey: "2026-10-20", kind: "activity" },
+    ]);
+    expect(
+      progressRecordingPattern(rows, { startKey: "2026-10-20", endKey: "2026-10-20" }, now, 3, true).map(
+        (day) => day.dayKey,
+      ),
+    ).toEqual(["2026-10-19", "2026-10-20"]);
+    const last = progressRecordingPattern(rows, { startKey: "2026-10-01", endKey: "2026-10-31" }, now, 3, false);
+    expect(last).toHaveLength(7);
+    expect(last[0]).toEqual({ dayKey: "2026-10-14", kind: "none" });
+    expect(progressRecordingPattern(rows, { startKey: "2026-10-21", endKey: "2026-10-31" }, now, 3, false)).toEqual([]);
+    expect(progressRecordingPattern([], range, now, 3, false).every((day) => day.kind === "none")).toBe(true);
+  });
+  it("compares supported rates in percentage points while preserving page counts and known-goal restrictions", () => {
+    const value = (count: number, possible: number | null, days = 7) => ({ count, possible, days, range });
+    expect(compareProgressMetric(value(6, 10), value(12, 30), "routines")).toMatchObject({
+      kind: "rate",
+      currentRate: 60,
+      previousRate: 40,
+      change: 20,
+    });
+    expect(compareProgressMetric(value(6, null), value(12, null), "pages")).toEqual({ kind: "count", change: -6 });
+    expect(compareProgressMetric(value(0, 21), value(7, 21), "routines")?.change).toBeCloseTo(-100 / 3);
+    expect(compareProgressMetric(value(1, 2), value(1, 3), "quranGoals")).toBeNull();
+    expect(compareProgressMetric(value(2, 3), value(1, 3), "quranGoals")).toMatchObject({ kind: "rate" });
+    expect(compareProgressMetric(value(0, 0), value(1, 3), "quranGoals")).toBeNull();
+    expect(compareProgressMetric(value(2, 3, 2), value(1, 3, 2), "routines")).toBeNull();
+    expect(compareProgressMetric(value(2, 3), value(1, 3, 6), "routines")).toBeNull();
+    expect(compareProgressMetric(value(2, 3), value(0, 3), "routines")).toBeNull();
+  });
   it("respects an explicit no-goal day rather than replacing it with a current plan", () => {
     const rows = indexProgressDashboard(
       {

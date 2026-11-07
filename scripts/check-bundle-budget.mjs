@@ -172,6 +172,24 @@ if (!entryKey) {
     failures.push(`Initial route: ${initialGzipSize} gzip bytes exceeds ${limits.initialGzip} bytes`);
   }
   checkAgainstBaseline("initialRouteGzip", initialGzipSize);
+
+  const shellKey = Object.keys(manifest).find((key) => /\/App-[^/]+\.js$/.test(manifest[key].file));
+  const homeKey = Object.keys(manifest).find((key) => /\/HomeScreen-[^/]+\.js$/.test(manifest[key].file));
+  if (!shellKey || !homeKey) {
+    failures.push("Build manifest does not contain the application shell and Home screen.");
+  } else {
+    visitManifestEntry(shellKey);
+    visitManifestEntry(homeKey);
+    let homeGzipSize = gzipSync(await readFile(path.join(distDirectory, "index.html"))).byteLength;
+    for (const file of initialFiles) {
+      if (/\/(?:audio-|baqarah-)/.test(file)) {
+        failures.push(`Home statically imports a deferred audio or Al-Baqarah chunk: ${file}`);
+      }
+      homeGzipSize += gzipSync(await readFile(path.join(distDirectory, file))).byteLength;
+    }
+    checkAgainstBaseline("homeStartupGzip", homeGzipSize);
+    console.log(`Home startup JavaScript, CSS and HTML: ${homeGzipSize} gzip bytes.`);
+  }
 }
 
 if (failures.length) {

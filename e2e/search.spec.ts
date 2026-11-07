@@ -6,9 +6,15 @@ async function openArabicLibrary(page: Page) {
   await page.getByTestId("language-option-ar").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
   await expect(page.getByRole("navigation")).toBeVisible();
 
   await page.getByTestId("nav-azkar").click();
+  const filters = page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger");
+  if (await filters.isVisible()) await filters.click();
   return page.getByRole("textbox").first();
 }
 
@@ -42,6 +48,8 @@ test("typing in the Library filters in place instead of navigating", async ({ pa
 
   // Typing narrows the collections and must leave the user on the Library.
   await libraryInput.fill("النوم");
+  const sheet = page.getByTestId("library-filter-disclosure-sheet");
+  if (await sheet.isVisible()) await sheet.getByTestId("modal-close-button").click();
   await expect(page).toHaveURL(/#\/azkar/);
   await expect(page.getByRole("link", { name: /أذكار النوم/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /أذكار الصباح/ })).toHaveCount(0);
@@ -77,15 +85,16 @@ test("Library search and responsive section controls stay bounded at every tier"
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(tabs).toBeVisible();
-  await page.getByTestId("library-filter-disclosure").locator("summary").click();
+  await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   await expect(async () => {
     const mobileInput = await input.boundingBox();
-    const mobileTabs = await tabs.boundingBox();
+    const mobileTabs = await page.locator("[role=tablist]").boundingBox();
     expect(mobileInput).not.toBeNull();
     expect(mobileTabs).not.toBeNull();
-    expect(mobileTabs!.y + mobileTabs!.height).toBeLessThanOrEqual(mobileInput!.y);
-    expect(mobileTabs!.x).toBeGreaterThanOrEqual(0);
-    expect(mobileTabs!.x + mobileTabs!.width).toBeLessThanOrEqual(390);
+    const sheet = (await page.getByTestId("library-filter-disclosure-sheet").boundingBox())!;
+    expect(mobileInput!.y).toBeGreaterThanOrEqual(sheet.y);
+    expect(mobileInput!.y + mobileInput!.height).toBeLessThanOrEqual(sheet.y + sheet.height);
+    await expect(tabs).toBeHidden();
   }).toPass({ timeout: 15_000 });
 });
 

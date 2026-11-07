@@ -32,14 +32,14 @@ for (const language of ["ar", "en"] as const) {
         },
         { language, width },
       );
-      await page.goto("/#/progress");
+      await page.goto("/#/progress/day");
       await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
       await chooseProgressDetail(page, "routines");
       const garden = page.getByTestId("today-garden-card");
       await expect(garden).toBeVisible();
       await expect(garden.locator("img")).toHaveCount(0);
       await chooseProgressOption(
-        page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+        page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
         "month",
       );
       const monthChart = page.getByTestId("today-garden-card");
@@ -58,15 +58,13 @@ for (const language of ["ar", "en"] as const) {
       await mkdir(directory, { recursive: true });
       await page.screenshot({ path: `${directory}/${language}-${width}-month.png` });
       await chooseProgressOption(
-        page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+        page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
         "year",
       );
       const chart = page.getByTestId("today-garden-card");
       await expect(chart).toBeVisible();
-      const rangeFilters = page.getByTestId("progress-range-disclosure");
-      if (!(await rangeFilters.evaluate((node) => (node as HTMLDetailsElement).open)))
-        await rangeFilters.locator("summary").click();
-      await expect(page.getByRole("combobox")).toHaveCount(4);
+      await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(3);
+      await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("aria-expanded", "false");
       const exportButton = chart.getByRole("button", {
         name: ar ? "تصدير الأوراد" : "Azkar JSON",
       });

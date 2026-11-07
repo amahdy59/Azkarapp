@@ -545,7 +545,7 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     ],
   ];
 
-  it("preserves identical canvas padding and structure whether floating controls are mounted or hidden", () => {
+  it("places mobile controls outside the paper's scrollport", () => {
     const { container: withControls } = render(
       <MushafPageViewer
         lines={sampleLines}
@@ -564,8 +564,14 @@ describe("MushafPageViewer invariant layout and center tap", () => {
 
     const canvasWithControls = withControls.querySelector(".mushaf-page-canvas") as HTMLElement;
     expect(canvasWithControls).toBeInTheDocument();
-    expect(canvasWithControls.style.paddingTop).toBe("var(--mushaf-top-clearance, 3.25rem)");
-    expect(canvasWithControls.style.paddingBottom).toMatch(/^calc\(3\.25rem\s*\+\s*env\(safe-area-inset-bottom\)\)$/);
+    const paper = withControls.querySelector(".mushaf-paper")!;
+    const top = withControls.querySelector(".mushaf-control-band--top")!;
+    const bottom = withControls.querySelector(".mushaf-control-band--bottom")!;
+    expect(top.compareDocumentPosition(paper) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(paper.nextElementSibling).toBe(bottom);
+    expect(paper).not.toContainElement(top);
+    expect(canvasWithControls.style.paddingTop).toBe("");
+    expect(canvasWithControls.style.paddingBottom).toBe("");
     expect(canvasWithControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
 
     const { container: withoutControls } = render(
@@ -581,7 +587,7 @@ describe("MushafPageViewer invariant layout and center tap", () => {
 
     const canvasWithoutControls = withoutControls.querySelector(".mushaf-page-canvas") as HTMLElement;
     expect(canvasWithoutControls).toBeInTheDocument();
-    // Layout and line geometry remain 100% constant in focus mode / hidden controls mode
+    // Both presentations use the same paper padding. The controls own their space.
     expect(canvasWithoutControls.style.paddingTop).toBe(canvasWithControls.style.paddingTop);
     expect(canvasWithoutControls.style.paddingBottom).toBe(canvasWithControls.style.paddingBottom);
     expect(canvasWithoutControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
@@ -675,6 +681,6 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     const centerBtn = center.querySelector("[data-testid='mushaf-furniture-page-btn']") as HTMLElement;
     expect(centerBtn).toBeInTheDocument();
     expect(centerBtn.className).toContain("h-11");
-    expect(centerBtn.querySelector("span")?.className).toContain("h-8");
+    expect(centerBtn.querySelector("span")).toHaveClass("mushaf-furniture-pill");
   });
 });

@@ -18,20 +18,30 @@
 .reader-swipe-surface:has(.mushaf-paper[data-magnified="true"]) {
   touch-action: pan-x pan-y;
 }
-/* Paint only: active ayahs retain the reference word and line rectangles. */
-.mushaf-page-canvas [data-playback-verse] {
-  background-color: color-mix(in srgb, var(--primary) 9%, transparent);
+/* Cue geometry stays with the canonical word. Removing the attribute drops the
+   old fill immediately, so even a fast seek never leaves a trail or lights a marker. */
+.mushaf-page-canvas [data-playback-word="true"] {
+  background-color: color-mix(in srgb, var(--primary) 19%, transparent);
+  border-radius: 0.14em;
+  animation: mushaf-word-arrive 90ms ease-out;
 }
-
-.mushaf-page-canvas [data-current-ayah-marker="true"] {
-  border-radius: 50%;
-  background-color: color-mix(in srgb, var(--primary) 16%, transparent);
-  outline: 1px solid var(--primary);
-  outline-offset: 1px;
+@keyframes mushaf-word-arrive {
+  from {
+    background-color: transparent;
+  }
 }
-
+.reduce-motion .mushaf-page-canvas [data-playback-word="true"] {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mushaf-page-canvas [data-playback-word="true"] {
+    animation: none;
+  }
+}
 @media (forced-colors: active) {
-  .mushaf-page-canvas [data-current-ayah-marker="true"] {
+  .mushaf-page-canvas [data-playback-word="true"] {
+    animation: none;
     outline: 2px solid Highlight;
+    outline-offset: 1px;
   }
 }

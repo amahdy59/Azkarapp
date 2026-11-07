@@ -75,8 +75,8 @@ export function TasbeehCounterButton({
       aria-label={t(language, "counter.tasbeehTitle")}
     >
       <div className="flex items-center gap-3.5 min-w-0">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/30 bg-primary/15 text-primary backdrop-blur-md transition-transform duration-standard group-hover:scale-105 sm:size-11 sm:rounded-2xl">
-          <TasbeehIcon size={24} className="shrink-0" />
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/30 bg-primary/15 text-primary backdrop-blur-md transition-transform duration-standard sm:size-11 sm:rounded-2xl">
+          <TasbeehIcon size={24} className="control-cue shrink-0" />
         </div>
         <span className="text-base md:text-title font-black tracking-tight text-foreground truncate">
           {t(language, "counter.tasbeehTitle")}
@@ -85,7 +85,7 @@ export function TasbeehCounterButton({
       <ArrowNext
         size={20}
         data-rtl-flip
-        className="shrink-0 text-muted-foreground transition-transform duration-standard group-hover:translate-x-1 group-hover:text-foreground rtl:group-hover:-translate-x-1"
+        className="shrink-0 text-muted-foreground transition-colors duration-standard group-hover:text-foreground"
         aria-hidden="true"
       />
     </button>

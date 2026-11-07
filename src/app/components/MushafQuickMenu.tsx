@@ -1,5 +1,5 @@
 import { MushafMaterialHint } from "./MushafMaterialHint";
-import { type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { handleRadioNavigation } from "./radioNavigation";
 import { formatNumerals } from "../formatting";
@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Eye,
   List,
   Pause,
   Play,
@@ -50,6 +51,7 @@ export interface MushafQuickMenuProps {
   onToggleWordMeanings: () => void;
   onTogglePageBookmark: () => void;
   onOpenSettings: () => void;
+  onEnterFocusMode?: () => void;
   onReadExternally?: () => void;
   onOpenBenefit?: () => void;
   surahAudio?: SurahAudioControl;
@@ -103,6 +105,7 @@ export function MushafQuickMenu({
   onToggleWordMeanings,
   onTogglePageBookmark,
   onOpenSettings,
+  onEnterFocusMode,
   onReadExternally,
   onOpenBenefit,
   surahAudio,
@@ -120,7 +123,19 @@ export function MushafQuickMenu({
   appTheme = "midnight",
   onSelectTheme,
 }: MushafQuickMenuProps) {
+  const focusOnClose = useRef(false);
   const items: QuickMenuItem[] = [
+    ...(onEnterFocusMode
+      ? [
+          {
+            id: "focus",
+            label: t(language, "mushaf.focusModeEnter"),
+            icon: <Eye size={19} aria-hidden="true" />,
+            onSelect: onEnterFocusMode,
+            testId: "mushaf-focus-enter",
+          },
+        ]
+      : []),
     ...(onOpenBenefit
       ? [
           {
@@ -230,6 +245,15 @@ export function MushafQuickMenu({
     <ResponsiveSheet
       open={open}
       onClose={onClose}
+      onCloseAutoFocus={(event) => {
+        if (!focusOnClose.current) return;
+        const exit = document.querySelector<HTMLElement>('[data-testid="mushaf-focus-exit"]');
+        if (exit) {
+          event.preventDefault();
+          exit.focus({ preventScroll: true });
+        }
+        focusOnClose.current = false;
+      }}
       title={t(language, "mushaf.readingViewOptions")}
       direction={direction}
       testId="mushaf-quick-menu"
@@ -401,6 +425,7 @@ export function MushafQuickMenu({
                   data-testid={item.testId}
                   {...(isToggle ? { role: "switch" as const, "aria-checked": item.pressed } : {})}
                   onClick={() => {
+                    focusOnClose.current = item.id === "focus";
                     item.onSelect();
                     if (!isToggle) onClose();
                   }}
@@ -463,7 +488,7 @@ export function MushafQuickMenu({
                       aria-label={t(language, opt.nameKey)}
                       data-testid={`quick-theme-${opt.id}`}
                       onClick={() => onSelectTheme(opt.id)}
-                      className={`flex h-11 flex-col items-center justify-center rounded-xl border p-1 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      className={`flex h-11 flex-col items-center justify-center rounded-xl border p-1 transition-[color,background-color,border-color,box-shadow,opacity,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                         isSelected
                           ? "border-primary ring-2 ring-primary/40 shadow-xs"
                           : "border-border/60 hover:border-border"

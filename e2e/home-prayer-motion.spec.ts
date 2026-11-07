@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const [language, width] of [
-  ["ar", 390],
+  ["ar", 820],
   ["en", 1440],
 ] as const) {
   test(`Home prayer cards interpolate together ${language} ${width} @cross-browser`, async ({ page }, testInfo) => {
@@ -88,7 +88,7 @@ for (const [language, width] of [
     );
     expect(paused).toBe(true);
     await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    await expect(sticky).toHaveCSS("transition-duration", "0.22s");
+    await expect(sticky).toHaveCSS("transition-duration", "0.26s");
     await expect(sticky).toHaveCSS("transition-delay", "0s");
     // At time zero the actual card shape is still expanded: no hidden-footer snap.
     expect((await card.boundingBox())!.height).toBeCloseTo(expanded, 0);
@@ -98,7 +98,7 @@ for (const [language, width] of [
           animation instanceof CSSTransition &&
           ["--home-prayer-expansion", "font-size", "translate"].includes(animation.transitionProperty)
         )
-          animation.currentTime = 100;
+          animation.currentTime = 130;
     });
     const middle = (await card.boundingBox())!.height;
     const middleFont = await digits.evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
@@ -107,7 +107,7 @@ for (const [language, width] of [
     await capture("middle");
     // The new countdown arrives during the final 60ms, finishing with the
     // geometry rather than appearing while a delayed contraction is running.
-    await expect(sticky.locator("[data-prayer-compact-countdown]")).toHaveCSS("transition-delay", "0.16s");
+    await expect(sticky.locator("[data-prayer-compact-countdown]")).toHaveCSS("transition-delay", "0.2s");
     await expect(sticky.locator("[data-prayer-footer]").first()).toHaveCSS("transition-delay", "0s");
     await sticky.evaluate((node) => {
       for (const animation of node.getAnimations({ subtree: true })) animation.finish();

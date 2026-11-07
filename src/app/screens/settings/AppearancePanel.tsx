@@ -15,6 +15,8 @@ export interface AppearancePanelProps {
   themeMode: ThemeMode;
   highContrast: boolean;
   homeWirdImages?: boolean;
+  paperTexture?: boolean;
+  onPaperTextureChange?: (value: boolean) => void;
   appMaterial?: "system" | "glass" | "solid";
   onAppMaterialChange?: (value: "system" | "glass" | "solid") => void;
   homeMaterial?: "inherit" | "system" | "glass" | "solid";
@@ -37,6 +39,8 @@ export function AppearancePanel({
   themeMode,
   highContrast,
   homeWirdImages = false,
+  paperTexture = true,
+  onPaperTextureChange,
   appMaterial = "solid",
   onAppMaterialChange,
   homeMaterial = "inherit",
@@ -89,7 +93,7 @@ export function AppearancePanel({
             </aside>
           )}
         </SettingsSection>
-        {(onAppMaterialChange || onHomeMaterialChange || onHomeWirdImagesChange) && (
+        {(onAppMaterialChange || onHomeMaterialChange || onHomeWirdImagesChange || onPaperTextureChange) && (
           <SettingsSection label={t(language, "settings.appMaterial")} className="mt-3">
             {/* 1. Entire app appearance */}
             {onAppMaterialChange && (
@@ -132,6 +136,19 @@ export function AppearancePanel({
             {onAppMaterialChange && onHomeMaterialChange && <div className="h-px bg-border/40 mx-4" />}
 
             {/* 2. Home page cards appearance */}
+            {onPaperTextureChange && (
+              <SettingsToggleRow
+                icon={<Droplets size={20} className="text-primary" />}
+                iconBg={iconBackground}
+                label={t(language, "settings.paperTexture")}
+                description={t(
+                  language,
+                  highContrast || reduceTransparency ? "settings.paperTextureSuppressed" : "settings.paperTextureHint",
+                )}
+                checked={paperTexture}
+                onChange={() => onPaperTextureChange(!paperTexture)}
+              />
+            )}
             {onHomeMaterialChange && (
               <>
                 <SettingsToggleRow
@@ -149,7 +166,7 @@ export function AppearancePanel({
                   }
                 />
                 <div className="px-4 pb-3 pt-1">
-                  <div className="rounded-2xl bg-muted/40 p-3 border border-border/40">
+                  <div className="paper-surface rounded-2xl bg-muted/40 p-3 border border-border/40">
                     <div className="mb-2 flex items-center justify-between text-xs font-semibold text-muted-foreground">
                       <span>{t(language, "settings.homeMaterial")}</span>
                       <span className="text-micro font-medium">

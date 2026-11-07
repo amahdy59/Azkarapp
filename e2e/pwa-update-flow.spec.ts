@@ -63,7 +63,7 @@ function buildRelease(relativeDirectory: string, release: string) {
   try {
     execFileSync(process.execPath, [VITE_CLI, "build", "--outDir", relativeDirectory, "--emptyOutDir"], {
       stdio: "pipe",
-      env: { ...process.env, AZKAR_RELEASE_OVERRIDE: release },
+      env: { ...process.env, AZKAR_RELEASE_OVERRIDE: release, VITE_CLOUDFLARE_API_URL: `${origin}/__browser-test-api` },
     });
   } catch (error) {
     const detail = error as { stderr?: Buffer; stdout?: Buffer };
@@ -80,10 +80,16 @@ function buildRelease(relativeDirectory: string, release: string) {
 /** Serves whichever directory `served` points at — flipping it is the deploy. */
 let served = join(ROOT, "v1");
 let server: Server | undefined;
+let delayedUpdateScript = false;
 
 function startServer() {
   server = createServer((request, response) => {
     const requested = decodeURIComponent((request.url ?? "/").split("?")[0]!);
+    if (requested.startsWith("/__browser-test-api/")) {
+      response.writeHead(503, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+      response.end(JSON.stringify({ error: "Browser-test backend is unavailable" }));
+      return;
+    }
     const candidate = normalize(join(served, requested === "/" ? "index.html" : requested));
     // Never serve outside the directory being published.
     const file = candidate.startsWith(served + sep) || candidate === served ? candidate : join(served, "index.html");
@@ -113,7 +119,12 @@ function startServer() {
       "Content-Type": TYPES[extname(target)] ?? "application/octet-stream",
       "Cache-Control": "no-store",
     });
-    createReadStream(target).pipe(response);
+    if (served === join(ROOT, "v2") && target.endsWith(`${sep}sw.js`) && !delayedUpdateScript) {
+      delayedUpdateScript = true;
+      // A mobile update may spend more than the former 15s allowance just
+      // downloading its worker. One click must still finish the real handover.
+      setTimeout(() => createReadStream(target).pipe(response), 20_000);
+    } else createReadStream(target).pipe(response);
   });
   return new Promise<void>((done, reject) => {
     server!.once("error", reject);
@@ -136,10 +147,10 @@ test.beforeAll(async () => {
   test.setTimeout(600_000);
   removeOwnedBuilds();
   mkdirSync(ROOT, { recursive: true });
+  await startServer();
   buildRelease(`${ROOT_RELATIVE}/v1`, OLD_RELEASE);
   buildRelease(`${ROOT_RELATIVE}/v2`, NEW_RELEASE);
   served = join(ROOT, "v1");
-  await startServer();
 });
 
 test.afterAll(async () => {
@@ -164,7 +175,11 @@ async function openApp(page: import("@playwright/test").Page) {
      flow exists so the reader chooses the moment. So: wait for it to be active,
      then reload into it. This is the real second visit, which is the first one
      an update can ever be offered on. */
-  await page.evaluate(() => navigator.serviceWorker.ready.then(() => undefined));
+  await expect
+    .poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistration())?.active?.state), {
+      timeout: 60_000,
+    })
+    .toBe("activated");
   await page.reload();
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null, undefined, { timeout: 60_000 });
 }
@@ -172,7 +187,7 @@ async function openApp(page: import("@playwright/test").Page) {
 const notice = (page: import("@playwright/test").Page) =>
   page.getByRole("complementary", { name: "An update is ready" });
 
-test("a published build replaces the running one when the reader asks for it", async ({ page }) => {
+test("one request replaces the running build even when its worker download exceeds 15 seconds", async ({ page }) => {
   test.setTimeout(300_000);
 
   await openApp(page);
@@ -183,7 +198,25 @@ test("a published build replaces the running one when the reader asks for it", a
   served = join(ROOT, "v2");
 
   await page.reload();
-  await expect(notice(page)).toBeVisible({ timeout: 30_000 });
+  const preparing = page.getByRole("complementary", { name: "An update is available" });
+  await expect(preparing).toBeVisible({ timeout: 30_000 });
+  await expect(preparing.getByRole("button", { name: "Preparing update…", exact: true })).toBeDisabled();
+  await preparing.getByRole("button", { name: "Later", exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration())?.waiting)), {
+      timeout: 60_000,
+    })
+    .toBe(true);
+  // Downloading did not activate the waiting worker or override Later.
+  await expect(notice(page)).toBeHidden();
+  expect(await page.evaluate(() => sessionStorage.getItem("azkarapp.update-attempted-for"))).toBeNull();
+  await page.evaluate(() => {
+    location.hash = "/settings";
+  });
+  await page.getByRole("button", { name: "About & Help", exact: true }).click();
+  await page.getByRole("button", { name: "Review available update", exact: true }).click();
+  await expect(notice(page)).toBeVisible();
+  await expect(page.getByText(OLD_RELEASE, { exact: false })).toBeVisible();
 
   /* Chunks the old document may still ask for. Publishing deleted them, so a
      404 here is the symptom of the page being left running after its worker
@@ -201,6 +234,8 @@ test("a published build replaces the running one when the reader asks for it", a
      notice cannot come back, because the running release now matches the
      deployed one. */
   await expect(notice(page)).toBeHidden({ timeout: 120_000 });
+  expect(delayedUpdateScript).toBe(true);
+  await expect(page.getByText(NEW_RELEASE, { exact: false })).toBeVisible({ timeout: 30_000 });
 
   /* Cleared deliberately. Some 404s during the changeover are inherent to any
      deployment: publishing deletes the old hashed chunks, and a document still

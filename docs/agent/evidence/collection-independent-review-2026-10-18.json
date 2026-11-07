@@ -7,10 +7,23 @@
     "sourceAttributionsSupported": 12,
     "specificContentCorrections": 8
   },
+  "snapshotMigration": "On 2026-11-06 the startup split moved the collection into azkarCore.ts and separated Al-Baqarah metadata from its reading data. All 208 complete reviewed records, their labels and the Ruqyah reader order matched the previous release, 4f5b5e1d. The prior azkar.ts digest was 93ad65116de5fe44b422c3f68fd622c59c00098ef81e7c42f7c1af894933c384.",
   "snapshots": [
     {
       "file": "src/app/content/azkar.ts",
-      "sha256": "93ad65116de5fe44b422c3f68fd622c59c00098ef81e7c42f7c1af894933c384"
+      "sha256": "54c8b3ccf4fa33d2c34af06423d64a3d6b5a68c84a6089a48126f15ce269fc6b"
+    },
+    {
+      "file": "src/app/content/azkarCore.ts",
+      "sha256": "226dca8b4f23510374ff8a7a1793b0c06ca5f9ebad6b4267ed4c5278949ba1ae"
+    },
+    {
+      "file": "src/app/content/baqarahMetadata.ts",
+      "sha256": "7bfccc05284c999f24eacb66ec54e97774f06039f9674ba726d568f55812aafa"
+    },
+    {
+      "file": "src/app/content/baqarahSurah.ts",
+      "sha256": "de317ec2cbf4b2cbf486d6c41bf81c13c283e1f50c0a2fe21c1d3d9bd4904ce1"
     },
     {
       "file": "src/app/content/contentReview.ts",

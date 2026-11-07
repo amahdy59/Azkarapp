@@ -116,7 +116,13 @@ export async function transferAudio(
       );
     } catch (error) {
       options.signal?.throwIfAborted();
-      const failure = error instanceof AudioDownloadError ? error : new AudioDownloadError("network", variant.id);
+      const failure =
+        error instanceof AudioDownloadError
+          ? error
+          : new AudioDownloadError(
+              error instanceof DOMException && error.name === "DataError" ? "integrity" : "network",
+              variant.id,
+            );
       const retryable =
         failure.code === "network" ||
         (failure.code === "server" && (failure.status === 429 || (failure.status ?? 0) >= 500));

@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 import { expect, test } from "@playwright/test";
 
 for (const width of [390, 1440]) {
@@ -30,8 +31,11 @@ for (const width of [390, 1440]) {
     await expect(page.getByTestId("time-of-day-scene-window").locator("img")).toHaveCount(0);
     const samples = [];
     for (const tab of ["home", "azkar", "progress", "settings"] as const) {
-      await page.getByTestId(`nav-${tab}`).click();
-      await expect(page.getByTestId(`nav-${tab}`)).toHaveAttribute("aria-current", "page");
+      if (tab === "progress") await openProgress(page);
+      else {
+        await page.getByTestId(`nav-${tab}`).click();
+        await expect(page.getByTestId(`nav-${tab}`)).toHaveAttribute("aria-current", "page");
+      }
       if (tab === "home") await expect(page.getByTestId("home-tool-masbaha")).toBeAttached();
       if (tab === "azkar") await expect(page.getByTestId("category-card-morning")).toBeVisible();
       if (tab === "progress") await expect(page.getByTestId("progress-sticky-controls")).toBeVisible();
@@ -100,7 +104,7 @@ for (const width of [390, 1440]) {
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
     const observations = [];
     for (const route of ["home", "azkar", "progress", "settings"]) {
-      await page.goto("/#/" + route);
+      await page.goto("/#/" + (route === "progress" ? "progress/day" : route));
       if (route === "progress") {
         // The focused overview now fits on desktop. Inspect real optional
         // prayer details to exercise scrolling without inventing tall content.
@@ -118,8 +122,14 @@ for (const width of [390, 1440]) {
         .toBe(true);
       await page.evaluate(() => document.fonts.ready);
       const viewport = page.locator(".app-main-view");
-      await viewport.evaluate((root) => {
-        const region = [root, ...root.querySelectorAll<HTMLElement>("*")]
+      if (route === "azkar") await expect(page.getByTestId("category-card-morning")).toBeVisible();
+      await viewport.evaluate((root, route) => {
+        // The library's stationary header and horizontal rails are not its scroll owner.
+        const candidates =
+          route === "azkar"
+            ? [...root.querySelectorAll<HTMLElement>('[data-testid="library-content-scroll"]')]
+            : [root, ...root.querySelectorAll<HTMLElement>("*")];
+        const region = candidates
           .filter(
             (node) =>
               /auto|scroll/.test(getComputedStyle(node).overflowY) && node.scrollHeight > node.clientHeight + 100,
@@ -129,7 +139,7 @@ for (const width of [390, 1440]) {
           region.scrollTop = 0;
           region.setAttribute("data-glass-scroll-probe", "true");
         }
-      });
+      }, route);
       const region = page.locator('[data-glass-scroll-probe="true"]');
       await expect(region).toHaveCount(1);
       const trace = await page.evaluateHandle(() => {
@@ -164,7 +174,9 @@ for (const width of [390, 1440]) {
       await region.hover();
       const before = await region.evaluate((node) => node.scrollTop);
       await page.mouse.wheel(0, 180);
-      await expect.poll(() => region.evaluate((node) => node.scrollTop)).toBeGreaterThan(before + 50);
+      await expect
+        .poll(() => region.evaluate((node) => node.scrollTop), { message: `Wheel must scroll ${route}` })
+        .toBeGreaterThan(before + 50);
       const firstWheelTop = await region.evaluate((node) => node.scrollTop);
       await page.mouse.wheel(0, 180);
       // Short records can reach their native end on the first wheel. Require

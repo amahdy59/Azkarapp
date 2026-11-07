@@ -76,16 +76,24 @@ for (const language of ["ar", "en"] as const) {
       await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
       await expect.poll(activeHandoffAnimations).toBe(0);
       expect(await page.getByTestId("home-all-prayers-row").evaluate((node) => node.scrollLeft)).toBe(horizontal);
-      await assertInsets();
-      const compact = (await label.boundingBox())!;
-      // The owner now explicitly wants smaller icon/padding geometry. Keep
-      // the title's reading edge and type stable through that deliberate shift.
-      expect(compact.x + compact.width).toBeCloseTo(original.x + original.width, 0);
-      expect(compact.height).toBeCloseTo(original.height, 0);
-      await expect(label).toHaveCSS("font-size", "14px");
-      expect((await next.boundingBox())!.height).toBeLessThan(expandedHeight);
-      await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
-      expect((await next.locator("[data-prayer-timing] p").boundingBox())!.height).toBeCloseTo(originalTime!.height, 0);
+      if (width < 768) {
+        await expect(page.getByTestId("home-prayer-strip")).toHaveAttribute("inert", "");
+        await expect(page.getByTestId("home-compact-prayer")).toBeInViewport();
+      } else {
+        await assertInsets();
+        const compact = (await label.boundingBox())!;
+        // The owner now explicitly wants smaller icon/padding geometry. Keep
+        // the title's reading edge and type stable through that deliberate shift.
+        expect(compact.x + compact.width).toBeCloseTo(original.x + original.width, 0);
+        expect(compact.height).toBeCloseTo(original.height, 0);
+        await expect(label).toHaveCSS("font-size", "14px");
+        expect((await next.boundingBox())!.height).toBeLessThan(expandedHeight);
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
+        expect((await next.locator("[data-prayer-timing] p").boundingBox())!.height).toBeCloseTo(
+          originalTime!.height,
+          0,
+        );
+      }
       expect((await grid.boundingBox())!.y + (await scroll.evaluate((node) => node.scrollTop))).toBeCloseTo(
         contentBefore,
         0,
@@ -106,7 +114,12 @@ for (const language of ["ar", "en"] as const) {
       await scroll.evaluate((element) => (element.scrollTop = 0));
       await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
       await expect(next.locator("progress")).toHaveCount(0);
-      await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
+      if (width < 768) {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
+        await expect(next.locator(".home-prayer-countdown-text")).toHaveCount(1);
+      } else {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
+      }
       const footer = page.getByTestId("home-visitor-footer");
       await footer.scrollIntoViewIfNeeded();
       await expect(footer).toBeInViewport();
@@ -115,7 +128,10 @@ for (const language of ["ar", "en"] as const) {
         (await new AxeBuilder({ page }).include('[data-testid="home-sticky-prayers"]').analyze()).violations,
       ).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      const currentButton = sticky.locator('[data-prayer-state="current"] button');
+      const currentButton =
+        width < 768
+          ? page.getByTestId("home-compact-prayer").getByRole("button")
+          : sticky.locator('[data-prayer-state="current"] button');
       await currentButton.focus();
       await scroll.evaluate((node) => (node.scrollTop = 0));
       await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");

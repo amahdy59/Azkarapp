@@ -29,8 +29,8 @@ for (const language of ["ar", "en"] as const) {
       document.documentElement.style.fontSize = "200%";
     });
     await indexButton.click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toHaveCSS("background-color", "rgb(15, 23, 42)");
+    const dialog = page.getByTestId("mushaf-index-inline");
+    await expect(dialog).toHaveCSS("background-color", "rgb(16, 27, 58)");
     const panel = dialog.getByRole("tabpanel");
     for (const label of [dialog.getByRole("heading"), ...(await dialog.getByRole("tab").all())]) {
       expect(await label.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);

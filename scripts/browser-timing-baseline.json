@@ -1,1777 +1,2377 @@
 {
-  "commit": "e84435b0404c58b454eecdb0d76212290a1d2971",
-  "run": 39146690337,
-  "tests": 2098,
+  "commit": "4b6203165d99dd07bd4929a50e7ccd720389e10f",
+  "run": 41335950799,
+  "tests": 2675,
   "files": [
     {
       "project": "desktop-chromium",
       "file": "accessibility-new-surfaces.spec.ts",
       "tests": 4,
-      "durationMs": 37276
+      "durationMs": 35073
     },
     {
       "project": "desktop-chromium",
       "file": "accessibility.spec.ts",
       "tests": 18,
-      "durationMs": 111099
+      "durationMs": 131721
     },
     {
       "project": "desktop-chromium",
       "file": "after-prayer-arrangement.spec.ts",
       "tests": 2,
-      "durationMs": 12327
+      "durationMs": 14149
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "android-reliability.spec.ts",
+      "tests": 7,
+      "durationMs": 36155
     },
     {
       "project": "desktop-chromium",
       "file": "app-materials.spec.ts",
       "tests": 4,
-      "durationMs": 51815
+      "durationMs": 61940
     },
     {
       "project": "desktop-chromium",
       "file": "audio-control-lock.spec.ts",
       "tests": 3,
-      "durationMs": 21880
+      "durationMs": 26869
     },
     {
       "project": "desktop-chromium",
       "file": "audio-download-recovery.spec.ts",
       "tests": 2,
-      "durationMs": 15308
+      "durationMs": 16325
     },
     {
       "project": "desktop-chromium",
       "file": "audio-expanded-layout.spec.ts",
       "tests": 10,
-      "durationMs": 171173
+      "durationMs": 152350
     },
     {
       "project": "desktop-chromium",
       "file": "audio-file-export.spec.ts",
       "tests": 2,
-      "durationMs": 12950
+      "durationMs": 12039
     },
     {
       "project": "desktop-chromium",
       "file": "audio-integrity.spec.ts",
       "tests": 13,
-      "durationMs": 81914
+      "durationMs": 89565
     },
     {
       "project": "desktop-chromium",
       "file": "audio-surah-stream.spec.ts",
       "tests": 18,
-      "durationMs": 382653
+      "durationMs": 399115
     },
     {
       "project": "desktop-chromium",
       "file": "audio.spec.ts",
       "tests": 13,
-      "durationMs": 186725
+      "durationMs": 210295
     },
     {
       "project": "desktop-chromium",
       "file": "audit-remediation.spec.ts",
       "tests": 4,
-      "durationMs": 8522
+      "durationMs": 9285
     },
     {
       "project": "desktop-chromium",
       "file": "ayah-image-sharing.spec.ts",
       "tests": 4,
-      "durationMs": 77093
+      "durationMs": 99145
     },
     {
       "project": "desktop-chromium",
       "file": "ayah-sharing-offline.spec.ts",
       "tests": 1,
-      "durationMs": 12920
+      "durationMs": 11004
     },
     {
       "project": "desktop-chromium",
       "file": "backend-isolation.spec.ts",
       "tests": 1,
-      "durationMs": 1082
+      "durationMs": 1492
     },
     {
       "project": "desktop-chromium",
       "file": "card-frost-reference.spec.ts",
       "tests": 2,
-      "durationMs": 29401
+      "durationMs": 26139
     },
     {
       "project": "desktop-chromium",
       "file": "chrome-material-parity.spec.ts",
       "tests": 2,
-      "durationMs": 14892
+      "durationMs": 17461
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "compact-icon-feedback.spec.ts",
+      "tests": 2,
+      "durationMs": 9223
     },
     {
       "project": "desktop-chromium",
       "file": "compact-prayer.spec.ts",
       "tests": 32,
-      "durationMs": 247573
+      "durationMs": 222098
     },
     {
       "project": "desktop-chromium",
       "file": "compact-reading-headers.spec.ts",
       "tests": 8,
-      "durationMs": 40197
+      "durationMs": 36766
     },
     {
       "project": "desktop-chromium",
       "file": "contextual-reminder-plan.spec.ts",
       "tests": 6,
-      "durationMs": 52932
+      "durationMs": 50307
     },
     {
       "project": "desktop-chromium",
       "file": "control-alignment.spec.ts",
       "tests": 2,
-      "durationMs": 16624
+      "durationMs": 14270
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "control-feedback-sharing.spec.ts",
+      "tests": 4,
+      "durationMs": 25936
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "counter-accessibility.spec.ts",
+      "tests": 7,
+      "durationMs": 45948
     },
     {
       "project": "desktop-chromium",
       "file": "counter-feedback.spec.ts",
       "tests": 11,
-      "durationMs": 57530
+      "durationMs": 53564
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "counter-footer-pickers.spec.ts",
+      "tests": 4,
+      "durationMs": 32398
     },
     {
       "project": "desktop-chromium",
       "file": "counter-numeral-direction.spec.ts",
       "tests": 2,
-      "durationMs": 6089
+      "durationMs": 5613
     },
     {
       "project": "desktop-chromium",
       "file": "devotional-footer.spec.ts",
       "tests": 22,
-      "durationMs": 100465
+      "durationMs": 108298
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "dropdown-protection.spec.ts",
+      "tests": 19,
+      "durationMs": 165604
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "first-use-calm-controls.spec.ts",
+      "tests": 7,
+      "durationMs": 62851
     },
     {
       "project": "desktop-chromium",
       "file": "glass-refinement.spec.ts",
       "tests": 10,
-      "durationMs": 64874
+      "durationMs": 82477
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "header-frost-fallback.spec.ts",
+      "tests": 2,
+      "durationMs": 3999
     },
     {
       "project": "desktop-chromium",
       "file": "home-card-refinements.spec.ts",
       "tests": 4,
-      "durationMs": 9885
+      "durationMs": 12827
     },
     {
       "project": "desktop-chromium",
       "file": "home-clarity.spec.ts",
       "tests": 24,
-      "durationMs": 161143
+      "durationMs": 182093
     },
     {
       "project": "desktop-chromium",
       "file": "home-glass-material.spec.ts",
       "tests": 29,
-      "durationMs": 187273
+      "durationMs": 218851
     },
     {
       "project": "desktop-chromium",
       "file": "home-glass-parity.spec.ts",
       "tests": 12,
-      "durationMs": 157171
+      "durationMs": 163772
     },
     {
       "project": "desktop-chromium",
       "file": "home-image-loading.spec.ts",
       "tests": 3,
-      "durationMs": 8258
+      "durationMs": 8399
     },
     {
       "project": "desktop-chromium",
       "file": "home-prayer-moment.spec.ts",
       "tests": 13,
-      "durationMs": 49322
+      "durationMs": 50130
     },
     {
       "project": "desktop-chromium",
       "file": "home-prayer-motion.spec.ts",
       "tests": 2,
-      "durationMs": 15215
+      "durationMs": 17667
     },
     {
       "project": "desktop-chromium",
       "file": "home-prayer-scroll.spec.ts",
       "tests": 4,
-      "durationMs": 29553
+      "durationMs": 45574
     },
     {
       "project": "desktop-chromium",
       "file": "home-quick-share.spec.ts",
       "tests": 10,
-      "durationMs": 55914
+      "durationMs": 47975
     },
     {
       "project": "desktop-chromium",
       "file": "home-routine-actions.spec.ts",
       "tests": 14,
-      "durationMs": 69530
+      "durationMs": 64970
     },
     {
       "project": "desktop-chromium",
       "file": "home-scroll-material.spec.ts",
       "tests": 1,
-      "durationMs": 6395
+      "durationMs": 9802
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "home-time-actions.spec.ts",
+      "tests": 14,
+      "durationMs": 71153
     },
     {
       "project": "desktop-chromium",
       "file": "image-first-sharing.spec.ts",
       "tests": 4,
-      "durationMs": 22639
+      "durationMs": 24673
     },
     {
       "project": "desktop-chromium",
       "file": "independent-appearance.spec.ts",
       "tests": 4,
-      "durationMs": 70270
+      "durationMs": 66458
     },
     {
       "project": "desktop-chromium",
       "file": "keyboard.spec.ts",
       "tests": 5,
-      "durationMs": 24424
+      "durationMs": 30177
     },
     {
       "project": "desktop-chromium",
       "file": "khatmah-reader.spec.ts",
       "tests": 11,
-      "durationMs": 97416
+      "durationMs": 103352
     },
     {
       "project": "desktop-chromium",
       "file": "legal-pages.spec.ts",
       "tests": 5,
-      "durationMs": 127
+      "durationMs": 108
     },
     {
       "project": "desktop-chromium",
       "file": "long-session-reliability.spec.ts",
       "tests": 1,
-      "durationMs": 9660
+      "durationMs": 11536
     },
     {
       "project": "desktop-chromium",
       "file": "manual-checklist.spec.ts",
       "tests": 28,
-      "durationMs": 126376
+      "durationMs": 111698
     },
     {
       "project": "desktop-chromium",
       "file": "mobile-pinch-behavior.spec.ts",
       "tests": 1,
-      "durationMs": 4901
+      "durationMs": 3910
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "mobile-sharing-filters.spec.ts",
+      "tests": 4,
+      "durationMs": 50240
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "motion-control-polish.spec.ts",
+      "tests": 4,
+      "durationMs": 30930
     },
     {
       "project": "desktop-chromium",
       "file": "mushaf-baqarah-audio.spec.ts",
       "tests": 1,
-      "durationMs": 12616
+      "durationMs": 12997
     },
     {
       "project": "desktop-chromium",
       "file": "mushaf-fallback.spec.ts",
       "tests": 4,
-      "durationMs": 32054
+      "durationMs": 28801
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "mushaf-glass-clarity.spec.ts",
+      "tests": 2,
+      "durationMs": 22413
     },
     {
       "project": "desktop-chromium",
       "file": "mushaf-immersive.spec.ts",
       "tests": 7,
-      "durationMs": 74957
+      "durationMs": 75881
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "mushaf-interaction-refinements.spec.ts",
+      "tests": 7,
+      "durationMs": 52601
     },
     {
       "project": "desktop-chromium",
       "file": "mushaf-magnification.spec.ts",
       "tests": 4,
-      "durationMs": 75369
+      "durationMs": 79170
     },
     {
       "project": "desktop-chromium",
       "file": "mushaf-mobile-translation-mode.spec.ts",
       "tests": 1,
-      "durationMs": 8944
+      "durationMs": 9512
     },
     {
       "project": "desktop-chromium",
       "file": "mushaf-opening-readability.spec.ts",
       "tests": 2,
-      "durationMs": 21605
+      "durationMs": 23065
     },
     {
       "project": "desktop-chromium",
       "file": "mushaf-overlay.spec.ts",
       "tests": 2,
-      "durationMs": 10432
+      "durationMs": 10269
     },
     {
       "project": "desktop-chromium",
       "file": "narrow-layout.spec.ts",
       "tests": 3,
-      "durationMs": 19544
+      "durationMs": 17839
     },
     {
       "project": "desktop-chromium",
       "file": "navigation.spec.ts",
       "tests": 12,
-      "durationMs": 68095
+      "durationMs": 65658
     },
     {
       "project": "desktop-chromium",
       "file": "offline-core.spec.ts",
       "tests": 1,
-      "durationMs": 12670
+      "durationMs": 10982
     },
     {
       "project": "desktop-chromium",
       "file": "offline-downloads.spec.ts",
-      "tests": 6,
-      "durationMs": 47368
+      "tests": 8,
+      "durationMs": 51895
     },
     {
       "project": "desktop-chromium",
       "file": "overlay-geometry.spec.ts",
       "tests": 5,
-      "durationMs": 21713
+      "durationMs": 21194
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "page-layout-consistency.spec.ts",
+      "tests": 11,
+      "durationMs": 68055
     },
     {
       "project": "desktop-chromium",
       "file": "player-containment-benefits.spec.ts",
       "tests": 3,
-      "durationMs": 141581
+      "durationMs": 138213
     },
     {
       "project": "desktop-chromium",
       "file": "practical-devotional-access.spec.ts",
       "tests": 23,
-      "durationMs": 81846
+      "durationMs": 91148
     },
     {
       "project": "desktop-chromium",
       "file": "prayer-actions-responsive.spec.ts",
       "tests": 12,
-      "durationMs": 126943
+      "durationMs": 144893
     },
     {
       "project": "desktop-chromium",
       "file": "prayer-glass-hierarchy.spec.ts",
       "tests": 7,
-      "durationMs": 54035
+      "durationMs": 60988
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "prayer-scroll-padding.spec.ts",
+      "tests": 2,
+      "durationMs": 7036
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "prayer-seconds.spec.ts",
+      "tests": 8,
+      "durationMs": 48356
     },
     {
       "project": "desktop-chromium",
       "file": "prayer-selection-connection.spec.ts",
       "tests": 8,
-      "durationMs": 44906
+      "durationMs": 51600
     },
     {
       "project": "desktop-chromium",
       "file": "prayer-tracking.spec.ts",
       "tests": 4,
-      "durationMs": 21058
+      "durationMs": 21875
     },
     {
       "project": "desktop-chromium",
       "file": "pre-phase-nine.spec.ts",
-      "tests": 8,
-      "durationMs": 49482
+      "tests": 9,
+      "durationMs": 47877
     },
     {
       "project": "desktop-chromium",
       "file": "product-images.spec.ts",
       "tests": 3,
-      "durationMs": 13310
+      "durationMs": 15071
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "progress-card-design.spec.ts",
+      "tests": 8,
+      "durationMs": 109726
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "progress-dashboard.spec.ts",
+      "tests": 16,
+      "durationMs": 150746
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "progress-heatmap.spec.ts",
+      "tests": 3,
+      "durationMs": 28067
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "progress-internal-header.spec.ts",
+      "tests": 4,
+      "durationMs": 13917
     },
     {
       "project": "desktop-chromium",
       "file": "progress-readonly-statistics.spec.ts",
       "tests": 6,
-      "durationMs": 29873
+      "durationMs": 36057
     },
     {
       "project": "desktop-chromium",
       "file": "progress-responsive.spec.ts",
       "tests": 5,
-      "durationMs": 11253
+      "durationMs": 23418
     },
     {
       "project": "desktop-chromium",
       "file": "progress-trends.spec.ts",
       "tests": 13,
-      "durationMs": 85324
+      "durationMs": 132937
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "progress-vnext.spec.ts",
+      "tests": 6,
+      "durationMs": 50897
     },
     {
       "project": "desktop-chromium",
       "file": "progress-zikr-history.spec.ts",
       "tests": 2,
-      "durationMs": 9582
+      "durationMs": 11521
     },
     {
       "project": "desktop-chromium",
       "file": "pwa-update-flow.spec.ts",
       "tests": 2,
-      "durationMs": 15507
+      "durationMs": 33585
     },
     {
       "project": "desktop-chromium",
       "file": "pwa-update.spec.ts",
       "tests": 2,
-      "durationMs": 5768
+      "durationMs": 5102
     },
     {
       "project": "desktop-chromium",
       "file": "quiet-garden.spec.ts",
       "tests": 9,
-      "durationMs": 39677
+      "durationMs": 63005
     },
     {
       "project": "desktop-chromium",
       "file": "quran-listening.spec.ts",
       "tests": 6,
-      "durationMs": 57655
+      "durationMs": 64066
     },
     {
       "project": "desktop-chromium",
       "file": "quran-snippet-typography.spec.ts",
       "tests": 12,
-      "durationMs": 86990
+      "durationMs": 70218
     },
     {
       "project": "desktop-chromium",
       "file": "quran-translation-layout.spec.ts",
       "tests": 14,
-      "durationMs": 147547
+      "durationMs": 136957
     },
     {
       "project": "desktop-chromium",
       "file": "quran-translation.spec.ts",
       "tests": 6,
-      "durationMs": 126890
+      "durationMs": 100713
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "quran-wird-plan-form.spec.ts",
+      "tests": 4,
+      "durationMs": 48032
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "quran-wird-responsive.spec.ts",
+      "tests": 2,
+      "durationMs": 10660
     },
     {
       "project": "desktop-chromium",
       "file": "quran-word-layout.spec.ts",
       "tests": 28,
-      "durationMs": 199456
+      "durationMs": 210722
     },
     {
       "project": "desktop-chromium",
       "file": "reader-benefits.spec.ts",
       "tests": 16,
-      "durationMs": 88680
+      "durationMs": 134053
     },
     {
       "project": "desktop-chromium",
       "file": "reader-collection-panel.spec.ts",
       "tests": 4,
-      "durationMs": 34585
+      "durationMs": 33428
     },
     {
       "project": "desktop-chromium",
       "file": "reader-control-consistency.spec.ts",
       "tests": 18,
-      "durationMs": 83629
+      "durationMs": 82536
     },
     {
       "project": "desktop-chromium",
       "file": "reader-guidance-layout.spec.ts",
       "tests": 2,
-      "durationMs": 23978
+      "durationMs": 17886
     },
     {
       "project": "desktop-chromium",
       "file": "reader-header-refinement.spec.ts",
       "tests": 4,
-      "durationMs": 41476
+      "durationMs": 29273
     },
     {
       "project": "desktop-chromium",
       "file": "reader-microinteractions.spec.ts",
       "tests": 31,
-      "durationMs": 184445
+      "durationMs": 201777
     },
     {
       "project": "desktop-chromium",
       "file": "reader-mushaf-lettering.spec.ts",
       "tests": 12,
-      "durationMs": 103891
+      "durationMs": 107083
     },
     {
       "project": "desktop-chromium",
       "file": "reader-options.spec.ts",
       "tests": 8,
-      "durationMs": 54230
+      "durationMs": 58206
     },
     {
       "project": "desktop-chromium",
       "file": "reader-quran-refinement.spec.ts",
       "tests": 9,
-      "durationMs": 55303
+      "durationMs": 59747
     },
     {
       "project": "desktop-chromium",
       "file": "reader-scene.spec.ts",
       "tests": 14,
-      "durationMs": 125779
+      "durationMs": 103327
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "reading-preference-polish.spec.ts",
+      "tests": 8,
+      "durationMs": 38034
     },
     {
       "project": "desktop-chromium",
       "file": "reading-progress-thickness.spec.ts",
       "tests": 2,
-      "durationMs": 6324
+      "durationMs": 7215
     },
     {
       "project": "desktop-chromium",
       "file": "reading-reliability.spec.ts",
       "tests": 6,
-      "durationMs": 33023
+      "durationMs": 36035
     },
     {
       "project": "desktop-chromium",
       "file": "reduce-transparency.spec.ts",
       "tests": 3,
-      "durationMs": 12332
+      "durationMs": 14052
     },
     {
       "project": "desktop-chromium",
       "file": "release-history.spec.ts",
       "tests": 2,
-      "durationMs": 20314
+      "durationMs": 21485
     },
     {
       "project": "desktop-chromium",
       "file": "relevant-now.spec.ts",
       "tests": 4,
-      "durationMs": 15871
+      "durationMs": 15935
     },
     {
       "project": "desktop-chromium",
       "file": "reliance-mushaf.spec.ts",
       "tests": 2,
-      "durationMs": 9572
+      "durationMs": 6176
     },
     {
       "project": "desktop-chromium",
       "file": "reminder-reliability.spec.ts",
       "tests": 2,
-      "durationMs": 11387
+      "durationMs": 8082
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "reminder-responsive.spec.ts",
+      "tests": 11,
+      "durationMs": 113611
     },
     {
       "project": "desktop-chromium",
       "file": "responsive.spec.ts",
       "tests": 20,
-      "durationMs": 82424
+      "durationMs": 85463
     },
     {
       "project": "desktop-chromium",
       "file": "review-reliability.spec.ts",
       "tests": 7,
-      "durationMs": 24814
+      "durationMs": 23097
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "runtime-reliability.spec.ts",
+      "tests": 2,
+      "durationMs": 9893
     },
     {
       "project": "desktop-chromium",
       "file": "scroll-performance.spec.ts",
       "tests": 4,
-      "durationMs": 68057
+      "durationMs": 69806
     },
     {
       "project": "desktop-chromium",
       "file": "seamless-home-material.spec.ts",
       "tests": 6,
-      "durationMs": 30882
+      "durationMs": 30002
     },
     {
       "project": "desktop-chromium",
       "file": "search.spec.ts",
       "tests": 7,
-      "durationMs": 37528
+      "durationMs": 40977
     },
     {
       "project": "desktop-chromium",
       "file": "session-completion.spec.ts",
       "tests": 2,
-      "durationMs": 9781
+      "durationMs": 8095
     },
     {
       "project": "desktop-chromium",
       "file": "settings-experience.spec.ts",
       "tests": 10,
-      "durationMs": 80518
+      "durationMs": 75505
     },
     {
       "project": "desktop-chromium",
       "file": "settings-progress-clarity.spec.ts",
       "tests": 8,
-      "durationMs": 69495
+      "durationMs": 110231
     },
     {
       "project": "desktop-chromium",
       "file": "settings-simplification.spec.ts",
       "tests": 6,
-      "durationMs": 37973
+      "durationMs": 41792
     },
     {
       "project": "desktop-chromium",
       "file": "shared-interface-scene.spec.ts",
       "tests": 1,
-      "durationMs": 13071
+      "durationMs": 10081
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "sharing-arrows.spec.ts",
+      "tests": 4,
+      "durationMs": 34107
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "sharing-benefits-home.spec.ts",
+      "tests": 6,
+      "durationMs": 48305
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "sharing-board-layout.spec.ts",
+      "tests": 5,
+      "durationMs": 98425
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "sharing-caption.spec.ts",
+      "tests": 2,
+      "durationMs": 13808
     },
     {
       "project": "desktop-chromium",
       "file": "sharing-curated.spec.ts",
       "tests": 4,
-      "durationMs": 36201
+      "durationMs": 19617
     },
     {
       "project": "desktop-chromium",
       "file": "sharing-refinement.spec.ts",
       "tests": 16,
-      "durationMs": 186253
+      "durationMs": 151315
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "sharing-responsive-preview.spec.ts",
+      "tests": 8,
+      "durationMs": 75806
+    },
+    {
+      "project": "desktop-chromium",
+      "file": "sharing-steps.spec.ts",
+      "tests": 2,
+      "durationMs": 28735
     },
     {
       "project": "desktop-chromium",
       "file": "sharing-themes.spec.ts",
       "tests": 3,
-      "durationMs": 26621
+      "durationMs": 21921
     },
     {
       "project": "desktop-chromium",
       "file": "standalone-counter-footer.spec.ts",
       "tests": 8,
-      "durationMs": 33489
+      "durationMs": 30648
     },
     {
       "project": "desktop-chromium",
       "file": "startup-performance.spec.ts",
       "tests": 3,
-      "durationMs": 11496
+      "durationMs": 13069
     },
     {
       "project": "desktop-chromium",
       "file": "sticky-prayer-cards.spec.ts",
       "tests": 4,
-      "durationMs": 35294
+      "durationMs": 39580
     },
     {
       "project": "desktop-chromium",
       "file": "todays-path.spec.ts",
       "tests": 5,
-      "durationMs": 20169
+      "durationMs": 18671
     },
     {
       "project": "desktop-chromium",
       "file": "visual-coherence.spec.ts",
       "tests": 4,
-      "durationMs": 26838
+      "durationMs": 31805
     },
     {
       "project": "desktop-chromium",
       "file": "wird-evidence-sharing.spec.ts",
       "tests": 6,
-      "durationMs": 39612
+      "durationMs": 37997
     },
     {
       "project": "desktop-chromium",
       "file": "word-meanings.spec.ts",
-      "tests": 3,
-      "durationMs": 11632
+      "tests": 4,
+      "durationMs": 13767
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "after-prayer-arrangement.spec.ts",
       "tests": 2,
-      "durationMs": 16427
+      "durationMs": 18608
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "android-reliability.spec.ts",
+      "tests": 2,
+      "durationMs": 18270
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "app-materials.spec.ts",
       "tests": 4,
-      "durationMs": 59009
+      "durationMs": 69438
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audio-control-lock.spec.ts",
       "tests": 2,
-      "durationMs": 14664
+      "durationMs": 17820
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audio-download-recovery.spec.ts",
       "tests": 2,
-      "durationMs": 16930
+      "durationMs": 23123
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audio-expanded-layout.spec.ts",
       "tests": 3,
-      "durationMs": 45668
+      "durationMs": 54206
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audio-file-export.spec.ts",
       "tests": 2,
-      "durationMs": 12167
+      "durationMs": 13755
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audio-integrity.spec.ts",
       "tests": 13,
-      "durationMs": 76051
+      "durationMs": 85932
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audio-surah-stream.spec.ts",
       "tests": 18,
-      "durationMs": 248173
+      "durationMs": 295480
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audio.spec.ts",
       "tests": 4,
-      "durationMs": 27420
+      "durationMs": 32574
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "audit-remediation.spec.ts",
       "tests": 4,
-      "durationMs": 15365
+      "durationMs": 15364
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "ayah-image-sharing.spec.ts",
       "tests": 4,
-      "durationMs": 65495
+      "durationMs": 91068
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "card-frost-reference.spec.ts",
       "tests": 2,
-      "durationMs": 30367
+      "durationMs": 34623
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "chrome-material-parity.spec.ts",
       "tests": 2,
-      "durationMs": 12127
+      "durationMs": 16246
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "compact-icon-feedback.spec.ts",
+      "tests": 2,
+      "durationMs": 10872
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "compact-prayer.spec.ts",
       "tests": 32,
-      "durationMs": 296644
+      "durationMs": 318183
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "compact-reading-headers.spec.ts",
       "tests": 8,
-      "durationMs": 46470
+      "durationMs": 49348
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "contextual-reminder-plan.spec.ts",
       "tests": 6,
-      "durationMs": 56774
+      "durationMs": 66617
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "control-alignment.spec.ts",
       "tests": 2,
-      "durationMs": 16851
+      "durationMs": 20275
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "control-feedback-sharing.spec.ts",
+      "tests": 4,
+      "durationMs": 39991
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "counter-accessibility.spec.ts",
+      "tests": 2,
+      "durationMs": 20499
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "counter-footer-pickers.spec.ts",
+      "tests": 4,
+      "durationMs": 42297
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "counter-numeral-direction.spec.ts",
       "tests": 2,
-      "durationMs": 9788
+      "durationMs": 8802
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "devotional-footer.spec.ts",
       "tests": 18,
-      "durationMs": 106450
+      "durationMs": 120694
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "dropdown-protection.spec.ts",
+      "tests": 19,
+      "durationMs": 191564
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "first-use-calm-controls.spec.ts",
+      "tests": 7,
+      "durationMs": 97102
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "glass-refinement.spec.ts",
       "tests": 10,
-      "durationMs": 75544
+      "durationMs": 85671
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "header-frost-fallback.spec.ts",
+      "tests": 2,
+      "durationMs": 7723
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-card-refinements.spec.ts",
       "tests": 4,
-      "durationMs": 18546
+      "durationMs": 18500
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-clarity.spec.ts",
       "tests": 24,
-      "durationMs": 194826
+      "durationMs": 240265
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-glass-parity.spec.ts",
       "tests": 12,
-      "durationMs": 158421
+      "durationMs": 183919
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-image-loading.spec.ts",
       "tests": 3,
-      "durationMs": 8121
+      "durationMs": 9239
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-prayer-moment.spec.ts",
       "tests": 4,
-      "durationMs": 19633
+      "durationMs": 20490
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-prayer-motion.spec.ts",
       "tests": 2,
-      "durationMs": 14280
+      "durationMs": 20281
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-prayer-scroll.spec.ts",
       "tests": 4,
-      "durationMs": 43744
+      "durationMs": 63085
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-quick-share.spec.ts",
       "tests": 8,
-      "durationMs": 46996
+      "durationMs": 47920
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "home-routine-actions.spec.ts",
       "tests": 8,
-      "durationMs": 43324
+      "durationMs": 43565
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "home-time-actions.spec.ts",
+      "tests": 14,
+      "durationMs": 81142
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "image-first-sharing.spec.ts",
       "tests": 4,
-      "durationMs": 28481
+      "durationMs": 27149
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "independent-appearance.spec.ts",
       "tests": 4,
-      "durationMs": 83223
+      "durationMs": 88643
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "khatmah-reader.spec.ts",
       "tests": 2,
-      "durationMs": 19339
+      "durationMs": 21166
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "long-session-reliability.spec.ts",
       "tests": 1,
-      "durationMs": 15002
+      "durationMs": 14512
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "mobile-pinch-behavior.spec.ts",
       "tests": 1,
-      "durationMs": 4112
+      "durationMs": 5961
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "mobile-sharing-filters.spec.ts",
+      "tests": 4,
+      "durationMs": 57639
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "motion-control-polish.spec.ts",
+      "tests": 4,
+      "durationMs": 34026
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "mushaf-baqarah-audio.spec.ts",
       "tests": 1,
-      "durationMs": 5885
+      "durationMs": 8181
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "mushaf-fallback.spec.ts",
       "tests": 4,
-      "durationMs": 34622
+      "durationMs": 35379
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "mushaf-glass-clarity.spec.ts",
+      "tests": 2,
+      "durationMs": 25947
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "mushaf-interaction-refinements.spec.ts",
+      "tests": 7,
+      "durationMs": 57538
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "mushaf-magnification.spec.ts",
       "tests": 4,
-      "durationMs": 42638
+      "durationMs": 52898
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "mushaf-mobile-translation-mode.spec.ts",
       "tests": 1,
-      "durationMs": 11714
+      "durationMs": 11755
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "mushaf-opening-readability.spec.ts",
       "tests": 2,
-      "durationMs": 16208
+      "durationMs": 19765
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "mushaf-overlay.spec.ts",
       "tests": 2,
-      "durationMs": 11364
+      "durationMs": 12028
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "navigation.spec.ts",
       "tests": 6,
-      "durationMs": 40098
+      "durationMs": 41638
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "offline-downloads.spec.ts",
-      "tests": 6,
-      "durationMs": 50782
+      "tests": 8,
+      "durationMs": 80183
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "page-layout-consistency.spec.ts",
+      "tests": 11,
+      "durationMs": 78399
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "player-containment-benefits.spec.ts",
       "tests": 2,
-      "durationMs": 64391
+      "durationMs": 70166
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "practical-devotional-access.spec.ts",
       "tests": 11,
-      "durationMs": 61470
+      "durationMs": 83614
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "prayer-actions-responsive.spec.ts",
       "tests": 12,
-      "durationMs": 123959
+      "durationMs": 147569
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "prayer-glass-hierarchy.spec.ts",
       "tests": 7,
-      "durationMs": 53764
+      "durationMs": 48291
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "prayer-scroll-padding.spec.ts",
+      "tests": 2,
+      "durationMs": 7615
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "prayer-seconds.spec.ts",
+      "tests": 8,
+      "durationMs": 52954
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "prayer-selection-connection.spec.ts",
       "tests": 8,
-      "durationMs": 45674
+      "durationMs": 52818
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "pre-phase-nine.spec.ts",
+      "tests": 1,
+      "durationMs": 7389
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "progress-card-design.spec.ts",
+      "tests": 8,
+      "durationMs": 162548
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "progress-dashboard.spec.ts",
+      "tests": 16,
+      "durationMs": 159749
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "progress-heatmap.spec.ts",
+      "tests": 3,
+      "durationMs": 44464
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "progress-internal-header.spec.ts",
+      "tests": 4,
+      "durationMs": 16831
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "progress-readonly-statistics.spec.ts",
       "tests": 6,
-      "durationMs": 34340
+      "durationMs": 53787
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "progress-trends.spec.ts",
       "tests": 12,
-      "durationMs": 90293
+      "durationMs": 155736
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "progress-vnext.spec.ts",
+      "tests": 6,
+      "durationMs": 56228
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "progress-zikr-history.spec.ts",
       "tests": 1,
-      "durationMs": 3912
+      "durationMs": 5036
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "quran-listening.spec.ts",
       "tests": 6,
-      "durationMs": 61183
+      "durationMs": 68557
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "quran-snippet-typography.spec.ts",
       "tests": 12,
-      "durationMs": 83411
+      "durationMs": 94794
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "quran-translation-layout.spec.ts",
       "tests": 14,
-      "durationMs": 121843
+      "durationMs": 128097
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "quran-translation.spec.ts",
       "tests": 6,
-      "durationMs": 72136
+      "durationMs": 79200
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "quran-wird-plan-form.spec.ts",
+      "tests": 4,
+      "durationMs": 54436
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "quran-wird-responsive.spec.ts",
+      "tests": 2,
+      "durationMs": 13001
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "quran-word-layout.spec.ts",
       "tests": 28,
-      "durationMs": 205478
+      "durationMs": 234448
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-benefits.spec.ts",
       "tests": 16,
-      "durationMs": 94338
+      "durationMs": 83205
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-collection-panel.spec.ts",
       "tests": 4,
-      "durationMs": 38356
+      "durationMs": 34573
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-control-consistency.spec.ts",
       "tests": 18,
-      "durationMs": 96963
+      "durationMs": 107169
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-guidance-layout.spec.ts",
       "tests": 2,
-      "durationMs": 25506
+      "durationMs": 27942
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-header-refinement.spec.ts",
       "tests": 4,
-      "durationMs": 51905
+      "durationMs": 52485
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-mushaf-lettering.spec.ts",
       "tests": 12,
-      "durationMs": 99391
+      "durationMs": 100080
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-options.spec.ts",
       "tests": 8,
-      "durationMs": 62880
+      "durationMs": 68763
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-quran-refinement.spec.ts",
       "tests": 9,
-      "durationMs": 60922
+      "durationMs": 68705
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reader-scene.spec.ts",
       "tests": 14,
-      "durationMs": 139299
+      "durationMs": 151619
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "reading-preference-polish.spec.ts",
+      "tests": 8,
+      "durationMs": 51908
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reading-reliability.spec.ts",
       "tests": 6,
-      "durationMs": 42883
+      "durationMs": 49473
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "release-history.spec.ts",
       "tests": 2,
-      "durationMs": 16700
+      "durationMs": 16493
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reliance-mushaf.spec.ts",
       "tests": 2,
-      "durationMs": 12049
+      "durationMs": 14212
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "reminder-reliability.spec.ts",
       "tests": 2,
-      "durationMs": 12059
+      "durationMs": 16207
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "reminder-responsive.spec.ts",
+      "tests": 11,
+      "durationMs": 115754
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "responsive.spec.ts",
       "tests": 5,
-      "durationMs": 29275
+      "durationMs": 32325
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "review-reliability.spec.ts",
       "tests": 7,
-      "durationMs": 34605
+      "durationMs": 40386
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "runtime-reliability.spec.ts",
+      "tests": 2,
+      "durationMs": 10808
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "seamless-home-material.spec.ts",
       "tests": 6,
-      "durationMs": 38572
+      "durationMs": 42230
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "session-completion.spec.ts",
       "tests": 2,
-      "durationMs": 10631
+      "durationMs": 12943
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "settings-progress-clarity.spec.ts",
       "tests": 8,
-      "durationMs": 86129
+      "durationMs": 120760
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "settings-simplification.spec.ts",
       "tests": 6,
-      "durationMs": 43257
+      "durationMs": 52721
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "shared-interface-scene.spec.ts",
       "tests": 1,
-      "durationMs": 8754
+      "durationMs": 7602
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "sharing-arrows.spec.ts",
+      "tests": 4,
+      "durationMs": 34291
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "sharing-benefits-home.spec.ts",
+      "tests": 6,
+      "durationMs": 48021
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "sharing-board-layout.spec.ts",
+      "tests": 5,
+      "durationMs": 73647
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "sharing-caption.spec.ts",
+      "tests": 2,
+      "durationMs": 29637
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "sharing-curated.spec.ts",
       "tests": 3,
-      "durationMs": 32492
+      "durationMs": 33890
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "sharing-refinement.spec.ts",
       "tests": 8,
-      "durationMs": 83511
+      "durationMs": 96085
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "sharing-responsive-preview.spec.ts",
+      "tests": 8,
+      "durationMs": 75969
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "sharing-steps.spec.ts",
+      "tests": 2,
+      "durationMs": 39886
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "standalone-counter-footer.spec.ts",
       "tests": 8,
-      "durationMs": 43118
+      "durationMs": 44915
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "startup-performance.spec.ts",
       "tests": 2,
-      "durationMs": 5405
+      "durationMs": 5206
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "sticky-prayer-cards.spec.ts",
       "tests": 4,
-      "durationMs": 41565
+      "durationMs": 43017
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "todays-path.spec.ts",
       "tests": 1,
-      "durationMs": 4664
+      "durationMs": 5522
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "visual-coherence.spec.ts",
       "tests": 4,
-      "durationMs": 35123
+      "durationMs": 43727
     },
     {
       "project": "desktop-firefox-smoke",
       "file": "wird-evidence-sharing.spec.ts",
       "tests": 6,
-      "durationMs": 43860
+      "durationMs": 50310
+    },
+    {
+      "project": "desktop-firefox-smoke",
+      "file": "word-meanings.spec.ts",
+      "tests": 1,
+      "durationMs": 5510
     },
     {
       "project": "mobile-chromium",
       "file": "accessibility-new-surfaces.spec.ts",
       "tests": 4,
-      "durationMs": 27757
+      "durationMs": 22329
     },
     {
       "project": "mobile-chromium",
       "file": "accessibility.spec.ts",
       "tests": 18,
-      "durationMs": 96455
+      "durationMs": 93091
     },
     {
       "project": "mobile-chromium",
       "file": "khatmah-reader.spec.ts",
       "tests": 11,
-      "durationMs": 94726
+      "durationMs": 76988
     },
     {
       "project": "mobile-chromium",
       "file": "narrow-layout.spec.ts",
       "tests": 3,
-      "durationMs": 16530
+      "durationMs": 16880
     },
     {
       "project": "mobile-chromium",
       "file": "navigation.spec.ts",
       "tests": 12,
-      "durationMs": 65275
+      "durationMs": 65396
     },
     {
       "project": "mobile-chromium",
       "file": "overlay-geometry.spec.ts",
       "tests": 5,
-      "durationMs": 18960
+      "durationMs": 16317
     },
     {
       "project": "mobile-chromium",
       "file": "progress-responsive.spec.ts",
       "tests": 5,
-      "durationMs": 9728
+      "durationMs": 19402
     },
     {
       "project": "mobile-chromium",
       "file": "responsive.spec.ts",
       "tests": 20,
-      "durationMs": 74025
+      "durationMs": 73821
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "after-prayer-arrangement.spec.ts",
       "tests": 2,
-      "durationMs": 18472
+      "durationMs": 25153
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "android-reliability.spec.ts",
+      "tests": 2,
+      "durationMs": 45584
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "app-materials.spec.ts",
       "tests": 4,
-      "durationMs": 120469
+      "durationMs": 200452
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audio-control-lock.spec.ts",
       "tests": 2,
-      "durationMs": 17974
+      "durationMs": 84751
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audio-download-recovery.spec.ts",
       "tests": 2,
-      "durationMs": 18765
+      "durationMs": 27466
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audio-expanded-layout.spec.ts",
       "tests": 3,
-      "durationMs": 95234
+      "durationMs": 101477
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audio-file-export.spec.ts",
       "tests": 2,
-      "durationMs": 12362
+      "durationMs": 29077
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audio-integrity.spec.ts",
       "tests": 13,
-      "durationMs": 102529
+      "durationMs": 135419
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audio-surah-stream.spec.ts",
       "tests": 18,
-      "durationMs": 347478
+      "durationMs": 488929
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audio.spec.ts",
       "tests": 4,
-      "durationMs": 41248
+      "durationMs": 68952
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "audit-remediation.spec.ts",
       "tests": 4,
-      "durationMs": 15260
+      "durationMs": 21702
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "ayah-image-sharing.spec.ts",
       "tests": 4,
-      "durationMs": 96725
+      "durationMs": 184275
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "card-frost-reference.spec.ts",
       "tests": 2,
-      "durationMs": 40852
+      "durationMs": 73287
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "chrome-material-parity.spec.ts",
       "tests": 2,
-      "durationMs": 35902
+      "durationMs": 54026
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "compact-icon-feedback.spec.ts",
+      "tests": 2,
+      "durationMs": 34521
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "compact-prayer.spec.ts",
       "tests": 32,
-      "durationMs": 545648
+      "durationMs": 880925
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "compact-reading-headers.spec.ts",
       "tests": 8,
-      "durationMs": 63076
+      "durationMs": 91810
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "contextual-reminder-plan.spec.ts",
       "tests": 6,
-      "durationMs": 92844
+      "durationMs": 157904
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "control-alignment.spec.ts",
       "tests": 2,
-      "durationMs": 21566
+      "durationMs": 31407
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "control-feedback-sharing.spec.ts",
+      "tests": 4,
+      "durationMs": 67852
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "counter-accessibility.spec.ts",
+      "tests": 2,
+      "durationMs": 21501
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "counter-footer-pickers.spec.ts",
+      "tests": 4,
+      "durationMs": 65774
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "counter-numeral-direction.spec.ts",
       "tests": 2,
-      "durationMs": 8118
+      "durationMs": 10843
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "devotional-footer.spec.ts",
       "tests": 18,
-      "durationMs": 115902
+      "durationMs": 164346
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "dropdown-protection.spec.ts",
+      "tests": 19,
+      "durationMs": 446131
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "first-use-calm-controls.spec.ts",
+      "tests": 7,
+      "durationMs": 184216
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "glass-refinement.spec.ts",
       "tests": 10,
-      "durationMs": 95381
+      "durationMs": 142011
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "header-frost-fallback.spec.ts",
+      "tests": 2,
+      "durationMs": 8941
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-card-refinements.spec.ts",
       "tests": 4,
-      "durationMs": 32966
+      "durationMs": 50765
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-clarity.spec.ts",
       "tests": 24,
-      "durationMs": 285738
+      "durationMs": 418092
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-glass-parity.spec.ts",
       "tests": 12,
-      "durationMs": 252208
+      "durationMs": 362319
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-image-loading.spec.ts",
       "tests": 3,
-      "durationMs": 16424
+      "durationMs": 16145
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-prayer-moment.spec.ts",
       "tests": 4,
-      "durationMs": 41700
+      "durationMs": 41287
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-prayer-motion.spec.ts",
       "tests": 2,
-      "durationMs": 22466
+      "durationMs": 32401
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-prayer-scroll.spec.ts",
       "tests": 4,
-      "durationMs": 60351
+      "durationMs": 121941
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-quick-share.spec.ts",
       "tests": 8,
-      "durationMs": 42403
+      "durationMs": 78357
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "home-routine-actions.spec.ts",
       "tests": 8,
-      "durationMs": 50402
+      "durationMs": 83400
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "home-time-actions.spec.ts",
+      "tests": 14,
+      "durationMs": 223273
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "image-first-sharing.spec.ts",
       "tests": 4,
-      "durationMs": 22906
+      "durationMs": 54107
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "independent-appearance.spec.ts",
       "tests": 4,
-      "durationMs": 101733
+      "durationMs": 180255
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "khatmah-reader.spec.ts",
       "tests": 2,
-      "durationMs": 24634
+      "durationMs": 40821
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "long-session-reliability.spec.ts",
       "tests": 1,
-      "durationMs": 14073
+      "durationMs": 20390
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "mobile-pinch-behavior.spec.ts",
       "tests": 1,
-      "durationMs": 4641
+      "durationMs": 8070
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "mobile-sharing-filters.spec.ts",
+      "tests": 4,
+      "durationMs": 156650
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "motion-control-polish.spec.ts",
+      "tests": 4,
+      "durationMs": 71490
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "mushaf-baqarah-audio.spec.ts",
       "tests": 1,
-      "durationMs": 7960
+      "durationMs": 14698
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "mushaf-fallback.spec.ts",
       "tests": 4,
-      "durationMs": 23139
+      "durationMs": 40109
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "mushaf-glass-clarity.spec.ts",
+      "tests": 2,
+      "durationMs": 50405
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "mushaf-interaction-refinements.spec.ts",
+      "tests": 7,
+      "durationMs": 76563
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "mushaf-magnification.spec.ts",
       "tests": 4,
-      "durationMs": 50751
+      "durationMs": 91974
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "mushaf-mobile-translation-mode.spec.ts",
       "tests": 1,
-      "durationMs": 9123
+      "durationMs": 15969
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "mushaf-opening-readability.spec.ts",
       "tests": 2,
-      "durationMs": 23522
+      "durationMs": 44555
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "mushaf-overlay.spec.ts",
       "tests": 2,
-      "durationMs": 12497
+      "durationMs": 21984
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "navigation.spec.ts",
       "tests": 6,
-      "durationMs": 73303
+      "durationMs": 137129
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "offline-downloads.spec.ts",
-      "tests": 6,
-      "durationMs": 62364
+      "tests": 8,
+      "durationMs": 134472
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "page-layout-consistency.spec.ts",
+      "tests": 11,
+      "durationMs": 108277
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "player-containment-benefits.spec.ts",
       "tests": 2,
-      "durationMs": 79365
+      "durationMs": 135864
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "practical-devotional-access.spec.ts",
       "tests": 11,
-      "durationMs": 72190
+      "durationMs": 126978
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "prayer-actions-responsive.spec.ts",
       "tests": 12,
-      "durationMs": 234606
+      "durationMs": 445301
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "prayer-glass-hierarchy.spec.ts",
       "tests": 7,
-      "durationMs": 91464
+      "durationMs": 164304
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "prayer-scroll-padding.spec.ts",
+      "tests": 2,
+      "durationMs": 10445
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "prayer-seconds.spec.ts",
+      "tests": 8,
+      "durationMs": 90421
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "prayer-selection-connection.spec.ts",
       "tests": 8,
-      "durationMs": 56872
+      "durationMs": 91447
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "pre-phase-nine.spec.ts",
+      "tests": 1,
+      "durationMs": 15897
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "progress-card-design.spec.ts",
+      "tests": 8,
+      "durationMs": 311167
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "progress-dashboard.spec.ts",
+      "tests": 16,
+      "durationMs": 408859
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "progress-heatmap.spec.ts",
+      "tests": 3,
+      "durationMs": 96817
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "progress-internal-header.spec.ts",
+      "tests": 4,
+      "durationMs": 24154
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "progress-readonly-statistics.spec.ts",
       "tests": 6,
-      "durationMs": 36670
+      "durationMs": 107035
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "progress-trends.spec.ts",
       "tests": 12,
-      "durationMs": 90158
+      "durationMs": 332283
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "progress-vnext.spec.ts",
+      "tests": 6,
+      "durationMs": 143442
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "progress-zikr-history.spec.ts",
       "tests": 1,
-      "durationMs": 2670
+      "durationMs": 4973
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "quran-listening.spec.ts",
       "tests": 6,
-      "durationMs": 60849
+      "durationMs": 101891
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "quran-snippet-typography.spec.ts",
       "tests": 12,
-      "durationMs": 84996
+      "durationMs": 139618
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "quran-translation-layout.spec.ts",
       "tests": 14,
-      "durationMs": 110367
+      "durationMs": 192213
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "quran-translation.spec.ts",
       "tests": 6,
-      "durationMs": 85894
+      "durationMs": 149020
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "quran-wird-plan-form.spec.ts",
+      "tests": 4,
+      "durationMs": 138506
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "quran-wird-responsive.spec.ts",
+      "tests": 2,
+      "durationMs": 24387
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "quran-word-layout.spec.ts",
       "tests": 28,
-      "durationMs": 231078
+      "durationMs": 330974
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-benefits.spec.ts",
       "tests": 16,
-      "durationMs": 100703
+      "durationMs": 177728
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-collection-panel.spec.ts",
       "tests": 4,
-      "durationMs": 49854
+      "durationMs": 68809
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-control-consistency.spec.ts",
       "tests": 18,
-      "durationMs": 100977
+      "durationMs": 173473
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-guidance-layout.spec.ts",
       "tests": 2,
-      "durationMs": 35665
+      "durationMs": 62858
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-header-refinement.spec.ts",
       "tests": 4,
-      "durationMs": 51562
+      "durationMs": 74694
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-mushaf-lettering.spec.ts",
       "tests": 12,
-      "durationMs": 105882
+      "durationMs": 148105
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-options.spec.ts",
       "tests": 8,
-      "durationMs": 51743
+      "durationMs": 85385
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-quran-refinement.spec.ts",
       "tests": 9,
-      "durationMs": 63440
+      "durationMs": 97227
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reader-scene.spec.ts",
       "tests": 14,
-      "durationMs": 112831
+      "durationMs": 180979
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "reading-preference-polish.spec.ts",
+      "tests": 8,
+      "durationMs": 85245
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reading-reliability.spec.ts",
       "tests": 6,
-      "durationMs": 41086
+      "durationMs": 60695
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "release-history.spec.ts",
       "tests": 2,
-      "durationMs": 19953
+      "durationMs": 21679
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reliance-mushaf.spec.ts",
       "tests": 2,
-      "durationMs": 7473
+      "durationMs": 12086
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "reminder-reliability.spec.ts",
       "tests": 2,
-      "durationMs": 16214
+      "durationMs": 29186
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "reminder-responsive.spec.ts",
+      "tests": 11,
+      "durationMs": 602574
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "responsive.spec.ts",
       "tests": 5,
-      "durationMs": 54577
+      "durationMs": 76681
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "review-reliability.spec.ts",
       "tests": 7,
-      "durationMs": 27313
+      "durationMs": 45609
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "runtime-reliability.spec.ts",
+      "tests": 2,
+      "durationMs": 12964
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "seamless-home-material.spec.ts",
       "tests": 6,
-      "durationMs": 60496
+      "durationMs": 95211
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "session-completion.spec.ts",
       "tests": 2,
-      "durationMs": 7428
+      "durationMs": 10888
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "settings-progress-clarity.spec.ts",
       "tests": 8,
-      "durationMs": 93667
+      "durationMs": 262933
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "settings-simplification.spec.ts",
       "tests": 6,
-      "durationMs": 58644
+      "durationMs": 89350
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "shared-interface-scene.spec.ts",
       "tests": 1,
-      "durationMs": 9380
+      "durationMs": 13793
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "sharing-arrows.spec.ts",
+      "tests": 4,
+      "durationMs": 96210
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "sharing-benefits-home.spec.ts",
+      "tests": 6,
+      "durationMs": 135893
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "sharing-board-layout.spec.ts",
+      "tests": 5,
+      "durationMs": 267679
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "sharing-caption.spec.ts",
+      "tests": 2,
+      "durationMs": 66123
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "sharing-curated.spec.ts",
       "tests": 3,
-      "durationMs": 44032
+      "durationMs": 69229
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "sharing-refinement.spec.ts",
       "tests": 8,
-      "durationMs": 117637
+      "durationMs": 204759
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "sharing-responsive-preview.spec.ts",
+      "tests": 8,
+      "durationMs": 235683
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "sharing-steps.spec.ts",
+      "tests": 2,
+      "durationMs": 85723
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "standalone-counter-footer.spec.ts",
       "tests": 8,
-      "durationMs": 41584
+      "durationMs": 57497
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "startup-performance.spec.ts",
       "tests": 2,
-      "durationMs": 4532
+      "durationMs": 5718
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "sticky-prayer-cards.spec.ts",
       "tests": 4,
-      "durationMs": 79868
+      "durationMs": 87813
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "todays-path.spec.ts",
       "tests": 1,
-      "durationMs": 4343
+      "durationMs": 8393
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "visual-coherence.spec.ts",
       "tests": 4,
-      "durationMs": 33777
+      "durationMs": 49365
     },
     {
       "project": "mobile-webkit-smoke",
       "file": "wird-evidence-sharing.spec.ts",
       "tests": 6,
-      "durationMs": 108537
+      "durationMs": 200956
+    },
+    {
+      "project": "mobile-webkit-smoke",
+      "file": "word-meanings.spec.ts",
+      "tests": 1,
+      "durationMs": 6501
     },
     {
       "project": "tablet-chromium",
       "file": "accessibility-new-surfaces.spec.ts",
       "tests": 4,
-      "durationMs": 35310
+      "durationMs": 28450
     },
     {
       "project": "tablet-chromium",
       "file": "accessibility.spec.ts",
       "tests": 18,
-      "durationMs": 99777
+      "durationMs": 96784
     },
     {
       "project": "tablet-chromium",
       "file": "khatmah-reader.spec.ts",
       "tests": 11,
-      "durationMs": 89331
+      "durationMs": 77903
     },
     {
       "project": "tablet-chromium",
       "file": "narrow-layout.spec.ts",
       "tests": 3,
-      "durationMs": 17955
+      "durationMs": 17997
     },
     {
       "project": "tablet-chromium",
       "file": "navigation.spec.ts",
       "tests": 12,
-      "durationMs": 69201
+      "durationMs": 68438
     },
     {
       "project": "tablet-chromium",
       "file": "overlay-geometry.spec.ts",
       "tests": 5,
-      "durationMs": 21513
+      "durationMs": 18301
     },
     {
       "project": "tablet-chromium",
       "file": "progress-responsive.spec.ts",
       "tests": 5,
-      "durationMs": 10969
+      "durationMs": 19048
     },
     {
       "project": "tablet-chromium",
       "file": "responsive.spec.ts",
       "tests": 20,
-      "durationMs": 77918
+      "durationMs": 78505
     }
   ]
 }

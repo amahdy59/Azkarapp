@@ -105,7 +105,7 @@ export function SheetHeader({
   return (
     <div
       className={`flex shrink-0 items-center justify-between gap-4 border-b px-5 py-3 ${
-        onGlass ? "border-white/20 bg-white/5" : "border-border/40"
+        onGlass ? "border-white/20" : "border-border/40"
       } ${className}`.trim()}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -146,7 +146,7 @@ export function SheetHeader({
         onClick={onClose}
         aria-label={closeLabel}
         data-testid="modal-close-button"
-        className={`flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95 ${
+        className={`ui-icon-button flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
           onGlass
             ? "border border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
             : "bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -159,6 +159,7 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  onOpenAutoFocus?: (event: Event) => void;
   /** Explicit recovery when the opener unmounts or becomes hidden. */
   onCloseAutoFocus?: (event: Event) => void;
   preventOutsideDismiss?: boolean;
@@ -199,6 +200,7 @@ interface ModalProps {
  * that — see DEC-025.
  */
 export function Modal({
+  onOpenAutoFocus,
   onCloseAutoFocus,
   returnFocusRef,
   returnFocusScopeId,
@@ -240,6 +242,10 @@ export function Modal({
         <DialogPrimitive.Content
           data-back-dismiss={backDismiss}
           {...focusScope}
+          onOpenAutoFocus={(event) => {
+            focusScope.onOpenAutoFocus();
+            onOpenAutoFocus?.(event);
+          }}
           onCloseAutoFocus={(event) => {
             onCloseAutoFocus?.(event);
             if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
@@ -266,7 +272,7 @@ export function Modal({
               onClick={onClose}
               aria-label={t(lang, "common.close")}
               data-testid="modal-close-button"
-              className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 ${
+              className={`ui-icon-button absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                 onGlass
                   ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
                   : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
@@ -407,6 +413,7 @@ export function ResponsiveSheet({
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (event.target instanceof Element && event.target.closest("[data-dropdown-surface]")) return;
         if (topOverlay()?.dataset.backDismiss !== backDismiss) return;
         event.stopPropagation();
         onClose();
@@ -470,7 +477,7 @@ export function ResponsiveSheet({
             onClick={onClose}
             aria-label={t(lang, "common.close")}
             data-testid="modal-close-button"
-            className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 ${
+            className={`ui-icon-button absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               onGlass
                 ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
                 : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"

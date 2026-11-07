@@ -80,7 +80,7 @@ const en = {
       "Each bar compares the same prayer across days. A prayer recorded at home or at the mosque counts equally here.",
     optionalHint:
       "These practices are recorded independently; they do not imply that the obligatory prayer was recorded. Asr has no Rawatib measure here.",
-    chronological: "Earlier → later. The lines describe records, not the value of worship.",
+    chronological: "Earlier → later.",
     exportRoutines: "Azkar JSON",
     exportPrayers: "Prayer JSON",
     saving: "Saving…",
@@ -162,7 +162,7 @@ const ar: typeof en = {
     noRecord: "غياب السجل لا يعني تفويت الصلاة. هذه الرسوم تصف ما سجّلته فقط.",
     fardHint: "يقارن كل شريط الصلاة نفسها عبر الأيام. التسجيل في المنزل أو المسجد يحتسب بالتساوي هنا.",
     optionalHint: "تُسجَّل هذه الممارسات باستقلال، ولا تعني تسجيل الفريضة. لا يوجد مقياس للرواتب مع العصر هنا.",
-    chronological: "الأقدم يمينًا والأحدث يسارًا. تصف الخطوط السجلات، وليست مقياسًا للعبادة.",
+    chronological: "الأقدم يمينًا والأحدث يسارًا.",
     exportRoutines: "تصدير الأوراد",
     exportPrayers: "تصدير الصلاة",
     saving: "جارٍ الحفظ…",

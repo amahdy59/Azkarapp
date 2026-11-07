@@ -11,7 +11,7 @@ import type {
 } from "./types";
 import type { InsightBucket, InsightTimelinePoint } from "./progressInsights";
 
-export type ProgressPreset = "day" | "week" | "month" | "year";
+export type ProgressPreset = "day" | "week" | "month" | "year" | "last30";
 export type ProgressRange = { startKey: string; endKey: string };
 export type ProgressMetric =
   "prayers" | "routines" | "pages" | "quranGoals" | "mosque" | "rawatib" | "adhkar" | "morning" | "evening" | "sleep";
@@ -39,6 +39,10 @@ export function validateProgressRange(range: ProgressRange, today: string): "inv
   return null;
 }
 export function progressPresetRange(preset: ProgressPreset, date: Date, language: AppLanguage, calendar: CalendarType) {
+  if (preset === "last30") {
+    const endKey = getProgressDayKey(date, 0);
+    return { startKey: shiftProgressDayKey(endKey, -29), endKey };
+  }
   return getPeriodRange(preset, date, language, calendar);
 }
 export function formatProgressRange(range: ProgressRange, language: AppLanguage, calendar: CalendarType) {
@@ -86,6 +90,21 @@ export type ProgressScopedDailyRecord = { dayKey: string; quranGoal: number | nu
   ProgressMetric,
   number | null
 >;
+
+/** Unknown historical goals are never evidence of a change in recording rate. */
+export function compareProgressMetric(
+  current: ProgressMetricValue,
+  previous: ProgressMetricValue,
+  metric: ProgressMetric,
+) {
+  if (current.days < 3 || current.days !== previous.days || previous.count <= 0) return null;
+  if (metric === "pages") return { kind: "count" as const, change: current.count - previous.count };
+  if (!current.possible || !previous.possible) return null;
+  if (metric === "quranGoals" && current.possible !== previous.possible) return null;
+  const currentRate = (current.count / current.possible) * 100;
+  const previousRate = (previous.count / previous.possible) * 100;
+  return { kind: "rate" as const, currentRate, previousRate, change: currentRate - previousRate };
+}
 
 /** Build sparse, normalized daily facts once per actual record revision. No
  * historical opportunities, goal changes or item records are reconstructed. */
@@ -198,7 +217,12 @@ export function dashboardProgressBuckets(
 ): InsightBucket[] {
   const days = progressRangeDays(range);
   if (!days) return [];
-  const size = preset === "week" || preset === "day" ? 1 : preset === "month" ? 7 : Math.max(1, Math.ceil(days / 24));
+  const size =
+    preset === "week" || preset === "day" || preset === "last30"
+      ? 1
+      : preset === "month"
+        ? 1
+        : Math.max(1, Math.ceil(days / 24));
   const ranges =
     preset === "year"
       ? getCalendarYearPeriods(displayDate, calendar, language).map((month) => ({
@@ -253,7 +277,7 @@ export function matchedDashboardRanges(
 ) {
   const days = progressRangeDays(range);
   const previous =
-    preset === "custom" || preset === "day"
+    preset === "custom" || preset === "day" || preset === "last30"
       ? {
           startKey: shiftProgressDayKey(range.startKey, -days),
           endKey: shiftProgressDayKey(range.startKey, -1),
@@ -300,6 +324,40 @@ export function scopeProgressDailyRecords(
       }
       return result;
     });
+}
+
+/** Presence of saved activity, not a judgment about worship or an invented
+ * per-practice explicit-zero record. Apply civil/devotional windows first. */
+export function progressRecordingPattern(
+  records: readonly ProgressDailyRecord[],
+  range: ProgressRange,
+  now: Date,
+  dayStart: number,
+  currentDay: boolean,
+) {
+  const windows = PROGRESS_METRICS.map((metric) =>
+    metricProgressRange(range, metric, now, dayStart, false, currentDay),
+  ).filter((window) => progressRangeDays(window) > 0);
+  if (!windows.length) return [];
+  const start = windows.map((window) => window.startKey).sort()[0]!;
+  const end = windows
+    .map((window) => window.endKey)
+    .sort()
+    .at(-1)!;
+  const rows = new Map(
+    scopeProgressDailyRecords(records, range, now, dayStart, currentDay).map((row) => [row.dayKey, row]),
+  );
+  return Array.from({ length: Math.min(7, progressRangeDays({ startKey: start, endKey: end })) }, (_, index) => {
+    const dayKey = shiftProgressDayKey(end, -index);
+    const row = rows.get(dayKey);
+    const kind =
+      row && PROGRESS_METRICS.some((metric) => (row[metric] ?? 0) > 0)
+        ? "activity"
+        : row?.quranGoal
+          ? "target"
+          : "none";
+    return { dayKey, kind } as const;
+  }).reverse();
 }
 
 export function exportProgressDashboard(

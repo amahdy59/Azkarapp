@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { CrescentMark } from "../../components/CrescentMark";
 import { ChoiceRadioItem } from "../../components/ChoiceRadioItem";
 import { Button } from "../../components/ui/button";
 import { PreAppLayout } from "../../components/PreAppLayout";
@@ -28,15 +29,10 @@ export function LanguageScreen({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div className="flex flex-col items-center gap-2 px-6 pt-5 pb-4 shrink-0">
-        <div className="relative w-[32px] h-[32px]" aria-hidden="true">
-          <div className="absolute" style={{ inset: "-18.75% 0 0 -18.75%" }}>
-            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-              <circle cx="22" cy="22" r="16" fill="currentColor" className="text-primary" />
-              <circle cx="14" cy="14" r="14" fill="currentColor" className="text-background" />
-            </svg>
-          </div>
-        </div>
-        <p className="text-subtitle font-semibold text-foreground font-sans">Azkar</p>
+        <CrescentMark size={40} />
+        <p className="text-subtitle font-semibold text-foreground font-sans" lang={language}>
+          {t(language, "common.appName")}
+        </p>
         <h1 className="text-lg font-semibold text-foreground font-sans leading-[24px] text-center">
           {t(language, "onboarding.chooseLanguage")}
         </h1>

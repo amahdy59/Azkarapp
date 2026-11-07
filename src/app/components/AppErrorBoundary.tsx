@@ -51,7 +51,7 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, E
           role="alert"
           dir={direction}
         >
-          <p className="text-sm font-semibold text-primary">Azkar</p>
+          <p className="text-sm font-semibold text-primary">{isArabic ? "وَذَكِّرْ" : "wa-zaker"}</p>
           <h1 className="mt-2 text-2xl font-bold">
             {isArabic ? "تعذر تحميل بعض التفضيلات" : "Some preferences could not load"}
           </h1>

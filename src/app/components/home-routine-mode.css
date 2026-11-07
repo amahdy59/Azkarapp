@@ -1,0 +1,15 @@
+/* Prefer the complete label's natural width. If enlarged text cannot fit,
+   wrap whole options rather than splitting an Arabic word into two lines. */
+.home-routine-mode {
+  width: max-content;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.home-routine-mode .choice-pill {
+  flex-wrap: wrap;
+}
+.home-routine-mode .choice-pill-option {
+  flex: 1 0 auto;
+  min-inline-size: max-content;
+  white-space: nowrap;
+}

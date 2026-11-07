@@ -2,6 +2,13 @@ import { describe, expect, it } from "vitest";
 import { parseHash, parseLocation, routeToHash } from "./routing";
 
 describe("routeToHash", () => {
+  it("keeps explicit Progress snapshots and rolling ranges distinct from the default destination", () => {
+    for (const progressPeriod of ["day", "week", "month", "year", "last30"] as const) {
+      const route = { view: "progress" as const, progressPeriod };
+      expect(parseHash(routeToHash(route)!)).toEqual(route);
+    }
+    expect(parseHash("#/progress")).toEqual({ view: "progress" });
+  });
   it("round trips the dedicated prayer location panel and preserves notifications links", () => {
     for (const settingsPanel of ["appearance", "prayer", "location", "notifications", "audio", "downloads"] as const) {
       const route = { view: "settings" as const, settingsPanel };

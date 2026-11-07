@@ -10,6 +10,8 @@ import {
   pruneStaleFridayProgress,
   readFridaySalawatProgress,
   readFridayDuaProgress,
+  readDailyFridayDuaProgress,
+  writeDailyFridayDuaProgress,
   writeFridayDuaProgress,
   writeFridaySalawatProgress,
   readFridayCycle,
@@ -19,6 +21,32 @@ import {
   writeFridayPractices,
   markFridayKahfOpened,
 } from "./fridayProgress";
+
+describe("daily Friday dua reading place", () => {
+  it("resumes only today's known ids and preserves the independent weekly activity", () => {
+    localStorage.clear();
+    writeFridayDuaProgress(["comprehensive-dua-01"], "2026-11-06");
+    writeDailyFridayDuaProgress(["comprehensive-dua-01", "unknown"], "2026-11-01");
+    expect([...readDailyFridayDuaProgress(["comprehensive-dua-01"], "2026-11-01")]).toEqual(["comprehensive-dua-01"]);
+    expect([...readDailyFridayDuaProgress(["comprehensive-dua-01"], "2026-11-02")]).toEqual([]);
+    writeDailyFridayDuaProgress([], "2026-11-02");
+    expect([...readFridayDuaProgress(["comprehensive-dua-01"], "2026-11-06")]).toEqual(["comprehensive-dua-01"]);
+  });
+  it("recovers from malformed or unavailable device storage", () => {
+    localStorage.setItem("azkarapp.friday-dua-reading.v1", "invalid");
+    expect([...readDailyFridayDuaProgress([])]).toEqual([]);
+    const get = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    expect([...readDailyFridayDuaProgress([])]).toEqual([]);
+    get.mockRestore();
+    const set = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    expect(() => writeDailyFridayDuaProgress([])).not.toThrow();
+    set.mockRestore();
+  });
+});
 
 describe("Friday cycle boundary", () => {
   // 2026-08-20 Thu, 08-21 Fri, 08-22 Sat, 08-28 the following Fri.

@@ -7,6 +7,7 @@ import { getFridaySummary } from "../fridaySummary";
 import { formatNumerals, formatRatio } from "../formatting";
 import { t } from "../i18n";
 import { CheckCircle2, BookOpen } from "./icons";
+import { ProgressBar } from "./ProgressBar";
 
 export function FridayProgressStats({
   activeTab,
@@ -85,14 +86,14 @@ export function FridayProgressStats({
             </bdi>
           </div>
           {stats.practicesTotalCount > 0 && (
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-standard"
-                style={{
-                  width: `${Math.min(100, Math.round((stats.practicesDoneCount / stats.practicesTotalCount) * 100))}%`,
-                }}
-              />
-            </div>
+            <ProgressBar
+              value={stats.practicesDoneCount}
+              max={stats.practicesTotalCount}
+              height={6}
+              direction={direction}
+              aria-label={t(language, "friday.practicesDone")}
+              aria-valuetext={formatRatio(stats.practicesDoneCount, stats.practicesTotalCount, language)}
+            />
           )}
         </div>
         <div className="flex flex-col gap-1.5">
@@ -106,14 +107,15 @@ export function FridayProgressStats({
             </bdi>
           </div>
           {stats.fridaysCount > 0 && (
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full bg-success transition-all duration-standard"
-                style={{
-                  width: `${Math.min(100, Math.round((stats.kahfOpenedCount / stats.fridaysCount) * 100))}%`,
-                }}
-              />
-            </div>
+            <ProgressBar
+              value={stats.kahfOpenedCount}
+              max={stats.fridaysCount}
+              height={6}
+              direction={direction}
+              fillColor="var(--success)"
+              aria-label={t(language, "friday.kahfOpened")}
+              aria-valuetext={formatRatio(stats.kahfOpenedCount, stats.fridaysCount, language)}
+            />
           )}
         </div>
         {activeTab !== "year" && (

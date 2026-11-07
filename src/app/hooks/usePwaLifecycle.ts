@@ -3,7 +3,7 @@ import { reportError } from "../../lib/observability";
 import { t } from "../i18n";
 import { APP_RELEASE } from "../releaseStamp";
 import { loadReleaseNotes, markReleaseSeen, readSeenRelease, type ReleaseNotes } from "../releaseNotes";
-import { escapeStaleServiceWorker, rememberUpdateAttempt } from "../pwaUpdate";
+import { clearUpdateAttempt, escapeStaleServiceWorker, rememberUpdateAttempt } from "../pwaUpdate";
 import { deferUpdate, readUpdateDeferral, remainingUpdateDeferral } from "../updateDeferral";
 import type { AppLanguage, BeforeInstallPromptEvent } from "../types";
 
@@ -22,6 +22,9 @@ export function usePwaLifecycle(language: AppLanguage) {
   const [hasWaitingUpdate, setHasWaitingUpdate] = useState(false);
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNotes | null>(null);
   const [updatedNotes, setUpdatedNotes] = useState<ReleaseNotes | null>(null);
+  const [updateReady, setUpdateReady] = useState(false);
+  const [isPreparingUpdate, setIsPreparingUpdate] = useState(false);
+  const ready = useRef(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [pwaError, setPwaError] = useState("");
@@ -33,6 +36,7 @@ export function usePwaLifecycle(language: AppLanguage) {
   const [initialDeferral] = useState(readUpdateDeferral);
   const deferredUpdate = useRef(initialDeferral);
   const updateRequest = useRef(0);
+  const reviewingUpdate = useRef(false);
 
   const showWaitingUpdate = useCallback((notes: ReleaseNotes | null) => {
     setHasWaitingUpdate(true);
@@ -41,15 +45,24 @@ export function usePwaLifecycle(language: AppLanguage) {
     // A failed/offline notes fetch must not undo the reader's known choice.
     const release = notes?.release || deferredUpdate.current?.release || "unknown";
     const remaining = remainingUpdateDeferral(deferredUpdate.current, release);
-    setUpdateAvailable(remaining === 0);
-    if (remaining > 0) {
+    setUpdateAvailable(reviewingUpdate.current || remaining === 0);
+    if (remaining > 0 && !reviewingUpdate.current) {
       deferralTimer.current = window.setTimeout(() => setUpdateAvailable(true), remaining);
     }
+  }, []);
+
+  const prepareUpdate = useCallback(() => {
+    setPwaError("");
+    setIsPreparingUpdate(true);
+    window.dispatchEvent(new Event("azkar-prepare-update"));
   }, []);
 
   useEffect(() => {
     let active = true;
     const handleUpdate = () => {
+      ready.current = true;
+      setUpdateReady(true);
+      setIsPreparingUpdate(false);
       const request = ++updateRequest.current;
       setPwaError("");
       void loadReleaseNotes().then((notes) => {
@@ -65,11 +78,18 @@ export function usePwaLifecycle(language: AppLanguage) {
       setPwaError(t(language, "pwa.updateError"));
     };
 
+    const preparationFailed = () => {
+      if (ready.current) return;
+      setIsPreparingUpdate(false);
+      setPwaError(t(language, "pwa.preparationError"));
+    };
+    window.addEventListener("azkar-update-preparation-failed", preparationFailed);
     window.addEventListener("azkar-update-available", handleUpdate);
     window.addEventListener("azkar-update-failed", handleUpdateFailure);
     window.addEventListener("beforeinstallprompt", handleInstallPrompt);
     return () => {
       active = false;
+      window.removeEventListener("azkar-update-preparation-failed", preparationFailed);
       window.removeEventListener("azkar-update-available", handleUpdate);
       window.removeEventListener("azkar-update-failed", handleUpdateFailure);
       window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
@@ -101,6 +121,8 @@ export function usePwaLifecycle(language: AppLanguage) {
       if (cancelled || request !== updateRequest.current || !notes?.release) return;
 
       if (APP_RELEASE && notes.release !== APP_RELEASE) {
+        // Native readiness is announced only after the verified bundle download.
+        if (import.meta.env.MODE === "android") return;
         /* Still on the old build after asking for the new one. The worker
            serving it has had its chance, so it is discarded rather than asked
            again — see escapeStaleServiceWorker. This reloads when it fires, so
@@ -113,6 +135,7 @@ export function usePwaLifecycle(language: AppLanguage) {
         }).then((escalated) => {
           if (cancelled || request !== updateRequest.current || escalated) return;
           showWaitingUpdate(notes);
+          if (!ready.current && import.meta.env.MODE !== "android") prepareUpdate();
         });
         return;
       }
@@ -128,12 +151,16 @@ export function usePwaLifecycle(language: AppLanguage) {
     return () => {
       cancelled = true;
     };
-  }, [showWaitingUpdate]);
+  }, [showWaitingUpdate, prepareUpdate]);
 
   useEffect(() => () => window.clearTimeout(statusTimer.current), []);
   useEffect(() => () => window.clearTimeout(deferralTimer.current), []);
 
   const applyUpdate = useCallback(() => {
+    if (!ready.current) {
+      prepareUpdate();
+      return;
+    }
     window.clearTimeout(deferralTimer.current);
     setPwaError("");
     setIsUpdating(true);
@@ -146,15 +173,18 @@ export function usePwaLifecycle(language: AppLanguage) {
       rememberUpdateAttempt(releaseNotes.release);
     }
     window.dispatchEvent(new Event("azkar-apply-update"));
-  }, [releaseNotes]);
+  }, [releaseNotes, prepareUpdate]);
 
   const dismissUpdate = useCallback(() => {
+    reviewingUpdate.current = false;
+    clearUpdateAttempt();
     ++updateRequest.current;
     deferredUpdate.current = deferUpdate(releaseNotes?.release || deferredUpdate.current?.release || "unknown");
     showWaitingUpdate(releaseNotes);
   }, [releaseNotes, showWaitingUpdate]);
 
   const reviewUpdate = useCallback(() => {
+    reviewingUpdate.current = true;
     window.clearTimeout(deferralTimer.current);
     setUpdateAvailable(true);
   }, []);
@@ -193,6 +223,8 @@ export function usePwaLifecycle(language: AppLanguage) {
 
   return {
     applyUpdate,
+    updateReady,
+    isPreparingUpdate,
     dismissInstall,
     dismissUpdate,
     dismissUpdatedNotes,

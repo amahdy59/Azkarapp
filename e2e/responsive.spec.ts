@@ -1,3 +1,4 @@
+import { openProgress } from "./helpers/open-progress";
 import { expect, test } from "@playwright/test";
 
 test("the app shell fills the viewport at every tier", async ({ page }) => {
@@ -38,6 +39,10 @@ test("the production shell does not render simulated device chrome", async ({ pa
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
 
   const shell = page.locator(".app-shell");
   const navigation = page.getByRole("navigation", { name: "Bottom Navigation" });
@@ -149,6 +154,10 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
   await page.getByTestId("language-option-ar").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
   for (const testId of ["hijri-date"]) {
     const chip = page.getByTestId(testId);
     await expect(chip).toBeVisible();
@@ -184,6 +193,10 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
 }
 
 test("exactly one navigation variant renders at each breakpoint tier", async ({ page }) => {
@@ -293,6 +306,10 @@ test("desktop onboarding keeps related controls within the form measure and clos
   }
 
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
   await expect(page.getByRole("navigation")).toBeVisible();
 });
 
@@ -396,7 +413,7 @@ test("there is exactly one main landmark and focus moves to it on navigation", a
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expect(page.locator("main")).toHaveCount(1);
 
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
   await expect(page.getByRole("navigation", { name: "Bottom Navigation" })).toBeVisible();
 
   await expect(page.locator("#main-content")).toBeFocused();
@@ -414,10 +431,11 @@ test("the Library displays unified section tabs beside the heading across mobile
   await expect(collectionsTab).toBeVisible();
   await expect(savedTab).toBeVisible();
 
-  await page.getByTestId("library-filter-disclosure").locator("summary").click();
+  await page.getByTestId("library-filter-disclosure").locator(".responsive-filter-trigger").click();
   const allPill = page.getByRole("button", { name: "All", exact: true });
   await expect(allPill).toBeVisible();
   await expect(page.getByRole("button", { name: "Daily Azkar", exact: true })).toBeVisible();
+  await page.getByTestId("library-filter-disclosure-sheet").getByTestId("modal-close-button").click();
 
   await savedTab.click();
   await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
@@ -470,8 +488,8 @@ for (const language of ["ar", "en"] as const) {
           await document.fonts.ready;
           await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
         });
-        await expect(collections.locator("span.hidden")).toBeHidden();
-        await expect(saved.locator("span.hidden")).toBeHidden();
+        await expect(collections.locator(".section-tab-label")).toBeHidden();
+        await expect(saved.locator(".section-tab-label")).toBeHidden();
         const [headingBox, tabsBox, collectionsBox, savedBox] = await Promise.all([
           heading.boundingBox(),
           tabs.boundingBox(),
@@ -483,10 +501,18 @@ for (const language of ["ar", "en"] as const) {
         expect(collectionsBox).not.toBeNull();
         expect(savedBox).not.toBeNull();
         if (!headingBox || !tabsBox || !collectionsBox || !savedBox) return;
-        expect(Math.abs(headingBox.y + headingBox.height / 2 - tabsBox.y - tabsBox.height / 2)).toBeLessThan(1);
+        // Native scrollbar/font metrics can wrap the complete title before
+        // the explicit narrow-container rule. Both layouts must stay aligned.
+        const titleBesideTabs = Math.abs(headingBox.y + headingBox.height / 2 - tabsBox.y - tabsBox.height / 2) < 1;
+        const titleAboveTabs = headingBox.y + headingBox.height <= tabsBox.y;
+        expect(titleBesideTabs || titleAboveTabs, JSON.stringify({ width, scale, headingBox, tabsBox })).toBe(true);
         expect(collectionsBox.height).toBeGreaterThanOrEqual(44);
         expect(savedBox.width).toBeGreaterThanOrEqual(44);
-        expect(tabsBox.height).toBeCloseTo(collectionsBox.height, 0);
+        // The inset track surrounds its options with equal padding and border.
+        const beforeInset = collectionsBox.y - tabsBox.y;
+        const afterInset = tabsBox.y + tabsBox.height - collectionsBox.y - collectionsBox.height;
+        expect(beforeInset).toBeGreaterThanOrEqual(4);
+        expect(beforeInset).toBeCloseTo(afterInset, 0);
         expect(savedBox.width).toBeCloseTo(collectionsBox.width, 0);
         expect(savedBox.height).toBeCloseTo(collectionsBox.height, 0);
         for (const tab of [collections, saved]) {
@@ -497,7 +523,11 @@ for (const language of ["ar", "en"] as const) {
         }
         expect(tabsBox.width).toBeLessThanOrEqual(scale === "100%" ? 110 : 200);
         const filtersBox = await page.getByTestId("library-filter-disclosure").boundingBox();
-        expect(filtersBox!.y - (tabsBox.y + tabsBox.height)).toBeCloseTo(scale === "100%" ? 8 : 16, 0);
+        expect(Math.abs(filtersBox!.y + filtersBox!.height / 2 - tabsBox.y - tabsBox.height / 2)).toBeLessThanOrEqual(
+          1,
+        );
+        expect(filtersBox!.height).toBeCloseTo(tabsBox.height, 0);
+        expect(filtersBox!.x + filtersBox!.width <= tabsBox.x || tabsBox.x + tabsBox.width <= filtersBox!.x).toBe(true);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
     }
@@ -516,8 +546,8 @@ for (const language of ["ar", "en"] as const) {
     await expect(collections).toHaveAttribute("aria-selected", "true");
 
     await page.setViewportSize({ width: 1280, height: 800 });
-    await expect(collections.locator("span.hidden")).toBeVisible();
-    await expect(saved.locator("span.hidden")).toBeVisible();
+    await expect(collections.locator(".section-tab-label")).toBeVisible();
+    await expect(saved.locator(".section-tab-label")).toBeVisible();
     await expect(tabs).toHaveCSS("padding", "4px");
 
     // Nested inline-flex labels used to add baseline/descent space around the
@@ -537,7 +567,7 @@ for (const language of ["ar", "en"] as const) {
             buttonBox: button.getBoundingClientRect().toJSON(),
             groupBox: button.querySelector(":scope > span > span")!.getBoundingClientRect().toJSON(),
             iconBox: button.querySelector("svg")!.getBoundingClientRect().toJSON(),
-            textBox: button.querySelector("span.hidden")!.getBoundingClientRect().toJSON(),
+            textBox: button.querySelector(".section-tab-label")!.getBoundingClientRect().toJSON(),
           }));
           const centreY = buttonBox.y + buttonBox.height / 2;
           expect(Math.abs(groupBox.y + groupBox.height / 2 - centreY)).toBeLessThan(1);
@@ -560,7 +590,7 @@ for (const language of ["ar", "en"] as const) {
   });
 }
 
-test("shared screen headers stay opaque after scrolling without changing Home", async ({ page }) => {
+test("Progress toolbar stays opaque after scrolling without changing Home", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 });
   await enterEnglishGuestMode(page);
 
@@ -568,17 +598,27 @@ test("shared screen headers stay opaque after scrolling without changing Home", 
   await expect(homeHeader).toBeVisible();
   await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
 
-  await page.getByTestId("nav-progress").click();
+  await openProgress(page);
   const header = page.getByTestId("progress-sticky-controls");
   await expect(header).toBeVisible();
   await expect(header).not.toHaveAttribute("data-scrolled");
+  await expect(header.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true })).toBeHidden();
+  await page.getByTestId("progress-filters-toggle").click();
 
   await page.locator(".app-screen-surface").evaluate((surface) => {
     surface.scrollTop = 120;
     surface.dispatchEvent(new Event("scroll"));
   });
   await expect(header).toHaveAttribute("data-scrolled", "true");
-  await expect(header.getByTestId("shared-screen-header")).toHaveClass(/bg-background/);
+  await expect(
+    page.getByTestId("progress-filter-sheet").getByRole("combobox", { name: "Date range", exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("progress-filters-toggle")).toBeFocused();
+  await expect(header.getByRole("tablist")).toBeVisible();
+  const background = await header.evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(background).not.toBe("transparent");
+  expect(background).not.toMatch(/rgba\([^)]*,\s*(?:0|0?\.\d+)\s*\)/);
   await expect(header).toHaveCSS(
     "background-color",
     await page.locator(".app-screen-surface").evaluate((surface) => getComputedStyle(surface).backgroundColor),

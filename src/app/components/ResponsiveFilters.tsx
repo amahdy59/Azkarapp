@@ -1,21 +1,24 @@
-import { useRef, type ReactNode } from "react";
+import { useRef, useState, useEffect, type ReactNode } from "react";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 import { ChevronDown, SlidersHorizontal } from "./icons";
-import { t } from "../i18n";
+import "./responsive-filters.css";
 import type { AppLanguage } from "../types";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 
-/** Native disclosure: phones keep the applied context visible; wider layouts show the fields. */
+/** Phones edit filters in a portalled sheet; wider layouts show the fields. */
 export function ResponsiveFilters({
   label,
   summary,
   children,
   testId,
   language = "en",
+  compactIconOnly = false,
 }: {
   label: string;
   summary: ReactNode;
   testId: string;
   language?: AppLanguage;
+  compactIconOnly?: boolean;
   children: (controls: {
     compact: boolean;
     collapse: () => boolean;
@@ -23,47 +26,96 @@ export function ResponsiveFilters({
   }) => ReactNode;
 }) {
   const compact = useLayoutMode() === "compact";
-  const details = useRef<HTMLDetailsElement>(null);
-  const trigger = useRef<HTMLElement>(null);
-  const focus = () => trigger.current?.focus({ preventScroll: true });
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!compact) setOpen(false);
+  }, [compact]);
+  const focus = () => {
+    const target = trigger.current ?? root.current?.querySelector<HTMLElement>("input, button");
+    target?.focus({ preventScroll: true });
+  };
   const collapse = () => {
-    if (!compact || !details.current) return false;
-    details.current.open = false;
-    focus();
+    if (!compact) return false;
+    setOpen(false);
     return true;
   };
   return (
-    <details ref={details} open={!compact} data-testid={testId} className="group">
-      <summary
-        ref={trigger}
-        className={`${compact ? "flex" : "hidden"} min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-xl border border-border-control bg-card px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring [&::-webkit-details-marker]:hidden`}
-      >
-        <SlidersHorizontal className="size-5 shrink-0 text-primary" aria-hidden="true" />
-        <span className="min-w-0 flex-1 break-words">
-          <span className="block text-xs text-muted-foreground">{label}</span>
-          <span className="block font-semibold">{summary}</span>
-        </span>
-        <span className="flex shrink-0 items-center gap-1 text-micro font-semibold text-primary">
-          <span className="group-open:hidden">{t(language, "common.expand")}</span>
-          <span className="hidden group-open:inline">{t(language, "common.collapse")}</span>
-          <ChevronDown
-            className="size-5 shrink-0 transition-transform duration-fast motion-reduce:transition-none group-open:rotate-180"
+    <div
+      ref={root}
+      data-testid={testId}
+      className="responsive-filters"
+      data-open={open || undefined}
+      data-icon-only={compactIconOnly || undefined}
+    >
+      {compact && (
+        <button
+          ref={trigger}
+          type="button"
+          aria-expanded={open}
+          aria-haspopup="dialog"
+          aria-label={compactIconOnly ? label : undefined}
+          title={compactIconOnly ? label : undefined}
+          onClick={() => setOpen(true)}
+          className="grid w-full responsive-filter-trigger surface-card-finish cursor-pointer items-center text-start text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <span
+            className="surface-control-finish flex items-center justify-center rounded-xl bg-primary/10 text-primary"
+            style={{ width: 36, height: 36 }}
             aria-hidden="true"
-          />
-        </span>
-      </summary>
-      <div className={compact ? "pt-3" : undefined}>
-        {children({
-          compact,
-          collapse,
-          restoreSelectFocus: (event) => {
-            if (compact && !details.current?.open) {
-              event.preventDefault();
-              focus();
-            }
-          },
-        })}
-      </div>
-    </details>
+          >
+            <SlidersHorizontal size={20} />
+          </span>
+          <span className={compactIconOnly ? "sr-only" : "responsive-filter-copy"}>
+            <span className="font-semibold leading-normal">{label}</span>
+            <span className="responsive-filter-context">{summary}</span>
+          </span>
+          {!compactIconOnly && (
+            <ChevronDown
+              className="responsive-filter-chevron size-5 text-muted-foreground transition-transform duration-fast"
+              aria-hidden="true"
+            />
+          )}
+        </button>
+      )}
+      {compact
+        ? open && (
+            <ResponsiveSheet
+              open={open}
+              onClose={() => setOpen(false)}
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                focus();
+              }}
+              title={label}
+              language={language}
+              direction={language === "ar" ? "rtl" : "ltr"}
+              testId={`${testId}-sheet`}
+              focusOnOpen
+              drawerClassName="filter-sheet"
+            >
+              <SheetHeader
+                title={label}
+                language={language}
+                onClose={() => setOpen(false)}
+                className="filter-sheet-header"
+              />
+              <div className="min-h-0 overflow-y-auto p-3">
+                {children({
+                  compact,
+                  collapse,
+                  restoreSelectFocus: (event) => {
+                    if (!open) {
+                      event.preventDefault();
+                      focus();
+                    }
+                  },
+                })}
+              </div>
+            </ResponsiveSheet>
+          )
+        : children({ compact, collapse, restoreSelectFocus: () => undefined })}
+    </div>
   );
 }

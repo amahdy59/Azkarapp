@@ -4,6 +4,7 @@ import { Mosque } from "./icons";
 import { getPrayerVirtues, PRAYER_VIRTUE_CLOSING_ARABIC } from "../content/prayerVirtues";
 import { t } from "../i18n";
 import type { AppLanguage, PrayerName } from "../types";
+import { EvidenceSource } from "./EvidenceSource";
 
 /**
  * Acknowledges praying in congregation with what that prayer is worth.
@@ -81,6 +82,17 @@ export function PrayerVirtueModal({
                 <bdi className={`mt-2 block text-xs font-bold ${onGlass ? "text-white/70" : "text-muted-foreground"}`}>
                   {language === "ar" ? virtue.referenceArabic : virtue.referenceEnglish}
                 </bdi>
+                <EvidenceSource
+                  language={language}
+                  className={onGlass ? "text-white" : "text-primary"}
+                  details={{
+                    title: name,
+                    quotation: virtue.textArabic,
+                    textLanguage: "ar",
+                    reference: language === "ar" ? virtue.referenceArabic : virtue.referenceEnglish,
+                    sourceUrl: virtue.sourceUrl,
+                  }}
+                />
               </li>
             ))}
           </ul>

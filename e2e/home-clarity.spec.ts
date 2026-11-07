@@ -212,10 +212,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(next).toContainText(t(language, "prayerTracking.nextShort"));
       await expect(next.getByRole("progressbar")).toHaveCount(0);
       await expect(next.locator("[data-prayer-footer]").getByRole("progressbar")).toHaveCount(0);
-      // The condensed strip owns a hidden countdown inside its button. At the
-      // top only the separate footer countdown is visible.
-      await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
-      await expect(next.locator("[data-prayer-detail]")).toContainText(/باقي|left/);
+      if (width < 768) {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
+        await expect(next.locator(".home-prayer-countdown-text")).toHaveCount(1);
+      } else {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
+      }
+      await expect(next.locator("[data-prayer-detail]")).toContainText(/متبقٍ|remaining/);
       await expect(next.locator("[data-prayer-detail]")).toHaveCSS("justify-content", "center");
       await expect(next.locator(".home-prayer-divider")).toHaveCount(0);
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-home.png`), scale: "css" });
@@ -248,8 +251,19 @@ for (const language of ["ar", "en"] as const) {
           ),
         )
         .toBe(true);
-      // Firefox delivers the footer's ResizeObserver after the font-size
-      // mutation. Assert the settled shared geometry, not its intervening frame.
+      // ResizeObserver follows descendant font reflow in Firefox/WebKit.
+      // Wait for the actual content fit as well as aligned footer tops.
+      await expect
+        .poll(() =>
+          row
+            .locator("[data-prayer-footer]")
+            .evaluateAll((nodes) =>
+              nodes.every(
+                (node) => node.firstElementChild!.getBoundingClientRect().height <= node.getBoundingClientRect().height,
+              ),
+            ),
+        )
+        .toBe(true);
       await expect
         .poll(() =>
           row.locator("[data-prayer-footer]").evaluateAll((nodes) => {
@@ -290,6 +304,7 @@ for (const language of ["ar", "en"] as const) {
           };
         }),
       );
+      await page.screenshot({ path: testInfo.outputPath("enlarged-footer-geometry.png") });
       expect(footerTextBounds).toHaveLength(5);
       expect(
         footerTextBounds.every(

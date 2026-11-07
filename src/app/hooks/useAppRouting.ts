@@ -2,8 +2,8 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { parseLocation, routeToHash } from "../routing";
 import type { LibraryRouteSection, ProgressRoutePeriod, RouteState, SettingsRoutePanel } from "../routing";
-import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkar";
-import { reportError } from "../../lib/observability";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkarCore";
+import { recordDiagnosticScreen, reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
 import { isAudioControlLocked } from "../audioControlLock";
@@ -16,7 +16,7 @@ function categoryFromShortcutUrl(): CategoryId | null {
 }
 
 export function isLazyRouteCategory(categoryId: CategoryId): boolean {
-  return categoryId === "comprehensive_duas" || categoryId === "friday_kahf";
+  return categoryId === "comprehensive_duas" || categoryId === "friday_kahf" || categoryId === "illness_ruqyah";
 }
 
 export async function loadLazyRouteCategory(categoryId: CategoryId) {
@@ -26,6 +26,8 @@ export async function loadLazyRouteCategory(categoryId: CategoryId) {
   } else if (categoryId === "friday_kahf") {
     const { FRIDAY_KAHF } = await import("../content/fridayKahf");
     registerLazyCollection(categoryId, FRIDAY_KAHF);
+  } else if (categoryId === "illness_ruqyah") {
+    await import("../content/azkar");
   }
 }
 
@@ -73,7 +75,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   const [librarySection, setLibrarySection] = useState<LibraryRouteSection>(
     initialRoute?.librarySection ?? "collections",
   );
-  const [progressPeriod, setProgressPeriod] = useState<ProgressRoutePeriod>(initialRoute?.progressPeriod ?? "day");
+  const [progressPeriod, setProgressPeriod] = useState<ProgressRoutePeriod>(initialRoute?.progressPeriod ?? "month");
   const [settingsPanel, setSettingsPanel] = useState<SettingsRoutePanel>(initialRoute?.settingsPanel ?? "root");
 
   const [routeContentLoading, setRouteContentLoading] = useState(
@@ -135,11 +137,15 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
       if (isAudioControlLocked()) return;
       window.history.pushState({ view: to }, "", window.location.href);
       inAppHistoryDepth.current += 1;
-      startSafeViewTransition(() => {
+      const update = () => {
         flushSync(() => {
           setView(to);
         });
-      }, reduceMotion);
+      };
+      // These deferred pages own one content arrival, including cold loading.
+      // Snapshotting their loading placeholder adds a second visible handoff.
+      if (to === "library" || to === "khatmah_overview") update();
+      else startSafeViewTransition(update, reduceMotion);
     },
     [reduceMotion],
   );
@@ -148,9 +154,12 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     (to: View) => {
       if (isAudioControlLocked()) return;
       window.history.replaceState({ view: to }, "", window.location.href);
-      startSafeViewTransition(() => {
-        flushSync(() => setView(to));
-      }, reduceMotion);
+      startSafeViewTransition(
+        () => {
+          flushSync(() => setView(to));
+        },
+        reduceMotion || to === "library" || to === "khatmah_overview",
+      );
     },
     [reduceMotion],
   );
@@ -195,6 +204,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     if (`${window.location.pathname}${window.location.hash}` !== target) {
       window.history.replaceState({ view }, "", target);
     }
+    recordDiagnosticScreen();
     renderedLocation.current = { url: window.location.href, state: window.history.state };
   }, [
     view,
@@ -224,35 +234,40 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     const route = parseLocation(window.location.search, window.location.hash);
     if (!route) return false;
 
-    startSafeViewTransition(() => {
-      flushSync(() => {
-        setView(route.view);
-        setSharedContext(
-          route.categoryId && route.routineMode ? { categoryId: route.categoryId, mode: route.routineMode } : undefined,
-        );
-        if (route.page !== undefined) setQuranPage(route.page);
-        if (route.prayer) setActivePrayer(route.prayer);
-        if (route.categoryId) {
-          setActiveCat(route.categoryId);
-          setActiveSubCategory(route.subCategory);
-          if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
-            void hydrateRouteCategory(route.categoryId, route.view, route.index, route);
+    startSafeViewTransition(
+      () => {
+        flushSync(() => {
+          setView(route.view);
+          setSharedContext(
+            route.categoryId && route.routineMode
+              ? { categoryId: route.categoryId, mode: route.routineMode }
+              : undefined,
+          );
+          if (route.page !== undefined) setQuranPage(route.page);
+          if (route.prayer) setActivePrayer(route.prayer);
+          if (route.categoryId) {
+            setActiveCat(route.categoryId);
+            setActiveSubCategory(route.subCategory);
+            if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
+              void hydrateRouteCategory(route.categoryId, route.view, route.index, route);
+            } else {
+              routeLoadId.current += 1;
+              setRouteContentLoading(false);
+            }
           } else {
             routeLoadId.current += 1;
             setRouteContentLoading(false);
           }
-        } else {
-          routeLoadId.current += 1;
-          setRouteContentLoading(false);
-        }
-        if (route.index !== undefined) setActiveIdx(route.index);
-        if (route.query !== undefined) setSearchQuery(route.query);
-        if (route.view === "library") setLibrarySection(route.librarySection ?? "collections");
-        if (route.view === "progress") setProgressPeriod(route.progressPeriod ?? "day");
-        if (route.view === "settings") setSettingsPanel(route.settingsPanel ?? "root");
-        setActiveTab(tabForView(route.view));
-      });
-    }, reduceMotion);
+          if (route.index !== undefined) setActiveIdx(route.index);
+          if (route.query !== undefined) setSearchQuery(route.query);
+          if (route.view === "library") setLibrarySection(route.librarySection ?? "collections");
+          if (route.view === "progress") setProgressPeriod(route.progressPeriod ?? "month");
+          if (route.view === "settings") setSettingsPanel(route.settingsPanel ?? "root");
+          setActiveTab(tabForView(route.view));
+        });
+      },
+      reduceMotion || route.view === "library" || route.view === "khatmah_overview",
+    );
     return true;
   }, [hydrateRouteCategory, reduceMotion]);
 
@@ -320,7 +335,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   }, [replace, view]);
 
   const pushRouteState = useCallback(
-    (route: RouteState, update: () => void) => {
+    (route: RouteState, update: () => void, animate = true) => {
       if (isAudioControlLocked()) return;
       const hash = routeToHash(route);
       if (!hash) return;
@@ -331,14 +346,15 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
       }
       window.history.pushState({ view: route.view }, "", target);
       inAppHistoryDepth.current += 1;
-      startSafeViewTransition(() => flushSync(update), reduceMotion);
+      if (animate) startSafeViewTransition(() => flushSync(update), reduceMotion);
+      else flushSync(update);
     },
     [reduceMotion],
   );
 
   const navigateLibrarySection = useCallback(
     (section: LibraryRouteSection) =>
-      pushRouteState({ view: "library", librarySection: section }, () => setLibrarySection(section)),
+      pushRouteState({ view: "library", librarySection: section }, () => setLibrarySection(section), false),
     [pushRouteState],
   );
 
@@ -446,7 +462,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
         setLibrarySection("collections");
         push("library");
       } else if (tab === "progress") {
-        setProgressPeriod("day");
+        setProgressPeriod("month");
         push("progress");
       } else if (tab === "settings") {
         setSettingsPanel("root");

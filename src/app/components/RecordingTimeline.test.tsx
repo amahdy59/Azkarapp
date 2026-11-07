@@ -23,6 +23,58 @@ const series: RecordingTimelineSeries[] = [
   },
 ];
 describe("RecordingTimeline", () => {
+  it("renders columns with real gaps and preserves exact data and keyboard exploration", async () => {
+    render(
+      <RecordingTimeline
+        series={[
+          {
+            ...series[0]!,
+            points: [series[0]!.points[0]!, { ...series[0]!.points[1]!, possible: 0 }, series[0]!.points[2]!],
+          },
+        ]}
+        language="en"
+        period="month"
+        title="Columns"
+        testId="columns"
+        chartDisplay="columns"
+      />,
+    );
+    expect(screen.getAllByTestId("recording-time-column")).toHaveLength(2);
+    expect(screen.queryByTestId("recording-time-line")).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("slider"), { key: "Home" });
+    expect(screen.getByRole("slider")).toHaveValue("0");
+    fireEvent.keyDown(screen.getByRole("slider"), { key: "ArrowRight" });
+    expect(screen.getByTestId("timeline-readout")).toHaveTextContent("—");
+    fireEvent.click(screen.getByText("Exact chart data"));
+    expect(await screen.findByRole("table")).toHaveTextContent("Unavailable");
+  });
+  it("discloses exact plotted buckets, including unavailable rates and partial dates, without fabricating zero rates", async () => {
+    render(
+      <RecordingTimeline
+        series={[
+          { ...series[0]!, points: [series[0]!.points[0]!, { ...series[0]!.points[2]!, recorded: 0, possible: 0 }] },
+        ]}
+        language="en"
+        period="month"
+        title="Exact rates"
+        testId="exact"
+      />,
+    );
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText("Exact chart data"));
+    const table = await screen.findByRole("table", { name: "Exact rates · Exact chart data" });
+    const rows = within(table).getAllByRole("row");
+    expect(rows).toHaveLength(3);
+    expect(rows[1]).toHaveTextContent("1–7 Oct");
+    expect(
+      within(rows[1]!)
+        .getAllByRole("cell")
+        .map((cell) => cell.textContent),
+    ).toEqual(["7", "21", "33%"]);
+    expect(rows[2]).toHaveTextContent("Unavailable");
+    expect(rows[2]).not.toHaveTextContent("0%");
+    expect(rows[2]).toHaveTextContent("Period in progress");
+  });
   it.each(["ar", "en"] as const)(
     "keeps coordinates, pointer selection and physical arrows coherent in %s",
     (language) => {

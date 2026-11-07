@@ -1,3 +1,4 @@
+import { ListeningResumeButton } from "./ListeningResumeButton";
 import { AudioOptionToggle } from "./AudioOptionToggle";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -26,8 +27,7 @@ function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | n
   if (!viewport || !target) return;
   const view = viewport.getBoundingClientRect();
   const bounds = target.getBoundingClientRect();
-  const controls = root?.closest(".floating-audio-player--expanded")?.querySelector("[data-listening-controls]");
-  const visibleTop = enlarged ? view.top : Math.max(view.top, controls?.getBoundingClientRect().bottom ?? view.top);
+  const visibleTop = view.top;
   if (alignOpening || bounds.top < visibleTop || bounds.bottom > view.bottom) {
     viewport.scrollTo?.({
       top: Math.max(0, viewport.scrollTop + bounds.top - visibleTop - 8),
@@ -47,7 +47,7 @@ export function PagedQuranListeningReader({
   textScale = "medium",
   magnification = 100,
   textSize = "medium",
-  controlsHost,
+  recoveryHost,
   preferencesHost,
 }: {
   entry: PlaybackEntry;
@@ -60,7 +60,7 @@ export function PagedQuranListeningReader({
   textScale?: MushafTextScale;
   magnification?: number;
   textSize?: TextSizeOption;
-  controlsHost?: HTMLElement | null;
+  recoveryHost?: HTMLElement | null;
   preferencesHost?: HTMLElement | null;
 }) {
   const pages = useMemo(() => entry.mushafPages ?? [], [entry.mushafPages]);
@@ -76,9 +76,9 @@ export function PagedQuranListeningReader({
     setFollow(true);
     setManualIndex(0);
   }, [entry.entryId, segment?.variantId]);
-  const ayah = Number(cue.verseKey?.split(":")[1]);
+  const ayah = Number(cue.followVerseKey?.split(":")[1]);
   const playingIndex =
-    cue.verseKey && Number(cue.verseKey.split(":")[0]) === entry.quranRange?.surah
+    cue.followVerseKey && Number(cue.followVerseKey.split(":")[0]) === entry.quranRange?.surah
       ? pages.findIndex((page) => ayah >= page.startAyah && ayah <= page.endAyah)
       : -1;
   const index = follow && timing && playingIndex >= 0 ? playingIndex : Math.min(manualIndex, pages.length - 1);
@@ -98,12 +98,13 @@ export function PagedQuranListeningReader({
     });
   }, [translation, result, page.startAyah, page.endAyah]);
   const hasWords = !error && Boolean(timing?.verses.some((verse) => verse.words?.length));
+  const inCueGap = cue.followVerseKey !== null && (!cue.verseKey || (words && cue.verseHasWords && !cue.word));
   const browse = (next: number) => {
     setFollow(false);
     setManualIndex(next);
   };
   useEffect(() => {
-    if (!follow || !result) return;
+    if (!follow || !result || inCueGap) return;
     const cueTarget =
       root.current?.querySelector<HTMLElement>('[data-playback-word="true"]') ??
       root.current?.querySelector<HTMLElement>("[data-playback-verse]");
@@ -146,6 +147,7 @@ export function PagedQuranListeningReader({
   }, [
     follow,
     result,
+    inCueGap,
     cue.verseKey,
     cue.word?.position,
     magnification,
@@ -163,7 +165,7 @@ export function PagedQuranListeningReader({
     const key = `${magnification}:${page.page}`;
     const changed = positionedZoom.current !== key;
     positionedZoom.current = key;
-    if (!changed && !follow) return;
+    if (!changed && (!follow || inCueGap)) return;
     let frame = 0;
     const position = () => {
       const current = follow
@@ -193,7 +195,7 @@ export function PagedQuranListeningReader({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [magnification, result, follow, page.page, entry.quranRange?.surah]);
+  }, [magnification, result, follow, inCueGap, page.page, entry.quranRange?.surah]);
   useEffect(() => {
     const viewport = root.current?.closest<HTMLElement>(".audio-expanded-text") ?? root.current;
     const pauseFollowing = () => {
@@ -249,6 +251,7 @@ export function PagedQuranListeningReader({
       className="flex flex-col gap-2"
       dir={language === "ar" ? "rtl" : "ltr"}
     >
+      {controls}
       <p className="text-sm">{t(language, timing ? "quranListening.browseHint" : "quranListening.unavailable")}</p>
       {timing && (
         <AudioOptionToggle
@@ -274,28 +277,23 @@ export function PagedQuranListeningReader({
     </div>
   );
   const resume =
-    language === "ar" && timing && !follow && !error ? (
-      <button
-        type="button"
-        className={`${buttonClass} audio-listening-resume mx-auto flex`}
-        onClick={() => {
+    timing && !follow && !error ? (
+      <ListeningResumeButton
+        language={language}
+        onResume={() => {
           setFollow(true);
           root.current?.closest<HTMLElement>(".audio-expanded-text")?.focus({ preventScroll: true });
         }}
-      >
-        {t(language, "quranListening.returnToVerse")}
-      </button>
+      />
     ) : null;
-  const overlayHost = root.current?.closest(".audio-expanded-reading");
   return (
     <section ref={root} className="w-full" aria-label={t(language, "quranListening.reader")}>
-      {controlsHost ? createPortal(controls, controlsHost) : controls}
       {preferencesHost
         ? createPortal(preferences, preferencesHost)
         : preferencesHost === undefined
           ? preferences
           : null}
-      {overlayHost ? createPortal(resume, overlayHost) : resume}
+      {recoveryHost ? createPortal(resume, recoveryHost) : resume}
       <div className="audio-listening-body min-w-0" data-listening-magnified={magnification > 100}>
         <div
           className="audio-listening-arabic min-w-0"
@@ -354,7 +352,6 @@ export function PagedQuranListeningReader({
               setManualIndex(index);
               setFollow(false);
             }}
-            onResumeFollowing={timing ? () => setFollow(true) : undefined}
           />
         )}
       </div>

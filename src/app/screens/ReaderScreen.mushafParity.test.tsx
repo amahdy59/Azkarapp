@@ -82,7 +82,7 @@ describe("the surah view is the Mushaf", () => {
       "mushaf-rail-next",
       "mushaf-rail-page-bookmark",
       "mushaf-difficult-words-switch",
-      "mushaf-focus-enter",
+      "mushaf-focus-toggle",
       "mushaf-fullscreen-toggle",
       "mushaf-settings-trigger",
     ]) {
@@ -108,7 +108,7 @@ describe("the surah view is the Mushaf", () => {
     renderKahf();
     fireEvent.click(screen.getByRole("button", { name: "فهرس المصحف الشريف" }));
     expect(screen.getByRole("tab", { name: /السور/ })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("الكهف")).toBeInTheDocument();
+    expect(within(screen.getByRole("dialog")).getByText("الكهف")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: /صفحة/ }));
     // Al-Kahf runs 293-304.
@@ -124,7 +124,7 @@ describe("the surah view is the Mushaf", () => {
     // exit was leaving the surah altogether — and on a phone, with no keyboard,
     // there was no exit at all.
     expect(screen.queryByTestId("mushaf-focus-exit")).toBeNull();
-    fireEvent.click(screen.getByTestId("mushaf-focus-enter"));
+    fireEvent.click(screen.getByTestId("mushaf-focus-toggle"));
     expect(screen.getByTestId("mushaf-focus-exit")).toBeInTheDocument();
     expect(screen.queryByTestId("mushaf-rail-back")).toBeNull();
 
@@ -134,7 +134,7 @@ describe("the surah view is the Mushaf", () => {
 
   it("gives the tools back before it gives up the surah", () => {
     renderKahf();
-    fireEvent.click(screen.getByTestId("mushaf-focus-enter"));
+    fireEvent.click(screen.getByTestId("mushaf-focus-toggle"));
     // Escape leaves focus mode first, as it does in the Mushaf: one keypress
     // meant to undo the last thing should not cost the reader their place.
     // Fired on an element, as a real keypress is: the handler inspects the
@@ -520,7 +520,7 @@ describe("the rail is banded rather than flat", () => {
       "mushaf-rail-listen",
       "mushaf-rail-page-bookmark",
       "mushaf-difficult-words-switch",
-      "mushaf-focus-enter",
+      "mushaf-focus-toggle",
       "mushaf-fullscreen-toggle",
       "mushaf-settings-trigger",
       "mushaf-rail-shortcuts",

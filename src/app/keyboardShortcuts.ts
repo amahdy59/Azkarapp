@@ -38,3 +38,4 @@ export function isCounterShortcutBlocked(event: KeyboardEvent, allowFocusedCount
     )
   );
 }
+export const COMPACT_TOUCH_KEYBOARD_HELP_QUERY = "(pointer: coarse) and (max-height: 600px)";

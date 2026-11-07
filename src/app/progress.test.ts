@@ -194,7 +194,7 @@ describe("quiet garden progress", () => {
     expect(reset.home).toEqual(completed.home);
   });
 
-  it("starts a new day with empty daily routines while preserving situational progress", () => {
+  it("starts every collection afresh daily while preserving Al-Kahf's weekly cycle", () => {
     const completed = Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<string>([`${id}-partial`])])) as Record<
       CategoryId,
       Set<string>
@@ -202,10 +202,19 @@ describe("quiet garden progress", () => {
 
     const reset = resetDailyRoutineProgress(completed);
 
-    for (const category of ["morning", "evening", "before_sleep", "waking_up", "after_prayer"] as const) {
+    for (const category of CATEGORY_IDS.filter((category) => category !== "friday_kahf")) {
       expect(reset[category].size).toBe(0);
     }
-    expect([...reset.travel]).toEqual(["travel-partial"]);
+    expect([...reset.friday_kahf]).toEqual(["friday_kahf-partial"]);
+    expect(reset.comprehensive_duas.size).toBe(0);
+  });
+  it("does not discard same-day lazy dua progress because its startup identity list is empty", () => {
+    const completed = Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<string>()])) as Record<
+      CategoryId,
+      Set<string>
+    >;
+    completed.comprehensive_duas.add("comprehensive-dua-01");
+    expect(resetStaleCompletedCollections(completed, []).comprehensive_duas).toEqual(completed.comprehensive_duas);
   });
 
   it("wraps to an earlier unfinished zikr instead of treating the final index as collection completion", () => {

@@ -11,8 +11,9 @@ for (const language of ["ar", "en"] as const) {
     }, language);
     await page.goto("/#/azkar/morning/2");
     const hint = page.getByTestId("counter-tap-hint");
-    const help = page.getByRole("button", {
-      name: language === "ar" ? "اختصارات لوحة المفاتيح" : "Keyboard shortcuts",
+    const help = page.getByTestId("reader-help-trigger");
+    const menuTrigger = page.getByRole("button", {
+      name: language === "ar" ? "خيارات القارئ" : "Reader options",
       exact: true,
     });
     const next = page.getByRole("button", { name: language === "ar" ? "التالي" : "Next", exact: true });
@@ -24,6 +25,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
       await expect(page.getByTestId("reader-side-navigation")).toHaveCount(0);
       if (width >= 768) {
+        await menuTrigger.click();
         await expect(help).toBeVisible();
         await help.click();
         const dialog = page.getByRole("dialog");
@@ -32,7 +34,7 @@ for (const language of ["ar", "en"] as const) {
         await expect(dialog).toContainText("Esc");
         await page.keyboard.press("Escape");
         await expect(dialog).not.toBeVisible();
-        await expect(help).toBeFocused();
+        await expect(menuTrigger).toBeFocused();
         await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-index", "1");
       } else await expect(help).not.toBeVisible();
       const [text, counter, nav] = await Promise.all([
@@ -97,11 +99,12 @@ for (const language of ["ar", "en"] as const) {
       document.documentElement.style.fontSize = "200%";
     });
     await expect(next).toBeVisible();
+    await menuTrigger.click();
     await expect(help).toBeVisible();
     await help.click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(help).toBeFocused();
+    await expect(menuTrigger).toBeFocused();
     await page.setViewportSize({ width: 1440, height: 900 });
     const panel = page.getByTestId("reader-collection-navigator");
     await expect(panel).toBeVisible();
@@ -126,8 +129,12 @@ for (const language of ["ar", "en"] as const) {
         })
         .boundingBox(),
     ]);
+    // Enlarged controls may wrap; retain the same clear gap on either axis.
     expect(
-      Math.max(toggle!.x, menu!.x) - Math.min(toggle!.x + toggle!.width, menu!.x + menu!.width),
+      Math.max(
+        Math.max(toggle!.x, menu!.x) - Math.min(toggle!.x + toggle!.width, menu!.x + menu!.width),
+        Math.max(toggle!.y, menu!.y) - Math.min(toggle!.y + toggle!.height, menu!.y + menu!.height),
+      ),
     ).toBeGreaterThanOrEqual(8);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(next.locator("span")).toBeHidden();

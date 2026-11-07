@@ -9,7 +9,7 @@ import type {
 } from "../types";
 import type { NavTab } from "../components/LayoutShells";
 import { MAX_STORED_SESSIONS, type StoredSession } from "../state";
-import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../content/azkar";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../content/azkarCore";
 import { isPrayerName } from "../content/prayerTimes";
 import {
   getFirstIncompleteZikrIndex,

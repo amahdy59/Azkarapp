@@ -1,11 +1,20 @@
-import { useEffect, useId, useRef, type ComponentType, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  type ComponentType,
+  type ReactNode,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import type { AppLanguage } from "../types";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import "./select-field.css";
 
 /** Progress filters share the application's menu, focus and selection behavior. */
 export function ProgressSelectField<Value extends string>({
   label,
+  displayValue,
   value,
   options,
   onChange,
@@ -16,6 +25,7 @@ export function ProgressSelectField<Value extends string>({
   onCloseAutoFocus,
 }: {
   label: string;
+  displayValue?: ReactNode;
   value: Value;
   options: readonly { value: Value; label: string }[];
   onChange: (value: Value) => void;
@@ -63,14 +73,14 @@ export function ProgressSelectField<Value extends string>({
         <SelectTrigger
           id={id}
           aria-labelledby={`${id}-label`}
-          className="progress-select-trigger"
+          className="select-field-trigger progress-select-trigger"
           data-progress-value={value}
           onKeyDownCapture={useKeyboard}
         >
           <span className="progress-select-leading" aria-hidden="true">
             <Icon className="size-4" />
           </span>
-          <SelectValue />
+          <SelectValue>{displayValue}</SelectValue>
         </SelectTrigger>
         <SelectContent
           onCloseAutoFocus={onCloseAutoFocus}

@@ -86,13 +86,77 @@ describe("native reminder queue", () => {
           id: 10_000,
           title: "Fajr",
           body: "Reminder",
+          largeBody: "Reminder",
           schedule: { at: new Date(reminder.at), allowWhileIdle: true },
-          extra: { route: reminder.route },
+          extra: { route: reminder.route, azkarappAt: reminder.at, azkarappExact: "granted" },
         },
       ],
     });
     await replaceNativeReminders([]);
     expect(notifications.schedule).toHaveBeenCalledTimes(1);
+  });
+  it("retains unchanged alarms and updates changed time, wording, route or exact access", async () => {
+    const reminder = {
+      id: 10_000,
+      title: "Fajr",
+      body: "Reminder",
+      at: Date.now() + 60_000,
+      route: "#/prayer/fajr",
+    };
+    notifications.getPending.mockResolvedValue({
+      notifications: [
+        { ...reminder, extra: { route: reminder.route, azkarappAt: reminder.at, azkarappExact: "granted" } },
+      ],
+    });
+
+    await replaceNativeReminders([reminder]);
+    expect(notifications.cancel).not.toHaveBeenCalled();
+    expect(notifications.schedule).not.toHaveBeenCalled();
+
+    for (const change of [{ at: reminder.at + 60_000 }, { body: "Updated reminder" }, { route: "#/azkar/morning" }]) {
+      await replaceNativeReminders([{ ...reminder, ...change }]);
+    }
+    expect(notifications.schedule).toHaveBeenCalledTimes(3);
+    notifications.checkExactNotificationSetting.mockResolvedValueOnce({ exact_alarm: "denied" });
+    await replaceNativeReminders([reminder]);
+    expect(notifications.schedule).toHaveBeenLastCalledWith({
+      notifications: [expect.objectContaining({ extra: expect.objectContaining({ azkarappExact: "denied" }) })],
+    });
+    expect(notifications.cancel).not.toHaveBeenCalled();
+  });
+
+  it("honors an explicit rebuild when a newer refresh supersedes it", async () => {
+    const reminder = { id: 10_000, title: "Fajr", body: "Reminder", at: Date.now() + 60_000, route: "#/prayer/fajr" };
+    notifications.getPending.mockResolvedValue({
+      notifications: [
+        { ...reminder, extra: { route: reminder.route, azkarappAt: reminder.at, azkarappExact: "granted" } },
+      ],
+    });
+    await Promise.all([replaceNativeReminders([reminder], true), replaceNativeReminders([reminder])]);
+    expect(notifications.schedule).toHaveBeenCalledOnce();
+  });
+  it("cancels a pending contextual reminder when its choice is switched off", async () => {
+    notifications.getPending.mockResolvedValue({ notifications: [{ id: 19_001 }, { id: 9999 }] });
+    await replaceNativeReminders([]);
+    expect(notifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 19_001 }] });
+    expect(notifications.schedule).not.toHaveBeenCalled();
+  });
+  it("retires alarms from the previous competing scheduler", async () => {
+    notifications.getPending.mockResolvedValue({
+      notifications: [{ id: 123456789, extra: { azkarappReminder: true } }, { id: 9999 }, { id: 456 }],
+    });
+    await replaceNativeReminders([]);
+    expect(notifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 123456789 }] });
+  });
+  it("opens the prayer selected by a native notification tap", async () => {
+    const { initializeNativeNotifications } = await import("./reminders");
+    await initializeNativeNotifications();
+    const callback = notifications.addListener.mock.calls[0]![1];
+    callback({ notification: { extra: { route: "#/prayer/asr" } } });
+    expect(window.location.hash).toBe("#/prayer/asr");
+    callback({ notification: { extra: { route: "https://example.com/" } } });
+    expect(window.location.hash).toBe("#/prayer/asr");
+    window.location.hash = "";
   });
 
   it("recovers after a failed native write and never schedules without permission", async () => {

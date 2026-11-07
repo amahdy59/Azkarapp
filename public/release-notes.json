@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-31.2",
+  "release": "2026-11-07.4",
   "ar": [
-    "إصلاح تنزيل ملفات الصوت المضغوطة لتفتح بسلاسة على ويندوز وكافة الأجهزة.",
-    "استقرار حفظ التنزيلات الصوتية والمصحف والتحقق من اكتمالها بعد تحديث الصفحة.",
-    "تحسين ملاءمة شريط التنقل السفلي تلقائياً عند تكبير الخط والشاشات الصغيرة.",
-    "ضبط دقة أبعاد أزرار الوصول السريع وتجاوبها السلس مع اللمس والتنقل."
+    "يبقى التاريخان ظاهرين عند تمرير الرئيسية، مع خط أكبر للتاريخ الثانوي.",
+    "يظهر الوقت المتبقي للصلاة القادمة بالساعات والدقائق في سطر واحد، مع مساحة أوسع عند تكبير النص.",
+    "احفظ صفحة المصحف بجانب اسم السورة، وادخل وضع التركيز من الزر أسفل الشاشة على الهاتف.",
+    "تصفّح فهرس المصحف داخل مساحة القراءة مع بقاء شريطي التنقل متاحين."
   ],
   "en": [
-    "Fixed audio ZIP downloads so archives open smoothly on Windows and all platforms.",
-    "Reliable offline audio and Mushaf caching that persists verification after page reload.",
-    "Improved bottom navigation layout under enlarged text sizes and narrow screens.",
-    "Refined shortcut touch target dimensions for smooth touch and keyboard navigation."
+    "Both dates remain visible as you scroll Home, with larger text for the secondary date.",
+    "The time until the next prayer stays on one line in hours and minutes, with more room at enlarged text sizes.",
+    "On phones, bookmark beside the surah selector and enter Focus using the bottom button.",
+    "Browse the Mushaf index inside the reading area while both navigation bars stay accessible."
   ]
 }

@@ -101,24 +101,29 @@ for (const { language, width } of (["ar", "en"] as const).flatMap((language) =>
     });
     if (width === 1440) {
       const indicator = page.getByTestId("audio-play-all-indicator");
-      await expect(indicator).toContainText(language === "ar" ? "تشغيل الكل" : "Play all");
+      await expect(indicator).toContainText(language === "ar" ? "تلقائي" : "Play next");
+      await expect(indicator.getByRole("switch")).toHaveAccessibleName(
+        language === "ar" ? "تشغيل التالي تلقائيًا" : "Auto-play next",
+      );
       const layout = await indicator.evaluate((node) => ({
-        label: node.getBoundingClientRect().right,
-        controls: document.querySelector(".audio-expanded-transport")!.getBoundingClientRect().left,
+        label: node.getBoundingClientRect().bottom,
+        controls: document.querySelector(".audio-seek-row")!.getBoundingClientRect().top,
       }));
       expect(layout.label).toBeLessThanOrEqual(layout.controls);
       await page.screenshot({ path: testInfo.outputPath(`play-all-beside-transport-${language}.png`), scale: "css" });
     }
     await options.click();
-    const continuation = page.getByRole("switch", {
-      name: language === "ar" ? "تشغيل الذكر التالي تلقائيًا" : "Play next zikr automatically",
-    });
-    await expect(continuation).toHaveAttribute("aria-checked", "true");
+
     await expect(page.locator(".audio-expanded-meta > .sr-only")).toHaveCount(0); // Reader already supplies context.
     await page.screenshot({ path: testInfo.outputPath(`consistent-audio-options-${language}.png`), scale: "css" });
+    await page.keyboard.press("Escape");
+    const continuation = page.getByRole("switch", {
+      name: language === "ar" ? "تشغيل التالي تلقائيًا" : "Auto-play next",
+      exact: true,
+    });
+    await expect(continuation).toHaveAttribute("aria-checked", "true");
     await continuation.click();
     await expect(continuation).toHaveAttribute("aria-checked", "false");
-    await page.keyboard.press("Escape");
     const reader = page.getByTestId("reader-screen");
     const firstId = await reader.getAttribute("data-zikr-id");
     await player.getByRole("button", { name: language === "ar" ? "الذكر التالي" : "Next item", exact: true }).click();
@@ -221,7 +226,27 @@ test("100-count tawhid offers prescribed repeat and shows each repetition", asyn
   await page.getByTestId("reader-audio-dock-button").click();
   const player = page.getByRole("region", { name: "Audio player", exact: true });
   await player.getByRole("button", { name: "Expand player" }).click();
-  await player.getByRole("button", { name: "Audio options", exact: true }).click();
+  await page.setViewportSize({ width: 320, height: 844 });
+  const footerRow = player.locator(".audio-expanded-feedback");
+  expect(
+    await footerRow.evaluate((node) => {
+      const bounds = node.getBoundingClientRect();
+      return [...node.querySelectorAll("button")].every((button) => {
+        const box = button.getBoundingClientRect();
+        return (
+          box.width >= 44 &&
+          box.left >= bounds.left - 1 &&
+          box.right <= bounds.right + 1 &&
+          Math.abs(box.top + box.height / 2 - (bounds.top + bounds.height / 2)) <= 1
+        );
+      });
+    }),
+  ).toBe(true);
+  await expect(player.locator(".audio-continue-label")).toBeVisible();
+  expect(
+    await player.locator(".audio-continue-label").evaluate((node) => node.scrollWidth - node.clientWidth),
+  ).toBeLessThanOrEqual(1);
+  await player.getByTestId("audio-repetition-progress").click();
   await expect(page.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
@@ -241,6 +266,9 @@ test("100-count tawhid offers prescribed repeat and shows each repetition", asyn
     (window as unknown as { repetitionAudio: EventTarget }).repetitionAudio.dispatchEvent(new Event("ended")),
   );
   await expect(player).toContainText("2 / 100");
+  await player.locator(".audio-seek-row").dispatchEvent("pointerdown", { pointerType: "touch" });
+  await expect(page.locator(".audio-options-panel")).toHaveCount(0);
+  await player.getByTestId("audio-repetition-progress").click();
   await page.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
   await expect(page.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
     "aria-pressed",
@@ -263,6 +291,10 @@ async function _enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
@@ -280,6 +312,10 @@ test("unreviewed audio is unavailable and never autoplays", async ({ page }) => 
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-comprehensive_duas").click();
   const playAll = page.getByRole("button", { name: "Play All Audio" });
@@ -299,6 +335,10 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
 
   // Select the mode in the collection overview before entering ReaderScreen.
   await page.getByTestId("nav-azkar").click();

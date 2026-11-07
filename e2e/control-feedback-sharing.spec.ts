@@ -13,7 +13,7 @@ for (const language of ["ar", "en"] as const) {
         localStorage.setItem(
           "azkarapp.state.v1",
           JSON.stringify({
-            settings: { language, reduceMotion: true, routineModes: { morning: "complete" } },
+            settings: { readerToolLabels: true, language, reduceMotion: true, routineModes: { morning: "complete" } },
             profile: { isGuest: true },
           }),
         );

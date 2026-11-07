@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { applyServiceWorkerUpdate, escapeStaleServiceWorker, isProtectedContentCache } from "./pwaUpdate";
+import {
+  applyServiceWorkerUpdate,
+  prepareServiceWorkerUpdate,
+  escapeStaleServiceWorker,
+  isProtectedContentCache,
+} from "./pwaUpdate";
 
 /** A worker whose state can be driven, as the browser drives a real one. */
 function fakeWorker(state: ServiceWorker["state"]) {
@@ -31,6 +36,77 @@ function deps(registration: Partial<ServiceWorkerRegistration> | undefined) {
 }
 
 describe("applying a service worker update", () => {
+  it("does not recheck the network when a worker is already ready", async () => {
+    const update = vi.fn(() => new Promise<void>(() => {}));
+    const postMessage = vi.fn();
+    const { args, reload } = deps({ update, waiting: { postMessage } as unknown as ServiceWorker });
+    await applyServiceWorkerUpdate(args);
+    expect(update).not.toHaveBeenCalled();
+    expect(postMessage).toHaveBeenCalledOnce();
+    expect(reload).toHaveBeenCalledOnce();
+  });
+
+  it("follows an install discovered by the browser while an explicit check is queued", async () => {
+    const installing = fakeWorker("installing");
+    const registration = Object.assign(new EventTarget(), {
+      update: vi.fn(() => new Promise<void>(() => {})),
+      installing: null as ServiceWorker | null,
+      waiting: null as ServiceWorker | null,
+    });
+    const preparing = prepareServiceWorkerUpdate(async () => registration as unknown as ServiceWorkerRegistration);
+    await Promise.resolve();
+    registration.installing = installing.worker;
+    registration.dispatchEvent(new Event("updatefound"));
+    registration.waiting = {} as ServiceWorker;
+    installing.finish("installed");
+    expect(await preparing).toBe(registration);
+  });
+
+  it("prepares an installing worker without granting activation consent", async () => {
+    const installing = fakeWorker("installing");
+    const postMessage = vi.fn();
+    const registration = { installing: installing.worker, waiting: null as ServiceWorker | null };
+    const preparing = prepareServiceWorkerUpdate(async () => registration as ServiceWorkerRegistration);
+    await Promise.resolve();
+    registration.waiting = { postMessage } as unknown as ServiceWorker;
+    installing.finish("installed");
+    expect(await preparing).toBe(registration);
+    expect(postMessage).not.toHaveBeenCalled();
+  });
+
+  it("observes handover before messaging the actual waiting worker", async () => {
+    const order: string[] = [];
+    const postMessage = vi.fn(() => order.push("activate"));
+    const { args, updateServiceWorker, reload } = deps({ waiting: { postMessage } as unknown as ServiceWorker });
+    reload.mockImplementation(() => order.push("reload"));
+    await applyServiceWorkerUpdate({
+      ...args,
+      awaitHandover: async () => {
+        order.push("observe");
+        return true;
+      },
+    });
+    expect(postMessage).toHaveBeenCalledWith({ type: "SKIP_WAITING" });
+    expect(updateServiceWorker).not.toHaveBeenCalled();
+    expect(order).toEqual(["observe", "activate", "reload"]);
+  });
+
+  it("allows a slow install to finish and prevents an expired attempt from reloading later", async () => {
+    const installing = fakeWorker("installing");
+    const remove = vi.fn();
+    installing.worker.removeEventListener = remove;
+    const controller = new AbortController();
+    const { args, reload } = deps({ installing: installing.worker });
+    const attempt = applyServiceWorkerUpdate({ ...args, signal: controller.signal });
+    const rejected = expect(attempt).rejects.toThrow("expired");
+    await Promise.resolve();
+    await Promise.resolve();
+    controller.abort(new Error("expired"));
+    await rejected;
+    installing.finish("installed");
+    expect(reload).not.toHaveBeenCalled();
+    expect(remove).toHaveBeenCalledWith("statechange", expect.any(Function));
+  });
   it("hands over to a worker that is already waiting", async () => {
     const { args, updateServiceWorker, reload } = deps({
       update: vi.fn(async () => undefined),

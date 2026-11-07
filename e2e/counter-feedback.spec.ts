@@ -4,24 +4,24 @@ test("custom target remains reachable at 200 percent text on a short phone", asy
   await page.setViewportSize({ width: 390, height: 568 });
   await openReturningGuest(page);
   await page.goto("/#/counter");
-  await page.getByTestId("counter-target-filter").click();
-  await page.getByRole("menuitem", { name: "Custom", exact: true }).click();
+  await page.getByTestId("masbaha-settings-trigger").click();
+  await page.getByRole("radio", { name: "Custom", exact: true }).check();
   await page.locator("html").evaluate((el) => {
     el.style.fontSize = "32px";
   });
-  const dialog = page.getByRole("dialog", { name: "Set Custom Target", exact: true });
-  const title = dialog.locator('[aria-hidden="true"]').filter({ hasText: "Set Custom Target" });
+  const dialog = page.getByRole("dialog", { name: "Masbaha settings", exact: true });
+  const title = dialog.locator('[aria-hidden="true"]').filter({ hasText: "Masbaha settings" });
   expect(await title.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
-  const target = dialog.getByRole("spinbutton", { name: "Target:" });
+  const target = dialog.getByRole("spinbutton", { name: "Set Custom Target" });
   await target.fill("55");
-  const apply = dialog.getByRole("button", { name: "Apply Target", exact: true });
+  const apply = dialog.getByRole("button", { name: "Apply settings", exact: true });
   await apply.scrollIntoViewIfNeeded();
   const bounds = (await apply.boundingBox())!;
   expect(bounds.y + bounds.height).toBeLessThanOrEqual(569);
   await page.screenshot({ path: "output/playwright/review-custom-target-200-percent-fixed.png" });
   await apply.click();
   await expect(dialog).toBeHidden();
-  await expect(page.getByTestId("counter-target-filter")).toHaveText(/55/);
+  await expect(page.getByTestId("masbaha-settings-summary")).toHaveText(/55/);
 });
 
 async function openReturningGuest(page: Page, language: "ar" | "en" = "en", settings: Record<string, unknown> = {}) {
@@ -169,9 +169,9 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
         .first()
         .evaluate((node) => node.getBoundingClientRect().bottom);
       expect(prayerDetailBox.y).toBeCloseTo(cardBottom + 20, 0);
-      expect(primaryBox.width).toBeCloseTo((gridBox.width - 1.25 * rootSize) / 2, 0);
+      expect(primaryBox.width).toBeCloseTo((gridBox.width - rootSize) / 2, 0);
       expect(companionBox.width).toBeCloseTo(primaryBox.width, 0);
-      expect(primaryBox.y).toBeCloseTo(prayerDetailBox.y + prayerDetailBox.height + 1.25 * rootSize, 0);
+      expect(primaryBox.y).toBeCloseTo(prayerDetailBox.y + prayerDetailBox.height + 0.75 * rootSize, 0);
       expect(companionBox.y).toBeCloseTo(primaryBox.y, 0);
       expect(primaryBox.x + primaryBox.width).toBeCloseTo(gridBox.x + gridBox.width, 0);
       expect(companionBox.x).toBeCloseTo(gridBox.x, 0);
@@ -198,7 +198,7 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
       expect(tabletPrayerBox.width).toBeCloseTo(tabletGridBox.width, 0);
       expect(tabletPrayerBox.x).toBeCloseTo(tabletGridBox.x, 0);
       expect(tabletSummaryBox.width).toBeCloseTo(tabletGridBox.width, 0);
-      expect(tabletPrimaryBox.y).toBeCloseTo(tabletPrayerBox.y + tabletPrayerBox.height + rootSize, 0);
+      expect(tabletPrimaryBox.y).toBeCloseTo(tabletPrayerBox.y + tabletPrayerBox.height + 0.75 * rootSize, 0);
       expect(tabletCompanionBox.y).toBeCloseTo(tabletPrimaryBox.y, 0);
       expect(tabletPrimaryBox.width).toBeCloseTo((tabletGridBox.width - rootSize) / 2, 0);
       expect(tabletCompanionBox.width).toBeCloseTo(tabletPrimaryBox.width, 0);

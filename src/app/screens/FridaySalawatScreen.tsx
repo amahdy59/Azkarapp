@@ -1,14 +1,17 @@
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { ReferenceCard } from "../components/ReferenceCard";
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
+import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { useCounterAnnouncement } from "../hooks/useCounterAnnouncement";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
   ArrowPrevious,
   Check,
   Lightbulb,
+  Keyboard,
   MoreVertical,
   Play,
   RotateCcw,
@@ -28,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
-import { isCounterShortcutBlocked } from "../keyboardShortcuts";
+import { COMPACT_TOUCH_KEYBOARD_HELP_QUERY, isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
@@ -138,6 +141,9 @@ export function FridaySalawatScreen({
   const [selectedFormula, setSelectedFormula] = useState<SalawatFormula>(() => SALAWAT_FORMULAS[0]!);
   const [currentTextSize, setCurrentTextSize] = useState<TextSizeOption>(textSize);
   const [shareOpen, setShareOpen] = useState(false);
+  const compactTouch = useMediaQuery(COMPACT_TOUCH_KEYBOARD_HELP_QUERY);
+  const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
+  const moreTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setCurrentTextSize(textSize);
@@ -328,10 +334,20 @@ export function FridaySalawatScreen({
               return (
                 <div className="flex items-center gap-1.5">
                   <DropdownMenu dir={direction}>
-                    <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
+                    <DropdownMenuTrigger
+                      ref={moreTriggerRef}
+                      className={actionClass}
+                      aria-label={t(language, "common.moreOptions")}
+                    >
                       <MoreVertical size={20} aria-hidden="true" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      {isWide && !compactTouch && (
+                        <DropdownMenuItem onSelect={() => setKeyboardHelpOpen(true)}>
+                          <Keyboard size={16} aria-hidden="true" />
+                          {t(language, "reader.keyboardShortcuts")}
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={toggleSound}>
                         {soundEnabled ? (
                           <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
@@ -467,6 +483,22 @@ export function FridaySalawatScreen({
         </div>
       </div>
 
+      <CounterKeyboardHelp
+        language={language}
+        direction={direction}
+        open={keyboardHelpOpen}
+        onOpenChange={setKeyboardHelpOpen}
+        showTrigger={false}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          moreTriggerRef.current?.focus();
+        }}
+        shortcuts={[
+          { keys: ["Space"], label: t(language, "reader.shortcutCount") },
+          { keys: ["R"], label: t(language, "reader.shortcutReset") },
+          { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
+        ]}
+      />
       {showCompletionModal && (
         <ResponsiveSheet
           open

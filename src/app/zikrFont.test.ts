@@ -89,7 +89,7 @@ describe("zikr font selection", () => {
 
   it("falls back to the default rather than trusting a stored value", () => {
     const stored = normalizeAppState({ settings: { ...DEFAULT_APP_STATE.settings, zikrFont: "comic-sans" } });
-    expect(stored.settings.zikrFont).toBe("humanist");
+    expect(stored.settings.zikrFont).toBe(DEFAULT_APP_STATE.settings.zikrFont);
   });
 
   it("carries the choice through an account merge", () => {

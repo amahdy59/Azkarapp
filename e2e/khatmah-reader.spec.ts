@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { chooseWirdOption } from "./helpers/wird";
+import { t } from "../src/app/i18n";
 
 test.beforeEach(async ({ page }) => {
   // The reader no longer talks to api.quran.com at all; blocking the remote
@@ -36,8 +37,11 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
       ),
     )
     .toBe(true);
-  const progress = page.getByRole("progressbar", { name: /أكملت ٠ من ٤/ });
+  const progress = page.getByRole("progressbar", { name: t("ar", "mushaf.todayReadingTitle"), exact: true });
   await expect(progress).toHaveAttribute("dir", "rtl");
+  await expect(progress).toHaveAttribute("aria-valuenow", "0");
+  await expect(progress).toHaveAttribute("aria-valuemax", "4");
+  await expect(progress).toHaveAttribute("aria-valuetext", t("ar", "mushaf.noPagesReadToday"));
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toBeVisible();
   await expect(page.getByRole("region", { name: "هذا الأسبوع" }).getByRole("listitem").first()).toContainText("السبت");
   const arabicAlignments = await page
@@ -90,7 +94,9 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect(mushafPage.locator("[data-mushaf-column] > div")).toHaveCount(15);
   const footerSeparation = await mushafPage.evaluate((article) => {
     const slots = [...article.querySelectorAll<HTMLElement>("[data-mushaf-column] > div")];
-    const folio = article.querySelector<HTMLElement>("[data-testid='mushaf-furniture-page-btn']");
+    const folio = article
+      .closest("[data-mushaf-reader]")
+      ?.querySelector<HTMLElement>("[data-testid='mushaf-furniture-page-btn']");
     const finalSlot = slots.at(-1);
     if (!folio || !finalSlot) return null;
     return {
@@ -187,7 +193,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   // Moving right goes back; the labelled controls keep the same semantics.
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
-  await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).dispatchEvent("click");
+  await pageNavigation.getByRole("button", { name: t("ar", "common.next"), exact: true }).dispatchEvent("click");
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 });
 
@@ -345,14 +351,28 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
     )
     .toEqual({ sameMode: true, visible: true });
   const spreadGeometry = await page.locator("[data-mushaf-page]").evaluateAll((pages) => {
-    const frames = pages.map((page) => page.querySelector<HTMLElement>(".mushaf-page-frame")?.getBoundingClientRect());
+    // Facing paper canvases are equal; each inner ink frame follows its own
+    // fitted measure, which differs between pages in the Unicode fallback.
+    const frames = pages.map((page) => page.getBoundingClientRect());
     return {
       widthDelta: Math.abs((frames[0]?.width ?? 0) - (frames[1]?.width ?? 0)),
       heightDelta: Math.abs((frames[0]?.height ?? 0) - (frames[1]?.height ?? 0)),
+      pages: pages.map((page) => ({
+        mode: page.getAttribute("data-mushaf-rendering"),
+        frame: page.querySelector(".mushaf-page-frame")!.getBoundingClientRect().toJSON(),
+        measure: (page as HTMLElement).style.getPropertyValue("--mushaf-measure"),
+      })),
+      inkContained: pages.every((page) => {
+        const paper = page.getBoundingClientRect();
+        const ink = page.querySelector(".mushaf-page-frame")!.getBoundingClientRect();
+        return ink.left >= paper.left && ink.right <= paper.right && ink.top >= paper.top && ink.bottom <= paper.bottom;
+      }),
     };
   });
-  expect(spreadGeometry.widthDelta).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: testInfo.outputPath("spread-geometry.png") });
+  expect(spreadGeometry.widthDelta, JSON.stringify(spreadGeometry)).toBeLessThanOrEqual(1);
   expect(spreadGeometry.heightDelta).toBeLessThanOrEqual(1);
+  expect(spreadGeometry.inkContained).toBe(true);
   const widestWordGap = await article.locator("[data-mushaf-line-content]").evaluateAll((lines) =>
     Math.max(
       0,
@@ -390,7 +410,7 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   await expect(page.getByTestId("mushaf-rail-page-bookmark")).toBeVisible();
   await expect(page.getByTestId("mushaf-difficult-words-switch")).toBeVisible();
   await expect(page.getByTestId("mushaf-rail-more")).toBeVisible();
-  await expect(page.getByTestId("mushaf-focus-enter")).toHaveCount(0);
+  await expect(page.getByTestId("mushaf-focus-toggle")).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
   const desktopGeometry = await page.evaluate(() => {
     const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;

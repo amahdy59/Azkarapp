@@ -3,13 +3,17 @@ import {
   getMushafPageUrl,
   getQcfFontUrl,
   MUSHAF_CACHE_NAME,
-  readMushafPageResponse,
+  parseMushafPage,
   readQcfFontResponse,
 } from "./qcfMushaf";
 import { fetchNativeBinaryResource } from "@azkar/native-mushaf-download";
 
+import { getMushafAssetBytes, MUSHAF_SIZE_VERSION } from "./downloadStorage";
+import { scheduleMushafRequest } from "./mushafScheduler";
+
 const PAGE_COUNT = 604;
-const CONCURRENCY_LIMIT = 8;
+const CONCURRENCY_LIMIT = 4;
+const DOWNLOAD_REQUEST_TIMEOUT_MS = 30_000;
 
 function pageUrl(page: number) {
   return new URL(getMushafPageUrl(page), window.location.href).toString();
@@ -19,12 +23,36 @@ function fontUrl(page: number) {
   return getQcfFontUrl(page);
 }
 
-export async function getMushafDownloadStatus(): Promise<{
+export type MushafDownloadStatus = {
   downloadedPages: number;
   downloadedFonts: number;
   totalPages: number;
   isComplete: boolean;
-}> {
+  downloadedBytes?: number;
+  remainingBytes?: number;
+};
+
+const summaryKey = `azkar-mushaf-summary-v2:${MUSHAF_SIZE_VERSION}:${MUSHAF_CACHE_NAME}:${FONT_CACHE_NAME}`;
+let lastStatus: MushafDownloadStatus | undefined;
+export function getPreviousMushafDownloadStatus() {
+  if (lastStatus) return lastStatus;
+  try {
+    const value = JSON.parse(sessionStorage.getItem(summaryKey) ?? "null") as MushafDownloadStatus | null;
+    if (
+      value &&
+      value.totalPages === PAGE_COUNT &&
+      [value.downloadedPages, value.downloadedFonts].every((n) => Number.isInteger(n) && n >= 0 && n <= PAGE_COUNT) &&
+      Number.isFinite(value.downloadedBytes) &&
+      Number.isFinite(value.remainingBytes)
+    )
+      return value;
+  } catch {
+    /* The hint is optional. */
+  }
+  return undefined;
+}
+
+export async function getMushafDownloadStatus(signal?: AbortSignal): Promise<MushafDownloadStatus> {
   if (!("caches" in window)) {
     return { downloadedPages: 0, downloadedFonts: 0, totalPages: PAGE_COUNT, isComplete: false };
   }
@@ -36,52 +64,124 @@ export async function getMushafDownloadStatus(): Promise<{
     const fontSet = new Set(fontKeys.map((key) => key.url));
     let trulyReadyPages = 0;
     let downloadedFonts = 0;
+    let downloadedBytes = 0;
+    let remainingBytes = 0;
     for (let first = 1; first <= PAGE_COUNT; first += CONCURRENCY_LIMIT) {
+      signal?.throwIfAborted();
       await Promise.all(
         Array.from({ length: Math.min(CONCURRENCY_LIMIT, PAGE_COUNT - first + 1) }, async (_, offset) => {
           const page = first + offset;
           const pUrl = pageUrl(page);
           const fUrl = new URL(fontUrl(page), window.location.href).href;
-          const [hasPage, hasFont] = await Promise.all([
-            pageSet.has(pUrl) && validCachedResource(pageCache, pUrl, readMushafPageResponse),
+          const [pageBytes, fontBytes] = await Promise.all([
+            pageSet.has(pUrl) && validCachedResource(pageCache, pUrl, readPageBytes),
             fontSet.has(fUrl) && validCachedResource(fontCache, fUrl, readQcfFontResponse),
           ]);
-          if (hasFont) downloadedFonts++;
-          if (hasPage && hasFont) trulyReadyPages++;
+          if (fontBytes) downloadedFonts++;
+          if (pageBytes && fontBytes) trulyReadyPages++;
+          const bytes = Number(pageBytes) + Number(fontBytes);
+          downloadedBytes += bytes;
+          const expected = getMushafAssetBytes(page);
+          remainingBytes += (pageBytes ? 0 : expected.page) + (fontBytes ? 0 : expected.font);
         }),
       );
     }
-    return {
+    signal?.throwIfAborted();
+    lastStatus = {
+      downloadedBytes,
+      remainingBytes,
       downloadedPages: trulyReadyPages,
       downloadedFonts,
       totalPages: PAGE_COUNT,
       isComplete: trulyReadyPages >= PAGE_COUNT,
     };
+    try {
+      sessionStorage.setItem(summaryKey, JSON.stringify(lastStatus));
+    } catch {
+      /* Optional hint. */
+    }
+    return lastStatus;
   } catch {
+    signal?.throwIfAborted();
     return { downloadedPages: 0, downloadedFonts: 0, totalPages: PAGE_COUNT, isComplete: false };
   }
 }
 
-async function validCachedResource(cache: Cache, url: string, read: (response: Response) => Promise<unknown>) {
+async function readPageBytes(response: Response) {
+  if (response.status !== 200) return null;
+  try {
+    const bytes = await response.clone().arrayBuffer();
+    return parseMushafPage(JSON.parse(new TextDecoder().decode(bytes))) ? bytes : null;
+  } catch {
+    return null;
+  }
+}
+
+async function validCachedResource(
+  cache: Cache,
+  url: string,
+  read: (response: Response) => Promise<ArrayBuffer | null>,
+) {
   const response = await cache.match(url);
   if (!response) return false;
-  if (await read(response)) return true;
+  const validated = await read(response);
+  if (validated) return validated.byteLength;
   await cache.delete(url);
   return false;
 }
 
+async function downloadResource(
+  cache: Cache,
+  url: string,
+  label: string,
+  read: (response: Response) => Promise<ArrayBuffer | null>,
+  controller: AbortController,
+) {
+  const { signal } = controller;
+  signal.throwIfAborted();
+  const timeout = setTimeout(
+    () => controller.abort(new DOMException(`${label} timed out`, "TimeoutError")),
+    DOWNLOAD_REQUEST_TIMEOUT_MS,
+  );
+  try {
+    const response = await fetchNativeBinaryResource(url, signal);
+    if (!response.ok) throw new Error(`${label} failed: ${response.status}`);
+    const bytes = await read(response);
+    signal.throwIfAborted();
+    if (!bytes) throw new Error(`${label} was invalid`);
+    await cache.put(url, response);
+    return bytes.byteLength;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function removeDownloadedMushaf(): Promise<void> {
   if (!("caches" in window)) return;
+  lastStatus = undefined;
+  try {
+    sessionStorage.removeItem(summaryKey);
+  } catch {
+    /* Optional hint. */
+  }
   await Promise.all([caches.delete(MUSHAF_CACHE_NAME), caches.delete(FONT_CACHE_NAME)]);
 }
 
 export async function downloadMushaf(
-  options: { signal?: AbortSignal; onProgress?: (completed: number, total: number) => void } = {},
+  options: {
+    signal?: AbortSignal;
+    pages?: readonly number[];
+    onProgress?: (completed: number, total: number, bytes: number) => void;
+  } = {},
 ) {
+  const pages = options.pages ? [...new Set(options.pages)] : Array.from({ length: PAGE_COUNT }, (_, i) => i + 1);
+  if (!pages.length || pages.some((page) => !Number.isInteger(page) || page < 1 || page > PAGE_COUNT))
+    throw new RangeError("Invalid Mushaf page selection");
   if (!("caches" in window)) throw new Error("Cache API unavailable");
   const [pageCache, fontCache] = await Promise.all([caches.open(MUSHAF_CACHE_NAME), caches.open(FONT_CACHE_NAME)]);
 
   let completed = 0;
+  let bytes = 0;
   const controller = new AbortController();
   const cancel = () => controller.abort();
   options.signal?.addEventListener("abort", cancel, { once: true });
@@ -91,7 +191,6 @@ export async function downloadMushaf(
     failure ??= error;
     controller.abort();
   };
-  const pages = Array.from({ length: PAGE_COUNT }, (_, i) => i + 1);
 
   const downloadSinglePage = async (page: number) => {
     if (controller.signal.aborted) throw new DOMException("Download cancelled", "AbortError");
@@ -100,7 +199,7 @@ export async function downloadMushaf(
     const fUrl = fontUrl(page);
 
     const [hasPage, hasFont] = await Promise.all([
-      validCachedResource(pageCache, pUrl, readMushafPageResponse),
+      validCachedResource(pageCache, pUrl, readPageBytes),
       validCachedResource(fontCache, fUrl, readQcfFontResponse),
     ]);
 
@@ -108,25 +207,35 @@ export async function downloadMushaf(
 
     if (!hasPage) {
       fetchTasks.push(
-        (async () => {
-          const response = await fetchNativeBinaryResource(pUrl, controller.signal);
-          if (!response.ok) throw new Error(`Mushaf page ${page} failed: ${response.status}`);
-          if (!(await readMushafPageResponse(response))) throw new Error(`Mushaf page ${page} was invalid`);
-          controller.signal.throwIfAborted();
-          await pageCache.put(pUrl, response);
-        })(),
+        scheduleMushafRequest(
+          pUrl,
+          async () => {
+            const size = await downloadResource(pageCache, pUrl, `Mushaf page ${page}`, readPageBytes, controller);
+            bytes += size;
+          },
+          "download",
+          controller.signal,
+        ),
       );
     }
 
     if (!hasFont) {
       fetchTasks.push(
-        (async () => {
-          const fontResponse = await fetchNativeBinaryResource(fUrl, controller.signal);
-          if (!fontResponse.ok) throw new Error(`Mushaf font ${page} failed: ${fontResponse.status}`);
-          if (!(await readQcfFontResponse(fontResponse))) throw new Error(`Mushaf font ${page} was invalid`);
-          controller.signal.throwIfAborted();
-          await fontCache.put(fUrl, fontResponse);
-        })(),
+        scheduleMushafRequest(
+          fUrl,
+          async () => {
+            const size = await downloadResource(
+              fontCache,
+              fUrl,
+              `Mushaf font ${page}`,
+              readQcfFontResponse,
+              controller,
+            );
+            bytes += size;
+          },
+          "download",
+          controller.signal,
+        ),
       );
     }
 
@@ -145,7 +254,7 @@ export async function downloadMushaf(
     }
 
     completed += 1;
-    options.onProgress?.(completed, PAGE_COUNT);
+    options.onProgress?.(completed, pages.length, bytes);
   };
 
   // Run with bounded concurrency for fast parallel downloads

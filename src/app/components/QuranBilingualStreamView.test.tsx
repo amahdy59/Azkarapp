@@ -57,7 +57,7 @@ describe("QuranBilingualStreamView", () => {
 
     expect(screen.getByTestId("bilingual-stream-view")).toBeInTheDocument();
     expect(screen.getByText("Saheeh International")).toBeVisible();
-    expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ١")).toBeInTheDocument();
+    expect(await screen.findByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ١")).toBeInTheDocument();
     expect(
       await screen.findByText("In the name of Allah, the Entirely Merciful, the Especially Merciful."),
     ).toBeInTheDocument();
@@ -67,6 +67,7 @@ describe("QuranBilingualStreamView", () => {
     const user = userEvent.setup();
     const onToggleBookmark = vi.fn();
     const onAyahAction = vi.fn();
+    const onShareAyah = vi.fn();
 
     render(
       <QuranBilingualStreamView
@@ -79,6 +80,7 @@ describe("QuranBilingualStreamView", () => {
         bookmarkedVerses={[]}
         onToggleVerseBookmark={onToggleBookmark}
         onAyahAction={onAyahAction}
+        onShareAyah={onShareAyah}
         showWordMeanings={false}
         onPaginate={vi.fn()}
         atFirstPage={true}
@@ -93,5 +95,8 @@ describe("QuranBilingualStreamView", () => {
     const detailsBtn = screen.getByTestId("bilingual-details-1:1");
     await user.click(detailsBtn);
     expect(onAyahAction).toHaveBeenCalledWith("1:1", 1);
+    await user.click(screen.getByTestId("bilingual-share-1:1"));
+    expect(onShareAyah).toHaveBeenCalledWith("1:1", 1);
+    expect(screen.getByTestId("bilingual-scroll")).toContainElement(screen.getByTestId("bilingual-bookmark-1:1"));
   });
 });

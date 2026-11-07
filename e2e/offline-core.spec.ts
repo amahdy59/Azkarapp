@@ -60,6 +60,12 @@ test("core Reader and Settings are available on a first offline visit after inst
     await expect(page.getByTestId("counter-tap-hint")).toHaveCount(0);
     await page.screenshot({ path: testInfo.outputPath("first-offline-mushaf-lettering.png") });
 
+    // Home no longer loads this text. Its original route must still open from the install cache.
+    const baqarah = getAzkarForMode("illness_ruqyah").findIndex((zikr) => zikr.id === "ir-baqarah") + 1;
+    await page.goto(`/#/azkar/illness-ruqyah/${baqarah}`);
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Al-Baqarah/ }).first()).toBeVisible();
+
     await page.goto("/");
     if (await page.getByTestId("nav-more").isVisible()) {
       await page.getByTestId("nav-more").click();

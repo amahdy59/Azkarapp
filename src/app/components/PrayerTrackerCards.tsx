@@ -7,9 +7,6 @@ import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { trackedLocation } from "../prayerMoment";
 import { prayerDisplayName } from "../prayerPresentation";
-import { usePrayerCountdown } from "../hooks/usePrayerCountdown";
-import type { PrayerCountdownInterval } from "../prayerCountdown";
-import { PrayerCountdown } from "./PrayerCountdown";
 
 /**
  * The five after-prayer cards.
@@ -52,8 +49,6 @@ export interface PrayerCardModel {
   isRecordable: boolean;
   /** Only present on the next prayer. */
   countdown?: string;
-  remainingPercent?: number;
-  countdownInterval?: PrayerCountdownInterval;
   /** Decorative surface emphasis, independent of recording and prayer validity. */
   emphasis?: number;
 }
@@ -141,7 +136,7 @@ function TrackingCheckbox({
   return (
     <label
       htmlFor={id}
-      className={`relative flex min-h-11 items-center justify-between gap-2 rounded-xl px-2.5 py-1 my-0.5 border transition-all duration-standard ${
+      className={`relative flex min-h-11 items-center justify-between gap-2 rounded-xl px-2.5 py-1 my-0.5 border transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-standard ${
         disabled
           ? "cursor-not-allowed opacity-40 border-transparent bg-transparent"
           : checked
@@ -206,6 +201,8 @@ function PrayerCard({
   onOpen,
   onGlass,
   summaryOnly,
+  summaryCondensed,
+  separateCompactSummary,
   selected,
   dayKey,
 }: {
@@ -216,13 +213,12 @@ function PrayerCard({
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onOpen?: (prayer: PrayerName | null) => void;
   summaryOnly?: boolean;
+  summaryCondensed?: boolean;
+  separateCompactSummary?: boolean;
   selected?: boolean;
   dayKey: string;
 }) {
   const { prayer, time, state, countdown, isOpenable, isRecordable } = model;
-  const cardRef = useRef<HTMLElement>(null);
-  const countdownInterval = summaryOnly && state === "next" ? model.countdownInterval : undefined;
-  const countdownNow = usePrayerCountdown(cardRef, countdownInterval);
   const Icon = PRAYER_ICON[prayer];
   const name = prayerDisplayName(prayer, language, dayKey);
   const timeLabel = formatPrayerTimeLabel(time, language === "ar");
@@ -248,7 +244,6 @@ function PrayerCard({
   if (summaryOnly) {
     return (
       <article
-        ref={cardRef}
         aria-labelledby={`prayer-card-heading-${prayer}`}
         data-testid={`prayer-card-${prayer}`}
         data-prayer={prayer}
@@ -275,7 +270,7 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-detail-${prayer}${state !== "next" ? ` prayer-summary-record-${prayer}` : ""}`}
+          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-${summaryCondensed && countdown && !separateCompactSummary ? "compact" : "detail"}-${prayer}${state !== "next" ? ` prayer-summary-record-${prayer}` : ""}`}
           className="home-prayer-summary-button no-press grid min-h-16 min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,max-content)] justify-between gap-x-2.5 gap-y-1 rounded-xl outline-none transition-colors"
         >
           <div className="home-prayer-identity min-w-0 text-start" data-prayer-identity>
@@ -328,19 +323,15 @@ function PrayerCard({
               )}
             </p>
           </div>
-          {state === "next" && countdown && (
-            <span data-prayer-compact-countdown className="home-prayer-compact-countdown" aria-hidden="true" dir="auto">
-              {countdownInterval && countdownNow !== null ? (
-                <PrayerCountdown
-                  interval={countdownInterval}
-                  now={countdownNow}
-                  language={language}
-                  prayerName={name}
-                  decorative
-                />
-              ) : (
-                footerText
-              )}
+          {state === "next" && countdown && !separateCompactSummary && (
+            <span
+              id={`prayer-summary-compact-${prayer}`}
+              data-prayer-compact-countdown
+              className="home-prayer-compact-countdown"
+              aria-hidden="true"
+              dir="auto"
+            >
+              <span className="home-prayer-countdown-text">{countdown}</span>
             </span>
           )}
         </button>
@@ -355,25 +346,18 @@ function PrayerCard({
               dir="auto"
               className="home-prayer-status-pill min-w-0 text-sm tabular-nums [overflow-wrap:anywhere]"
             >
-              {state === "next" && countdownInterval && countdownNow !== null ? (
-                <PrayerCountdown
-                  interval={countdownInterval}
-                  now={countdownNow}
-                  language={language}
-                  prayerName={name}
-                />
-              ) : isCurrent ? (
+              {state === "next" ? null : isCurrent ? (
                 <span className="home-prayer-now-dot" aria-hidden="true" />
               ) : (
                 <Clock size={17} aria-hidden="true" />
               )}
-              {state === "next"
-                ? countdownInterval && countdownNow !== null
-                  ? null
-                  : footerText
-                : isCurrent
-                  ? t(language, "prayerTracking.nowPill")
-                  : statusLabel(language, state)}
+              {state === "next" ? (
+                <span className="home-prayer-countdown-text">{footerText}</span>
+              ) : isCurrent ? (
+                t(language, "prayerTracking.nowPill")
+              ) : (
+                statusLabel(language, state)
+              )}
             </span>
             {state !== "next" && (
               <span id={`prayer-summary-record-${prayer}`} className="sr-only">
@@ -556,6 +540,8 @@ export function PrayerTrackerCards({
   onGlass,
   summaryOnly,
   compactSummary = false,
+  summaryCondensed = false,
+  separateCompactSummary = false,
   selectedPrayer,
 }: {
   models: readonly PrayerCardModel[];
@@ -569,6 +555,8 @@ export function PrayerTrackerCards({
   /** Keep overview surfaces scannable; focused views retain full recording. */
   summaryOnly?: boolean;
   compactSummary?: boolean;
+  summaryCondensed?: boolean;
+  separateCompactSummary?: boolean;
   /** The Home summary whose shared detail panel is expanded below the strip. */
   selectedPrayer?: PrayerName | null;
 }) {
@@ -747,6 +735,8 @@ export function PrayerTrackerCards({
                   }}
                   onOpen={onOpen}
                   summaryOnly={summaryOnly}
+                  summaryCondensed={summaryCondensed}
+                  separateCompactSummary={separateCompactSummary}
                   selected={summaryOnly && model.prayer === selectedPrayer}
                 />
               );

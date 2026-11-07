@@ -56,15 +56,11 @@ describe("read-only listening controls", () => {
     vi.spyOn(timings, "resolveQuranTiming").mockReturnValue(null);
   });
   afterEach(() => vi.restoreAllMocks());
-  it("reveals a cue covered by navigation portalled above the reading pane", () => {
+  it("reveals a cue above the reading viewport without reserving header space", () => {
     vi.mocked(timings.resolveQuranTiming).mockReturnValue(annotation);
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
-      const top = this.matches(".audio-expanded-text") ? 100 : this.matches("[data-playback-word]") ? 120 : 0;
-      const bottom = this.matches("[data-listening-controls]")
-        ? 160
-        : this.matches(".audio-expanded-text")
-          ? 300
-          : top + 20;
+      const top = this.matches(".audio-expanded-text") ? 100 : this.matches("[data-playback-word]") ? 80 : 0;
+      const bottom = this.matches(".audio-expanded-text") ? 300 : top + 20;
       return { top, bottom, left: 0, right: 200, width: 200, height: bottom - top, x: 0, y: top, toJSON: () => {} };
     });
     const wrapper = document.createElement("div");
@@ -78,10 +74,10 @@ describe("read-only listening controls", () => {
     wrapper.append(host, viewport);
     document.body.append(wrapper);
     const { unmount } = render(
-      <QuranListeningReader entry={entry} segment={null} currentTime={1} language="en" controlsHost={host} />,
+      <QuranListeningReader entry={entry} segment={null} currentTime={1} language="en" recoveryHost={host} />,
       { container: viewport },
     );
-    expect(scrollTo).toHaveBeenCalledWith({ top: 52, behavior: "instant" });
+    expect(scrollTo).toHaveBeenCalledWith({ top: 72, behavior: "instant" });
     unmount();
     wrapper.remove();
   });
@@ -115,16 +111,18 @@ describe("read-only listening controls", () => {
     expect(host).toBeEmptyDOMElement();
     host.remove();
   });
-  it("renders navigation in the fixed header host while keeping browsing and text in the reading pane", () => {
+  it("keeps page browsing in options and portals only recovery into the footer host", () => {
     const host = document.createElement("div");
     document.body.append(host);
     const { container, unmount } = render(
-      <QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" controlsHost={host} />,
+      <QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" recoveryHost={host} />,
     );
-    expect(host.querySelector("[data-listening-controls]")).not.toBeNull();
-    expect(container.querySelector("[data-listening-controls]")).toBeNull();
+    expect(host).toBeEmptyDOMElement();
+    expect(
+      container.querySelector("[data-testid=quran-listening-preferences] [data-listening-controls]"),
+    ).not.toBeNull();
     const next = screen.getByRole("combobox");
-    expect(host).toContainElement(next);
+    expect(host).not.toContainElement(next);
     fireEvent.change(next, { target: { value: "1" } });
     expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
     expect(screen.getByRole("combobox", { name: "Quran page 563" })).toHaveValue("1");
@@ -364,10 +362,19 @@ describe("continuous surah listening", () => {
     expect(container.querySelector(".audio-listening-stream")).toHaveClass("theme-midnight");
   });
   it("keeps every passage mounted without page controls and restores following after keyboard browsing", () => {
-    const { container } = render(
+    const host = document.createElement("div");
+    document.body.append(host);
+    const { container, unmount } = render(
       <div className="audio-expanded-reading">
         <div className="audio-expanded-text" tabIndex={-1} role="region" aria-label="Test reading">
-          <ContinuousReader entry={entry} segment={null} currentTime={1} language="ar" preferencesHost={null} />
+          <ContinuousReader
+            entry={entry}
+            segment={null}
+            currentTime={1}
+            language="ar"
+            preferencesHost={null}
+            recoveryHost={host}
+          />
         </div>
       </div>,
     );
@@ -377,11 +384,15 @@ describe("continuous surah listening", () => {
     const viewport = container.querySelector<HTMLElement>(".audio-expanded-text")!;
     fireEvent.keyDown(viewport, { key: "PageDown" });
     const resume = screen.getByRole("button", { name: "العودة للآية الحالية" });
-    expect(resume.parentElement).toHaveClass("audio-expanded-reading");
+    expect(host).toContainElement(resume);
+    expect(container.querySelector(".audio-listening-resume")).toBeNull();
     fireEvent.click(resume);
     expect(viewport).toHaveFocus();
     expect(screen.queryByRole("button", { name: "العودة للآية الحالية" })).toBeNull();
     expect(container.querySelectorAll("[data-listening-passage]")).toHaveLength(3);
+    unmount();
+    expect(host).toBeEmptyDOMElement();
+    host.remove();
   });
   it("retains the complete offline passage and meaning without a page picker", () => {
     loader.error = true;

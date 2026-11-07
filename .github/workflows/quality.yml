@@ -60,7 +60,8 @@ jobs:
   browser:
     needs: checks
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    # Ubuntu's mirror took 52 minutes to install the WebKit runtime in run 42193494627.
+    timeout-minutes: 105
     strategy:
       # Diagnose every shard even when another fails; never drop coverage.
       fail-fast: false

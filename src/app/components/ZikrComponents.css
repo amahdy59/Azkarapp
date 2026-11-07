@@ -62,17 +62,6 @@
   }
 }
 
-@keyframes adaptive-counter-pulse {
-  0% {
-    opacity: 0.5;
-    transform: scale(0.92);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.06);
-  }
-}
-
 @keyframes counter-face-swap {
   from {
     opacity: 0;
@@ -140,9 +129,11 @@
     background-color 200ms ease;
 }
 
-.adaptive-counter-surface:hover:not(:disabled, [aria-disabled="true"]) {
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
-  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .adaptive-counter-surface:hover:not(:disabled, [aria-disabled="true"]) {
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
+  }
 }
 
 .adaptive-counter-surface.is-pressed,
@@ -201,12 +192,11 @@
   z-index: 1;
   display: flex;
   width: 100%;
-  height: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  white-space: nowrap;
+  padding: 0.5rem 8px;
+  white-space: normal;
 }
 
 .adaptive-counter-surface.is-complete {
@@ -216,16 +206,6 @@
 
 .adaptive-counter-surface.is-complete .counter-progress-fill {
   background: var(--primary);
-}
-
-.adaptive-counter-pulse {
-  position: absolute;
-  inset: 6px;
-  border: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  animation: adaptive-counter-pulse 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .adaptive-counter-nav {
@@ -249,16 +229,18 @@
     opacity 160ms ease;
 }
 
-.adaptive-counter-nav:hover:not(:disabled) {
-  background: var(--muted);
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));
+@media (hover: hover) and (pointer: fine) {
+  .adaptive-counter-nav:hover:not(:disabled) {
+    background: var(--muted);
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));
+  }
 }
 .adaptive-counter-nav:active:not(:disabled) {
   transform: scale(0.94);
 }
 .adaptive-counter-nav:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--ring);
+  box-shadow: inset 0 0 0 3px var(--ring);
 }
 .adaptive-counter-nav:disabled {
   opacity: 0.5;
@@ -338,7 +320,6 @@
   .adaptive-counter-nav {
     transition-duration: 0.01ms;
   }
-  .adaptive-counter-pulse,
   .counter-number,
   .counter-ring-ready::after,
   .adaptive-counter-surface.just-completed::after,

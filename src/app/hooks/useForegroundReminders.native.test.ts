@@ -1,5 +1,5 @@
-import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_APP_STATE } from "../state";
 import type { ReminderSettings } from "../types";
 
@@ -12,7 +12,11 @@ const nativeNotifications = {
 };
 
 describe("native reminder delivery", () => {
+  afterEach(() => vi.useRealTimers());
   beforeEach(() => {
+    // Keep the next-hour reminder on the same date; 23:00 otherwise wraps to midnight.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 9, 20, 12, 0, 0));
     vi.resetModules();
     nativeNotifications.checkPermissions.mockResolvedValue({ display: "granted" });
     nativeNotifications.getPending.mockResolvedValue({ notifications: [] });
@@ -25,7 +29,7 @@ describe("native reminder delivery", () => {
     }));
   });
 
-  it("hands enabled reminders to Android instead of starting browser timers", async () => {
+  it("leaves Android scheduling to useNativeServices", async () => {
     const { useForegroundReminders } = await import("./useForegroundReminders");
     const now = new Date();
     now.setHours(now.getHours() + 1, 0, 0, 0);
@@ -47,30 +51,9 @@ describe("native reminder delivery", () => {
       }),
     );
 
-    await waitFor(() => expect(nativeNotifications.schedule).toHaveBeenCalledTimes(1));
-    const request = nativeNotifications.schedule.mock.calls[0]![0];
-    expect(request.notifications).toHaveLength(14);
-    expect(request.notifications[0]).toMatchObject({
-      title: "Morning Azkar",
-      body: "Reminder Morning Azkar",
-      channelId: "azkarapp-reminders",
-      schedule: { allowWhileIdle: true, isExactNotification: true },
-    });
-    expect(nativeNotifications.createChannel).toHaveBeenCalledOnce();
-  });
-
-  it("cancels legacy native reminder IDs before replacing the schedule", async () => {
-    nativeNotifications.getPending.mockResolvedValueOnce({ notifications: [{ id: 10_001 }, { id: 42 }] });
-    const { useForegroundReminders } = await import("./useForegroundReminders");
-    renderHook(() =>
-      useForegroundReminders({
-        reminders: DEFAULT_APP_STATE.settings.reminders,
-        dailyCompletions: [],
-        progressDayStartHour: 4,
-        language: "en",
-      }),
-    );
-
-    await waitFor(() => expect(nativeNotifications.cancel).toHaveBeenCalledWith({ notifications: [{ id: 10_001 }] }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    // useNativeServices is the sole native scheduling owner.
+    expect(nativeNotifications.schedule).not.toHaveBeenCalled();
+    expect(nativeNotifications.createChannel).not.toHaveBeenCalled();
   });
 });

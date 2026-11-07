@@ -14,7 +14,17 @@ export function usePrayerSelectionAnchor(
     const card = prayer && row?.querySelector<HTMLElement>(`[data-prayer="${prayer}"]`);
     if (!row || !panel || !card) return;
 
+    let frameId = 0;
+    const written = new Map<string, string>();
+    const set = (name: string, value: number, unit = "px") => {
+      const next = `${Math.round(value * 100) / 100}${unit}`;
+      if (written.get(name) === next) return;
+      written.set(name, next);
+      panel.style.setProperty(name, next);
+    };
     const measure = () => {
+      frameId = 0;
+      if (document.visibilityState === "hidden") return;
       const frame = row.getBoundingClientRect();
       const selected = card.getBoundingClientRect();
       const detail = panel.getBoundingClientRect();
@@ -26,20 +36,33 @@ export function usePrayerSelectionAnchor(
       const visibleRatio = selected.width - visible < 0.01 ? 1 : visible / selected.width;
       const opacity = width > 0 && selected.width > 0 ? Math.max(0, Math.min(1, (visibleRatio - 0.6) / 0.4)) : 0;
       const clearance = stripRef.current!.getBoundingClientRect().bottom - selected.bottom;
-      panel.style.setProperty("--prayer-panel-offset", `${20 - clearance}px`);
-      panel.style.setProperty("--prayer-anchor-x", `${center}px`);
-      panel.style.setProperty("--prayer-anchor-width", `${Math.max(0, width)}px`);
-      panel.style.setProperty("--prayer-anchor-opacity", `${opacity}`);
+      set("--prayer-panel-offset", 20 - clearance);
+      set("--prayer-anchor-x", center);
+      set("--prayer-anchor-width", Math.max(0, width));
+      set("--prayer-anchor-opacity", opacity, "");
     };
-    const observer = new ResizeObserver(measure);
+    const schedule = () => {
+      if (!frameId && document.visibilityState !== "hidden") frameId = requestAnimationFrame(measure);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState !== "hidden") schedule();
+      else if (frameId) {
+        cancelAnimationFrame(frameId);
+        frameId = 0;
+      }
+    };
+    const observer = new ResizeObserver(schedule);
     for (const element of [row, card, panel]) observer.observe(element);
-    row.addEventListener("scroll", measure, { passive: true });
-    window.addEventListener("resize", measure);
+    row.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    document.addEventListener("visibilitychange", onVisibility);
     measure();
     return () => {
       observer.disconnect();
-      row.removeEventListener("scroll", measure);
-      window.removeEventListener("resize", measure);
+      if (frameId) cancelAnimationFrame(frameId);
+      row.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      document.removeEventListener("visibilitychange", onVisibility);
       for (const name of ["x", "width", "opacity"]) panel.style.removeProperty(`--prayer-anchor-${name}`);
       panel.style.removeProperty("--prayer-panel-offset");
     };

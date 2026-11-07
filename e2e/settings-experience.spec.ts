@@ -6,6 +6,10 @@ async function enterEnglishGuestMode(page: Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
+  await page
+    .getByTestId("first-use-setup")
+    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
+    .click();
   // Tier-agnostic: the shell mounts BottomNav, NavRail or NavSidebar by width.
   await expect(page.getByRole("navigation")).toBeVisible();
 }
@@ -38,7 +42,7 @@ test("all product themes apply atomically and remain accessible", async ({ page 
 
   const expectations = [
     { mode: "midnight", background: "#0a1228", scheme: "dark" },
-    { mode: "light", background: "#f8f5f0", scheme: "light" },
+    { mode: "light", background: "#f2f0eb", scheme: "light" },
     { mode: "dark", background: "#0d0d0d", scheme: "dark" },
   ] as const;
 
@@ -186,7 +190,11 @@ test("launch-critical settings screens are discoverable and accessible", async (
   if (await locationBack.isVisible()) await locationBack.click();
   else await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-notifications").click();
-  await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "false");
+  const prayerReminder = page.getByRole("switch", { name: "Prayer-time reminders" });
+  await expect(prayerReminder).toHaveAttribute("aria-checked", "true");
+  await expect(page.locator("#prayer-reminder-lead")).toBeEnabled();
+  await prayerReminder.click();
+  await expect(prayerReminder).toHaveAttribute("aria-checked", "false");
   await expect(page.locator("#prayer-reminder-lead")).toBeDisabled();
   await expectNoWcagViolations(page);
   const backBtn1 = page.getByRole("button", { name: "Back", exact: true });
@@ -203,9 +211,9 @@ test("launch-critical settings screens are discoverable and accessible", async (
 
   for (const destination of destinations) {
     await page.getByRole("button", { name: destination.row }).click();
-    await expect(page.getByRole("heading", { name: destination.heading, exact: true })).toBeVisible();
+    await expect(page.locator("[data-settings-subheading]").filter({ hasText: destination.heading })).toBeVisible();
     await expectNoWcagViolations(page);
-    const backBtn = page.getByRole("button", { name: "Back" });
+    const backBtn = page.getByRole("button", { name: "Back", exact: true });
     if (await backBtn.isVisible()) {
       await backBtn.click();
     }

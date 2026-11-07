@@ -21,7 +21,7 @@ describe("daily prayer diagram", () => {
     expect(fajr.getByText("Sunan Rawātib")).toBeVisible();
     expect(screen.getAllByText("Completed the azkar")).toHaveLength(2);
     expect(container.querySelector("input, select, textarea, button, a, table, details")).toBeNull();
-    expect(screen.getByText(/does not mean a missed prayer/)).toBeVisible();
+    expect(screen.queryByText(/does not mean a missed prayer/)).not.toBeInTheDocument();
   });
   it("reads legacy mosque facts and localizes empty Arabic statuses", () => {
     const { rerender } = render(

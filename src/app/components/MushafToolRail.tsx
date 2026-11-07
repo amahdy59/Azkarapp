@@ -102,8 +102,9 @@ function RailButton({ action, highlight }: { action: MushafToolRailAction; highl
       aria-label={action.label}
       title={action.hint ? `${action.label} — ${action.hint}` : action.label}
       data-testid={action.testId}
+      data-tool={action.id}
       {...(isToggle ? { role: "switch" as const, "aria-checked": action.pressed } : {})}
-      className={`${RAIL_CELL} disabled:cursor-not-allowed disabled:opacity-40 ${
+      className={`${RAIL_CELL} ${action.id === "focus" ? "mushaf-rail-focus" : ""} disabled:cursor-not-allowed disabled:opacity-40 ${
         highlight
           ? "bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-sm"
           : action.pressed
@@ -157,6 +158,7 @@ export interface MushafToolRailProps {
   /** Omitted on surfaces with no keyboard to describe, which is every phone. */
   onOpenShortcuts?: () => void;
   onComplete?: () => void;
+  navigationInHeader?: boolean;
 }
 
 export function MushafToolRail({
@@ -189,6 +191,7 @@ export function MushafToolRail({
   playbackFollowing,
   onOpenShortcuts,
   onComplete,
+  navigationInHeader = false,
 }: MushafToolRailProps) {
   const iconSize = compact ? 18 : 20;
   // The back arrow points away from the reading surface, which depends on the
@@ -276,30 +279,32 @@ export function MushafToolRail({
       ]
     : [];
 
-  const displayTools: MushafToolRailAction[] = onOpenMore
-    ? []
-    : [
-        ...(onEnterFocusMode
-          ? [
-              {
-                id: "focus",
-                label: t(language, "mushaf.focusModeEnter"),
-                caption: t(language, "mushaf.railFocus"),
-                icon: <Eye size={iconSize} />,
-                onClick: onEnterFocusMode,
-                testId: "mushaf-focus-enter",
-              },
-            ]
-          : []),
-        {
-          id: "fullscreen",
-          label: t(language, isFullscreen ? "mushaf.exitFullscreen" : "mushaf.enterFullscreen"),
-          caption: t(language, "mushaf.railFullscreen"),
-          icon: isFullscreen ? <Minimize size={iconSize} /> : <Maximize size={iconSize} />,
-          onClick: onToggleFullscreen,
-          testId: "mushaf-fullscreen-toggle",
-        },
-      ];
+  const displayTools: MushafToolRailAction[] = [
+    ...(onEnterFocusMode
+      ? [
+          {
+            id: "focus",
+            label: t(language, "mushaf.focusModeEnter"),
+            caption: t(language, "mushaf.railFocus"),
+            icon: <Eye size={iconSize} />,
+            onClick: onEnterFocusMode,
+            testId: "mushaf-focus-toggle",
+          },
+        ]
+      : []),
+    ...(!onOpenMore && !navigationInHeader
+      ? [
+          {
+            id: "fullscreen",
+            label: t(language, isFullscreen ? "mushaf.exitFullscreen" : "mushaf.enterFullscreen"),
+            caption: t(language, "mushaf.railFullscreen"),
+            icon: isFullscreen ? <Minimize size={iconSize} /> : <Maximize size={iconSize} />,
+            onClick: onToggleFullscreen,
+            testId: "mushaf-fullscreen-toggle",
+          },
+        ]
+      : []),
+  ];
 
   const helpTools: MushafToolRailAction[] = onOpenMore
     ? []
@@ -376,33 +381,37 @@ export function MushafToolRail({
       role="group"
       aria-label={t(language, "mushaf.toolbar")}
     >
-      <RailButton
-        action={{
-          id: "back",
-          label: t(language, "common.back"),
-          icon: backIcon,
-          onClick: onBack,
-          testId: "mushaf-rail-back",
-        }}
-      />
+      {!navigationInHeader && (
+        <RailButton
+          action={{
+            id: "back",
+            label: t(language, "common.back"),
+            icon: backIcon,
+            onClick: onBack,
+            testId: "mushaf-rail-back",
+          }}
+        />
+      )}
 
       <div className="mx-1 my-1 h-px flex-none bg-current/15" aria-hidden="true" />
 
       {/* The reader's place: which surah, which juz, opened for navigation. */}
-      <button
-        type="button"
-        onClick={onOpenIndex}
-        className={`${RAIL_CELL} arabic-ui px-1 hover:bg-current/10`}
-        aria-label={t(language, "mushaf.indexTitle")}
-        data-testid="mushaf-rail-index"
-      >
-        <span className={RAIL_LABEL} dir="auto">
-          {surahName}
-        </span>
-        <span className="text-micro font-bold leading-[1.6] opacity-70">
-          {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
-        </span>
-      </button>
+      {!navigationInHeader && (
+        <button
+          type="button"
+          onClick={onOpenIndex}
+          className={`${RAIL_CELL} arabic-ui px-1 hover:bg-current/10`}
+          aria-label={t(language, "mushaf.indexTitle")}
+          data-testid="mushaf-rail-index"
+        >
+          <span className={RAIL_LABEL} dir="auto">
+            {surahName}
+          </span>
+          <span className="text-micro font-bold leading-[1.6] opacity-70">
+            {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+          </span>
+        </button>
+      )}
 
       {/* The rail stands on end; the book does not. A page turn is horizontal —
           right goes back towards page one, left goes onward (DEC-094) — and it

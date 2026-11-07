@@ -4,6 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_APP_STATE } from "../../state";
 import { NotificationsPanel } from "./NotificationsPanel";
 
+function openReadiness() {
+  const details = screen.getByTestId("notification-permission-details") as HTMLDetailsElement;
+  if (!details.open) fireEvent.click(details.querySelector("summary")!);
+}
+
 describe("NotificationsPanel", () => {
   const originalNotification = window.Notification;
   const originalWorker = Object.getOwnPropertyDescriptor(navigator, "serviceWorker");
@@ -22,6 +27,29 @@ describe("NotificationsPanel", () => {
     }
   });
 
+  it("groups next configured time, selected timezone and the existing test action without promising closed-browser delivery", () => {
+    Object.defineProperty(window, "Notification", { configurable: true, value: { permission: "granted" } });
+    const onOpenLocation = vi.fn();
+    render(
+      <NotificationsPanel
+        language="en"
+        reminders={DEFAULT_APP_STATE.settings.reminders}
+        onRemindersChange={vi.fn()}
+        onBack={vi.fn()}
+        onOpenLocation={onOpenLocation}
+      />,
+    );
+    expect(screen.getByTestId("reminder-readiness")).toHaveTextContent("Next configured reminder");
+    expect(screen.getByTestId("reminder-readiness")).toHaveTextContent("Africa/Cairo");
+    expect(screen.getByText(/Delivery after the browser closes/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Review location and timezone" }));
+    expect(onOpenLocation).toHaveBeenCalledOnce();
+    openReadiness();
+    expect(screen.getByRole("button", { name: "Send a test notification" }).closest("section")).toContainElement(
+      screen.getByTestId("reminder-readiness"),
+    );
+  });
+
   it("refreshes permission after returning from browser settings without changing saved choices", () => {
     const notification = { permission: "denied", requestPermission: vi.fn() };
     Object.defineProperty(window, "Notification", { configurable: true, value: notification });
@@ -36,7 +64,7 @@ describe("NotificationsPanel", () => {
     );
     notification.permission = "granted";
     fireEvent.focus(window);
-    expect(screen.getByText("Browser permission is granted.")).toBeInTheDocument();
+    expect(screen.getByText("Notification permission is granted.")).toBeInTheDocument();
     notification.permission = "denied";
     fireEvent(document, new Event("visibilitychange"));
     expect(screen.queryByRole("button", { name: "Send a test notification" })).not.toBeInTheDocument();
@@ -64,6 +92,7 @@ describe("NotificationsPanel", () => {
         onBack={vi.fn()}
       />,
     );
+    openReadiness();
     const button = screen.getByRole("button", { name: "Send a test notification" });
     fireEvent.click(button);
     expect(button).toBeDisabled();
@@ -90,12 +119,12 @@ describe("NotificationsPanel", () => {
     );
 
     expect(screen.getByText(/Open this site’s settings/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("switch", { name: "Morning reminder" }));
+    fireEvent.click(screen.getByRole("switch", { name: "Morning adhkar" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Notifications remain off");
     expect(onRemindersChange).not.toHaveBeenCalled();
   });
 
-  for (const name of ["Morning reminder", "Prayer-time reminders"]) {
+  for (const name of ["Morning adhkar", "Prayer-time reminders"]) {
     it(`enables ${name} immediately after a newly granted permission`, async () => {
       Object.defineProperty(window, "Notification", {
         configurable: true,
@@ -114,7 +143,7 @@ describe("NotificationsPanel", () => {
       await vi.waitFor(() => expect(onRemindersChange).toHaveBeenCalledOnce());
       expect(onRemindersChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          [name === "Morning reminder" ? "morning" : "prayer"]: expect.objectContaining({ enabled: true }),
+          [name === "Morning adhkar" ? "morning" : "prayer"]: expect.objectContaining({ enabled: true }),
         }),
       );
     });

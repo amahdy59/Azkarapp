@@ -25,7 +25,7 @@ for (const language of ["ar", "en"] as const) {
       await action.scrollIntoViewIfNeeded();
       await page.keyboard.press("Tab");
       await action.focus();
-      await expect(cue).toHaveCSS("scale", "1.08");
+      await expect(cue).toHaveCSS("scale", "1.05");
       await expect(cue).toHaveCSS("transition-property", "scale");
       const arrow = action.locator("[data-rtl-flip]");
       const rotation = await arrow.evaluate((node) => getComputedStyle(node).transform);
@@ -43,7 +43,7 @@ for (const language of ["ar", "en"] as const) {
       if (await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches)) {
         await action.evaluate((node) => (node as HTMLElement).blur());
         await action.hover();
-        await expect(cue).toHaveCSS("scale", "1.08");
+        await expect(cue).toHaveCSS("scale", "1.05");
         await page.mouse.move(0, 0);
       }
       await action.focus();
@@ -65,7 +65,7 @@ for (const language of ["ar", "en"] as const) {
       await action.evaluate((node) => node.setAttribute("aria-disabled", "true"));
       await expect(cue).toHaveCSS("scale", "1");
       await action.evaluate((node) => node.removeAttribute("aria-disabled"));
-      await expect(cue).toHaveCSS("scale", "1.08");
+      await expect(cue).toHaveCSS("scale", "1.05");
       // A pointer begins a new interaction; it cannot leave an old key press latched.
       await page.keyboard.down(" ");
       await page.mouse.move(0, 0);
@@ -89,6 +89,9 @@ for (const language of ["ar", "en"] as const) {
       const slider = page.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true });
       await page.keyboard.press("Tab");
       await slider.focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
+      await expect(slider).toBeFocused();
       await slider.press("Home");
       await expect(slider).toHaveCSS("outline-style", "solid");
       await expect(slider).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");

@@ -441,7 +441,7 @@ describe("ReaderScreen audio identity", () => {
     await userEvent.setup().click(screen.getAllByRole("button", { name: "خيارات القارئ" })[0]);
     expect(screen.queryByRole("menuitem", { name: /مشاركة/u })).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-benefit-dock-button")).not.toBeInTheDocument();
-    expect(screen.getByTestId("surah-reading-actions").querySelectorAll(":scope > button")).toHaveLength(3);
+    expect(within(screen.getByTestId("reader-surah-controls")).getAllByRole("button")).toHaveLength(3);
   });
 
   it("allows tapping the empty canvas area between text and counter to count zikr for small surahs", () => {
@@ -857,6 +857,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("reader-share-dock-button")).toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-repeat")).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-keyboard-help")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("reader-help-trigger")).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-focus-toggle")).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-routine-mode")).not.toBeInTheDocument();
     expect(screen.getByTestId("reader-menu-reset-collection")).toBeInTheDocument();

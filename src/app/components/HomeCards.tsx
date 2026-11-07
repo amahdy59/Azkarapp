@@ -11,6 +11,7 @@ import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
+import "./home-routine-mode.css";
 import {
   ArrowNext,
   Bookmark,
@@ -26,6 +27,7 @@ import {
   Share2,
 } from "./icons";
 import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
+import { EvidenceSource } from "./EvidenceSource";
 
 const ReminderShareModal = lazy(() =>
   import("./CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
@@ -92,7 +94,7 @@ export function PrayerRoutineCard({
     >
       <HomeCard onGlass={onGlass} className="flex-1 flex-col gap-5 text-start">
         {/* Header Row: "It is time for" + Mode Selector */}
-        <div className="flex w-full items-center justify-between gap-4">
+        <div className="flex w-full flex-wrap items-center justify-between gap-4">
           <div
             className={`flex items-center gap-2 text-sm font-bold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
             dir="auto"
@@ -103,7 +105,7 @@ export function PrayerRoutineCard({
               aria-hidden="true"
             />
           </div>
-          <div className="w-fit min-w-[140px]">
+          <div className="home-routine-mode">
             {showModeSelector && (
               <SegmentedControl
                 value={mode}
@@ -114,7 +116,7 @@ export function PrayerRoutineCard({
                   onGlass ? "border-white/20 home-glass-inset" : "border-border bg-muted"
                 }`}
                 itemClassName={(selected) =>
-                  `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-[color,background-color,border-color,box-shadow,opacity,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "bg-primary text-primary-foreground"
                       : onGlass
@@ -204,7 +206,7 @@ export function PrayerRoutineCard({
             data-testid="home-primary-cta"
             aria-describedby={progressId}
             onClick={onOpen}
-            className="group flex min-h-[52px] min-w-0 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="surface-control-finish group flex min-h-[52px] min-w-0 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <span className="min-w-0 truncate" title={ctaLabel}>
               {ctaLabel}
@@ -409,7 +411,7 @@ export function FridayHomeCard({
       >
         <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
           <Mosque size={28} aria-hidden="true" />
-          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
+          <ProductImage name="mosque_prophet" loading="eager" sizes="64px" className="h-full w-full object-cover" />
         </span>
         <div className="min-w-0 flex-1 text-start">
           <h3
@@ -454,7 +456,12 @@ export function FridayHomeCard({
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
           <Mosque size={52} aria-hidden="true" />
-          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
+          <ProductImage
+            name="mosque_prophet"
+            loading="eager"
+            sizes="(min-width: 1280px) 224px, calc(100vw - 64px)"
+            className="h-full w-full object-cover"
+          />
         </div>
 
         <div className="min-w-0 text-start">
@@ -558,7 +565,7 @@ function DailyEvidenceCardContent({
       data-testid="home-daily-evidence"
       data-evidence-id={evidence.evidenceId}
       dir={direction}
-      className="home-glass-reading flex min-h-0 w-full flex-col gap-3"
+      className="home-glass-reading flex min-h-0 min-w-0 w-full flex-col gap-3 [overflow-wrap:anywhere]"
       onFocusCapture={() => setFocusedEvidence(evidence)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusedEvidence(null);
@@ -678,15 +685,21 @@ function DailyEvidenceCardContent({
         </span>
         {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
         {evidence.sourceUrl && (
-          <a
-            data-testid="daily-evidence-source"
-            href={evidence.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`ms-auto inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
-          >
-            {reminderText(language, "home.viewEvidenceSource")}
-          </a>
+          <EvidenceSource
+            language={language}
+            testId="daily-evidence-source"
+            label={reminderText(language, "home.viewEvidenceSource")}
+            className={`ms-auto ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+            details={{
+              title: evidence.title || reminderLabel,
+              quotation: evidence.hadith,
+              reference: evidence.sourceReference ?? "",
+              grade: evidence.authenticity,
+              context: evidence.meaning ?? evidence.benefit,
+              sourceUrl: evidence.sourceUrl,
+              textLanguage: evidence.hadithInArabic ? "ar" : "en",
+            }}
+          />
         )}
         {evidence.sourceReference && (
           <span className={`text-xs ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`} dir="auto">

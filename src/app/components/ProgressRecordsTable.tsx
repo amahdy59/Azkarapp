@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import "./progress-records-table.css";
+import { useId, useMemo, useState } from "react";
 import type { AppLanguage } from "../types";
 import type { CalendarType } from "../calendarPeriods";
 import { dashboardText as text } from "../i18n/progressDashboard";
 import { formatNumerals } from "../formatting";
 import { formatProgressRange, type ProgressScopedDailyRecord, type ProgressMetric } from "../progressDashboard";
-import { ChevronDown, ChevronUp } from "./icons";
+import { ChevronDown, ChevronUp, Calendar, PrayerRug, PrayerBeads, BookOpen, CheckCircle2 } from "./icons";
 
 const PAGE_SIZE = 10;
 export function ProgressRecordsTable({
@@ -18,6 +19,7 @@ export function ProgressRecordsTable({
   language: AppLanguage;
   calendar: CalendarType;
 }) {
+  const id = useId();
   const [sort, setSort] = useState<{ key: "dayKey" | ProgressMetric; descending: boolean }>({
     key: "dayKey",
     descending: true,
@@ -41,9 +43,12 @@ export function ProgressRecordsTable({
     setSort({ key, descending: key === sort.key ? !sort.descending : true });
   };
   const button =
-    "inline-flex min-h-11 items-center whitespace-nowrap gap-1 rounded-lg px-2 py-2 text-start text-xs font-bold progress-focus";
+    "inline-flex min-h-11 items-center gap-1 rounded-lg px-2 py-2 text-start text-xs font-bold progress-focus";
   return (
     <div className="space-y-3" data-testid="progress-records-table">
+      <p id={`${id}-help`} className="progress-help">
+        {text(language, "recordsHelp")}
+      </p>
       <div
         className="progress-records-surface glass-reading bg-card overflow-x-auto rounded-lg border border-border progress-focus"
         role="region"
@@ -52,7 +57,7 @@ export function ProgressRecordsTable({
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
       >
-        <table className="w-full border-collapse text-start text-sm">
+        <table className="progress-styled-records w-full text-start text-sm" aria-describedby={`${id}-help`}>
           <caption className="sr-only">{text(language, "records")}</caption>
           <thead className="border-b border-border bg-muted/40">
             <tr>
@@ -60,7 +65,8 @@ export function ProgressRecordsTable({
                 <th
                   key={key}
                   scope="col"
-                  className="min-w-32 px-1 text-start"
+                  aria-label={key === "dayKey" ? text(language, "date") : text(language, key)}
+                  className="progress-record-column px-1 text-start"
                   aria-sort={sort.key === key ? (sort.descending ? "descending" : "ascending") : "none"}
                 >
                   <button
@@ -69,7 +75,20 @@ export function ProgressRecordsTable({
                     onClick={() => changeSort(key)}
                     aria-label={`${key === "dayKey" ? text(language, "date") : text(language, key)}: ${text(language, sort.key === key && sort.descending ? "sortAscending" : "sortDescending")}`}
                   >
-                    {key === "dayKey" ? text(language, "date") : text(language, key)}
+                    {(() => {
+                      const Icon =
+                        key === "dayKey"
+                          ? Calendar
+                          : key === "pages"
+                            ? BookOpen
+                            : key === "prayers"
+                              ? PrayerRug
+                              : key === "quranGoals"
+                                ? CheckCircle2
+                                : PrayerBeads;
+                      return <Icon size={18} className="shrink-0 text-primary" aria-hidden="true" />;
+                    })()}
+                    {key === "dayKey" ? text(language, "date") : text(language, `short_${key}`)}
                     {sort.key === key &&
                       (sort.descending ? (
                         <ChevronDown size={14} aria-hidden="true" />
@@ -89,7 +108,25 @@ export function ProgressRecordsTable({
                 </th>
                 {metrics.map((metric) => (
                   <td key={metric} className="px-3 py-3 tabular-nums">
-                    <bdi>{row[metric] === null ? "—" : formatNumerals(row[metric]!, language)}</bdi>
+                    <bdi>
+                      {row[metric] === null ? (
+                        <>
+                          <span aria-hidden="true">—</span>
+                          <span className="sr-only">{text(language, "unavailable")}</span>
+                        </>
+                      ) : (
+                        formatNumerals(row[metric]!, language)
+                      )}
+                    </bdi>
+                    {row[metric] !== null && metric !== "pages" && (
+                      <div className="progress-record-mini" aria-hidden="true">
+                        <span
+                          style={{
+                            inlineSize: `${Math.min(100, (row[metric]! / (metric === "prayers" || metric === "mosque" || metric === "adhkar" ? 5 : metric === "routines" ? 3 : metric === "rawatib" ? 4 : 1)) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    )}
                   </td>
                 ))}
               </tr>

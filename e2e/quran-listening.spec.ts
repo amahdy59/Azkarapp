@@ -30,7 +30,7 @@ for (const scenario of [
       await player.getByRole("button", { name: t(scenario.language, "audioPlayer.expand"), exact: true }).click();
     }
     const header = player.locator(".audio-expanded-header");
-    await expect(header.locator("[data-listening-controls]")).toHaveCount(1);
+    await expect(header.locator("[data-listening-controls]")).toHaveCount(0);
     await expect(player.locator("[data-mushaf-page]")).toBeVisible();
     await testInfo.attach("reading-layout", {
       contentType: "application/json",
@@ -92,19 +92,12 @@ for (const scenario of [
     await expect(
       header.getByRole("button", { name: t(scenario.language, "quranListening.information"), exact: true }),
     ).toHaveCount(0);
-    const alignment = await header.evaluate((element) => {
-      const options = element.querySelector(".audio-options-trigger")!.getBoundingClientRect();
-      const navigation = element.querySelector("[data-listening-controls]")!.getBoundingClientRect();
-      const header = element.getBoundingClientRect();
-      return {
-        centerOffset:
-          (Math.min(options.left, navigation.left) + Math.max(options.right, navigation.right)) / 2 -
-          (header.left + header.width / 2),
-        rowOffset: options.top + options.height / 2 - navigation.top - navigation.height / 2,
-      };
+    const alignment = await options.evaluate((element) => {
+      const options = element.getBoundingClientRect();
+      const header = element.closest(".audio-expanded-header")!.getBoundingClientRect();
+      return options.left + options.width / 2 - header.left - header.width / 2;
     });
-    expect(Math.abs(alignment.centerOffset)).toBeLessThanOrEqual(2);
-    if (!scenario.enlarged) expect(Math.abs(alignment.rowOffset)).toBeLessThanOrEqual(2);
+    expect(Math.abs(alignment)).toBeLessThanOrEqual(2);
     await options.focus();
     await page.keyboard.press("Enter");
     const dialog = page.getByRole("dialog", { name: t(scenario.language, "audioPlayer.options"), exact: true });
@@ -112,12 +105,8 @@ for (const scenario of [
     expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(options).toBeFocused();
-    await expect(header.locator("[data-listening-controls]")).toBeVisible();
-    const navigationBounds = await header.locator("[data-listening-controls]").boundingBox();
-    const headerBounds = await header.boundingBox();
-    expect(navigationBounds!.y + navigationBounds!.height).toBeLessThanOrEqual(
-      headerBounds!.y + headerBounds!.height + 1,
-    );
+    await expect(header.locator("[data-listening-controls]")).toHaveCount(0);
+    await expect(header.getByRole("combobox")).toHaveCount(0);
     await header.getByRole("button", { name: t(scenario.language, "audioPlayer.collapse"), exact: true }).focus();
     await player.locator(".audio-expanded-layout").evaluate((element) => {
       element.scrollTop = 0;
@@ -188,7 +177,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
         const viewport = element.querySelector(".audio-expanded-text")!.getBoundingClientRect();
         const heading = (element.querySelector(".audio-expanded-text [data-mushaf-surah-number]") ??
           element.querySelector(".audio-expanded-text [data-listening-verse]"))!.getBoundingClientRect();
-        const controls = element.querySelector("[data-listening-controls]")!.getBoundingClientRect();
+        const controls = element.querySelector(".audio-expanded-header")!.getBoundingClientRect();
         return {
           viewportBottom: viewport.bottom,
           headingTop: heading.top,
@@ -197,11 +186,11 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
           controlsHeight: controls.height,
         };
       });
-      expect(initialLayout.controlsHeight).toBeLessThanOrEqual(48);
+      expect(initialLayout.controlsHeight).toBeGreaterThanOrEqual(44);
       expect(initialLayout.headingTop).toBeGreaterThanOrEqual(initialLayout.controlsBottom - 1);
       expect(initialLayout.headingBottom).toBeLessThanOrEqual(initialLayout.viewportBottom + 1);
       const header = player.locator(".audio-expanded-header");
-      await expect(header.locator("[data-listening-controls]")).toHaveCount(1);
+      await expect(header.locator("[data-listening-controls]")).toHaveCount(0);
       await expect(player.locator(".audio-expanded-text [data-listening-controls]")).toHaveCount(0);
       const navigationTargets = await header.getByRole("button").evaluateAll((buttons) =>
         buttons.map((button) => {
@@ -246,12 +235,11 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       );
       const active = player.locator('[data-playback-word="true"]');
       await expect(active).toHaveCount(1);
-      await expect
-        .poll(() =>
-          active.evaluate((word) => getComputedStyle(word).color !== getComputedStyle(word.parentElement!).color),
-        )
-        .toBe(true);
-      expect(await active.evaluate((word) => getComputedStyle(word).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+      await expect(active).toHaveCSS("outline-style", "none");
+      await expect(active).toHaveCSS("text-decoration-line", "none");
+      await expect(active).toHaveCSS("animation-name", "none");
+      await expect(active).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(player.locator("[data-quran-ayah][data-playback-word]")).toHaveCount(0);
       if (language === "en") {
         await expect(translation.locator('[aria-current="true"]')).toHaveAttribute(
           "data-translation-verse",
@@ -311,7 +299,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
                   view.getBoundingClientRect().top,
                   word
                     .closest(".floating-audio-player--expanded")!
-                    .querySelector("[data-listening-controls]")!
+                    .querySelector(".audio-expanded-header")!
                     .getBoundingClientRect().bottom,
                 ) && bounds.bottom <= view.getBoundingClientRect().bottom
             );
@@ -333,12 +321,12 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
           const viewport = element.querySelector<HTMLElement>(".audio-expanded-text")!;
           viewport.scrollTop = offset;
           const view = viewport.getBoundingClientRect();
-          const toolbar = element.querySelector("[data-listening-controls]")!.getBoundingClientRect();
+          const toolbar = element.querySelector(".audio-expanded-header")!.getBoundingClientRect();
           const hit = document.elementFromPoint(toolbar.left + toolbar.width / 2, toolbar.top + toolbar.height / 2);
           return {
             gap: view.top - toolbar.bottom,
             headerTop: element.querySelector(".audio-expanded-header")!.getBoundingClientRect().top,
-            toolbarHit: Boolean(hit?.closest("[data-listening-controls]")),
+            toolbarHit: Boolean(hit?.closest(".audio-expanded-header")),
           };
         }, offset);
         expect(scrollLayout.gap).toBeGreaterThanOrEqual(-1);
@@ -346,7 +334,8 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
         expect(scrollLayout.toolbarHit).toBe(true);
       }
       await expect(paper.getByRole("button")).toHaveCount(0);
-      const next = player.getByRole("combobox");
+      await information.click();
+      const next = page.getByTestId("quran-listening-preferences").getByRole("combobox");
       expect(
         await next.evaluate((button) => {
           const bounds = button.getBoundingClientRect();
@@ -384,6 +373,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
         splitMushafPages(zikr.arabicText, zikr.mushafPages!)[10]!.text,
       );
       await page.context().setOffline(false);
+      await page.keyboard.press("Escape");
       await player.getByRole("button", { name: t(language, "audioPlayer.retry"), exact: true }).click();
       await expect(player.locator(`[data-mushaf-page="${zikr.mushafPages![10]!.page}"]`)).toBeVisible();
       const state = await page.evaluate(() => {
@@ -433,4 +423,57 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       await player.screenshot({ path: testInfo.outputPath(`${item.id}-mushaf-listening-desktop.png`) });
     });
   }
+}
+
+for (const { item, verseKey } of [
+  { item: listeningCases[0], verseKey: "2:13" },
+  { item: listeningCases[3], verseKey: "67:18" },
+] as const) {
+  test(`expanded Mushaf holds its later page through a breath in ${item.id} @cross-browser`, async ({ page }, info) => {
+    const player = await openListeningPage(page, item, "ar");
+    const viewport = player.locator(".audio-expanded-text");
+    const passage = player.locator(`[data-mushaf-page="${item.next}"]`);
+    const active = player.locator('[data-playback-word="true"]');
+    const { verses } = listeningTiming(item);
+    const index = verses.findIndex((verse) => verse.verseKey === verseKey);
+    const verse = verses[index]!;
+    const next = verses[index + 1]!;
+    expect(next.startMs).toBeGreaterThan(verse.endMs + 1);
+    const seek = (ms: number) =>
+      page.evaluate((ms) => {
+        const audio = (window as unknown as { __listeningAudio: HTMLAudioElement }).__listeningAudio;
+        audio.currentTime = ms / 1000;
+        audio.dispatchEvent(new Event("timeupdate"));
+      }, ms);
+    const settle = () =>
+      viewport.evaluate(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          }),
+      );
+
+    await seek(verse.words!.at(-1)!.startMs + 1);
+    await expect(passage.locator('[data-playback-word="true"]')).toHaveAttribute("data-listening-verse", verseKey);
+    await expect(active).toBeInViewport();
+    await settle();
+    const scrollTop = await viewport.evaluate((node) => node.scrollTop);
+    if (item.id !== "ir-baqarah") expect(scrollTop).toBeGreaterThan(0);
+
+    await seek((verse.endMs + next.startMs) / 2);
+    await expect(active).toHaveCount(0);
+    await settle();
+    await expect(passage).toBeInViewport();
+    expect(await viewport.evaluate((node) => node.scrollTop)).toBeCloseTo(scrollTop, 0);
+    await page.screenshot({ path: info.outputPath("breath-gap.png"), scale: "css" });
+
+    await seek(next.words![0]!.startMs + 1);
+    await expect(active).toHaveAttribute("data-listening-verse", next.verseKey);
+    await expect(active).toBeInViewport();
+    await page.screenshot({ path: info.outputPath("recitation-resumed.png"), scale: "css" });
+
+    await seek(0);
+    await expect(player.locator(`[data-mushaf-page="${item.first}"]`)).toBeInViewport();
+    await expect(active).toHaveCount(0);
+  });
 }

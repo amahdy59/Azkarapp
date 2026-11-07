@@ -148,6 +148,11 @@ describe("Modal accessibility", () => {
 });
 
 describe("SheetHeader", () => {
+  it("lets a Glass header share its owning sheet surface", () => {
+    render(<SheetHeader title="Listening options" onClose={vi.fn()} onGlass />);
+    expect(screen.getByTestId("sheet-header-title").closest(".border-b")).not.toHaveClass("bg-white/5");
+  });
+
   it("renders canonical header with title, close button and triggers onClose", () => {
     const handleClose = vi.fn();
     render(<SheetHeader title="الفائدة" onClose={handleClose} language="ar" direction="rtl" />);
