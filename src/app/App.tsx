@@ -84,6 +84,7 @@ import type { AudioStatus } from "./audio/audioTypes";
 import { loadAudioModule, EMPTY_AUDIO_COVERAGE, type AudioModule } from "./audio/lazyAudio";
 import { t } from "./i18n";
 import { reportError } from "../lib/observability";
+import { isNativeAndroid } from "./native/platform";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { useCloudflareDeviceSync } from "./hooks/useCloudflareDeviceSync";
 import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
@@ -1794,6 +1795,7 @@ function AppContent({
         // .app-shell both at <=599px and at >=600px, so the shadow-2xl that used
         // to sit here never rendered at any viewport width (DEC-067 / F11).
         data-material-reading={view === "reader" || view === "khatmah" || readerInMushafMode ? "true" : undefined}
+        data-native-android={isNativeAndroid() ? "true" : undefined}
         className={`app-shell relative isolate overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
         {![

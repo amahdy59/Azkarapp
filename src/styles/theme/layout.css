@@ -549,9 +549,11 @@
   padding: 2px 10px;
 }
 .mushaf-control-band--top {
-  /* The app shell already reserves the physical status-bar inset. Applying
-     env(safe-area-inset-top) here as well double-counts it on Android and
-     leaves a large, empty band above the Mushaf toolbar. */
+  padding-block-start: max(2px, var(--mushaf-safe-top, env(safe-area-inset-top)));
+}
+.app-shell[data-native-android="true"] .mushaf-control-band--top {
+  /* The Android app shell already reserves the physical status-bar inset.
+     Keep web/PWA Mushaf safe-area behavior unchanged. */
   padding-block-start: 2px;
 }
 .mushaf-control-band--bottom {

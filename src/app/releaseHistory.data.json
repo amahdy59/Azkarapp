@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-11-07.6",
+    "ar": [
+      "تظهر أدوات المصحف في موضعها الصحيح على أندرويد دون تغيير تخطيط الويب.",
+      "يحافظ التطبيق على مساحة شريط الحالة المناسبة عند فتح المصحف على الهاتف.",
+      "تظل تجربة قراءة المصحف متسقة بين التطبيق والمتصفح."
+    ],
+    "en": [
+      "Mushaf controls appear in the correct position on Android without changing the web layout.",
+      "The phone Mushaf keeps the proper status-bar spacing when it opens.",
+      "Mushaf reading remains consistent between the app and the browser."
+    ]
+  },
+  {
     "release": "2026-11-07.5",
     "ar": [
       "تحسّن تشغيل التطبيق على أجهزة أندرويد الأقدم وأصبح عرض الواجهة أكثر استقرارًا.",
