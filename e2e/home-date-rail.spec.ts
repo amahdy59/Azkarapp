@@ -99,8 +99,8 @@ for (const viewport of [
       await scroller.evaluate((node) => (node.scrollTop = 150));
     }
     await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    await expect(secondary).toBeHidden();
-    expect(await anchor()).toEqual(anchored);
+    await expect(secondary).toBeVisible();
+    await expect.poll(anchor).toEqual(anchored);
     if (phone) {
       await expect(strip).toHaveAttribute("inert", "");
       await expect(summary).toBeInViewport();
@@ -114,7 +114,7 @@ for (const viewport of [
         );
       });
       expect(hit).toBe(true);
-      await expect(summary).toContainText(language === "ar" ? /[٠-٩]{2}:[٠-٩]{2}/u : /\d{2}:\d{2}/u);
+      await expect(summary).toContainText(language === "ar" ? /متبقٍ.*[٠-٩]+\sد/u : /\d+m remaining/u);
     } else {
       await expect(summary).toHaveCount(0);
       for (const card of await strip.locator("article").all()) await expect(card).toBeInViewport();

@@ -7,9 +7,6 @@ import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { trackedLocation } from "../prayerMoment";
 import { prayerDisplayName } from "../prayerPresentation";
-import { usePrayerCountdown } from "../hooks/usePrayerCountdown";
-import type { PrayerCountdownInterval } from "../prayerCountdown";
-import { PrayerCountdown } from "./PrayerCountdown";
 
 /**
  * The five after-prayer cards.
@@ -52,8 +49,6 @@ export interface PrayerCardModel {
   isRecordable: boolean;
   /** Only present on the next prayer. */
   countdown?: string;
-  remainingPercent?: number;
-  countdownInterval?: PrayerCountdownInterval;
   /** Decorative surface emphasis, independent of recording and prayer validity. */
   emphasis?: number;
 }
@@ -222,9 +217,6 @@ function PrayerCard({
   dayKey: string;
 }) {
   const { prayer, time, state, countdown, isOpenable, isRecordable } = model;
-  const cardRef = useRef<HTMLElement>(null);
-  const countdownInterval = summaryOnly && state === "next" ? model.countdownInterval : undefined;
-  const countdownNow = usePrayerCountdown(cardRef, countdownInterval, !summaryCondensed);
   const Icon = PRAYER_ICON[prayer];
   const name = prayerDisplayName(prayer, language, dayKey);
   const timeLabel = formatPrayerTimeLabel(time, language === "ar");
@@ -250,7 +242,6 @@ function PrayerCard({
   if (summaryOnly) {
     return (
       <article
-        ref={cardRef}
         aria-labelledby={`prayer-card-heading-${prayer}`}
         data-testid={`prayer-card-${prayer}`}
         data-prayer={prayer}
@@ -338,7 +329,7 @@ function PrayerCard({
               aria-hidden="true"
               dir="auto"
             >
-              <span className="prayer-countdown-digits">{countdown}</span>
+              <span className="home-prayer-countdown-text">{countdown}</span>
             </span>
           )}
         </button>
@@ -353,25 +344,18 @@ function PrayerCard({
               dir="auto"
               className="home-prayer-status-pill min-w-0 text-sm tabular-nums [overflow-wrap:anywhere]"
             >
-              {state === "next" && countdownInterval && countdownNow !== null ? (
-                <PrayerCountdown
-                  interval={countdownInterval}
-                  now={countdownNow}
-                  language={language}
-                  prayerName={name}
-                />
-              ) : isCurrent ? (
+              {state === "next" ? null : isCurrent ? (
                 <span className="home-prayer-now-dot" aria-hidden="true" />
               ) : (
                 <Clock size={17} aria-hidden="true" />
               )}
-              {state === "next"
-                ? countdownInterval && countdownNow !== null
-                  ? null
-                  : footerText
-                : isCurrent
-                  ? t(language, "prayerTracking.nowPill")
-                  : statusLabel(language, state)}
+              {state === "next" ? (
+                <span className="home-prayer-countdown-text">{footerText}</span>
+              ) : isCurrent ? (
+                t(language, "prayerTracking.nowPill")
+              ) : (
+                statusLabel(language, state)
+              )}
             </span>
             {state !== "next" && (
               <span id={`prayer-summary-record-${prayer}`} className="sr-only">

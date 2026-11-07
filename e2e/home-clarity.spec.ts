@@ -215,7 +215,7 @@ for (const language of ["ar", "en"] as const) {
       // The condensed strip owns a hidden countdown inside its button. At the
       // top only the separate footer countdown is visible.
       await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
-      await expect(next.locator("[data-prayer-detail]")).toContainText(/باقي|left/);
+      await expect(next.locator("[data-prayer-detail]")).toContainText(/متبقٍ|remaining/);
       await expect(next.locator("[data-prayer-detail]")).toHaveCSS("justify-content", "center");
       await expect(next.locator(".home-prayer-divider")).toHaveCount(0);
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-home.png`), scale: "css" });

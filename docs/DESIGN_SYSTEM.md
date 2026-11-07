@@ -1569,6 +1569,10 @@ Preserve the deliberately distinct Mushaf furniture capsules, 44px hit targets, 
 
 Theme cycling reports the applied page color through a transient status capsule using matching paper/ink/grain. It is not a picker. Normal compact chrome reuses the title slot without changing its target geometry; rail/Focus reserve a transient status inset inside the reading viewport so scripture is never under the notice and Focus exit remains available. The exact Mushaf reading ground and notice use their own opaque paper/ink tokens, even when application chrome uses Glass; menus and word meanings retain the protected Glass contract. This owner-approved distinction supersedes the older rule that app Glass recolors every Mushaf page/HUD. High contrast, Forced Colors and texture preferences still apply.
 
+## Phone Mushaf bars and index — 2026-11-07
+
+Below 600px, the bookmark sits to the left of the centered Surah/Juz selector. The bottom bar centers the folio independently and places the accessible icon-only Focus action at the left. The expanded index uses the themed area between the bars, with fixed search and tabs and a scrollable results region. Close and Back return to the reader and restore the opener's focus. Tablet and desktop use their existing framed or facing-page layouts and modal index.
+
 ## Approved Mushaf chrome — local review 2026-11-05
 
 Interactive desktop readers compose one compact header with Back, fullscreen, Surah/Juz navigation and index search, a centered canonical reading area and a footer. Center the single page-range capsule within the reading area, excluding the tool rail; omit the total page count and duplicated per-page furniture. Keep the keyboard hint at the edge, with individually bordered arrow keycaps. The rail retains existing reading actions and a visible Focus action without a redundant Quran tile or repeated index control. This owner decision supersedes the rail-only header contract. Paired Arabic/English retains matching internal furniture so the two reading panes stay aligned.

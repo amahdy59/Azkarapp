@@ -723,11 +723,11 @@ export function HomeScreen({
           >
             <div
               data-testid="home-header-content"
-              className="home-layout-frame px-page mx-auto flex w-full max-w-7xl items-start justify-between gap-3"
+              className="home-layout-frame px-page mx-auto flex w-full max-w-7xl flex-wrap items-start justify-between gap-x-3 gap-y-1"
             >
               <div
                 data-testid="hijri-date"
-                className={`min-w-0 flex-1 pt-1 text-start text-label font-bold leading-tight sm:text-subtitle ${
+                className={`min-w-0 grow basis-[min(100%,10rem)] pt-1 text-start text-label font-bold leading-tight sm:text-subtitle ${
                   homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
                 }`}
               >
@@ -735,13 +735,9 @@ export function HomeScreen({
                   {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
                 </time>
                 {secondaryDate && (
-                  <div
-                    className="home-date-secondary home-rail-fold"
-                    aria-hidden={prayerCardsCondensed || undefined}
-                    data-testid="home-secondary-date"
-                  >
+                  <div data-testid="home-secondary-date">
                     <span
-                      className={`block min-h-0 text-xs font-medium ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
+                      className={`block min-h-0 text-label font-medium ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
                       dir="auto"
                     >
                       {secondaryDate}
@@ -749,7 +745,7 @@ export function HomeScreen({
                   </div>
                 )}
               </div>
-              <div className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}>
+              <div className={`ms-auto shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}>
                 <button
                   type="button"
                   data-testid="home-header-routine-summary-mobile"
@@ -826,29 +822,28 @@ export function HomeScreen({
                   <div className="min-h-0" {...(!compactPrayerActive ? { inert: "" } : {})}>
                     <div
                       data-testid="home-compact-prayer"
-                      className={`home-compact-prayer mx-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl border px-3 py-1.5 ${
+                      className={`home-compact-prayer mx-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl border ${
                         homeVisualEffects
                           ? "hero-glass home-glass-surface text-on-media"
                           : "border-border bg-card text-foreground"
                       }`}
                     >
-                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                         <NextPrayerIcon
                           size={20}
                           className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
                           aria-hidden="true"
                         />
-                        <div className="min-w-0 [overflow-wrap:anywhere]">
-                          <p className="text-sm font-bold leading-snug">
-                            {prayerDisplayName(nextPrayer.prayer, language, todayKey)} ·{" "}
-                            <bdi className="tabular-nums">{formatPrayerTimeLabel(nextPrayer.time, isArabic)}</bdi>
-                          </p>
-                          <p
-                            className={`text-xs tabular-nums ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
-                          >
-                            {nextPrayer.countdown ?? t(language, "prayerTracking.nextShort")}
-                          </p>
-                        </div>
+                        <p className="min-w-0 text-sm font-bold leading-snug [overflow-wrap:anywhere]">
+                          {prayerDisplayName(nextPrayer.prayer, language, todayKey)} ·{" "}
+                          <bdi className="tabular-nums">{formatPrayerTimeLabel(nextPrayer.time, isArabic)}</bdi>
+                        </p>
+                        <p
+                          className={`col-span-2 text-xs tabular-nums whitespace-nowrap ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
+                          data-prayer-countdown-line
+                        >
+                          {nextPrayer.countdown ?? t(language, "prayerTracking.nextShort")}
+                        </p>
                       </div>
                       <button
                         type="button"

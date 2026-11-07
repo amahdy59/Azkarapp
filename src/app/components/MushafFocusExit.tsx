@@ -1,10 +1,18 @@
 import { useEffect, useRef } from "react";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { Eye } from "./icons";
+import { CollapseCorners, Eye } from "./icons";
 
 /** One discoverable 44px exit for either Mushaf owner; no fullscreen API. */
-export function MushafFocusExit({ language, onExit }: { language: AppLanguage; onExit: () => void }) {
+export function MushafFocusExit({
+  language,
+  onExit,
+  iconOnly = false,
+}: {
+  language: AppLanguage;
+  onExit: () => void;
+  iconOnly?: boolean;
+}) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const frame = requestAnimationFrame(() => ref.current?.focus({ preventScroll: true }));
@@ -15,6 +23,7 @@ export function MushafFocusExit({ language, onExit }: { language: AppLanguage; o
       ref={ref}
       type="button"
       data-testid="mushaf-focus-exit"
+      aria-label={t(language, "mushaf.focusModeExit")}
       onClick={() => {
         const reader = ref.current?.closest<HTMLElement>("[data-mushaf-reader]");
         onExit();
@@ -30,8 +39,8 @@ export function MushafFocusExit({ language, onExit }: { language: AppLanguage; o
       className="group flex min-h-11 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
     >
       <span className="mushaf-furniture-pill gap-2">
-        <Eye size={14} aria-hidden="true" />
-        {t(language, "mushaf.focusModeExit")}
+        {iconOnly ? <CollapseCorners size={16} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}
+        {!iconOnly && t(language, "mushaf.focusModeExit")}
       </span>
     </button>
   );

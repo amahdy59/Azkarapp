@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Persistent Home dates — 2026-11-07
+
+Both calendar dates remain in the sticky header during scroll. The expanded prayer cards still hand off to the compact row with the existing motion and reduced-motion endpoints. Both states use the same localized minute countdown, with a separate final-minute label. The earlier seconds animation and decorative interval ring are retired from Home.
+
 ## Home date rail and prayer handoff — 2026-11-06
 
 The preferred date and Today's Path control hold their top positions. The secondary date and phone prayer cards fold into their measured intrinsic space together over 260ms with the existing standard easing, while the compact next-prayer row enters in the same interval. The wider layout retains its five-card geometry and uses that same handoff duration. The 96px collapse and 8px restore thresholds, stable content coordinates, interaction focus holds and short-viewport fallback remain. The phone card shapes stay stable while their track folds. Only the expanded next card runs a visible seconds clock. The compact countdown uses the existing minute model. Both motion preferences select immediate endpoints. The shared sticky Glass surface owns the blur, with the existing solid and accessibility fallbacks.

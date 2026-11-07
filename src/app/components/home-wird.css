@@ -61,7 +61,7 @@
   overflow: clip;
 }
 .home-prayer-mobile-fold,
-.home-prayer-sticky[data-prayer-cards-condensed] :is(.home-date-secondary, .home-prayer-expanded) {
+.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-expanded {
   grid-template-rows: minmax(0, 0fr);
   opacity: 0;
   visibility: hidden;
@@ -84,6 +84,7 @@
 }
 .home-compact-prayer {
   min-inline-size: 0;
+  padding: min(0.375rem, 6px) min(0.75rem, 12px);
 }
 .home-compact-prayer > div {
   flex-basis: 8rem;
@@ -257,7 +258,7 @@
 }
 .home-all-prayers-row {
   grid-auto-flow: column;
-  grid-auto-columns: max(min(8.25rem, calc(100% - 1.5rem)), calc((100% - 2rem) / 5));
+  grid-auto-columns: max(min(8.75rem, calc(100% - 12px)), calc((100% - 2rem) / 5));
   justify-content: safe center;
   scroll-padding-inline: 0.25rem;
   scrollbar-width: none;
@@ -266,6 +267,16 @@
 }
 .home-all-prayers-row::-webkit-scrollbar {
   display: none;
+}
+
+.home-all-prayers-row:lang(en) {
+  grid-auto-columns: max(min(10.5rem, calc(100% - 12px)), calc((100% - 2rem) / 5));
+}
+
+@media (max-width: 359px) {
+  .home-prayer-sticky-row:lang(en) {
+    padding-inline: min(1rem, 16px);
+  }
 }
 
 /* Home-only chrome and inset variants load with the Home screen. */
@@ -703,8 +714,25 @@
   border-radius: 999px;
   background: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(2 6 23 / 0.14));
 }
-.home-prayer-status-pill .prayer-countdown-digits {
+.home-prayer-countdown-text {
+  display: inline-block;
+  white-space: nowrap;
+}
+.home-prayer-summary-card[data-prayer-state="next"] .home-prayer-footer-content {
+  padding-inline: 8px;
+}
+.home-prayer-summary-card[data-prayer-state="next"] .home-prayer-status-pill {
+  border: 0;
+  background: none;
+  padding-inline: 0;
+}
+.home-prayer-status-pill .home-prayer-countdown-text {
   font-size: 0.9375rem;
+}
+@media (max-width: 767px) {
+  .home-prayer-status-pill .home-prayer-countdown-text {
+    font-size: var(--text-label);
+  }
 }
 @container (max-width: 9rem) {
   .home-prayer-status-pill > svg {

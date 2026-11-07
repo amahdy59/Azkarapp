@@ -1,3 +1,4 @@
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { MushafDesktopHeader, MushafDesktopFooter, MushafFocusButton } from "../components/MushafReadingChrome";
 import { MushafThemeNotice } from "../components/MushafThemeNotice";
 import { trimMushafPrefetch } from "../content/mushafScheduler";
@@ -33,7 +34,13 @@ import {
   Translate,
   MoreVertical,
 } from "../components/icons";
-import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "../components/mushafShell";
+import {
+  MUSHAF_PHONE_QUERY,
+  PAPER_ASPECT,
+  getNextMushafTheme,
+  spreadStart,
+  useMushafShell,
+} from "../components/mushafShell";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafLoadingPlaceholder } from "../components/MushafLoadingPlaceholder";
@@ -189,6 +196,8 @@ export function KhatmahReaderScreen({
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
+  const isPhone = useMediaQuery(MUSHAF_PHONE_QUERY);
+  const closeIndex = useCallback(() => setIsIndexOpen(false), []);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
   const [isLoadingWordMeanings, setIsLoadingWordMeanings] = useState(false);
@@ -774,7 +783,8 @@ export function KhatmahReaderScreen({
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
-    if (event.target instanceof Element && event.target.closest(".quran-page-meaning")) return;
+    if (event.target instanceof Element && event.target.closest(".quran-page-meaning, [data-mushaf-inline-index]"))
+      return;
     if ((event.target as HTMLElement).closest("button, a, input, label, select, textarea, [role='switch']")) return;
     drag.current = {
       pointerId: event.pointerId,
@@ -821,11 +831,12 @@ export function KhatmahReaderScreen({
   const isRtl = direction === "rtl";
   const MobileBackIcon = isRtl ? ArrowRight : ArrowLeft;
 
+  const inlineIndex = isPhone && readingMode === "mushaf" && !compactTranslation;
   const mobileBack =
     (!useRail || compactTranslation) && !isFocusMode ? (
       <button
         type="button"
-        onClick={onBack}
+        onClick={inlineIndex && isIndexOpen ? closeIndex : onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
         className={
@@ -872,6 +883,35 @@ export function KhatmahReaderScreen({
       </button>
     ) : undefined;
 
+  const indexPanel = (
+    <MushafNavigationModal
+      isOpen={isIndexOpen}
+      inline={inlineIndex}
+      initialTab={indexTab}
+      currentPage={currentPage}
+      onClose={closeIndex}
+      onSelectPage={selectPage}
+      language={language}
+      direction={direction}
+      bookmarks={initialBookmarks}
+      verseBookmarks={initialVerseBookmarks}
+      onSelectVerseBookmark={(bookmark) => setHighlightedVerseKey(bookmark.verseKey)}
+    />
+  );
+  const focusHandle = <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} iconOnly={isPhone} />;
+  const phoneFocus = isFocusMode ? (
+    focusHandle
+  ) : (
+    <MushafFocusButton
+      language={language}
+      iconOnly
+      onEnter={() => {
+        closeIndex();
+        setIsFocusMode(true);
+      }}
+    />
+  );
+
   const mobileTopLeft = isRtl ? mobileMore : mobileBack;
   const mobileTopRight = isRtl ? mobileBack : mobileMore;
 
@@ -881,7 +921,7 @@ export function KhatmahReaderScreen({
         type="button"
         onClick={() => {
           setIndexTab("jump");
-          setIsIndexOpen(true);
+          setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "jump"));
         }}
         data-testid="mushaf-furniture-page-btn"
         aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(currentPage, language) })}
@@ -900,7 +940,7 @@ export function KhatmahReaderScreen({
         dir={direction}
         onClick={() => {
           setIndexTab("surahs");
-          setIsIndexOpen(true);
+          setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "surahs"));
         }}
         data-testid="mushaf-top-center-index"
         aria-label={t(language, "mushaf.indexTitle")}
@@ -925,7 +965,7 @@ export function KhatmahReaderScreen({
       </button>
     ) : undefined;
 
-  const mobileBottomLeft =
+  const mobileBookmark =
     !useRail && !isFocusMode ? (
       <button
         type="button"
@@ -957,7 +997,10 @@ export function KhatmahReaderScreen({
         aria-checked={showWordMeanings}
         aria-busy={isLoadingWordMeanings}
         disabled={isLoadingWordMeanings}
-        onClick={() => void toggleWordMeanings()}
+        onClick={() => {
+          if (inlineIndex) closeIndex();
+          void toggleWordMeanings();
+        }}
         data-testid="mushaf-difficult-words-switch"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
@@ -1014,8 +1057,6 @@ export function KhatmahReaderScreen({
       }
     />
   );
-
-  const focusHandle = <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} />;
 
   const wirdProgressBar =
     wirdGoal > 0 ? (
@@ -1258,9 +1299,14 @@ export function KhatmahReaderScreen({
               topLeftControl={compactTranslation ? undefined : mobileTopLeft}
               topRightControl={compactTranslation ? undefined : mobileTopRight}
               topCenterControl={compactTranslation ? undefined : mobileTopCenter}
-              bottomLeftControl={mobileBottomLeft}
+              phoneBookmark={isPhone && !compactTranslation ? mobileBookmark : undefined}
+              inlineIndex={inlineIndex ? indexPanel : undefined}
+              inlineIndexOpen={inlineIndex && isIndexOpen}
+              bottomLeftControl={isPhone ? phoneFocus : mobileBookmark}
               bottomCenterControl={
-                isFocusMode ? (
+                isPhone ? (
+                  mobileBottomCenter
+                ) : isFocusMode ? (
                   focusHandle
                 ) : !useRail ? (
                   <div className="mushaf-compact-focus">
@@ -1447,18 +1493,7 @@ export function KhatmahReaderScreen({
       />
 
       {/* Index & Navigation Modal */}
-      <MushafNavigationModal
-        isOpen={isIndexOpen}
-        initialTab={indexTab}
-        currentPage={currentPage}
-        onClose={() => setIsIndexOpen(false)}
-        onSelectPage={selectPage}
-        language={language}
-        direction={direction}
-        bookmarks={initialBookmarks}
-        verseBookmarks={initialVerseBookmarks}
-        onSelectVerseBookmark={(bookmark) => setHighlightedVerseKey(bookmark.verseKey)}
-      />
+      {!inlineIndex && indexPanel}
     </ScreenContainer>
   );
 }

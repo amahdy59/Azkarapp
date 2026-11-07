@@ -243,3 +243,48 @@
     border-color: ButtonText;
   }
 }
+
+.mushaf-control-band[data-phone-bookmark="true"] {
+  grid-template-columns: minmax(92px, 1fr) minmax(0, auto) minmax(92px, 1fr);
+  padding-inline: 4px;
+}
+.mushaf-control-band[data-phone-bookmark="true"] .col-start-1 {
+  justify-self: stretch;
+  justify-content: space-between;
+  gap: 0;
+}
+.mushaf-control-band[data-phone-bookmark="true"] :is(.col-start-1, .col-start-3) > button {
+  inline-size: 46px;
+  min-inline-size: 46px;
+  block-size: 46px;
+  padding-inline: 0;
+}
+.mushaf-control-band[data-phone-bookmark="true"] :is(.col-start-1, .col-start-3) > button > span {
+  inline-size: 44px;
+  min-inline-size: 0;
+  max-block-size: 44px;
+  padding-inline: 0;
+}
+.mushaf-control-band[data-phone-bookmark="true"] .mushaf-title-control > button {
+  min-height: 46px;
+  height: auto;
+  max-inline-size: 100%;
+}
+.mushaf-reader-viewer[data-phone-controls="true"] .mushaf-control-band--bottom button {
+  min-inline-size: 46px;
+  min-block-size: 46px;
+}
+.mushaf-control-band[data-phone-bookmark="true"] .mushaf-title-control > button > span {
+  min-height: 2rem;
+  height: auto;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+}
+.mushaf-control-band[data-phone-bookmark="true"] .mushaf-title-control .arabic-ui {
+  min-inline-size: 0;
+  flex-shrink: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}

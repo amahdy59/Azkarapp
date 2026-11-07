@@ -68,7 +68,7 @@ for (const scenario of [
       }, scenario.scale);
       const indexOpener = page.getByTestId("mushaf-rail-index").or(page.getByTestId("mushaf-top-center-index"));
       await indexOpener.click();
-      const modal = page.getByTestId("mushaf-index-modal");
+      const modal = page.getByTestId("mushaf-index-modal").or(page.getByTestId("mushaf-index-inline"));
       await expect(modal).toBeVisible();
       const search = modal.locator('input[type="search"]');
       await expect(search).toBeVisible();

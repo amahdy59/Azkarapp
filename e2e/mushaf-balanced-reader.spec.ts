@@ -125,7 +125,7 @@ for (const scenario of [
     }
     await page.clock.resume();
     if ("focusMode" in scenario) await page.getByTestId("mushaf-focus-exit").click();
-    const index = page.getByTestId("mushaf-index-modal");
+    const index = page.getByTestId("mushaf-index-modal").or(page.getByTestId("mushaf-index-inline"));
     const opener = reader
       .getByTestId("mushaf-rail-index")
       .or(reader.getByTestId("mushaf-top-center-index"))
@@ -136,7 +136,7 @@ for (const scenario of [
     const grid = index.locator(".mushaf-index-surahs");
     await expect.poll(() => grid.evaluate((n) => getComputedStyle(n).gridTemplateColumns.split(" ").length)).toBe(2);
     const bounds = (await index.boundingBox())!;
-    expect(bounds.height).toBeLessThan(scenario.height * 0.8);
+    if (scenario.width >= 600) expect(bounds.height).toBeLessThan(scenario.height * 0.8);
     const cards = grid.locator("button");
     const first = (await cards.nth(0).boundingBox())!,
       second = (await cards.nth(1).boundingBox())!;

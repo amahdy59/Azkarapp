@@ -1,10 +1,18 @@
 import type { AppLanguage, MushafToolbarSide } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { ArrowLeft, ArrowRight, ChevronDown, Eye, Keyboard, Maximize, Minimize, Search } from "./icons";
+import { ArrowLeft, ArrowRight, ChevronDown, ExpandCorners, Eye, Keyboard, Maximize, Minimize, Search } from "./icons";
 import "./mushaf-reading-chrome.css";
 
-export function MushafFocusButton({ language, onEnter }: { language: AppLanguage; onEnter: () => void }) {
+export function MushafFocusButton({
+  language,
+  onEnter,
+  iconOnly = false,
+}: {
+  language: AppLanguage;
+  onEnter: () => void;
+  iconOnly?: boolean;
+}) {
   return (
     <button
       type="button"
@@ -14,8 +22,8 @@ export function MushafFocusButton({ language, onEnter }: { language: AppLanguage
       onClick={onEnter}
     >
       <span className="mushaf-furniture-pill">
-        <Eye size={16} aria-hidden="true" />
-        {t(language, "mushaf.railFocus")}
+        {iconOnly ? <ExpandCorners size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
+        {!iconOnly && t(language, "mushaf.railFocus")}
       </span>
     </button>
   );

@@ -2,7 +2,7 @@
 
 ## Active phase
 
-[Home startup, reminder updates and offline downloads](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md) is the current owner-approved phase. [Surah covers, listening desk and image delivery](phases/SURAH_COVERS_AND_IMAGE_DELIVERY_2026_11_06.md) records the previous deployment.
+[Persistent Home dates and phone Mushaf index](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md) is the current owner-approved phase. [Home startup, reminder updates and offline downloads](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md) records the previous deployment.
 
 [Home date rail and pending release](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md) records the preceding owner-approved phase. The owner lifts the previous commit and publication hold and requests screenshots, exact-commit verification and production smoke.
 

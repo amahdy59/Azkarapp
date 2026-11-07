@@ -1,5 +1,5 @@
 /* One bounded opaque index, with search outside the scrolling results. */
-[data-testid="mushaf-index-modal"] {
+:is(.mushaf-index-dialog, .mushaf-index-inline) {
   --mushaf-index-gutter: 16px;
   container: mushaf-index / inline-size;
 }
@@ -10,6 +10,23 @@
   inline-size: min(36rem, calc(100vw - 1rem));
   block-size: min(40rem, max(76dvh, calc(14rem + 200px)));
   max-block-size: calc(100dvh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom)));
+}
+.mushaf-index-inline {
+  background-color: var(--mushaf-paper);
+  color: var(--mushaf-ink);
+  outline: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.mushaf-index-inline .mushaf-index-panel {
+  min-block-size: min(8rem, 28dvh);
+  overscroll-behavior: contain;
+}
+.mushaf-index-inline .mushaf-index-header h2 {
+  color: var(--mushaf-ink);
+}
+.mushaf-index-inline .mushaf-index-surah {
+  overflow-wrap: anywhere;
 }
 /* Physical centering is independent of Arabic/English inline direction. */
 .mushaf-index-dialog[dir="rtl"] {

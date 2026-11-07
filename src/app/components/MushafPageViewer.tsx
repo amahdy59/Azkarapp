@@ -1187,6 +1187,9 @@ export function MushafPageViewer({
   onJuzClick,
   onPageClick,
   topLeftControl,
+  phoneBookmark,
+  inlineIndex,
+  inlineIndexOpen = false,
   topRightControl,
   topCenterControl,
   themeNotice,
@@ -1252,6 +1255,9 @@ export function MushafPageViewer({
   onJuzClick?: () => void;
   onPageClick?: () => void;
   topLeftControl?: ReactNode;
+  phoneBookmark?: ReactNode;
+  inlineIndex?: ReactNode;
+  inlineIndexOpen?: boolean;
   topRightControl?: ReactNode;
   topCenterControl?: ReactNode;
   themeNotice?: ReactNode;
@@ -1421,6 +1427,7 @@ export function MushafPageViewer({
       data-desktop-chrome={Boolean(desktopHeader && useRail)}
       data-rail-side={railSide}
       data-focus-mode={focusMode}
+      data-phone-controls={Boolean(inlineIndex)}
       data-reader-presentation={Boolean(desktopHeader || topCenterControl)}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
@@ -1472,7 +1479,7 @@ export function MushafPageViewer({
           </button>
         </nav>
       )}
-      {isBookmarked && !topCenterControl && (
+      {isBookmarked && !topCenterControl && !(inlineIndex && focusMode) && (
         <div
           className={`pointer-events-none absolute end-4 z-20 flex items-center justify-center text-primary drop-shadow-md ${
             headerContent && !useRail ? "top-14" : "top-2"
@@ -1485,13 +1492,18 @@ export function MushafPageViewer({
       )}
 
       {(topLeftControl || topRightControl || topCenterControl) && (
-        <div dir="ltr" className="mushaf-control-band mushaf-control-band--top">
+        <div
+          dir="ltr"
+          className="mushaf-control-band mushaf-control-band--top"
+          data-phone-bookmark={Boolean(phoneBookmark)}
+        >
           {topLeftControl && (
             <div
               data-testid="mushaf-corner-top-left"
               className="col-start-1 row-start-1 flex min-w-0 justify-center gap-1.5"
             >
               {topLeftControl}
+              {phoneBookmark}
             </div>
           )}
 
@@ -1502,7 +1514,7 @@ export function MushafPageViewer({
               data-theme-notice={Boolean(themeNotice)}
               dir="ltr"
             >
-              {isBookmarked && (
+              {isBookmarked && !phoneBookmark && (
                 <span
                   className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-primary/50 bg-card/90 px-2 text-primary shadow-xs backdrop-blur-md"
                   role="img"
@@ -1574,7 +1586,11 @@ export function MushafPageViewer({
         key={`${pageNumber}:${facingPage?.pageNumber ?? "single"}`}
         ref={paperRef}
         style={
-          { ...paperStyle, "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)) } as CSSProperties
+          {
+            ...paperStyle,
+            display: inlineIndexOpen ? "none" : undefined,
+            "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
+          } as CSSProperties
         }
         data-magnified={magnification > 100}
         data-theme-notice={Boolean(themeNotice && !topCenterControl && !desktopHeader)}
@@ -1702,7 +1718,9 @@ export function MushafPageViewer({
         )}
       </div>
 
-      {!focusMode && !useRail && !facingContent && (onNext || onPrevious || onEdgeTap) && (
+      {inlineIndex}
+
+      {!inlineIndexOpen && !focusMode && !useRail && !facingContent && (onNext || onPrevious || onEdgeTap) && (
         <nav className="mushaf-tablet-turns" aria-label={t(language, "mushaf.pageNavigation")}>
           <button
             type="button"

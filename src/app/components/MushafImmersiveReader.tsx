@@ -1,3 +1,4 @@
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { MushafDesktopHeader, MushafDesktopFooter, MushafFocusButton } from "./MushafReadingChrome";
 import { MushafThemeNotice } from "./MushafThemeNotice";
 import { trimMushafPrefetch } from "../content/mushafScheduler";
@@ -5,7 +6,7 @@ import { progressFillStyle } from "./progressFillStyle";
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
-import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "./mushafShell";
+import { MUSHAF_PHONE_QUERY, PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "./mushafShell";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
 import { MushafNavigationModal } from "./MushafNavigationModal";
@@ -172,6 +173,8 @@ export function MushafImmersiveReader({
   const [pageIndex, slideDir] = pageTuple;
   const [showWordMeanings, setShowWordMeanings] = useState(false);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
+  const isPhone = useMediaQuery(MUSHAF_PHONE_QUERY);
+  const closeIndex = useCallback(() => setIsIndexOpen(false), []);
   const [indexTab, setIndexTab] = useState<"surahs" | "juzs" | "jump" | "bookmarks">("surahs");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
@@ -579,11 +582,12 @@ export function MushafImmersiveReader({
   const isRtl = direction === "rtl";
   const MobileBackIcon = isRtl ? ArrowRight : ArrowLeft;
 
+  const inlineIndex = isPhone;
   const mobileBack =
     !shell.rail && !isFocusMode ? (
       <button
         type="button"
-        onClick={onClose}
+        onClick={inlineIndex && isIndexOpen ? closeIndex : onClose}
         data-testid="mushaf-immersive-close"
         aria-label={t(language, "common.back")}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -609,6 +613,55 @@ export function MushafImmersiveReader({
       </button>
     ) : undefined;
 
+  const indexPanel = (
+    <MushafNavigationModal
+      isOpen={isIndexOpen}
+      inline={inlineIndex}
+      onClose={closeIndex}
+      currentPage={displayPage}
+      onSelectPage={(page) => {
+        const index = pageNumbers.indexOf(page);
+        if (index >= 0) {
+          setPageTuple([index, index >= pageIndex ? 1 : -1]);
+        } else {
+          const surahIdx = SURAHS.findIndex(
+            (s, idx) => page >= s.startPage && (idx === SURAHS.length - 1 || page < SURAHS[idx + 1]!.startPage),
+          );
+          const surahMeta = surahIdx >= 0 ? SURAHS[surahIdx]! : undefined;
+          const startP = surahMeta ? surahMeta.startPage : page;
+          const nextPlacement = surahMeta && surahMeta.number < 114 ? SURAH_PLACEMENTS[surahMeta.number + 1] : null;
+          const endP = nextPlacement
+            ? Math.max(startP, nextPlacement.line > 1 ? nextPlacement.page : nextPlacement.page - 1)
+            : 604;
+          const nextPages: number[] = [];
+          for (let p = startP; p <= endP; p++) nextPages.push(p);
+          setCustomPages(nextPages);
+          const nextIdx = Math.max(0, nextPages.indexOf(page));
+          setPageTuple([nextIdx, 1]);
+        }
+        setIsIndexOpen(false);
+      }}
+      language={language}
+      direction={direction}
+      bookmarks={[...bookmarkedPages]}
+      initialTab={indexTab}
+      // The span is the whole difference from the Mushaf's own index.
+      pageRange={{ first: pageNumbers[0]!, last: pageNumbers[pageNumbers.length - 1]! }}
+    />
+  );
+  const phoneFocus = isFocusMode ? (
+    <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} iconOnly={isPhone} />
+  ) : (
+    <MushafFocusButton
+      language={language}
+      iconOnly
+      onEnter={() => {
+        closeIndex();
+        setIsFocusMode(true);
+      }}
+    />
+  );
+
   const mobileTopLeft = isRtl ? mobileMore : mobileBack;
   const mobileTopRight = isRtl ? mobileBack : mobileMore;
 
@@ -618,7 +671,7 @@ export function MushafImmersiveReader({
         type="button"
         onClick={() => {
           setIndexTab("jump");
-          setIsIndexOpen(true);
+          setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "jump"));
         }}
         data-testid="mushaf-furniture-page-btn"
         aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(displayPage, language) })}
@@ -637,7 +690,7 @@ export function MushafImmersiveReader({
         dir={direction}
         onClick={() => {
           setIndexTab("surahs");
-          setIsIndexOpen(true);
+          setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "surahs"));
         }}
         data-testid="mushaf-furniture-surah-btn"
         aria-label={t(language, "mushaf.indexTitle")}
@@ -686,41 +739,43 @@ export function MushafImmersiveReader({
       </button>
     ) : undefined;
 
-  const mobileBottomLeft =
+  const mobileComplete =
+    !shell.rail && !isFocusMode && atEnd && onComplete ? (
+      <button
+        type="button"
+        onClick={onComplete}
+        data-testid="mushaf-immersive-return"
+        aria-label={t(language, "reader.immersiveComplete")}
+        className="group flex h-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      >
+        <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-primary px-3 text-xs font-black text-primary-foreground  backdrop-blur-md transition-[color,background-color] hover:bg-primary/90">
+          <CheckCircle2 size={16} aria-hidden="true" />
+          {!isPhone && <span className="truncate">{t(language, "reader.immersiveComplete")}</span>}
+        </span>
+      </button>
+    ) : undefined;
+
+  const mobileBookmark =
     !shell.rail && !isFocusMode ? (
-      atEnd && onComplete ? (
-        <button
-          type="button"
-          onClick={onComplete}
-          data-testid="mushaf-immersive-return"
-          aria-label={t(language, "reader.immersiveComplete")}
-          className="group flex h-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      <button
+        type="button"
+        aria-pressed={isPageBookmarked}
+        onClick={() => onTogglePageBookmark?.(displayPage)}
+        data-testid="mushaf-immersive-bookmark"
+        aria-label={t(language, "mushaf.bookmarkCurrentPage")}
+        title={t(language, "mushaf.bookmarkCurrentPage")}
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      >
+        <span
+          className={`inline-flex h-8 min-w-[2rem] items-center justify-center gap-1 rounded-full border px-3  backdrop-blur-md transition-colors ${
+            isPageBookmarked
+              ? "border-primary/50 bg-primary text-primary-foreground group-hover:bg-primary/90"
+              : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
+          }`}
         >
-          <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-primary px-3 text-xs font-black text-primary-foreground  backdrop-blur-md transition-[color,background-color] hover:bg-primary/90">
-            <CheckCircle2 size={16} aria-hidden="true" />
-            <span className="truncate">{t(language, "reader.immersiveComplete")}</span>
-          </span>
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => onTogglePageBookmark?.(displayPage)}
-          data-testid="mushaf-immersive-bookmark"
-          aria-label={t(language, "mushaf.bookmarkCurrentPage")}
-          title={t(language, "mushaf.bookmarkCurrentPage")}
-          className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <span
-            className={`inline-flex h-8 min-w-[2rem] items-center justify-center gap-1 rounded-full border px-3  backdrop-blur-md transition-colors ${
-              isPageBookmarked
-                ? "border-primary/50 bg-primary text-primary-foreground group-hover:bg-primary/90"
-                : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
-            }`}
-          >
-            <Bookmark size={16} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
-          </span>
-        </button>
-      )
+          <Bookmark size={16} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
+        </span>
+      </button>
     ) : undefined;
 
   const progressBar = (
@@ -846,9 +901,14 @@ export function MushafImmersiveReader({
             topLeftControl={mobileTopLeft}
             topRightControl={mobileTopRight}
             topCenterControl={mobileTopCenter}
-            bottomLeftControl={mobileBottomLeft}
+            phoneBookmark={isPhone ? mobileBookmark : undefined}
+            inlineIndex={inlineIndex ? indexPanel : undefined}
+            inlineIndexOpen={inlineIndex && isIndexOpen}
+            bottomLeftControl={isPhone ? phoneFocus : (mobileComplete ?? mobileBookmark)}
             bottomCenterControl={
-              isFocusMode ? (
+              isPhone ? (
+                mobileBottomCenter
+              ) : isFocusMode ? (
                 <MushafFocusExit language={language} onExit={() => setIsFocusMode(false)} />
               ) : !shell.rail ? (
                 <div className="mushaf-compact-focus">
@@ -857,7 +917,16 @@ export function MushafImmersiveReader({
                 </div>
               ) : undefined
             }
-            bottomRightControl={mobileBottomRight}
+            bottomRightControl={
+              isPhone ? (
+                <>
+                  {mobileComplete}
+                  {mobileBottomRight}
+                </>
+              ) : (
+                mobileBottomRight
+              )
+            }
             onSurahClick={() => {
               setIndexTab("surahs");
               setIsIndexOpen(true);
@@ -931,39 +1000,7 @@ export function MushafImmersiveReader({
         surahAudio={surahAudio}
       />
 
-      <MushafNavigationModal
-        isOpen={isIndexOpen}
-        onClose={() => setIsIndexOpen(false)}
-        currentPage={displayPage}
-        onSelectPage={(page) => {
-          const index = pageNumbers.indexOf(page);
-          if (index >= 0) {
-            setPageTuple([index, index >= pageIndex ? 1 : -1]);
-          } else {
-            const surahIdx = SURAHS.findIndex(
-              (s, idx) => page >= s.startPage && (idx === SURAHS.length - 1 || page < SURAHS[idx + 1]!.startPage),
-            );
-            const surahMeta = surahIdx >= 0 ? SURAHS[surahIdx]! : undefined;
-            const startP = surahMeta ? surahMeta.startPage : page;
-            const nextPlacement = surahMeta && surahMeta.number < 114 ? SURAH_PLACEMENTS[surahMeta.number + 1] : null;
-            const endP = nextPlacement
-              ? Math.max(startP, nextPlacement.line > 1 ? nextPlacement.page : nextPlacement.page - 1)
-              : 604;
-            const nextPages: number[] = [];
-            for (let p = startP; p <= endP; p++) nextPages.push(p);
-            setCustomPages(nextPages);
-            const nextIdx = Math.max(0, nextPages.indexOf(page));
-            setPageTuple([nextIdx, 1]);
-          }
-          setIsIndexOpen(false);
-        }}
-        language={language}
-        direction={direction}
-        bookmarks={[...bookmarkedPages]}
-        initialTab={indexTab}
-        // The span is the whole difference from the Mushaf's own index.
-        pageRange={{ first: pageNumbers[0]!, last: pageNumbers[pageNumbers.length - 1]! }}
-      />
+      {!inlineIndex && indexPanel}
 
       {mushafSettings && (
         <MushafSettingsSheet

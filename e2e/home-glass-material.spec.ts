@@ -118,7 +118,7 @@ for (const width of [390, 834, 1440]) {
         await expect(noon.getByRole("heading")).toHaveText("الجمعة");
         await expect(noon.getByRole("button")).toHaveAccessibleName("فتح صلاة الجمعة");
         if (scene === "friday-morning") {
-          await expect(noon.locator("[data-prayer-footer]")).toContainText("باقي");
+          await expect(noon.locator("[data-prayer-footer]")).toContainText("متبقٍ");
         }
       }
       const standard = page

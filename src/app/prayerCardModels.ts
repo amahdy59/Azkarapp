@@ -24,12 +24,23 @@ export function buildPrayerCardModels(
   // Thirty calm minute-clock steps; use dated instants, including midnight/DST.
   // This is decoration only and does not define a religious prayer window.
   const approach = Math.max(0, Math.min(1, 1 - (timeline.next.at - now.getTime()) / (30 * 60_000)));
-  const countdown = formatNumerals(
-    `${Math.floor(timeline.remainingMinutes / 60)
-      .toString()
-      .padStart(2, "0")}:${(timeline.remainingMinutes % 60).toString().padStart(2, "0")}`,
-    language,
-  );
+  const remainingMs = timeline.next.at - now.getTime();
+  const minutes = Math.floor(remainingMs / 60_000);
+  const hours = Math.floor(minutes / 60);
+  const minuteLabel = t(language, "prayerTracking.remainingMinutes", {
+    minutes: formatNumerals(minutes % 60, language),
+  });
+  const countdown =
+    minutes === 0
+      ? t(language, "prayerTracking.remainingUnderMinute")
+      : t(language, "prayerTracking.timeLeft", {
+          time: hours
+            ? t(language, "prayerTracking.remainingHoursMinutes", {
+                hours: formatNumerals(hours, language),
+                minutes: minuteLabel,
+              })
+            : minuteLabel,
+        });
 
   return PRAYER_NAMES.map((prayer, index) => {
     const isNext = prayer === timeline.next.prayer;
@@ -46,9 +57,7 @@ export function buildPrayerCardModels(
       emphasis: state === "current" ? (approach > 0 ? 0 : 1) : isNext ? 0.15 + approach * 0.85 : 0,
       ...(isNext
         ? {
-            countdown: t(language, "prayerTracking.timeLeft", { time: countdown }),
-            remainingPercent: timeline.remainingPercent,
-            countdownInterval: { startsAt: timeline.current.at, endsAt: timeline.next.at },
+            countdown,
           }
         : {}),
     };

@@ -5414,3 +5414,7 @@ The owner supplied a visual reference for larger covers and authorized a verifie
 ## 2026-11-06 · Home startup, reminders and downloads
 
 The owner approves the startup audit recommendations and requests reliable notification updates and Android and desktop downloads. Preserve the existing offline installation promise, the exact reviewed Al-Baqarah text and evidence, and the reminder schedule and consent rules. Measure the full Home path, reconcile owned native alarms against the current plan, and retain verified file checkpoints when a download stalls. See [the phase brief](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md).
+
+## 2026-11-07 · Persistent Home dates and phone Mushaf index
+
+The owner approves keeping the slightly larger secondary date visible during scroll, replacing the expanded prayer ring and seconds with the localized minute countdown, and applying the reference Mushaf control placement and in-content index on phones. Preserve the wider reader presentation and canonical pages. See [the phase brief](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md).
