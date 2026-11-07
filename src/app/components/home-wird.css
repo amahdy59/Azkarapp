@@ -258,7 +258,7 @@
 }
 .home-all-prayers-row {
   grid-auto-flow: column;
-  grid-auto-columns: max(min(8.25rem, calc(100% - 1.5rem)), calc((100% - 2rem) / 5));
+  grid-auto-columns: max(min(8.25rem, calc(100% - min(1.5rem, 24px))), calc((100% - 2rem) / 5));
   justify-content: safe center;
   scroll-padding-inline: 0.25rem;
   scrollbar-width: none;

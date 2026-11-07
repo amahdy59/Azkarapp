@@ -1,15 +1,17 @@
 [
   {
-    "release": "2026-11-07.3",
+    "release": "2026-11-07.4",
     "ar": [
-      "يمكنك رؤية التاريخين أثناء التمرير في الرئيسية، وقراءة التاريخ الثانوي بخط أكبر.",
-      "اقرأ الوقت المتبقي للصلاة القادمة في سطر واحد بالساعات والدقائق. تظهر عبارة «أقل من دقيقة» عند اقتراب الموعد.",
-      "في مصحف الهاتف، احفظ الصفحة من الشريط العلوي، وفعّل وضع التركيز من الأسفل، وتصفّح الفهرس مع بقاء شريطي القراءة ظاهرين."
+      "يبقى التاريخان ظاهرين عند تمرير الرئيسية، مع خط أكبر للتاريخ الثانوي.",
+      "يظهر الوقت المتبقي للصلاة القادمة بالساعات والدقائق في سطر واحد، مع مساحة أوسع عند تكبير النص.",
+      "احفظ صفحة المصحف بجانب اسم السورة، وادخل وضع التركيز من الزر أسفل الشاشة على الهاتف.",
+      "تصفّح فهرس المصحف داخل مساحة القراءة مع بقاء شريطي التنقل متاحين."
     ],
     "en": [
-      "See both dates while scrolling Home, with a larger secondary date.",
-      "Read the time until the next prayer in hours and minutes on one line. The final minute shows ‘Under 1 min’.",
-      "On phones, bookmark from the top bar, enter Focus from the bottom bar, and browse the Mushaf index with both bars in view."
+      "Both dates remain visible as you scroll Home, with larger text for the secondary date.",
+      "The time until the next prayer stays on one line in hours and minutes, with more room at enlarged text sizes.",
+      "On phones, bookmark beside the surah selector and enter Focus using the bottom button.",
+      "Browse the Mushaf index inside the reading area while both navigation bars stay accessible."
     ]
   },
   {
