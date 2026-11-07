@@ -117,6 +117,9 @@ describe("HomeScreen quick access", () => {
     );
 
     expect(screen.getByTestId("hijri-date")).toBeInTheDocument();
+    const utilityHeader = screen.getByTestId("home-utility-header");
+    expect(utilityHeader).toHaveClass("pt-2");
+    expect(utilityHeader.className).not.toContain("safe-area-inset-top");
     expect(screen.getByTestId("home-hero")).not.toHaveClass("sm:mt-4");
     expect(screen.getByTestId("home-hero").closest(".app-screen-surface")).toHaveStyle({ paddingTop: "0px" });
     expect(screen.queryByTestId("home-header-stats")).not.toBeInTheDocument();
