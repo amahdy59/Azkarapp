@@ -114,7 +114,12 @@ for (const language of ["ar", "en"] as const) {
       await scroll.evaluate((element) => (element.scrollTop = 0));
       await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
       await expect(next.locator("progress")).toHaveCount(0);
-      await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
+      if (width < 768) {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
+        await expect(next.locator(".home-prayer-countdown-text")).toHaveCount(1);
+      } else {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
+      }
       const footer = page.getByTestId("home-visitor-footer");
       await footer.scrollIntoViewIfNeeded();
       await expect(footer).toBeInViewport();

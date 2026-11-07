@@ -212,9 +212,12 @@ for (const language of ["ar", "en"] as const) {
       await expect(next).toContainText(t(language, "prayerTracking.nextShort"));
       await expect(next.getByRole("progressbar")).toHaveCount(0);
       await expect(next.locator("[data-prayer-footer]").getByRole("progressbar")).toHaveCount(0);
-      // The condensed strip owns a hidden countdown inside its button. At the
-      // top only the separate footer countdown is visible.
-      await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
+      if (width < 768) {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
+        await expect(next.locator(".home-prayer-countdown-text")).toHaveCount(1);
+      } else {
+        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
+      }
       await expect(next.locator("[data-prayer-detail]")).toContainText(/متبقٍ|remaining/);
       await expect(next.locator("[data-prayer-detail]")).toHaveCSS("justify-content", "center");
       await expect(next.locator(".home-prayer-divider")).toHaveCount(0);
