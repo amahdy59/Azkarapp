@@ -1556,7 +1556,8 @@ export function MushafPageViewer({
       ) : headerContent ? (
         <div
           data-mushaf-chrome="header"
-          /* The screen chrome sits within the protected app shell. */
+          /* The screen runs to the physical edges, so the inset lives on the bar
+             rather than outside the paper. */
           className={`relative flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
           style={{ height: "3.5rem" }}
         >
@@ -1569,7 +1570,7 @@ export function MushafPageViewer({
       ) : (
         /* Focus mode: no chrome at all, and the progress hairline is the last
            thing to go — it is the only thing on screen that is not the page. */
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-30" style={{ top: "0px" }}>
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30" style={{ top: 0 }}>
           {progressBar}
         </div>
       )}

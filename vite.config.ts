@@ -103,6 +103,76 @@ function unwrapColorMixGuards(): Plugin {
 }
 
 /**
+ * Chromium 91 (still shipped by some Android emulator images) does not
+ * understand CSS Cascade Layers and ignores the rules inside @layer blocks.
+ * Android builds flatten the wrappers while preserving their source order;
+ * current browsers continue to receive the layered stylesheet unchanged.
+ */
+function flattenAndroidCascadeLayers(enabled: boolean): Plugin {
+  return {
+    name: "azkar:flatten-android-cascade-layers",
+    apply: "build",
+    generateBundle(_options, bundle) {
+      if (!enabled) return;
+      for (const asset of Object.values(bundle)) {
+        if (asset.type !== "asset" || !asset.fileName.endsWith(".css")) continue;
+        const source = typeof asset.source === "string" ? asset.source : Buffer.from(asset.source).toString("utf8");
+        asset.source = flattenLayers(source);
+      }
+    },
+  };
+}
+
+function flattenLayers(css: string) {
+  let output = "";
+  let cursor = 0;
+  while (cursor < css.length) {
+    const layer = css.indexOf("@layer", cursor);
+    if (layer < 0) {
+      output += css.slice(cursor);
+      break;
+    }
+    output += css.slice(cursor, layer);
+    let headerEnd = layer + "@layer".length;
+    let quote: string | undefined;
+    let parentheses = 0;
+    while (headerEnd < css.length) {
+      const character = css[headerEnd]!;
+      if (quote) {
+        if (character === quote && css[headerEnd - 1] !== "\\") quote = undefined;
+      } else if (character === '"' || character === "'") quote = character;
+      else if (character === "(") parentheses += 1;
+      else if (character === ")") parentheses -= 1;
+      else if (parentheses === 0 && (character === "{" || character === ";")) break;
+      headerEnd += 1;
+    }
+    if (headerEnd >= css.length) {
+      output += css.slice(layer);
+      break;
+    }
+    if (css[headerEnd] === ";") {
+      cursor = headerEnd + 1;
+      continue;
+    }
+    let depth = 1;
+    let bodyEnd = headerEnd + 1;
+    let bodyQuote: string | undefined;
+    while (bodyEnd < css.length && depth > 0) {
+      const character = css[bodyEnd]!;
+      if (bodyQuote) {
+        if (character === bodyQuote && css[bodyEnd - 1] !== "\\") bodyQuote = undefined;
+      } else if (character === '"' || character === "'") bodyQuote = character;
+      else if (character === "{") depth += 1;
+      else if (character === "}") depth -= 1;
+      bodyEnd += 1;
+    }
+    output += flattenLayers(css.slice(headerEnd + 1, bodyEnd - 1));
+    cursor = bodyEnd;
+  }
+  return output;
+}
+
+/**
  * Injects the Content-Security-Policy into the built `index.html`.
  *
  * GitHub Pages cannot set response headers, so a meta tag is the only mechanism
@@ -205,6 +275,7 @@ export default defineConfig(({ mode, command }) => {
       react(),
       tailwindcss(),
       unwrapColorMixGuards(),
+      flattenAndroidCascadeLayers(mode === "android"),
       compactAudioLiterals(),
       compactBuildManifest(),
       contentSecurityPolicy(audioBaseUrl, cloudflareApiUrl, liveUpdateManifestUrl),
