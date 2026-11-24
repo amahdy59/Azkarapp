@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getAzkarForMode } from "../content/azkar";
 import { DEFAULT_LOCATION } from "../content/prayerCalculation";
@@ -95,7 +95,7 @@ describe("HomeScreen quick access", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
-    expect(screen.queryByText(/دقيقة/)).not.toBeInTheDocument();
+    expect(within(screen.getByTestId("home-primary-card")).queryByText(/دقيقة/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /افتح الأدعية الجامعة/ }));
     expect(onResume).toHaveBeenCalledWith("comprehensive_duas");
   });

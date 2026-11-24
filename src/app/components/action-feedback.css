@@ -26,9 +26,6 @@
 .offline-resource {
   transition: box-shadow var(--motion-duration-standard) var(--motion-ease-standard);
 }
-.offline-resource[data-transfer-state="active"] {
-  box-shadow: inset 3px 0 var(--primary);
-}
 .offline-resource[data-transfer-state="ready"] > p {
   color: var(--success);
 }

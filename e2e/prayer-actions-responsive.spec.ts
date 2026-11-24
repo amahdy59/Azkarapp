@@ -100,16 +100,22 @@ for (const material of ["glass", "solid"] as const) {
             });
             expect(Math.abs(virtueTitle.y - titleBox.y)).toBeLessThanOrEqual(1);
             expect(evidenceBox.y).toBeCloseTo(titleBox.y, 0);
-            expect(virtueTitle.height).toBeCloseTo(titleBox.height, 0);
+            expect(titleBox.height).toBeGreaterThan(virtueTitle.height);
             const attribution = panel.getByTestId("prayer-virtue-attribution");
-            expect(attributionBox.y).toBeCloseTo(sunriseBox.y, 0);
+            expect(attributionBox.y - (virtueTitle.y + virtueTitle.height)).toBeCloseTo(4, 0);
+            expect(sunriseBox.y - (titleBox.y + titleBox.height)).toBeCloseTo(4, 0);
             await expect(attribution).toHaveCSS("font-size", "13px");
             expect(language === "ar" ? attributionBox.x + attributionBox.width : attributionBox.x).toBeCloseTo(
               language === "ar" ? virtueTitle.x + virtueTitle.width : virtueTitle.x,
               0,
             );
-            await expect(panel.getByTestId("prayer-record-date")).toHaveCount(0);
-            expect((await panel.boundingBox())!.height).toBeLessThanOrEqual(language === "ar" ? 240 : 300);
+            await expect(panel.getByTestId("prayer-record-date")).toBeVisible();
+            await expect(panel.getByTestId("prayer-actions-more-info")).toHaveCount(0);
+            const guidance = panel.getByTestId("prayer-inline-info");
+            await expect(guidance).toBeVisible();
+            const guidanceBox = (await guidance.boundingBox())!;
+            const virtueBox = (await panel.getByTestId("prayer-moment-virtue").boundingBox())!;
+            expect(guidanceBox.y - (virtueBox.y + virtueBox.height)).toBeCloseTo(12, 0);
           }
 
           expect(await panel.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);

@@ -1,3 +1,4 @@
+import { assertPrayerOverview } from "./helpers/home-overview";
 import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { expect, test } from "@playwright/test";
 
@@ -29,7 +30,7 @@ for (const language of ["ar", "en"] as const) {
       await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
       await expect(page.getByTestId("home-prayer-moment")).toBeVisible();
       const alignment = await page.getByTestId("home-context-grid").evaluate((grid) => {
-        const row = document.querySelector('[data-testid="home-all-prayers-row"]')!;
+        const row = document.querySelector('[data-testid="home-prayer-strip"]')!;
         const frame = row.getBoundingClientRect();
         const inset = getComputedStyle(row);
         // Narrow tablets retain native browsing; align to its visible aperture.
@@ -99,285 +100,38 @@ for (const language of ["ar", "en"] as const) {
       await page.goto("/#/home");
       const row = page.getByTestId("home-all-prayers-row");
       await expect(row.locator("article")).toHaveCount(5);
-      const geometry = await row.evaluate((node) => {
-        const frame = node.getBoundingClientRect();
-        return [...node.querySelectorAll("article")].map((card) => {
-          const bounds = card.getBoundingClientRect();
-          const name = card.querySelector("h3")!.getBoundingClientRect();
-          const time = card.querySelector('[id^="prayer-summary-time"]')!.getBoundingClientRect();
-          const digits = card.querySelector("[data-prayer-time-digits]")!.getBoundingClientRect();
-          const icon = card.querySelector("[data-prayer-icon]")!.getBoundingClientRect();
-          const style = getComputedStyle(card);
-          const padding = getComputedStyle(card.querySelector("button")!);
-          const identity = card.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect();
-          const footer = card.querySelector("[data-prayer-footer]")!.getBoundingClientRect();
-          return {
-            state: card.getAttribute("data-prayer-state"),
-            nameTop: name.top,
-            timeTop: time.top,
-            iconTop: icon.top,
-            bottomGap: bounds.bottom - card.querySelector("button")!.getBoundingClientRect().bottom,
-            visible: bounds.left >= frame.left && bounds.right <= frame.right,
-            aligned: Math.abs(name.right - time.right) <= 1 && name.bottom <= time.top,
-            iconAbove: icon.right < name.left && icon.bottom >= name.bottom,
-            bounded: parseFloat(style.borderTopWidth) >= 1 && style.borderTopColor !== "rgba(0, 0, 0, 0)",
-            height: bounds.height,
-            paddingTop: parseFloat(padding.paddingTop),
-            paddingLeft: parseFloat(padding.paddingLeft),
-            paddingRight: parseFloat(padding.paddingRight),
-            iconWidth: icon.width,
-            columnGap: parseFloat(padding.columnGap),
-            visibleTopInset: icon.top - bounds.top,
-            visibleIdentityInset: bounds.right - identity.right,
-            visibleTimeInset: bounds.right - time.right,
-            // The expanded line reaches below the icon; its empty flex space
-            // is not ink. Preserve the name-column gap and check actual digits.
-            actualColumnGap: name.left - icon.right,
-            timeClearsIcon: digits.left >= icon.right || digits.right <= icon.left || digits.top >= icon.bottom,
-            timeClearsName: digits.top >= name.bottom,
-            timeClearsFooter: digits.bottom <= footer.top,
-            width: bounds.width,
-            footerTop: footer.top,
-            footerHeight: footer.height,
-          };
-        });
-      });
-      expect(
-        geometry.every((card) => card.aligned && card.iconAbove && card.bounded),
-        JSON.stringify(geometry),
-      ).toBe(true);
-      expect(
-        geometry.every((card) => card.timeClearsIcon && card.timeClearsName && card.timeClearsFooter),
-        JSON.stringify(geometry),
-      ).toBe(true);
-      expect(geometry.every((card) => card.height <= 156)).toBe(true);
-      expect(
-        geometry.every(
-          (card) =>
-            card.paddingTop >= 11.5 &&
-            card.paddingTop <= 12 &&
-            card.paddingLeft >= 11.5 &&
-            card.paddingLeft <= 12 &&
-            card.paddingLeft === card.paddingRight &&
-            card.columnGap === (card.width <= 144 ? 6 : 10) &&
-            card.visibleTopInset >= 10 &&
-            card.visibleTopInset <= 15 &&
-            Math.abs(card.visibleIdentityInset - 13) <= 1 &&
-            Math.abs(card.visibleTimeInset - 13) <= 1 &&
-            card.iconWidth >= 26,
-        ),
-        JSON.stringify(geometry),
-      ).toBe(true);
-      await expect(page.getByTestId("prayer-tracker-cards")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(row.locator("[data-prayer-icon]").first()).toHaveCSS("border-top-width", "1px");
-      if (width === 1440) {
-        expect(geometry.every((card) => card.actualColumnGap >= 10)).toBe(true);
-        const frames = await row.evaluate((node) => ({
-          row: node.getBoundingClientRect().width,
-          cards: [...node.querySelectorAll("article")].reduce(
-            (sum, card) => sum + card.getBoundingClientRect().width,
-            0,
-          ),
-          padding: parseFloat(getComputedStyle(node).paddingLeft) + parseFloat(getComputedStyle(node).paddingRight),
-          gaps: parseFloat(getComputedStyle(node).columnGap) * 4,
-        }));
-        const expectedCardWidth = (frames.row - frames.padding - frames.gaps) / 5;
-        expect(geometry.every((card) => Math.abs(card.width - expectedCardWidth) <= 1)).toBe(true);
-        expect(Math.abs(frames.row - frames.cards - frames.padding - frames.gaps)).toBeLessThanOrEqual(1);
-      }
-      for (const key of ["nameTop", "timeTop", "iconTop"] as const) {
-        const positions = geometry.map((card) => card[key]);
-        expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
-      }
-      for (const key of ["width", "height", "footerTop", "footerHeight"] as const) {
-        const positions = geometry.map((card) => card[key]);
-        expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
-      }
-      expect(geometry.every((card) => card.footerHeight >= 52 && card.footerHeight <= 53)).toBe(true);
-      await expect(row.locator("[data-prayer-footer]")).toHaveCount(5);
-      await expect(row.locator('[data-prayer-state="current"] [data-prayer-detail]')).toHaveText(
-        t(language, "prayerTracking.nowPill"),
+      await assertPrayerOverview(page);
+      const current = row.locator('[data-prayer-state="current"]');
+      const toggle = current.getByRole("button");
+      await toggle.focus();
+      await expect(toggle).toBeFocused();
+      const initial = await toggle.getAttribute("aria-expanded");
+      await toggle.press("Space");
+      await expect(toggle).toHaveAttribute("aria-expanded", initial === "true" ? "false" : "true");
+      if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
+      await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
+      await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute(
+        "data-prayer",
+        (await current.getAttribute("data-prayer"))!,
       );
-      await expect(row.locator('[data-prayer="dhuhr"] [data-prayer-footer]')).toContainText(
-        t(language, "prayerTracking.notRecorded"),
-      );
-      await expect(row.locator('[data-prayer="maghrib"] [data-prayer-footer]')).toContainText(
-        t(language, "prayerTracking.afterPrayer", { prayer: t(language, "notifications.asr") }),
-      );
-      await expect(row).not.toContainText(/Rawatib|Optional|رواتب|مستحبة/);
-      await expect(row).not.toContainText(/Opens 30m before|تفتح قبلها/);
-      expect(geometry.find((card) => card.state === "next")!.visible).toBe(true);
-      if (width >= 390) expect(geometry.find((card) => card.state === "current")!.visible).toBe(true);
-      const next = row.locator('[data-prayer-state="next"]');
-      await expect(next).toContainText(t(language, "prayerTracking.nextShort"));
-      await expect(next.getByRole("progressbar")).toHaveCount(0);
-      await expect(next.locator("[data-prayer-footer]").getByRole("progressbar")).toHaveCount(0);
-      if (width < 768) {
-        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
-        await expect(next.locator(".home-prayer-countdown-text")).toHaveCount(1);
-      } else {
-        await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
-      }
-      await expect(next.locator("[data-prayer-detail]")).toContainText(/متبقٍ|remaining/);
-      await expect(next.locator("[data-prayer-detail]")).toHaveCSS("justify-content", "center");
-      await expect(next.locator(".home-prayer-divider")).toHaveCount(0);
-      await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-home.png`), scale: "css" });
-      await page
-        .getByTestId("home-prayer-strip")
-        .screenshot({ path: testInfo.outputPath(`${language}-${width}-prayers.png`) });
-      await row
-        .getByRole("button", {
-          name: t(language, "prayerTracking.openPrayer", { prayer: t(language, "notifications.fajr") }),
-        })
-        .focus();
-      const focused = await row.evaluate((node) => {
-        const frame = node.getBoundingClientRect();
-        const focus = document.activeElement!.getBoundingClientRect();
-        return focus.left >= frame.left && focus.right <= frame.right && focus.height >= 44;
-      });
-      expect(focused).toBe(true);
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "32px";
       });
-      // Container queries can expose the enlarged grid before descendant
-      // typography/margins settle. Verify actual resized type and card fit.
-      await expect
-        .poll(() =>
-          row.locator("article").evaluateAll((nodes) =>
-            nodes.every((card) => {
-              const time = card.querySelector('[id^="prayer-summary-time"]')!;
-              return parseFloat(getComputedStyle(time).fontSize) >= 32 && card.scrollWidth <= card.clientWidth + 1;
-            }),
-          ),
-        )
-        .toBe(true);
-      // ResizeObserver follows descendant font reflow in Firefox/WebKit.
-      // Wait for the actual content fit as well as aligned footer tops.
-      await expect
-        .poll(() =>
-          row
-            .locator("[data-prayer-footer]")
-            .evaluateAll((nodes) =>
-              nodes.every(
-                (node) => node.firstElementChild!.getBoundingClientRect().height <= node.getBoundingClientRect().height,
-              ),
-            ),
-        )
-        .toBe(true);
-      await expect
-        .poll(() =>
-          row.locator("[data-prayer-footer]").evaluateAll((nodes) => {
-            const tops = nodes.map((node) => node.getBoundingClientRect().top);
-            return Math.max(...tops) - Math.min(...tops);
-          }),
-        )
-        .toBeLessThanOrEqual(1);
-      const enlarged = await row.locator("article").evaluateAll((nodes) =>
-        nodes.map((node) => ({
-          width: node.clientWidth,
-          content: node.scrollWidth,
-          height: node.getBoundingClientRect().height,
-          footerTop: node.querySelector("[data-prayer-footer]")!.getBoundingClientRect().top,
-        })),
-      );
-      expect(
-        enlarged.every((card) => card.content <= card.width + 1),
-        JSON.stringify(enlarged),
-      ).toBe(true);
-      for (const key of ["width", "height", "footerTop"] as const) {
-        const positions = enlarged.map((card) => card[key]);
-        expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
-      }
-      const footerTextBounds = await row.locator("[data-prayer-footer] .home-prayer-status-pill").evaluateAll((nodes) =>
-        nodes.map((node) => {
-          const text = node.getBoundingClientRect();
-          const footer = node.closest("[data-prayer-footer]")!.getBoundingClientRect();
-          const style = getComputedStyle(node);
-          return {
-            text: node.textContent,
-            left: text.left - footer.left,
-            right: footer.right - text.right,
-            top: text.top - footer.top,
-            bottom: footer.bottom - text.bottom,
-            ellipsis: style.textOverflow === "ellipsis",
-            overflow: node.scrollWidth - node.clientWidth,
-          };
-        }),
-      );
-      await page.screenshot({ path: testInfo.outputPath("enlarged-footer-geometry.png") });
-      expect(footerTextBounds).toHaveLength(5);
-      expect(
-        footerTextBounds.every(
-          (item) =>
-            item.left >= 0 &&
-            item.right >= 0 &&
-            item.top >= 0 &&
-            item.bottom >= 0 &&
-            !item.ellipsis &&
-            item.overflow <= 1,
-        ),
-        JSON.stringify(footerTextBounds),
-      ).toBe(true);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await expect(row).not.toContainText(/Viewing|معروضة/);
-      const current = row.locator('[data-prayer-state="current"]');
-      await current.scrollIntoViewIfNeeded();
-      // Horizontal focus recovery can scroll the Home region as well. Prove
-      // footer activation in the expanded state it belongs to, including 200% text.
-      await page
-        .getByTestId("home-sticky-prayers")
-        .locator("..")
-        .evaluate((node) => {
-          node.scrollTop = 0;
-        });
-      await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute("data-prayer-cards-condensed");
-      await expect(current.locator("[data-prayer-footer]")).toBeVisible();
-      const toggle = current.getByRole("button");
-      const initiallyExpanded = await toggle.getAttribute("aria-expanded");
-      const footerHit = (await current.locator("[data-prayer-footer]").boundingBox())!;
-      await page.mouse.click(footerHit.x + footerHit.width / 2, footerHit.y + footerHit.height / 2);
-      await expect(toggle).toHaveAttribute("aria-expanded", initiallyExpanded === "true" ? "false" : "true");
-      await toggle.focus();
-      await page.keyboard.press("Space");
-      await expect(toggle).toHaveAttribute("aria-expanded", initiallyExpanded!);
-      // Capture the localized receiving edge at ordinary text size after proving
-      // full-card activation and equal geometry at 200%.
+      await assertPrayerOverview(page);
+      const arrow = current.locator("[data-prayer-chevron]");
+      await toggle.scrollIntoViewIfNeeded();
+      const hit = (await arrow.boundingBox())!;
+      await page.mouse.click(hit.x + hit.width / 2, hit.y + hit.height / 2);
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await toggle.press("Space");
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      const panel = page.getByTestId("home-prayer-moment");
+      await expect(panel).toHaveAttribute("data-prayer", (await current.getAttribute("data-prayer"))!);
+      await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
+      await expect(panel).toHaveCSS("margin-top", "0px");
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "";
       });
-      if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
-      const panel = page.getByTestId("home-prayer-moment");
-      await expect(panel).toHaveAttribute("data-prayer", (await current.getAttribute("data-prayer")) ?? "");
-      await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
-      const matchingEdges = async () =>
-        current.evaluate((node) => {
-          const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
-          const small = getComputedStyle(node, "::after");
-          const detail = getComputedStyle(panel, "::before");
-          return (
-            small.content === '""' &&
-            detail.content === '""' &&
-            detail.backgroundImage.includes(small.backgroundColor) &&
-            small.pointerEvents === "none" &&
-            detail.pointerEvents === "none" &&
-            small.height === "2px" &&
-            detail.height === "2px"
-          );
-        });
-      // Wait for the receiving gradient to resolve the exact selected accent.
-      await expect.poll(matchingEdges).toBe(true);
-      await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
-      const oldScroll = await row.evaluate((node) => node.scrollLeft);
-      await row.evaluate((node) => {
-        node.scrollLeft += 16;
-      });
-      await expect.poll(matchingEdges).toBe(true);
-      await row.evaluate((node, left) => {
-        node.scrollLeft = left;
-      }, oldScroll);
-      await expect.poll(matchingEdges).toBe(true);
-      await toggle.evaluate((node) => node.blur());
-      await row.scrollIntoViewIfNeeded();
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-joined.png`), scale: "css" });
     });
   }
@@ -429,63 +183,9 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("prayer-card-asr")).toHaveAttribute("data-prayer-state", "next");
       await expect(strip.getByRole("button", { name: t(language, "settings.showAllPrayers") })).toHaveCount(0);
       const allRow = page.getByTestId("home-all-prayers-row");
-      const prayerTops = await allRow
-        .locator("article")
-        .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
-      expect(Math.max(...prayerTops) - Math.min(...prayerTops)).toBeLessThanOrEqual(1);
-      const overflowing = await allRow.evaluate((row) => row.scrollWidth > row.clientWidth + 1);
-      expect(overflowing).toBe(width < 600);
-      await expect(strip.locator("#home-prayer-scroll-hint")).toHaveCount(0);
-      if (overflowing) {
-        // Start at the first prayer: initially revealing Asr may already reach
-        // the scroll limit on tablet widths, where another forward key is inert.
-        await allRow.evaluate((row) => {
-          row.scrollLeft = 0;
-        });
-        await allRow.focus();
-        await expect(allRow).toBeFocused();
-        const beforeKey = await allRow.evaluate((row) => row.scrollLeft);
-        await allRow.press(language === "ar" ? "ArrowLeft" : "ArrowRight");
-        await expect.poll(() => allRow.evaluate((row) => row.scrollLeft)).not.toBe(beforeKey);
-      }
-      const anatomy = await allRow.locator("article").evaluateAll((cards) =>
-        cards.map((card) => {
-          const identity = card.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect();
-          const timing = card.querySelector("[data-prayer-timing] p")!.getBoundingClientRect();
-          const bounds = card.getBoundingClientRect();
-          return {
-            separated: identity.bottom <= timing.top && Math.abs(identity.right - timing.right) <= 1,
-            width: bounds.width,
-            height: bounds.height,
-          };
-        }),
-      );
-      const availableRowWidth = await allRow.evaluate((node) => node.clientWidth);
-      expect(
-        anatomy.every(
-          (card) =>
-            card.separated &&
-            card.width >= 130 &&
-            card.width <= Math.max(240, availableRowWidth / 5) &&
-            card.height >= 64,
-        ),
-      ).toBe(true);
-
-      await allRow.locator("article").last().scrollIntoViewIfNeeded();
-      const lastReachable = await allRow.evaluate((row) => {
-        const viewport = row.getBoundingClientRect();
-        const last = row.querySelector("article:last-child")!.getBoundingClientRect();
-        return last.left >= viewport.left - 1 && last.right <= viewport.right + 1;
-      });
-      expect(lastReachable).toBe(true);
-      const prayerTime = allRow.locator('[id^="prayer-summary-time-"]').first();
-      expect(await prayerTime.evaluate((node) => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(
-        width < 640 ? 16 : 15,
-      );
-      expect(await prayerTime.evaluate((node) => Number(getComputedStyle(node).fontWeight))).toBeGreaterThanOrEqual(
-        800,
-      );
-      await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
+      await assertPrayerOverview(page);
+      await expect(strip.getByRole("progressbar")).toHaveCount(0);
+      expect(await allRow.evaluate((row) => row.scrollWidth > row.clientWidth + 1)).toBe(false);
       const path = page.getByTestId("home-header-routine-summary");
       if (width >= 600) await expect(path).toBeVisible();
       else await expect(path).toBeHidden();

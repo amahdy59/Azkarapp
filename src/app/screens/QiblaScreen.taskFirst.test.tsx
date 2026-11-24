@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { QiblaScreen } from "./QiblaScreen";
 
 describe("QiblaScreen Task-First Experience", () => {
@@ -24,12 +24,14 @@ describe("QiblaScreen Task-First Experience", () => {
     expect(screen.getByText(/Qibla is 136° from north/i)).toBeInTheDocument();
     expect(screen.getByText(/South-east/i)).toBeInTheDocument();
 
-    // Distance to Kaaba
-    expect(screen.getByText(/1,287 km to the Holy Kaaba/i)).toBeInTheDocument();
+    expect(screen.queryByText(/1,287 km to the Holy Kaaba/i)).not.toBeInTheDocument();
 
     expect(screen.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
-    expect(screen.getByText("Find north, then turn clockwise to the bearing above.")).toBeVisible();
+    expect(screen.getByText("Static view — does not track your phone")).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable live compass" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Details" }));
+    expect(screen.getByText(/1,287 km to the Holy Kaaba/i)).toBeVisible();
+    expect(screen.getByText("Find north, then turn clockwise to the bearing above.")).toBeInTheDocument();
   });
 
   it("renders the visual direction with Arabic numerals and localization", () => {
@@ -53,11 +55,12 @@ describe("QiblaScreen Task-First Experience", () => {
     expect(screen.getByText(/اتجاه القبلة ١٣٦° من الشمال/)).toBeInTheDocument();
     expect(screen.getByText(/الجنوب الشرقي/)).toBeInTheDocument();
 
-    // Distance in Arabic numerals
-    expect(screen.getByText(/١[,٬]?٢٨٧ كم إلى الكعبة المشرفة/)).toBeInTheDocument();
+    expect(screen.queryByText(/١[,٬]?٢٨٧ كم إلى الكعبة المشرفة/)).not.toBeInTheDocument();
 
     expect(screen.getByRole("img", { name: /اتجاه مرئي إلى الكعبة بزاوية ١٣٦ درجة/ })).toBeVisible();
-    expect(screen.getByText("حدّد الشمال، ثم اتجه مع عقارب الساعة إلى الزاوية الموضحة أعلاه.")).toBeVisible();
+    expect(screen.getByText("رسم ثابت — لا يتتبع حركة الهاتف")).toBeVisible();
     expect(screen.getByRole("button", { name: "تشغيل البوصلة المباشرة" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "التفاصيل" }));
+    expect(screen.getByText(/١[,٬]?٢٨٧ كم إلى الكعبة المشرفة/)).toBeVisible();
   });
 });

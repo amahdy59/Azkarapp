@@ -1,3 +1,4 @@
+import { openDownloadManagement } from "./helpers/downloads";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
@@ -39,6 +40,7 @@ for (const language of ["en", "ar"] as const) {
       };
     }, language);
     await page.goto("/#/settings/downloads");
+    await openDownloadManagement(page);
     const keep = page.getByRole("button", { name: t(language, "downloads.keepDownloads"), exact: true });
     await expect(keep).toBeEnabled();
     await keep.click();
@@ -50,26 +52,23 @@ for (const language of ["en", "ar"] as const) {
         exact: true,
       })
       .click();
-    const progress = row.getByRole("progressbar");
+    const overview = page.getByTestId("download-overview");
+    await overview.getByTestId("download-transfer-details").locator("summary").click();
+    const progress = overview.getByRole("progressbar");
     await expect(progress).toHaveAttribute("value", "4096");
-    await expect(row).toContainText(
+    await expect(overview).toContainText(
       t(language, "downloads.receivingFile", { file: language === "ar" ? "١" : "1", total: "" }).split(
         language === "ar" ? " من " : " of ",
       )[0],
     );
-    await expect(row).toContainText(
+    await expect(overview).toContainText(
       language === "ar" ? "للتشغيل دون اتصال" : "saved on this device for offline playback",
     );
     await page.screenshot({ path: testInfo.outputPath(`audio-download-progress-${language}.png`), fullPage: true });
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-    await row
-      .getByRole("button", {
-        name: `${t(language, "downloads.cancelDownload")} · ${t(language, "downloads.adhkarTitle")}`,
-        exact: true,
-      })
-      .click();
+    await page.getByTestId("download-overview-action").click();
     await expect(page.getByText(t(language, "downloads.downloadCancelled"), { exact: true })).toBeVisible();
-    await expect(row.getByRole("progressbar")).toHaveCount(0);
+    await expect(overview.getByRole("progressbar")).toHaveCount(0);
     await expect(row).toContainText(t(language, "downloads.notDownloaded"));
     // The filesystem export remains available after storage protection is granted.
     const archive = page.getByTestId("audio-archive-export");
@@ -79,15 +78,15 @@ for (const language of ["en", "ar"] as const) {
     page.on("download", () => downloads++);
     await zip.focus();
     await page.keyboard.press("Enter");
-    await expect(archive.getByRole("progressbar")).toHaveAttribute("value", "4096");
+    await expect(overview.getByRole("progressbar")).toHaveAttribute("value", "4096");
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await page.screenshot({ path: testInfo.outputPath(`audio-zip-progress-${language}.png`), fullPage: true });
-    const cancelZip = archive.getByRole("button", { name: t(language, "downloads.cancelDownload"), exact: true });
+    const cancelZip = page.getByTestId("download-overview-action");
     await cancelZip.focus();
     await page.keyboard.press("Enter");
     await expect(zip).toBeEnabled();
     await expect(zip).toBeFocused();
-    await expect(archive.getByRole("progressbar")).toHaveCount(0);
+    await expect(overview.getByRole("progressbar")).toHaveCount(0);
     expect(downloads).toBe(0);
   });
 }

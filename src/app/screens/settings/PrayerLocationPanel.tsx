@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Card } from "../../components/Card";
+import { PrayerCalculationPicker } from "../../components/PrayerCalculationPicker";
+import { Modal, ResponsiveSheet, SheetHeader } from "../../components/ResponsiveSheet";
+import { useNow } from "../../hooks/useNow";
 import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS, FormField } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { ChevronDown, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
 import {
@@ -11,7 +14,12 @@ import {
   formatUtcOffset,
   getTimeZoneStatus,
 } from "../../content/prayerCalculation";
-import { searchPrayerLocations, type PrayerLocationPreset } from "../../content/prayerLocations";
+import {
+  displayLocationName,
+  PRAYER_LOCATION_PRESETS,
+  searchPrayerLocations,
+  type PrayerLocationPreset,
+} from "../../content/prayerLocations";
 import type { AppLanguage, LocationSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
@@ -35,11 +43,43 @@ export function PrayerLocationPanel({
   const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
   const [timeZoneDraft, setTimeZoneDraft] = useState(locationSettings?.timeZone ?? "");
   const [citySearch, setCitySearch] = useState("");
+  const [cityPickerOpen, setCityPickerOpen] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
+  const cityTrigger = useRef<HTMLButtonElement>(null);
+  const manualSaveTrigger = useRef<HTMLButtonElement>(null);
+  const noticeTrigger = useRef<HTMLElement | null>(null);
+  const noticeDescriptionId = useId();
+  const cityDescriptionId = useId();
+  const direction = isArabic ? "rtl" : "ltr";
   // Which coordinate the last save attempt rejected, so the message can sit on
   // that field rather than only in the status line under the form.
   const [invalidCoordinates, setInvalidCoordinates] = useState({ latitude: false, longitude: false });
   const locationRequestId = useRef(0);
-  const timeZoneStatus = getTimeZoneStatus(new Date(), locationSettings?.timeZone ?? DEFAULT_LOCATION.timeZone);
+  const now = useNow();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const day = now.getDate();
+  const location = locationSettings ?? DEFAULT_LOCATION;
+  const timeZone = location.timeZone ?? DEFAULT_LOCATION.timeZone;
+  // City typing and method selection do not repeat a year's Intl samples.
+  // The existing clock reconciles dates on foregrounding and pauses when hidden.
+  const timeZoneStatus = useMemo(
+    () => getTimeZoneStatus(new Date(year, month, day, 12), timeZone),
+    [year, month, day, timeZone],
+  );
+  const selectedCity = PRAYER_LOCATION_PRESETS.find(
+    (city) =>
+      city.latitude === location.latitude &&
+      city.longitude === location.longitude &&
+      city.timeZone === location.timeZone &&
+      [city.nameEnglish, city.nameArabic].includes(location.cityName ?? ""),
+  );
+  const methodOptions = Object.values(CALCULATION_METHODS).map((method) => ({
+    id: method.id,
+    label: isArabic ? method.nameArabic : method.nameEnglish,
+    shortLabel: t(language, `prayerLocation.methodShort${method.id}`),
+  }));
   const cityResults = searchPrayerLocations(citySearch);
 
   useEffect(() => {
@@ -56,11 +96,13 @@ export function PrayerLocationPanel({
     [],
   );
 
-  const handleDetectLocation = async () => {
+  const handleDetectLocation = async (trigger: HTMLButtonElement) => {
     const requestId = ++locationRequestId.current;
     setIsDetectingLocation(true);
     setLocationStatus(null);
     setLocationStatusIsError(false);
+    setNoticeOpen(false);
+    setAnnouncement(t(language, "notifications.detectingLocation"));
     const result = await detectUserCoordinates();
     if (requestId !== locationRequestId.current) return;
 
@@ -92,11 +134,14 @@ export function PrayerLocationPanel({
     }
     if (requestId === locationRequestId.current) {
       setIsDetectingLocation(false);
+      setAnnouncement("");
+      noticeTrigger.current = trigger;
+      setNoticeOpen(true);
     }
   };
 
-  const handleMethodChange = async (methodId: number) => {
-    if (!onLocationChange) return;
+  const handleMethodChange = (methodId: number) => {
+    if (!onLocationChange || !CALCULATION_METHODS[methodId]) return;
     // A pending detection must not overwrite a newer manual choice.
     locationRequestId.current += 1;
     setIsDetectingLocation(false);
@@ -106,6 +151,11 @@ export function PrayerLocationPanel({
       calculationMethod: methodId,
     };
     onLocationChange(updatedLocation);
+    setAnnouncement(
+      t(language, "prayerLocation.methodApplied", {
+        method: isArabic ? CALCULATION_METHODS[methodId]!.nameArabic : CALCULATION_METHODS[methodId]!.nameEnglish,
+      }),
+    );
 
     /* Changing the method used to refetch. The calculation is local, so the
        new method applies to the next render without a request. */
@@ -119,6 +169,7 @@ export function PrayerLocationPanel({
       !longitudeDraft.trim() || !Number.isFinite(longitude) || longitude < -180 || longitude > 180;
     setInvalidCoordinates({ latitude: latitudeInvalid, longitude: longitudeInvalid });
     if (latitudeInvalid || longitudeInvalid) {
+      setAnnouncement(t(language, "notifications.invalidCoordinates"));
       setLocationStatus(t(language, "notifications.invalidCoordinates"));
       setLocationStatusIsError(true);
       return;
@@ -135,6 +186,8 @@ export function PrayerLocationPanel({
     });
     setLocationStatus(t(language, "notifications.manualLocationSaved"));
     setLocationStatusIsError(false);
+    noticeTrigger.current = manualSaveTrigger.current;
+    setNoticeOpen(true);
   };
 
   const handleCitySelect = (location: PrayerLocationPreset) => {
@@ -153,7 +206,8 @@ export function PrayerLocationPanel({
       autoDetect: false,
       timeZone: location.timeZone,
     });
-    setLocationStatus(t(language, "notifications.citySelected", { city: localizedCityName }));
+    setCityPickerOpen(false);
+    setAnnouncement(t(language, "notifications.citySelected", { city: localizedCityName }));
     setLocationStatusIsError(false);
   };
 
@@ -170,15 +224,11 @@ export function PrayerLocationPanel({
   };
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
+    <div className="prayer-location-panel flex h-full min-h-0 flex-col">
       <SubHeader title={t(language, "settings.prayerTimesAndLocation")} onBack={onBack} language={language} />
-      <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        {/* Location & Prayer Times Section */}
-        <section
-          className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
-          aria-labelledby="prayer-location-title"
-        >
-          <div className="flex items-start gap-3">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3" data-testid="prayer-location-scroll">
+        <Card as="section" padding="md" aria-labelledby="prayer-location-title" className="space-y-4">
+          <div className="flex items-center gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
               aria-hidden="true"
@@ -186,246 +236,340 @@ export function PrayerLocationPanel({
               <MapPin size={22} />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id="prayer-location-title" className="text-title font-semibold text-foreground">
-                {t(language, "notifications.locationPrayerTimes")}
+              <h2 id="prayer-location-title" className="text-label text-muted-foreground">
+                {t(language, "prayerLocation.locationUsed")}
               </h2>
+              <p className="text-xl font-bold text-foreground" data-testid="prayer-location-name">
+                {location.autoDetect
+                  ? t(language, "prayerLocation.deviceLocation")
+                  : displayLocationName(location, language)}
+              </p>
+              <p className="text-label leading-relaxed text-muted-foreground">
+                {selectedCity && !location.autoDetect && (
+                  <>
+                    {isArabic ? selectedCity.countryArabic : selectedCity.countryEnglish}
+                    {" · "}
+                  </>
+                )}
+                {location.autoDetect ? (
+                  <bdi dir="ltr">
+                    {location.latitude?.toFixed(2)}°, {location.longitude?.toFixed(2)}°
+                  </bdi>
+                ) : (
+                  t(language, "prayerLocation.savedLocation")
+                )}
+              </p>
             </div>
           </div>
-
-          <div
-            className="mt-4 rounded-xl border border-border bg-muted/50 p-3"
-            data-testid="daylight-saving-status"
-            aria-live="polite"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <strong className="text-label text-foreground" dir="ltr">
-                {timeZoneStatus.timeZone}
-              </strong>
-              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-bold text-primary" dir="ltr">
-                {formatUtcOffset(timeZoneStatus.currentOffsetHours)}
-              </span>
-            </div>
-            <p className="mt-2 text-label font-semibold text-foreground">
+          <div className="space-y-2">
+            <Button
+              type="button"
+              onClick={(event) => void handleDetectLocation(event.currentTarget)}
+              disabled={isDetectingLocation}
+              className="w-full"
+            >
               {t(
                 language,
-                timeZoneStatus.daylightSavingActive
-                  ? "notifications.daylightSavingActive"
-                  : timeZoneStatus.observesDaylightSaving
-                    ? "notifications.standardTimeActive"
-                    : "notifications.noSeasonalTimeChange",
+                isDetectingLocation ? "notifications.detectingLocation" : "prayerLocation.useCurrentLocation",
               )}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              {t(
-                language,
-                locationSettings?.autoDetect
-                  ? "notifications.automaticTimeZoneHint"
-                  : "notifications.manualTimeZoneHint",
-              )}
-            </p>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <Button type="button" onClick={handleDetectLocation} disabled={isDetectingLocation} className="w-full">
-              {isDetectingLocation
-                ? t(language, "notifications.detectingLocation")
-                : t(language, "notifications.detectLocation")}
             </Button>
-
-            {locationStatus && (
-              <p
-                className={`rounded-lg p-2.5 text-label font-medium ${locationStatusIsError ? "bg-destructive/10 text-destructive" : "bg-muted text-foreground"}`}
-                role={locationStatusIsError ? "alert" : "status"}
-              >
-                {locationStatus}
+            <Button
+              ref={cityTrigger}
+              type="button"
+              variant="outline"
+              className="w-full"
+              aria-haspopup="dialog"
+              aria-expanded={cityPickerOpen}
+              onClick={(event) => {
+                // Starting a manual flow supersedes an outstanding GPS lookup.
+                locationRequestId.current += 1;
+                setIsDetectingLocation(false);
+                setAnnouncement("");
+                event.currentTarget.focus({ preventScroll: true });
+                setCityPickerOpen(true);
+              }}
+            >
+              {t(language, "prayerLocation.chooseAnotherCity")}
+            </Button>
+          </div>
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 text-label"
+            data-testid="daylight-saving-status"
+          >
+            <bdi dir="ltr" className="font-semibold text-foreground">
+              {timeZoneStatus.timeZone}
+            </bdi>
+            <bdi dir="ltr" className="rounded-full bg-primary/10 px-2 py-1 font-bold text-primary">
+              {formatUtcOffset(timeZoneStatus.currentOffsetHours)}
+            </bdi>
+          </div>
+          <details className="group border-t border-border/40 pt-2">
+            <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg text-label font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+              {t(language, "prayerLocation.timeZoneDetails")}
+              <ChevronDown
+                size={16}
+                className="shrink-0 transition-transform group-open:rotate-180"
+                aria-hidden="true"
+              />
+            </summary>
+            <div className="space-y-2 pt-2 text-label leading-relaxed text-muted-foreground">
+              <p>
+                {t(
+                  language,
+                  timeZoneStatus.daylightSavingActive
+                    ? "notifications.daylightSavingActive"
+                    : timeZoneStatus.observesDaylightSaving
+                      ? "notifications.standardTimeActive"
+                      : "notifications.noSeasonalTimeChange",
+                )}
               </p>
-            )}
-
-            <div className="pt-2">
-              <p id="calculation-method-label" className="mb-1.5 block text-sm font-bold text-foreground">
-                {t(language, "notifications.calculationMethod")}
+              <p>
+                {t(
+                  language,
+                  location.autoDetect ? "prayerLocation.deviceTimeZoneHint" : "notifications.manualTimeZoneHint",
+                )}
               </p>
-              <Select
-                value={String(locationSettings?.calculationMethod ?? 5)}
-                onValueChange={(value) => void handleMethodChange(Number(value))}
-                dir={isArabic ? "rtl" : "ltr"}
-              >
-                <SelectTrigger
-                  id="calculation-method-select"
-                  aria-labelledby="calculation-method-label"
-                  className="font-semibold"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(CALCULATION_METHODS).map((method) => (
-                    <SelectItem key={method.id} value={String(method.id)}>
-                      {isArabic ? method.nameArabic : method.nameEnglish}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
-
-            <fieldset className="space-y-2 border-t border-border pt-4">
-              <legend className="mb-2 text-sm font-bold text-foreground">
-                {t(language, "notifications.chooseCity")}
-              </legend>
-
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="city-search" className={FIELD_LABEL_CLASS}>
-                  {t(language, "notifications.citySearchLabel")}
-                </label>
-                <input
-                  id="city-search"
-                  type="search"
-                  value={citySearch}
-                  onChange={(event) => setCitySearch(event.target.value)}
-                  placeholder={t(language, "notifications.citySearchPlaceholder")}
-                  className={FIELD_CONTROL_CLASS}
-                />
-              </div>
-              <p className="text-xs font-semibold text-muted-foreground">
-                {t(language, citySearch.trim() ? "notifications.cityResults" : "notifications.popularCities")}
-              </p>
-              {cityResults.length > 0 ? (
-                <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {cityResults.map((location) => {
-                    const cityName = isArabic ? location.nameArabic : location.nameEnglish;
-                    const countryName = isArabic ? location.countryArabic : location.countryEnglish;
-                    const isSelected =
-                      locationSettings?.latitude === location.latitude &&
-                      locationSettings?.longitude === location.longitude;
-                    return (
-                      <li key={location.id}>
-                        <button
-                          type="button"
-                          onClick={() => handleCitySelect(location)}
-                          aria-pressed={isSelected}
-                          className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-border-control bg-background px-3 py-2 text-start text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring aria-pressed:border-primary aria-pressed:bg-primary/10"
-                        >
-                          <MapPin size={17} className="shrink-0 text-primary" aria-hidden="true" />
-                          <span className="min-w-0">
-                            <span className="block text-label font-bold">{cityName}</span>
-                            <span className="block text-xs text-muted-foreground">{countryName}</span>
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="rounded-xl bg-muted p-3 text-label text-muted-foreground" role="status">
-                  {t(language, "notifications.noCitiesFound")}
-                </p>
-              )}
-            </fieldset>
-
-            <details className="group border-t border-border pt-2">
-              <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          </details>
+        </Card>
+        <Card as="section" padding="md">
+          <PrayerCalculationPicker
+            language={language}
+            options={methodOptions}
+            value={location.calculationMethod ?? 5}
+            onChange={handleMethodChange}
+          />
+        </Card>
+        <Card as="section" padding="md">
+          <details className="group">
+            <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+              <span className="min-w-0">
                 {t(language, "settings.advancedPrayer")}
-                <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="space-y-4 pt-2">
-                <fieldset className="space-y-2 border-t border-border pt-4">
-                  <legend className="mb-2 text-sm font-bold text-foreground">
-                    {t(language, "notifications.manualLocation")}
-                  </legend>
+                <span className="mt-1 block text-xs font-normal leading-relaxed text-muted-foreground">
+                  {t(language, "prayerLocation.advancedHint")}
+                </span>
+              </span>
+              <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="space-y-4 pt-2">
+              <fieldset className="space-y-2 border-t border-border pt-4">
+                <legend className="mb-2 text-sm font-bold text-foreground">
+                  {t(language, "notifications.manualLocation")}
+                </legend>
+                <FormField
+                  label={t(language, "notifications.cityName")}
+                  type="text"
+                  value={cityDraft}
+                  onChange={(event) => setCityDraft(event.target.value)}
+                />
+                <FormField
+                  label={t(language, "notifications.timeZoneLabel")}
+                  type="text"
+                  value={timeZoneDraft}
+                  onChange={(event) => setTimeZoneDraft(event.target.value)}
+                  placeholder={t(language, "notifications.timeZonePlaceholder")}
+                  dir="ltr"
+                />
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <FormField
-                    label={t(language, "notifications.cityName")}
-                    type="text"
-                    value={cityDraft}
-                    onChange={(event) => setCityDraft(event.target.value)}
-                  />
-                  <FormField
-                    label={t(language, "notifications.timeZoneLabel")}
-                    type="text"
-                    value={timeZoneDraft}
-                    onChange={(event) => setTimeZoneDraft(event.target.value)}
-                    placeholder={t(language, "notifications.timeZonePlaceholder")}
+                    label={t(language, "notifications.latitude")}
+                    type="number"
+                    min="-90"
+                    max="90"
+                    step="0.0001"
+                    value={latitudeDraft}
+                    onChange={(event) => {
+                      setLatitudeDraft(event.target.value);
+                      setInvalidCoordinates((current) => ({ ...current, latitude: false }));
+                    }}
+                    error={invalidCoordinates.latitude ? t(language, "notifications.latitudeRange") : undefined}
+                    inputMode="decimal"
                     dir="ltr"
                   />
-                  <div className="grid grid-cols-2 gap-2">
-                    <FormField
-                      label={t(language, "notifications.latitude")}
-                      type="number"
-                      min="-90"
-                      max="90"
-                      step="0.0001"
-                      value={latitudeDraft}
-                      onChange={(event) => {
-                        setLatitudeDraft(event.target.value);
-                        setInvalidCoordinates((current) => ({ ...current, latitude: false }));
-                      }}
-                      error={invalidCoordinates.latitude ? t(language, "notifications.latitudeRange") : undefined}
-                      inputMode="decimal"
-                      dir="ltr"
-                    />
-                    <FormField
-                      label={t(language, "notifications.longitude")}
-                      type="number"
-                      min="-180"
-                      max="180"
-                      step="0.0001"
-                      value={longitudeDraft}
-                      onChange={(event) => {
-                        setLongitudeDraft(event.target.value);
-                        setInvalidCoordinates((current) => ({ ...current, longitude: false }));
-                      }}
-                      error={invalidCoordinates.longitude ? t(language, "notifications.longitudeRange") : undefined}
-                      inputMode="decimal"
-                      dir="ltr"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleManualLocationSave}
-                    className="w-full border-primary text-primary hover:bg-primary/5"
-                  >
-                    {t(language, "notifications.saveLocation")}
-                  </Button>
-                </fieldset>
+                  <FormField
+                    label={t(language, "notifications.longitude")}
+                    type="number"
+                    min="-180"
+                    max="180"
+                    step="0.0001"
+                    value={longitudeDraft}
+                    onChange={(event) => {
+                      setLongitudeDraft(event.target.value);
+                      setInvalidCoordinates((current) => ({ ...current, longitude: false }));
+                    }}
+                    error={invalidCoordinates.longitude ? t(language, "notifications.longitudeRange") : undefined}
+                    inputMode="decimal"
+                    dir="ltr"
+                  />
+                </div>
+                <Button
+                  ref={manualSaveTrigger}
+                  type="button"
+                  variant="outline"
+                  onClick={handleManualLocationSave}
+                  className="w-full border-primary text-primary hover:bg-primary/5"
+                >
+                  {t(language, "notifications.saveLocation")}
+                </Button>
+              </fieldset>
 
-                <fieldset className="border-t border-border pt-4">
-                  <legend className="mb-2 text-sm font-bold text-foreground">
-                    {t(language, "notifications.manualMinuteAdjustments")}
-                  </legend>
-                  <p className="mb-3 text-xs leading-5 text-muted-foreground">
-                    {t(language, "notifications.minuteAdjustmentHint")}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(
-                      [
-                        ["fajr", t(language, "notifications.fajr")],
-                        ["dhuhr", t(language, "notifications.dhuhr")],
-                        ["asr", t(language, "notifications.asr")],
-                        ["maghrib", t(language, "notifications.maghrib")],
-                        ["isha", t(language, "notifications.isha")],
-                      ] as const
-                    ).map(([prayer, label]) => (
-                      <label key={prayer} className="text-xs font-semibold text-muted-foreground">
-                        {label}
-                        <input
-                          type="number"
-                          min="-120"
-                          max="120"
-                          value={locationSettings?.adjustments?.[prayer] ?? 0}
-                          onChange={(event) => handleAdjustmentChange(prayer, Number(event.target.value))}
-                          inputMode="numeric"
-                          onWheel={(event) => event.currentTarget.blur()}
-                          dir="ltr"
-                          className="mt-1 min-h-11 w-full rounded-lg border border-border-control bg-background px-2 text-center text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-              </div>
-            </details>
-          </div>
-        </section>
+              <fieldset className="border-t border-border pt-4">
+                <legend className="mb-2 text-sm font-bold text-foreground">
+                  {t(language, "notifications.manualMinuteAdjustments")}
+                </legend>
+                <p className="mb-3 text-xs leading-5 text-muted-foreground">
+                  {t(language, "notifications.minuteAdjustmentHint")}
+                </p>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {(
+                    [
+                      ["fajr", t(language, "notifications.fajr")],
+                      ["dhuhr", t(language, "notifications.dhuhr")],
+                      ["asr", t(language, "notifications.asr")],
+                      ["maghrib", t(language, "notifications.maghrib")],
+                      ["isha", t(language, "notifications.isha")],
+                    ] as const
+                  ).map(([prayer, label]) => (
+                    <label key={prayer} className="text-xs font-semibold text-muted-foreground">
+                      {label}
+                      <input
+                        type="number"
+                        min="-120"
+                        max="120"
+                        value={locationSettings?.adjustments?.[prayer] ?? 0}
+                        onChange={(event) => handleAdjustmentChange(prayer, Number(event.target.value))}
+                        inputMode="numeric"
+                        onWheel={(event) => event.currentTarget.blur()}
+                        dir="ltr"
+                        className="mt-1 min-h-11 w-full rounded-lg border border-border-control bg-background px-2 text-center text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </details>
+        </Card>
+        <p role="status" className="sr-only">
+          {announcement}
+        </p>
       </div>
+      <ResponsiveSheet
+        open={cityPickerOpen}
+        onClose={() => setCityPickerOpen(false)}
+        title={t(language, "notifications.chooseCity")}
+        direction={direction}
+        language={language}
+        protectedSurface
+        focusOnOpen
+        describedById={cityDescriptionId}
+        testId="prayer-city-sheet"
+        drawerClassName="prayer-settings-surface"
+        dialogClassName="prayer-settings-surface"
+        onCloseAutoFocus={(event) => {
+          if (cityTrigger.current?.isConnected) {
+            event.preventDefault();
+            cityTrigger.current.focus({ preventScroll: true });
+          }
+        }}
+      >
+        <SheetHeader
+          title={t(language, "notifications.chooseCity")}
+          language={language}
+          onClose={() => setCityPickerOpen(false)}
+          className="prayer-settings-heading"
+        />
+        <div className="prayer-settings-search shrink-0 space-y-2 px-5 py-3">
+          <p id={cityDescriptionId} className="sr-only">
+            {t(language, "notifications.citySearchHint")}
+          </p>
+          <label htmlFor="city-search" className={FIELD_LABEL_CLASS}>
+            {t(language, "notifications.citySearchLabel")}
+          </label>
+          <input
+            id="city-search"
+            type="search"
+            value={citySearch}
+            onChange={(event) => setCitySearch(event.target.value)}
+            placeholder={t(language, "notifications.citySearchPlaceholder")}
+            className={FIELD_CONTROL_CLASS}
+          />
+        </div>
+        <div className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-3" data-vaul-no-drag>
+          <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">
+            {t(language, citySearch.trim() ? "notifications.cityResults" : "notifications.popularCities")}
+          </p>
+          {cityResults.length > 0 ? (
+            <ul className="space-y-1">
+              {cityResults.map((city) => (
+                <li key={city.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleCitySelect(city)}
+                    className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+                    aria-pressed={selectedCity?.id === city.id}
+                  >
+                    <MapPin size={18} className="shrink-0 text-primary" aria-hidden="true" />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold">
+                        {isArabic ? city.nameArabic : city.nameEnglish}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        {isArabic ? city.countryArabic : city.countryEnglish}
+                      </span>
+                    </span>
+                    {selectedCity?.id === city.id && (
+                      <span className="ms-auto shrink-0 text-xs text-primary">
+                        {t(language, "prayerLocation.current")}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p role="status" className="px-2 py-4 text-label leading-relaxed text-muted-foreground">
+              {t(language, "prayerLocation.noCitiesFound")}
+            </p>
+          )}
+        </div>
+      </ResponsiveSheet>
+      <Modal
+        open={noticeOpen}
+        onClose={() => setNoticeOpen(false)}
+        title={t(language, "prayerLocation.noticeTitle")}
+        describedById={noticeDescriptionId}
+        direction={direction}
+        language={language}
+        protectedSurface
+        showCloseButton={false}
+        testId="prayer-location-notice"
+        className="prayer-settings-surface"
+        onCloseAutoFocus={(event) => {
+          if (noticeTrigger.current?.isConnected) {
+            event.preventDefault();
+            noticeTrigger.current.focus({ preventScroll: true });
+          }
+        }}
+      >
+        <SheetHeader
+          title={t(language, "prayerLocation.noticeTitle")}
+          language={language}
+          onClose={() => setNoticeOpen(false)}
+          className="prayer-settings-heading"
+        />
+        <p
+          id={noticeDescriptionId}
+          className={`min-h-0 overflow-y-auto px-5 py-4 text-sm leading-relaxed ${locationStatusIsError ? "text-destructive" : "text-foreground"}`}
+        >
+          {locationStatus}
+        </p>
+        <div className="shrink-0 border-t border-border/40 p-4">
+          <Button className="w-full" onClick={() => setNoticeOpen(false)}>
+            {t(language, "common.close")}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

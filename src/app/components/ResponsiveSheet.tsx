@@ -159,6 +159,8 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  /** Functional pickers opt into the shared opaque dropdown-surface contract. */
+  protectedSurface?: boolean;
   onOpenAutoFocus?: (event: Event) => void;
   /** Explicit recovery when the opener unmounts or becomes hidden. */
   onCloseAutoFocus?: (event: Event) => void;
@@ -200,6 +202,7 @@ interface ModalProps {
  * that — see DEC-025.
  */
 export function Modal({
+  protectedSurface = false,
   onOpenAutoFocus,
   onCloseAutoFocus,
   returnFocusRef,
@@ -240,6 +243,7 @@ export function Modal({
           }
         />
         <DialogPrimitive.Content
+          data-dropdown-surface={protectedSurface ? "" : undefined}
           data-back-dismiss={backDismiss}
           {...focusScope}
           onOpenAutoFocus={(event) => {
@@ -381,6 +385,7 @@ export interface ResponsiveSheetProps extends Omit<ModalProps, "className"> {
  * provide focus containment, focus restore, Escape dismissal, and scroll lock.
  */
 export function ResponsiveSheet({
+  protectedSurface = false,
   onCloseAutoFocus,
   open,
   onClose,
@@ -413,7 +418,9 @@ export function ResponsiveSheet({
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        if (event.target instanceof Element && event.target.closest("[data-dropdown-surface]")) return;
+        const popup =
+          event.target instanceof Element ? event.target.closest<HTMLElement>("[data-dropdown-surface]") : null;
+        if (popup && popup.dataset.backDismiss !== backDismiss) return;
         if (topOverlay()?.dataset.backDismiss !== backDismiss) return;
         event.stopPropagation();
         onClose();
@@ -426,6 +433,7 @@ export function ResponsiveSheet({
   if (!isCompact) {
     return (
       <Modal
+        protectedSurface={protectedSurface}
         onCloseAutoFocus={onCloseAutoFocus}
         returnFocusRef={returnFocusRef}
         returnFocusScopeId={returnFocusScopeId}
@@ -456,6 +464,7 @@ export function ResponsiveSheet({
       }}
     >
       <DrawerContent
+        data-dropdown-surface={protectedSurface ? "" : undefined}
         data-back-dismiss={backDismiss}
         {...focusScope}
         onCloseAutoFocus={(event) => {

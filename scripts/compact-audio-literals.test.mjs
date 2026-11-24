@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { Buffer } from "node:buffer";
 import { expect, test } from "vitest";
 import ts from "typescript";
+import { transformWithEsbuild } from "vite";
 import { compactAudioLiterals } from "./compact-audio-literals.ts";
 import { BAQARAH_SURAH } from "../src/app/content/baqarahSurah";
 
@@ -63,4 +64,32 @@ test("emitted Azkar data preserves the exact reviewed draft and its collection o
   for (const [name, data] of Object.entries(before)) {
     if (typeof data !== "function") expect(after[name], name).toEqual(data);
   }
+});
+
+test("frequent short metadata is shared but low-frequency tiny strings stay literal", () => {
+  const values = Array.from({ length: 30 }, (_, index) => ({
+    id: `unique-${index}`,
+    reviewStatus: "approved",
+    mimeType: "audio/mpeg",
+    kind: "single",
+  }));
+  const original = `export const assets = ${JSON.stringify(values)};`;
+  const result = compactAudioLiterals().transform(original, "/repo/src/app/audio/audioAssetsCore.ts");
+  expect(evaluate(result.code)).toEqual(evaluate(original));
+  expect(result.code.match(/"approved"/g)).toHaveLength(1);
+  expect(
+    compactAudioLiterals().transform('export const data = {a:"one",b:"one"}', "/repo/src/app/audio/audioAssetsCore.ts"),
+  ).toBeUndefined();
+});
+
+test.each(["ar", "en"])("emitted %s interface copy retains every exact localized value", async (language) => {
+  const original = readFileSync(`src/app/i18n/${language}.ts`, "utf8");
+  const result = compactAudioLiterals().transform(original, `/repo/src/app/i18n/${language}.ts`);
+  expect(result).toBeDefined();
+  expect(evaluate(result.code)).toEqual(evaluate(original));
+  const [before, after] = await Promise.all([
+    transformWithEsbuild(original, `${language}.ts`, { minify: true }),
+    transformWithEsbuild(result.code, `${language}.ts`, { minify: true }),
+  ]);
+  expect(Buffer.byteLength(after.code)).toBeLessThan(Buffer.byteLength(before.code));
 });

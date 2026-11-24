@@ -46,18 +46,17 @@ for (const language of ["ar", "en"] as const) {
     test(`prayer record respects ${calendar} calendar in ${language} @cross-browser`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await openHomeAt(page, "2026-09-05T13:20:00", language, calendar, 1);
-      await page.getByTestId("prayer-actions-more-info").click();
       const record = page.getByTestId("prayer-record-date");
       await expect(record).toHaveAttribute("datetime", "2026-09-05");
       // The header and checklist name the same civil day using one preference.
-      const dateLabel = await page.locator("time[datetime='2026-09-05']").allTextContents();
-      expect(dateLabel).toHaveLength(1);
+      const headerDate = await page.getByTestId("home-header-content").locator("time").innerText();
+      await expect(record).toContainText(headerDate);
       const recordText = await record.innerText();
       expect(recordText).toContain(
         calendar === "hijri" ? (language === "ar" ? "هـ" : "AH") : language === "ar" ? "م" : "AD",
       );
       const label = recordText.replace(language === "ar" ? "تسجيل يوم " : "Record for ", "");
-      await expect(page.getByText(label, { exact: true })).toBeVisible();
+      await expect(page.getByTestId("home-header-content").locator("time")).toHaveText(label);
       await page.screenshot({ path: testInfo.outputPath(`${language}-${calendar}-date.png`), fullPage: true });
     });
   }
@@ -129,11 +128,11 @@ test("a quiet stretch between prayers keeps Home to the compact five", async ({ 
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
 });
 
-test("each Home prayer expands its shared properties under an aligned notch", async ({ page }) => {
+test("each Home prayer expands its shared properties in the connected detail panel", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00");
   // The contextual prayer starts open. It can still be dismissed, then opened
   // again explicitly from the stable five-prayer strip.
-  await page.getByRole("button", { name: /Open Dhuhr/i }).click();
+  await page.getByRole("button", { name: /Close Dhuhr details/i }).click();
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
   await page.getByRole("button", { name: /Open Dhuhr/i }).click();
 
@@ -271,37 +270,31 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
   expect(copyBox).not.toBeNull();
   expect(indicatorBox!.x).toBeGreaterThan(copyBox!.x + copyBox!.width);
 
-  const infoButton = page.getByTestId("prayer-actions-more-info");
-  const infoCircle = infoButton.locator("span[aria-hidden='true']");
-  const infoCircleBox = await infoCircle.boundingBox();
-  expect(infoCircleBox).not.toBeNull();
+  await expect(page.getByTestId("prayer-actions-more-info")).toHaveCount(0);
   expect(indicatorBox!.width).toBeCloseTo(20, 0);
   expect(indicatorBox!.height).toBeCloseTo(20, 0);
-  expect(infoCircleBox!.width).toBeCloseTo(24, 0);
-  expect(infoCircleBox!.height).toBeCloseTo(24, 0);
 
-  const infoCenterX = infoCircleBox!.x + infoCircleBox!.width / 2;
   const indicatorCenterX = indicatorBox!.x + indicatorBox!.width / 2;
   const actions = page.getByTestId("prayer-actions-card");
-  const headingBox = await actions.locator(":scope > div:first-child").boundingBox();
-  const listBox = await actions.locator(":scope > ol").boundingBox();
+  const headingBox = await actions.locator(".prayer-actions-header").boundingBox();
+  const listBox = await actions.locator(".prayer-actions-list").boundingBox();
   expect(headingBox).not.toBeNull();
   expect(listBox).not.toBeNull();
-  // At desktop widths the approved disclosure places the heading/virtue and
-  // checkboxes in separate grid columns. Keep both controls in their own
-  // columns with a real gap instead of comparing their screen x coordinates.
-  expect(infoCenterX).toBeGreaterThan(headingBox!.x);
-  expect(infoCenterX).toBeLessThan(headingBox!.x + headingBox!.width);
   expect(indicatorCenterX).toBeGreaterThan(listBox!.x);
   expect(indicatorCenterX).toBeLessThan(listBox!.x + listBox!.width);
-  // Identity and checklist share one logical column beside the evidence.
+  // Desktop actions and reading have independent columns and a real gutter.
+  const evidenceBox = (await actions.getByTestId("prayer-moment-virtue").boundingBox())!;
   expect(headingBox!.x).toBeCloseTo(listBox!.x, 0);
   expect(headingBox!.width).toBeCloseTo(listBox!.width, 0);
+  expect(evidenceBox.x + evidenceBox.width).toBeLessThan(listBox!.x);
 
   await page.setViewportSize({ width: 390, height: 844 });
+  const infoCircle = page.getByTestId("prayer-actions-more-info").locator("span[aria-hidden='true']");
   const phoneInfo = await infoCircle.boundingBox();
   const phoneIndicator = await indicator.boundingBox();
   expect(phoneInfo).not.toBeNull();
+  expect(phoneInfo!.width).toBeCloseTo(24, 0);
+  expect(phoneInfo!.height).toBeCloseTo(24, 0);
   expect(phoneIndicator).not.toBeNull();
   const phoneCopy = (await copy.boundingBox())!;
   expect(phoneIndicator!.x).toBeGreaterThan(phoneCopy.x + phoneCopy.width);

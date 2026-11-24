@@ -22,7 +22,11 @@ import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard } from "../compone
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
 import { VisitorCount } from "../components/VisitorCount";
 import { useHomePrayerScroll } from "../hooks/useHomePrayerScroll";
-import { usePrayerSelectionAnchor } from "../hooks/usePrayerSelectionAnchor";
+import { HomePrayerOverview } from "../components/HomePrayerOverview";
+import { HomeLocationRow } from "../components/HomeLocationRow";
+import { Modal, SheetHeader } from "../components/ResponsiveSheet";
+import { useHomeLocation } from "../hooks/useHomeLocation";
+import { getPrayerTimeline } from "../prayerTimeline";
 import { getReminderPlan, reminderCivilTime } from "../reminderPlan";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { createDailyPathIndex, getDailyPathStatus } from "../dailyPath";
@@ -35,7 +39,7 @@ import {
 } from "../content/azkarCore";
 import { CATEGORIES } from "../content/categories";
 import { formatPrayerTimeLabel, type PrayerName } from "../content/prayerTimes";
-import { PRAYER_ICON, PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+import { PRAYER_ICON, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { prayerDisplayName } from "../prayerPresentation";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { buildPrayerCardModels } from "../prayerCardModels";
@@ -163,6 +167,8 @@ export function HomeScreen({
   calendarType = "hijri",
   hijriDateOffset = 0,
   locationSettings,
+  onLocationChange,
+  onOpenLocation,
   onResume,
   onOpenPrayerAdhkar,
   onViewPrayers,
@@ -205,6 +211,8 @@ export function HomeScreen({
   calendarType?: "hijri" | "gregorian";
   hijriDateOffset?: number;
   locationSettings?: LocationSettings;
+  onLocationChange?: (location: LocationSettings) => void;
+  onOpenLocation?: () => void;
   onResume: (category: CategoryId) => void;
   /** Opens that prayer's own adhkar, as the prayer screen's card does. */
   onOpenPrayerAdhkar?: (prayer: PrayerName) => void;
@@ -236,6 +244,8 @@ export function HomeScreen({
   const [failedBackgroundCategory, setFailedBackgroundCategory] = useState<string | null>(null);
   const isArabic = language === "ar";
   const now = useNow();
+  const locationUpdate = useHomeLocation(language, locationSettings, onLocationChange);
+  const locationRefreshTrigger = useRef<HTMLButtonElement | null>(null);
   const [fridayKahfStarted] = useState(hasStartedFridayKahf);
   const [selectedPrayer, setSelectedPrayer] = useState<PrayerName | null>(null);
   const [dismissedAutoPrayer, setDismissedAutoPrayer] = useState<PrayerName | null>(null);
@@ -523,6 +533,10 @@ export function HomeScreen({
     () => buildPrayerCardModels(now, language, locationSettings),
     [now, language, locationSettings],
   );
+  const elapsedPercent = useMemo(
+    () => 100 - getPrayerTimeline(now, locationSettings).remainingPercent,
+    [now, locationSettings],
+  );
   const homeScrollRef = useRef<HTMLDivElement>(null);
   const homeStickyRef = useRef<HTMLDivElement>(null);
   const prayerPanelRef = useRef<HTMLElement>(null);
@@ -608,7 +622,6 @@ export function HomeScreen({
   const autoPrayer = isPrayerHero ? (leadingPrayer?.prayer ?? null) : null;
   const expandedPrayer = selectedPrayer ?? (dismissedAutoPrayer === autoPrayer ? null : autoPrayer);
   const expandedPrayerModel = prayerCardModels.find((model) => model.prayer === expandedPrayer);
-  usePrayerSelectionAnchor(homeStickyRef, prayerPanelRef, showHeroContent ? expandedPrayer : null, direction);
   const quickShare = useQuickRoutineShare(reminderInfo.categoryId, language);
   const hasQuranActivity =
     Boolean(quranWirdPlan?.startedDayKey) ||
@@ -621,6 +634,7 @@ export function HomeScreen({
 
   const prayerControlFocused = () =>
     !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row :is(button, a):focus");
+  const locationInteractionActive = locationUpdate.locating || Boolean(locationUpdate.message);
   const handlePrayerOpen = (prayer: PrayerName | null) => {
     setSelectedPrayer(prayer);
     setDismissedAutoPrayer(prayer ? null : autoPrayer);
@@ -684,7 +698,7 @@ export function HomeScreen({
             scrolledHomeRef.current = scrolled;
             setHasScrolledHomeContent(scrolled);
           }
-          updatePrayerScroll(top, selectedPrayer !== null || prayerControlFocused());
+          updatePrayerScroll(top, selectedPrayer !== null || locationInteractionActive || prayerControlFocused());
         }}
       >
         {/* Sticky Header Overlay */}
@@ -693,6 +707,7 @@ export function HomeScreen({
           onBlurCapture={(event) => {
             if (
               !selectedPrayer &&
+              !locationInteractionActive &&
               !(
                 event.relatedTarget instanceof Element &&
                 event.relatedTarget.closest(".home-prayer-sticky-row :is(button, a)")
@@ -801,20 +816,31 @@ export function HomeScreen({
                   {...(compactPrayerActive ? { inert: "" } : {})}
                 >
                   <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
-                  <PrayerTrackerCards
+                  <HomePrayerOverview
                     models={prayerCardModels}
                     language={language}
-                    direction={direction}
-                    records={prayerTracking}
                     dayKey={todayKey}
-                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
                     onOpen={handlePrayerOpen}
                     onGlass={homeVisualEffects}
-                    summaryOnly
-                    compactSummary
-                    summaryCondensed={prayerCardsCondensed}
-                    separateCompactSummary={showCompactPrayer}
+                    elapsedPercent={elapsedPercent}
                     selectedPrayer={expandedPrayer}
+                    location={
+                      <HomeLocationRow
+                        language={language}
+                        name={displayLocationName(locationSettings, language)}
+                        deviceLocation={Boolean(locationSettings?.autoDetect)}
+                        locating={locationUpdate.locating}
+                        onSelect={onOpenLocation}
+                        onRefresh={
+                          onLocationChange
+                            ? (trigger) => {
+                                locationRefreshTrigger.current = trigger;
+                                void locationUpdate.refresh();
+                              }
+                            : undefined
+                        }
+                      />
+                    }
                   />
                 </div>
               </div>
@@ -880,9 +906,16 @@ export function HomeScreen({
                         data-testid="home-prayer-moment"
                         data-prayer={expandedPrayer}
                         aria-label={t(language, "prayerMoment.homeTitle")}
-                        className="home-prayer-connected-panel mx-auto w-full min-w-0 justify-self-center md:col-span-2"
+                        className="home-prayer-connected-panel home-prayer-details-v2 mx-auto w-full min-w-0 justify-self-center md:col-span-2"
                       >
                         <PrayerMomentPanel
+                          key={expandedPrayer}
+                          onClose={() => {
+                            homeStickyRef.current
+                              ?.querySelector<HTMLButtonElement>(`[data-prayer-trigger="${expandedPrayer}"]`)
+                              ?.focus({ preventScroll: true });
+                            handlePrayerOpen(null);
+                          }}
                           prayer={expandedPrayer}
                           language={language}
                           direction={direction}
@@ -1115,6 +1148,33 @@ export function HomeScreen({
           </footer>
         </div>
       </div>
+      {locationUpdate.message && (
+        <Modal
+          open
+          protectedSurface
+          showCloseButton={false}
+          title={t(language, "home.locationResult")}
+          onClose={locationUpdate.dismiss}
+          language={language}
+          direction={direction}
+          testId="home-location-result"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            locationRefreshTrigger.current?.focus({ preventScroll: true });
+          }}
+          maxWidthClassName="max-w-md"
+        >
+          <SheetHeader
+            title={t(language, "home.locationResult")}
+            onClose={locationUpdate.dismiss}
+            language={language}
+            direction={direction}
+          />
+          <p role="status" className="p-5 text-base leading-relaxed">
+            {locationUpdate.message}
+          </p>
+        </Modal>
+      )}
     </ScreenContainer>
   );
 }

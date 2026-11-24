@@ -1,3 +1,4 @@
+import { openDownloadManagement } from "./helpers/downloads";
 import { openMasbahaSettings } from "./helpers/masbaha-settings";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -241,6 +242,7 @@ test("keyboard help disables character actions while preserving native counting"
 test("offline categories disclose verified readiness without starting downloads", async ({ page }) => {
   await returningReader(page, "en");
   await page.goto("/#/settings/downloads");
+  await openDownloadManagement(page);
   const prepare = page.getByRole("button", { name: "Download · Adhkar & duas" });
   await expect(prepare).toBeEnabled();
   await expect(page.getByTestId("offline-resource-adhkar")).toContainText("Adhkar & duas");

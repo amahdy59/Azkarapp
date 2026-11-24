@@ -1,3 +1,9 @@
+## Home prayer overview and explicit location — 2026-11-24 (local)
+
+HomePrayerOverview and HomeLocationRow present screen-owned models and callbacks. The five-prayer grid and shaded interval share the existing timeline; they do not calculate, record or persist prayer state. The summary pairs labels with prayer names beneath them and keeps the next countdown inline at normal sizes. A screen-composed location slot follows the grid. Compact layouts have one material owner; desktop has five independent card surfaces, one interval-summary surface and one location-footer surface. Container queries reflow enlarged desktop content while retaining its card anatomy.
+
+useHomeLocation owns explicit detection, duplicate-request prevention and stale/unmounted-result rejection. App's existing location callback owns normalization, persistence and reminder reconciliation. Refresh preserves calculation preferences and failed detection preserves the saved location. The screen owns the protected result modal and return-focus reference, and holds the expanded prayer section during the request/result so the disabled trigger remains available for focus recovery. Change opens the existing location-settings route. Presentation components perform no storage or network work.
+
 ## Home startup and offline acquisition — 2026-11-06
 
 Home launches start the shell import before starting the overlapping Home import. This preserves the normal order of the shell and Home styles, including Glass and reduced transparency. Both callers share one Home import promise and the regular screen boundary owns localized loading and retry feedback. The startup bundle check walks the entry, shell and Home graphs together. Home uses reviewed Al-Baqarah metadata for its evidence rotation, while the complete text, transliteration, translation and page boundaries load through the full collection or listening paths. The install cache retains the complete reading chunk and the Ruqyah route hydrates before rendering.
@@ -865,3 +871,43 @@ Home evidence, prayer virtues and notification previews share the portalled evid
 ### Surah cover delivery
 
 The Reader selects between a 416px same-origin WebP and the existing 768px versioned hosted WebP. The visible cover has high fetch priority. The compact versions ship in the offline precache, while larger immutable versions are cached on demand. The error path first tries the compact matching cover and then the packaged generic Quran artwork. Friday's small and expanded photo slots select responsive sizes. Progress card photos share the existing image variants, and authored sharing exports retain their original files.
+
+## Combined offline download selection — 2026-11-24
+
+DownloadsPanel composes the shared DownloadOverview, native selection/management disclosures, existing page/juz picker and individual download controls. The presentation has no storage/network calls. downloadBatch runs selected category tasks sequentially and aggregates group failures while preserving successful groups. The existing audio/Mushaf services remain the only acquisition and integrity boundaries; retries recheck and reuse complete verified resources.
+
+The document-owned downloadSession keeps selected categories, page ranges and current group alongside exact progress. Cancellation remains busy while owned work drains, overlapping starts are rejected and a returning panel uses the current snapshot. Visible updates remain bounded to one per 80ms; hidden subscriber updates pause. Group progress uses the current resource's actual bytes or page count with explicit group context, never a mixed-unit overall percentage. Management rows mount only on disclosure; voice resolution is memoized. No cache/storage schema or synchronization changes.
+
+## Qibla direction clarity — 2026-11-24
+
+QiblaScreen composes the existing Header/Button and opaque ResponsiveSheet; QiblaCompassDial is presentation only. useQiblaCompass owns explicit permission, magnetic-to-true heading correction, accuracy filtering, five-second stale detection and visibility cleanup. Relative/invalid/steeply tilted samples cannot replace a usable heading. Unknown heading accuracy permits approximate guidance but never the confirmed alignment/haptic. Known accuracy of at most 10 degrees plus raw and smoothed turns within three degrees for 350ms permits one confirmation; leaving five degrees re-arms it.
+
+The screen requests fresh coordinates explicitly through detectUserCoordinates({ maximumAge: 0 }); its optional accuracy/acquisition/altitude metadata is transient. Saved city labels are never borrowed after a fresh fix. No geocoder, network request, storage field, Home/navigation edit or prayer-profile mutation is introduced. Local WMM2025 correction is evaluated per coordinate/day, outside sensor callbacks, and remains confined to the lazy Qibla graph.
+
+### Qibla explicit recovery follow-up — 2026-11-24
+
+useQiblaCompass.retry restarts one active sensor effect via an attempt identity; cleanup removes listeners and expiry before replacement. When disabled, retry goes through the ordinary user-initiated permission boundary. No added loop, polling or persistence. Device-location accuracy above 100m produces a screen-owned approximation warning. The WMM model metadata owns epoch, validity and review date; the ordinary geomagnetic unit suite deliberately fails from 2029-07-01 until a reviewed successor is installed and independently validated. Hardware execution is recorded separately in agent/DEVICE_ACCEPTANCE.md.
+
+Final downloads refinements derive the overview Resume label from verified saved counts after every new status scan, including reload; there is no new persisted history. Category readiness remains visible with checking/partial/ready/unavailable states. The current-group progress context applies to both visible and accessible values. Mushaf acquisition errors distinguish network/timeout, server (OperationError), and invalid file (DataError) at the existing acquisition boundary. Pointer focus never triggers the custom dock-clearance scroll before click; keyboard focus retains the clearance adjustment.
+
+## Surah entry delivery and deferred navigator — 2026-11-24
+
+`SurahArtwork` always starts with the existing bundled 416px cover (or the generic local fallback). It has no remote-first `srcset` or source-switch timeout. After the local image loads, wide screens may load a low-priority, lazy 768px detail layer; that layer is invisible until successful loading and never removes the local image. Phone entry has no hosted-cover dependency. The named artwork key resets per-surah image state. No cache, service-worker, storage or content format changes.
+
+Reader entry uses the shared Button and existing header/menu primitives. Long-surah collection navigation mounts on explicit opening instead of constructing its hidden reading/glossary DOM on arrival; screen-owned selection, expansion and scroll state remain. Ordinary reader mounting is unchanged. Single-surah collection percentages are omitted without changing completion or page persistence. Canonical Mushaf and audio ownership remain unchanged. See [approved phase](agent/phases/SURAH_ENTRY_CLARITY_2026_11_24.md).
+
+## Local prayer-settings presentation — 2026-11-24
+
+PrayerLocationPanel continues owning location/method/adjustment callbacks and request-generation cancellation. Opening a manual city flow supersedes pending GPS work; late/unmounted responses cannot save or open a notice. PrayerCalculationPicker owns transient overlay presentation only and passes the selected numeric ID to the existing normalized application boundary. Shared ResponsiveSheet/Modal expose an opt-in protectedSurface flag that places the existing opaque-dropdown marker on the actual dialog/drawer root. Escape distinguishes a protected root from a nested popup; default callers retain their existing behavior.
+
+The panel reuses useNow's minute/foreground/hidden lifecycle. Timezone status is memoized by device civil date and selected IANA zone, so city search and method changes do not reconstruct twelve seasonal Intl samples plus the current offset. A new date or zone recomputes status; astronomical calculation, selected-location date rules, reminders, storage and remote schemas remain unchanged. No cache is persisted and no new network request or dependency is introduced.
+
+## Desktop prayer information composition — 2026-11-24
+
+PrayerActionsCard uses the existing useMediaQuery shell boundary to mount either presentation-only PrayerSunnahDetails inside the card or the existing compact information dialog. Both consume unchanged getPrayerInfoData results. PrayerMomentPanel supplies one native recording-date time element directly, preserving its supplied dayKey and selected-calendar formatting, and retains the complete virtue/reference without a source-preview link. CSS card containment owns internal columns; no layout observer, new storage, network boundary, clock, dependency or persisted schema is introduced. Compact-to-desktop dialog teardown clears transient open state and uses Modal's existing focus-recovery callback.
+
+Approved final prayer finish uses the same presentation-only PrayerEvidenceQuote for the main virtue, Sunnah and Rawatib, keeping the complete model strings and separate passive source footer. CSS reserves the Collapse control's desktop width only when that control exists and the card has enough available width; enlarged/narrow layouts retain in-flow controls. There is no new measurement listener, timer or data boundary.
+
+## Consolidated release build-copy sharing — 2026-11-24
+
+The existing build-only string-literal compactor also processes the two interface dictionaries. It shares repeated property-value strings in emitted code without modifying either source dictionary or adding a runtime decoder. Actual Arabic/English dictionaries are deep-equal before/after transformation, and tests compare their actual minified byte sizes. This recovers total-output headroom while retaining every translation and the unchanged 12MiB ceiling. The release records measured stylesheet, initial-route and Home-startup sizes in the existing baseline file; no ceiling or growth tolerance changes.

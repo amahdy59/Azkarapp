@@ -1,3 +1,4 @@
+import { assertPrayerOverview } from "./helpers/home-overview";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -27,7 +28,7 @@ for (const language of ["ar", "en"] as const) {
       const current = row.locator('[data-prayer-state="current"]');
       const next = row.locator('[data-prayer-state="next"]');
       for (const card of [current, next]) {
-        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+        await expect(card).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
         await expect
           .poll(() =>
             card.evaluate((n) => {
@@ -38,41 +39,26 @@ for (const language of ["ar", "en"] as const) {
           )
           .toBe(true);
       }
-      await expect(current.locator(".home-prayer-status-pill")).toContainText(language === "ar" ? "الآن" : "Now");
+      const summary = page.getByTestId("home-prayer-interval");
+      await expect(summary).toContainText(language === "ar" ? "حان وقتها" : "Now");
+      await expect(summary).toContainText(language === "ar" ? "متبقٍ" : "remaining");
       await expect(next.getByRole("progressbar")).toHaveCount(0);
-      // One continuous card material: no rectangular next-footer tint may
-      // spill beyond the rounded card or compete with the countdown pill.
-      await expect(next.locator("[data-prayer-footer]")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(next.locator("[data-prayer-footer]")).toHaveCSS("background-image", "none");
       await page.evaluate(() => document.fonts.ready);
-      const sizes = await row.locator("article").evaluateAll((nodes) =>
-        nodes.map((n) => {
-          const box = n.getBoundingClientRect();
-          const time = n.querySelector('[id^="prayer-summary-time-"]')!;
-          const pill = n.querySelector(".home-prayer-status-pill")!;
-          return {
-            width: box.width,
-            height: box.height,
-            timeFits: time.scrollWidth <= time.clientWidth + 1,
-            pillFits: pill.scrollWidth <= pill.clientWidth + 1,
-          };
-        }),
-      );
-      expect(
-        sizes.every((s) => s.width >= 130 && s.timeFits && s.pillFits),
-        JSON.stringify(sizes),
-      ).toBe(true);
-      expect(Math.max(...sizes.map((s) => s.height)) - Math.min(...sizes.map((s) => s.height))).toBeLessThanOrEqual(1);
-      expect(Math.max(...sizes.map((s) => s.height))).toBeLessThanOrEqual(140);
-      const nowBadge = (await current.locator(".home-prayer-status-pill").boundingBox())!;
-      expect(nowBadge.width).toBeGreaterThan((await current.boundingBox())!.width * 0.7);
+      const sizes = await assertPrayerOverview(page);
+      expect(Math.max(...sizes.map((s) => s.height))).toBeLessThanOrEqual(width >= 1200 ? 160 : 140);
+      if (width < 1200) {
+        await expect(page.getByTestId("prayer-tracker-cards")).toHaveCSS(
+          "backdrop-filter",
+          "blur(22px) saturate(1.35)",
+        );
+      }
       if (width === 1440) {
         const grid = (await page.getByTestId("home-context-grid").boundingBox())!;
         const summary = (await row.boundingBox())!;
         expect(summary.width).toBeCloseTo(grid.width, 0);
         expect(summary.x).toBeCloseTo(grid.x, 0);
         const icon = current.locator("[data-prayer-icon]");
-        await expect(icon).toHaveCSS("width", "44px");
+        await expect(icon).toHaveCSS("width", "40px");
       }
       if (width === 480) expect(sizes[0]!.width * 3 + 16).toBeLessThanOrEqual(await row.evaluate((n) => n.clientWidth));
       await page.screenshot({ path: testInfo.outputPath("prayer-hierarchy.png"), scale: "css" });
@@ -99,6 +85,10 @@ for (const language of ["ar", "en"] as const) {
       await page.locator("html").evaluate((n) => {
         n.style.fontSize = "";
       });
+      await page.locator(".home-content-scroll").evaluate((node) => {
+        node.scrollTop = 0;
+      });
+      await expect(page.getByTestId("home-prayer-strip")).not.toHaveAttribute("inert");
       await current.getByRole("button").click();
       const panel = page.getByTestId("home-prayer-moment");
       await expect(panel.getByTestId("prayer-open-adhkar")).toBeVisible();
@@ -127,7 +117,9 @@ test("overnight current and next stay adjacent in the initial phone viewport @cr
   });
   await page.goto("/#/home");
   const row = page.getByTestId("home-all-prayers-row");
-  await expect(row.locator("article").first()).toHaveAttribute("data-prayer", "isha");
+  await expect(row.locator("article").first()).toHaveAttribute("data-prayer", "fajr");
+  await expect(row.locator('[data-prayer-state="current"]')).toHaveAttribute("data-prayer", "isha");
+  await expect(row.locator('[data-prayer-state="next"]')).toHaveAttribute("data-prayer", "fajr");
   for (const state of ["current", "next"]) {
     const card = row.locator(`[data-prayer-state="${state}"]`);
     await expect

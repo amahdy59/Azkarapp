@@ -1,3 +1,4 @@
+import { openDownloadManagement } from "./helpers/downloads";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { t } from "../src/app/i18n";
@@ -37,6 +38,7 @@ for (const scenario of [
     });
     const scroll = page.getByTestId("downloads-scroll");
     await expect(scroll).toBeVisible();
+    await openDownloadManagement(page);
     const viewport = scenario.width >= 900 ? page.locator(".settings-detail-pane") : scroll;
     if (scenario.scale === 2)
       await page.locator("html").evaluate((el) => {

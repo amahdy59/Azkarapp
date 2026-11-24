@@ -11,6 +11,7 @@ export function DownloadProgress({
   language,
   direction = language === "ar" ? "rtl" : "ltr",
   active = false,
+  context,
 }: {
   completed: number;
   total: number;
@@ -18,10 +19,11 @@ export function DownloadProgress({
   language: AppLanguage;
   direction?: "ltr" | "rtl";
   active?: boolean;
+  context?: string;
 }) {
   const percent = Math.min(100, Math.max(0, Math.floor((100 * completed) / Math.max(1, total))));
   const milestone = Math.floor(percent / 25) * 25;
-  const progressText = t(language, "downloads.progressValue", { percent: formatNumerals(percent, language) });
+  const progressText = `${context ? context + ": " : ""}${t(language, "downloads.progressValue", { percent: formatNumerals(percent, language) })}`;
 
   return (
     <div className="space-y-1.5" dir={direction} data-slot="download-progress-group">
@@ -31,6 +33,7 @@ export function DownloadProgress({
         </span>
       </div>
       <ProgressBar
+        animateOnMount={false}
         value={completed}
         max={Math.max(1, total)}
         height={6}
@@ -42,7 +45,7 @@ export function DownloadProgress({
       />
       <span className="sr-only" role="status">
         {active
-          ? `${label}: ${t(language, "downloads.progressValue", { percent: formatNumerals(milestone, language) })}`
+          ? `${label}: ${context ? context + ": " : ""}${t(language, "downloads.progressValue", { percent: formatNumerals(milestone, language) })}`
           : ""}
       </span>
     </div>

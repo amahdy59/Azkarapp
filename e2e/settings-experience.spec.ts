@@ -183,7 +183,7 @@ test("launch-critical settings screens are discoverable and accessible", async (
   await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-location").click();
   await expect(page).toHaveURL(/#\/settings\/location$/);
-  await expect(page.getByRole("heading", { name: "Location & Prayer Times", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Prayer times & location", exact: true })).toBeVisible();
   await expect(page.getByTestId("daylight-saving-status")).toContainText("Africa/Cairo");
   await expect(page.getByTestId("daylight-saving-status")).toContainText(/UTC\+0[23]:00/);
   const locationBack = page.getByRole("button", { name: "Back", exact: true });

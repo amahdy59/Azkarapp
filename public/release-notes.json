@@ -1,13 +1,15 @@
 {
-  "release": "2026-11-07.6",
+  "release": "2026-11-24",
   "ar": [
-    "تظهر أدوات المصحف في موضعها الصحيح على أندرويد دون تغيير تخطيط الويب.",
-    "يحافظ التطبيق على مساحة شريط الحالة المناسبة عند فتح المصحف على الهاتف.",
-    "تظل تجربة قراءة المصحف متسقة بين التطبيق والمتصفح."
+    "تابع الصلاة الحالية والقادمة وموقع المواقيت بوضوح، واقرأ السنن ومراجعها وتاريخ التسجيل داخل البطاقة الموسعة على الكمبيوتر.",
+    "نزّل موارد القراءة والتسجيلات المختارة من مكان واحد، وتابع التقدم أو استكمل الملفات المتبقية مع إرشادات أوضح عند تعثر التنزيل.",
+    "اعرف اتجاه القبلة بواجهة أوضح، ومعلومات صريحة عن دقة البوصلة ومصدر الموقع، وخيارات مباشرة للتحديث والمعايرة.",
+    "ابدأ قراءة السور من بطاقات أبسط، واضبط موقع الصلاة وطريقة الحساب من خيارات أوضح وأسهل للقراءة."
   ],
   "en": [
-    "Mushaf controls appear in the correct position on Android without changing the web layout.",
-    "The phone Mushaf keeps the proper status-bar spacing when it opens.",
-    "Mushaf reading remains consistent between the app and the browser."
+    "See the current and next prayer and timing location clearly, with Sunnah guidance, references and recording dates inside expanded desktop cards.",
+    "Download reading resources and selected recordings together, track progress and resume remaining files with clearer recovery guidance.",
+    "Find Qibla with a clearer compass, honest accuracy and location information, and direct refresh and calibration options.",
+    "Start surah reading from simpler cards and choose prayer locations and calculation methods through clearer, readable controls."
   ]
 }

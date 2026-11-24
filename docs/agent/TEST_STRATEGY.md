@@ -24,6 +24,8 @@ Use settings-readiness-surfaces for separate saving/sync/offline status, reminde
 
 ## Current behavior and efficient execution — 2026-11-01
 
+The local 2026-11-24 Home overview changes also require the explicit prayer suites alongside the `home` feature group: `compact-prayer`, `prayer-glass-hierarchy`, `prayer-seconds`, `prayer-selection-connection`, `prayer-tracking` and `prayer-actions-responsive`. `home-prayer-overview` covers location adjacency, whole-word enlarged-name reflow, geolocation outcomes and dialog focus. See the [local verification report](reports/HOME_PRAYER_OVERVIEW_LOCAL_2026_11_24_REPORT.md) for retained failures, corrected contracts and three-engine follow-ups. The complete CI inventory remains intact.
+
 Finish application, test and documentation inputs before the final quality pass. Exact-content receipts expire after 24 hours and bind the installed lockfile, Node/platform and build environment; a changed input runs the full gate again. Never create or edit receipts by hand. During development use targeted unit tests and explicit `pnpm test:e2e:feature home` / `reminders` / other feature selections, with `--list`, engine and grep filters. These are development aids; frozen install, complete check, core browser smoke and Pages build remain in the hook. Complete browser inventory/engines run once in mandatory exact-commit CI, and Pages waits for that result. Full local browser runs remain diagnostics when requested or needed for unresolved failures.
 
 | Current contract                                                                                                               | Primary regression                                                              |

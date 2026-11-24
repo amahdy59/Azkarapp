@@ -1,3 +1,4 @@
+import { openDownloadManagement, openDownloadSelection } from "./helpers/downloads";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { t } from "../src/app/i18n";
@@ -50,6 +51,15 @@ for (const scenario of [
     await expect(page).toHaveURL(/settings\/downloads$/);
     await expect(page.getByTestId("downloads-scroll")).toBeVisible();
     const downloads = page.getByTestId("downloads-scroll");
+    await expect(page.getByTestId("download-overview-action")).toBeEnabled();
+    await expect(page.getByTestId("download-overview-action")).toHaveText(
+      t(scenario.language, "downloads.downloadAll"),
+    );
+    await expect(downloads.locator('[data-testid^="download-category-"]')).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath("downloads-overview.png"), fullPage: true });
+    await openDownloadSelection(page);
+    await expect(page.getByRole("checkbox")).toHaveCount(3);
+    await openDownloadManagement(page);
     await expect(downloads.locator('[data-testid^="download-category-"]')).toHaveCount(3);
     await expect(
       page.getByRole("button", {

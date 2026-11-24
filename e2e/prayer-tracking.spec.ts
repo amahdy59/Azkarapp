@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { assertPrayerOverview } from "./helpers/home-overview";
 
 async function openHome(page: Page) {
   await page.clock.setFixedTime(new Date("2026-09-05T22:30:00+03:00"));
@@ -48,6 +49,7 @@ test.describe("after-prayer tracking", () => {
   });
 
   test("prayer evidence is optional and undo does not interrupt recording", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await openHome(page);
     const actions = page.getByTestId("prayer-actions-card");
     const checkbox = actions.getByTestId("prayer-action-location").getByRole("checkbox");
@@ -63,19 +65,21 @@ test.describe("after-prayer tracking", () => {
     await expect(checkbox).not.toBeChecked();
   });
 
-  test("summary cards scroll on phones and fit the wide canvas without squeezed text", async ({ page }) => {
+  test("summary cards reflow on phones and fit the wide canvas without squeezed text", async ({ page }) => {
     await openHome(page);
     const grid = page.getByTestId("home-all-prayers-row");
     const cards = grid.locator("article[data-prayer]");
     await page.setViewportSize({ width: 320, height: 800 });
     await expect(cards).toHaveCount(5);
-    expect(await grid.evaluate((node) => node.scrollWidth > node.clientWidth)).toBe(true);
+    expect(await grid.evaluate((node) => node.scrollWidth > node.clientWidth)).toBe(false);
+    await assertPrayerOverview(page);
     for (const card of await cards.all()) {
       expect((await card.boundingBox())!.width).toBeGreaterThanOrEqual(100);
       expect(await card.locator("h3").evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
     }
     await page.setViewportSize({ width: 1440, height: 900 });
     await expect.poll(() => grid.evaluate((node) => node.scrollWidth > node.clientWidth)).toBe(false);
+    await assertPrayerOverview(page);
   });
 
   test("all five prayer records stay available without bringing recording controls into Progress", async ({ page }) => {

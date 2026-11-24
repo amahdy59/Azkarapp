@@ -11,6 +11,7 @@ export function ProgressBar({
   "aria-label": ariaLabel,
   "aria-valuetext": ariaValueText,
   className,
+  animateOnMount = true,
 }: {
   value: number;
   max: number;
@@ -21,6 +22,7 @@ export function ProgressBar({
   "aria-label": string;
   "aria-valuetext"?: string;
   className?: string;
+  animateOnMount?: boolean;
 }) {
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
   // The bar fills in from empty when it first appears, so arriving on a screen
@@ -28,11 +30,12 @@ export function ProgressBar({
   // After that first paint `pct` drives it directly, and the transform
   // transition carries every later change — so counting up mid-session still
   // animates from wherever the bar already was, not from zero.
-  const [hasEntered, setHasEntered] = useState(false);
+  const [hasEntered, setHasEntered] = useState(!animateOnMount);
   useEffect(() => {
+    if (!animateOnMount) return;
     const frame = requestAnimationFrame(() => setHasEntered(true));
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [animateOnMount]);
 
   return (
     <div

@@ -44,6 +44,17 @@ import { DownloadsPanel } from "./DownloadsPanel";
 import { clearDownloadNotice, cancelDownloadSession, getDownloadSession } from "../../downloads/downloadSession";
 import { AudioDownloadError } from "../../audio/audioDownloadTransfer";
 
+function openDetails(id: string) {
+  const details = screen.getByTestId(id) as HTMLDetailsElement;
+  details.open = true;
+  fireEvent(details, new Event("toggle"));
+}
+function renderDownloads(element: React.ReactElement) {
+  const view = render(element);
+  openDetails("download-management");
+  return view;
+}
+
 function openManagement(id: string) {
   const category = screen.getByTestId("download-category-" + id);
   fireEvent.click(category.querySelector("summary")!);
@@ -57,13 +68,203 @@ afterEach(async () => {
 });
 
 describe("DownloadsPanel", () => {
+  it("derives Resume and readiness from verified files after remount, without a session result", async () => {
+    const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
+    vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>
+      groups.map((_, index) => ({
+        completed: index === 6 ? 1 : 0,
+        total: 4,
+        remainingBytes: index === 6 ? 2048 : 4096,
+      })),
+    );
+    const view = render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() => expect(screen.getByTestId("download-overview-action")).toHaveTextContent("Resume download"));
+    expect(screen.getByTestId("download-coverage")).toHaveTextContent("Partly downloaded");
+    expect(screen.getByTestId("download-management")).not.toHaveAttribute("open");
+    expect(audioMocks.download).not.toHaveBeenCalled();
+    view.unmount();
+    clearDownloadNotice();
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() => expect(screen.getByTestId("download-overview-action")).toHaveTextContent("Resume download"));
+    expect(screen.getByTestId("download-overview")).toHaveTextContent("Estimated remaining:");
+    expect(audioMocks.download).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [new TypeError("failed to fetch"), "Reconnect and try again"],
+    [new DOMException("timeout", "TimeoutError"), "Reconnect and try again"],
+    [new DOMException("bad file", "DataError"), "failed verification"],
+    [new DOMException("unavailable", "OperationError"), "Try again later"],
+  ])("offers specific recovery for a Mushaf failure: %s", async (error, expected) => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: async () => ({ usage: 0, quota: 1e9 }) },
+    });
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    vi.mocked(downloadMushaf).mockRejectedValue(error);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const download = screen.getByRole("button", { name: "Download · Mushaf pages" });
+    await waitFor(() => expect(download).toBeEnabled());
+    fireEvent.click(download);
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(expected));
+    expect(screen.getByTestId("download-overview-action")).toHaveTextContent("Try again");
+    expect(screen.getByRole("alert")).not.toHaveTextContent("bad file");
+  });
+  it("resumes a cancelled page selection using the same range", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: async () => ({ quota: 1e9, usage: 0 }) },
+    });
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    vi.mocked(downloadMushaf)
+      .mockImplementationOnce(async (options) => {
+        await new Promise<void>((_resolve, reject) =>
+          options?.signal?.addEventListener("abort", () => reject(options.signal?.reason), { once: true }),
+        );
+      })
+      .mockResolvedValue(undefined);
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const action = screen.getByTestId("download-overview-action");
+    await waitFor(() => expect(action).toBeEnabled());
+    openDetails("download-selection");
+    openDetails("mushaf-download-selection");
+    fireEvent.change(screen.getByLabelText("First page"), { target: { value: "42" } });
+    fireEvent.change(screen.getByLabelText("Last page"), { target: { value: "43" } });
+    fireEvent.submit(screen.getByTestId("mushaf-download-selection").querySelector("form")!);
+    await waitFor(() => expect(downloadMushaf).toHaveBeenCalledOnce());
+    fireEvent.click(action);
+    await waitFor(() => expect(action).toHaveTextContent("Resume download"));
+    await waitFor(() => expect(action).toBeEnabled());
+    fireEvent.click(action);
+    await waitFor(() => expect(downloadMushaf).toHaveBeenCalledTimes(2));
+    expect(vi.mocked(downloadMushaf).mock.calls[1]![0]?.pages).toEqual([42, 43]);
+    expect(audioMocks.download).not.toHaveBeenCalled();
+  });
+  it("keeps management work out of the default overview", async () => {
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() => expect(screen.getByTestId("download-overview-action")).toBeEnabled());
+    expect(screen.getByTestId("download-overview-action")).toHaveTextContent("Download all");
+    expect(screen.getByTestId("download-management")).not.toHaveAttribute("open");
+    expect(screen.queryByTestId("offline-resource-adhkar")).not.toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(screen.queryByText("Download all audio as ZIP")).not.toBeInTheDocument();
+  });
+
+  it("downloads all groups, keeps successful groups after failure and retries only what remains", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: async () => ({ quota: 1e9, usage: 0 }) },
+    });
+    const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
+    const { downloadMushaf, getMushafDownloadStatus } = await import("../../content/mushafOfflineCache");
+    const saved = { adhkar: false, recitations: false, mushaf: false };
+    vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>
+      groups.map((_, index) => {
+        const complete = index === 6 ? saved.adhkar : index === 7 ? saved.recitations : false;
+        return { completed: complete ? 4 : 0, total: 4, remainingBytes: complete ? 0 : 4096 };
+      }),
+    );
+    vi.mocked(getMushafDownloadStatus).mockImplementation(async () => ({
+      downloadedPages: saved.mushaf ? 604 : 0,
+      downloadedFonts: saved.mushaf ? 604 : 0,
+      totalPages: 604,
+      isComplete: saved.mushaf,
+      remainingBytes: saved.mushaf ? 0 : 1024,
+    }));
+    let adhkarAttempts = 0;
+    audioMocks.download.mockImplementation(async (zikrs) => {
+      const group = zikrs.some((zikr: { id: string }) => zikr.id === "ir-baqarah") ? "recitations" : "adhkar";
+      if (group === "adhkar" && ++adhkarAttempts === 1) throw new AudioDownloadError("network", "lost");
+      saved[group] = true;
+    });
+    vi.mocked(downloadMushaf).mockImplementation(async () => {
+      saved.mushaf = true;
+    });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const action = screen.getByTestId("download-overview-action");
+    await waitFor(() => expect(action).toBeEnabled());
+    fireEvent.click(action);
+    await waitFor(() => expect(screen.getByTestId("download-overview")).toHaveAttribute("data-phase", "failed"));
+    expect(saved).toEqual({ adhkar: false, recitations: true, mushaf: true });
+    expect(audioMocks.download).toHaveBeenCalledTimes(2);
+    expect(audioMocks.remove).not.toHaveBeenCalled();
+    fireEvent.click(action);
+    await waitFor(() => expect(screen.getByTestId("download-overview")).toHaveAttribute("data-phase", "ready"));
+    expect(audioMocks.download).toHaveBeenCalledTimes(3);
+    expect(downloadMushaf).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(action).toHaveTextContent("Done");
+  });
+
+  it("does not cancel on a start double-click and returns to the same live progress", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: async () => ({ quota: 1e9, usage: 0 }) },
+    });
+    let signal!: AbortSignal;
+    audioMocks.download.mockImplementation(async (_zikrs, _preferences, options) => {
+      signal = options.signal;
+      options.onDetail({
+        phase: "receiving",
+        completedFiles: 0,
+        totalFiles: 4,
+        fileNumber: 1,
+        attempt: 1,
+        receivedBytes: 25,
+        totalBytes: 100,
+      });
+      await new Promise<void>((_resolve, reject) =>
+        signal.addEventListener("abort", () => reject(signal.reason), { once: true }),
+      );
+    });
+    const view = render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() => expect(screen.getByTestId("download-overview-action")).toBeEnabled());
+    fireEvent.click(screen.getByTestId("download-overview-action"), { detail: 1 });
+    fireEvent.click(screen.getByTestId("download-overview-action"), { detail: 2 });
+    await waitFor(() => expect(screen.getByRole("progressbar")).toHaveAttribute("value", "25"));
+    expect(signal.aborted).toBe(false);
+    expect(audioMocks.download).toHaveBeenCalledOnce();
+    view.unmount();
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    expect(screen.getByRole("progressbar")).toHaveAttribute("value", "25");
+    expect(
+      document.querySelector<HTMLElement>('[data-slot="progress-fill"]')?.style.getPropertyValue("--progress-ratio"),
+    ).toBe("0.25");
+    expect(signal.aborted).toBe(false);
+    fireEvent.click(screen.getByTestId("download-overview-action"), { detail: 1 });
+    await waitFor(() => expect(signal.aborted).toBe(true));
+    expect(audioMocks.download).toHaveBeenCalledOnce();
+  });
+
+  it("downloads only checked categories and keeps the selective action after collapsing choices", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: async () => ({ quota: 1e9, usage: 0 }) },
+    });
+    audioMocks.download.mockResolvedValue(undefined);
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() => expect(screen.getByTestId("download-overview-action")).toBeEnabled());
+    openDetails("download-selection");
+    fireEvent.click(screen.getByRole("checkbox", { name: /Kahf & Baqarah/ }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /Mushaf pages/ }));
+    const selection = screen.getByTestId("download-selection") as HTMLDetailsElement;
+    selection.open = false;
+    fireEvent(selection, new Event("toggle"));
+    expect(screen.getByTestId("download-overview-action")).toHaveTextContent("Download selected");
+    fireEvent.click(screen.getByTestId("download-overview-action"));
+    await waitFor(() => expect(audioMocks.download).toHaveBeenCalledOnce());
+    expect(audioMocks.download.mock.calls[0]![0].some((zikr: { id: string }) => zikr.id === "ir-baqarah")).toBe(false);
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    expect(downloadMushaf).not.toHaveBeenCalled();
+  });
+
   it("offers Resume download after failure when verified recordings remain", async () => {
     const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
     vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>
       groups.map(() => ({ completed: 1, total: 4, remainingBytes: 2048 })),
     );
     audioMocks.download.mockRejectedValue(new AudioDownloadError("network", "connection lost"));
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     const row = screen.getByTestId("offline-resource-adhkar");
     const resume = await within(row).findByRole("button", { name: /Resume/ });
     await waitFor(() => expect(resume).toBeEnabled());
@@ -74,24 +275,24 @@ describe("DownloadsPanel", () => {
   });
 
   it.each(["ar", "en"] as const)("uses page-specific offline status in %s", async (language) => {
-    render(<DownloadsPanel language={language} onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language={language} onBack={vi.fn()} />);
     const row = screen.getByTestId("offline-resource-mushaf");
     await waitFor(() =>
       expect(row).toHaveTextContent(language === "ar" ? "صفحات متاحة عبر الإنترنت" : "Pages available online"),
     );
     expect(row).not.toHaveTextContent(language === "ar" ? "صوتيات عبر الإنترنت" : "Online audio");
   });
-  it("offers a persistent ZIP export outside management, including adhkar and both recitations", async () => {
+  it("offers a persistent ZIP export inside management, including adhkar and both recitations", async () => {
     Object.defineProperty(navigator, "storage", {
       configurable: true,
       value: { persisted: async () => true, estimate: async () => ({ usage: 0, quota: 1e9 }) },
     });
     const file = new File(["zip"], "wa-zaker-audio.zip");
     audioMocks.archive.mockResolvedValue(file);
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     const button = screen.getByRole("button", { name: "Download all audio as ZIP" });
     await waitFor(() => expect(button).toBeEnabled());
-    expect(button.closest("details")).toBeNull();
+    expect(button.closest("details")).toBe(screen.getByTestId("download-management"));
     fireEvent.click(button);
     await waitFor(() => expect(audioMocks.export).toHaveBeenCalledWith(file));
     expect(audioMocks.archive.mock.calls[0]![0].map((z: { id: string }) => z.id)).toEqual(
@@ -119,15 +320,13 @@ describe("DownloadsPanel", () => {
         options.signal.addEventListener("abort", () => reject(options.signal.reason), { once: true }),
       );
     });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     const button = screen.getByRole("button", { name: "Download all audio as ZIP" });
     await waitFor(() => expect(button).toBeEnabled());
+    button.focus();
     fireEvent.click(button);
     await screen.findByText("Preparing ZIP: 1 of 3 recordings");
-    button.focus();
-    fireEvent.click(
-      within(screen.getByTestId("audio-archive-export")).getByRole("button", { name: "Cancel download" }),
-    );
+    fireEvent.click(screen.getByTestId("download-overview-action"));
     await waitFor(() => expect(screen.getByRole("button", { name: "Download all audio as ZIP" })).toBeEnabled());
     await waitFor(() => expect(button).toHaveFocus());
     expect(audioMocks.export).not.toHaveBeenCalled();
@@ -147,7 +346,7 @@ describe("DownloadsPanel", () => {
         options.signal.addEventListener("abort", () => reject(options.signal.reason), { once: true });
       });
     });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     const row = screen.getByTestId("offline-resource-adhkar");
     const download = within(row).getByRole("button", { name: "Download · Adhkar & duas" });
     await waitFor(() => expect(download).toBeEnabled());
@@ -164,10 +363,12 @@ describe("DownloadsPanel", () => {
         totalBytes: 1000,
       }),
     );
-    await waitFor(() => expect(within(row).getByRole("progressbar")).toHaveAttribute("value", "500"));
-    expect(row).toHaveTextContent("50% downloaded");
-    expect(row).toHaveTextContent("1 of 4 recordings saved on this device");
-    expect(row).toHaveTextContent("Receiving recording 2 of 4");
+    const overview = screen.getByTestId("download-overview");
+    openDetails("download-transfer-details");
+    await waitFor(() => expect(within(overview).getByRole("progressbar")).toHaveAttribute("value", "500"));
+    expect(overview).toHaveTextContent("50% downloaded");
+    expect(overview).toHaveTextContent("1 of 4 recordings saved on this device");
+    expect(overview).toHaveTextContent("Receiving recording 2 of 4");
     act(() =>
       detail({
         phase: "verifying",
@@ -179,7 +380,7 @@ describe("DownloadsPanel", () => {
         totalBytes: 1000,
       }),
     );
-    await waitFor(() => expect(row).toHaveTextContent("Checking recording 2 of 4"));
+    await waitFor(() => expect(overview).toHaveTextContent("Checking recording 2 of 4"));
     expect(row).not.toHaveTextContent("Ready offline");
     await act(async () => finish());
   });
@@ -192,7 +393,7 @@ describe("DownloadsPanel", () => {
         value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
       });
       audioMocks.download.mockRejectedValue(new AudioDownloadError(code, "internal-id"));
-      render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+      renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
       const row = screen.getByTestId("offline-resource-adhkar");
       const button = within(row).getByRole("button", { name: "Download · Adhkar & duas" });
       await waitFor(() => expect(button).toBeEnabled());
@@ -200,9 +401,9 @@ describe("DownloadsPanel", () => {
       await waitFor(() => expect(within(row).getByRole("button", { name: "Try again · Adhkar & duas" })).toBeEnabled());
       expect(row).toHaveTextContent(
         code === "network"
-          ? "3 attempts"
+          ? "Reconnect and try again"
           : code === "server"
-            ? "Audio server unavailable"
+            ? "download server is unavailable"
             : code === "integrity"
               ? "failed verification"
               : "This browser cannot store offline audio",
@@ -221,7 +422,7 @@ describe("DownloadsPanel", () => {
         persist,
       },
     });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     const button = await screen.findByRole("button", { name: "Keep downloads on this device" });
     await waitFor(() => expect(button).toBeEnabled());
     fireEvent.click(button);
@@ -247,17 +448,18 @@ describe("DownloadsPanel", () => {
         options.signal.addEventListener("abort", () => reject(new DOMException("Cancelled", "AbortError"))),
       );
     });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     openManagement("adhkar");
     const download = await screen.findByRole("button", { name: "Download · Morning adhkar" });
     await waitFor(() => expect(download).toBeEnabled());
     fireEvent.click(download);
-    const cancel = await screen.findByRole("button", { name: "Cancel download · Adhkar & duas" });
+    const cancel = screen.getByTestId("download-overview-action");
+    await waitFor(() => expect(cancel).toHaveTextContent("Cancel download"));
     openManagement("adhkar");
     expect(screen.getByTestId("download-category-adhkar").querySelector("details")).not.toHaveAttribute("open");
     fireEvent.click(cancel);
     expect(signal?.aborted).toBe(true);
-    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Download cancelled"));
+    await waitFor(() => expect(screen.getByText(/Download cancelled. Saved audio is kept/)).toBeInTheDocument());
     expect(audioMocks.download).toHaveBeenCalledOnce();
   });
 
@@ -269,7 +471,7 @@ describe("DownloadsPanel", () => {
       totalPages: 604,
       isComplete: true,
     });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     await waitFor(() =>
       expect(within(screen.getByTestId("offline-resource-mushaf")).getByText("Downloaded")).toBeInTheDocument(),
     );
@@ -288,7 +490,7 @@ describe("DownloadsPanel", () => {
       value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
     });
     audioMocks.download.mockResolvedValue({ assetCount: 1, byteSize: 1024 });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     openManagement("recitations");
     openManagement("adhkar");
     const row = await screen.findByTestId(`offline-resource-${id}`);
@@ -320,14 +522,14 @@ describe("DownloadsPanel", () => {
     vi.mocked(getAudioDownloadStatuses).mockResolvedValue(
       Array.from({ length: 8 }, () => ({ completed: 1, total: 4, remainingBytes: 77_256_100 })),
     );
-    const view = render(<DownloadsPanel language="ar" onBack={vi.fn()} />);
+    const view = renderDownloads(<DownloadsPanel language="ar" onBack={vi.fn()} />);
     openManagement("recitations");
     await waitFor(() =>
       expect(within(screen.getByTestId("offline-resource-kahf")).getByText("تم التنزيل جزئيًا")).toBeInTheDocument(),
     );
     expect(screen.getByTestId("offline-resource-kahf").querySelector('bdi[dir="ltr"]')).toHaveTextContent("٧٧.٣ MB");
     view.unmount();
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     openManagement("recitations");
     openManagement("adhkar");
     await waitFor(() =>
@@ -369,7 +571,7 @@ describe("DownloadsPanel", () => {
     vi.mocked(getAudioDownloadStatuses).mockResolvedValue(
       Array.from({ length: 8 }, () => ({ completed: 1, total: 4, remainingBytes: 4096 })),
     );
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     openManagement("recitations");
     openManagement("adhkar");
     const morningDownload = await screen.findByRole("button", { name: /^(Download|Resume) · Morning adhkar$/ });
@@ -391,7 +593,7 @@ describe("DownloadsPanel", () => {
       resolveStorage = resolve;
     });
     vi.mocked(navigator.storage.estimate).mockReturnValueOnce(storage);
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     openManagement("recitations");
     openManagement("adhkar");
     const mushaf = screen.getByRole("button", { name: "Download · Mushaf pages" });
@@ -428,7 +630,7 @@ describe("DownloadsPanel", () => {
       });
     });
 
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     openManagement("recitations");
     openManagement("adhkar");
 
@@ -439,9 +641,14 @@ describe("DownloadsPanel", () => {
     fireEvent.click(downloadMushafBtn);
 
     // Shows progress and cancel button
-    const cancelBtn = await screen.findByRole("button", { name: "Cancel download · Mushaf pages" });
+    const cancelBtn = screen.getByTestId("download-overview-action");
+    await waitFor(() => expect(cancelBtn).toHaveTextContent("Cancel download"));
     expect(cancelBtn).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText(/100 of 604 pages downloaded/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        within(screen.getByTestId("offline-resource-mushaf")).getByText(/100 of 604 pages downloaded/i),
+      ).toBeInTheDocument(),
+    );
 
     // Clicking cancel aborts the signal and displays cancelled status
     fireEvent.click(cancelBtn);
@@ -453,7 +660,7 @@ describe("DownloadsPanel", () => {
 
   it("does not start a Mushaf download when estimated storage is insufficient", async () => {
     const { downloadMushaf } = await import("../../content/mushafOfflineCache");
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     openManagement("recitations");
     openManagement("adhkar");
     const downloadMushafBtn = await screen.findByRole("button", {
@@ -465,9 +672,10 @@ describe("DownloadsPanel", () => {
     expect(downloadMushaf).not.toHaveBeenCalled();
   });
 
-  it("exposes exactly three categories and no overlapping essentials bundle", async () => {
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+  it("leads with one combined action and discloses the three category actions", async () => {
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     await waitFor(() => expect(screen.getByRole("button", { name: "Download · Adhkar & duas" })).toBeEnabled());
+    expect(screen.getByTestId("download-overview-action")).toHaveTextContent("Download all");
     expect(screen.getAllByTestId(/^download-category-/)).toHaveLength(3);
     for (const id of ["adhkar", "recitations", "mushaf"]) {
       expect(
@@ -485,7 +693,7 @@ describe("DownloadsPanel", () => {
       value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
     });
     audioMocks.download.mockResolvedValue({ assetCount: 1, byteSize: 1024 });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     const download = screen.getByRole("button", { name: "Download · Adhkar & duas" });
     await waitFor(() => expect(download).toBeEnabled());
     fireEvent.click(download);
@@ -504,7 +712,7 @@ describe("DownloadsPanel", () => {
       configurable: true,
       value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
     });
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     const download = screen.getByRole("button", { name: "Download · Kahf & Baqarah recitations" });
     await waitFor(() => expect(download).toBeEnabled());
     fireEvent.click(download);
@@ -525,7 +733,7 @@ describe("DownloadsPanel", () => {
     vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>
       groups.map(() => ({ completed: 0, total: 0, remainingBytes: 0 })),
     );
-    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    renderDownloads(<DownloadsPanel language="en" onBack={vi.fn()} />);
     await waitFor(() =>
       expect(within(screen.getByTestId("offline-resource-adhkar")).getByText("Unavailable")).toBeInTheDocument(),
     );

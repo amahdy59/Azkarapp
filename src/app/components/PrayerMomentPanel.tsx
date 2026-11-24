@@ -11,7 +11,7 @@ import { HomeCard } from "./HomeCard";
 import { PrayerActionsCard } from "./PrayerActionsCard";
 import { dateFromProgressDayKey } from "../progress";
 import { formatDisplayDate } from "../formatting";
-import { EvidenceSource } from "./EvidenceSource";
+import { PrayerEvidenceQuote } from "./PrayerSunnahDetails";
 
 export const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
   fajr: Sunrise,
@@ -36,6 +36,7 @@ export function PrayerMomentPanel({
   onOpenAdhkar,
   onGlass = false,
   canRecord = true,
+  onClose,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
@@ -53,6 +54,7 @@ export function PrayerMomentPanel({
   /** Future prayers may be previewed shortly before adhan, but not recorded. */
   canRecord?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
+  onClose?: () => void;
 }) {
   const [evidenceExpanded, setEvidenceExpanded] = useState(false);
   const times = useMemo(() => getEstimatedPrayerTimes(now, locationSettings), [now, locationSettings]);
@@ -61,9 +63,8 @@ export function PrayerMomentPanel({
   const name = prayerDisplayName(prayer, language, dayKey);
   const virtue = isJumuahPrayer(prayer, dayKey) ? JUMUAH_VIRTUE : getPrayerVirtues(prayer)[0];
 
-  const titleText = onGlass ? "text-on-media" : "text-foreground";
   const bodyText = onGlass ? "text-on-media-muted" : "text-muted-foreground";
-  const accentText = onGlass ? "text-on-media-accent" : "text-primary";
+  const titleText = onGlass ? "text-on-media" : "text-foreground";
   const hairline = onGlass ? "border-white/20" : "border-border/60";
 
   // The checklist writes this record day, which can precede the civil date
@@ -77,6 +78,7 @@ export function PrayerMomentPanel({
     <HomeCard as="article" onGlass={onGlass} padding="none" className="prayer-moment-panel min-w-0 overflow-hidden">
       <div data-testid="prayer-journey">
         <PrayerActionsCard
+          onClose={onClose}
           prayer={prayer}
           language={language}
           direction={direction}
@@ -94,15 +96,10 @@ export function PrayerMomentPanel({
               </p>
             ) : undefined
           }
-          infoContext={
-            <div
-              data-testid="prayer-moment-status"
-              className={`flex min-w-0 flex-col gap-1 text-label leading-normal ${bodyText}`}
-            >
-              <time dateTime={dayKey} data-testid="prayer-record-date" dir="auto">
-                {t(language, "prayerMoment.recordDate", { date: dateLabel })}
-              </time>
-            </div>
+          status={
+            <time dateTime={dayKey} data-testid="prayer-record-date" dir="auto">
+              {t(language, "prayerMoment.recordDate", { date: dateLabel })}
+            </time>
           }
         >
           {virtue && (
@@ -114,7 +111,7 @@ export function PrayerMomentPanel({
             >
               <h3
                 id={`prayer-virtue-heading-${prayer}`}
-                className={`text-title font-semibold leading-normal ${accentText}`}
+                className={`text-base font-semibold leading-normal ${titleText}`}
                 dir="auto"
               >
                 <span className="prayer-evidence-desktop-title leading-normal">
@@ -127,7 +124,9 @@ export function PrayerMomentPanel({
                   aria-controls={`prayer-evidence-body-${prayer}`}
                   onClick={() => setEvidenceExpanded((expanded) => !expanded)}
                 >
-                  <span>{t(language, "prayerMoment.virtueTitle", { prayer: name })}</span>
+                  <span className="min-w-0 break-words">
+                    {t(language, "prayerMoment.virtueTitle", { prayer: name })}
+                  </span>
                   <ChevronDown
                     size={18}
                     aria-hidden="true"
@@ -143,30 +142,11 @@ export function PrayerMomentPanel({
                 >
                   {t(language, "prayerMoment.virtueAttribution")}
                 </p>
-                <p
-                  className={`mt-1 text-base font-semibold leading-loose ${titleText}`}
-                  dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
-                  lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
-                >
-                  {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}{" "}
-                  <span
-                    className={`inline text-xs font-medium ${bodyText}`}
-                    dir="auto"
-                    data-testid="prayer-virtue-source"
-                  >
-                    {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
-                  </span>
-                </p>
-                <EvidenceSource
+                <PrayerEvidenceQuote
+                  source={virtue}
                   language={language}
-                  className={accentText}
-                  details={{
-                    title: t(language, "prayerMoment.virtueTitle", { prayer: name }),
-                    quotation: isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic),
-                    reference: isArabic ? virtue.referenceArabic : virtue.referenceEnglish,
-                    textLanguage: isArabic || !virtue.textEnglish ? "ar" : "en",
-                    sourceUrl: virtue.sourceUrl,
-                  }}
+                  onGlass={onGlass}
+                  sourceTestId="prayer-virtue-source"
                 />
               </div>
             </section>

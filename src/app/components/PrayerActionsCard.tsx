@@ -1,10 +1,12 @@
 import "./prayer-actions-card.css";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BookOpen, ChevronDown, Info, PrayerRug } from "./icons";
 import { TrackingCheckMark } from "./PrayerTrackerCards";
 import { Modal, SheetHeader } from "./ResponsiveSheet";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { PrayerRawatibDetails, PrayerSunnahDetails } from "./PrayerSunnahDetails";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 
 import { getPrayerActions, getPrayerInfoData } from "../content/prayerActions";
@@ -25,11 +27,10 @@ export interface PrayerActionsCardProps {
   status?: ReactNode;
   /** Short prayer context aligned directly beneath its title. */
   subtitle?: ReactNode;
-  /** Secondary record context belongs in the information sheet. */
-  infoContext?: ReactNode;
   showProgress?: boolean;
   headingLevel?: 2 | 3;
   children?: ReactNode;
+  onClose?: () => void;
 }
 
 /**
@@ -55,13 +56,19 @@ export function PrayerActionsCard({
   className = "",
   status,
   subtitle,
-  infoContext,
   showProgress = false,
   headingLevel = 3,
   children,
+  onClose,
 }: PrayerActionsCardProps) {
   const [infoOpen, setInfoOpen] = useState(false);
+  const desktop = useMediaQuery("(min-width: 1200px)");
+  const cardRef = useRef<HTMLElement>(null);
   const isArabic = language === "ar";
+
+  useEffect(() => {
+    if (desktop) setInfoOpen(false);
+  }, [desktop]);
 
   const record = useMemo(
     () => records.find((r) => (!dayKey || r.dayKey === dayKey) && r.prayer === prayer),
@@ -80,145 +87,168 @@ export function PrayerActionsCard({
 
   return (
     <section
+      ref={cardRef}
       data-testid="prayer-actions-card"
       data-prayer={prayer}
+      data-inline-information={desktop || undefined}
+      data-has-close={Boolean(onClose) || undefined}
       aria-labelledby={`prayer-actions-heading-${prayer}`}
       dir={direction}
       className={`prayer-actions-card flex min-w-0 flex-col gap-2 p-4 sm:p-5 ${className}`}
     >
-      {/* One heading and a quiet information action. */}
-      <div className="prayer-actions-header flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <Heading
-            id={`prayer-actions-heading-${prayer}`}
-            className={`text-title font-bold leading-normal ${titleColor}`}
-            dir="auto"
-          >
-            {t(language, "prayerActions.heading", { prayer: infoData.prayerName })}
-          </Heading>
-          {subtitle && (
-            <div
-              className={`mt-1 text-label leading-normal ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+      <div className="prayer-actions-main min-w-0">
+        {/* One heading and a quiet information action on compact screens. */}
+        <div className="prayer-actions-header flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <Heading
+              id={`prayer-actions-heading-${prayer}`}
+              className={`${desktop ? "text-lg" : "text-title"} font-bold leading-normal ${titleColor}`}
+              dir="auto"
             >
-              {subtitle}
-            </div>
-          )}
-        </div>
-
-        <button
-          type="button"
-          onClick={(event) => {
-            // Safari pointer activation does not focus buttons by default.
-            // The sheet must capture this trigger, not the previous checkbox.
-            event.currentTarget.focus();
-            setInfoOpen(true);
-          }}
-          data-testid="prayer-actions-more-info"
-          aria-haspopup="dialog"
-          aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
-          className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            onGlass ? "text-on-media hover:bg-white/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-          }`}
-        >
-          <span aria-hidden="true" className="flex size-6 items-center justify-center rounded-full border-2">
-            <Info size={14} />
-          </span>
-        </button>
-      </div>
-      {(status || showProgress) && (
-        <div
-          className={`prayer-actions-context flex flex-wrap items-start justify-between gap-x-3 gap-y-1 text-label ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
-        >
-          {status}
-          {showProgress && (
-            <output
-              aria-live="polite"
-              aria-atomic="true"
-              className="leading-relaxed"
-              data-testid="prayer-actions-progress"
-            >
-              {t(language, "prayerActions.completedCount", {
-                count: formatNumerals(actions.filter((action) => action.checked).length, language),
-                total: formatNumerals(actions.length, language),
-              })}
-            </output>
-          )}
-        </div>
-      )}
-
-      {/* Plain rows grow naturally with wrapped labels, retaining 44px targets. */}
-      <ol className="prayer-actions-list flex min-w-0 flex-col">
-        {actions.map((action) => {
-          const inputId = `prayer-action-${prayer}-${action.id}`;
-          const labelId = `prayer-action-label-${prayer}-${action.id}`;
-
-          return (
-            <li
-              key={action.id}
-              data-testid={action.testId}
-              className="group/item flex min-h-11 min-w-0 flex-wrap items-center gap-2"
-            >
-              <label
-                className={`relative flex min-h-11 ${action.id === "adhkar" ? "min-w-[min(100%,10rem)] flex-initial" : "min-w-0 flex-1"} cursor-pointer items-center gap-3 rounded-xl px-3 py-1 transition-colors duration-fast ${
-                  onGlass
-                    ? "text-on-media hover:bg-white/10 active:bg-white/15"
-                    : "text-foreground hover:bg-muted/50 active:bg-muted/70"
-                }`}
+              {t(language, "prayerActions.heading", { prayer: infoData.prayerName })}
+            </Heading>
+            {subtitle && (
+              <div
+                className={`mt-1 text-label leading-normal ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
               >
-                {/* Overlay transparent checkbox spanning full row for accessibility & 44px+ hit target */}
-                <input
-                  id={inputId}
-                  type="checkbox"
-                  disabled={!canRecord}
-                  checked={action.checked}
-                  onChange={(event) => {
-                    if (!canRecord) return;
-                    const next = event.currentTarget.checked;
-                    if (action.id === "congregation") {
-                      onToggle(prayer, "location", next ? "mosque" : null);
-                    } else {
-                      onToggle(prayer, action.field, next);
-                    }
-                  }}
-                  aria-labelledby={labelId}
-                  className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
-                />
+                {subtitle}
+              </div>
+            )}
+          </div>
 
-                <TrackingCheckMark checked={action.checked} onGlass={onGlass} compact />
-                <div className="min-w-0 flex-1">
-                  <span
-                    id={labelId}
-                    className={`block break-words text-base font-semibold leading-normal ${onGlass ? "text-on-media" : titleColor}`}
-                    dir="auto"
-                  >
-                    {action.label}
-                  </span>
-                </div>
-              </label>
-              {action.id === "adhkar" && (
-                <button
-                  type="button"
-                  onClick={() => onOpenAdhkar(prayer)}
-                  data-testid="prayer-open-adhkar"
-                  aria-label={t(language, "prayerActions.readAdhkarAria")}
-                  className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-transparent px-1.5 py-1 text-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+          {onClose && (
+            <button type="button" className="home-prayer-detail-close" onClick={onClose}>
+              <ChevronDown size={16} aria-hidden="true" />
+              {t(language, "home.collapsePrayer")}
+            </button>
+          )}
+          {!desktop && (
+            <button
+              type="button"
+              onClick={(event) => {
+                // Safari pointer activation does not focus buttons by default.
+                // The sheet must capture this trigger, not the previous checkbox.
+                event.currentTarget.focus();
+                setInfoOpen(true);
+              }}
+              data-testid="prayer-actions-more-info"
+              aria-haspopup="dialog"
+              aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
+              className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                onGlass
+                  ? "text-on-media hover:bg-white/10"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <span aria-hidden="true" className="flex size-6 items-center justify-center rounded-full border-2">
+                <Info size={14} />
+              </span>
+            </button>
+          )}
+        </div>
+
+        {/* Plain rows grow naturally with wrapped labels, retaining 44px targets. */}
+        <ol className="prayer-actions-list flex min-w-0 flex-col">
+          {actions.map((action) => {
+            const inputId = `prayer-action-${prayer}-${action.id}`;
+            const labelId = `prayer-action-label-${prayer}-${action.id}`;
+
+            return (
+              <li
+                key={action.id}
+                data-testid={action.testId}
+                className="group/item flex min-h-11 min-w-0 flex-wrap items-center gap-2"
+              >
+                <label
+                  className={`relative flex min-h-11 ${action.id === "adhkar" ? "min-w-[min(100%,10rem)] flex-initial" : "min-w-0 flex-1"} cursor-pointer items-center gap-3 rounded-xl px-3 py-1 transition-colors duration-fast ${
+                    onGlass
+                      ? "text-on-media hover:bg-white/10 active:bg-white/15"
+                      : "text-foreground hover:bg-muted/50 active:bg-muted/70"
+                  }`}
                 >
-                  <BookOpen size={18} className="shrink-0" aria-hidden="true" />
-                  <span>{t(language, "prayerActions.readAdhkar")}</span>
-                </button>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+                  {/* Overlay transparent checkbox spanning full row for accessibility & 44px+ hit target */}
+                  <input
+                    id={inputId}
+                    type="checkbox"
+                    disabled={!canRecord}
+                    checked={action.checked}
+                    onChange={(event) => {
+                      if (!canRecord) return;
+                      const next = event.currentTarget.checked;
+                      if (action.id === "congregation") {
+                        onToggle(prayer, "location", next ? "mosque" : null);
+                      } else {
+                        onToggle(prayer, action.field, next);
+                      }
+                    }}
+                    aria-labelledby={labelId}
+                    className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
+                  />
 
-      {children}
+                  <TrackingCheckMark checked={action.checked} onGlass={onGlass} compact />
+                  <div className="min-w-0 flex-1">
+                    <span
+                      id={labelId}
+                      className={`block break-words text-base font-semibold leading-normal ${onGlass ? "text-on-media" : titleColor}`}
+                      dir="auto"
+                    >
+                      {action.label}
+                    </span>
+                  </div>
+                </label>
+                {action.id === "adhkar" && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenAdhkar(prayer)}
+                    data-testid="prayer-open-adhkar"
+                    aria-label={t(language, "prayerActions.readAdhkarAria")}
+                    className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-transparent px-1.5 py-1 text-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+                  >
+                    <BookOpen size={18} className="shrink-0" aria-hidden="true" />
+                    <span>{t(language, "prayerActions.readAdhkar")}</span>
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+        {(status || showProgress) && (
+          <div
+            className={`prayer-actions-context flex flex-wrap items-start justify-between gap-x-3 gap-y-1 text-label ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+          >
+            {status}
+            {showProgress && (
+              <output
+                aria-live="polite"
+                aria-atomic="true"
+                className="leading-relaxed"
+                data-testid="prayer-actions-progress"
+              >
+                {t(language, "prayerActions.completedCount", {
+                  count: formatNumerals(actions.filter((action) => action.checked).length, language),
+                  total: formatNumerals(actions.length, language),
+                })}
+              </output>
+            )}
+          </div>
+        )}
+        {desktop && <PrayerRawatibDetails info={infoData} language={language} onGlass={onGlass} />}
+      </div>
+      <div className="prayer-actions-reading min-w-0">
+        {children}
+        {desktop && <PrayerSunnahDetails info={infoData} language={language} onGlass={onGlass} />}
+      </div>
 
       {/* Educational More Info Modal */}
-      {infoOpen && (
+      {infoOpen && !desktop && (
         <Modal
           open
           onClose={() => setInfoOpen(false)}
+          onCloseAutoFocus={(event) => {
+            if (!cardRef.current?.hasAttribute("data-inline-information")) return;
+            event.preventDefault();
+            cardRef.current.querySelector<HTMLButtonElement>('[data-testid="prayer-open-adhkar"]')?.focus();
+          }}
           title={infoData.modalTitle}
           direction={direction}
           language={language}
@@ -237,7 +267,6 @@ export function PrayerActionsCard({
             />
 
             <div dir={direction} className="flex flex-col overflow-y-auto px-5 py-4 sm:px-6 min-h-0 flex-1">
-              {infoContext && <div className="mb-3 text-label text-muted-foreground">{infoContext}</div>}
               {infoData.sunnahItems.length === 0 ? (
                 <p className="py-8 text-center text-sm font-medium text-muted-foreground" dir="auto">
                   {t(language, "prayerMoment.statusNow")}

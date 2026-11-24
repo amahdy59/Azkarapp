@@ -1,0 +1,57 @@
+.prayer-location-panel {
+  overflow-wrap: anywhere;
+}
+
+.prayer-method-trigger {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.prayer-method-trigger [data-slot="select-value"] {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  white-space: normal;
+}
+
+/* Keep text-bearing picker surfaces opaque throughout their entrance. The
+   shared modal/drawer still owns positioning, focus, bounds and sheet motion. */
+.prayer-settings-surface {
+  overflow-wrap: anywhere;
+  background: var(--popover) !important;
+  color: var(--popover-foreground);
+  animation: none !important;
+  max-height: 88dvh;
+}
+
+.prayer-method-popup[data-state] {
+  opacity: 1;
+  animation: none;
+  max-width: calc(100vw - 1rem);
+}
+
+.prayer-method-popup [role="option"] {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .prayer-settings-surface {
+      background: rgb(15 23 42) !important;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .prayer-settings-surface {
+    background: Canvas !important;
+    color: CanvasText;
+  }
+}
+
+.prayer-settings-heading,
+.prayer-settings-search {
+  padding-inline: min(1.25rem, 20px);
+  column-gap: 12px;
+}

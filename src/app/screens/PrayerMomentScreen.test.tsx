@@ -64,8 +64,7 @@ describe("the prayer as one surface", () => {
         onOpenAdhkar={vi.fn()}
       />,
     );
-    expect(screen.queryByTestId("prayer-record-date")).toBeNull();
-    fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
+    expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByTestId("prayer-record-date")).toHaveAttribute("datetime", "2026-09-04");
     expect(screen.getByTestId("prayer-record-date")).toHaveTextContent("Record for Friday, September 4, 2026 AD");
     expect(screen.queryByText("Not yet due")).toBeNull();
@@ -89,7 +88,6 @@ describe("the prayer as one surface", () => {
         onSelectPrayer: vi.fn(),
       };
       const { rerender } = render(<PrayerMomentScreen {...props} calendarType="hijri" hijriDateOffset={1} />);
-      fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
       const date = screen.getByTestId("prayer-record-date");
       expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "hijri", 1));
       rerender(<PrayerMomentScreen {...props} calendarType="hijri" hijriDateOffset={-1} />);
@@ -97,7 +95,6 @@ describe("the prayer as one surface", () => {
       rerender(<PrayerMomentScreen {...props} calendarType="gregorian" hijriDateOffset={1} />);
       expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "gregorian"));
       expect(date).toHaveAttribute("datetime", DAY);
-      fireEvent.click(screen.getByTestId("prayer-actions-info-close"));
       fireEvent.click(screen.getByTestId("prayer-action-location").querySelector("input")!);
       expect(props.onToggle).toHaveBeenCalledWith("isha", "location", "mosque");
     },
@@ -145,16 +142,19 @@ describe("the prayer as one surface", () => {
     expect(screen.getByTestId("prayer-moment-virtue")).toBeInTheDocument();
   });
 
-  it("keeps the source inline with the complete narration and the record date in information", () => {
+  it("keeps the complete narration, passive source and recording date in the card", () => {
     renderScreen({ prayer: "fajr" });
     const source = screen.getByTestId("prayer-virtue-source");
     expect(source.tagName).toBe("SPAN");
-    expect(source.parentElement).toHaveAttribute("lang", "ar");
-    expect(source.parentElement).toHaveTextContent("«مَنْ صَلَّى الصُّبْحَ فِي جَمَاعَةٍ فَهُوَ فِي ذِمَّةِ اللَّهِ»");
+    const quotation = source.closest("blockquote")!;
+    expect(quotation.querySelector("p")).toHaveAttribute("lang", "ar");
+    expect(quotation).toHaveTextContent("«مَنْ صَلَّى الصُّبْحَ فِي جَمَاعَةٍ فَهُوَ فِي ذِمَّةِ اللَّهِ»");
+    expect(source.parentElement?.tagName).toBe("FOOTER");
     expect(source).toHaveTextContent("صحيح مسلم ٦٥٧");
-    expect(screen.queryByTestId("prayer-record-date")).toBeNull();
+    expect(screen.getByTestId("prayer-actions-card")).toContainElement(screen.getByTestId("prayer-record-date"));
+    expect(source.closest("a, button, summary")).toBeNull();
     fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
-    expect(screen.getByRole("dialog")).toContainElement(screen.getByTestId("prayer-record-date"));
+    expect(screen.getByRole("dialog")).not.toContainElement(screen.getByTestId("prayer-record-date"));
   });
 
   it("asks whether the prayer was in congregation, not where it was prayed", () => {

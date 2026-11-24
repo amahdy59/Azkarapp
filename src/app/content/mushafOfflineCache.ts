@@ -145,10 +145,10 @@ async function downloadResource(
   );
   try {
     const response = await fetchNativeBinaryResource(url, signal);
-    if (!response.ok) throw new Error(`${label} failed: ${response.status}`);
+    if (!response.ok) throw new DOMException(`${label} failed: ${response.status}`, "OperationError");
     const bytes = await read(response);
     signal.throwIfAborted();
-    if (!bytes) throw new Error(`${label} was invalid`);
+    if (!bytes) throw new DOMException(`${label} was invalid`, "DataError");
     await cache.put(url, response);
     return bytes.byteLength;
   } finally {

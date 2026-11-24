@@ -302,10 +302,20 @@ export function getPrayerTimes(date: Date = new Date(), location?: LocationSetti
 }
 
 export type CoordinateDetectionResult =
-  | { ok: true; latitude: number; longitude: number; timeZone?: string }
+  | {
+      ok: true;
+      latitude: number;
+      longitude: number;
+      timeZone?: string;
+      accuracy?: number;
+      timestamp?: number;
+      altitude?: number;
+    }
   | { ok: false; reason: "unsupported" | "denied" | "unavailable" | "timeout" | "unknown" };
 
-export async function detectUserCoordinates(): Promise<CoordinateDetectionResult> {
+export async function detectUserCoordinates(
+  options: Pick<PositionOptions, "maximumAge"> = {},
+): Promise<CoordinateDetectionResult> {
   if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
     return { ok: false, reason: "unsupported" };
   }
@@ -313,6 +323,15 @@ export async function detectUserCoordinates(): Promise<CoordinateDetectionResult
   return new Promise((resolve) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        if (
+          !Number.isFinite(position.coords.latitude) ||
+          Math.abs(position.coords.latitude) > 90 ||
+          !Number.isFinite(position.coords.longitude) ||
+          Math.abs(position.coords.longitude) > 180
+        ) {
+          resolve({ ok: false, reason: "unavailable" });
+          return;
+        }
         let timeZone: string | undefined;
         try {
           timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -324,6 +343,15 @@ export async function detectUserCoordinates(): Promise<CoordinateDetectionResult
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           timeZone,
+          accuracy:
+            Number.isFinite(position.coords.accuracy) && position.coords.accuracy >= 0
+              ? position.coords.accuracy
+              : undefined,
+          timestamp: Number.isFinite(position.timestamp) && position.timestamp > 0 ? position.timestamp : undefined,
+          altitude:
+            typeof position.coords.altitude === "number" && Number.isFinite(position.coords.altitude)
+              ? position.coords.altitude
+              : undefined,
         });
       },
       (error) => {
@@ -331,7 +359,7 @@ export async function detectUserCoordinates(): Promise<CoordinateDetectionResult
           error.code === 1 ? "denied" : error.code === 2 ? "unavailable" : error.code === 3 ? "timeout" : "unknown";
         resolve({ ok: false, reason });
       },
-      { timeout: 8000, enableHighAccuracy: true, maximumAge: 300_000 },
+      { timeout: 8000, enableHighAccuracy: true, maximumAge: options.maximumAge ?? 300_000 },
     );
   });
 }

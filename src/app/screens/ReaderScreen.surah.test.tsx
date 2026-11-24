@@ -101,20 +101,62 @@ describe("the three surah readings", () => {
     ["friday-kahf", "al-kahf"],
     ["s-hm-110a", "as-sajdah"],
     ["s-hm-110b", "al-mulk"],
-  ])("uses responsive artwork and recovers offline for %s", (id, artwork) => {
+  ])("starts with the bundled artwork and recovers from a missing cover for %s", (id, artwork) => {
     if (id === "friday-kahf") renderKahf();
     else renderReader("before_sleep", indexOf("before_sleep", id));
     leaveMushaf();
     const image = screen.getByTestId("surah-reading-actions").querySelector("img")!;
-    expect(image.getAttribute("srcset")).toContain(`/${artwork}-768.webp 768w`);
-    expect(image.getAttribute("srcset")).toContain(`/${artwork}-416.webp 416w`);
+    expect(image).not.toHaveAttribute("srcset");
+    expect(image.getAttribute("src")).toMatch(new RegExp(`/${artwork}-416\\.webp$`));
     expect(image).toHaveAttribute("fetchpriority", "high");
     expect(image).toHaveAttribute("alt", "");
     fireEvent.error(image);
-    expect(image).not.toHaveAttribute("srcset");
-    expect(image.getAttribute("src")).toMatch(new RegExp(`/${artwork}-416\\.webp$`));
-    fireEvent.error(image);
     expect(image.getAttribute("src")).toMatch(/\/assets\/cards\/wird-quran-720\.webp$/);
+  });
+
+  it("keeps single-surah entry focused on reading, with Share in the header", () => {
+    renderKahf();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("reader-session-chrome")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("reader-settings-button")).not.toBeInTheDocument();
+    expect(within(screen.getByTestId("reader-actions")).getByTestId("reader-surah-share-button")).toHaveAccessibleName(
+      "Share this zikr",
+    );
+    expect(within(screen.getByTestId("surah-reading-actions")).queryByTestId("reader-surah-share-button")).toBeNull();
+    expect(screen.queryByTestId("reader-surah-status")).not.toBeInTheDocument();
+  });
+
+  it("shows recorded completion without inventing verse progress", () => {
+    renderKahf({ isDone: true, collectionCompletedCount: 1 });
+    expect(screen.getByTestId("reader-surah-status")).toHaveTextContent("Completed");
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
+  it("keeps genuine collection progress when the surah belongs to a larger collection", () => {
+    renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-session-chrome")).toBeInTheDocument();
+  });
+
+  it("mounts the desktop surah navigator only when opened and preserves its controls", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query.includes("min-width: 768px") || query.includes("min-width: 1200px"),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    renderKahf({ onSelectZikr: vi.fn() });
+    expect(screen.queryByTestId("reader-collection-navigator")).not.toBeInTheDocument();
+    const toggle = screen.getByTestId("reader-sidebar-toggle");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle);
+    expect(screen.getByTestId("reader-collection-navigator")).toBeVisible();
+    fireEvent.click(screen.getByTestId("reader-sidebar-close"));
+    expect(screen.queryByTestId("reader-collection-navigator")).not.toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByTestId("reader-surah-share-button")).toBeVisible();
   });
 
   it.each(["s-hm-110a", "s-hm-110b"])("keeps benefits out of the reading choices for %s", (id) => {

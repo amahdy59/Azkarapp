@@ -1,3 +1,4 @@
+import { assertPrayerOverview } from "./helpers/home-overview";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { getEstimatedPrayerTimes } from "../src/app/content/prayerTimes";
@@ -51,12 +52,13 @@ for (const language of ["ar", "en"] as const) {
     }
     await tile.scrollIntoViewIfNeeded();
     await page.screenshot({ path: testInfo.outputPath(`friday-${language}.png`), scale: "css" });
-    await panel.getByTestId("prayer-actions-more-info").click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toContainText(language === "ar" ? "٨٨١" : "881a");
-    await expect(dialog).toContainText(language === "ar" ? "٨٨٢" : "882a");
+    const desktop = language === "en";
+    if (!desktop) await panel.getByTestId("prayer-actions-more-info").click();
+    const guidance = desktop ? panel.getByTestId("prayer-inline-info") : page.getByRole("dialog");
+    await expect(guidance).toContainText(language === "ar" ? "٨٨١" : "881a");
+    await expect(guidance).toContainText(language === "ar" ? "٨٨٢" : "882a");
     await page.screenshot({ path: testInfo.outputPath(`friday-info-${language}.png`), scale: "css" });
-    await page.keyboard.press("Escape");
+    if (!desktop) await page.keyboard.press("Escape");
     await page.reload();
     await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
     for (const check of await panel.getByRole("checkbox").all()) await expect(check).toBeChecked();
@@ -123,7 +125,7 @@ async function checkGeometry(page: Page) {
     rootSize: parseFloat(getComputedStyle(document.documentElement).fontSize),
     labelIcons: list.querySelectorAll("li > div svg").length,
   }));
-  expect(["normal", "0px"]).toContain(checklist.gap);
+  expect(checklist.gap).toBe(`${checklist.rootSize * 0.25}px`);
   expect(checklist.labelIcons).toBe(0);
   for (const width of checklist.circles) expect(width).toBeCloseTo(checklist.rootSize * 1.25, 2);
   const bounds = (await panel.boundingBox())!;
@@ -240,7 +242,9 @@ for (const language of ["ar", "en"] as const) {
               const gaps = cards.slice(1).map((card, index) => {
                 const previous = cards[index].getBoundingClientRect();
                 const current = card.getBoundingClientRect();
-                return Math.max(current.left - previous.right, previous.left - current.right);
+                return Math.abs(current.top - previous.top) < 1
+                  ? Math.max(current.left - previous.right, previous.left - current.right)
+                  : null;
               });
               const viewport = row.getBoundingClientRect();
               const selected = row.querySelector<HTMLElement>('[data-selected="true"]')!.getBoundingClientRect();
@@ -250,13 +254,16 @@ for (const language of ["ar", "en"] as const) {
               });
               return {
                 gaps,
+                expectedGap: parseFloat(getComputedStyle(row).columnGap),
                 selectedVisible: selected.left >= viewport.left - 1 && selected.right <= viewport.right + 1,
                 visibleCount: visible.length,
               };
             });
-            expect(cardGaps.gaps.every((gap) => Math.abs(gap - 8) <= 1)).toBe(true);
+            expect(
+              cardGaps.gaps.filter((gap) => gap !== null).every((gap) => Math.abs(gap - cardGaps.expectedGap) <= 1),
+            ).toBe(true);
             expect(cardGaps.selectedVisible).toBe(true);
-            if (width === 390) expect(cardGaps.visibleCount).toBeGreaterThanOrEqual(2);
+            expect(cardGaps.visibleCount).toBe(5);
             await expect(page.getByTestId(`prayer-card-${prayer}`)).toHaveAttribute("data-selected", "true");
             await page.screenshot({
               path: testInfo.outputPath(`${language}-${width}-${prayer}-fixed-panel.png`),
@@ -335,38 +342,13 @@ for (const language of ["ar", "en"] as const) {
             "data-prayer-cards-condensed",
             "true",
           );
-          const edges = await tile.evaluate((node) => ({
-            small: getComputedStyle(node, "::after").backgroundColor,
-            detail: getComputedStyle(document.querySelector('[data-testid="home-prayer-moment"]')!, "::before")
-              .backgroundImage,
-          }));
-          expect(edges.detail).toContain(edges.small);
           await expect(tile).toHaveAttribute("data-selected", "true");
-          await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
-          const tiles = await page.locator('[data-density="summary"]').evaluateAll((tiles) =>
-            tiles.map((tile) => {
-              const button = tile.querySelector("button")!;
-              return {
-                width: button.getBoundingClientRect().width,
-                height: button.getBoundingClientRect().height,
-                gap: parseFloat(getComputedStyle(button).rowGap),
-                statusGap:
-                  tile.querySelector("[data-prayer-footer]")!.getBoundingClientRect().top -
-                  tile.querySelector("p")!.getBoundingClientRect().bottom,
-                identity: tile.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect().right,
-                timing: tile.querySelector("[data-prayer-timing] p")!.getBoundingClientRect().right,
-                overflow: [...tile.querySelectorAll("h3, p, [data-prayer-detail]")].some(
-                  (el) => el.scrollWidth > el.clientWidth + 1,
-                ),
-              };
-            }),
-          );
-          expect(tiles.every((tile) => tile.width >= 44 && tile.height >= 44 && !tile.overflow)).toBe(true);
-          expect(tiles.every((tile) => tile.gap === 4)).toBe(true);
+          await expect(tile).toHaveCSS("outline-width", "1px");
           expect(
-            tiles.every((tile) => tile.statusGap >= 8 && Math.abs(tile.identity - tile.timing) <= 1),
-            JSON.stringify(tiles),
-          ).toBe(true);
+            await page.getByTestId("home-prayer-moment").evaluate((node) => getComputedStyle(node, "::before").display),
+          ).toBe("none");
+          await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
+          await assertPrayerOverview(page);
           const timeStyles = await page.locator('[id^="prayer-summary-time-"]').evaluateAll((times) =>
             times.map((time) => ({
               size: getComputedStyle(time).fontSize,
@@ -375,7 +357,7 @@ for (const language of ["ar", "en"] as const) {
           );
           expect(
             timeStyles.every(
-              (time) => parseFloat(time.size) >= 16 && parseFloat(time.size) <= 28 && Number(time.weight) >= 800,
+              (time) => parseFloat(time.size) === (width >= 1200 ? 36 : 14) && Number(time.weight) >= 600,
             ),
           ).toBe(true);
           if ((width === 390 && prayer === "fajr") || (width === 1440 && prayer === "dhuhr")) {
@@ -431,7 +413,8 @@ for (const language of ["ar", "en"] as const) {
     const tileRows = await page
       .locator('[data-density="summary"]')
       .evaluateAll((tiles) => new Set(tiles.map((el) => el.getBoundingClientRect().y)).size);
-    expect(tileRows).toBe(1);
+    expect([3, 5]).toContain(tileRows);
+    await assertPrayerOverview(page);
     const row = page.getByTestId("home-all-prayers-row");
     await row.locator("article").last().scrollIntoViewIfNeeded();
     await expect(row.locator("article").last()).toBeInViewport();
@@ -440,9 +423,8 @@ for (const language of ["ar", "en"] as const) {
     await page.keyboard.press("Space");
     await expect(input).toBeChecked();
     await expect(page.getByTestId("prayer-actions-progress")).toHaveCount(0);
-    await expect(page.getByTestId("prayer-card-dhuhr").getByRole("button")).toHaveAccessibleDescription(
-      language === "ar" ? /في المسجد/ : /At the mosque/,
-    );
+    await expect(page.getByTestId("prayer-card-dhuhr").getByRole("button")).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByTestId("prayer-card-dhuhr")).toHaveAttribute("data-prayer-state", "current");
     await page.keyboard.press("Space");
     await expect(input).not.toBeChecked();
     await page.getByTestId("prayer-actions-more-info").click();

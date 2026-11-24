@@ -73,6 +73,7 @@ import { ToggleTrack } from "../components/SettingsRow";
 import { ReadingTextTransition } from "../components/ReadingTextTransition";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
+import { Button } from "../components/ui/button";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
@@ -321,6 +322,7 @@ export function ReaderScreen({
   const surahCardArt = surahNumber ? SURAH_CARD_ART[surahNumber] : undefined;
   const surahMeta = surahNumber ? getSurahMeta(surahNumber) : undefined;
   const readerHeaderTitle = longSurah && azkar.length === 1 ? t(language, "common.azkar") : displayCategoryName;
+  const showCollectionProgress = !longSurah || azkar.length > 1;
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const isShortSurah = Boolean(z?.isSurah) && !longSurah;
   const [localMeaningOnly, setLocalMeaningOnly] = useState(false);
@@ -769,6 +771,21 @@ export function ReaderScreen({
   const localizedReadingPercent = formatNumerals(readingPercent, language);
 
   const handleShare = () => setShareOpen(true);
+  const renderSurahShare = () => (
+    <button
+      type="button"
+      onClick={(event) => {
+        event.currentTarget.focus({ preventScroll: true });
+        handleShare();
+      }}
+      aria-haspopup="dialog"
+      aria-label={t(language, "reader.shareCurrent")}
+      data-testid="reader-surah-share-button"
+      className={READER_HEADER_ACTION_CLASS}
+    >
+      <ShareExport size={20} aria-hidden="true" />
+    </button>
+  );
 
   let displayArabicText = z.arabicText;
   if (z.hasBasmalah || z.isSurah) {
@@ -824,22 +841,9 @@ export function ReaderScreen({
       {longSurah ? (
         <div className="reader-surah-layout" data-testid="surah-reading-actions">
           <div className="reader-surah-heading">
-            <h2 className="reader-surah-title" dir="auto" lang={language} data-testid="reader-zikr-title">
+            <h2 className="reader-surah-title text-display" dir="auto" lang={language} data-testid="reader-zikr-title">
               {readerZikrTitle}
             </h2>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.currentTarget.focus({ preventScroll: true });
-                handleShare();
-              }}
-              aria-haspopup="dialog"
-              aria-label={t(language, "reader.shareCurrent")}
-              data-testid="reader-surah-share-button"
-              className={`flex size-11 items-center justify-center rounded-xl border border-border bg-card/80 text-foreground hover:bg-muted ${ACTION_FOCUS}`}
-            >
-              <ShareExport size={20} aria-hidden="true" />
-            </button>
             {surahMeta && (
               <p className="reader-surah-meta text-sm font-semibold text-muted-foreground">
                 <span>{t(language, `mushaf.${surahMeta.revelationType}`)}</span>
@@ -851,39 +855,52 @@ export function ReaderScreen({
                 </span>
               </p>
             )}
+            {isDone && (
+              <p
+                className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
+                data-testid="reader-surah-status"
+              >
+                <Check size={16} aria-hidden="true" />
+                {t(language, "reader.completed")}
+              </p>
+            )}
           </div>
           <SurahArtwork key={surahCardArt?.name} name={surahCardArt?.name} focus={surahCardArt?.focus} />
           <div className="reader-surah-controls" data-testid="reader-surah-controls">
-            <button
+            <Button
               type="button"
+              size="lg"
               onClick={() => setImmersiveOpen(true)}
               data-testid="reader-mushaf-button"
-              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-primary px-4 py-2.5 text-subtitle font-bold text-primary-foreground transition-colors hover:bg-primary/90 ${ACTION_FOCUS}`}
+              className="reader-surah-primary w-full rounded-2xl text-base"
             >
               <BookOpen size={20} className="shrink-0" aria-hidden="true" />
               {t(language, "reader.readFromMushaf")}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              size="lg"
+              variant="outline"
               onClick={surahAudio?.onToggle ?? onPlayAudio}
               disabled={!audioAvailable}
               aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
-              className={`flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl border border-border-control bg-card px-4 py-2.5 text-subtitle font-bold text-foreground transition-colors hover:bg-muted disabled:opacity-50 ${ACTION_FOCUS}`}
+              className="reader-surah-listen w-full rounded-2xl text-base"
             >
               <Volume2 size={20} className="shrink-0" aria-hidden="true" />
               {t(language, "reader.listenToSurah")}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => {
                 if (!isDone) handleZikrCompletion(idx);
                 onAdvance(idx);
               }}
-              className={`mx-auto flex min-h-11 max-w-full items-center justify-center gap-2 rounded-full border border-border-control px-4 py-2 text-label font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${ACTION_FOCUS}`}
+              className="mt-2 justify-self-center text-sm text-muted-foreground"
             >
               <Check size={18} className="shrink-0" aria-hidden="true" />
               {t(language, "reader.readExternally")}
-            </button>
+            </Button>
           </div>
           {azkar.length > 1 && renderSurahNavigation()}
         </div>
@@ -1044,6 +1061,9 @@ export function ReaderScreen({
   const renderCollectionNavigator = (drawer = false) => {
     if (focusMode) return null;
     if (!onSelectZikr) return null;
+    // A closed navigator need not mount an entire surah's reading/glossary DOM.
+    // It mounts on explicit opening; selection and scroll position stay owned here.
+    if (longSurah && !drawer && !isSidebarOpen) return null;
     const doneCount = collectionCompletedCount;
     const isFullyComplete = doneCount === (azkarList?.length ?? 0);
 
@@ -1536,6 +1556,7 @@ export function ReaderScreen({
       data-reader-scroll-recovery={!showMushaf && !isDesktopReader ? "true" : undefined}
       dir={direction}
       data-reader-category={catId}
+      data-surah-entry={longSurah && !showMushaf ? "true" : undefined}
       data-reading-focus={focusMode && !showMushaf ? "true" : "false"}
       screenName={displayCategoryName}
       onTouchStart={onTouchStart}
@@ -1631,14 +1652,18 @@ export function ReaderScreen({
               <div
                 data-testid="reader-desktop-hero"
                 data-reading-chrome
-                className="relative isolate w-full flex shrink-0 flex-col items-center overflow-hidden rounded-b-2xl px-6 pb-2.5 pt-2 text-center"
-                style={{
-                  gap: "0.375rem",
-                  background:
-                    "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
-                }}
+                className={`relative isolate w-full flex shrink-0 flex-col items-center overflow-hidden rounded-b-2xl px-6 pb-2.5 pt-2 text-center ${longSurah ? "reader-surah-header" : ""}`}
+                style={
+                  longSurah
+                    ? undefined
+                    : {
+                        gap: "0.375rem",
+                        background:
+                          "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
+                      }
+                }
               >
-                <ReaderSceneArt category={catId} />
+                {!longSurah && <ReaderSceneArt category={catId} />}
                 <ReadingHeroToolbar
                   title={readerHeaderTitle}
                   testId="reader-header-toolbar"
@@ -1646,7 +1671,7 @@ export function ReaderScreen({
                     <IconButton
                       onClick={onBack}
                       label={t(language, "common.back")}
-                      className={READER_WIDE_HEADER_ACTION_CLASS}
+                      className={longSurah ? READER_HEADER_ACTION_CLASS : READER_WIDE_HEADER_ACTION_CLASS}
                     >
                       <ArrowPrevious size={20} />
                     </IconButton>
@@ -1657,12 +1682,12 @@ export function ReaderScreen({
                     className="flex min-w-0 flex-wrap items-center justify-end gap-2"
                     data-testid="reader-hero-actions"
                   >
-                    {renderAppearanceMenu(READER_WIDE_HEADER_ACTION_CLASS)}
+                    {longSurah ? renderSurahShare() : renderAppearanceMenu(READER_WIDE_HEADER_ACTION_CLASS)}
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
                         ref={readerMenuRef}
                         aria-label={t(language, "reader.menu")}
-                        className={READER_WIDE_HEADER_ACTION_CLASS}
+                        className={longSurah ? READER_HEADER_ACTION_CLASS : READER_WIDE_HEADER_ACTION_CLASS}
                       >
                         <MoreVertical size={20} />
                       </DropdownMenuTrigger>
@@ -1679,7 +1704,11 @@ export function ReaderScreen({
                       hidden={canDockCollection && isSidebarOpen}
                       onClick={toggleCollectionPanel}
                       aria-expanded={canDockCollection ? isSidebarOpen : isCollectionDrawerOpen}
-                      aria-controls="reader-collection-navigator"
+                      aria-controls={
+                        !longSurah || (canDockCollection ? isSidebarOpen : isCollectionDrawerOpen)
+                          ? "reader-collection-navigator"
+                          : undefined
+                      }
                       aria-label={
                         (canDockCollection ? isSidebarOpen : isCollectionDrawerOpen)
                           ? t(language, "reader.collapseSidebar")
@@ -1703,28 +1732,30 @@ export function ReaderScreen({
                   </div>
                 </ReadingHeroToolbar>
 
-                <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-1">
-                  <div className="flex w-full items-center justify-between px-1 leading-none" aria-hidden="true">
-                    <span className="text-xs font-semibold text-on-media-muted">
-                      {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
-                    </span>
-                    <span className="text-xs font-bold text-on-media-muted">
-                      {t(language, "reader.collectionCount", {
-                        done: formatNumerals(readingProgressValue, language),
-                        total: formatNumerals(azkar.length, language),
-                      })}
-                    </span>
+                {showCollectionProgress && (
+                  <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-1">
+                    <div className="flex w-full items-center justify-between px-1 leading-none" aria-hidden="true">
+                      <span className="text-xs font-semibold text-on-media-muted">
+                        {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
+                      </span>
+                      <span className="text-xs font-bold text-on-media-muted">
+                        {t(language, "reader.collectionCount", {
+                          done: formatNumerals(readingProgressValue, language),
+                          total: formatNumerals(azkar.length, language),
+                        })}
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={readingProgressValue}
+                      max={azkar.length}
+                      height={8}
+                      trackColor="rgba(255,255,255,0.2)"
+                      fillColor="var(--on-media-accent)"
+                      direction={direction}
+                      aria-label={t(language, "reader.groupProgress")}
+                    />
                   </div>
-                  <ProgressBar
-                    value={readingProgressValue}
-                    max={azkar.length}
-                    height={8}
-                    trackColor="rgba(255,255,255,0.2)"
-                    fillColor="var(--on-media-accent)"
-                    direction={direction}
-                    aria-label={t(language, "reader.groupProgress")}
-                  />
-                </div>
+                )}
               </div>
 
               {/* Wide-desktop card: reading content, side navigation, counter,
@@ -1840,17 +1871,13 @@ export function ReaderScreen({
                 onBack={onBack}
                 language={language}
                 elevateOnScroll={false}
-                decoration={<ReaderSceneArt category={catId} compact />}
+                decoration={longSurah ? undefined : <ReaderSceneArt category={catId} compact />}
                 backButtonClassName={READER_HEADER_ACTION_CLASS}
                 right={
-                  // Two actions: appearance, then the overflow control.
-                  // Share used to sit between them; at 320-390px a third 44px
-                  // target was the difference between the collection name
-                  // fitting and being truncated to "أذكار ال…", and share is not
-                  // a per-zikr primary. Both share the header's ghost
-                  // icon-button treatment so the row reads as one set.
+                  // The entry has no adjustable reading text. Its two actions
+                  // are Share and More; reading appearance stays in the Mushaf.
                   <div className="flex items-center gap-1" data-testid="reader-actions">
-                    {renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
+                    {longSurah ? renderSurahShare() : renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
 
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
@@ -1873,30 +1900,32 @@ export function ReaderScreen({
               />
             </div>
 
-            <div
-              data-reading-chrome
-              className="shrink-0 px-5 pb-1.5 pt-1 reader-column"
-              data-testid="reader-session-chrome"
-            >
-              <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
-                <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
-                <span>
-                  {t(language, "reader.collectionCount", {
-                    done: formatNumerals(readingProgressValue, language),
-                    total: formatNumerals(azkar.length, language),
-                  })}
-                </span>
+            {showCollectionProgress && (
+              <div
+                data-reading-chrome
+                className="shrink-0 px-5 pb-1.5 pt-1 reader-column"
+                data-testid="reader-session-chrome"
+              >
+                <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
+                  <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
+                  <span>
+                    {t(language, "reader.collectionCount", {
+                      done: formatNumerals(readingProgressValue, language),
+                      total: formatNumerals(azkar.length, language),
+                    })}
+                  </span>
+                </div>
+                <ProgressBar
+                  value={readingProgressValue}
+                  max={azkar.length}
+                  height={8}
+                  trackColor="var(--muted)"
+                  fillColor="var(--primary)"
+                  direction={direction}
+                  aria-label={t(language, "reader.groupProgress")}
+                />
               </div>
-              <ProgressBar
-                value={readingProgressValue}
-                max={azkar.length}
-                height={8}
-                trackColor="var(--muted)"
-                fillColor="var(--primary)"
-                direction={direction}
-                aria-label={t(language, "reader.groupProgress")}
-              />
-            </div>
+            )}
 
             {/* Main Layout Area */}
             <div

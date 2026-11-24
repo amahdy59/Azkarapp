@@ -1,5 +1,18 @@
 import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function assertPrayerMaterials(page: Page) {
+  const overview = page.getByTestId("prayer-tracker-cards");
+  const desktop = (await overview.getAttribute("data-desktop")) === "true";
+  const surfaces = desktop ? overview.locator(".hero-glass.home-glass-surface") : overview;
+  await expect(surfaces).toHaveCount(desktop ? 7 : 1);
+  for (const surface of await surfaces.all()) {
+    await expect(surface).toHaveClass(/hero-glass/);
+    await expect(surface).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
+    await expect(surface).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+  }
+  return desktop;
+}
 
 test.beforeEach(async ({ page }) => fixtureReminderCatalogue(page));
 import AxeBuilder from "@axe-core/playwright";
@@ -32,7 +45,7 @@ test("next-prayer remaining time updates without live announcements or phone ove
   const strip = page.getByTestId("home-prayer-strip");
   await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
   await expect(strip.getByRole("progressbar")).toHaveCount(0);
-  const countdown = strip.locator('[data-prayer-state="next"] [data-prayer-detail]');
+  const countdown = strip.locator("[data-prayer-countdown-line]");
   const first = await countdown.textContent();
   await page.clock.fastForward(60_000);
   await expect.poll(() => countdown.textContent()).not.toBe(first);
@@ -59,28 +72,32 @@ for (const width of [390, 1440]) {
     await page.goto("/#/home");
     const current = page.getByTestId("prayer-card-dhuhr");
     const next = page.getByTestId("prayer-card-asr");
-    const strength = (card: typeof current) =>
-      card.evaluate((node) => Number(getComputedStyle(node).getPropertyValue("--prayer-focus")));
+    const elapsed = () =>
+      page
+        .locator(".home-prayer-interval-shade")
+        .evaluate((node) => parseFloat((node as HTMLElement).style.getPropertyValue("--interval-elapsed")));
     await expect(current).toHaveAttribute("data-prayer-state", "current");
     const originalTextColors = await next
       .locator("h3, p")
       .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).color));
-    for (const [minutes, expectedCurrent, expectedNext] of [
-      [45, 1, 0.15],
-      [15, 0, 0.575],
-      [1, 0, 0.9716667],
-    ]) {
+    let previousElapsed = -1;
+    for (const minutes of [45, 15, 1]) {
       await page.clock.setFixedTime(new Date(boundary - minutes * 60_000));
       await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-      await expect.poll(() => strength(current)).toBeCloseTo(expectedCurrent, 5);
-      await expect.poll(() => strength(next)).toBeCloseTo(expectedNext, 5);
+      const fill = await elapsed();
+      expect(fill).toBeGreaterThan(previousElapsed);
+      expect(fill).toBeLessThan(100);
+      previousElapsed = fill;
+      // Near-adhan contextual opening remains independent of next-state color.
+      const selected = page.locator('[data-density="summary"][data-selected]');
+      expect(await selected.count()).toBeLessThanOrEqual(1);
       expect(
         await next.locator("h3, p").evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).color)),
       ).toEqual(originalTextColors);
       for (const card of await page.locator('[data-density="summary"]').all()) {
         await expect(card).toHaveCSS("opacity", "1");
         await expect(card).toHaveCSS("filter", "none");
-        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+        await expect(card).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
       }
       const a11y = await new AxeBuilder({ page }).include('[data-testid="home-prayer-strip"]').analyze();
       expect(a11y.violations).toEqual([]);
@@ -89,7 +106,7 @@ for (const width of [390, 1440]) {
     await page.clock.setFixedTime(new Date(boundary));
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
     await expect(next).toHaveAttribute("data-prayer-state", "current");
-    await expect.poll(() => strength(next)).toBe(1);
+    await expect.poll(elapsed).toBe(0);
     await expect(page.getByTestId("prayer-card-maghrib")).toHaveAttribute("data-prayer-state", "next");
     await expect(next.getByRole("progressbar")).toHaveCount(0);
     await expect(page.getByTestId("home-prayer-strip").getByRole("progressbar")).toHaveCount(0);
@@ -118,22 +135,24 @@ for (const width of [390, 834, 1440]) {
         await expect(noon.getByRole("heading")).toHaveText("الجمعة");
         await expect(noon.getByRole("button")).toHaveAccessibleName("فتح صلاة الجمعة");
         if (scene === "friday-morning") {
-          await expect(noon.locator("[data-prayer-footer]")).toContainText("متبقٍ");
+          await expect(page.getByTestId("home-prayer-interval")).toContainText("متبقٍ");
         }
       }
       const standard = page
         .getByTestId("prayer-tracker-cards")
         .locator('article[data-prayer-state="past"], article[data-prayer-state="upcoming"]')
         .first();
-      await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
-      await expect(standard).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
-      await expect(standard).toHaveCSS("--prayer-focus", "0");
+      await assertPrayerMaterials(page);
+      await expect(standard).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
       const quietBorder = await standard.evaluate((node) => getComputedStyle(node).borderTopColor);
       expect(quietBorder).not.toBe("rgba(0, 0, 0, 0)");
-      expect(await standard.evaluate((node) => getComputedStyle(node).boxShadow)).toContain("0px 8px 24px");
+      await expect(standard).not.toHaveAttribute("data-selected");
       // Verify the whole Home material inventory, not just the prayer strip.
       const surfaces = page.locator(".home-photo-canvas .hero-glass.home-glass-surface");
-      expect(await surfaces.count()).toBeGreaterThan(10);
+      await expect(page.getByTestId("wird-category-card")).toHaveCount(4);
+      for (const id of ["home-daily-evidence", "situational-shortcuts", "home-tool-masbaha"]) {
+        await expect(page.getByTestId(id).first()).toHaveClass(/hero-glass/);
+      }
       for (const surface of await surfaces.all()) {
         if ((await surface.getAttribute("data-testid")) === "home-utility-header") {
           await expect(surface).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -183,7 +202,7 @@ test("Home glass respects live system preference and high contrast without chang
   page,
 }) => {
   await page.goto("/#/home");
-  const card = page.getByTestId("prayer-tracker-cards").locator('article[data-prayer-state="current"]');
+  const card = page.getByTestId("home-prayer-interval");
   await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setEmulatedMedia", {
@@ -231,9 +250,9 @@ for (const width of [390, 1440]) {
       await expect(card).toHaveClass(/hero-glass/);
       await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
     }
+    await assertPrayerMaterials(page);
     for (const prayer of await page.getByTestId("prayer-tracker-cards").locator("article").all()) {
-      await expect(prayer).toHaveClass(/hero-glass/);
-      await expect(prayer).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
+      await expect(prayer).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
     }
     await page.getByTestId("prayer-card-fajr").getByRole("button").click();
     await expect(page.getByTestId("home-prayer-moment").locator(".hero-glass.home-glass-surface")).toHaveCount(1);
@@ -288,21 +307,14 @@ test("localized prayer accent edges preserve selection at phone and desktop widt
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
-    const edges = await page.getByTestId("prayer-card-dhuhr").evaluate((node) => {
-      const small = getComputedStyle(node, "::after"),
-        panel = getComputedStyle(document.querySelector('[data-testid="home-prayer-moment"]')!, "::before");
-      return {
-        small: small.backgroundColor,
-        panel: panel.backgroundImage,
-        height: small.height,
-        content: panel.content,
-        pointer: panel.pointerEvents,
-      };
-    });
-    expect(edges.panel).toContain(edges.small);
-    expect(edges.height).toBe("2px");
-    expect(edges.content).toBe('""');
-    expect(edges.pointer).toBe("none");
+    const selected = page.getByTestId("prayer-card-dhuhr");
+    if ((await selected.getByRole("button").getAttribute("aria-expanded")) !== "true")
+      await selected.getByRole("button").click();
+    await expect(selected).toHaveAttribute("data-selected", "true");
+    await expect(selected).toHaveCSS("outline-width", "1px");
+    const panel = page.getByTestId("home-prayer-moment");
+    await expect(panel).toHaveAttribute("data-prayer", "dhuhr");
+    expect(await panel.evaluate((node) => getComputedStyle(node, "::before").display)).toBe("none");
     await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
     await page.screenshot({ path: testInfo.outputPath(`matching-edges-${width}.png`), scale: "css" });
   }
@@ -310,7 +322,9 @@ test("localized prayer accent edges preserve selection at phone and desktop widt
 
 for (const themeMode of ["light", "dark", "midnight"]) {
   for (const language of ["ar", "en"]) {
-    test(`all Home cards retain glass in ${themeMode}/${language} through responsive resizing`, async ({ page }) => {
+    test(`all Home cards retain glass in ${themeMode}/${language} through responsive resizing`, async ({
+      page,
+    }, info) => {
       await page.addInitScript(
         ({ themeMode, language }) => {
           localStorage.setItem(
@@ -333,9 +347,24 @@ for (const themeMode of ["light", "dark", "midnight"]) {
               const styles = nodes.filter((node) => node.tagName !== "HEADER").map((node) => getComputedStyle(node));
               const headers = nodes.filter((node) => node.tagName === "HEADER").map((node) => getComputedStyle(node));
               return {
-                countAboveTen: nodes.length > 10,
+                completeInventory:
+                  document.querySelectorAll('[data-testid="wird-category-card"].hero-glass.home-glass-surface')
+                    .length === 4 &&
+                  ["home-daily-evidence", "situational-shortcuts", "home-tool-masbaha"].every((id) =>
+                    document.querySelector(`[data-testid="${id}"].hero-glass.home-glass-surface`),
+                  ) &&
+                  document.querySelectorAll(
+                    ".home-prayer-overview-v2.hero-glass.home-glass-surface, .home-prayer-overview-v2 .hero-glass.home-glass-surface",
+                  ).length === (document.querySelector(".home-prayer-overview-v2[data-desktop]") ? 7 : 1),
                 filters: [...new Set(styles.map((style) => style.backdropFilter))],
-                translucent: styles.every((style) => /^rgba\(/.test(style.backgroundColor)),
+                nonTranslucent: nodes
+                  .filter(
+                    (node) => node.tagName !== "HEADER" && !/^rgba\(/.test(getComputedStyle(node).backgroundColor),
+                  )
+                  .map((node) => ({
+                    surface: node.getAttribute("data-testid") ?? node.className,
+                    fill: getComputedStyle(node).backgroundColor,
+                  })),
                 restingHeader:
                   headers.length === 1 &&
                   headers.every(
@@ -345,12 +374,18 @@ for (const themeMode of ["light", "dark", "midnight"]) {
             }),
           )
           .toEqual({
-            countAboveTen: true,
+            completeInventory: true,
             filters: ["blur(22px) saturate(1.35)"],
-            translucent: true,
+            nonTranslucent: [],
             restingHeader: true,
           });
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
+        if (width === 390 || width === 1440) {
+          await page.screenshot({
+            path: `output/playwright/home-overview/${info.project.name}-${language}-${themeMode}-${width}-glass.png`,
+            scale: "css",
+          });
+        }
       }
     });
   }

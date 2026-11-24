@@ -2,7 +2,21 @@
 
 ## Active phase
 
-[Persistent Home dates and phone Mushaf index](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md) is the current owner-approved phase. [Home startup, reminder updates and offline downloads](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md) records the previous deployment.
+[Coordinated complete release](phases/COORDINATED_RELEASE_2026_11_24.md) is the current owner-authorized integration and publication phase. The owner approves the final prayer-card reference and requests pushing **all** pending repository changes after verification, superseding the earlier publication holds for this batch. This chat owns the combined commit/push and Quality/Pages/production monitoring. Earlier local phase descriptions below are historical handoffs; preserve their evidence and independent device/content limits.
+
+[Home prayer overview and location](phases/HOME_PRAYER_OVERVIEW_LOCAL_2026_11_24.md) records this chat's owner-approved local Home work and screenshot corrections. The latest correction keeps a two-line logical-start summary with inline remaining time, moves location below the timings and groups Change/Refresh without a Home dropdown. Keep the desktop timer-card anatomy, centered phone tiles and theme/material adaptation. Preserve all separately scoped pending changes and the publication hold. [Two-line/footer verification](reports/HOME_TWO_LINE_LOCATION_2026_11_24_REPORT.md) records the latest implementation; the [preceding report](reports/HOME_PRAYER_OVERVIEW_LOCAL_2026_11_24_REPORT.md) retains earlier evidence and independent full-gate blockers.
+
+[Expanded desktop prayer card](phases/PRAYER_CARD_DESKTOP_LOCAL_2026_11_24.md) is the current scoped prayer-card refinement: inline desktop guidance, passive references, visible record dates and actual screenshot review. Preserve all independent pending checkpoints below and the global publication hold.
+
+[Prayer settings clarity](phases/PRAYER_SETTINGS_CLARITY_LOCAL_2026_11_24.md) is the current owner-approved prayer-settings implementation in this chat. Keep it local and preserve the independent pending Qibla, Downloads and Home checkpoints below.
+
+[Approved surah entry clarity](phases/SURAH_ENTRY_CLARITY_2026_11_24.md) is this chat's owner-approved implementation after review of the dark/light concepts and actual-font comparison. It supersedes the earlier surah-entry typography/cover hierarchy only. Preserve the separately scoped Qibla, downloads and Home changes below and the publication hold.
+
+[Qibla clarity](phases/QIBLA_CLARITY_2026_11_24.md) records the separately scoped owner-approved Qibla implementation; preserve the concurrent downloads phase and Home design.
+
+[Approved offline downloads overview](phases/DOWNLOADS_OVERVIEW_2026_11_24.md) is the active owner-approved implementation following review of the Arabic concept boards. The Home/Mushaf phase below is the preceding completed checkpoint.
+
+[Persistent Home dates and phone Mushaf index](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md) records the preceding owner-approved phase. [Home startup, reminder updates and offline downloads](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md) records the previous deployment.
 
 [Home date rail and pending release](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md) records the preceding owner-approved phase. The owner lifts the previous commit and publication hold and requests screenshots, exact-commit verification and production smoke.
 

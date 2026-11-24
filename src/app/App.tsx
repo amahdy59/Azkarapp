@@ -2028,6 +2028,8 @@ function AppContent({
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
                   quranReadingPosition={quranReadingPosition}
+                  onLocationChange={handleLocationChange}
+                  onOpenLocation={() => navigateSettingsPanel("location")}
                   quranWirdPlan={quranWirdPlan}
                   wirdHistory={wirdHistory}
                   onContinueKhatmah={() => {

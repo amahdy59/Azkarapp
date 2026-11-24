@@ -1,3 +1,4 @@
+import { openDownloadManagement } from "./helpers/downloads";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
@@ -30,6 +31,7 @@ for (const language of ["en", "ar"] as const) {
       localStorage.setItem("azkar.audio-preferences.v1", JSON.stringify({ duaVoiceId: "english-george" }));
     }, language);
     await page.goto("/#/settings/downloads");
+    await openDownloadManagement(page);
     await expect(page.getByTestId("downloads-scroll")).toBeVisible();
     const url = `https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/${variant.relativePath}?sha256=${variant.sha256}`;
     await page.evaluate(

@@ -3,6 +3,23 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { DownloadProgress } from "./DownloadProgress";
 
 describe("DownloadProgress", () => {
+  it("identifies the current group in visible and spoken progress", () => {
+    render(
+      <DownloadProgress
+        completed={50}
+        total={100}
+        label="Adhkar, group 1 of 3"
+        context="Current group progress"
+        language="en"
+        active
+      />,
+    );
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "Current group progress: 50% downloaded");
+    expect(screen.getByText("Current group progress: 50% downloaded")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Adhkar, group 1 of 3: Current group progress: 50% downloaded",
+    );
+  });
   afterEach(() => vi.useRealTimers());
 
   it("renders with accessible progressbar attributes, value, and direction in English", () => {

@@ -70,6 +70,7 @@ test("the interactive word-meaning card is named, reachable, and has no automati
 });
 
 test("the prayer information dialog has no automatically detectable WCAG A/AA violations", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await seed(page, "/#/home");
   await page.getByTestId("prayer-card-isha").getByRole("button").click();
   const actions = page.getByTestId("prayer-actions-card");

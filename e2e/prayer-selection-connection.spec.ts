@@ -29,23 +29,15 @@ async function openHome(page: Page, language: "ar" | "en", width: number, materi
 }
 
 async function expectAligned(page: Page) {
-  await expect
-    .poll(() =>
-      page.evaluate(() => {
-        const panel = document.querySelector<HTMLElement>('[data-testid="home-prayer-moment"]')!;
-        const card = document.querySelector<HTMLElement>('[data-selected="true"]')!;
-        const p = panel.getBoundingClientRect();
-        const c = card.getBoundingClientRect();
-        const x = parseFloat(panel.style.getPropertyValue("--prayer-anchor-x"));
-        return Math.abs(p.left + x - c.left - c.width / 2);
-      }),
-    )
-    .toBeLessThan(1);
-  await expect
-    .poll(() =>
-      page.getByTestId("home-prayer-moment").evaluate((n) => n.style.getPropertyValue("--prayer-anchor-opacity")),
-    )
-    .toBe("1");
+  const panel = page.getByTestId("home-prayer-moment");
+  const selected = page.getByTestId("home-all-prayers-row").locator('[data-selected="true"]');
+  await expect(selected).toHaveCount(1);
+  await expect(selected).toHaveCSS("outline-width", "1px");
+  await expect(selected.getByRole("button")).toHaveAttribute("aria-expanded", "true");
+  await expect(panel).toHaveAttribute("data-prayer", (await selected.getAttribute("data-prayer"))!);
+  await expect(panel).toHaveCSS("margin-top", "0px");
+  expect(await panel.evaluate((node) => getComputedStyle(node, "::before").display)).toBe("none");
+  await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
 }
 
 for (const language of ["ar", "en"] as const) {
@@ -55,22 +47,10 @@ for (const language of ["ar", "en"] as const) {
       await expectAligned(page);
       const panel = page.getByTestId("home-prayer-moment");
       const selected = page.locator('[data-selected="true"]');
-      const card = (await selected.boundingBox())!;
+      const row = (await page.getByTestId("home-all-prayers-row").boundingBox())!;
       const detail = (await panel.boundingBox())!;
-      expect(detail.y - card.y - card.height).toBeCloseTo(20, 0);
-      const widthOfLight = await panel.evaluate((n) => parseFloat(n.style.getPropertyValue("--prayer-anchor-width")));
-      expect(widthOfLight).toBeGreaterThan(28);
-      expect(widthOfLight).toBeLessThan(card.width);
-      expect(
-        await panel
-          .locator("article")
-          .first()
-          .evaluate((n) => getComputedStyle(n).boxShadow),
-      ).not.toContain("0px -6px");
-      expect(await panel.evaluate((n) => getComputedStyle(n, "::before").pointerEvents)).toBe("none");
-      expect(await panel.evaluate((n) => parseFloat(getComputedStyle(n, "::before").transitionDuration))).toBeLessThan(
-        0.001,
-      );
+      expect(detail.y).toBeGreaterThanOrEqual(row.y + row.height - 1);
+      expect(await panel.evaluate((node) => getComputedStyle(node, "::before").pointerEvents)).toBe("none");
       if (testInfo.project.name === "desktop-chromium") {
         const scene = page.getByTestId("time-of-day-scene-window").last().locator("img");
         await expect
@@ -96,7 +76,7 @@ for (const language of ["ar", "en"] as const) {
   }
 }
 
-test("selection follows keyboard activation and fades during free browsing @cross-browser", async ({
+test("selection follows keyboard activation and remains independent of browsing @cross-browser", async ({
   page,
 }, testInfo) => {
   await openHome(page, "ar", 390, "glass", "19:45:00");
@@ -110,7 +90,7 @@ test("selection follows keyboard activation and fades during free browsing @cros
   await expectAligned(page);
   const isha = row.locator('[data-prayer="isha"]');
   await isha.scrollIntoViewIfNeeded();
-  await expect.poll(() => panel.evaluate((n) => n.style.getPropertyValue("--prayer-anchor-opacity"))).toBe("0");
+  await expect(maghrib).toHaveAttribute("aria-expanded", "true");
   await expect(panel).toHaveAttribute("data-prayer", "maghrib");
   await isha.getByRole("button").click();
   await expect(panel).toHaveAttribute("data-prayer", "isha");

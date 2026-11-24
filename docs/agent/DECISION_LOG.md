@@ -5418,3 +5418,63 @@ The owner approves the startup audit recommendations and requests reliable notif
 ## 2026-11-07 · Persistent Home dates and phone Mushaf index
 
 The owner approves keeping the slightly larger secondary date visible during scroll, replacing the expanded prayer ring and seconds with the localized minute countdown, and applying the reference Mushaf control placement and in-content index on phones. Preserve the wider reader presentation and canonical pages. See [the phase brief](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md).
+
+## 2026-11-24 — Approved combined offline download experience
+
+The owner approves the two Arabic downloads concept boards and requests implementation with UX, visual design, accessibility and performance verification. This supersedes the 2026-10-11 presentation rule for exactly three top-level categories. Lead with one Download all action, disclose category/page-juz selection and secondary management/export/storage controls, keep one reachable progress/cancel surface, remove the full-height active gold line and prevent progress replay from zero on return. Preserve approved content/voice coverage, exact verification, independently recoverable groups and completed files; no full-Quran-audio, byte-range-resume or app-closure transfer promise. See phases/DOWNLOADS_OVERVIEW_2026_11_24.md.
+
+### Owner publication hold — 2026-11-24
+
+The owner explicitly says: “I don't want to release now. I want to continue improving the features and doing reruqired tests but I don't want any chat to rlease now. I'll use a new chat for thefinal release.” This supersedes standing autonomous release authority for all current work. Continue local improvements and required testing; retain all concurrent feature edits. Do not commit, push, deploy or rewrite the deployed release-note manifest in this chat. Final consolidation and release belong to a new owner-selected chat. Current mixed-checkout lint/format, cache-test timing and total-output-budget findings must be included in the handoff, with successful feature-specific evidence kept separately.
+
+## 2026-11-24 — Qibla approved; Home and future hub excluded
+
+The owner approves implementing Qibla essentials and optional details/recovery, then explicitly rejects the Explore mockup's Home look and limits work to Qibla. Preserve Home and navigation. Move distance/coordinates into opaque shared details and retain explicit sensor/location permission, honest uncertainty and static fallback. Add validated on-device true-north correction without dependencies, geocoding or prayer-profile changes. City comparison/switching, Explore and learning modules remain future proposals. See phases/QIBLA_CLARITY_2026_11_24.md.
+
+## 2026-11-24 — Precision-instrument compass appearance
+
+The owner rejects the cartoonish dial appearance and requests a robust, slightly photorealistic finish. Apply the material/needle/Kaaba refinement within the existing Qibla layout. Preserve Home/navigation, behavior, offline performance and the global publication hold.
+
+## 2026-11-24 — Final Qibla recommendations approved locally
+
+The owner approves all final recommendations, requests screenshot evidence of the current implementation and explicitly prohibits pushing. Implement saved-location clarity, top-of-phone guidance, direct sensor recovery/calibration, approximate-location warning and model-maintenance gate. Prepare and record real-device acceptance separately; simulated browser sensor evidence cannot be called physical acceptance. Home and navigation remain unchanged.
+
+## 2026-11-24 — Approved final download refinements
+
+The owner says to implement all final recommendations locally: reopen/resume clarity from verified files, visible readiness summary, current-group progress labeling, open-app guidance and specific actionable failures, plus physical Android/TalkBack verification where available. No connected Android device was found; retain the explicit acceptance checklist. Preserve the global publication hold: no commit, push, deployment or release-note edits.
+
+## 2026-11-24 — Location result is a dismissible modal
+
+The owner supersedes inline location-update/approximation paragraphs with a notification modal, a close button and no change in the underlying page positioning. Reuse the shared portalled Modal, retain prayer/location privacy contracts and publication hold, and verify geometry/focus in Arabic/English.
+
+## 2026-11-24 — Surah entry recommendations approved locally
+
+After reviewing the supplied surah-entry screenshot, design/performance findings, dark/light concept board and actual bundled-font comparison, the owner says “apply recommendations”. This supersedes the 2026-11-06 entry-specific Mushaf face, oversized image-led cover and title-side Share. Use the existing Noto Sans Arabic UI title, bounded inset landscape art, primary reading/secondary listening/tertiary completion, a Share/More entry header and meaningful single-surah status. Keep real multi-item progress. Show bundled artwork immediately; optional sharper desktop detail cannot blank it out. Defer closed long-surah navigator content while preserving its existing interactions. Preserve reviewed names/text, canonical Mushaf, audio, offline reading, persistence and all concurrent work. The existing publication hold remains: no commit, push, deployment or release-note rewrite. See [approved phase](phases/SURAH_ENTRY_CLARITY_2026_11_24.md).
+
+## 2026-11-24 — Approved prayer-settings recommendations, local only
+
+The owner approves the reviewed Arabic prayer-location and calculation-picker concepts and explicitly requests no push. Separate location/method/advanced groups, collapse timezone detail, use a protected phone method sheet and city picker, show concise values with complete authority names nearby, and keep explicit location results in a closable modal without moving the page. Preserve immediate local calculation, method IDs/parameters, adjustments, normalization and offline persistence. Starting a manual city flow cancels outstanding GPS work. Reuse date/zone-keyed timezone status with foreground/date refresh. No commit, push, deployment or release-note rewrite. See phases/PRAYER_SETTINGS_CLARITY_LOCAL_2026_11_24.md.
+
+## 2026-11-24 — Qibla final acceptance and local gate repairs
+
+The owner says “OK. go ahead. dont push changes yet” after the final acceptance recommendations. Continue Qibla contrast/browser evidence and the previously recorded lint/format/bundle-blocker repairs locally, preserving every concurrent feature. Keep physical-device/screen-reader acceptance Pending when unavailable. Retain all size ceilings and assertions; share only identical emitted metadata and preserve document-generator templates. No commit, push, deployment or release-note change.
+
+## 2026-11-24 — Expanded desktop prayer information and inline recording date
+
+The owner requests removing the desktop More information panel, presenting all existing guidance within the expanded card, improving spacing and eliminating unnecessary clickable hadith/reference text. They explicitly request actual screenshots along the way. Keep the exact recording date visible in the card at every width. This supersedes the earlier desktop modal, date-in-sheet and source-preview-link presentation only; preserve all reviewed quotations, references, grading, rank distinctions, counts and Friday alternatives. Compact information dialogs remain available, with resize/close focus recovery. Use existing shell/card boundaries, semantic materials and normalization/recording callbacks. The global local-only publication hold remains in force. See phases/PRAYER_CARD_DESKTOP_LOCAL_2026_11_24.md.
+
+## 2026-11-24 — Home location adjacency and completion
+
+After reviewing the local Home redesign, the owner agrees Refresh belongs next to the location and says “continue and apply any further reocmmendations”. Keep the location selector sized to its label, an 8px default gap and separate 44px targets, with long-name/200% reflow. Complete the previously approved Home overview verification; preserve the original desktop card anatomy, centered phone tiles, theme/material adaptation, existing prayer/recording rules and independent pending changes. Location feedback remains a closable protected modal with a visible heading. This authorizes local improvements and tests; the global publication hold remains in force. See phases/HOME_PRAYER_OVERVIEW_LOCAL_2026_11_24.md.
+
+### Owner screenshot correction — desktop prayer whitespace, 2026-11-24
+
+The owner rejects the first fuller desktop screenshot as too empty, awkward and inconsistent. Supersede its full-width lower guidance row. Use two independent content columns: checklist/date with Rawatib beneath, and virtue with prayer-specific Sunnah beneath. Related groups use 12px, the wide gutter remains 32px, and shared headings, hairlines and passive quotation/reference anatomy keep one hierarchy. Preserve all existing text, ranks, recording, compact recovery and publication hold. Show the actual revision during implementation.
+
+## 2026-11-24 — Approved two-line Home summary and location footer
+
+The owner approves applying the corrected reference. Current/Next labels are on the first line, prayer names on the second, with the remaining time beside the next name. Use logical start alignment independent of the shaded interval. Move city, explicit Change and Refresh below the five timings with a divider. Change opens existing location settings; Home gains no extra dropdown. This supersedes the prior header location and centered/three-line mockups only. Preserve timing/recording/data contracts, desktop card anatomy, existing scroll animation and the global publication hold. Enlarged text reflows without shrinking. See phases/HOME_PRAYER_OVERVIEW_LOCAL_2026_11_24.md.
+
+## 2026-11-24 — Approved final prayer refinement and coordinated full release
+
+The owner approves the rendered recommendation images and explicitly instructs this chat to coordinate with the other working chat, finish all approved changes and push **all** pending repository changes, not merely the two chats' feature files. This supersedes the earlier global publication hold for the current consolidated batch. This chat owns the combined release: preserve all pending work, collect the Home handoff, implement the tighter desktop heading gap, aligned edges, quieter headings and uniform passive evidence, repair integration/tooling failures, update bilingual release notes, run the intact local hook gates, commit/push main once ready and monitor exact-commit Quality, Pages build/deploy and production smoke. No force push, skipped hook, weakened assertion/coverage/budget, data migration or religious wording change is authorized.

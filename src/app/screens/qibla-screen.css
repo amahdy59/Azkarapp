@@ -1,0 +1,76 @@
+.qibla-dial {
+  inline-size: min(100%, clamp(12rem, 38svh, 20rem));
+}
+
+/* Text-over-text surfaces need an opaque fill in every material mode. */
+.qibla-details-surface {
+  background: var(--popover) !important;
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .qibla-details-surface {
+      background: rgb(15 23 42) !important;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  /* Include the shared header/navigation while this screen is mounted. */
+  html:has(.qibla-screen) {
+    --background: Canvas;
+    --foreground: CanvasText;
+    --card: Canvas;
+    --card-foreground: CanvasText;
+    --popover: Canvas;
+    --popover-foreground: CanvasText;
+    --muted: Canvas;
+    --muted-foreground: CanvasText;
+    --primary: LinkText;
+    --primary-foreground: Canvas;
+    --border: CanvasText;
+  }
+
+  .qibla-details-surface {
+    background: Canvas !important;
+    color: CanvasText;
+  }
+
+  :is(.qibla-screen, .qibla-details-surface) [data-slot="button"][data-variant="default"] {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+}
+
+.qibla-screen {
+  overflow-wrap: anywhere;
+  container: qibla-screen / inline-size;
+}
+
+.high-contrast .qibla-instrument [data-testid="kaaba-target"] path {
+  stroke: var(--foreground);
+  stroke-width: 1;
+}
+
+@media (forced-colors: active) {
+  .qibla-instrument {
+    --foreground: CanvasText;
+    --muted-foreground: CanvasText;
+    --primary: LinkText;
+    --background: Canvas;
+    --card: Canvas;
+    --border: CanvasText;
+  }
+  .qibla-instrument [data-testid="kaaba-target"] path {
+    fill: Canvas;
+    stroke: CanvasText;
+    stroke-width: 1;
+  }
+}
+
+@container qibla-screen (max-width: 18rem) {
+  .qibla-details-label {
+    display: none;
+  }
+}

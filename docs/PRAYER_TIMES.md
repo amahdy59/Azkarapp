@@ -1,5 +1,13 @@
 # Prayer times, location, timezone, and DST
 
+## Home overview and location refresh — 2026-11-24 (local)
+
+Home presents the existing five dated prayer models together and a passive elapsed-interval shade behind current/next text. The numeric countdown remains visible without live announcements. Next, current and the opened details are independent states; existing availability/recording windows, tracking day keys, Friday naming, midnight and DST behavior remain authoritative. Reviewed prayer guidance is unchanged.
+
+At normal phone sizes, labels occupy the first summary line and names the second, with remaining time beside the next prayer. Logical start alignment is fixed independently of interval progress. Location now follows the timings, with grouped Change/Refresh actions; Change opens existing settings without adding a Home dropdown. Enlarged text reflows without clipping. The existing scroll animation is retained, with an interaction hold during location acquisition and result-dialog recovery.
+
+Refresh beside the location explicitly detects fresh coordinates through the existing on-device provider and App callback. It preserves calculation preferences, replaces the old city label with honest device-location context, ignores stale requests and retains the saved location on failure. Results appear in a dismissible protected dialog without inserting a page banner; keyboard focus returns to Refresh. Existing location settings remain the selection destination. No geocoding, new prayer service or synchronization field is added.
+
 ## Reminder readiness — 2026-11-01
 
 Settings → Notifications now brings the existing permission and test action together with the next configured instant, selected location/timezone and location recovery link. It reuses the current scheduler’s next-delay boundary and formats the instant in the displayed timezone. Completed routines may be suppressed by the existing only-incomplete setting. This is not confirmation of a pending native alarm or future delivery; Android and browser limitations are explained separately. No calculation, scheduling, content or saved preference contract changes.
@@ -246,3 +254,25 @@ Browser delivery expires after at most five minutes. Advance-prayer messages exp
 ### Optional contextual alerts
 
 Pre-Fajr dua requires an explicit choice for new readers. Previously saved choices continue to apply. Friday Salawat and Monday/Thursday fasting preparation start off. The Friday alert uses 10:00 in the selected prayer location, after sunrise and outside the immediate prayer window. Preparation uses 45 minutes after Asr on Sunday or Wednesday, with the full delivery window at least 30 minutes before Maghrib. These are app reminder times. The fasting check uses the saved Hijri offset and the existing conservative margin around Ramadan, Eid and Tashriq. Dates without reliable eligibility are skipped.
+
+## Qibla-only location and north reference — 2026-11-24
+
+Qibla refresh requests maximumAge zero and uses the returned coordinates only for that screen. Acquisition timestamp, accuracy radius and optional altitude are displayed/used when supplied. It never changes saved prayer coordinates, timezone, method, adjustments or reminders. Fresh coordinates show Device location because the app has no approved reverse geocoder; the former saved-city name is not reused.
+
+Compass headings are magnetic on the supported WebKit/absolute orientation paths. Offline WMM2025 correction converts them to true north before comparison with the existing great-circle bearing. The degree-12 harmonic evaluator follows Android GeomagneticField (Apache-2.0; license in third-party/GEOMAGNETIC_LICENSE.txt); coefficients are public-domain NOAA/BGS WMM2025 data from https://www.ncei.noaa.gov/sites/default/files/2024-12/WMM2025COF.zip. All 100 independent bundled NOAA test vectors verify declination and north/east/down/horizontal fields. This is numerical model validation, not physical handset acceptance. The model rejects dates outside 2025–2029, unsupported altitude and horizontal field below 6000nT for guidance. Replace coefficients and revalidate with the next official model before 2030. No coordinate leaves the device.
+
+Official sensor contracts: https://developer.apple.com/documentation/webkitjs/deviceorientationevent/1804777-webkitcompassheading and https://www.w3.org/TR/orientation-event/. A separate physical compass must use true north or its own appropriate declination correction. Sensor uncertainty, magnetic interference and device calibration remain limitations; unknown or poor accuracy cannot be described as guaranteed correctness.
+
+Model maintenance: MAGNETIC_MODEL records epoch 2025, exclusive validity year 2030 and review date 2029-07-01. A real-clock test in the normal unit suite becomes a failing release gate at the review date, six months before correction expiry. Install the official successor and its independent vectors, verify correction sign/reference, date/altitude/weak-field bounds and real-device behavior, then revise the metadata and gate together. No scheduled automation or new service is required. The location-warning threshold of 100 metres is a conservative UI prompt, not a geolocation or Qibla accuracy guarantee.
+
+## Prayer settings clarity — 2026-11-24, local
+
+Settings separates the used location, method and advanced adjustments. The compact location summary retains the selected IANA zone/UTC offset with disclosed seasonal explanations. GPS uses the device-provided zone and an honest Device location/coordinate label; it does not perform reverse geocoding. City search remains the built-in offline catalogue and opens in a protected shared sheet/dialog. City choice never changes the calculation method or minute offsets.
+
+The five existing method definitions and IDs are unchanged. A short closed label is accompanied by the full authority name. Selection applies immediately through the existing callback, works offline and persists normally. Phones use a bounded opaque sheet; wide screens use the shared anchored select. Result notices no longer insert a banner into the form. Pending GPS is superseded by a city flow, method, manual save or adjustment, and ignored after unmount. Date/zone-keyed status avoids repeated seasonal sampling during typing while foreground/date refresh stays live. No religious content, prayer formula, timezone fallback, reminder or persistence contract changed. Physical-device acceptance remains pending.
+
+## Inline desktop guidance and recording date — 2026-11-24
+
+The owner supersedes the recording-date-in-information-sheet presentation. Home and the focused prayer card now show the same native time element directly in the card at all widths. It still formats the supplied tracking dayKey with the selected calendar and Hijri offset, including across midnight. Desktop exposes the unchanged Sunnah data and complete supporting evidence; compact screens retain the information dialog. No calculation, reminder, recording window, Friday identity, persisted field or source wording changes.
+
+The subsequent approved final reference places the complete passive citation beneath each quotation through one shared presentation component. This supersedes the older inline-virtue-citation presentation only; all quotation/reference strings, calendar identity, counts and recording behavior are unchanged.

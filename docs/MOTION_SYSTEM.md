@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Home compact overview — 2026-11-24 (local)
+
+The approved five-tile phone/tablet grid retains fixed content geometry through the existing sticky handoff. Desktop retains its large-time card anatomy and reflows at enlarged text. The passive shaded current/next interval uses the existing minute model, with no recurring decorative animation or live timer announcement. Next-prayer countdown remains accurate under both app/OS Reduce Motion. Existing scroll thresholds, hidden-work policy and calm endpoints are unchanged. Location now folds with the timings; an active location request or result dialog holds the expanded section so disabling Refresh does not remove its focus-recovery destination. The latest two-line summary/footer correction leaves motion tuning for a separate review. The replaced carousel's unused summary/footer styling is retired.
+
 ## Persistent Home dates — 2026-11-07
 
 Both calendar dates remain in the sticky header during scroll. The expanded prayer cards still hand off to the compact row with the existing motion and reduced-motion endpoints. Both states use the same localized minute countdown, with a separate final-minute label. The earlier seconds animation and decorative interval ring are retired from Home.
@@ -309,3 +313,15 @@ The owner requests a consistent app-wide review. Shared action/card icon cues us
 Whole-control pointer hover uses no brightness filter or opacity change. Those effects can establish backdrop boundaries and wash out the target's ink. Shared card hover uses a quiet edge reflection and existing finite icon scale. Keyboard focus remains distinct. Completed opacity entrances use backwards fill so the finished animation does not retain a compositing boundary over scenery.
 
 Soft scroll edges use threshold-only visibility and a fixed mask/blur. Header geometry, typography and blur strength do not animate with scroll position. High contrast and reduced transparency keep their existing clear boundary.
+
+## Download return and active feedback — 2026-11-24
+
+The approved downloads overview replaces the full-height active resource edge with one horizontal progress indicator. DownloadProgress opts out of ProgressBar's initial zero-fill arrival; a returning document-owned transfer renders its current ratio on first paint. Other reading progress retains its established arrival. Real subsequent values retain the shared transform transition and both still preferences. Reserve the active progress slot between group stages, do not fabricate a mixed bytes/pages percentage and do not animate the whole card or rerun entrances on each byte. Existing 80ms notification coalescing, hidden-work pause, visible reconciliation and finite action feedback remain.
+
+## Qibla clarity — 2026-11-24
+
+Sensor rotation retains shortest-angle smoothing without a second CSS rotation transition. North labels and Kaaba artwork counter-rotate upright. A confirmed check waits for raw and displayed alignment for 350ms and known acceptable sensor accuracy, with one optional existing haptic and five-degree re-arm. Unknown/poor/stale readings never trigger confirmation; hidden listeners/timers pause. Shared sheet motion and existing reduced-motion preferences apply without ambient loops.
+
+## Prayer-settings picker stability — 2026-11-24
+
+The calculation popup's text-bearing ground is opaque at its first visible frame; its scoped presentation removes the shared text fade/zoom rather than exposing the form underneath. The phone's existing drawer keeps its bounded transform transition and app/OS reduced-motion handling. Location and city/method feedback does not add an in-flow banner or replay the page entrance. Shared control hover, press, focus and selected-state cues remain; no ambient motion, new clock or per-card blur is added.

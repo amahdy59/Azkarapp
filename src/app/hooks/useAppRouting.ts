@@ -366,7 +366,11 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   const navigateSettingsPanel = useCallback(
     (panel: SettingsRoutePanel) =>
-      pushRouteState({ view: "settings", settingsPanel: panel }, () => setSettingsPanel(panel)),
+      pushRouteState({ view: "settings", settingsPanel: panel }, () => {
+        setSettingsPanel(panel);
+        setActiveTab("settings");
+        setView("settings");
+      }),
     [pushRouteState],
   );
 

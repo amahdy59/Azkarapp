@@ -8,8 +8,21 @@ export type DownloadJob = {
   transferredBytes?: number;
   detail?: AudioDownloadProgress;
   archive?: boolean;
+  selection?: readonly string[];
+  group?: string;
+  groupIndex?: number;
+  groupCount?: number;
+  finishedGroups?: readonly string[];
+  pageRange?: readonly [number, number];
+  cancelling?: boolean;
 };
-type Result = { id: string; status: "complete" | "cancelled" | "failed"; error?: unknown };
+type Result = {
+  id: string;
+  status: "complete" | "cancelled" | "failed";
+  error?: unknown;
+  selection?: readonly string[];
+  pageRange?: readonly [number, number];
+};
 type Snapshot = { job: DownloadJob | null; result: Result | null; revision: number };
 const listeners = new Set<() => void>();
 let snapshot: Snapshot = { job: null, result: null, revision: 0 };
@@ -21,7 +34,12 @@ const subscribe = (listener: () => void) => {
   return () => listeners.delete(listener);
 };
 export const getDownloadSession = () => snapshot;
-export const cancelDownloadSession = () => controller?.abort();
+export const cancelDownloadSession = () => {
+  if (!controller || controller.signal.aborted) return;
+  if (snapshot.job) snapshot = { ...snapshot, job: { ...snapshot.job, cancelling: true } };
+  emit();
+  controller.abort();
+};
 export function clearDownloadNotice() {
   if (!snapshot.result) return;
   snapshot = { ...snapshot, result: null };
@@ -29,7 +47,7 @@ export function clearDownloadNotice() {
 }
 export function updateDownloadSession(job: DownloadJob) {
   if (!controller || snapshot.job?.id !== job.id) return;
-  snapshot = { ...snapshot, job };
+  snapshot = { ...snapshot, job: { ...snapshot.job, ...job } };
   // Preserve exact bytes while bounding React updates during fast streams.
   if (!progressTimer && document.visibilityState !== "hidden")
     progressTimer = setTimeout(() => {
@@ -69,7 +87,11 @@ export async function runDownloadSession(job: DownloadJob, work: (controller: Ab
     progressTimer = undefined;
     controller = null;
   }
-  snapshot = { job: null, result, revision: snapshot.revision + 1 };
+  snapshot = {
+    job: null,
+    result: { ...result, selection: job.selection, pageRange: job.pageRange },
+    revision: snapshot.revision + 1,
+  };
   emit();
   return result;
 }

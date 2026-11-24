@@ -41,3 +41,9 @@ Downloads are private to the same app origin, browser profile and device, and do
 ## Packaged Android — 2026-10-15
 
 Eligible recordings retain verified explicit downloads, file export and ZIP export. A native media-source boundary reads complete cached audio into an object URL because the packaged Android shell does not register a service worker. Source changes release the URL. The system document picker exports bounded chunks to the user-selected location, without deleting app-private offline copies. The owner-authorized Muhammad Al-Shara recordings for Al-Baqarah and Al-Kahf are eligible for Android download and playback. Device playback/seek, large exports, cancellation and document-provider failures remain required acceptance evidence.
+
+## Approved combined entry — 2026-11-24
+
+The owner approves one combined Download all entry with optional category/page-juz selection, superseding the earlier three-top-level-card presentation. All available approved adhkar/dua and Kahf/Baqarah audio use the existing selected-voice resolution and checksum cache; complete Mushaf pages/fonts use their existing downloader. Groups run sequentially and independently. A failed group does not erase verified files or skip remaining groups; retry skips verified-ready categories and existing services reuse complete valid files within partial groups. Selected page retry retains the original range. ZIP/export, confirmed removal and honest persistence outcomes remain in secondary management.
+
+Only one overview owns active progress and cancel, with resource-specific units and group context. The app continues downloads during in-app navigation, retains the exact document snapshot and pauses hidden visual notifications. Closure/reload limitations remain; no native background guarantee or unverified-byte resume is added. Downloads still require complete-file verification and existing bounded native/Mushaf transfer limits.

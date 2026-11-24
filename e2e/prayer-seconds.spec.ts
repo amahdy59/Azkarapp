@@ -1,3 +1,4 @@
+import { assertPrayerOverview } from "./helpers/home-overview";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -26,22 +27,23 @@ for (const language of ["ar", "en"] as const) {
       await page.goto("/#/home");
       await page.evaluate(() => document.fonts.ready);
       const card = page.locator('[data-density="summary"][data-prayer-state="next"]');
-      const countdown = card.locator("[data-prayer-footer] .home-prayer-countdown-text");
+      const countdown = page.locator("#home-prayer-countdown");
       const wording = language === "ar" ? /متبقٍ.*[٠-٩]+\sد/u : /\d+m remaining/u;
-      await expect(countdown).toHaveCSS("font-size", width <= 768 ? "13px" : "15px");
+      await expect(countdown).toHaveCSS("font-size", "12px");
       await expect(countdown).toHaveText(wording);
-      const fitsOneLine = (node: HTMLElement) => {
+      const fits = (node: HTMLElement) => {
+        // Firefox exposes scrollWidth but no clientWidth on inline text.
+        // Measure the actual text fragments against their owning line instead.
+        const bounds = (node.closest("[data-prayer-countdown-line]") ?? node).getBoundingClientRect();
         const range = document.createRange();
         range.selectNodeContents(node);
-        const box = node.getBoundingClientRect();
-        const runs = [...range.getClientRects()].filter((rect) => rect.width > 0);
-        if (!runs.length) return false;
-        const lineTop = runs[0].top;
-        return runs.every(
-          (rect) => rect.left >= box.left - 1 && rect.right <= box.right + 1 && Math.abs(rect.top - lineTop) <= 1,
+        const fragments = [...range.getClientRects()].filter((rect) => rect.width > 0);
+        return (
+          fragments.length > 0 &&
+          fragments.every((rect) => rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1)
         );
       };
-      await expect.poll(() => countdown.evaluate(fitsOneLine)).toBe(true);
+      await expect.poll(() => countdown.evaluate(fits)).toBe(true);
       await expect(card.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
       const before = (await countdown.textContent())!;
       await page.clock.fastForward(2000);
@@ -51,34 +53,18 @@ for (const language of ["ar", "en"] as const) {
       await expect(countdown).toHaveText(wording);
       await expect(card.locator("[aria-live], [role=timer], [role=progressbar]")).toHaveCount(0);
       await expect(card.locator("button")).toHaveAccessibleDescription(wording);
-      const assertFit = async () =>
-        expect
-          .poll(() =>
-            card.evaluate((node) => {
-              const cardBox = node.getBoundingClientRect();
-              return [
-                ...node.querySelectorAll<HTMLElement>(".home-prayer-countdown-text, h3, [data-prayer-timing] p"),
-              ].flatMap((child) => {
-                const state = child.closest("[data-prayer-footer], [data-prayer-compact-countdown]");
-                if (state && getComputedStyle(state).opacity === "0") return [];
-                const box = child.getBoundingClientRect();
-                const start = box.left - cardBox.left;
-                const end = cardBox.right - box.right;
-                const overflow = child.scrollWidth - child.clientWidth;
-                return start >= 8 && end >= 8 && overflow <= 1
-                  ? []
-                  : [{ text: child.textContent, start, end, overflow }];
-              });
-            }),
-          )
-          .toEqual([]);
+      const assertFit = async () => {
+        await assertPrayerOverview(page);
+        const summary = page.getByTestId("home-prayer-interval");
+        expect(await summary.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+      };
       await assertFit();
       await page.screenshot({ path: testInfo.outputPath(`countdown-${language}-${width}.png`), scale: "css" });
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "200%";
       });
       await assertFit();
-      await expect.poll(() => countdown.evaluate(fitsOneLine)).toBe(true);
+      await expect.poll(() => countdown.evaluate(fits)).toBe(true);
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "";
       });
@@ -93,26 +79,20 @@ for (const language of ["ar", "en"] as const) {
         await expect(compact).toContainText(wording);
         await expect(compact.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
       } else {
-        const compact = card.locator("[data-prayer-compact-countdown]");
-        await expect(compact).toHaveCSS("opacity", "1");
+        const compact = page.getByTestId("home-prayer-interval");
+        await expect(compact).toBeVisible();
         await expect(compact).toContainText(wording);
         await expect(compact.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
-        await expect(card.locator("[data-prayer-compact-countdown] .home-prayer-countdown-text")).toHaveCSS(
-          "font-size",
-          "13px",
-        );
         await assertFit();
       }
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "200%";
       });
       await page.evaluate(() => document.fonts.ready);
-      await assertFit();
+      if (width >= 768) await assertFit();
       const activeCountdown =
-        width < 768
-          ? page.getByTestId("home-compact-prayer").locator("[data-prayer-countdown-line]")
-          : card.locator("[data-prayer-compact-countdown] .home-prayer-countdown-text");
-      await expect.poll(() => activeCountdown.evaluate(fitsOneLine)).toBe(true);
+        width < 768 ? page.getByTestId("home-compact-prayer").locator("[data-prayer-countdown-line]") : countdown;
+      await expect.poll(() => activeCountdown.evaluate(fits)).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.screenshot({
         path: testInfo.outputPath(`countdown-enlarged-condensed-${language}-${width}.png`),
@@ -140,9 +120,9 @@ for (const source of ["app", "os"] as const) {
       { source },
     );
     await page.goto("/#/home");
-    const footer = page.locator('[data-prayer-state="next"] [data-prayer-footer]');
+    const footer = page.getByTestId("home-prayer-interval");
     await expect(footer.locator(".prayer-countdown-arc, .prayer-countdown-seconds")).toHaveCount(0);
-    const countdown = footer.locator(".home-prayer-countdown-text");
+    const countdown = page.locator("#home-prayer-countdown");
     const before = (await countdown.textContent())!;
     await page.clock.fastForward(60_000);
     await expect(countdown).not.toHaveText(before);

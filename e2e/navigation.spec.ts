@@ -84,19 +84,18 @@ for (const viewport of [
       await expect(page.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
       await expect(page.getByRole("button", { name: "Enable live compass" })).toBeVisible();
       const qiblaSurface = page.locator(".app-screen-surface");
+      await expect(qiblaSurface).toHaveCSS("overflow-y", "auto");
+      await qiblaSurface.evaluate((element) => {
+        element.style.fontSize = "200%";
+      });
       await expect
-        .poll(() =>
-          qiblaSurface.evaluate((element) => ({
-            canScroll: element.scrollHeight > element.clientHeight,
-            overflowY: getComputedStyle(element).overflowY,
-          })),
-        )
-        .toEqual({ canScroll: true, overflowY: "auto" });
+        .poll(() => qiblaSurface.evaluate((element) => element.scrollHeight > element.clientHeight))
+        .toBe(true);
       await qiblaSurface.evaluate((element) => element.scrollTo({ top: element.scrollHeight }));
       expect(await qiblaSurface.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-      const accuracyDisclosure = page.locator("details").filter({ hasText: "Accuracy and calibration tips" });
-      await accuracyDisclosure.locator("summary").click();
+      await page.getByRole("button", { name: "Accuracy and calibration tips" }).click();
       await expect(page.getByText(/Keep the device flat/)).toBeVisible();
+      await page.getByTestId("qibla-details").getByTestId("modal-close-button").click();
     }
 
     await page.getByTestId("nav-home").click();
@@ -191,7 +190,7 @@ test("Qibla keeps the static bearing and explains Android sensor denial", async 
   await page.getByRole("button", { name: "Enable live compass" }).click();
   await expect(page.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
-  await expect(page.getByText("Find north, then turn clockwise to the bearing above.")).toBeVisible();
+  await expect(page.getByText("Static view — does not track your phone")).toBeVisible();
   await expect(page.getByTestId("qibla-arrow")).toHaveAttribute("transform", /^rotate\(136\./);
 });
 

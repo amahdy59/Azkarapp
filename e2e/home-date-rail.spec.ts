@@ -100,7 +100,13 @@ for (const viewport of [
     }
     await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
     await expect(secondary).toBeVisible();
-    await expect.poll(anchor).toEqual(anchored);
+    if (large && (await sticky.evaluate((node) => getComputedStyle(node).position === "relative"))) {
+      // The enlarged stacked overview releases sticky positioning so every
+      // prayer and the content below remain reachable in a short viewport.
+      const moved = await anchor();
+      const top = await scroller.evaluate((node) => node.scrollTop);
+      expect(moved.map((value) => Math.round(value + top))).toEqual(anchored.map(Math.round));
+    } else await expect.poll(anchor).toEqual(anchored);
     if (phone) {
       await expect(strip).toHaveAttribute("inert", "");
       await expect(summary).toBeInViewport();

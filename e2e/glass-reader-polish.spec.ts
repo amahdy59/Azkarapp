@@ -129,7 +129,7 @@ test("Glass cards reveal scenery and keep their ink stable during pointer hover 
     content: '[data-testid="time-of-day-scene-window"] > * { visibility: hidden !important; }',
   });
   const cards = [
-    page.locator(".home-prayer-summary-card").first(),
+    page.getByTestId("home-all-prayers-row").locator("article").first(),
     page.getByTestId("home-routine-card").locator(".hero-glass"),
     page.getByTestId("home-daily-evidence"),
   ];

@@ -176,4 +176,36 @@ describe("prayerCalculation", () => {
       longitude: 31.24,
     });
   });
+
+  it("retains fix metadata and lets Qibla explicitly bypass a cached position", async () => {
+    const getCurrentPosition = vi.fn((success: PositionCallback) =>
+      success({
+        coords: { latitude: 24.4672, longitude: 39.6111, accuracy: 20, altitude: 600 },
+        timestamp: 1795500000000,
+      } as GeolocationPosition),
+    );
+    Object.defineProperty(navigator, "geolocation", { configurable: true, value: { getCurrentPosition } });
+    await expect(detectUserCoordinates({ maximumAge: 0 })).resolves.toMatchObject({
+      ok: true,
+      accuracy: 20,
+      altitude: 600,
+      timestamp: 1795500000000,
+    });
+    expect(getCurrentPosition).toHaveBeenCalledWith(expect.any(Function), expect.any(Function), {
+      timeout: 8000,
+      enableHighAccuracy: true,
+      maximumAge: 0,
+    });
+  });
+
+  it("rejects an invalid coordinate fix rather than passing it into prayer or Qibla calculations", async () => {
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        getCurrentPosition: (success: PositionCallback) =>
+          success({ coords: { latitude: 91, longitude: NaN } } as GeolocationPosition),
+      },
+    });
+    await expect(detectUserCoordinates()).resolves.toEqual({ ok: false, reason: "unavailable" });
+  });
 });

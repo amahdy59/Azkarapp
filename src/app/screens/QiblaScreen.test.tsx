@@ -1,6 +1,8 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { getMagneticDeclination } from "../content/geomagnetic";
+import * as locationService from "../content/prayerCalculation";
 import { headingFromOrientation, QiblaScreen } from "./QiblaScreen";
 
 function orientationEvent(values: Partial<DeviceOrientationEvent> & { webkitCompassHeading?: number }) {
@@ -28,6 +30,48 @@ describe("headingFromOrientation", () => {
 describe("QiblaScreen", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it("shows location results in a dismissible modal and does not reuse an old warning after failure", async () => {
+    vi.spyOn(locationService, "detectUserCoordinates")
+      .mockResolvedValueOnce({ ok: true, latitude: 30.0444, longitude: 31.2357, accuracy: 1200 })
+      .mockResolvedValueOnce({ ok: false, reason: "denied" });
+    const user = userEvent.setup();
+    render(
+      <QiblaScreen
+        language="en"
+        direction="ltr"
+        locationSettings={{
+          latitude: 30.0444,
+          longitude: 31.2357,
+          cityName: "Cairo",
+          calculationMethod: 5,
+          autoDetect: false,
+        }}
+        reduceMotion
+        onBack={() => undefined}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Use my location" }));
+    expect(await screen.findByRole("dialog", { name: "Location update" })).toBeVisible();
+    expect(screen.getByTestId("qibla-location-warning")).toHaveTextContent("1200 m");
+    expect(screen.getByTestId("qibla-location-warning").closest(".qibla-main")).toBeNull();
+    await user.click(
+      screen
+        .getByTestId("qibla-location-notice")
+        .querySelector<HTMLButtonElement>('[data-testid="modal-close-button"]')!,
+    );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const refresh = screen.getByRole("button", { name: "Refresh: Use current location" });
+    expect(refresh).toHaveFocus();
+    await user.click(refresh);
+    expect(await screen.findByRole("dialog", { name: "Location update" })).toBeVisible();
+    expect(screen.getByText(/Location access was denied/)).toBeVisible();
+    expect(screen.queryByTestId("qibla-location-warning")).not.toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(refresh).toHaveFocus();
   });
 
   it("shows the offline bearing and a progressive live-compass control", () => {
@@ -52,7 +96,7 @@ describe("QiblaScreen", () => {
     expect(screen.getByText("Cairo")).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
-    expect(screen.getByText("Find north, then turn clockwise to the bearing above.")).toBeVisible();
+    expect(screen.getByText("Static view — does not track your phone")).toBeVisible();
     expect(screen.getByTestId("kaaba-target")).toBeInTheDocument();
     expect(screen.getByTestId("compass-rose")).toHaveAttribute("transform", "rotate(0 160 160)");
     expect(screen.getByRole("heading", { name: "Qibla" }).closest(".app-screen-surface")).toHaveClass(
@@ -169,10 +213,26 @@ describe("QiblaScreen", () => {
         }),
       );
     });
-    expect(screen.getByRole("heading", { name: "Turn 36° right" })).toBeVisible();
-    expect(screen.getByTestId("compass-rose")).toHaveAttribute("transform", "rotate(260 160 160)");
-    expect(screen.getByTestId("qibla-arrow")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(36\./));
-    expect(screen.getByTestId("kaaba-target")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(-36\./));
+    const correction = getMagneticDeclination(30.0444, 31.2357, new Date())!;
+    const turn = 136.14095496068893 - 100 - correction;
+    expect(screen.getByRole("heading", { name: `Turn ${Math.round(turn)}° right` })).toBeVisible();
+    expect(
+      Number(
+        screen
+          .getByTestId("compass-rose")
+          .getAttribute("transform")!
+          .match(/rotate\(([^ ]+)/)![1],
+      ),
+    ).toBeCloseTo(260 - correction, 2);
+    expect(
+      Number(
+        screen
+          .getByTestId("qibla-arrow")
+          .getAttribute("transform")!
+          .match(/rotate\(([^ ]+)/)![1],
+      ),
+    ).toBeCloseTo(turn, 2);
+    expect(screen.getByTestId("kaaba-target")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(-/));
     // Live angles are already smoothed by the domain helper. CSS must not
     // interpolate a second time, especially when the shortest turn flips sign.
     for (const heading of [315, 319, 359, 1]) {
@@ -236,7 +296,8 @@ describe("QiblaScreen", () => {
           beta: 0,
           gamma: 0,
           absolute: false,
-          webkitCompassHeading: 136,
+          webkitCompassHeading: 136.14095496068893 - getMagneticDeclination(30.0444, 31.2357, new Date())!,
+          webkitCompassAccuracy: 2,
         }),
       );
     });

@@ -2,13 +2,82 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PrayerActionsCard } from "./PrayerActionsCard";
 import type { PrayerTrackingRecord } from "../types";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { getPrayerInfoData } from "../content/prayerActions";
+
+vi.mock("../hooks/useMediaQuery", () => ({ useMediaQuery: vi.fn(() => false) }));
 
 afterEach(cleanup);
+afterEach(() => vi.mocked(useMediaQuery).mockReturnValue(false));
 
 // Weekday fixture keeps the ordinary Dhuhr rawatib expectations distinct from Friday guidance.
 const DAY = "2026-09-17";
 
 describe("PrayerActionsCard", () => {
+  it.each(["fajr", "dhuhr", "asr", "maghrib", "isha"] as const)(
+    "presents all %s guidance and references on desktop without extra controls",
+    (prayer) => {
+      vi.mocked(useMediaQuery).mockReturnValue(true);
+      render(
+        <PrayerActionsCard
+          prayer={prayer}
+          language="en"
+          direction="ltr"
+          records={[]}
+          dayKey={DAY}
+          onToggle={vi.fn()}
+          onOpenAdhkar={vi.fn()}
+        />,
+      );
+      const info = screen.getByTestId("prayer-inline-info");
+      expect(screen.queryByTestId("prayer-actions-more-info")).toBeNull();
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(info.querySelector("button, a, summary, details")).toBeNull();
+      const data = getPrayerInfoData(prayer, "en", DAY);
+      for (const item of data.sunnahItems) {
+        expect(info).toHaveTextContent(item.description);
+        expect(info).toHaveTextContent(item.rankLabel);
+        expect(info).toHaveTextContent(item.sunnah.evidence.textEnglish!);
+        expect(info).toHaveTextContent(item.sunnah.evidence.referenceEnglish);
+      }
+      if (data.rawatibVirtue) {
+        const virtue = screen.getByTestId("rawatib-virtue-banner");
+        expect(virtue).toBeVisible();
+        expect(virtue).toHaveTextContent(data.rawatibVirtue.evidence.textEnglish!);
+        expect(virtue.closest('[data-testid="prayer-actions-card"]')).toBe(screen.getByTestId("prayer-actions-card"));
+      } else expect(screen.queryByTestId("rawatib-virtue-banner")).toBeNull();
+      expect(screen.getAllByRole("checkbox")).toHaveLength(prayer === "dhuhr" ? 4 : 3);
+    },
+  );
+  it.each(["ar", "en"] as const)(
+    "keeps Friday's distinct alternatives and passive evidence on desktop in %s",
+    (language) => {
+      vi.mocked(useMediaQuery).mockReturnValue(true);
+      render(
+        <PrayerActionsCard
+          prayer="dhuhr"
+          language={language}
+          direction={language === "ar" ? "rtl" : "ltr"}
+          dayKey="2026-11-27"
+          records={[]}
+          onToggle={vi.fn()}
+          onOpenAdhkar={vi.fn()}
+        />,
+      );
+      const info = screen.getByTestId("prayer-inline-info");
+      for (const item of getPrayerInfoData("dhuhr", language, "2026-11-27").sunnahItems) {
+        expect(info).toHaveTextContent(
+          language === "ar" ? item.sunnah.evidence.textArabic : item.sunnah.evidence.textEnglish!,
+        );
+        expect(info).toHaveTextContent(
+          language === "ar" ? item.sunnah.evidence.referenceArabic : item.sunnah.evidence.referenceEnglish,
+        );
+      }
+      expect(info.querySelector("button, a, summary")).toBeNull();
+      expect(screen.queryByTestId("rawatib-virtue-banner")).toBeNull();
+      expect(screen.getAllByRole("checkbox")).toHaveLength(3);
+    },
+  );
   it("keeps reading independent from completion, including a completed future preview", () => {
     const onToggle = vi.fn();
     const onOpenAdhkar = vi.fn();

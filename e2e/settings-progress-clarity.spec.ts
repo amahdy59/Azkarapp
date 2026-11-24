@@ -2,6 +2,7 @@ import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { t } from "../src/app/i18n";
 
 for (const language of ["ar", "en"] as const) {
   for (const width of [320, 390, 900, 1440]) {
@@ -96,9 +97,11 @@ for (const language of ["ar", "en"] as const) {
         });
       }
       await page.goto("/#/settings/location");
+      await page.getByRole("button", { name: t(language, "prayerLocation.chooseAnotherCity") }).click();
       await expect(
         page.getByRole("searchbox", { name: ar ? "البحث في المدن والدول" : "Search cities and countries" }),
       ).toBeVisible();
+      await page.getByRole("button", { name: t(language, "common.close"), exact: true }).click();
       await expect(
         page.getByRole("switch", { name: ar ? "تذكيرات مواقيت الصلاة" : "Prayer-time reminders" }),
       ).toHaveCount(0);

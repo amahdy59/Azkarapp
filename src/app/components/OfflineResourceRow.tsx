@@ -35,6 +35,7 @@ export function OfflineResourceRow({
   compact = false,
   hideRemove = false,
   showDownload = true,
+  showTransfer = true,
   direction = language === "ar" ? "rtl" : "ltr",
   headingLevel = 3,
 }: {
@@ -56,6 +57,7 @@ export function OfflineResourceRow({
   compact?: boolean;
   hideRemove?: boolean;
   showDownload?: boolean;
+  showTransfer?: boolean;
   direction?: "ltr" | "rtl";
   headingLevel?: 2 | 3;
 }) {
@@ -88,7 +90,7 @@ export function OfflineResourceRow({
         {state}
       </p>
       {feedback && <div className="space-y-1 text-sm text-muted-foreground">{feedback}</div>}
-      {total > 0 && (!compact || active) && (
+      {showTransfer && total > 0 && (!compact || active) && (
         <DownloadProgress
           completed={completed}
           total={total}
@@ -99,7 +101,7 @@ export function OfflineResourceRow({
         />
       )}
       <div className="flex flex-wrap gap-2">
-        {!showDownload ? null : active ? (
+        {!showDownload || (active && !showTransfer) ? null : active ? (
           <Button
             className="h-auto min-h-11 max-w-full whitespace-normal py-2"
             variant="outline"

@@ -66,6 +66,16 @@ test("core Reader and Settings are available on a first offline visit after inst
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await expect(page.getByRole("heading", { name: /Al-Baqarah/ }).first()).toBeVisible();
 
+    // The entry and its own artwork must also work on their first offline visit.
+    await page.goto("/#/azkar/friday-kahf/1");
+    const cover = page.getByTestId("surah-artwork-cover");
+    await expect(cover).toHaveAttribute("src", /al-kahf-416\.webp$/);
+    await expect
+      .poll(() => cover.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0))
+      .toBe(true);
+    await expect(page.getByTestId("reader-mushaf-button")).toBeEnabled();
+    await page.screenshot({ path: testInfo.outputPath("first-offline-surah-entry.png") });
+
     await page.goto("/");
     if (await page.getByTestId("nav-more").isVisible()) {
       await page.getByTestId("nav-more").click();

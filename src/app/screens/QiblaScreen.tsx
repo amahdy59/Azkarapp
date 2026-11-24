@@ -1,179 +1,25 @@
-import { displayLocationName } from "../content/prayerLocations";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, Compass, MapPin } from "../components/icons";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, Compass, HelpCircle, Info, MapPin, RefreshCw } from "../components/icons";
 import { Header } from "../components/LayoutShells";
+import { QiblaCompassDial } from "../components/QiblaCompassDial";
+import { Modal, ResponsiveSheet, SheetHeader } from "../components/ResponsiveSheet";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
-import { detectUserCoordinates } from "../content/prayerCalculation";
+import { getMagneticDeclination } from "../content/geomagnetic";
+import { detectUserCoordinates, type CoordinateDetectionResult } from "../content/prayerCalculation";
+import { displayLocationName } from "../content/prayerLocations";
 import { formatNumerals } from "../formatting";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useNow } from "../hooks/useNow";
+import { useQiblaCompass } from "../hooks/useQiblaCompass";
 import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
-import { getKaabaDistance, getQiblaBearing, getQiblaTurn, normalizeDegrees, smoothCompassHeading } from "../qibla";
+import { getKaabaDistance, getQiblaBearing, getQiblaTurn, normalizeDegrees } from "../qibla";
 import type { AppLanguage, LocationSettings } from "../types";
+import "./qibla-screen.css";
 
-type OrientationEventWithCompass = DeviceOrientationEvent & {
-  webkitCompassHeading?: number;
-  webkitCompassAccuracy?: number;
-};
-
-type OrientationConstructorWithPermission = typeof DeviceOrientationEvent & {
-  requestPermission?: (absolute?: boolean) => Promise<"granted" | "denied">;
-};
-
-async function requestOrientationPermission(
-  orientation: OrientationConstructorWithPermission,
-): Promise<"granted" | "denied"> {
-  if (!orientation.requestPermission) return "granted";
-
-  try {
-    return await orientation.requestPermission(true);
-  } catch (error) {
-    if (!(error instanceof TypeError)) throw error;
-    // Safari shipped the permission API before its optional `absolute`
-    // argument. Those versions can reject the standards-based call even
-    // though their ordinary orientation event exposes webkitCompassHeading.
-    return orientation.requestPermission();
-  }
-}
-
-function screenOrientationAngle(): number {
-  const legacyOrientation = (window as typeof window & { orientation?: number }).orientation;
-  return window.screen.orientation?.angle ?? legacyOrientation ?? 0;
-}
-
-function computeHeadingFromEuler(alpha: number, beta: number, gamma: number): number {
-  const rad = Math.PI / 180;
-  const x = beta * rad;
-  const y = gamma * rad;
-  const z = alpha * rad;
-
-  const cY = Math.cos(y);
-  const cZ = Math.cos(z);
-  const sX = Math.sin(x);
-  const sY = Math.sin(y);
-  const sZ = Math.sin(z);
-
-  const Vx = -cZ * sY - sZ * sX * cY;
-  const Vy = -sZ * sY + cZ * sX * cY;
-
-  let heading = Math.atan2(Vx, Vy) * (180 / Math.PI);
-  if (heading < 0) heading += 360;
-  return normalizeDegrees(heading + screenOrientationAngle());
-}
-
-export function headingFromOrientation(event: OrientationEventWithCompass, fromAbsoluteEvent = false): number | null {
-  // WebKit uses a negative compass heading to signal an invalid reading.
-  if (Number.isFinite(event.webkitCompassHeading) && event.webkitCompassHeading! >= 0) {
-    return normalizeDegrees(event.webkitCompassHeading!);
-  }
-  if (!fromAbsoluteEvent && event.absolute !== true) return null;
-  if (!Number.isFinite(event.alpha)) return null;
-
-  if (
-    Number.isFinite(event.beta) &&
-    Number.isFinite(event.gamma) &&
-    (Math.abs(event.beta!) > 5 || Math.abs(event.gamma!) > 5)
-  ) {
-    return computeHeadingFromEuler(event.alpha!, event.beta!, event.gamma!);
-  }
-
-  return normalizeDegrees(360 - event.alpha! + screenOrientationAngle());
-}
-
-function cardinalKey(degrees: number): string {
-  const keys = ["north", "northEast", "east", "southEast", "south", "southWest", "west", "northWest"];
-  return keys[Math.round(normalizeDegrees(degrees) / 45) % 8]!;
-}
-
-function CompassDial({
-  rotation,
-  northRotation,
-  reduceMotion,
-  language,
-  aligned = false,
-}: {
-  rotation: number;
-  northRotation: number;
-  reduceMotion: boolean;
-  language: AppLanguage;
-  aligned?: boolean;
-}) {
-  const ticks = Array.from({ length: 36 }, (_, index) => index * 10);
-  const cardinalLabels = language === "ar" ? ["شمال", "شرق", "جنوب", "غرب"] : ["N", "E", "S", "W"];
-  return (
-    <svg viewBox="0 0 320 320" className="aspect-square w-full" aria-hidden="true">
-      <circle cx="160" cy="160" r="146" fill="var(--background)" stroke="var(--border)" strokeWidth="2" />
-      <circle cx="160" cy="160" r="124" fill="none" stroke="var(--border)" strokeWidth="1" opacity="0.55" />
-      <g data-testid="compass-rose" transform={`rotate(${northRotation} 160 160)`}>
-        {ticks.map((degrees) => {
-          const major = degrees % 90 === 0;
-          return (
-            <line
-              key={degrees}
-              x1="160"
-              y1={major ? 22 : 27}
-              x2="160"
-              y2={major ? 40 : 35}
-              stroke={major ? "var(--foreground)" : "var(--muted-foreground)"}
-              strokeWidth={major ? 3 : 1.5}
-              transform={`rotate(${degrees} 160 160)`}
-            />
-          );
-        })}
-        <g
-          fill="var(--foreground)"
-          fontFamily="inherit"
-          fontSize={language === "ar" ? "12" : "17"}
-          fontWeight="800"
-          textAnchor="middle"
-        >
-          <text x="160" y="58">
-            {cardinalLabels[0]}
-          </text>
-          <text x="263" y="166">
-            {cardinalLabels[1]}
-          </text>
-          <text x="160" y="274">
-            {cardinalLabels[2]}
-          </text>
-          <text x="57" y="166">
-            {cardinalLabels[3]}
-          </text>
-        </g>
-      </g>
-      <g data-testid="qibla-arrow" transform={`rotate(${rotation} 160 160)`}>
-        <path d="M160 67 181 168 160 151 139 168Z" fill="var(--primary)" />
-        <path d="M160 262 181 152 160 169 139 152Z" fill="var(--muted-foreground)" opacity="0.55" />
-        <g data-testid="kaaba-target" transform={`rotate(${-rotation} 160 43)`}>
-          <circle
-            cx="160"
-            cy="43"
-            r="29"
-            fill="none"
-            stroke="var(--primary)"
-            strokeWidth="3"
-            opacity={aligned ? 0.72 : 0}
-            style={
-              reduceMotion
-                ? undefined
-                : {
-                    transition: "opacity 180ms ease-out, transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
-                    transformOrigin: "160px 43px",
-                    transform: aligned ? "scale(1)" : "scale(0.78)",
-                  }
-            }
-          />
-          <circle cx="160" cy="43" r="23" fill="var(--primary)" opacity="0.14" />
-          <rect x="143" y="27" width="34" height="32" rx="4" fill="var(--foreground)" />
-          <path d="M143 36h34v7h-34z" fill="var(--primary)" />
-          <path d="M165 45h7v14h-7z" fill="var(--primary)" />
-        </g>
-      </g>
-      <circle cx="160" cy="160" r="12" fill="var(--background)" stroke="var(--primary)" strokeWidth="6" />
-    </svg>
-  );
-}
+export { headingFromOrientation } from "../hooks/useQiblaCompass";
+type DeviceLocation = Extract<CoordinateDetectionResult, { ok: true }>;
 
 export function QiblaScreen({
   language,
@@ -190,334 +36,430 @@ export function QiblaScreen({
   hapticFeedback?: boolean;
   onBack: () => void;
 }) {
-  const savedCoordinates = useMemo(
-    () =>
-      Number.isFinite(locationSettings?.latitude) && Number.isFinite(locationSettings?.longitude)
-        ? { latitude: locationSettings!.latitude!, longitude: locationSettings!.longitude! }
-        : null,
-    [locationSettings],
-  );
-  const [coordinates, setCoordinates] = useState(savedCoordinates);
-  const [locationLabel, setLocationLabel] = useState(displayLocationName(locationSettings, language) ?? null);
+  const [deviceLocation, setDeviceLocation] = useState<DeviceLocation | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
-  const [compassEnabled, setCompassEnabled] = useState(false);
-  const [heading, setHeading] = useState<number | null>(null);
-  const [compassStatus, setCompassStatus] = useState<string | null>(null);
-  const receivedHeading = useRef(false);
+  const [locationNoticeOpen, setLocationNoticeOpen] = useState(false);
+  const [locationWarningMeters, setLocationWarningMeters] = useState<number | null>(null);
+  const locationTrigger = useRef<HTMLButtonElement>(null);
+  const locationDescriptionId = useId();
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [aligned, setAligned] = useState(false);
+  const mounted = useRef(true),
+    locationRequest = useRef(0),
+    alignmentArmed = useRef(true);
+  const dayKey = useNow().toISOString().slice(0, 10);
   const showDesktopGuide = useMediaQuery("(min-width: 1024px) and (hover: hover) and (pointer: fine)");
-
-  const bearing = useMemo(
-    () => (coordinates ? getQiblaBearing(coordinates.latitude, coordinates.longitude) : null),
-    [coordinates],
+  const savedLatitude = locationSettings?.latitude,
+    savedLongitude = locationSettings?.longitude;
+  const savedCoordinates =
+    typeof savedLatitude === "number" &&
+    Number.isFinite(savedLatitude) &&
+    Math.abs(savedLatitude) <= 90 &&
+    typeof savedLongitude === "number" &&
+    Number.isFinite(savedLongitude) &&
+    Math.abs(savedLongitude) <= 180
+      ? { latitude: savedLatitude, longitude: savedLongitude }
+      : null;
+  const coordinates = deviceLocation ?? savedCoordinates;
+  const latitude = coordinates?.latitude,
+    longitude = coordinates?.longitude;
+  const declination = useMemo(
+    () =>
+      latitude !== undefined && longitude !== undefined
+        ? getMagneticDeclination(latitude, longitude, new Date(`${dayKey}T00:00:00Z`), deviceLocation?.altitude ?? 0)
+        : null,
+    [latitude, longitude, dayKey, deviceLocation?.altitude],
   );
-  const distanceKm = useMemo(
-    () => (coordinates ? getKaabaDistance(coordinates.latitude, coordinates.longitude) : null),
-    [coordinates],
-  );
-  const turn = bearing === null || heading === null ? null : getQiblaTurn(bearing, heading);
-  const dialRotation = turn ?? bearing ?? 0;
-  const northRotation = heading === null ? 0 : normalizeDegrees(-heading);
-  const roundedBearing = bearing === null ? null : Math.round(bearing);
-  const isAligned = turn !== null && Math.abs(turn) <= 3;
-  const alignmentArmed = useRef(true);
-  const alignmentTimer = useRef<number | null>(null);
-
+  const compass = useQiblaCompass(declination);
+  const bearing = coordinates ? getQiblaBearing(coordinates.latitude, coordinates.longitude) : null;
+  const distanceKm = coordinates ? getKaabaDistance(coordinates.latitude, coordinates.longitude) : null;
+  const degrees = bearing === null ? "" : formatNumerals(Math.round(bearing), language);
+  const turn = bearing === null || !compass.reading ? null : getQiblaTurn(bearing, compass.reading.heading);
+  const rawTurn = bearing === null || !compass.reading ? null : getQiblaTurn(bearing, compass.reading.rawHeading);
+  const nearTarget = turn !== null && rawTurn !== null && Math.abs(turn) <= 3 && Math.abs(rawTurn) <= 3;
+  const knownAccuracy = compass.reading?.accuracy !== null && compass.reading?.accuracy !== undefined;
+  const leftAlignment = rawTurn === null || Math.abs(rawTurn) > 5;
+  const locationLabel = deviceLocation
+    ? t(language, "qibla.deviceLocation")
+    : (displayLocationName(locationSettings, language) ??
+      t(language, coordinates ? "qibla.savedLocation" : "qibla.noLocation"));
+  const sourceLabel = t(language, deviceLocation ? "qibla.deviceLocation" : "qibla.usingSavedLocation");
+  const canRetryCompass = ["stale", "unavailable", "unsupported", "denied"].includes(compass.status);
+  const locationTime = deviceLocation?.timestamp
+    ? new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
+        dateStyle: "short",
+        timeStyle: "short",
+      }).format(deviceLocation.timestamp)
+    : null;
   useEffect(() => {
-    if (isAligned && alignmentArmed.current) {
-      alignmentTimer.current = window.setTimeout(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  useEffect(() => {
+    if (leftAlignment) alignmentArmed.current = true;
+  }, [leftAlignment]);
+  useEffect(() => {
+    setAligned(false);
+    if (!nearTarget || !knownAccuracy) return;
+    const timer = window.setTimeout(() => {
+      setAligned(true);
+      if (alignmentArmed.current) {
         vibrateIfEnabled(hapticFeedback, 15);
         alignmentArmed.current = false;
-      }, 350);
-    } else if (!isAligned) {
-      if (alignmentTimer.current !== null) window.clearTimeout(alignmentTimer.current);
-      alignmentTimer.current = null;
-      if (turn === null || Math.abs(turn) > 5) alignmentArmed.current = true;
-    }
-    return () => {
-      if (alignmentTimer.current !== null) window.clearTimeout(alignmentTimer.current);
-    };
-  }, [hapticFeedback, isAligned, turn]);
-
-  useEffect(() => {
-    if (!compassEnabled) return;
-
-    const handleOrientation = (rawEvent: Event) => {
-      const event = rawEvent as OrientationEventWithCompass;
-      const nextHeading = headingFromOrientation(event, rawEvent.type === "deviceorientationabsolute");
-      if (nextHeading === null) return;
-      receivedHeading.current = true;
-      setHeading((previous) => smoothCompassHeading(previous, nextHeading));
-      setCompassStatus(null);
-    };
-
-    window.addEventListener("deviceorientationabsolute", handleOrientation);
-    window.addEventListener("deviceorientation", handleOrientation);
-    const timeout = window.setTimeout(() => {
-      if (!receivedHeading.current) setCompassStatus(t(language, "qibla.compassUnavailable"));
-    }, 5000);
-
-    return () => {
-      window.clearTimeout(timeout);
-      window.removeEventListener("deviceorientationabsolute", handleOrientation);
-      window.removeEventListener("deviceorientation", handleOrientation);
-    };
-  }, [compassEnabled, language]);
-
-  const detectLocation = useCallback(async () => {
+      }
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [nearTarget, knownAccuracy, hapticFeedback]);
+  const detectLocation = async () => {
+    const id = ++locationRequest.current;
     setIsLocating(true);
     setLocationMessage(null);
-    const result = await detectUserCoordinates();
+    const result = await detectUserCoordinates({ maximumAge: 0 });
+    if (!mounted.current || id !== locationRequest.current) return;
+    setLocationWarningMeters(
+      result.ok && result.accuracy !== undefined && result.accuracy > 100 ? Math.ceil(result.accuracy) : null,
+    );
     if (result.ok) {
-      setCoordinates({ latitude: result.latitude, longitude: result.longitude });
-      setLocationLabel(`${result.latitude.toFixed(2)}°, ${result.longitude.toFixed(2)}°`);
+      setDeviceLocation(result);
       setLocationMessage(t(language, "qibla.locationReady"));
-    } else {
-      setLocationMessage(t(language, `qibla.location${result.reason[0]!.toUpperCase()}${result.reason.slice(1)}`));
-    }
+    } else setLocationMessage(t(language, `qibla.location${result.reason[0]!.toUpperCase()}${result.reason.slice(1)}`));
     setIsLocating(false);
-  }, [language]);
-
-  const toggleCompass = async () => {
-    if (compassEnabled) {
-      setCompassEnabled(false);
-      setHeading(null);
-      receivedHeading.current = false;
-      setCompassStatus(null);
-      return;
-    }
-    if (!window.isSecureContext || typeof DeviceOrientationEvent === "undefined") {
-      setCompassStatus(t(language, "qibla.compassUnsupported"));
-      return;
-    }
-    const orientation = DeviceOrientationEvent as OrientationConstructorWithPermission;
-    if (orientation.requestPermission) {
-      try {
-        const permission = await requestOrientationPermission(orientation);
-        if (permission !== "granted") {
-          setCompassStatus(t(language, "qibla.compassDenied"));
-          return;
-        }
-      } catch {
-        setCompassStatus(t(language, "qibla.compassDenied"));
-        return;
-      }
-    }
-    receivedHeading.current = false;
-    setCompassStatus(t(language, "qibla.compassWaiting"));
-    setCompassEnabled(true);
+    setLocationNoticeOpen(true);
   };
-
-  const guidance = (() => {
-    if (turn === null) return null;
-    const amount = Math.round(Math.abs(turn));
-    if (amount <= 3) return t(language, "qibla.aligned");
-    return t(language, turn > 0 ? "qibla.turnRight" : "qibla.turnLeft", {
-      degrees: formatNumerals(amount, language),
-    });
+  const openDetails = (trigger: HTMLButtonElement, help = false) => {
+    trigger.focus({ preventScroll: true });
+    setHelpOpen(help);
+    setDetailsOpen(true);
+  };
+  const statusText = (() => {
+    switch (compass.status) {
+      case "off":
+        return t(language, "qibla.staticLabel");
+      case "live":
+        return knownAccuracy
+          ? t(language, "qibla.headingAccuracy", {
+              degrees: formatNumerals(Math.ceil(compass.reading!.accuracy!), language),
+            })
+          : t(language, "qibla.headingAccuracyUnknown");
+      case "poor":
+        return t(language, "qibla.compassPoor");
+      case "stale":
+        return t(language, "qibla.compassStale");
+      case "paused":
+        return t(language, "qibla.compassPaused");
+      case "referenceUnavailable":
+        return t(language, "qibla.referenceUnavailable");
+      default:
+        return t(language, `qibla.compass${compass.status[0]!.toUpperCase()}${compass.status.slice(1)}`);
+    }
   })();
-
+  const guidance = aligned
+    ? t(language, "qibla.aligned")
+    : nearTarget
+      ? t(language, knownAccuracy ? "qibla.holdSteady" : "qibla.approximateAlignment")
+      : turn === null
+        ? t(language, "qibla.bearing", { degrees })
+        : t(language, turn > 0 ? "qibla.turnRight" : "qibla.turnLeft", {
+            degrees: formatNumerals(Math.round(Math.abs(turn)), language),
+          });
+  // Announce direction/state changes, not each high-frequency degree update.
+  const turnAnnouncement = aligned
+    ? t(language, "qibla.aligned")
+    : nearTarget
+      ? t(language, "qibla.holdSteady")
+      : turn === null
+        ? ""
+        : t(language, turn > 0 ? "qibla.turnRightShort" : "qibla.turnLeftShort");
+  const bearingText = t(language, "qibla.trueBearing", { degrees });
+  const distanceText =
+    distanceKm === null
+      ? ""
+      : t(language, "qibla.distanceToKaaba", {
+          distance: formatNumerals(distanceKm.toLocaleString("en-US"), language),
+        });
+  const cardinalKeys = ["north", "northEast", "east", "southEast", "south", "southWest", "west", "northWest"] as const;
+  const detailRows = [
+    [t(language, "qibla.locationSource"), sourceLabel],
+    [
+      t(language, "qibla.locationAccuracy"),
+      deviceLocation?.accuracy !== undefined
+        ? t(language, "qibla.accuracyMeters", { meters: formatNumerals(Math.ceil(deviceLocation.accuracy), language) })
+        : t(language, "qibla.notAvailable"),
+    ],
+    [t(language, "qibla.locationAcquired"), locationTime ?? t(language, "qibla.notAvailable")],
+    [t(language, "qibla.title"), bearing === null ? t(language, "qibla.notAvailable") : bearingText],
+    [t(language, "qibla.distanceLabel"), distanceText || t(language, "qibla.notAvailable")],
+  ];
   return (
-    <ScreenContainer className="overflow-y-auto" dir={direction} screenName={t(language, "qibla.title")}>
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
+    <ScreenContainer className="qibla-screen overflow-y-auto" dir={direction} screenName={t(language, "qibla.title")}>
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col">
         <Header
-          pageGutters
           title={t(language, "qibla.title")}
-          subtitle={t(language, "qibla.subtitle")}
           onBack={onBack}
           language={language}
+          right={
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-haspopup="dialog"
+              aria-label={t(language, "qibla.details")}
+              onClick={(event) => openDetails(event.currentTarget)}
+            >
+              <Info size={18} aria-hidden="true" />
+              <span className="qibla-details-label">{t(language, "qibla.details")}</span>
+            </Button>
+          }
         />
-        <div className="grid w-full min-w-0 grid-cols-1 content-start items-start gap-4 px-page py-4 [overflow-wrap:anywhere] lg:grid-cols-[minmax(20rem,1fr)_minmax(16rem,0.7fr)]">
+        <div
+          className={`grid min-w-0 gap-6 px-page py-2 ${showDesktopGuide ? "lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.7fr)]" : ""}`}
+        >
           <section
-            className="flex flex-col items-center rounded-3xl border border-border/50 bg-card p-4 shadow-raised sm:p-6"
-            aria-labelledby="qibla-bearing"
+            className="qibla-main mx-auto flex w-full min-w-0 max-w-md flex-col items-center gap-3"
+            aria-label={t(language, "qibla.title")}
           >
+            <div
+              data-testid="qibla-location"
+              className="flex w-full min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border/60 bg-card px-3 py-2"
+            >
+              <MapPin size={22} className="shrink-0 text-primary" aria-hidden="true" />
+              <div className="min-w-0 flex-1 basis-24 break-words">
+                <h2 className="text-base font-bold text-foreground">{locationLabel}</h2>
+                {coordinates && (
+                  <p className="text-xs leading-normal text-muted-foreground">
+                    {deviceLocation && locationTime
+                      ? t(language, "qibla.updatedAt", { time: locationTime })
+                      : sourceLabel}
+                  </p>
+                )}
+              </div>
+              <Button
+                ref={locationTrigger}
+                size="sm"
+                variant={coordinates ? "ghost" : "default"}
+                disabled={isLocating}
+                aria-busy={isLocating}
+                onClick={() => void detectLocation()}
+                aria-label={
+                  isLocating
+                    ? t(language, "qibla.locating")
+                    : deviceLocation
+                      ? `${t(language, "qibla.refreshLocation")}: ${t(language, "qibla.useCurrentLocation")}`
+                      : t(language, "qibla.useMyLocation")
+                }
+              >
+                <RefreshCw size={18} aria-hidden="true" />
+                {t(
+                  language,
+                  isLocating ? "qibla.locating" : deviceLocation ? "qibla.refreshLocation" : "qibla.useMyLocation",
+                )}
+              </Button>
+            </div>
             {bearing === null ? (
-              <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-                <MapPin size={40} className="text-primary" aria-hidden="true" />
-                <h2 id="qibla-bearing" className="mt-4 text-title font-extrabold text-foreground">
-                  {t(language, "qibla.locationNeeded")}
-                </h2>
-                <p className="mt-2 max-w-md text-sm font-semibold leading-6 text-muted-foreground">
-                  {t(language, "qibla.locationNeededHint")}
-                </p>
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <Compass size={40} className="text-primary" aria-hidden="true" />
+                <h2 className="text-title font-bold">{t(language, "qibla.locationNeeded")}</h2>
+                <p className="text-sm text-muted-foreground">{t(language, "qibla.locationNeededHint")}</p>
               </div>
             ) : (
               <>
-                <figure
-                  className="w-full"
-                  role="img"
-                  aria-label={t(language, "qibla.directionVisualLabel", {
-                    degrees: formatNumerals(roundedBearing!, language),
-                  })}
-                >
-                  <div className="mx-auto w-full max-w-[21rem]">
-                    <CompassDial
-                      rotation={dialRotation}
-                      northRotation={northRotation}
-                      reduceMotion={reduceMotion}
-                      language={language}
-                      aligned={isAligned}
-                    />
-                  </div>
-                </figure>
-                <h2 id="qibla-bearing" className="mt-1 text-center text-title font-extrabold text-foreground">
-                  {t(language, "qibla.bearing", { degrees: formatNumerals(roundedBearing!, language) })}
-                </h2>
-                <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
-                  {t(language, `qibla.${cardinalKey(bearing)}`)}
+                <p className="text-center text-sm text-muted-foreground">
+                  {t(language, compass.reading ? "qibla.phoneTopHint" : "qibla.staticDoesNotTrack")}
                 </p>
-                {distanceKm !== null && (
-                  <p className="mt-1 text-center text-xs font-medium text-muted-foreground">
-                    {t(language, "qibla.distanceToKaaba", {
-                      distance: formatNumerals(distanceKm.toLocaleString(), language),
-                    })}
-                  </p>
-                )}
-                <h3
-                  className="mt-3 flex min-h-6 items-center justify-center gap-2 text-center font-bold text-foreground"
-                  aria-live="polite"
+                <figure
+                  className="qibla-dial m-0"
+                  role="img"
+                  aria-label={t(language, "qibla.directionVisualLabel", { degrees })}
                 >
-                  <span
-                    aria-hidden="true"
-                    className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-[opacity,transform] duration-standard ${isAligned ? "scale-100 opacity-100" : "pointer-events-none scale-75 opacity-0"}`}
+                  <QiblaCompassDial
+                    rotation={turn ?? bearing}
+                    northRotation={compass.reading ? normalizeDegrees(-compass.reading.heading) : 0}
+                    reduceMotion={reduceMotion}
+                    language={language}
+                    aligned={aligned}
+                    live={turn !== null}
+                  />
+                </figure>
+                <div className="w-full text-center">
+                  <h2
+                    id="qibla-guidance"
+                    className="flex min-h-8 items-center justify-center gap-2 text-2xl font-extrabold leading-normal text-foreground"
                   >
-                    <Check size={15} strokeWidth={3} />
-                  </span>
-                  {guidance ?? t(language, "qibla.staticHint")}
-                </h3>
-                {!showDesktopGuide && (
+                    {aligned && <Check size={24} className="shrink-0 text-primary" aria-hidden="true" />}
+                    {guidance}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {turn !== null
+                      ? bearingText
+                      : t(language, `qibla.${cardinalKeys[Math.round(normalizeDegrees(bearing) / 45) % 8]!}`)}
+                  </p>
+                </div>
+                <p role="status" className="text-center text-sm leading-normal text-muted-foreground">
+                  {statusText}
+                </p>
+                <span role="status" className="sr-only">
+                  {turnAnnouncement}
+                </span>
+                {!showDesktopGuide && canRetryCompass && (
                   <Button
-                    className="mt-4 min-h-11 w-full max-w-sm"
-                    variant={compassEnabled ? "outline" : "default"}
-                    onClick={() => void toggleCompass()}
-                    aria-pressed={compassEnabled}
+                    variant="default"
+                    className="w-full"
+                    disabled={compass.requesting}
+                    onClick={() => void compass.retry()}
                   >
-                    {compassEnabled ? t(language, "qibla.stopCompass") : t(language, "qibla.startCompass")}
+                    <RefreshCw size={18} aria-hidden="true" />
+                    {t(language, "qibla.retryCompass")}
                   </Button>
                 )}
-                {compassStatus && (
-                  <p
-                    className="mt-3 text-center text-sm font-semibold text-muted-foreground"
-                    role="status"
-                    aria-live="polite"
+                {!showDesktopGuide && (
+                  <Button
+                    variant={compass.enabled ? "outline" : "default"}
+                    className="w-full"
+                    disabled={compass.requesting}
+                    aria-busy={compass.requesting}
+                    aria-pressed={compass.enabled}
+                    onClick={() => void compass.toggle()}
                   >
-                    {compassStatus}
-                  </p>
+                    <Compass size={18} aria-hidden="true" />
+                    {t(language, compass.enabled ? "qibla.stopCompass" : "qibla.startCompass")}
+                  </Button>
                 )}
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  aria-haspopup="dialog"
+                  onClick={(event) => openDetails(event.currentTarget, true)}
+                >
+                  <HelpCircle size={18} aria-hidden="true" />
+                  {t(language, compass.status === "poor" ? "qibla.calibrateCompass" : "qibla.accuracyTips")}
+                </Button>
               </>
             )}
           </section>
-
-          <aside className="flex min-w-0 flex-col gap-4">
-            <section className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
-              <div className="flex items-start gap-3">
-                <span
-                  className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
-                  aria-hidden="true"
-                >
-                  <MapPin size={22} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-subtitle font-extrabold text-foreground">{t(language, "qibla.locationTitle")}</h2>
-                  <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
-                    {coordinates
-                      ? locationLabel || `${coordinates.latitude.toFixed(2)}°, ${coordinates.longitude.toFixed(2)}°`
-                      : t(language, "qibla.noLocation")}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant={bearing === null ? "default" : "outline"}
-                className="mt-4 min-h-11 w-full"
-                onClick={() => void detectLocation()}
-                disabled={isLocating}
-              >
-                {isLocating ? t(language, "qibla.locating") : t(language, "qibla.useCurrentLocation")}
-              </Button>
-              {locationMessage && (
-                <p className="mt-3 text-sm font-semibold text-muted-foreground" role="status" aria-live="polite">
-                  {locationMessage}
-                </p>
-              )}
-              <p className="mt-3 text-xs font-semibold leading-5 text-muted-foreground">
-                {t(language, "qibla.locationPrivacy")}
-              </p>
+          {showDesktopGuide && (
+            <section className="h-fit rounded-3xl border border-border/50 bg-card p-5">
+              <h2 className="text-title font-bold">{t(language, "qibla.desktopGuideTitle")}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{t(language, "qibla.desktopGuideHint", { degrees })}</p>
+              <ol className="mt-4 list-inside list-decimal space-y-3 text-sm leading-relaxed">
+                {(["desktopGuideNorth", "desktopGuideTurn", "desktopGuideAlign"] as const).map((key) => (
+                  <li key={key}>{t(language, `qibla.${key}`, { degrees })}</li>
+                ))}
+              </ol>
             </section>
-
-            {showDesktopGuide ? (
-              <section className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
-                <div className="flex items-start gap-3">
-                  <span
-                    className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
-                    aria-hidden="true"
-                  >
-                    <Compass size={22} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-subtitle font-extrabold text-foreground">
-                      {t(language, "qibla.desktopGuideTitle")}
-                    </h2>
-                    <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
-                      {bearing === null
-                        ? t(language, "qibla.desktopGuideNeedsLocation")
-                        : t(language, "qibla.desktopGuideHint", {
-                            degrees: formatNumerals(roundedBearing!, language),
-                          })}
-                    </p>
-                  </div>
-                </div>
-                {bearing !== null && (
-                  <ol className="mt-4 space-y-3">
-                    {(["desktopGuideNorth", "desktopGuideTurn", "desktopGuideAlign"] as const).map((key, index) => (
-                      <li key={key} className="flex items-start gap-3 text-sm font-semibold leading-6 text-foreground">
-                        <span
-                          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-extrabold text-primary"
-                          aria-hidden="true"
-                        >
-                          {formatNumerals(index + 1, language)}
-                        </span>
-                        <span>
-                          {t(language, `qibla.${key}`, {
-                            degrees: formatNumerals(roundedBearing!, language),
-                          })}
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </section>
-            ) : (
-              <details className="group rounded-3xl border border-border/50 bg-card p-5 shadow-raised transition-colors">
-                <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between font-bold text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-                  <span>{t(language, "qibla.accuracyTips")}</span>
-                  <ChevronDown
-                    size={18}
-                    className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
-                    aria-hidden="true"
-                  />
-                </summary>
-                <div className="flex items-start gap-3">
-                  <span
-                    className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
-                    aria-hidden="true"
-                  >
-                    <Compass size={22} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
-                      {t(language, "qibla.calibrationHint")}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-3 text-xs font-semibold leading-5 text-muted-foreground">
-                  {t(language, "qibla.liveCompassHint")}
-                </p>
-              </details>
-            )}
-          </aside>
+          )}
         </div>
       </div>
+      <Modal
+        open={locationNoticeOpen}
+        onClose={() => setLocationNoticeOpen(false)}
+        title={t(language, "qibla.locationNoticeTitle")}
+        describedById={locationDescriptionId}
+        direction={direction}
+        language={language}
+        showCloseButton={false}
+        testId="qibla-location-notice"
+        className="qibla-details-surface"
+        onCloseAutoFocus={(event) => {
+          if (!locationTrigger.current?.isConnected) return;
+          event.preventDefault();
+          locationTrigger.current.focus({ preventScroll: true });
+        }}
+      >
+        <SheetHeader
+          title={t(language, "qibla.locationNoticeTitle")}
+          onClose={() => setLocationNoticeOpen(false)}
+          direction={direction}
+          language={language}
+        />
+        <div id={locationDescriptionId} className="min-h-0 space-y-3 overflow-y-auto px-5 py-4 text-sm leading-relaxed">
+          <p>{locationMessage}</p>
+          {locationWarningMeters !== null && (
+            <p data-testid="qibla-location-warning" className="text-muted-foreground">
+              {t(language, "qibla.locationApproximate", {
+                meters: formatNumerals(locationWarningMeters, language),
+              })}
+            </p>
+          )}
+        </div>
+        <div className="shrink-0 border-t border-border/50 p-4">
+          <Button className="w-full" onClick={() => setLocationNoticeOpen(false)}>
+            {t(language, "common.close")}
+          </Button>
+        </div>
+      </Modal>
+      <ResponsiveSheet
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        title={t(language, "qibla.detailsTitle")}
+        direction={direction}
+        language={language}
+        focusOnOpen
+        testId="qibla-details"
+        drawerClassName="qibla-details-surface"
+        dialogClassName="qibla-details-surface"
+      >
+        <SheetHeader
+          title={t(language, "qibla.detailsTitle")}
+          onClose={() => setDetailsOpen(false)}
+          direction={direction}
+          language={language}
+        />
+        <div className="min-h-0 overflow-y-auto px-5 py-4">
+          <h2 className="text-base font-bold">{locationLabel}</h2>
+          <dl className="mt-3 divide-y divide-border/50 text-sm">
+            {detailRows.map(([label, value]) => (
+              <div key={label} className="flex flex-wrap justify-between gap-x-4 gap-y-1 py-2">
+                <dt className="text-muted-foreground">{label}</dt>
+                <dd className="min-w-0 break-words text-end font-semibold">{value}</dd>
+              </div>
+            ))}
+          </dl>
+          {coordinates && (
+            <div className="mt-3 rounded-xl border border-border/60 p-3 text-sm">
+              <p className="text-muted-foreground">{t(language, "qibla.coordinates")}</p>
+              <p dir="ltr" className="mt-1 break-words text-center font-medium">
+                {coordinates.latitude.toFixed(5)}°, {coordinates.longitude.toFixed(5)}°
+              </p>
+            </div>
+          )}
+          <div className="mt-3 rounded-xl border border-border/60 p-3 text-sm leading-relaxed">
+            <p className="font-semibold">
+              {compass.reading && knownAccuracy
+                ? t(language, "qibla.headingAccuracy", {
+                    degrees: formatNumerals(Math.ceil(compass.reading.accuracy!), language),
+                  })
+                : t(language, "qibla.headingAccuracyUnknown")}
+            </p>
+            <p className="mt-1 text-muted-foreground">{t(language, "qibla.accuracyCaution")}</p>
+          </div>
+          <details open={helpOpen} onToggle={(event) => setHelpOpen(event.currentTarget.open)} className="mt-3">
+            <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+              {t(language, "qibla.accuracyTips")}
+              <ChevronDown size={18} aria-hidden="true" />
+            </summary>
+            <div className="space-y-3 py-2 text-sm leading-relaxed text-muted-foreground">
+              <p>{t(language, "qibla.calibrationHint")}</p>
+              <p>{t(language, "qibla.liveCompassHint")}</p>
+              <p>{t(language, "qibla.staticHint")}</p>
+              <p>{t(language, "qibla.northReferenceHint")}</p>
+            </div>
+          </details>
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t(language, "qibla.locationPrivacy")}</p>
+          {deviceLocation && (
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              {t(language, "qibla.prayerLocationUnchanged")}
+            </p>
+          )}
+        </div>
+        <div className="shrink-0 border-t border-border/50 p-4">
+          <Button className="w-full" onClick={() => setDetailsOpen(false)}>
+            {t(language, "common.close")}
+          </Button>
+        </div>
+      </ResponsiveSheet>
     </ScreenContainer>
   );
 }

@@ -1,3 +1,4 @@
+import { openDownloadManagement, openDownloadSelection } from "./helpers/downloads";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
@@ -23,6 +24,7 @@ for (const language of ["ar", "en"] as const) {
       await route.continue();
     });
     await page.goto("/#/settings/downloads");
+    await openDownloadSelection(page);
     const selection = page.getByTestId("mushaf-download-selection");
     await selection.locator("summary").click();
     await page.locator("html").evaluate((node) => {
@@ -88,6 +90,7 @@ for (const language of ["ar", "en"] as const) {
     await submit.click();
     await expect(page.getByText(t(language, "downloads.downloadComplete"), { exact: true })).toBeVisible();
     expect(acquired.sort()).toEqual(["/data/mushaf/42.json", "/fonts/qcf-v2/2026-10-11/p42.woff2"]);
+    await openDownloadManagement(page);
     await expect(page.getByTestId("offline-resource-mushaf")).toContainText(
       t(language, "downloads.mushafProgressValue", {
         completed: language === "ar" ? "١" : "1",
@@ -177,9 +180,10 @@ test("download survives navigation and cancels from the returning screen @cross-
     };
   });
   await page.goto("/#/settings/downloads");
+  await openDownloadManagement(page);
   const row = page.getByTestId("offline-resource-adhkar");
   await row.getByRole("button", { name: /^Download ·/ }).click();
-  await expect(row.getByRole("progressbar")).toHaveAttribute("value", "4096");
+  await expect(page.getByTestId("download-overview").getByRole("progressbar")).toHaveAttribute("value", "4096");
   await page.getByTestId("nav-home").click();
   await expect(page.getByTestId("home-daily-evidence")).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { __downloadAborts: number }).__downloadAborts)).toBe(0);
@@ -187,11 +191,11 @@ test("download survives navigation and cancels from the returning screen @cross-
   await page.evaluate(() => {
     window.location.hash = "/settings/downloads";
   });
-  await expect(row.getByRole("progressbar")).toHaveAttribute("value", "4096");
-  await expect(row).toHaveAttribute("data-transfer-state", "active");
+  await expect(page.getByTestId("download-overview").getByRole("progressbar")).toHaveAttribute("value", "4096");
+  await expect(page.getByTestId("download-overview")).toHaveAttribute("data-phase", "active");
   await page.screenshot({ path: info.outputPath("continued-download.png") });
-  await row.getByRole("button", { name: /^Cancel download ·/ }).click();
-  await expect(row.getByRole("progressbar")).toHaveCount(0);
+  await page.getByTestId("download-overview-action").click();
+  await expect(page.getByTestId("download-overview").getByRole("progressbar")).toHaveCount(0);
   expect(await page.evaluate(() => (window as unknown as { __downloadAborts: number }).__downloadAborts)).toBe(1);
 });
 
@@ -206,6 +210,7 @@ for (const mode of ["default", "app", "os"] as const) {
       );
     }, mode === "app");
     await page.goto("/#/settings/downloads");
+    await openDownloadManagement(page);
     const button = page.getByTestId("offline-resource-adhkar").getByRole("button", { name: /^Download ·/ });
     await expect(button).toBeEnabled();
     const geometry = () =>

@@ -1,8 +1,12 @@
 # Azkarapp
 
+Home keeps all five prayer times together with a two-line current/next summary, centered compact phone tiles and the original large-time desktop cards. Prayer names align beneath their labels, with remaining time beside the next prayer. Location sits below the timings with grouped Change and Refresh actions; long names and enlarged text reflow without squeezing controls. Location results open in a closable dialog. Expanded desktop cards present complete guidance and references directly, with tighter headings and a visible recording date.
+
+Surah entry uses a compact interface title, inset landscape artwork and one clear reading action. Single-surah entry omits the redundant collection tally; recorded completion remains visible. The bundled cover paints first, while optional sharper desktop artwork never replaces it with a blank loading state. Mushaf text, reading position, completion and audio behavior are preserved.
+
 Themes share a subtle static paper-grain background on pages, cards and Quran surfaces. Appearance → Paper texture controls the effect and remembers the device's choice. The small cached tile sits beneath content; accessibility/plain-material fallbacks remain untextured.
 
-Offline audio downloads continue during in-app navigation and expose progress/cancel when returning to Downloads. Readers can choose Mushaf pages or a juz as well as the full pack, and see resolved voices before audio transfer. Shared action icons have eased hover/focus feedback with still alternatives; narrow saved-page charts keep all seven dates in chronological rows. These refinements remain local pending owner review; they do not promise background transfers after closing the app.
+Offline audio downloads continue during in-app navigation and expose progress/cancel when returning to Downloads. Readers can choose Mushaf pages or a juz as well as the full pack, and see resolved voices before audio transfer. Shared action icons have eased hover/focus feedback with still alternatives; narrow saved-page charts keep all seven dates in chronological rows. Downloads still require keeping the app open.
 
 Home prayer times are larger inside the same expanded cards and return to their original size when collapsed. Share, Refresh, routine/Wird and shortcut actions have consistent keyboard/pointer feedback, with immediate still alternatives under Reduce Motion.
 
@@ -298,3 +302,5 @@ Local pnpm check validates audio catalog metadata offline. Use pnpm validate:aud
 ## Local adaptive navigation checkpoint
 
 Phone/tablet navigation keeps Home, Quran, Azkar, Qibla and Settings visible. Masbaha additionally appears when the bar has room; its Home card remains available. Progress is reachable through Today's path and More, and stays in wide navigation. Home provides a More action. These owner-approved refinements remain local under the publication hold.
+
+Qibla keeps the complete direction dial and location source together, with distance, coordinates and calibration in Details. Fresh device fixes remain separate from the saved prayer location. Supported live magnetic headings receive offline WMM2025 true-north correction; poor or stale readings return to a clearly labelled static bearing. Unknown sensor accuracy remains explicit. See [Qibla/location contracts](docs/PRAYER_TIMES.md).

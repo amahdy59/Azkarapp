@@ -6,38 +6,122 @@
   box-shadow: none;
 }
 
+.prayer-actions-card {
+  --prayer-detail-edge: var(--border);
+  gap: 1rem;
+}
+
+.prayer-moment-panel.home-glass-surface .prayer-actions-card,
+.hero-glass .prayer-actions-card {
+  --prayer-detail-edge: var(--glass-edge);
+}
+
+.prayer-actions-list {
+  gap: 0.25rem;
+}
+
+.prayer-actions-main,
+.prayer-actions-reading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.prayer-actions-context {
+  padding-inline: 0.75rem;
+  line-height: 1.7;
+}
+
+.prayer-sunnah-details {
+  min-inline-size: 0;
+  display: grid;
+  gap: 0.75rem;
+  border-block-start: 1px solid var(--prayer-detail-edge);
+  padding-block-start: 1rem;
+}
+
+.prayer-sunnah-points {
+  display: grid;
+  gap: 1rem;
+}
+
+.prayer-sunnah-point {
+  min-inline-size: 0;
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+}
+
+.prayer-sunnah-evidence {
+  min-inline-size: 0;
+  max-inline-size: 70ch;
+  border-inline-start: 2px solid var(--prayer-detail-edge);
+  padding-inline-start: 1rem;
+  margin-block-start: 0.25rem;
+}
+
+.prayer-sunnah-evidence > p {
+  line-height: 1.85;
+}
+
+.prayer-actions-card[data-inline-information] .prayer-actions-list label,
+.prayer-actions-card[data-inline-information] .prayer-actions-context {
+  padding-inline: 0;
+}
+
+.prayer-rawatib-details {
+  border-block-start: 1px solid var(--prayer-detail-edge);
+  padding-block-start: 1rem;
+}
+
 .prayer-evidence-desktop-title,
 .prayer-actions-evidence[data-expanded="false"] .prayer-evidence-body {
   display: none;
+}
+
+/* Desktop references remain visible even when enlarged text stacks the card. */
+.prayer-actions-card[data-inline-information] .prayer-evidence-toggle {
+  display: none;
+}
+
+.prayer-actions-card[data-inline-information] .prayer-evidence-desktop-title,
+.prayer-actions-card[data-inline-information] .prayer-evidence-body {
+  display: block;
 }
 
 /* Fit the actual card, including enlarged text, rather than the app viewport. */
 @container (min-width: 40rem) {
   .prayer-actions-card {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    column-gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 1rem 2rem;
+    padding: 1.5rem;
     align-items: start;
   }
 
-  .prayer-actions-header {
+  .prayer-actions-main {
     grid-column: 1;
-    grid-row: 1;
+    align-self: start;
   }
 
-  .prayer-actions-context {
+  .prayer-actions-reading {
     grid-column: 2;
-    grid-row: 1;
   }
 
-  .prayer-actions-list {
-    grid-column: 1;
-    grid-row: 2;
+  /* Reserve the control's width without letting its 44px target stretch the title row. */
+  .prayer-actions-card[data-inline-information][data-has-close] .prayer-actions-header {
+    position: relative;
+    padding-inline-end: 9rem;
+  }
+
+  .prayer-actions-card[data-inline-information][data-has-close] .home-prayer-detail-close {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: -0.5rem;
+    font-size: var(--text-label);
   }
 
   .prayer-actions-evidence {
-    grid-column: 2;
-    grid-row: 1 / 3;
     border-top: 0;
     padding-top: 0;
   }
