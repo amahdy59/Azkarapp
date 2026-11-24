@@ -24,7 +24,9 @@ for (const language of ["ar", "en"] as const) {
           );
         }, language);
         await page.goto("/#/home");
-        const home = page.getByTestId("prayer-card-asr");
+        // Compact tiles share their overview's material; desktop tiles own it.
+        const home = page.getByTestId(width >= 1200 ? "prayer-card-asr" : "prayer-tracker-cards");
+        await expect(home).toHaveClass(/hero-glass.*home-glass-surface/);
         const filter = await home.evaluate((n) => getComputedStyle(n).backdropFilter);
         const tint = await home.evaluate((n) => getComputedStyle(n).backgroundColor);
         const scene = await page.getByTestId("time-of-day-scene-window").last().locator("img").getAttribute("src");

@@ -35,10 +35,9 @@ for (const language of ["ar", "en"] as const) {
       const scroll = sticky.locator("..");
       const activeHandoffAnimations = () =>
         page.evaluate(() => {
-          const elements = document.querySelectorAll(
-            '[data-testid="home-sticky-prayers"], [data-density="summary"], [data-prayer-compact-countdown], [data-prayer-footer]',
-          );
-          return [...elements].flatMap((element) => element.getAnimations()).length;
+          const sticky = document.querySelector('[data-testid="home-sticky-prayers"]')!;
+          return sticky.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running")
+            .length;
         });
       const next = page.locator('[data-density="summary"][data-prayer-state="next"]');
       const label = next.locator("h3");
@@ -94,9 +93,21 @@ for (const language of ["ar", "en"] as const) {
       await expect(next.locator("progress")).toHaveCount(0);
       await expect(page.getByTestId("home-prayer-interval")).toContainText(/remaining|متبقٍ/);
       const footer = page.getByTestId("home-visitor-footer");
+      await expect(footer).toContainText(language === "ar" ? "١٢" : "12");
+      const footerBefore = await footer.evaluate((node) => {
+        const scroll = document.querySelector(".home-content-scroll")!;
+        return node.getBoundingClientRect().bottom + scroll.scrollTop;
+      });
       await footer.scrollIntoViewIfNeeded();
       await expect(footer).toBeInViewport();
-      await expect(footer).toContainText(language === "ar" ? "١٢" : "12");
+      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+      await expect.poll(activeHandoffAnimations).toBe(0);
+      const footerAfter = await footer.evaluate((node) => {
+        const scroll = document.querySelector(".home-content-scroll")!;
+        return node.getBoundingClientRect().bottom + scroll.scrollTop;
+      });
+      expect(footerAfter).toBeCloseTo(footerBefore, 0);
+      await expect(footer).toBeInViewport();
       expect(
         (await new AxeBuilder({ page }).include('[data-testid="home-sticky-prayers"]').analyze()).violations,
       ).toEqual([]);

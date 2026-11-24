@@ -557,23 +557,27 @@ export function HomeScreen({
     if (!scroll || !sticky) return;
     // Keep native focus/scroll-into-view recovery below the full sticky cards,
     // including when text size, viewport width or safe-area insets change.
-    let expandedHeight = sticky.getBoundingClientRect().height;
+    const overview = sticky.querySelector<HTMLElement>(".home-prayer-overview-v2");
+    const compact = sticky.querySelector<HTMLElement>(".home-compact-prayer");
     let viewportHeight = scroll.clientHeight;
     const measure = (entries: ResizeObserverEntry[] = []) => {
       const stickyEntry = entries.find((entry) => entry.target === sticky);
       const height = stickyEntry?.borderBoxSize?.[0]?.blockSize ?? sticky.getBoundingClientRect().height;
       if (entries.some((entry) => entry.target === scroll)) viewportHeight = scroll.clientHeight;
-      const expansion = Number(getComputedStyle(sticky).getPropertyValue("--home-prayer-expansion"));
-      if (expansion === 1) expandedHeight = height;
+      const foldRange =
+        overview && compact
+          ? Math.max(0, overview.getBoundingClientRect().height - compact.getBoundingClientRect().height)
+          : 0;
       // Finish geometry reads before changing styles. A read after changing
       // the reserved margin forced a second full layout on every motion frame.
       const fits = height + 44 < viewportHeight;
-      const reserved = `${Math.max(0, expandedHeight - height)}px`;
+      const range = `${foldRange}px`;
       const padding = `${fits ? height + 8 : 8}px`;
-      // Keep the same content coordinates while the sticky footprint contracts.
-      // This reserved flow space scrolls away normally, without scrollTop writes.
-      if (sticky.style.getPropertyValue("--home-prayer-reserved-space") !== reserved)
-        sticky.style.setProperty("--home-prayer-reserved-space", reserved);
+      // CSS reserves the fold's lost height in the same layout as contraction.
+      // Reserving it after resize lets Firefox clamp a bottom scroll before
+      // the observer can restore the range. Never repair that by scrolling.
+      if (sticky.style.getPropertyValue("--home-prayer-fold-range") !== range)
+        sticky.style.setProperty("--home-prayer-fold-range", range);
       // A short landscape or enlarged-text viewport must still expose the
       // content below the cards. Restore ordinary scrolling if it cannot.
       const position = fits ? "" : "relative";
@@ -583,12 +587,14 @@ export function HomeScreen({
     const observer = new ResizeObserver(measure);
     observer.observe(sticky);
     observer.observe(scroll);
+    if (overview) observer.observe(overview);
+    if (compact) observer.observe(compact);
     measure();
     return () => {
       observer.disconnect();
       scroll.style.removeProperty("scroll-padding-top");
       sticky.style.removeProperty("position");
-      sticky.style.removeProperty("--home-prayer-reserved-space");
+      sticky.style.removeProperty("--home-prayer-fold-range");
     };
   }, []);
 

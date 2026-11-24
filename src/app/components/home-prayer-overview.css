@@ -390,12 +390,15 @@
   padding: 0.25rem 0.5rem;
 }
 .home-prayer-overview-v2[data-desktop] .home-prayer-location:not(.hero-glass) {
-  background: var(--card);
+  background-color: var(--card);
 }
 [data-testid="home-secondary-date"] {
   margin-block-start: 2px;
 }
 /* Keep the existing sticky handoff, with stable intrinsic compact tile geometry. */
+.home-prayer-sticky:has(.home-prayer-overview-v2) {
+  margin-block-end: calc(var(--home-prayer-fold-range, 0px) * (1 - var(--home-prayer-expansion)));
+}
 .home-prayer-sticky-row:has(.home-prayer-overview-v2) {
   padding-block: 0.25rem;
 }

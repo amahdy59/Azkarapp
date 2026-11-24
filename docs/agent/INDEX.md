@@ -2,6 +2,8 @@
 
 ## Active phase
 
+[Approved Concept A and release regression repair](phases/PRAYER_CARD_CONCEPT_A_RELEASE_2026_11_24.md) is the current controlled follow-up after the owner's new image selection. Preserve the combined batch in c28fa0ca, repair all exact-commit CI failures and finish publication only after the final commit passes every required gate. This chat remains the single release owner.
+
 [Coordinated complete release](phases/COORDINATED_RELEASE_2026_11_24.md) is the current owner-authorized integration and publication phase. The owner approves the final prayer-card reference and requests pushing **all** pending repository changes after verification, superseding the earlier publication holds for this batch. This chat owns the combined commit/push and Quality/Pages/production monitoring. Earlier local phase descriptions below are historical handoffs; preserve their evidence and independent device/content limits.
 
 [Home prayer overview and location](phases/HOME_PRAYER_OVERVIEW_LOCAL_2026_11_24.md) records this chat's owner-approved local Home work and screenshot corrections. The latest correction keeps a two-line logical-start summary with inline remaining time, moves location below the timings and groups Change/Refresh without a Home dropdown. Keep the desktop timer-card anatomy, centered phone tiles and theme/material adaptation. Preserve all separately scoped pending changes and the publication hold. [Two-line/footer verification](reports/HOME_TWO_LINE_LOCATION_2026_11_24_REPORT.md) records the latest implementation; the [preceding report](reports/HOME_PRAYER_OVERVIEW_LOCAL_2026_11_24_REPORT.md) retains earlier evidence and independent full-gate blockers.

@@ -1,6 +1,7 @@
 import { assertPrayerOverview } from "./helpers/home-overview";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { t } from "../src/app/i18n";
 
 for (const language of ["ar", "en"] as const) {
   for (const width of [390, 480, 1440]) {
@@ -40,7 +41,10 @@ for (const language of ["ar", "en"] as const) {
           .toBe(true);
       }
       const summary = page.getByTestId("home-prayer-interval");
-      await expect(summary).toContainText(language === "ar" ? "حان وقتها" : "Now");
+      await expect(summary.locator('[data-prayer-summary-state="current"] .home-prayer-summary-label')).toHaveText(
+        t(language, "prayerTracking.nowPill"),
+      );
+      await expect(current).toHaveAttribute("aria-current", "step");
       await expect(summary).toContainText(language === "ar" ? "متبقٍ" : "remaining");
       await expect(next.getByRole("progressbar")).toHaveCount(0);
       await page.evaluate(() => document.fonts.ready);

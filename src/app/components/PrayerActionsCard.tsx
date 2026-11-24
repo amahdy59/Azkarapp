@@ -91,6 +91,7 @@ export function PrayerActionsCard({
       data-testid="prayer-actions-card"
       data-prayer={prayer}
       data-inline-information={desktop || undefined}
+      data-on-glass={onGlass || undefined}
       data-has-close={Boolean(onClose) || undefined}
       aria-labelledby={`prayer-actions-heading-${prayer}`}
       dir={direction}
@@ -147,91 +148,93 @@ export function PrayerActionsCard({
           )}
         </div>
 
-        {/* Plain rows grow naturally with wrapped labels, retaining 44px targets. */}
-        <ol className="prayer-actions-list flex min-w-0 flex-col">
-          {actions.map((action) => {
-            const inputId = `prayer-action-${prayer}-${action.id}`;
-            const labelId = `prayer-action-label-${prayer}-${action.id}`;
+        <div className="prayer-actions-checklist" data-testid="prayer-actions-checklist">
+          {/* One shared surface; plain rows retain independent native targets. */}
+          <ol className="prayer-actions-list flex min-w-0 flex-col">
+            {actions.map((action) => {
+              const inputId = `prayer-action-${prayer}-${action.id}`;
+              const labelId = `prayer-action-label-${prayer}-${action.id}`;
 
-            return (
-              <li
-                key={action.id}
-                data-testid={action.testId}
-                className="group/item flex min-h-11 min-w-0 flex-wrap items-center gap-2"
-              >
-                <label
-                  className={`relative flex min-h-11 ${action.id === "adhkar" ? "min-w-[min(100%,10rem)] flex-initial" : "min-w-0 flex-1"} cursor-pointer items-center gap-3 rounded-xl px-3 py-1 transition-colors duration-fast ${
-                    onGlass
-                      ? "text-on-media hover:bg-white/10 active:bg-white/15"
-                      : "text-foreground hover:bg-muted/50 active:bg-muted/70"
-                  }`}
+              return (
+                <li
+                  key={action.id}
+                  data-testid={action.testId}
+                  className="group/item flex min-h-11 min-w-0 flex-wrap items-center gap-2"
                 >
-                  {/* Overlay transparent checkbox spanning full row for accessibility & 44px+ hit target */}
-                  <input
-                    id={inputId}
-                    type="checkbox"
-                    disabled={!canRecord}
-                    checked={action.checked}
-                    onChange={(event) => {
-                      if (!canRecord) return;
-                      const next = event.currentTarget.checked;
-                      if (action.id === "congregation") {
-                        onToggle(prayer, "location", next ? "mosque" : null);
-                      } else {
-                        onToggle(prayer, action.field, next);
-                      }
-                    }}
-                    aria-labelledby={labelId}
-                    className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
-                  />
-
-                  <TrackingCheckMark checked={action.checked} onGlass={onGlass} compact />
-                  <div className="min-w-0 flex-1">
-                    <span
-                      id={labelId}
-                      className={`block break-words text-base font-semibold leading-normal ${onGlass ? "text-on-media" : titleColor}`}
-                      dir="auto"
-                    >
-                      {action.label}
-                    </span>
-                  </div>
-                </label>
-                {action.id === "adhkar" && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenAdhkar(prayer)}
-                    data-testid="prayer-open-adhkar"
-                    aria-label={t(language, "prayerActions.readAdhkarAria")}
-                    className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-transparent px-1.5 py-1 text-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+                  <label
+                    className={`relative flex min-h-11 ${action.id === "adhkar" ? "min-w-[min(100%,10rem)] flex-initial" : "min-w-0 flex-1"} cursor-pointer items-center gap-3 rounded-xl px-3 py-1 transition-colors duration-fast ${
+                      onGlass
+                        ? "text-on-media hover:bg-white/10 active:bg-white/15"
+                        : "text-foreground hover:bg-muted/50 active:bg-muted/70"
+                    }`}
                   >
-                    <BookOpen size={18} className="shrink-0" aria-hidden="true" />
-                    <span>{t(language, "prayerActions.readAdhkar")}</span>
-                  </button>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-        {(status || showProgress) && (
-          <div
-            className={`prayer-actions-context flex flex-wrap items-start justify-between gap-x-3 gap-y-1 text-label ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
-          >
-            {status}
-            {showProgress && (
-              <output
-                aria-live="polite"
-                aria-atomic="true"
-                className="leading-relaxed"
-                data-testid="prayer-actions-progress"
-              >
-                {t(language, "prayerActions.completedCount", {
-                  count: formatNumerals(actions.filter((action) => action.checked).length, language),
-                  total: formatNumerals(actions.length, language),
-                })}
-              </output>
-            )}
-          </div>
-        )}
+                    {/* Overlay transparent checkbox spanning full row for accessibility & 44px+ hit target */}
+                    <input
+                      id={inputId}
+                      type="checkbox"
+                      disabled={!canRecord}
+                      checked={action.checked}
+                      onChange={(event) => {
+                        if (!canRecord) return;
+                        const next = event.currentTarget.checked;
+                        if (action.id === "congregation") {
+                          onToggle(prayer, "location", next ? "mosque" : null);
+                        } else {
+                          onToggle(prayer, action.field, next);
+                        }
+                      }}
+                      aria-labelledby={labelId}
+                      className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
+                    />
+
+                    <TrackingCheckMark checked={action.checked} onGlass={onGlass} compact />
+                    <div className="min-w-0 flex-1">
+                      <span
+                        id={labelId}
+                        className={`block break-words text-base font-semibold leading-normal ${onGlass ? "text-on-media" : titleColor}`}
+                        dir="auto"
+                      >
+                        {action.label}
+                      </span>
+                    </div>
+                  </label>
+                  {action.id === "adhkar" && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenAdhkar(prayer)}
+                      data-testid="prayer-open-adhkar"
+                      aria-label={t(language, "prayerActions.readAdhkarAria")}
+                      className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-transparent px-1.5 py-1 text-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+                    >
+                      <BookOpen size={18} className="shrink-0" aria-hidden="true" />
+                      <span>{t(language, "prayerActions.readAdhkar")}</span>
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+          {(status || showProgress) && (
+            <div
+              className={`prayer-actions-context flex flex-wrap items-start justify-between gap-x-3 gap-y-1 text-label ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+            >
+              {status}
+              {showProgress && (
+                <output
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className="leading-relaxed"
+                  data-testid="prayer-actions-progress"
+                >
+                  {t(language, "prayerActions.completedCount", {
+                    count: formatNumerals(actions.filter((action) => action.checked).length, language),
+                    total: formatNumerals(actions.length, language),
+                  })}
+                </output>
+              )}
+            </div>
+          )}
+        </div>
         {desktop && <PrayerRawatibDetails info={infoData} language={language} onGlass={onGlass} />}
       </div>
       <div className="prayer-actions-reading min-w-0">

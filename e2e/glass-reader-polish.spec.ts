@@ -69,7 +69,15 @@ for (const language of ["ar", "en"] as const) {
     await expect(title).toHaveCount(1);
     await title.scrollIntoViewIfNeeded();
     await expect(title).toBeInViewport();
-    await expect(title).toHaveCSS("color", "rgb(131, 88, 6)");
+    const foreground = await title.evaluate((element) => {
+      const probe = document.createElement("span");
+      probe.style.color = "var(--foreground)";
+      element.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    });
+    await expect(title).toHaveCSS("color", foreground);
     const actions = page.getByTestId("surah-reading-actions");
     for (const key of ["reader.listenToSurah", "reader.readFromMushaf", "reader.readExternally"] as const) {
       const button = actions.getByRole("button", { name: t(language, key), exact: true });

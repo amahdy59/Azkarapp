@@ -110,7 +110,7 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
     expect(mobileCompanionBox.y + mobileCompanionBox.height).toBeLessThanOrEqual(mobileWirdBox.y);
   }
 
-  const maghribLabel = page.locator("#prayer-card-heading-maghrib");
+  const maghribLabel = page.getByTestId("prayer-card-maghrib").getByRole("heading");
   await expect(maghribLabel).toHaveText("Maghrib");
   expect(
     await maghribLabel.evaluate((element) => ({
@@ -164,11 +164,8 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
       expect(prayerDetailBox.x).toBeCloseTo(gridBox.x, 0);
       expect(prayerSummaryBox.width).toBeCloseTo(gridBox.width, 0);
       expect(prayerSummaryBox.x + prayerSummaryBox.width / 2).toBeCloseTo(gridBox.x + gridBox.width / 2, 0);
-      const cardBottom = await prayerSummary
-        .locator("article")
-        .first()
-        .evaluate((node) => node.getBoundingClientRect().bottom);
-      expect(prayerDetailBox.y).toBeCloseTo(cardBottom + 20, 0);
+      // The approved location footer is part of the complete prayer overview.
+      expect(prayerDetailBox.y).toBeCloseTo(prayerSummaryBox.y + prayerSummaryBox.height + 0.25 * rootSize, 0);
       expect(primaryBox.width).toBeCloseTo((gridBox.width - rootSize) / 2, 0);
       expect(companionBox.width).toBeCloseTo(primaryBox.width, 0);
       expect(primaryBox.y).toBeCloseTo(prayerDetailBox.y + prayerDetailBox.height + 0.75 * rootSize, 0);
@@ -231,7 +228,7 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
   expect(prayerOverflow.scrollWidth).toBeLessThanOrEqual(prayerOverflow.clientWidth + 1);
 });
 
-test("wide Home keeps navigation exposed, contains its scene, and uses glass for every card", async ({ page }) => {
+test("wide Home keeps navigation exposed, Glass cards and an opaque expanded reading ground", async ({ page }) => {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setEmulatedMedia", {
     features: [{ name: "prefers-reduced-transparency", value: "no-preference" }],
@@ -273,14 +270,20 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
 
   const material = await glassCards[1]!.evaluate((element) => {
     const style = getComputedStyle(element);
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const context = canvas.getContext("2d")!;
+    context.fillStyle = style.backgroundColor;
+    context.fillRect(0, 0, 1, 1);
     return {
-      backgroundColor: style.backgroundColor,
+      backgroundAlpha: context.getImageData(0, 0, 1, 1).data[3],
       backgroundImage: style.backgroundImage,
       backdropFilter: style.backdropFilter,
       boxShadow: style.boxShadow,
     };
   });
-  expect(material.backgroundColor).toBe("rgba(15, 23, 42, 0.24)");
+  expect(material.backgroundAlpha).toBe(255);
+  await expect(glassCards[0]!).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
   expect(material.backgroundImage).toContain("linear-gradient");
   expect(material.backdropFilter).toContain("blur(22px)");
   expect(material.boxShadow).not.toBe("none");
@@ -467,7 +470,7 @@ test("the full-screen texture stays absent across pages and reduced transparency
   expect(await appShell.evaluate((element) => getComputedStyle(element, "::after").display)).toBe("none");
 });
 
-test("prayer information keeps concise RTL and LTR points with keyboard evidence disclosure", async ({
+test("prayer information preserves compact keyboard disclosure and inline desktop evidence in RTL and LTR", async ({
   page,
 }, testInfo) => {
   await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
@@ -497,9 +500,9 @@ test("prayer information keeps concise RTL and LTR points with keyboard evidence
     await expect(evidence).toHaveAttribute("open", "");
     await expect(evidence.locator("blockquote")).toBeVisible();
     await page.keyboard.press("Enter");
-    for (const width of [320, 390, 1440]) {
+    for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 844 });
-      // The modal dialog remains centered and contained across phone and desktop widths.
+      // The compact dialog remains contained at both phone widths.
       await expect(modal).toBeVisible();
       expect(await modal.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
       expect(await points.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
@@ -509,5 +512,16 @@ test("prayer information keeps concise RTL and LTR points with keyboard evidence
     await modal.screenshot({ path: testInfo.outputPath("prayer-info-" + language + ".png") });
     await page.keyboard.press("Escape");
     await expect(info).toBeFocused();
+    await info.click();
+    await page.setViewportSize({ width: 1440, height: 844 });
+    await expect(modal).toHaveCount(0);
+    const inline = page.getByTestId("prayer-inline-info");
+    await expect(inline.getByTestId("prayer-info-points").locator(":scope > li")).toHaveCount(2);
+    await expect(inline.locator("summary, details, a, button")).toHaveCount(0);
+    for (const quote of await inline.locator("blockquote").all()) await expect(quote).toBeVisible();
+    await expect(page.getByTestId("prayer-open-adhkar")).toBeFocused();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(info).toBeVisible();
+    await expect(modal).toHaveCount(0);
   }
 });

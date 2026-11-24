@@ -100,26 +100,47 @@ for (const viewport of [
     }
     await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
     await expect(secondary).toBeVisible();
-    if (large && (await sticky.evaluate((node) => getComputedStyle(node).position === "relative"))) {
-      // The enlarged stacked overview releases sticky positioning so every
-      // prayer and the content below remain reachable in a short viewport.
-      const moved = await anchor();
-      const top = await scroller.evaluate((node) => node.scrollTop);
-      expect(moved.map((value) => Math.round(value + top))).toEqual(anchored.map(Math.round));
+    if (large) {
+      // Folding can make the oversized overview fit again. ResizeObserver then
+      // restores sticky positioning. Read its policy and coordinates in one
+      // frame instead of adding scrollTop to a subsequently pinned header.
+      await expect
+        .poll(() =>
+          sticky.evaluate((node) => {
+            const scroll = node.parentElement!;
+            const fits = node.getBoundingClientRect().height + 44 < scroll.clientHeight;
+            const position = getComputedStyle(node).position;
+            const offset = position === "relative" ? scroll.scrollTop : 0;
+            const date = node.querySelector('[data-testid="hijri-date"] time')!;
+            const progress = [...node.querySelectorAll(".home-header-path-button")].find(
+              (button) => button.getBoundingClientRect().width > 0,
+            )!;
+            return {
+              policySettled: position === (fits ? "sticky" : "relative"),
+              coordinates: [date, progress, node].map((element) =>
+                Math.round(element.getBoundingClientRect().y + offset),
+              ),
+            };
+          }),
+        )
+        .toEqual({ policySettled: true, coordinates: anchored.map(Math.round) });
     } else await expect.poll(anchor).toEqual(anchored);
     if (phone) {
       await expect(strip).toHaveAttribute("inert", "");
       await expect(summary).toBeInViewport();
       const action = summary.getByRole("button", { name: t(language, "home.viewAllPrayers") });
-      const hit = await action.evaluate((node) => {
-        const r = node.getBoundingClientRect();
-        return (
-          r.height >= 44 &&
-          r.width >= 44 &&
-          node.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2))
-        );
-      });
-      expect(hit).toBe(true);
+      await expect
+        .poll(() =>
+          action.evaluate((node) => {
+            const r = node.getBoundingClientRect();
+            return (
+              r.height >= 44 &&
+              r.width >= 44 &&
+              node.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2))
+            );
+          }),
+        )
+        .toBe(true);
       await expect(summary).toContainText(language === "ar" ? /متبقٍ.*[٠-٩]+\sد/u : /\d+m remaining/u);
     } else {
       await expect(summary).toHaveCount(0);

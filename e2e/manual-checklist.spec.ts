@@ -1,4 +1,5 @@
 import { openProgress } from "./helpers/open-progress";
+import { assertPrayerOverview } from "./helpers/home-overview";
 /**
  * Automated evidence for rows of the Manual release record in
  * `docs/QUALITY_CHECKLIST.md` that do not actually require a human.
@@ -346,23 +347,13 @@ test("post-prayer summaries show all prayers and preserve actionable tracking", 
     await expect(card.locator('input[type="checkbox"]')).toHaveCount(0);
     await expect(card.getByRole("button")).toBeDisabled();
   }
-  const geometry = await cards.evaluateAll((nodes) =>
-    nodes.map((card) => {
-      const top = card.getBoundingClientRect().top;
-      const heading = card.querySelector("h3")!;
-      const time = card.querySelector('[id^="prayer-summary-time-"]')!;
-      const status = card.querySelector('[id^="prayer-summary-status-"]')!;
-      return [
-        card.getBoundingClientRect().height,
-        heading.getBoundingClientRect().top - top,
-        time.getBoundingClientRect().top - top,
-        status.getBoundingClientRect().top - top,
-      ]
-        .map(Math.round)
-        .join("|");
-    }),
-  );
-  expect(new Set(geometry).size).toBe(1);
+  // The shared summary replaces per-card status footers. Check the actual
+  // icon/name/time/disclosure geometry, including enlarged stacked rows.
+  await page.evaluate(() => document.fonts.ready);
+  await assertPrayerOverview(page);
+  const summary = page.getByTestId("home-prayer-interval");
+  await expect(summary.locator('[data-prayer-summary-state="current"]')).toContainText("Now");
+  await expect(grid.locator('[aria-current="step"]')).toHaveCount(1);
   // Tracking now belongs to the expanded actionable prayer, rather than five duplicated fieldsets.
   const currentCard = grid.locator('article[data-prayer-state="current"]');
   if (await currentCard.count()) {

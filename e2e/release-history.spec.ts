@@ -36,8 +36,7 @@ for (const language of ["ar", "en"] as const) {
     await expect(latest).toContainText(history[0]![language][0]!);
     const disclosure = page.locator("details").first();
     const summary = disclosure.locator("summary");
-    await summary.focus();
-    await page.keyboard.press("Enter");
+    await summary.press("Enter");
     await expect(disclosure).toHaveAttribute("open", "");
     await expect(disclosure.getByRole("list")).toBeVisible();
     await summary.press("Space");
@@ -50,8 +49,7 @@ for (const language of ["ar", "en"] as const) {
     await page.evaluate(() => (document.documentElement.style.fontSize = "32px"));
     await expect(latest).toBeVisible();
     await summary.scrollIntoViewIfNeeded();
-    await summary.focus();
-    await page.keyboard.press("Enter");
+    await summary.press("Enter");
     await expect(disclosure.getByRole("list")).toBeVisible();
     const violations = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
     expect(violations.violations).toEqual([]);

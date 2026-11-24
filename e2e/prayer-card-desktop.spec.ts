@@ -78,20 +78,37 @@ for (const language of ["ar", "en"] as const) {
           const guidance = reading.querySelector(".prayer-sunnah-details")!.getBoundingClientRect();
           return { gap: guidance.top - virtue.bottom, main: main.top, reading: reading.getBoundingClientRect().top };
         });
-        expect(spacing.gap).toBeCloseTo(12, 0);
+        expect(spacing.gap).toBeCloseTo(24, 0);
         expect(spacing.main).toBeCloseTo(spacing.reading, 0);
         if (prayer !== "fajr") {
           const header = await card.evaluate((node) => {
             const heading = node.querySelector("h2")!.getBoundingClientRect();
-            const label = node.querySelector(".prayer-actions-list label span[id]")!;
-            const range = document.createRange();
-            range.selectNodeContents(label);
-            const ink = range.getBoundingClientRect();
+            const checklist = node.querySelector(".prayer-actions-checklist")!;
+            const group = checklist.getBoundingClientRect();
+            const label = node.querySelector(".prayer-actions-list label")!.getBoundingClientRect();
+            const canvas = document.createElement("canvas");
+            canvas.width = canvas.height = 1;
+            const context = canvas.getContext("2d")!;
+            const color = (element: Element) => {
+              context.clearRect(0, 0, 1, 1);
+              context.fillStyle = getComputedStyle(element).backgroundColor;
+              context.fillRect(0, 0, 1, 1);
+              const [r, g, b, alpha] = context.getImageData(0, 0, 1, 1).data;
+              return { alpha, lightness: (r! + g! + b!) / 3 };
+            };
+            const surface = color(checklist);
+            const panel = color(node.closest(".prayer-moment-panel")!);
             const close = node.querySelector(".home-prayer-detail-close")!.getBoundingClientRect();
+            const titleRange = document.createRange();
+            titleRange.selectNodeContents(node.querySelector(".prayer-evidence-desktop-title")!);
+            const virtueInk = titleRange.getBoundingClientRect();
             const input = node.querySelector("input")!.getBoundingClientRect();
             const date = node.querySelector(".prayer-actions-context")!.getBoundingClientRect();
             return {
-              gap: ink.top - heading.bottom,
+              gap: group.top - heading.bottom,
+              surface,
+              panel,
+              rowHeight: label.height,
               closeWidth: close.width,
               closeHeight: close.height,
               overlap:
@@ -99,16 +116,28 @@ for (const language of ["ar", "en"] as const) {
                 close.right > input.left &&
                 close.top < input.bottom &&
                 close.bottom > input.top,
+              virtueOverlap:
+                close.left < virtueInk.right &&
+                close.right > virtueInk.left &&
+                close.top < virtueInk.bottom &&
+                close.bottom > virtueInk.top,
               headingEdge: node.getAttribute("dir") === "rtl" ? heading.right : heading.left,
+              groupEdge: node.getAttribute("dir") === "rtl" ? group.right : group.left,
+              labelEdge: node.getAttribute("dir") === "rtl" ? label.right : label.left,
               dateEdge: node.getAttribute("dir") === "rtl" ? date.right : date.left,
             };
           });
-          expect(header.gap).toBeGreaterThanOrEqual(12);
-          expect(header.gap).toBeLessThanOrEqual(22);
+          expect(header.gap).toBeCloseTo(24, 0);
+          expect(header.surface.alpha).toBe(255);
+          expect(header.panel.alpha).toBe(255);
+          if (material === "glass") expect(header.surface.lightness).toBeGreaterThan(header.panel.lightness);
+          expect(header.rowHeight).toBeGreaterThanOrEqual(48);
           expect(header.closeWidth).toBeGreaterThanOrEqual(44);
           expect(header.closeHeight).toBeGreaterThanOrEqual(44);
           expect(header.overlap).toBe(false);
-          expect(header.dateEdge).toBeCloseTo(header.headingEdge, 0);
+          expect(header.virtueOverlap).toBe(false);
+          expect(header.groupEdge).toBeCloseTo(header.headingEdge, 0);
+          expect(header.dateEdge).toBeCloseTo(header.labelEdge, 0);
         }
         await expect(card.getByTestId("prayer-record-date")).toHaveAttribute("datetime", "2026-11-24");
         await expect(card.getByTestId("prayer-record-date")).toBeVisible();

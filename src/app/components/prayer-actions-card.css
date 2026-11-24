@@ -20,6 +20,10 @@
   gap: 0.25rem;
 }
 
+.prayer-actions-checklist {
+  display: contents;
+}
+
 .prayer-actions-main,
 .prayer-actions-reading {
   display: flex;
@@ -89,6 +93,67 @@
   display: block;
 }
 
+.prayer-actions-card[data-inline-information] .prayer-actions-main,
+.prayer-actions-card[data-inline-information] .prayer-actions-reading {
+  gap: 1.5rem;
+}
+
+.prayer-actions-card[data-inline-information] .prayer-actions-checklist {
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--prayer-detail-edge);
+  border-radius: var(--ds-radius-card);
+  background-color: var(--muted);
+}
+
+.prayer-actions-card[data-inline-information][data-on-glass] .prayer-actions-checklist {
+  background-color: color-mix(in srgb, var(--on-media-surface) 84%, var(--on-media));
+}
+
+.prayer-moment-panel.home-glass-surface:has(.prayer-actions-card[data-inline-information]) {
+  --home-glass-tint: color-mix(in srgb, var(--on-media-surface) 96%, var(--on-media));
+  background-color: var(--home-glass-tint);
+}
+
+.prayer-actions-card[data-inline-information] .prayer-actions-list {
+  gap: 0.5rem;
+}
+
+.prayer-actions-card[data-inline-information] .prayer-actions-list label {
+  min-block-size: 3rem;
+}
+
+.prayer-actions-card[data-inline-information] [data-testid="prayer-open-adhkar"] {
+  border: 1px solid currentColor;
+  padding-inline: 0.5rem;
+}
+
+.prayer-actions-card[data-inline-information] .prayer-sunnah-details {
+  padding-block-start: 1.5rem;
+  gap: 1rem;
+}
+
+.prayer-actions-card[data-inline-information] .prayer-sunnah-evidence > p {
+  font-size: var(--text-lg);
+}
+
+.prayer-actions-card[data-inline-information] .prayer-sunnah-point + .prayer-sunnah-point {
+  border-block-start: 1px solid var(--prayer-detail-edge);
+  padding-block-start: 1.25rem;
+}
+
+@media (forced-colors: active) {
+  .prayer-actions-card[data-inline-information] .prayer-actions-checklist,
+  .prayer-actions-card[data-inline-information][data-on-glass] .prayer-actions-checklist,
+  .prayer-moment-panel.home-glass-surface:has(.prayer-actions-card[data-inline-information]) {
+    background: Canvas;
+    border-color: CanvasText;
+  }
+}
+
 /* Fit the actual card, including enlarged text, rather than the app viewport. */
 @container (min-width: 40rem) {
   .prayer-actions-card {
@@ -108,16 +173,19 @@
     grid-column: 2;
   }
 
-  /* Reserve the control's width without letting its 44px target stretch the title row. */
-  .prayer-actions-card[data-inline-information][data-has-close] .prayer-actions-header {
+  /* The quiet close action occupies the far reading edge, clear of both titles. */
+  .prayer-actions-card[data-inline-information][data-has-close] {
     position: relative;
+  }
+
+  .prayer-actions-card[data-inline-information][data-has-close] .prayer-evidence-desktop-title {
     padding-inline-end: 9rem;
   }
 
   .prayer-actions-card[data-inline-information][data-has-close] .home-prayer-detail-close {
     position: absolute;
-    inset-inline-end: 0;
-    inset-block-start: -0.5rem;
+    inset-inline-end: 1.5rem;
+    inset-block-start: 0.875rem;
     font-size: var(--text-label);
   }
 

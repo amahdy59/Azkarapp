@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-24",
+  "release": "2026-11-24-2",
   "ar": [
-    "تابع الصلاة الحالية والقادمة وموقع المواقيت بوضوح، واقرأ السنن ومراجعها وتاريخ التسجيل داخل البطاقة الموسعة على الكمبيوتر.",
-    "نزّل موارد القراءة والتسجيلات المختارة من مكان واحد، وتابع التقدم أو استكمل الملفات المتبقية مع إرشادات أوضح عند تعثر التنزيل.",
-    "اعرف اتجاه القبلة بواجهة أوضح، ومعلومات صريحة عن دقة البوصلة ومصدر الموقع، وخيارات مباشرة للتحديث والمعايرة.",
-    "ابدأ قراءة السور من بطاقات أبسط، واضبط موقع الصلاة وطريقة الحساب من خيارات أوضح وأسهل للقراءة."
+    "تابع المواقيت والموقع من ملخص أوضح، وسجّل أعمال الصلاة في مساحة مرتبة مع السنن والمراجع وتاريخ التسجيل ظاهرًا داخل بطاقة الكمبيوتر.",
+    "اجمع موارد القراءة والتسجيلات في تنزيل واحد، واعرف ما اكتمل وما تبقى مع استكمال أسهل وخيارات أوضح عند التعثر.",
+    "استخدم بوصلة قبلة أوضح تعرض مصدر الموقع ودقة الاتجاه، مع وصول مباشر للتحديث والمعايرة عند الحاجة.",
+    "ادخل إلى قراءة السور من بطاقات أهدأ، واختر موقع المواقيت وطريقة الحساب من قوائم واضحة تدعم تكبير النص."
   ],
   "en": [
-    "See the current and next prayer and timing location clearly, with Sunnah guidance, references and recording dates inside expanded desktop cards.",
-    "Download reading resources and selected recordings together, track progress and resume remaining files with clearer recovery guidance.",
-    "Find Qibla with a clearer compass, honest accuracy and location information, and direct refresh and calibration options.",
-    "Start surah reading from simpler cards and choose prayer locations and calculation methods through clearer, readable controls."
+    "Follow prayer times and location in a clearer overview, with an organized desktop checklist beside complete Sunnah guidance, references and recording dates.",
+    "Bring reading resources and recordings into one download, see what is ready or remaining, and resume with clearer recovery options.",
+    "Use a clearer Qibla compass showing location source and direction accuracy, with refresh and calibration close at hand.",
+    "Open surahs from calmer reading cards and choose prayer locations and calculation methods from clear lists that support larger text."
   ]
 }

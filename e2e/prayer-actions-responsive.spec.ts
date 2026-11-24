@@ -115,7 +115,7 @@ for (const material of ["glass", "solid"] as const) {
             await expect(guidance).toBeVisible();
             const guidanceBox = (await guidance.boundingBox())!;
             const virtueBox = (await panel.getByTestId("prayer-moment-virtue").boundingBox())!;
-            expect(guidanceBox.y - (virtueBox.y + virtueBox.height)).toBeCloseTo(12, 0);
+            expect(guidanceBox.y - (virtueBox.y + virtueBox.height)).toBeCloseTo(24, 0);
           }
 
           expect(await panel.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);

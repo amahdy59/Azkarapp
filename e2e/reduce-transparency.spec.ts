@@ -117,12 +117,16 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
   expect(material.backdropFilter).toContain("blur(22px)");
   expect(material.backdropFilter).toContain("saturate(1.35)");
 
-  const standard = page.getByTestId("prayer-tracker-cards").locator("article").first();
+  const overview = page.getByTestId("prayer-tracker-cards");
+  const current = overview.locator('article[data-prayer-state="current"]');
+  const standard = (await overview.getAttribute("data-desktop")) === "true" ? current : overview;
   const reading = page.getByTestId("home-daily-evidence");
   await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
   await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-  const innerAction = standard.locator("button").first();
-  await expect(standard).toHaveCSS("--prayer-focus", "1");
+  const innerAction = current.getByRole("button");
+  await expect(current).toHaveAttribute("data-prayer", "fajr");
+  await expect(current).toHaveAttribute("aria-current", "step");
+  await expect(current).toHaveCSS("opacity", "1");
   await expect(innerAction).toHaveCSS("backdrop-filter", "none");
   // Bound contrast even if the brightest source photograph pixel is white.
   // Read actual compositing colors rather than treating blur as a guarantee.

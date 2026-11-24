@@ -1,6 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  const later = page.getByRole("button", { name: /^(Later|لاحقاً)$/ });
+  await page.addLocatorHandler(later, async () => later.click());
+});
+
 for (const language of ["ar", "en"] as const) {
   for (const width of [320, 1440]) {
     test(`prayer cards stay sticky ${language} ${width}px @cross-browser`, async ({ page }, testInfo) => {
@@ -19,8 +24,10 @@ for (const language of ["ar", "en"] as const) {
       await page.goto("/#/home");
       const strip = page.getByTestId("home-prayer-strip");
       const sticky = page.getByTestId("home-sticky-prayers");
+      const summary = page.getByTestId("home-prayer-interval");
       await expect(strip.locator("article")).toHaveCount(5);
-      await expect(strip.locator("[data-prayer-footer]").first()).toBeVisible();
+      await expect(summary).toBeVisible();
+      await expect(page.getByTestId("home-location")).toBeVisible();
       const originalCards = await strip.textContent();
       const scroll = sticky.locator("..");
       const visibleStrip = width < 768 ? page.getByTestId("home-compact-prayer") : strip;
@@ -32,12 +39,19 @@ for (const language of ["ar", "en"] as const) {
         await expect.poll(() => scroll.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
         await expect(visibleStrip).toBeInViewport();
         await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-        await expect(strip.locator("[data-prayer-footer]").first()).toBeHidden();
         if (width < 768) {
+          await expect(summary).toBeHidden();
           await expect(strip).toHaveAttribute("inert", "");
           await expect(visibleStrip.getByRole("button")).toBeEnabled();
+          await expect(visibleStrip.locator("[data-prayer-countdown-line]")).toBeVisible();
         } else {
-          await expect(strip.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
+          // The approved desktop cards retain their anatomy while pinned;
+          // summary and per-card statuses stay visible rather than folding.
+          await expect(summary).toBeVisible();
+          await expect(strip.locator("#home-prayer-countdown")).toBeVisible();
+          await expect(strip).not.toHaveAttribute("inert");
+          for (const status of await strip.locator(".home-prayer-desktop-status").all())
+            await expect(status).toBeVisible();
         }
         await expect(strip).toHaveText(originalCards!);
         const geometry = await visibleStrip.evaluate((node) => {
@@ -116,7 +130,9 @@ for (const language of ["ar", "en"] as const) {
         node.scrollTop = 0;
       });
       await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed", "true");
-      await expect(strip.locator("[data-prayer-footer]").first()).toBeVisible();
+      await expect(summary).toBeVisible();
+      await expect(strip).not.toHaveAttribute("inert");
+      await expect(page.getByTestId("home-location")).toBeVisible();
       // Very short windows must allow the full cards to scroll away rather
       // than covering every reachable action below them.
       await page.evaluate(() => {

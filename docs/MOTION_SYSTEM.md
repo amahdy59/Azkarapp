@@ -325,3 +325,7 @@ Sensor rotation retains shortest-angle smoothing without a second CSS rotation t
 ## Prayer-settings picker stability — 2026-11-24
 
 The calculation popup's text-bearing ground is opaque at its first visible frame; its scoped presentation removes the shared text fade/zoom rather than exposing the form underneath. The phone's existing drawer keeps its bounded transform transition and app/OS reduced-motion handling. Location and city/method feedback does not add an in-flow banner or replay the page entrance. Shared control hover, press, focus and selected-state cues remain; no ambient motion, new clock or per-card blur is added.
+
+### Home fold footprint repair — 2026-11-24 release
+
+The new overview's intrinsic expanded height and compact-row height are measured and observed separately. Their difference supplies --home-prayer-fold-range; CSS derives the reserved margin from the existing --home-prayer-expansion scalar in the same layout as folding. This prevents a transient document-height reduction that clamps Firefox/WebKit scroll positions near the footer. It replaces late observer-written margin correction. No corrective scrollTop write, new animation, timer, threshold, duration, easing or reduced-motion change is introduced. Repeated handoff tests assert settled footer coordinates and reachability in all three engines.

@@ -81,6 +81,19 @@ function cleanWirdLine(l) {
   return s;
 }
 
+function formatHadithContent(text, t) {
+  let res = text;
+  // Style Quranic verses ﴿...﴾ with Amiri Quran and gold color
+  res = res.replace(/﴿([^﴾]+)﴾/g, (m, ayah) => {
+    return `<span class="quran-quote" style="font-family:'Amiri Quran', serif; color:${t.gold}; font-weight:700;">﴿${ayah}﴾</span>`;
+  });
+  // Style bracketed references [ ... ]
+  res = res.replace(/(\[[^\]]+\])/g, (m, ref) => {
+    return `<span class="ayah-ref-inline" style="font-family:'IBM Plex Arabic'; font-size:7.4pt; color:${t.textMuted}; background:${t.goldLight}; padding:0.2mm 2mm; border-radius:4px; border:0.5px solid ${t.divider}; margin:0 1mm;">${ref}</span>`;
+  });
+  return res;
+}
+
 function buildHtml(theme) {
   const t = THEMES[theme];
   let pagesHtml = "";
@@ -300,7 +313,7 @@ function buildHtml(theme) {
 
         <div class="hadith-flow">
           <div class="hadith-card">
-            <div class="hadith-text">${fullText}</div>
+            <div class="hadith-text">${formatHadithContent(fullText, t)}</div>
           </div>
         </div>
 

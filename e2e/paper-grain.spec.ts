@@ -205,9 +205,26 @@ for (const homeMaterial of ["solid", "glass"] as const) {
       );
     }, homeMaterial);
     await page.goto("/#/home");
-    const prayer = page.getByTestId("prayer-card-fajr");
     const asset = new RegExp(`paper-grain-${homeMaterial === "solid" ? "light" : "dark"}`);
-    await expect(prayer).toHaveCSS("background-image", asset);
+    const overview = page.getByTestId("prayer-tracker-cards");
+    // Assert every filled owner in both responsive anatomies, and never paint
+    // the structural desktop wrapper or add nested Glass filters on phones.
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const owners =
+        width >= 1200 ? overview.locator(".home-prayer-tile, .home-prayer-interval, .home-prayer-location") : overview;
+      await expect(owners).toHaveCount(width >= 1200 ? 7 : 1);
+      if (width >= 1200) await expect(overview).toHaveCSS("background-image", "none");
+      for (const owner of await owners.all()) {
+        await expect(owner).toHaveCSS("background-image", asset);
+        for (const fallback of ["high-contrast", "reduce-transparency"]) {
+          await page.locator("html").evaluate((node, name) => node.classList.add(name), fallback);
+          await expect(owner).not.toHaveCSS("background-image", /paper-grain/);
+          await page.locator("html").evaluate((node, name) => node.classList.remove(name), fallback);
+        }
+        await expect(owner).toHaveCSS("background-image", asset);
+      }
+    }
     await page.locator(".home-content-scroll").evaluate((node) => {
       node.scrollTop = 500;
     });
