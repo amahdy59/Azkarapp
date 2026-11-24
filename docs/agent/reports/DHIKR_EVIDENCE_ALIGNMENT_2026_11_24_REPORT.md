@@ -75,4 +75,21 @@ Unrelated Qibla/download changes in the original shared checkout were preserved.
 
 ## Recommended next step
 
-Complete the final release gates, then obtain qualified content and recording review for remaining contextual variants and suspended audio.
+Integrate the local branch with the owner’s concurrent changes; obtain qualified content/recording review for remaining contextual variants and suspended audio. The owner controls publication.
+
+## Pre-push environment remediation
+
+The first push was correctly blocked by find-unused-css.test.mjs: inherited Git hook variables pointed its temporary fixture at the parent repository. The fixture now clears Git-reported repository-local variables for every child command and runs both ordinary and simulated-hook cases. Targeted result: 2 passed. No application assertions or quality thresholds were removed. The next push must pass the complete hook again.
+
+## Owner publication hold
+
+The owner explicitly prohibits pushing this batch on 2026-11-24 while other elements are being modified. Neither attempted push reached the remote: origin/main remains be3146ac. Continue local verification only. The inherited-hook fixture had also set the shared Git core.bare option to true through git init; restored it to false after confirming this ordinary worktree configuration. The isolated fixture fix prevents that mutation. Final proofreading also corrects the crescent supplication’s imperative vocalization and transliteration to the selected Tirmidhi wording.
+
+## Final local handoff
+
+- Final pnpm check passed in 216.6 seconds, including unit coverage, formatting, lint, types, content/audio/timing checks, build and budgets. Log: output/content-audit/final-check.log.
+- Final pnpm build:pages passed; Home startup measured 520,058 gzip bytes against the unchanged ceiling (2,414 bytes above the recorded baseline).
+- Core smoke: 27 passed; the remaining reset case exposed its obsolete 25-item expectation. Updated to the source-correct 24 steps, preserving the exact zero-total and modal assertions. Its targeted rerun passed (1 test); formatting and ESLint for that spec also passed.
+- Prior feature verification: 12 bilingual evidence cases across three engines, 14 Chromium audio/offline cases and 4 retained screenshot captures passed. Screenshots were visually inspected.
+- No changes were pushed and no CI/deployment or production acceptance is claimed. The owner will integrate this isolated local branch with concurrent work and publish later. Refresh combined release notes before that publication.
+- Eight changed-text recording assignments remain deliberately unavailable pending independent review. Remaining source-probe limitations are recorded in the audit; do not describe this screening as independent scholarly approval or guaranteed perfection.

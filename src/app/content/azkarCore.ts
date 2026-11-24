@@ -3529,8 +3529,8 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     category: "natural_events",
     orderIndex: 4,
     arabicText:
-      "اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ",
-    transliteration: "Allahumma ahillahu 'alayna bil-yumni wal-imani was-salamati wal-Islami, Rabbi wa Rabbukallah",
+      "اللَّهُمَّ أَهْلِلْهُ عَلَيْنَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسْلَامِ رَبِّي وَرَبُّكَ اللَّهُ",
+    transliteration: "Allahumma ahlilhu 'alayna bil-yumni wal-imani was-salamati wal-Islami, Rabbi wa Rabbukallah",
     translation:
       "O Allah, let this crescent moon rise over us with blessing and faith, safety and Islam. My Lord and your Lord is Allah.",
     benefit: "Recited upon sighting the new crescent moon.",
@@ -3538,7 +3538,7 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Jami al-Tirmidhi 3451 (Hasan Gharib, al-Tirmidhi; Daif, Darussalam).",
     hadithText:
-      "عن طلحة بن عبيد الله رضي الله عنه أن النبي ﷺ كان إذا رأى الهلال قال: «اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ».",
+      "عن طلحة بن عبيد الله رضي الله عنه أن النبي ﷺ كان إذا رأى الهلال قال: «اللَّهُمَّ أَهْلِلْهُ عَلَيْنَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسْلَامِ رَبِّي وَرَبُّكَ اللَّهُ».",
     hadithTextEnglish:
       "Talhah ibn ‘Ubaydullah (may Allah be pleased with him) reported that when the Prophet ﷺ saw the new moon he would say: “O Allah, bring it over us with blessing and faith, with safety and Islam. My Lord and your Lord is Allah.”",
     authenticityNote: "Hasan Gharib (al-Tirmidhi); Daif (Darussalam).",

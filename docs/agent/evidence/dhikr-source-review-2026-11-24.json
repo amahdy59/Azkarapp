@@ -2236,7 +2236,7 @@
       "sourceProbe": "unavailable",
       "sourceUrl": "https://sunnah.com/tirmidhi:3451",
       "count": 1,
-      "sha256": "aa1f5c2c9546d437b089fb632ec0ff94093c6720e41d324a2c41ab106b7cec77",
+      "sha256": "a7df6f1b569060bcb803e58f4e70f1ef4c68ec7b330cdd8f6b7715b0c2d8f3b6",
       "previousSha256": "3dfe5a5a0dc3ed8adb2508b76bc9a305d515367fc61ac56438e23188a3c87754",
       "findings": [
         "Use Talhah/Tirmidhi 3451 blessing wording rather than mixing the Ibn Umar security variant into it.",

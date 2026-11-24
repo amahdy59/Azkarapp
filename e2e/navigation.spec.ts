@@ -354,6 +354,6 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
   expect(dialogBox!.x + dialogBox!.width).toBeLessThanOrEqual(shellBox!.x + shellBox!.width);
 
   await page.getByRole("button", { name: "Reset", exact: true }).click();
-  await expect(page.getByText("0 of 25", { exact: true })).toBeVisible();
+  await expect(page.getByText("0 of 24", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Reset Progress", exact: true })).toHaveCount(0);
 });

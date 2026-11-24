@@ -22,3 +22,7 @@ The morning/evening `89` records attached Ibn Masud's different Muslim narration
 ## Acceptance boundaries
 
 No automated string comparison establishes religious authenticity. A normalized exact match is a diagnostic; contextual adaptations, Quran passages and alternative routes need explicit examination. The audit records its evidence provenance and does not call unverified rows independently approved. Ordinary count 1 means one counter unit where no numerical ritual is established. Existing completed history remains a record of the reader's action; changed targets do not rewrite it.
+
+## Current publication decision
+
+The owner explicitly requests all corrections and validation locally, with no push. The owner will integrate other work and publish later. This supersedes the release step in the original plan. Keep the isolated worktree and local commits available for integration.

@@ -5422,3 +5422,7 @@ The owner approves keeping the slightly larger secondary date visible during scr
 ## Exact dhikr evidence alignment — 2026-11-24
 
 The owner requests reviewing all dhikr text, benefits and supporting narrations, and explicitly selects exact sourced wording and counts with audio and progress checks. Correct source-specific mismatches in both languages; retain permanent IDs and historical records. Suspend changed-text audio assignments pending independent recording review rather than modifying approved transcripts or matching rules. Remove the evening-specific threefold protection step from the morning routine while keeping its old identity resolvable. Grading disagreement alone remains distinct from a mismatch. See phases/DHIKR_EVIDENCE_ALIGNMENT_2026_11_24.md.
+
+### Dhikr review publication hold — 2026-11-24
+
+The owner instructs: finish applying and validating the corrections, but do not push; the owner is modifying other elements and will push later. Retain this phase locally in its isolated worktree. No application deployment is authorized after this instruction.
