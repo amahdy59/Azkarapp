@@ -596,7 +596,9 @@ export function HomeScreen({
       sticky.style.removeProperty("position");
       sticky.style.removeProperty("--home-prayer-fold-range");
     };
-  }, []);
+    // Crossing the desktop breakpoint mounts or removes the compact row.
+    // Reconnect to that current element so folding still reserves its space.
+  }, [showCompactPrayer]);
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 

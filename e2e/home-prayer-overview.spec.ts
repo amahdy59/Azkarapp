@@ -3,6 +3,43 @@ import AxeBuilder from "@axe-core/playwright";
 import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { t } from "../src/app/i18n";
 
+for (const language of ["ar", "en"] as const) {
+  test(`Home retains reading position after desktop to phone resize ${language} @cross-browser`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await openHome(page, language, "glass");
+    await page.clock.setFixedTime(new Date("2026-09-05T16:29:00+03:00"));
+    await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+    await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", "asr");
+    const sticky = page.getByTestId("home-sticky-prayers");
+    const scroll = page.locator(".home-content-scroll");
+    const anchor = page.getByTestId("home-primary-card");
+    const documentTop = () =>
+      anchor.evaluate((node) => node.getBoundingClientRect().top + node.closest(".home-content-scroll")!.scrollTop);
+
+    for (const viewport of [
+      { width: 643, height: 275 },
+      { width: 390, height: 844 },
+    ]) {
+      await page.setViewportSize({ width: 1440, height: 1000 });
+      await scroll.evaluate((node) => {
+        node.scrollTop = 0;
+      });
+      await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+      await page.setViewportSize(viewport);
+      await expect(sticky).toHaveAttribute("data-home-compact-prayer", "true");
+      const before = await documentTop();
+      await scroll.evaluate((node) => {
+        node.scrollTop = 180;
+      });
+      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+      await expect.poll(documentTop).toBeCloseTo(before, 0);
+      const action = page.getByTestId("prayer-open-adhkar");
+      await action.scrollIntoViewIfNeeded();
+      await expect(action).toBeInViewport();
+    }
+  });
+}
+
 async function openHome(page: Page, language: "ar" | "en", material: string, large = false, locationName?: string) {
   await fixtureReminderCatalogue(page);
   await page.clock.setFixedTime(new Date("2026-11-24T12:30:00+02:00"));

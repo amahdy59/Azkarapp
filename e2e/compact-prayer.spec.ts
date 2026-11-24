@@ -121,11 +121,12 @@ async function checkGeometry(page: Page) {
   expect(overflow).toEqual([]);
   const checklist = await panel.locator("ol").evaluate((list) => ({
     gap: getComputedStyle(list).rowGap,
+    inlineInformation: list.closest("[data-inline-information]") !== null,
     circles: [...list.querySelectorAll(".tracking-check")].map((circle) => circle.getBoundingClientRect().width),
     rootSize: parseFloat(getComputedStyle(document.documentElement).fontSize),
     labelIcons: list.querySelectorAll("li > div svg").length,
   }));
-  expect(checklist.gap).toBe(`${checklist.rootSize * 0.25}px`);
+  expect(checklist.gap).toBe(`${checklist.rootSize * (checklist.inlineInformation ? 0.5 : 0.25)}px`);
   expect(checklist.labelIcons).toBe(0);
   for (const width of checklist.circles) expect(width).toBeCloseTo(checklist.rootSize * 1.25, 2);
   const bounds = (await panel.boundingBox())!;

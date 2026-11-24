@@ -277,15 +277,23 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
   const indicatorCenterX = indicatorBox!.x + indicatorBox!.width / 2;
   const actions = page.getByTestId("prayer-actions-card");
   const headingBox = await actions.locator(".prayer-actions-header").boundingBox();
+  const groupBox = (await actions.locator(".prayer-actions-checklist").boundingBox())!;
   const listBox = await actions.locator(".prayer-actions-list").boundingBox();
+  const dateBox = (await actions.locator(".prayer-actions-context").boundingBox())!;
   expect(headingBox).not.toBeNull();
   expect(listBox).not.toBeNull();
   expect(indicatorCenterX).toBeGreaterThan(listBox!.x);
   expect(indicatorCenterX).toBeLessThan(listBox!.x + listBox!.width);
   // Desktop actions and reading have independent columns and a real gutter.
   const evidenceBox = (await actions.getByTestId("prayer-moment-virtue").boundingBox())!;
-  expect(headingBox!.x).toBeCloseTo(listBox!.x, 0);
-  expect(headingBox!.width).toBeCloseTo(listBox!.width, 0);
+  // Concept A aligns the heading with the inset's outside edge, while the
+  // checklist and recording date share its padded content measure.
+  expect(headingBox!.x).toBeCloseTo(groupBox.x, 0);
+  expect(headingBox!.width).toBeCloseTo(groupBox.width, 0);
+  expect(listBox!.x).toBeGreaterThan(groupBox.x);
+  expect(listBox!.x + listBox!.width).toBeLessThan(groupBox.x + groupBox.width);
+  expect(dateBox.x).toBeCloseTo(listBox!.x, 0);
+  expect(dateBox.width).toBeCloseTo(listBox!.width, 0);
   expect(evidenceBox.x + evidenceBox.width).toBeLessThan(listBox!.x);
 
   await page.setViewportSize({ width: 390, height: 844 });

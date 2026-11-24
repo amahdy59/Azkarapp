@@ -273,6 +273,9 @@ test("Collections restart daily while Al-Kahf stays weekly and saved history sur
     );
   });
   await page.goto("/#/home");
+  // Persisted seed data exists before React mounts. Wait for the screen so
+  // the midnight timer is active before advancing the clock.
+  await expect(page.getByTestId("home-all-prayers-row")).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed.comprehensive_duas),
@@ -295,6 +298,9 @@ test("Collections restart daily while Al-Kahf stays weekly and saved history sur
     "comprehensive-dua-01",
   );
   await page.reload();
+  // Likewise, stored data alone does not prove the reloaded router has
+  // mounted its hash listener before the next same-document navigation.
+  await expect(page.getByTestId("home-all-prayers-row")).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed.comprehensive_duas),

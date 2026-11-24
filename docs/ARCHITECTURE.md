@@ -2,6 +2,8 @@
 
 HomePrayerOverview and HomeLocationRow present screen-owned models and callbacks. The five-prayer grid and shaded interval share the existing timeline; they do not calculate, record or persist prayer state. The summary pairs labels with prayer names beneath them and keeps the next countdown inline at normal sizes. A screen-composed location slot follows the grid. Compact layouts have one material owner; desktop has five independent card surfaces, one interval-summary surface and one location-footer surface. Container queries reflow enlarged desktop content while retaining its card anatomy.
 
+Home reconnects its intrinsic header measurements when the compact prayer row mounts or unmounts at the desktop breakpoint. Fold-space reservation uses the current row after resizing, preserving content coordinates and native scroll recovery without writing a corrective scroll position.
+
 useHomeLocation owns explicit detection, duplicate-request prevention and stale/unmounted-result rejection. App's existing location callback owns normalization, persistence and reminder reconciliation. Refresh preserves calculation preferences and failed detection preserves the saved location. The screen owns the protected result modal and return-focus reference, and holds the expanded prayer section during the request/result so the disabled trigger remains available for focus recovery. Change opens the existing location-settings route. Presentation components perform no storage or network work.
 
 ## Home startup and offline acquisition — 2026-11-06

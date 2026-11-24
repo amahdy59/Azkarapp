@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-11-24-3",
+    "ar": [
+      "اقرأ السنن والمراجع وسجّل الصلاة وتاريخها داخل بطاقة الكمبيوتر، مع مواقيت وموقع أوضح وثبات المحتوى عند تغيير حجم النافذة.",
+      "نزّل موارد القراءة والتسجيلات معًا، وتابع ما اكتمل واستكمل التنزيل مع خيارات أوضح عند التعثر.",
+      "تابع مصدر موقع القبلة ودقة الاتجاه، مع وصول مباشر للتحديث والمعايرة.",
+      "ابدأ قراءة السور من بطاقات مرتبة، واختر موقع الصلاة وطريقة الحساب بقوائم تدعم النص الكبير."
+    ],
+    "en": [
+      "Read complete Sunnah guidance beside your desktop prayer checklist and date, with steadier content when resizing.",
+      "Download reading resources and recordings together, track completed files and resume with clearer recovery.",
+      "Check Qibla location source and direction accuracy, with direct refresh and calibration.",
+      "Open surahs from clearer cards and choose prayer locations and calculation methods with larger-text support."
+    ]
+  },
+  {
     "release": "2026-11-24-2",
     "ar": [
       "تابع المواقيت والموقع من ملخص أوضح، وسجّل أعمال الصلاة في مساحة مرتبة مع السنن والمراجع وتاريخ التسجيل ظاهرًا داخل بطاقة الكمبيوتر.",

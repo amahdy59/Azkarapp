@@ -11,3 +11,7 @@ After the complete batch was pushed as c28fa0ca, the owner selected Concept A in
 5. Rewrite current bilingual notes for everything since the last successful deployment, archive them, run targeted feature/engine checks and the intact final pre-push gates, then push the coherent follow-up. Inspect exact-commit CI and Pages build/deploy and verify production SHA, HTTP health and real UI screenshots.
 
 The owner-approved Concept A supersedes only the earlier 12px desktop section gap, 16px desktop quotation step, unfilled checklist and central Collapse position. It does not authorize a content, data, timing, architecture or dependency change. Physical device/sensor/assistive-technology acceptance retains the existing documented limits.
+
+## Resumed exact-commit repair
+
+Quality 45482870944 at 375de474 completed with 14 failed and six retried browser cases. Reconcile the two remaining pre-Concept-A spacing/alignment assertions with the approved inset anatomy. Repair the proven desktop-to-phone measurement lifecycle: a null desktop compact-row reference remained captured after the row mounted, so folding could move content by 190px. A bilingual cross-engine regression must fail on the old code and preserve content position and Read access after repair. Keep all assertions, inventory, coverage and budgets intact. Preserve newly arriving external-source authoring independently from the previously frozen application batch; verify this remediation in an isolated checkout.
