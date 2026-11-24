@@ -5418,3 +5418,7 @@ The owner approves the startup audit recommendations and requests reliable notif
 ## 2026-11-07 · Persistent Home dates and phone Mushaf index
 
 The owner approves keeping the slightly larger secondary date visible during scroll, replacing the expanded prayer ring and seconds with the localized minute countdown, and applying the reference Mushaf control placement and in-content index on phones. Preserve the wider reader presentation and canonical pages. See [the phase brief](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md).
+
+## Exact dhikr evidence alignment — 2026-11-24
+
+The owner requests reviewing all dhikr text, benefits and supporting narrations, and explicitly selects exact sourced wording and counts with audio and progress checks. Correct source-specific mismatches in both languages; retain permanent IDs and historical records. Suspend changed-text audio assignments pending independent recording review rather than modifying approved transcripts or matching rules. Remove the evening-specific threefold protection step from the morning routine while keeping its old identity resolvable. Grading disagreement alone remains distinct from a mismatch. See phases/DHIKR_EVIDENCE_ALIGNMENT_2026_11_24.md.

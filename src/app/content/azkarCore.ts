@@ -343,24 +343,26 @@ const MORNING_AZKAR: ZikrDraft[] = [
     category: "morning",
     orderIndex: 11,
     arabicText:
-      "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0639\u064e\u0627\u0644\u0650\u0645\u064e \u0627\u0644\u0652\u063a\u064e\u064a\u0652\u0628\u0650 \u0648\u064e\u0627\u0644\u0634\u0651\u064e\u0647\u064e\u0627\u062f\u064e\u0629\u0650\u060c \u0641\u064e\u0627\u0637\u0650\u0631\u064e \u0627\u0644\u0633\u0651\u064e\u0645\u064e\u0627\u0648\u064e\u0627\u062a\u0650 \u0648\u064e\u0627\u0644\u0623\u064e\u0631\u0652\u0636\u0650\u060c \u0631\u064e\u0628\u0651\u064e \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d \u0648\u064e\u0645\u064e\u0644\u0650\u064a\u0643\u064e\u0647\u064f\u060c \u0623\u064e\u0634\u0652\u0647\u064e\u062f\u064f \u0623\u064e\u0646\u0652 \u0644\u0627\u064e \u0625\u0650\u0644\u064e\u0647\u064e \u0625\u0650\u0644\u0627\u0651\u064e \u0623\u064e\u0646\u0652\u062a\u064e\u060c \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0643\u064e \u0645\u0650\u0646\u0652 \u0634\u064e\u0631\u0651\u0650 \u0646\u064e\u0641\u0652\u0633\u0650\u064a\u060c \u0648\u064e\u0645\u0650\u0646\u0652 \u0634\u064e\u0631\u0651\u0650 \u0627\u0644\u0634\u0651\u064e\u064a\u0652\u0637\u064e\u0627\u0646\u0650 \u0648\u064e\u0634\u0650\u0631\u0652\u0643\u0650\u0647\u0650\u060c \u0648\u064e\u0623\u064e\u0646\u0652 \u0623\u064e\u0642\u0652\u062a\u064e\u0631\u0650\u0641\u064e \u0639\u064e\u0644\u064e\u0649 \u0646\u064e\u0641\u0652\u0633\u0650\u064a \u0633\u064f\u0648\u0621\u064b\u0627\u060c \u0623\u064e\u0648\u0652 \u0623\u064e\u062c\u064f\u0631\u0651\u064e\u0647\u064f \u0625\u0650\u0644\u064e\u0649 \u0645\u064f\u0633\u0652\u0644\u0650\u0645\u064d.",
+      "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ.",
     transliteration:
-      "All\u0101humma \u02bf\u0101limal-ghaybi wash-shah\u0101dah, f\u0101\u1e6diras-sam\u0101w\u0101ti wal-ar\u1e0d, Rabba kulli shay\u2019in wa mal\u012bkah, ash-hadu an l\u0101 il\u0101ha ill\u0101 ant, a\u02bf\u016bdhu bika min sharri nafs\u012b, wa min sharrish-shay\u1e6d\u0101ni wa shirkih, wa an aqtarifa \u02bfal\u0101 nafs\u012b s\u016b\u2019an, aw ajurrahu il\u0101 Muslim.",
+      "Allahumma ‘alimal-ghaybi wash-shahadah, fatiras-samawati wal-ard, rabba kulli shay’in wa malikah, ashhadu an la ilaha illa ant. A‘udhu bika min sharri nafsi wa min sharrish-shaytani wa shirkih.",
     translation:
-      "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and the earth, Lord and Sovereign of everything. I bear witness that none is worthy of worship but You. I seek refuge in You from the evil of myself, from the evil of Satan and his shirk, and from committing evil against myself or bringing it upon a Muslim.",
+      "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk.",
     benefit: "The Prophet ﷺ instructed Abu Bakr to say it morning, evening, and on going to bed.",
     benefitArabic: "أمر النبي ﷺ أبا بكر أن يقولها إذا أصبح وإذا أمسى وإذا أخذ مضجعه.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
+    sourceReference: "Jami al-Tirmidhi 3392 (Hasan Sahih, al-Tirmidhi).",
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
-      "\u0642\u0627\u0644 \ufdfa \u0644\u0623\u0628\u064a \u0628\u0643\u0631 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647: \u00ab\u0642\u064f\u0644\u0652\u0647\u064f \u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0635\u0652\u0628\u064e\u062d\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0645\u0652\u0633\u064e\u064a\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u062e\u064e\u0630\u0652\u062a\u064e \u0645\u064e\u0636\u0652\u062c\u064e\u0639\u064e\u0643\u064e\u00bb.",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: قَالَ أَبُو بَكْرٍ: يَا رَسُولَ اللَّهِ، مُرْنِي بِشَيْءٍ أَقُولُهُ إِذَا أَصْبَحْتُ وَإِذَا أَمْسَيْتُ. قَالَ: «قُلِ: اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ». قَالَ: «قُلْهُ إِذَا أَصْبَحْتَ وَإِذَا أَمْسَيْتَ وَإِذَا أَخَذْتَ مَضْجَعَكَ».",
     hadithTextEnglish:
-      "The Prophet ﷺ said to Abu Bakr (may Allah be pleased with him): “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.”",
-    authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
+      "Abu Hurayrah reported that Abu Bakr asked: Messenger of Allah, instruct me in something to say in the morning and evening. He said: “Say: O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk.” He said: “Say it in the morning, in the evening and when you go to bed.”",
+    authenticityNote: "Hasan Sahih (al-Tirmidhi).",
     notes: "Also appears in before-sleep adhkar.",
-    sourceUrl: "https://sunnah.com/hisn%3A85",
+    sourceUrl: "https://sunnah.com/tirmidhi:3392",
+
+    sourceReferenceArabic: "جامع الترمذي ٣٣٩٢ (حسن صحيح عند الترمذي).",
   },
   {
     id: "m-hm-86",
@@ -445,15 +447,19 @@ const MORNING_AZKAR: ZikrDraft[] = [
     benefitArabic: "سؤال خير هذا اليوم أو هذه الليلة والاستعاذة من شرها.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Abu Dawud 4/322; Hisn al-Muslim 89.",
+    sourceReference:
+      "Sunan Abi Dawud 5084; Hisn al-Muslim 89 (Hasan chain, Ibn Baz); Shuayb al-Arnaut, Takhrij Zad al-Maad 2/340 (Hasan chain).",
     preferredTiming: "Morning after Fajr.",
     hadithText:
-      "عَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ رضي الله عنه قَالَ: كَانَ نَبِيُّ اللَّهِ ﷺ إِذَا أَمْسَى قَالَ: «أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ، وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ، وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ»، وَإِذَا أَصْبَحَ قَالَ ذَلِكَ أَيْضًا: «أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ، وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ، وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ».",
+      "قَالَ أَبُو دَاوُدَ: وَبِهَذَا الْإِسْنَادِ أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «إِذَا أَصْبَحَ أَحَدُكُمْ فَلْيَقُلْ: أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذَا الْيَوْمِ فَتْحَهُ وَنَصْرَهُ وَنُورَهُ وَبَرَكَتَهُ وَهُدَاهُ وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهِ وَشَرِّ مَا بَعْدَهُ، ثُمَّ إِذَا أَمْسَى فَلْيَقُلْ مِثْلَ ذَلِكَ».",
     hadithTextEnglish:
-      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) said: When evening came, the Prophet of Allah ﷺ would say: “We have reached the evening, and the dominion has reached the evening belonging to Allah. Praise be to Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. My Lord, I ask You for the good of this night and the good that follows it, and I seek refuge in You from the evil of this night and the evil that follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.” And when morning came he would say the same, with the night changed to the day.",
-    authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
+      "Abu Dawud reported through the same chain that the Messenger of Allah ﷺ said: “When one of you reaches the morning, let him say: We have reached the morning, and dominion belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this day: its opening, victory, light, blessing and guidance. I seek refuge in You from its evil and the evil after it. Then, when evening comes, let him say the equivalent.”",
+    authenticityNote: "Hasan chain according to Ibn Baz and Shuayb al-Arnaut; graded Daif by al-Albani.",
     notes: "Use evening wording in the evening row.",
-    sourceUrl: "https://sunnah.com/hisn%3A89",
+    sourceUrl: "https://sunnah.com/abudawud:5084",
+
+    sourceReferenceArabic:
+      "سنن أبي داود ٥٠٨٤؛ حصن المسلم ٨٩ (حسّن إسناده ابن باز)؛ تخريج زاد المعاد ٢/٣٤٠ (إسناده حسن عند شعيب الأرناؤوط).",
   },
   {
     id: "m-hm-90m",
@@ -521,9 +527,9 @@ const MORNING_AZKAR: ZikrDraft[] = [
     sourceReference: "Al-Bukhari 4/95; Muslim 4/2071; Hisn al-Muslim 93.",
     preferredTiming: "Upon rising in the morning; can be recited any time during the day.",
     hadithText:
-      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، فِي يَوْمٍ مِائَةَ مَرَّةٍ، كَانَتْ لَهُ عَدْلَ عَشْرِ رِقَابٍ، وَكَانَتْ لَهُ حِرْزًا مِنَ الشَّيْطَانِ يَوْمَهُ ذَلِكَ حَتَّى يُمْسِيَ، وَلَمْ يَأْتِ أَحَدٌ بِأَفْضَلَ مِمَّا جَاءَ بِهِ إِلَّا أَحَدٌ عَمِلَ أَكْثَرَ مِنْ ذَلِكَ».",
+      "عن أبي هريرة رضي الله عنه أن رسول الله ﷺ قال: «مَنْ قَالَ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، فِي يَوْمٍ مِائَةَ مَرَّةٍ، كَانَتْ لَهُ عَدْلَ عَشْرِ رِقَابٍ، وَكُتِبَتْ لَهُ مِائَةُ حَسَنَةٍ، وَمُحِيَتْ عَنْهُ مِائَةُ سَيِّئَةٍ، وَكَانَتْ لَهُ حِرْزًا مِنَ الشَّيْطَانِ يَوْمَهُ ذَلِكَ حَتَّى يُمْسِيَ، وَلَمْ يَأْتِ أَحَدٌ بِأَفْضَلَ مِمَّا جَاءَ بِهِ إِلَّا أَحَدٌ عَمِلَ أَكْثَرَ مِنْ ذَلِكَ».",
     hadithTextEnglish:
-      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — a hundred times in a day, it is for him the equal of freeing ten slaves, and it is a protection for him from Satan for that day until evening; and no one brings anything better than what he brought, except one who does more than that.”",
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — a hundred times in a day, it is for him the equal of freeing ten slaves, a hundred good deeds are written for him, a hundred sins are erased from him, and it is a protection for him from Satan for that day until evening; and no one brings anything better than what he brought, except one who does more than that.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
     notes: "Same wording as HM-92 but with 100 count.",
     sourceUrl: "https://sunnah.com/hisn%3A93",
@@ -581,18 +587,22 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "\u0623\u064e\u0633\u0652\u062a\u064e\u063a\u0652\u0641\u0650\u0631\u064f \u0627\u0644\u0644\u0651\u064e\u0647\u064e \u0648\u064e\u0623\u064e\u062a\u064f\u0648\u0628\u064f \u0625\u0650\u0644\u064e\u064a\u0652\u0647\u0650.",
     transliteration: "Astaghfirull\u0101ha wa at\u016bbu ilayh.",
     translation: "I seek Allah\u2019s forgiveness and repent to Him.",
-    benefit: "Hisn notes: recite 100 times during the day.",
+    benefit: "Seeking Allah’s forgiveness and repenting one hundred times during the day.",
     repetitionCount: 100,
     countLabel: "100",
-    sourceReference: "Al-Bukhari; Muslim 4/2075; Hisn al-Muslim 96.",
+    sourceReference: "Hisn al-Muslim 96; Sahih al-Bukhari 6307; Sahih Muslim 2702b.",
     preferredTiming: "During the day; suitable to include in morning/evening routine.",
     hadithText:
-      "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u064a\u0642\u0648\u0644 \u0641\u064a \u0627\u0644\u0645\u062c\u0644\u0633 \u0627\u0644\u0648\u0627\u062d\u062f: \u00ab\u0631\u064e\u0628\u0651\u0650 \u0627\u063a\u0652\u0641\u0650\u0631\u0652 \u0644\u0650\u064a \u0648\u064e\u062a\u064f\u0628\u0652 \u0639\u064e\u0644\u064e\u064a\u0651\u064e \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u062a\u0651\u064e\u0648\u0651\u064e\u0627\u0628\u064f \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u064f\u00bb \u0645\u0631\u0627\u062a \u0643\u062b\u064a\u0631\u0629\u060c \u0648\u0648\u0631\u062f \u0639\u0646\u0647 \u0627\u0644\u0627\u0633\u062a\u063a\u0641\u0627\u0631 \u0645\u0627\u0626\u0629 \u0645\u0631\u0629 \u0641\u064a \u0627\u0644\u064a\u0648\u0645.",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: سَمِعْتُ رَسُولَ اللَّهِ ﷺ يَقُولُ: «وَاللَّهِ إِنِّي لَأَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ فِي الْيَوْمِ أَكْثَرَ مِنْ سَبْعِينَ مَرَّةً». (صحيح البخاري ٦٣٠٧)\n\nوَعَنِ الْأَغَرِّ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «يَا أَيُّهَا النَّاسُ تُوبُوا إِلَى اللَّهِ فَإِنِّي أَتُوبُ فِي الْيَوْمِ إِلَيْهِ مِائَةَ مَرَّةٍ». (صحيح مسلم ٢٧٠٢ب)",
     hadithTextEnglish:
-      "The Prophet ﷺ would say in a single sitting: “My Lord, forgive me and accept my repentance; You are the Ever-Relenting, the Merciful” many times over; and it is reported of him that he sought forgiveness a hundred times a day.",
-    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+      "Abu Hurayrah reported: I heard the Messenger of Allah ﷺ say: “By Allah, I seek Allah’s forgiveness and repent to Him more than seventy times a day.” (Sahih al-Bukhari 6307)\n\nAl-Agharr reported that the Messenger of Allah ﷺ said: “People, turn in repentance to Allah, for I repent to Him a hundred times a day.” (Sahih Muslim 2702b)",
+    authenticityNote:
+      "Sahih al-Bukhari and Sahih Muslim; the selected formula and daily count are recorded in Hisn al-Muslim 96.",
     notes: "Hisn notes: recite 100 times during the day.",
-    sourceUrl: "https://sunnah.com/hisn%3A96",
+    sourceUrl: "https://sunnah.com/hisn:96",
+
+    benefitArabic: "الاستغفار والتوبة إلى الله مائة مرة في اليوم.",
+    sourceReferenceArabic: "حصن المسلم ٩٦؛ صحيح البخاري ٦٣٠٧؛ صحيح مسلم ٢٧٠٢ب.",
   },
   {
     id: "m-hm-98",
@@ -602,7 +612,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0635\u064e\u0644\u0651\u0650 \u0648\u064e\u0633\u064e\u0644\u0651\u0650\u0645\u0652 \u0639\u064e\u0644\u064e\u0649 \u0646\u064e\u0628\u0650\u064a\u0651\u0650\u0646\u064e\u0627 \u0645\u064f\u062d\u064e\u0645\u0651\u064e\u062f\u064d.",
     transliteration: "All\u0101humma \u1e63alli wa sallim \u02bfal\u0101 nabiyyin\u0101 Mu\u1e25ammad.",
     translation: "O Allah, send prayers and peace upon our Prophet Muhammad.",
-    benefit: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
+    benefit:
+      "The report promises intercession for sending ten blessings upon the Prophet ﷺ in the morning and ten in the evening.",
     repetitionCount: 10,
     countLabel: "10",
     sourceReference: "At-Tabarani; Haythami Majma\u02bf az-Zawa\u2019id 10/120; Hisn al-Muslim 98.",
@@ -614,6 +625,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     authenticityNote: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A98",
+
+    benefitArabic: "وردت الشفاعة لمن صلى على النبي ﷺ عشرًا حين يصبح وعشرًا حين يمسي.",
   },
 ];
 
@@ -950,24 +963,26 @@ const EVENING_AZKAR: ZikrDraft[] = [
     category: "evening",
     orderIndex: 12,
     arabicText:
-      "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0639\u064e\u0627\u0644\u0650\u0645\u064e \u0627\u0644\u0652\u063a\u064e\u064a\u0652\u0628\u0650 \u0648\u064e\u0627\u0644\u0634\u0651\u064e\u0647\u064e\u0627\u062f\u064e\u0629\u0650\u060c \u0641\u064e\u0627\u0637\u0650\u0631\u064e \u0627\u0644\u0633\u0651\u064e\u0645\u064e\u0627\u0648\u064e\u0627\u062a\u0650 \u0648\u064e\u0627\u0644\u0623\u064e\u0631\u0652\u0636\u0650\u060c \u0631\u064e\u0628\u0651\u064e \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d \u0648\u064e\u0645\u064e\u0644\u0650\u064a\u0643\u064e\u0647\u064f\u060c \u0623\u064e\u0634\u0652\u0647\u064e\u062f\u064f \u0623\u064e\u0646\u0652 \u0644\u0627\u064e \u0625\u0650\u0644\u064e\u0647\u064e \u0625\u0650\u0644\u0627\u0651\u064e \u0623\u064e\u0646\u0652\u062a\u064e\u060c \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0643\u064e \u0645\u0650\u0646\u0652 \u0634\u064e\u0631\u0651\u0650 \u0646\u064e\u0641\u0652\u0633\u0650\u064a\u060c \u0648\u064e\u0645\u0650\u0646\u0652 \u0634\u064e\u0631\u0651\u0650 \u0627\u0644\u0634\u0651\u064e\u064a\u0652\u0637\u064e\u0627\u0646\u0650 \u0648\u064e\u0634\u0650\u0631\u0652\u0643\u0650\u0647\u0650\u060c \u0648\u064e\u0623\u064e\u0646\u0652 \u0623\u064e\u0642\u0652\u062a\u064e\u0631\u0650\u0641\u064e \u0639\u064e\u0644\u064e\u0649 \u0646\u064e\u0641\u0652\u0633\u0650\u064a \u0633\u064f\u0648\u0621\u064b\u0627\u060c \u0623\u064e\u0648\u0652 \u0623\u064e\u062c\u064f\u0631\u0651\u064e\u0647\u064f \u0625\u0650\u0644\u064e\u0649 \u0645\u064f\u0633\u0652\u0644\u0650\u0645\u064d.",
+      "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ.",
     transliteration:
-      "All\u0101humma \u02bf\u0101limal-ghaybi wash-shah\u0101dah, f\u0101\u1e6diras-sam\u0101w\u0101ti wal-ar\u1e0d, Rabba kulli shay\u2019in wa mal\u012bkah, ash-hadu an l\u0101 il\u0101ha ill\u0101 ant, a\u02bf\u016bdhu bika min sharri nafs\u012b, wa min sharrish-shay\u1e6d\u0101ni wa shirkih, wa an aqtarifa \u02bfal\u0101 nafs\u012b s\u016b\u2019an, aw ajurrahu il\u0101 Muslim.",
+      "Allahumma ‘alimal-ghaybi wash-shahadah, fatiras-samawati wal-ard, rabba kulli shay’in wa malikah, ashhadu an la ilaha illa ant. A‘udhu bika min sharri nafsi wa min sharrish-shaytani wa shirkih.",
     translation:
-      "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and the earth, Lord and Sovereign of everything. I bear witness that none is worthy of worship but You. I seek refuge in You from the evil of myself, from the evil of Satan and his shirk, and from committing evil against myself or bringing it upon a Muslim.",
+      "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk.",
     benefit: "The Prophet ﷺ instructed Abu Bakr to say it morning, evening, and on going to bed.",
     benefitArabic: "أمر النبي ﷺ أبا بكر أن يقولها إذا أصبح وإذا أمسى وإذا أخذ مضجعه.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
+    sourceReference: "Jami al-Tirmidhi 3392 (Hasan Sahih, al-Tirmidhi).",
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
-      "\u0642\u0627\u0644 \ufdfa \u0644\u0623\u0628\u064a \u0628\u0643\u0631 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647: \u00ab\u0642\u064f\u0644\u0652\u0647\u064f \u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0635\u0652\u0628\u064e\u062d\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0645\u0652\u0633\u064e\u064a\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u062e\u064e\u0630\u0652\u062a\u064e \u0645\u064e\u0636\u0652\u062c\u064e\u0639\u064e\u0643\u064e\u00bb.",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: قَالَ أَبُو بَكْرٍ: يَا رَسُولَ اللَّهِ، مُرْنِي بِشَيْءٍ أَقُولُهُ إِذَا أَصْبَحْتُ وَإِذَا أَمْسَيْتُ. قَالَ: «قُلِ: اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ». قَالَ: «قُلْهُ إِذَا أَصْبَحْتَ وَإِذَا أَمْسَيْتَ وَإِذَا أَخَذْتَ مَضْجَعَكَ».",
     hadithTextEnglish:
-      "The Prophet ﷺ said to Abu Bakr (may Allah be pleased with him): “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.”",
-    authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
+      "Abu Hurayrah reported that Abu Bakr asked: Messenger of Allah, instruct me in something to say in the morning and evening. He said: “Say: O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk.” He said: “Say it in the morning, in the evening and when you go to bed.”",
+    authenticityNote: "Hasan Sahih (al-Tirmidhi).",
     notes: "Also appears in before-sleep adhkar.",
-    sourceUrl: "https://sunnah.com/hisn%3A85",
+    sourceUrl: "https://sunnah.com/tirmidhi:3392",
+
+    sourceReferenceArabic: "جامع الترمذي ٣٣٩٢ (حسن صحيح عند الترمذي).",
   },
   {
     id: "e-hm-86",
@@ -1051,15 +1066,19 @@ const EVENING_AZKAR: ZikrDraft[] = [
     benefit: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Abu Dawud 4/322; Hisn al-Muslim 89.",
+    sourceReference:
+      "Sunan Abi Dawud 5084; Hisn al-Muslim 89 (Hasan chain, Ibn Baz); Shuayb al-Arnaut, Takhrij Zad al-Maad 2/340 (Hasan chain).",
     preferredTiming: "After \u2018Asr/sunset window.",
     hadithText:
-      "عَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ رضي الله عنه قَالَ: كَانَ نَبِيُّ اللَّهِ ﷺ إِذَا أَمْسَى قَالَ: «أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ، وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ، وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ».",
+      "قَالَ أَبُو دَاوُدَ: وَبِهَذَا الْإِسْنَادِ أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «إِذَا أَصْبَحَ أَحَدُكُمْ فَلْيَقُلْ: أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذَا الْيَوْمِ فَتْحَهُ وَنَصْرَهُ وَنُورَهُ وَبَرَكَتَهُ وَهُدَاهُ وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهِ وَشَرِّ مَا بَعْدَهُ، ثُمَّ إِذَا أَمْسَى فَلْيَقُلْ مِثْلَ ذَلِكَ».",
     hadithTextEnglish:
-      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) said: When evening came, the Prophet of Allah ﷺ would say: “We have reached the evening, and the dominion has reached the evening belonging to Allah. Praise be to Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. My Lord, I ask You for the good of this night and the good that follows it, and I seek refuge in You from the evil of this night and the evil that follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.”",
-    authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
+      "Abu Dawud reported through the same chain that the Messenger of Allah ﷺ said: “When one of you reaches the morning, let him say: We have reached the morning, and dominion belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this day: its opening, victory, light, blessing and guidance. I seek refuge in You from its evil and the evil after it. Then, when evening comes, let him say the equivalent.”",
+    authenticityNote: "Hasan chain according to Ibn Baz and Shuayb al-Arnaut; graded Daif by al-Albani.",
     notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A89",
+    sourceUrl: "https://sunnah.com/abudawud:5084",
+
+    sourceReferenceArabic:
+      "سنن أبي داود ٥٠٨٤؛ حصن المسلم ٨٩ (حسّن إسناده ابن باز)؛ تخريج زاد المعاد ٢/٣٤٠ (إسناده حسن عند شعيب الأرناؤوط).",
   },
   {
     id: "e-hm-90e",
@@ -1140,18 +1159,22 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "\u0623\u064e\u0633\u0652\u062a\u064e\u063a\u0652\u0641\u0650\u0631\u064f \u0627\u0644\u0644\u0651\u064e\u0647\u064e \u0648\u064e\u0623\u064e\u062a\u064f\u0648\u0628\u064f \u0625\u0650\u0644\u064e\u064a\u0652\u0647\u0650.",
     transliteration: "Astaghfirull\u0101ha wa at\u016bbu ilayh.",
     translation: "I seek Allah\u2019s forgiveness and repent to Him.",
-    benefit: "Hisn notes: recite 100 times during the day.",
+    benefit: "Seeking Allah’s forgiveness and repenting one hundred times during the day.",
     repetitionCount: 100,
     countLabel: "100",
-    sourceReference: "Al-Bukhari; Muslim 4/2075; Hisn al-Muslim 96.",
+    sourceReference: "Hisn al-Muslim 96; Sahih al-Bukhari 6307; Sahih Muslim 2702b.",
     preferredTiming: "During the day; suitable to include in morning/evening routine.",
     hadithText:
-      "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u064a\u0642\u0648\u0644 \u0641\u064a \u0627\u0644\u0645\u062c\u0644\u0633 \u0627\u0644\u0648\u0627\u062d\u062f: \u00ab\u0631\u064e\u0628\u0651\u0650 \u0627\u063a\u0652\u0641\u0650\u0631\u0652 \u0644\u0650\u064a \u0648\u064e\u062a\u064f\u0628\u0652 \u0639\u064e\u0644\u064e\u064a\u0651\u064e \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u062a\u0651\u064e\u0648\u0651\u064e\u0627\u0628\u064f \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u064f\u00bb \u0645\u0631\u0627\u062a \u0643\u062b\u064a\u0631\u0629\u060c \u0648\u0648\u0631\u062f \u0639\u0646\u0647 \u0627\u0644\u0627\u0633\u062a\u063a\u0641\u0627\u0631 \u0645\u0627\u0626\u0629 \u0645\u0631\u0629 \u0641\u064a \u0627\u0644\u064a\u0648\u0645.",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: سَمِعْتُ رَسُولَ اللَّهِ ﷺ يَقُولُ: «وَاللَّهِ إِنِّي لَأَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ فِي الْيَوْمِ أَكْثَرَ مِنْ سَبْعِينَ مَرَّةً». (صحيح البخاري ٦٣٠٧)\n\nوَعَنِ الْأَغَرِّ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «يَا أَيُّهَا النَّاسُ تُوبُوا إِلَى اللَّهِ فَإِنِّي أَتُوبُ فِي الْيَوْمِ إِلَيْهِ مِائَةَ مَرَّةٍ». (صحيح مسلم ٢٧٠٢ب)",
     hadithTextEnglish:
-      "The Prophet ﷺ would say in a single sitting: “My Lord, forgive me and accept my repentance; You are the Ever-Relenting, the Merciful” many times over; and it is reported of him that he sought forgiveness a hundred times a day.",
-    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+      "Abu Hurayrah reported: I heard the Messenger of Allah ﷺ say: “By Allah, I seek Allah’s forgiveness and repent to Him more than seventy times a day.” (Sahih al-Bukhari 6307)\n\nAl-Agharr reported that the Messenger of Allah ﷺ said: “People, turn in repentance to Allah, for I repent to Him a hundred times a day.” (Sahih Muslim 2702b)",
+    authenticityNote:
+      "Sahih al-Bukhari and Sahih Muslim; the selected formula and daily count are recorded in Hisn al-Muslim 96.",
     notes: "Hisn notes: recite 100 times during the day.",
-    sourceUrl: "https://sunnah.com/hisn%3A96",
+    sourceUrl: "https://sunnah.com/hisn:96",
+
+    benefitArabic: "الاستغفار والتوبة إلى الله مائة مرة في اليوم.",
+    sourceReferenceArabic: "حصن المسلم ٩٦؛ صحيح البخاري ٦٣٠٧؛ صحيح مسلم ٢٧٠٢ب.",
   },
   {
     id: "e-hm-97",
@@ -1164,15 +1187,18 @@ const EVENING_AZKAR: ZikrDraft[] = [
     benefit: "Sahih/Hasan as cited by Hisn al-Muslim/Sunnah.com.",
     repetitionCount: 3,
     countLabel: "3",
-    sourceReference: "Ahmad 2/290; An-Nasa\u2019i; At-Tirmidhi 3/187; Ibn as-Sunni; Hisn al-Muslim 97.",
+    sourceReference:
+      "Musnad Ahmad 7898; Ibn Baz, Majmu Fatawa 26/32 (Hasan chain); Sahih Muslim 2709 without the threefold wording.",
     preferredTiming: "In the evening.",
     hadithText:
-      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ رَجُلاً جَاءَ إِلَى النَّبِيِّ ﷺ فَقَالَ: يَا رَسُولَ اللَّهِ مَا لَقِيتُ مِنْ عَقْرَبٍ لَدَغَتْنِي الْبَارِحَةَ، قَالَ: «أَمَا لَوْ قُلْتَ حِينَ أَمْسَيْتَ: أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ، لَمْ تَضُرَّكَ».",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: قَالَ النَّبِيُّ ﷺ: «مَنْ قَالَ إِذَا أَمْسَى ثَلَاثَ مَرَّاتٍ: أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ، لَمْ تَضُرَّهُ حُمَةٌ تِلْكَ اللَّيْلَةَ».",
     hadithTextEnglish:
-      "Abu Hurayrah (may Allah be pleased with him) reported that a man came to the Prophet ﷺ and said: Messenger of Allah, what I suffered last night from a scorpion that stung me! He said: “Had you said, when you reached the evening: I seek refuge in the perfect words of Allah from the evil of what He has created — it would not have harmed you.”",
-    authenticityNote: "Sahih/Hasan as cited by Hisn al-Muslim/Sunnah.com.",
+      "Abu Hurayrah reported that the Prophet ﷺ said: “Whoever says three times when evening comes: I seek refuge in Allah’s perfect words from the evil of what He created, will not be harmed by a poisonous sting that night.”",
+    authenticityNote: "Hasan chain (Ibn Baz, Majmu Fatawa 26/32).",
     notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A97",
+    sourceUrl: "https://dorar.net/h/6HH9rv6I?osoul=1",
+
+    sourceReferenceArabic: "مسند أحمد ٧٨٩٨؛ مجموع فتاوى ابن باز ٢٦/٣٢ (إسناده حسن)؛ صحيح مسلم ٢٧٠٩ دون ذكر الثلاث.",
   },
   {
     id: "e-hm-98",
@@ -1182,7 +1208,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0635\u064e\u0644\u0651\u0650 \u0648\u064e\u0633\u064e\u0644\u0651\u0650\u0645\u0652 \u0639\u064e\u0644\u064e\u0649 \u0646\u064e\u0628\u0650\u064a\u0651\u0650\u0646\u064e\u0627 \u0645\u064f\u062d\u064e\u0645\u0651\u064e\u062f\u064d.",
     transliteration: "All\u0101humma \u1e63alli wa sallim \u02bfal\u0101 nabiyyin\u0101 Mu\u1e25ammad.",
     translation: "O Allah, send prayers and peace upon our Prophet Muhammad.",
-    benefit: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
+    benefit:
+      "The report promises intercession for sending ten blessings upon the Prophet ﷺ in the morning and ten in the evening.",
     repetitionCount: 10,
     countLabel: "10",
     sourceReference: "At-Tabarani; Haythami Majma\u02bf az-Zawa\u2019id 10/120; Hisn al-Muslim 98.",
@@ -1194,6 +1221,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     authenticityNote: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A98",
+
+    benefitArabic: "وردت الشفاعة لمن صلى على النبي ﷺ عشرًا حين يصبح وعشرًا حين يمسي.",
   },
 ];
 
@@ -1519,16 +1548,20 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     arabicText: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.",
     transliteration: "Allahumma qini 'adhabaka yawma tab'athu 'ibadak.",
     translation: "O Allah, protect me from Your punishment on the Day You resurrect Your servants.",
-    benefit: "Recited 3 times with right hand under cheek.",
-    repetitionCount: 3,
-    countLabel: "3",
-    sourceReference: "Sunan Abu Dawud 5045; Jami' at-Tirmidhi 3398; Hisn al-Muslim 104.",
+    benefit: "A bedtime supplication seeking protection from punishment on the Day of Resurrection.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Jami al-Tirmidhi 3398 (Hasan Sahih, al-Tirmidhi; Sahih, Darussalam).",
     preferredTiming: "When lying down, placing the right hand under the cheek.",
     hadithText:
-      "عَنْ حَفْصَةَ رضي الله عنها أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا أَرَادَ أَنْ يَرْقُدَ وَضَعَ يَدَهُ الْيُمْنَى تَحْتَ خَدِّهِ ثُمَّ يَقُولُ: «اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ» ثَلاَثَ مِرَارٍ.",
+      "عَنْ حُذَيْفَةَ بْنِ الْيَمَانِ رضي الله عنه أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا أَرَادَ أَنْ يَنَامَ وَضَعَ يَدَهُ تَحْتَ رَأْسِهِ ثُمَّ قَالَ: «اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَجْمَعُ عِبَادَكَ أَوْ تَبْعَثُ عِبَادَكَ».",
     hadithTextEnglish:
-      "Hafsah (may Allah be pleased with her) reported that when the Messenger of Allah ﷺ wished to sleep, he would place his right hand under his cheek and then say three times: “O Allah, protect me from Your punishment on the Day You raise Your servants.”",
-    authenticityNote: "Graded Sahih by al-Albani.",
+      "Hudhayfah ibn al-Yaman reported that when the Prophet ﷺ wished to sleep, he would put his hand under his head and say: “O Allah, protect me from Your punishment on the Day You gather Your servants,” or, “resurrect Your servants.”",
+    authenticityNote: "Hasan Sahih (al-Tirmidhi); Sahih (Darussalam). No repetition number in this report.",
+
+    benefitArabic: "دعاء عند النوم للاستعاذة من العذاب يوم يبعث الله عباده.",
+    sourceReferenceArabic: "جامع الترمذي ٣٣٩٨ (حسن صحيح عند الترمذي؛ صحيح بحسب تصنيف دار السلام).",
+    sourceUrl: "https://sunnah.com/tirmidhi:3398",
   },
   {
     id: "s-hm-108",
@@ -1577,19 +1610,26 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     category: "before_sleep",
     orderIndex: 13,
     arabicText:
-      "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ.",
-    transliteration: "Allahumma 'Alimal-ghaybi wash-shahadah, Fatiras-samawati wal-ard...",
-    translation: "O Allah, Knower of the unseen and witnessed, Creator of the heavens and earth...",
-    benefit: "Protects against self-harm, Satan, and wronging others.",
+      "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ.",
+    transliteration:
+      "Allahumma ‘alimal-ghaybi wash-shahadah, fatiras-samawati wal-ard, rabba kulli shay’in wa malikah, ashhadu an la ilaha illa ant. A‘udhu bika min sharri nafsi wa min sharrish-shaytani wa shirkih.",
+    translation:
+      "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk.",
+    benefit:
+      "A Prophetic supplication for refuge from the evil of the self and Satan, taught for morning, evening and bedtime.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sunan Abu Dawud 5067; Jami' at-Tirmidhi 3392; Hisn al-Muslim 109.",
+    sourceReference: "Jami al-Tirmidhi 3392 (Hasan Sahih, al-Tirmidhi).",
     preferredTiming: "Before sleeping.",
     hadithText:
-      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ أَبَا بَكْرٍ قَالَ: يَا رَسُولَ اللَّهِ، مُرْنِي بِكَلِمَاتٍ أَقُولُهُنَّ إِذَا أَصْبَحْتُ وَإِذَا أَمْسَيْتُ: «اللَّهُمَّ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي وَشَرِّ الشَّيْطَانِ وَشِرْكِهِ». قَالَ: «قُلْهُ إِذَا أَصْبَحْتَ وَإِذَا أَمْسَيْتَ وَإِذَا أَخَذْتَ مَضْجَعَكَ».",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: قَالَ أَبُو بَكْرٍ: يَا رَسُولَ اللَّهِ، مُرْنِي بِشَيْءٍ أَقُولُهُ إِذَا أَصْبَحْتُ وَإِذَا أَمْسَيْتُ. قَالَ: «قُلِ: اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ». قَالَ: «قُلْهُ إِذَا أَصْبَحْتَ وَإِذَا أَمْسَيْتَ وَإِذَا أَخَذْتَ مَضْجَعَكَ».",
     hadithTextEnglish:
-      "Abu Hurayrah (may Allah be pleased with him) reported that Abu Bakr said: Messenger of Allah, instruct me with words to say when I rise in the morning and when I reach the evening. He said: “O Allah, Originator of the heavens and the earth, Knower of the unseen and the seen, Lord of everything and its Sovereign — I bear witness that there is no god but You. I seek refuge in You from the evil of my own self, and from the evil of Satan and his associating.” He said: “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.”",
-    authenticityNote: "Graded Sahih by al-Albani.",
+      "Abu Hurayrah reported that Abu Bakr asked: Messenger of Allah, instruct me in something to say in the morning and evening. He said: “Say: O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk.” He said: “Say it in the morning, in the evening and when you go to bed.”",
+    authenticityNote: "Hasan Sahih (al-Tirmidhi).",
+
+    sourceReferenceArabic: "جامع الترمذي ٣٣٩٢ (حسن صحيح عند الترمذي).",
+    sourceUrl: "https://sunnah.com/tirmidhi:3392",
+    benefitArabic: "استعاذة نبوية من شر النفس والشيطان، تُقال صباحًا ومساءً وعند النوم.",
   },
   {
     id: "s-hm-111",
@@ -1645,15 +1685,19 @@ const WAKING_UP_AZKAR: ZikrDraft[] = [
     translation:
       "None has the right to be worshipped but Allah alone, Who has no partner. His is the dominion and His is the praise, and He is Able to do all things. Glory is to Allah. All praise is to Allah. None has the right to be worshipped but Allah. Allah is the Greatest. There is no power and no might except by Allah. My Lord, forgive me.",
     benefit:
-      "Whoever says this will be forgiven, and if he supplicates Allah, his prayer will be answered; if he performs ablution and prays, his prayer will be accepted.",
+      "When waking during the night: remembrance followed by asking forgiveness or supplicating; the report also mentions acceptance of prayer after ablution.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Al-Bukhari 3/39; Hisn al-Muslim 2.",
+    sourceReference: "Sunan Ibn Majah 3878 (selected wording); Sahih al-Bukhari 1154.",
     hadithText:
-      "عَنْ عُبَادَةَ بْنِ الصَّامِتِ رضي الله عنه عَنِ النَّبِيِّ ﷺ قَالَ: «مَنْ تَعَارَّ مِنَ اللَّيْلِ فَقَالَ: لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، الْحَمْدُ لِلَّهِ، وَسُبْحَانَ اللَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ، ثُمَّ قَالَ: اللَّهُمَّ اغْفِرْ لِي أَوْ دَعَا، اسْتُجِيبَ لَهُ، فَإِنْ تَوَضَّأَ وَصَلَّى قُبِلَتْ صَلاَتُهُ».",
+      "عَنْ عُبَادَةَ بْنِ الصَّامِتِ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ تَعَارَّ مِنَ اللَّيْلِ فَقَالَ حِينَ يَسْتَيْقِظُ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ، ثُمَّ دَعَا رَبِّ اغْفِرْ لِي، غُفِرَ لَهُ». قَالَ الْوَلِيدُ: أَوْ قَالَ: «دَعَا اسْتُجِيبَ لَهُ، فَإِنْ قَامَ فَتَوَضَّأَ ثُمَّ صَلَّى قُبِلَتْ صَلَاتُهُ».",
     hadithTextEnglish:
-      "‘Ubadah ibn al-Samit (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “Whoever wakes in the night and says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. Praise be to Allah; glory be to Allah; there is no god but Allah; Allah is greatest; and there is no power and no strength except with Allah — then says: O Allah, forgive me, or makes some other supplication, he is answered. And if he performs ablution and prays, his prayer is accepted.”",
-    authenticityNote: "Sahih al-Bukhari.",
+      "Ubadah ibn al-Samit reported that the Messenger of Allah ﷺ said: “Whoever wakes during the night and says upon waking: There is no god but Allah alone, without partner; His is the dominion and praise, and He has power over everything. Glory be to Allah, praise be to Allah, there is no god but Allah, Allah is greatest, and there is no power or strength except through Allah, the Most High, the Magnificent; then asks, My Lord, forgive me, will be forgiven.” Al-Walid said: Or he said, “If he supplicates, he is answered; and if he rises, performs ablution and prays, his prayer is accepted.”",
+    authenticityNote: "Sahih (Darussalam); also reported with a wording variant in Sahih al-Bukhari.",
+
+    benefitArabic: "عند الاستيقاظ من الليل: ذكر يتبعه طلب المغفرة أو الدعاء؛ وورد قبول الصلاة لمن قام فتوضأ وصلى.",
+    sourceReferenceArabic: "سنن ابن ماجه ٣٨٧٨ (اللفظ المختار)؛ صحيح البخاري ١١٥٤.",
+    sourceUrl: "https://sunnah.com/ibnmajah:3878",
   },
   {
     id: "wu-hm-3",
@@ -1752,8 +1796,8 @@ const HOME_AZKAR: ZikrDraft[] = [
     transliteration: "Bismillah, was-salamu 'alaykum wa rahmatullahi wa barakatuh.",
     translation: "In the name of Allah, and peace be upon you, and the mercy of Allah and His blessings.",
     benefit:
-      "Mentioning the name of Allah upon entering home and greeting family prevents Satan from taking lodging or food.",
-    benefitArabic: "ذكر اسم الله تعالى عند دخول البيت وإلقاء السلام على الأهل يمنع الشيطان من المبيت والطعام.",
+      "Mentioning Allah when entering the home and when eating prevents Satan from sharing lodging and the meal.",
+    benefitArabic: "ذكر الله عند دخول البيت وعند الطعام يمنع الشيطان من المبيت والعشاء.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 2018.",
@@ -2108,16 +2152,22 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     translation:
       "None has the right to be worshipped except Allah alone, with no partner. His is the kingdom and praise; He gives life and causes death, and He has power over all things.",
     benefit:
-      "Recited 10 times after Fajr and Maghrib before speaking; grants 10 good deeds, erases 10 sins, raises 10 degrees, and protects from Satan and harm.",
+      "Ten times after Fajr or Maghrib: the reports mention good deeds, sins erased and protection from Satan. The Fajr report specifies remaining seated before speaking.",
     preferredTiming: "Recited 10 times after Fajr and 10 times after Maghrib.",
     repetitionCount: 10,
     countLabel: "10",
-    sourceReference: "Jami' at-Tirmidhi 3474; Sunan an-Nasa'i 10234; Hisn al-Muslim 29.",
+    sourceReference: "Jami al-Tirmidhi 3474 (Fajr); Jami al-Tirmidhi 3534 (Maghrib); Hasan (Darussalam).",
     hadithText:
-      "عَنْ أَبِي ذَرٍّ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ فِي دُبُرِ صَلاَةِ الْفَجْرِ وَهُوَ ثَانٍ رِجْلَيْهِ قَبْلَ أَنْ يَتَكَلَّمَ: لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، عَشْرَ مَرَّاتٍ كُتِبَتْ لَهُ عَشْرُ حَسَنَاتٍ، وَمُحِيَ عَنْهُ عَشْرُ سَيِّئَاتٍ، وَرُفِعَ لَهُ عَشْرُ دَرَجَاتٍ وَكَانَ لَهُ حِرْزًا مِنْ كُلِّ مَكْرُوهٍ، وَحَرَسًا مِنَ الشَّيْطَانِ».",
+      "عَنْ أَبِي ذَرٍّ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ فِي دُبُرِ صَلاَةِ الْفَجْرِ وَهُوَ ثَانٍ رِجْلَيْهِ قَبْلَ أَنْ يَتَكَلَّمَ: لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، عَشْرَ مَرَّاتٍ كُتِبَتْ لَهُ عَشْرُ حَسَنَاتٍ، وَمُحِيَ عَنْهُ عَشْرُ سَيِّئَاتٍ، وَرُفِعَ لَهُ عَشْرُ دَرَجَاتٍ وَكَانَ يَوْمَهُ ذَلِكَ فِي حِرْزٍ مِنْ كُلِّ مَكْرُوهٍ، وَحَرْسٍ مِنَ الشَّيْطَانِ، وَلَمْ يَنْبَغِ لِذَنْبٍ أَنْ يُدْرِكَهُ فِي ذَلِكَ الْيَوْمِ إِلَّا الشِّرْكَ بِاللَّهِ». (جامع الترمذي ٣٤٧٤)\n\nعَنْ عُمَارَةَ بْنِ شَبِيبٍ السَّبَئِيِّ قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ قَالَ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، عَشْرَ مَرَّاتٍ عَلَى إِثْرِ الْمَغْرِبِ، بَعَثَ اللَّهُ لَهُ مَسْلَحَةً يَحْفَظُونَهُ مِنَ الشَّيْطَانِ حَتَّى يُصْبِحَ، وَكَتَبَ اللَّهُ لَهُ بِهَا عَشْرَ حَسَنَاتٍ مُوجِبَاتٍ، وَمَحَا عَنْهُ عَشْرَ سَيِّئَاتٍ مُوبِقَاتٍ، وَكَانَتْ لَهُ بِعَدْلِ عَشْرِ رِقَابٍ مُؤْمِنَاتٍ». (جامع الترمذي ٣٥٣٤)",
     hadithTextEnglish:
-      "Abu Dharr (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says after the dawn prayer, while his legs are still folded and before he speaks: There is no god but Allah alone, with no partner; His is the dominion and His is the praise; He gives life and causes death, and He is capable of all things — ten times, ten good deeds are written for him, ten sins are erased from him, he is raised ten degrees, and it is a protection for him from all that is disliked and a guard against Satan.”",
-    authenticityNote: "Graded Sahih/Hasan by al-Albani.",
+      "Abu Dharr (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says after the dawn prayer, while his legs are still folded and before he speaks: There is no god but Allah alone, with no partner; His is the dominion and His is the praise; He gives life and causes death, and He is capable of all things — ten times, ten good deeds are written for him, ten sins are erased from him, he is raised ten degrees, and it is a protection for him from all that is disliked and a guard against Satan that day; no sin should overtake him that day except associating partners with Allah.” (Jami al-Tirmidhi 3474)\n\nUmarah ibn Shabib al-Sabai reported that the Messenger of Allah ﷺ said: “Whoever says ten times after Maghrib: There is no god but Allah alone, without partner; His is the dominion and praise, He gives life and causes death, and He has power over everything, Allah sends guards to protect him from Satan until morning, records ten good deeds for him, erases ten destructive bad deeds, and grants the equivalent of freeing ten believing slaves.” (Jami al-Tirmidhi 3534)",
+    authenticityNote:
+      "Both reports graded Hasan (Darussalam); the Maghrib report is also Hasan according to al-Albani, Sahih al-Tirmidhi 3534.",
+
+    benefitArabic:
+      "عشر مرات بعد الفجر أو المغرب؛ ورد فيها كتابة الحسنات ومحو السيئات والحفظ من الشيطان. ويشترط حديث الفجر أن يبقى جالسًا قبل أن يتكلم.",
+    sourceReferenceArabic: "جامع الترمذي ٣٤٧٤ (الفجر)؛ جامع الترمذي ٣٥٣٤ (المغرب)؛ حسن بحسب تصنيف دار السلام.",
+    sourceUrl: "https://sunnah.com/tirmidhi:3474",
   },
   {
     id: "ap-ref-11",
@@ -2151,9 +2201,9 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 3233; Hisn al-Muslim 30.",
     hadithText:
-      "عن ابن عباس رضي الله عنهما عن النبي ﷺ قال الله تعالى: «يا محمد، إذا صليت فقل: اللهم إني أسألك فعل الخيرات وترك المنكرات وحب المساكين، وَأَنْ تَغْفِرَ لِي وَتَرْحَمَنِي، وَتَتُوبَ عَلَيَّ، وَإِذَا أَرَدْتَ بِعِبَادِكَ فِتْنَةً فَاقْبِضْنِي إِلَيْكَ غَيْرَ مَفْتُونٍ».",
+      "عن ابن عباس رضي الله عنهما عن النبي ﷺ قال الله تعالى: «يا محمد، إذا صليت فقل: اللهم إني أسألك فعل الخيرات وترك المنكرات وحب المساكين، وَإِذَا أَرَدْتَ بِعِبَادِكَ فِتْنَةً فَاقْبِضْنِي إِلَيْكَ غَيْرَ مَفْتُونٍ».",
     hadithTextEnglish:
-      "Ibn ‘Abbas (may Allah be pleased with them both) reported from the Prophet ﷺ that Allah, exalted is He, said: “O Muhammad, when you pray, say: O Allah, I ask You for the doing of good deeds, the leaving of wrongs, and the love of the poor; and that You forgive me, have mercy on me, and accept my repentance. And when You intend a trial for Your servants, take me to You untried.”",
+      "Ibn ‘Abbas (may Allah be pleased with them both) reported from the Prophet ﷺ that Allah, exalted is He, said: “O Muhammad, when you pray, say: O Allah, I ask You for the doing of good deeds, the leaving of wrongs, and the love of the poor. And when You intend a trial for Your servants, take me to You untried.”",
     authenticityNote: "Sahih at-Tirmidhi.",
   },
   {
@@ -2202,15 +2252,20 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     arabicText: "اللَّهُمَّ اغفِر لِي ذَنبِي وَوَسِّع لِي فِي دَارِي وَبَارِك لِي فِي رِزقِي",
     transliteration: "Allahummaghfir li dhanbi wa wassi' li fi dari wa barik li fi rizqi",
     translation: "O Allah, forgive my sin, expand my dwelling for me, and bless my provision.",
-    benefit: "Supplication during purification.",
+    benefit:
+      "A supplication for forgiveness, spacious living and blessed provision, reported in the context of ablution.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sunan Ibn Majah 299.",
+    sourceReference: "al-Nasai, al-Sunan al-Kubra 9908; al-Nawawi, al-Adhkar 44 (Sahih chain).",
     hadithText:
-      "عن أبي موسى الأشعري رضي الله عنه قال: أتيت النبي ﷺ بوضوء فتوضأ فسمعته يدعو يقول: «اللَّهُمَّ اغفِر لِي ذَنبِي وَوَسِّع لِي فِي دَارِي وَبَارِك لِي فِي رِزقِي».",
+      "عَنْ أَبِي مُوسَى رضي الله عنه قَالَ: أَتَيْتُ رَسُولَ اللَّهِ ﷺ وَتَوَضَّأَ، فَسَمِعْتُهُ يَدْعُو يَقُولُ: «اللَّهُمَّ اغْفِرْ لِي ذَنْبِي وَوَسِّعْ لِي فِي دَارِي وَبَارِكْ لِي فِي رِزْقِي». قَالَ: فَقُلْتُ: يَا نَبِيَّ اللَّهِ، لَقَدْ سَمِعْتُكَ تَدْعُو بِكَذَا وَكَذَا. قَالَ: «وَهَلْ تَرَكْنَ مِنْ شَيْءٍ؟».",
     hadithTextEnglish:
-      "Abu Musa al-Ash‘ari (may Allah be pleased with him) said: I brought the Prophet ﷺ water for ablution and he performed it, and I heard him supplicating: “O Allah, forgive me my sin, make my dwelling spacious for me, and bless me in my provision.”",
-    authenticityNote: "Hasan by al-Albani.",
+      "Abu Musa reported: I came to the Messenger of Allah ﷺ when he performed ablution, and heard him supplicating: “O Allah, forgive my sin, make my home spacious and bless my provision.” I said: Prophet of Allah, I heard you supplicate with these words. He said: “Have they left anything out?”",
+    authenticityNote: "Sahih chain according to al-Nawawi, al-Adhkar 44; other scholars question the chain.",
+
+    sourceReferenceArabic: "النسائي في السنن الكبرى ٩٩٠٨؛ الأذكار للنووي ٤٤ (إسناده صحيح عند النووي).",
+    sourceUrl: "https://dorar.net/h/mnAZbPXY?osoul=1",
+    benefitArabic: "دعاء بالمغفرة وسعة الدار وبركة الرزق، ورد في سياق الوضوء.",
   },
   {
     id: "pur-ref-3",
@@ -2369,12 +2424,16 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     benefit: "Recited when served food.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Jami' at-Tirmidhi 5/506; Hisn al-Muslim 181.",
+    sourceReference: "Sunan Abi Dawud 3730 (Hasan, al-Albani); Jami al-Tirmidhi 3455.",
     hadithText:
       "عن ابن عباس رضي الله عنهما قال: قال رسول الله ﷺ: «من أطعمه الله طعاماً فليقل: اللهم بارك لنا فيه وأطعمنا خيراً منه».",
     hadithTextEnglish:
       "Ibn ‘Abbas (may Allah be pleased with them both) said: The Messenger of Allah ﷺ said: “Whoever Allah has fed with food, let him say: O Allah, bless it for us and feed us better than it.”",
-    authenticityNote: "Sahih by al-Albani.",
+    authenticityNote:
+      "Hasan (al-Albani), Sunan Abi Dawud 3730; al-Tirmidhi calls 3455 Hasan; Darussalam grades that route Daif.",
+
+    sourceReferenceArabic: "سنن أبي داود ٣٧٣٠ (حسن عند الألباني)؛ جامع الترمذي ٣٤٥٥.",
+    sourceUrl: "https://sunnah.com/abudawud:3730",
   },
   {
     id: "fd-ref-6",
@@ -2521,12 +2580,15 @@ const CLOTHING_AZKAR: ZikrDraft[] = [
     benefit: "Said before undressing to shield from jinn.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sunan Ibn Majah 297; Jami' at-Tirmidhi; Hisn al-Muslim 5.",
+    sourceReference: "al-Tabarani, al-Mujam al-Awsat 2504; al-Albani, Sahih al-Jami 3610 (Sahih).",
     hadithText:
-      "عن علي بن أبي طالب رضي الله عنه أن رسول الله ﷺ قال: «ستر ما بين أعين الجن وعورات بني آدم إذا وضع أحدهم ثوبه أن يقول: بسم الله».",
+      "عَنْ أَنَسِ بْنِ مَالِكٍ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «سَتْرُ مَا بَيْنَ أَعْيُنِ الْجِنِّ وَعَوْرَاتِ بَنِي آدَمَ إِذَا وَضَعَ أَحَدُهُمْ ثَوْبَهُ أَنْ يَقُولَ: بِسْمِ اللَّهِ».",
     hadithTextEnglish:
-      "‘Ali ibn Abi Talib (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “The screen between the eyes of the jinn and the nakedness of the children of Adam is that, when one of them takes off his garment, he says: In the name of Allah.”",
-    authenticityNote: "Authenticated.",
+      "Anas ibn Malik reported that the Messenger of Allah ﷺ said: “The screen between the eyes of the jinn and the nakedness of the children of Adam, when one of them removes his garment, is to say: In the name of Allah.”",
+    authenticityNote: "Sahih (al-Albani, Sahih al-Jami 3610).",
+
+    sourceReferenceArabic: "الطبراني في المعجم الأوسط ٢٥٠٤؛ صحيح الجامع للألباني ٣٦١٠ (صحيح).",
+    sourceUrl: "https://dorar.net/h/sXsxl5OW",
   },
 ];
 
@@ -2760,7 +2822,8 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     transliteration: "La ilaha illa anta subhanaka inni kuntu minaz-zalimin",
     translation:
       "None has the right to be worshipped but You, Glory be to You. Indeed I have been of the wrongdoers (Dua of Yunus).",
-    benefit: "No Muslim supplicates with this in any distress except that Allah relieves him.",
+    benefit: "The report promises a response for a Muslim who supplicates with the prayer of Yunus.",
+    benefitArabic: "ما دعا بها رجل مسلم في شيء قط إلا استجاب الله له.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 3505; Quran 21:87; Hisn al-Muslim 121.",
@@ -2950,12 +3013,12 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
       "In the name of Allah He will cure you, from every disease He will heal you, from the evil of the envier when he envies and from every evil eye.",
     benefit: "Prophetic ruqyah for healing and protection.",
     benefitArabic: "رقية جبريل عليه السلام للنبي ﷺ للشفاء من كل داء وحسد وعين.",
-    repetitionCount: 3,
-    countLabel: "3",
+    repetitionCount: 1,
+    countLabel: "1",
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 130.",
     sourceReferenceArabic: "صحيح مسلم ٢١٨٦؛ حصن المسلم ١٣٠.",
     hadithText:
-      "عن عائشة رضي الله عنها أن رسول الله ﷺ كان إذا اشتكى رقاه جبريل عليه السلام فقال: «بِاسمِ اللَّهِ يُبرِيكَ وَمِن كُلِّ دَاءٍ يَشفِيكَ، مِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ، وَشَرِّ كُلِّ ذِي عَيْنٍ».",
+      "عن عائشة رضي الله عنها أن رسول الله ﷺ كان إذا اشتكى رقاه جبريل عليه السلام فقال: «بِاسمِ اللَّهِ يُبرِيكَ وَمِن كُلِّ دَاءٍ يَشفِيكَ، وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ، وَشَرِّ كُلِّ ذِي عَيْنٍ».",
     hadithTextEnglish:
       "‘A’ishah (may Allah be pleased with her) reported that when the Messenger of Allah ﷺ fell ill, Jibril (peace be upon him) would recite over him: “In the name of Allah, may He cure you and heal you from every disease; from the evil of an envier when he envies, and the evil of every evil eye.”",
     authenticityNote: "Sahih Muslim.",
@@ -3080,8 +3143,8 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
       "In the name of Allah I perform ruqyah for you, from everything that harms you, from the evil of every soul or envious eye.",
     benefit: "Ruqyah Jibril recited for the Prophet ﷺ.",
     benefitArabic: "رقية نبوية مباركة من كل ما يؤذي ومن كل نفس أو عين حاسد.",
-    repetitionCount: 3,
-    countLabel: "3",
+    repetitionCount: 1,
+    countLabel: "1",
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 133.",
     sourceReferenceArabic: "صحيح مسلم ٢١٨٦؛ حصن المسلم ١٣٣.",
     hadithText:
@@ -3205,15 +3268,18 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     arabicText: "بَارَكَ اللَّهُ فِيكَ",
     transliteration: "Barakallahu fik",
     translation: "May Allah bless you.",
-    benefit: "Prophetic supplication of blessing for a Muslim.",
+    benefit: "A prayer of blessing; Aisha would return the recipients’ blessing when distributing charity.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Various Sahih narrations.",
     hadithText:
-      "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أُهديت له شاة قال: «ما فعلوا؟» فتقول عائشة: يدعون لهم، فيقول النبي ﷺ: «وبارك الله فيهم، نرد عليهم مثل ما قالوا ويبقى لنا أجرنا».",
+      "عَنْ عَائِشَةَ رضي الله عنها قَالَتْ: أُهْدِيَتْ لِرَسُولِ اللَّهِ ﷺ شَاةٌ، قَالَ: «اقْسِمِيهَا». وَكَانَتْ عَائِشَةُ إِذَا رَجَعَتِ الْخَادِمُ تَقُولُ: مَا قَالُوا؟ تَقُولُ الْخَادِمُ: قَالُوا: بَارَكَ اللَّهُ فِيكُمْ. تَقُولُ عَائِشَةُ: وَفِيهِمْ بَارَكَ اللَّهُ، نَرُدُّ عَلَيْهِمْ مِثْلَ مَا قَالُوا، وَيَبْقَى أَجْرُنَا لَنَا.",
     hadithTextEnglish:
-      "‘A’ishah (may Allah be pleased with her) reported that when a sheep was given to the Prophet ﷺ as a gift, he would ask: “What did they do?” ‘A’ishah would say: They are praying for them. The Prophet ﷺ would say: “And may Allah bless them. We return to them the like of what they said, and our own reward remains for us.”",
+      "Aisha reported that a sheep was given to the Messenger of Allah ﷺ, who said: “Distribute it.” When the servant returned, Aisha would ask what the recipients had said. The servant would reply: “May Allah bless you.” Aisha would say: “And may Allah bless them. We return their words of blessing, and our reward remains for us.”",
     authenticityNote: "Sahih.",
+
+    benefitArabic: "دعاء بالبركة؛ وكانت عائشة رضي الله عنها ترد على من يدعو لها بالبركة عند توزيع الصدقة.",
+    attributionType: "companion_supplication",
   },
   {
     id: "sc-ref-7",
@@ -3346,19 +3412,20 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
       "Alhamdu lillahilladhi 'afani mimmabtalaaka bihi, wa faddalani 'ala kathirin mimman khalaqa tafdila.",
     translation:
       "All praise is for Allah who spared me from what He afflicted you with, and favored me over much of what He created.",
-    benefit:
-      "Whoever sees an afflicted person and recites this quietly will be shielded from that trial for the rest of their life.",
-    benefitArabic: "من رأى مبتلى فقالها سراً عافاه الله من ذلك البلاء كائناً ما كان ما عاش.",
+    benefit: "The report mentions protection from the affliction one sees.",
+    benefitArabic: "ورد فيه أن من قاله عند رؤية مبتلى لم يصبه ذلك البلاء.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Jami` at-Tirmidhi 3431; Hisn al-Muslim 198.",
-    sourceReferenceArabic: "جامع الترمذي ٣٤٣١؛ حصن المسلم ١٩٨.",
+    sourceReference:
+      "Jami al-Tirmidhi 3432 (Hasan Gharib, al-Tirmidhi; Daif, Darussalam); al-Albani, al-Kalim al-Tayyib 229 (Hasan).",
+    sourceReferenceArabic:
+      "جامع الترمذي ٣٤٣٢ (حسن غريب عند الترمذي؛ ضعيف بحسب دار السلام)؛ الكلم الطيب للألباني ٢٢٩ (حسن).",
     hadithText:
-      "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ رَأَى مُبْتَلًى فَقَالَ: الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ، وَفَضَّلَنِي عَلَى كَثِيرٍ مِمَّنْ خَلَقَ تَفْضِيلًا، لَمْ يُصِبْهُ ذَلِكَ الْبَلَاءُ كَائِنًا مَا كَانَ مَا عَاشَ».",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ رَأَى مُبْتَلًى فَقَالَ: الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ وَفَضَّلَنِي عَلَى كَثِيرٍ مِمَّنْ خَلَقَ تَفْضِيلًا، لَمْ يُصِبْهُ ذَلِكَ الْبَلَاءُ».",
     hadithTextEnglish:
-      "Ibn ‘Umar reported that the Messenger of Allah ﷺ said: “Whoever sees an afflicted person and says: ‘Praise be to Allah Who spared me from what He has afflicted you with, and has favored me over many of those He created’ — that affliction will not strike him as long as he lives.”",
-    authenticityNote: "Hasan according to Al-Albani.",
-    sourceUrl: "https://sunnah.com/tirmidhi%3A3431",
+      "Abu Hurayrah reported that the Messenger of Allah ﷺ said: “Whoever sees an afflicted person and says: Praise be to Allah who spared me from what He afflicted you with and favoured me greatly over many He created, will not be struck by that affliction.”",
+    authenticityNote: "Hasan Gharib (al-Tirmidhi); Hasan (al-Albani, al-Kalim al-Tayyib 229); Daif (Darussalam).",
+    sourceUrl: "https://sunnah.com/tirmidhi:3432",
   },
   {
     id: "sc-ref-14",
@@ -3389,10 +3456,11 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     category: "natural_events",
     orderIndex: 0,
     arabicText:
-      "اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَهَا وَخَيرَ مَا فِيهَا وَأَعُوذُ بِكَ مِن شَرِّهَا وَشَرِّ مَا فِيهَا",
-    transliteration: "Allahumma inni as'aluka khayraha wa khayra ma fiha wa a'udhu bika min sharriha wa sharri ma fiha",
+      "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا وَخَيْرَ مَا فِيهَا وَخَيْرَ مَا أُرْسِلَتْ بِهِ، وَأَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ مَا فِيهَا وَشَرِّ مَا أُرْسِلَتْ بِهِ",
+    transliteration:
+      "Allahumma inni as’aluka khayraha wa khayra ma fiha wa khayra ma ursilat bih, wa a’udhu bika min sharriha wa sharri ma fiha wa sharri ma ursilat bih.",
     translation:
-      "O Allah, I ask You for its good and what good is in it, and I seek refuge in You from its evil and what evil is in it.",
+      "O Allah, I ask You for its good, the good within it and the good it was sent with. I seek refuge in You from its evil, the evil within it and the evil it was sent with.",
     benefit: "Recited when strong winds blow.",
     benefitArabic: "دعاء هبوب الريح والعواصف؛ يسأل الله خيرها ويتعوذ به من شرها وما أرسلت به.",
     repetitionCount: 1,
@@ -3461,19 +3529,22 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     category: "natural_events",
     orderIndex: 4,
     arabicText:
-      "اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالأَمنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ",
-    transliteration: "Allahumma ahillahu 'alayna bil-amni wal-imani was-salamati wal-Islami, Rabbi wa Rabbukallah",
+      "اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ",
+    transliteration: "Allahumma ahillahu 'alayna bil-yumni wal-imani was-salamati wal-Islami, Rabbi wa Rabbukallah",
     translation:
-      "O Allah, let this crescent moon rise on us with security, faith, safety, and Islam. My Lord and your Lord is Allah.",
+      "O Allah, let this crescent moon rise over us with blessing and faith, safety and Islam. My Lord and your Lord is Allah.",
     benefit: "Recited upon sighting the new crescent moon.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Jami' at-Tirmidhi 3451; Hisn al-Muslim 168.",
+    sourceReference: "Jami al-Tirmidhi 3451 (Hasan Gharib, al-Tirmidhi; Daif, Darussalam).",
     hadithText:
-      "عن طلحة بن عبيد الله رضي الله عنه أن النبي ﷺ كان إذا رأى الهلال قال: «اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالأَمنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ».",
+      "عن طلحة بن عبيد الله رضي الله عنه أن النبي ﷺ كان إذا رأى الهلال قال: «اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ».",
     hadithTextEnglish:
-      "Talhah ibn ‘Ubaydullah (may Allah be pleased with him) reported that when the Prophet ﷺ saw the new moon he would say: “O Allah, bring it over us with security and faith, with safety and Islam. My Lord and your Lord is Allah.”",
-    authenticityNote: "Authenticated.",
+      "Talhah ibn ‘Ubaydullah (may Allah be pleased with him) reported that when the Prophet ﷺ saw the new moon he would say: “O Allah, bring it over us with blessing and faith, with safety and Islam. My Lord and your Lord is Allah.”",
+    authenticityNote: "Hasan Gharib (al-Tirmidhi); Daif (Darussalam).",
+
+    sourceReferenceArabic: "جامع الترمذي ٣٤٥١ (حسن غريب عند الترمذي؛ ضعيف بحسب تصنيف دار السلام).",
+    sourceUrl: "https://sunnah.com/tirmidhi:3451",
   },
   {
     id: "ne-ref-6",
@@ -3674,7 +3745,7 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     transliteration: "Bismillahilladhi la yadurru ma'asmihi shay'un fil-ardi wa la fis-sama'i wa huwas-Sami'ul-'Alim",
     translation:
       "In the name of Allah with Whose name nothing is harmed on earth nor in the heavens, and He is the All-Hearing, All-Knowing.",
-    benefit: "Whoever recites it 3 times, nothing will harm him.",
+    benefit: "Said three times in the morning and evening; the report mentions protection from harm.",
     benefitArabic: "من قالها ثلاثاً في الصباح والمساء لم يضره شيء.",
     repetitionCount: 3,
     countLabel: "3",
@@ -3744,14 +3815,14 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
       "O Allah, I seek refuge in You from knowingly associating any partner with You, and I ask Your forgiveness for that which I do not know.",
     benefit: "Supplication to safeguard the heart from ostentation and subtle association of partners (minor Shirk).",
     benefitArabic: "دعاء الحماية من الشرك الخفي والرياء وسؤال المغفرة مما لا يعلمه العبد.",
-    repetitionCount: 3,
-    countLabel: "3",
+    repetitionCount: 1,
+    countLabel: "1",
     sourceReference: "Al-Adab Al-Mufrad 716; Musnad Ahmad 19606; Hisn al-Muslim 203.",
     sourceReferenceArabic: "الأدب المفرد ٧١٦؛ مسند أحمد ١٩٦٠٦؛ حصن المسلم ٢٠٣.",
     hadithText:
-      "عَنْ مَعْقِلِ بْنِ يَسَارٍ رضي الله عنه عَنْ أَبِي بَكْرٍ الصِّدِّيقِ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «الشِّرْكُ فِيكُمْ أَخْفَى مِنْ دَبِيبِ النَّمْلِ، وَلَكِنْ سَأَدُلُّكَ عَلَى شَيْءٍ إِذَا فَعَلْتَهُ أَذْهَبَ عَنْكَ صِغَارَ الشِّرْكِ وَكِبَارَهُ: تَقُولُ: اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ، تَقُولُهَا ثَلَاثَ مَرَّاتٍ».",
+      "عَنْ مَعْقِلِ بْنِ يَسَارٍ قَالَ: انْطَلَقْتُ مَعَ أَبِي بَكْرٍ الصِّدِّيقِ رضي الله عنه إِلَى النَّبِيِّ ﷺ، فَقَالَ: «يَا أَبَا بَكْرٍ، لَلشِّرْكُ فِيكُمْ أَخْفَى مِنْ دَبِيبِ النَّمْلِ». فَقَالَ أَبُو بَكْرٍ: وَهَلِ الشِّرْكُ إِلَّا مَنْ جَعَلَ مَعَ اللَّهِ إِلَهًا آخَرَ؟ فَقَالَ النَّبِيُّ ﷺ: «وَالَّذِي نَفْسِي بِيَدِهِ، لَلشِّرْكُ أَخْفَى مِنْ دَبِيبِ النَّمْلِ، أَلَا أَدُلُّكَ عَلَى شَيْءٍ إِذَا قُلْتَهُ ذَهَبَ عَنْكَ قَلِيلُهُ وَكَثِيرُهُ؟ قُلِ: اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ».",
     hadithTextEnglish:
-      "Abu Bakr as-Siddiq narrated that the Messenger of Allah ﷺ said: “Shirk in you is more subtle than the creeping of ants, but I will guide you to something that, if you do it, will remove minor and major shirk from you: Say: O Allah, I seek refuge in You from associating anything with You while I know, and I seek Your forgiveness for what I do not know — three times.”",
+      "Maqil ibn Yasar reported: I went with Abu Bakr al-Siddiq to the Prophet ﷺ. He said: “Abu Bakr, shirk among you is more hidden than the movement of ants.” Abu Bakr asked: Is shirk anything other than placing another god alongside Allah? The Prophet ﷺ said: “By Him in whose hand is my soul, shirk is more hidden than the movement of ants. Shall I teach you words which, if you say them, remove its small and great forms? Say: O Allah, I seek refuge in You from associating anything with You knowingly, and I seek Your forgiveness for what I do not know.”",
     authenticityNote: "Sahih according to Al-Albani.",
     sourceUrl: "https://sunnah.com/adab%3A716",
   },
@@ -4097,7 +4168,9 @@ const isRoutineCategory = (cat: CategoryId): cat is RoutineCategoryId =>
 
 const getAzkarByCategory = (cat: CategoryId) =>
   (LAZY_AZKAR[cat] ?? ALL_AZKAR)
-    .filter((z) => z.category === cat && !z.isCollectionIntroduction)
+    // Keep the old ID resolvable for saved/history records, but the threefold
+    // protection report is evening-specific and must not prescribe a morning step.
+    .filter((z) => z.category === cat && !z.isCollectionIntroduction && z.id !== "m-hm-97")
     .sort((a, b) => a.orderIndex - b.orderIndex);
 
 const getAzkarForMode = (cat: CategoryId, mode: RoutineMode = "complete") => {

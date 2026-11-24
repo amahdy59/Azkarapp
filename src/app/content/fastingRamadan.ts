@@ -59,9 +59,9 @@ export const FASTING_RAMADAN_AZKAR: ZikrDraft[] = [
     id: "fasting-affront-response",
     category: "fasting_ramadan",
     orderIndex: 3,
-    arabicText: "إِنِّي صَائِمٌ، إِنِّي صَائِمٌ",
-    transliteration: "Inni sa'im, inni sa'im.",
-    translation: "I am fasting, I am fasting.",
+    arabicText: "إِنِّي صَائِمٌ",
+    transliteration: "Inni sa’im.",
+    translation: "I am fasting.",
     benefit:
       "What the fasting person says if someone reviles or insults them, restraining anger and guarding the fast.",
     benefitArabic: "ما يقوله الصائم إذا سابه أحد أو شاتمه أو قاتله، كفاً للغضب وحفظاً للصيام.",
@@ -70,9 +70,9 @@ export const FASTING_RAMADAN_AZKAR: ZikrDraft[] = [
     sourceReferenceArabic: "صحيح البخاري ١٨٩٤؛ صحيح مسلم ١١٥١.",
     preferredTiming: "When insulted, reviled, or provoked while fasting.",
     hadithText:
-      "قال رسول الله ﷺ: «وَإِذَا كَانَ يَوْمُ صَوْمِ أَحَدِكُمْ فَلَا يَرْفُثْ وَلَا يَصْخَبْ، فَإِنْ سَابَّهُ أَحَدٌ أَوْ قَاتَلَهُ فَلْيَقُلْ: إِنِّي امْرُؤٌ صَائِمٌ».",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «الصِّيَامُ جُنَّةٌ، فَلَا يَرْفُثْ وَلَا يَجْهَلْ، وَإِنِ امْرُؤٌ قَاتَلَهُ أَوْ شَاتَمَهُ فَلْيَقُلْ: إِنِّي صَائِمٌ، مَرَّتَيْنِ».",
     hadithTextEnglish:
-      "The Messenger of Allah ﷺ said: “When any of you is fasting on a day, he should neither indulge in obscenity nor raise his voice. If someone reviles him or fights him, let him say: ‘I am a fasting person.’”",
+      "Abu Hurayrah reported that the Messenger of Allah ﷺ said: “Fasting is a shield. Let a fasting person avoid obscenity and foolish behaviour. If someone fights or insults him, let him say twice: I am fasting.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
     attributionType: "said_by_prophet",
     sourceUrl: "https://sunnah.com/bukhari%3A1894",

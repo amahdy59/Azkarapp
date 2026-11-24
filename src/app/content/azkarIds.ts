@@ -10,7 +10,6 @@ export const CATEGORY_ZIKR_IDS: Partial<Record<CategoryId, readonly string[]>> =
     "m-hm-76a",
     "m-hm-76b",
     "m-hm-76c",
-    "m-hm-97",
     "m-hm-86",
     "m-hm-84",
     "m-hm-82",
@@ -192,6 +191,7 @@ export const CATEGORY_ZIKR_IDS: Partial<Record<CategoryId, readonly string[]>> =
 
 export const ALL_STATIC_ZIKR_IDS = new Set([
   ...Object.values(CATEGORY_ZIKR_IDS).flat(),
+  "m-hm-97", // Retired morning step; retained for saved/history identity compatibility.
   "m-hm-75a",
   "e-hm-75a",
   "in-prayer-introduction",

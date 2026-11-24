@@ -2,6 +2,8 @@
 
 ## Active phase
 
+[Dhikr wording, count and evidence alignment](phases/DHIKR_EVIDENCE_ALIGNMENT_2026_11_24.md) is the current owner-requested content review. The previous Home/Mushaf phase below remains completed release history.
+
 [Persistent Home dates and phone Mushaf index](phases/HOME_DATES_PHONE_MUSHAF_2026_11_07.md) is the current owner-approved phase. [Home startup, reminder updates and offline downloads](phases/STARTUP_REMINDERS_DOWNLOADS_2026_11_06.md) records the previous deployment.
 
 [Home date rail and pending release](phases/HOME_DATE_RAIL_AND_RELEASE_2026_11_06.md) records the preceding owner-approved phase. The owner lifts the previous commit and publication hold and requests screenshots, exact-commit verification and production smoke.

@@ -48,7 +48,6 @@ describe("azkar content totals", () => {
       "m-hm-76a",
       "m-hm-76b",
       "m-hm-76c",
-      "m-hm-97",
       "m-hm-86",
       "m-hm-84",
       "m-hm-82",

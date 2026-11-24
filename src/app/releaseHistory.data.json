@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-11-24",
+    "ar": [
+      "تتطابق الأحاديث المصاحبة لعدد من الأذكار مع ألفاظها ومصادرها المحددة.",
+      "صُححت أعداد التكرار وشروط بعض الفضائل، مع الحفاظ على سجلات القراءة المحفوظة.",
+      "توقفت مؤقتًا تسجيلات الألفاظ التي تغيرت حتى تُراجع مطابقتها للنص المصحح."
+    ],
+    "en": [
+      "Supporting narrations for several remembrances now match their wording and specific sources.",
+      "Repetition targets and reward conditions have been corrected while saved reading records are retained.",
+      "Recordings for changed wording are temporarily unavailable until checked against the corrected text."
+    ]
+  },
+  {
     "release": "2026-11-07.6",
     "ar": [
       "تظهر أدوات المصحف في موضعها الصحيح على أندرويد دون تغيير تخطيط الويب.",

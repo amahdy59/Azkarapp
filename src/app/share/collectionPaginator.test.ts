@@ -19,23 +19,23 @@ describe("collectionPaginator", () => {
     expect(pages[0].items).toHaveLength(1);
   });
 
-  it("partitions morning azkar (25 items) into 3-4 cards per group by default (7 pages)", () => {
+  it("partitions the sourced morning collection into complete share cards", () => {
     const morningAzkar = getAzkarByCategory("morning");
-    expect(morningAzkar.length).toBe(25);
+    expect(morningAzkar.length).toBe(24);
 
     const pages = paginateCollection(morningAzkar);
-    expect(pages).toHaveLength(7);
+    expect(pages).toHaveLength(6);
 
-    // Verify all 25 items are accounted for and in original sequence order
+    // Verify all 24 items are accounted for and in original sequence order
     const flattened = pages.flatMap((p) => p.items);
-    expect(flattened).toHaveLength(25);
+    expect(flattened).toHaveLength(24);
     expect(flattened.map((z) => z.id)).toEqual(morningAzkar.map((z) => z.id));
 
     // Verify every page strictly has 3 to 4 cards
     pages.forEach((page) => {
       expect(page.items.length).toBeGreaterThanOrEqual(3);
       expect(page.items.length).toBeLessThanOrEqual(4);
-      expect(page.totalPages).toBe(7);
+      expect(page.totalPages).toBe(6);
     });
   });
 
@@ -61,7 +61,7 @@ describe("collectionPaginator", () => {
     const morningAzkar = getAzkarByCategory("morning");
     const pages = paginateCollection(morningAzkar, { targetPages: 5 });
     expect(pages).toHaveLength(5);
-    expect(pages.flatMap((p) => p.items)).toHaveLength(25);
+    expect(pages.flatMap((p) => p.items)).toHaveLength(24);
   });
 
   it("computes reasonable weights for short vs long azkar", () => {

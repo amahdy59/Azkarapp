@@ -9,6 +9,7 @@ import manifest from "./homeReminderManifest.json";
 import primary from "../../../docs/agent/evidence/home-reminder-primary-sources-2026-10-18.json";
 import legacy from "../../../docs/agent/evidence/home-reminder-fallback-sources-2026-10-18.json";
 import audit from "../../../docs/agent/evidence/home-reminder-fallback-review-2026-10-18.json";
+import corrections from "../../../docs/agent/evidence/dhikr-source-review-2026-11-24.json";
 import { ALL_AZKAR } from "./azkar";
 import { createReminderReadingCatalogue, reminderSourceIdentity, type ReminderReadingRecord } from "./reminderReadings";
 import type { DailyEvidence } from "../dailyEvidence";
@@ -48,7 +49,12 @@ describe("complete local Home readings", () => {
     for (const [id, mapping] of Object.entries(fallbacks)) {
       const zikr = ALL_AZKAR.find((item) => item.id === id);
       expect(zikr, id).toBeDefined();
-      expect(zikr!.sourceReference).toContain(audit.entries[id as keyof typeof audit.entries].originalReference);
+      const correction = corrections.entries.find((entry) => entry.id === id);
+      if (correction?.status === "corrected") {
+        expect(zikr!.sourceUrl, id).toBe(correction.sourceUrl);
+      } else {
+        expect(zikr!.sourceReference).toContain(audit.entries[id as keyof typeof audit.entries].originalReference);
+      }
       const record = readings[mapping.reading as keyof typeof readings] as ReminderReadingRecord;
       expect(record.arabic, id).toBeTruthy();
       expect(record.english, id).toBeTruthy();

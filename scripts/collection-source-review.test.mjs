@@ -19,9 +19,11 @@ test("reviews every pending original independently of the Home alternative", () 
   }
 });
 
-test("binds the review to unchanged religious wording and effective benefit overrides", () => {
+test("binds the review and its owner-authorized successor to the current content snapshot", () => {
+  expect(review.snapshotSuccessor).toBe("dhikr-source-review-2026-11-24.json");
+  expect(review.snapshotHistory).toHaveLength(review.snapshots.length);
   for (const snapshot of review.snapshots) {
-    const bytes = readFileSync(new URL(`../${snapshot.file}`, import.meta.url));
+    const bytes = readFileSync(new URL(`../${snapshot.file}`, import.meta.url), "utf8").replaceAll("\r\n", "\n");
     expect(createHash("sha256").update(bytes).digest("hex")).toBe(snapshot.sha256);
   }
 });

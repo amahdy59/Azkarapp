@@ -44,6 +44,46 @@ function tapEventOn(target: Element) {
 }
 
 describe("useZikrCounter", () => {
+  it("keeps a legacy partial tally when a sourced target increases without inventing completion", () => {
+    const onPartialCountChange = vi.fn();
+    const { result, onComplete } = setup({
+      z: makeZikr({ id: "comprehensive-dua-42", repetitionCount: 100 }),
+      initialPartialCounts: { "comprehensive-dua-42": 2 },
+      onPartialCountChange,
+    });
+    expect(result.current.count).toBe(2);
+    expect(result.current.complete).toBe(false);
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(onPartialCountChange).not.toHaveBeenCalled();
+    act(() => result.current.handleTap());
+    expect(result.current.count).toBe(3);
+    expect(onPartialCountChange).toHaveBeenLastCalledWith("comprehensive-dua-42", 3);
+  });
+
+  it("bounds a legacy tally to a corrected smaller target without recording a new completion", () => {
+    const onPartialCountChange = vi.fn();
+    const { result, onComplete } = setup({
+      z: makeZikr({ id: "ir-ref-6", repetitionCount: 1 }),
+      initialPartialCounts: { "ir-ref-6": 2 },
+      onPartialCountChange,
+    });
+    expect(result.current.count).toBe(1);
+    expect(result.current.complete).toBe(true);
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(onPartialCountChange).not.toHaveBeenCalled();
+  });
+
+  it("retains an explicitly recorded completion after a target correction", () => {
+    const { result, onComplete } = setup({
+      z: makeZikr({ id: "comprehensive-dua-42", repetitionCount: 100 }),
+      isDone: true,
+      initialPartialCounts: { "comprehensive-dua-42": 2 },
+    });
+    expect(result.current.count).toBe(100);
+    expect(result.current.complete).toBe(true);
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+
   it("speaks every intermediate count for a short zikr", () => {
     const { result } = setup({ z: makeZikr({ repetitionCount: 7 }) });
     for (let count = 1; count < 7; count++) {

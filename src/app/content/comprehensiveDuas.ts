@@ -279,23 +279,26 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
   },
   {
     id: "friday-dua-13",
-    arabicText: "اللهم إني أعوذ بك من الهم والحزن، والعجز والكسل، والجبن والبخل، وغلبة الدين وقهر الرجال.",
+    arabicText: "اللهم إني أعوذ بك من الهم والحزن، والعجز والكسل، والجبن والبخل، وضلع الدين وغلبة الرجال.",
     transliteration: "",
     translation:
       "O Allah, I seek refuge in You from anxiety and grief, helplessness and laziness, cowardice and miserliness, the crushing burden of debt, and being overpowered by people.",
     benefit: "A Prophetic refuge from anxiety, grief, helplessness, laziness, debt, and oppression.",
     benefitArabic:
-      "الاستعاذة من الهم والحزن والدَّين\n• الهم: انشغال القلب بما يُخشى وقوعه.\n• الحزن: الألم على ما وقع أو فات.\n• غلبة الدين: أن يثقل الدين صاحبه ولا يستطيع سداده.\n• قهر الرجال: تسلط الناس وظلمهم.",
+      "الاستعاذة من الهم والحزن والدَّين\n• الهم: انشغال القلب بما يُخشى وقوعه.\n• الحزن: الألم على ما وقع أو فات.\n• ضلع الدين: ثقل الدين ومشقته.\n• غلبة الرجال: تسلط الناس وقهرهم.",
     repetitionCount: 1,
     sourceReference: "Sahih al-Bukhari 6369.",
-    sourceReferenceArabic: "كان النبي ﷺ يدعو به، وعلّمه لمن أثقلته الهموم والديون. صحيح البخاري 6369.",
+    sourceReferenceArabic: "صحيح البخاري ٦٣٦٩.",
     hadithText:
-      "عن أنس بن مالك رضي الله عنه قال: كنت أخدم رسول الله ﷺ إذا نزل، فكنت أسمعه يكثر أن يقول: «اللهم إني أعوذ بك من الهم والحزن، والعجز والكسل، والبخل والجبن، وضلع الدين، وغلبة الرجال». (أخرجه البخاري 6369).",
+      "عَنْ أَنَسٍ رضي الله عنه قَالَ: كَانَ النَّبِيُّ ﷺ يَقُولُ: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْجُبْنِ وَالْبُخْلِ، وَضَلَعِ الدَّيْنِ، وَغَلَبَةِ الرِّجَالِ».",
     hadithTextEnglish:
-      "Anas ibn Malik (may Allah be pleased with him) said: I used to serve the Messenger of Allah ﷺ when he halted, and I would hear him say often: “O Allah, I seek refuge in You from anxiety and grief, from incapacity and idleness, from miserliness and cowardice, from the burden of debt and from being overpowered by men.” (al-Bukhari 6369.)",
+      "Anas reported that the Prophet ﷺ used to say: “O Allah, I seek refuge in You from worry and grief, incapacity and laziness, cowardice and miserliness, the burden of debt and being overpowered by people.”",
     category: "comprehensive_duas",
     orderIndex: 13,
     includedInCore: true,
+
+    sourceUrl: "https://sunnah.com/bukhari:6369",
+    authenticityNote: "Sahih al-Bukhari.",
   },
   {
     id: "friday-dua-14",
@@ -383,24 +386,27 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
   {
     id: "friday-dua-18",
     arabicText:
-      "اللهم إني أسألك الثبات في الأمر، والعزيمة على الرشد، وأسألك شكر نعمتك، وحسن عبادتك، وأسألك قلبًا سليمًا، ولسانًا صادقًا، وأسألك من خير ما تعلم، وأعوذ بك من شر ما تعلم، وأستغفرك لما تعلم، إنك أنت علام الغيوب.",
+      "اللهم إني أسألك الثبات في الأمر، والعزيمة على الرشد، وأسألك شكر نعمتك، وحسن عبادتك، وأسألك قلبًا سليمًا، ولسانًا صادقًا، وأسألك من خير ما تعلم، وأعوذ بك من شر ما تعلم، وأستغفرك لما تعلم.",
     transliteration: "",
     translation:
-      "O Allah, I ask You for steadfastness in all matters and firm resolve to follow what is right. I ask You to enable me to thank You for Your blessings and worship You well. Grant me a sound heart and a truthful tongue. I ask You for the good that You know, seek refuge in You from the evil that You know, and ask Your forgiveness for what You know. You are the One who fully knows all that is unseen.",
+      "O Allah, I ask You for steadfastness in all matters and firm resolve to follow what is right. I ask You to enable me to thank You for Your blessings and worship You well. Grant me a sound heart and a truthful tongue. I ask You for the good that You know, seek refuge in You from the evil that You know, and ask Your forgiveness for what You know.",
     benefit:
       "A request for steadfastness, sound resolve, gratitude, sincere worship, a sound heart, and a truthful tongue.",
     benefitArabic:
       "الثبات والعزيمة والقلب السليم\n• العزيمة على الرشد: الإرادة الجادة لاتباع الصواب.\n• قلب سليم: قلب سليم من الشرك والحقد والفساد.\n• علام الغيوب: العليم بكل ما غاب عن الخلق.",
     repetitionCount: 1,
-    sourceReference: "Sunan an-Nasa'i 1304; Musnad Ahmad 17114.",
-    sourceReferenceArabic: "حديث شداد بن أوس رضي الله عنه في السلسلة الصحيحة برقم 3228 وموقع الدرر السنية.",
+    sourceReference: "Sunan an-Nasai 1304 (Hasan, Darussalam).",
+    sourceReferenceArabic: "سنن النسائي ١٣٠٤ (حسن بحسب تصنيف دار السلام).",
     hadithText:
-      "عن شداد بن أوس رضي الله عنه قال: قال لي رسول الله ﷺ: «يا شداد بن أوس، إذا رأيت الناس قد اكتنزوا الذهب والفضة، فاكنز هؤلاء الكلمات: اللهم إني أسألك الثبات في الأمر، والعزيمة على الرشد، وأسألك شكر نعمتك، وحسن عبادتك، وأسألك لسانًا صادقًا، وقلبًا سليمًا، وأسألك من خير ما تعلم، وأعوذ بك من شر ما تعلم، وأستغفرك لما تعلم، إنك أنت علام الغيوب». (أخرجه النسائي 1304، وأحمد 17114، والطبراني في الكبير 7135، وصححه الألباني في السلسلة الصحيحة 3228).",
+      "عَنْ شَدَّادِ بْنِ أَوْسٍ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ يَقُولُ فِي صَلَاتِهِ: «اللهم إني أسألك الثبات في الأمر، والعزيمة على الرشد، وأسألك شكر نعمتك، وحسن عبادتك، وأسألك قلبًا سليمًا، ولسانًا صادقًا، وأسألك من خير ما تعلم، وأعوذ بك من شر ما تعلم، وأستغفرك لما تعلم».",
     hadithTextEnglish:
-      "Shaddad ibn Aws (may Allah be pleased with him) said: The Messenger of Allah ﷺ said to me: “Shaddad ibn Aws, when you see people hoarding gold and silver, hoard these words: O Allah, I ask You for steadfastness in my affair and resolve upon right guidance. I ask You for gratitude for Your favour and for the good worship of You. I ask You for a truthful tongue and a sound heart. I ask You for the good of what You know, I seek refuge in You from the evil of what You know, and I seek Your forgiveness for what You know — You are the Knower of all that is hidden.” (al-Nasa’i 1304; Ahmad 17114; al-Tabarani in al-Kabir 7135, graded sahih by al-Albani in al-Silsilah al-Sahihah 3228.)",
+      "Shaddad ibn Aws reported that the Messenger of Allah ﷺ used to say in his prayer: “O Allah, I ask You for steadfastness in all matters and firm resolve to follow what is right. I ask You to enable me to thank You for Your blessings and worship You well. Grant me a sound heart and a truthful tongue. I ask You for the good that You know, seek refuge in You from the evil that You know, and ask Your forgiveness for what You know.”",
     category: "comprehensive_duas",
     orderIndex: 18,
     includedInCore: true,
+
+    sourceUrl: "https://sunnah.com/nasai:1304",
+    authenticityNote: "Hasan (Darussalam).",
   },
   {
     id: "friday-dua-19",
@@ -655,24 +661,27 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
   {
     id: "friday-dua-31",
     arabicText:
-      "اللهم فاطر السماوات والأرض، عالم الغيب والشهادة، رب كل شيء ومليكه، أشهد أن لا إله إلا أنت، أعوذ بك من شر نفسي، ومن شر الشيطان وشَرَكِه، وأن أقترف على نفسي سوءًا، أو أجرّه إلى مسلم.",
+      "اللَّهُمَّ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، لَا إِلَهَ إِلَّا أَنْتَ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي وَمِنْ شَرِّ الشَّيْطَانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ.",
     transliteration: "",
     translation:
-      "O Allah, Originator of the heavens and the earth, Knower of the unseen and the seen, Lord and Sovereign of everything: I testify that none has the right to be worshipped except You. I seek refuge in You from the evil within myself, from the evil and snares of Satan, from committing evil against myself, and from bringing it upon another Muslim.",
+      "O Allah, Creator of the heavens and earth, Knower of the unseen and the seen, none is worthy of worship but You, Lord and Sovereign of everything. I seek refuge in You from the evil of myself, from the evil of Satan and his snares, and from committing evil against myself or bringing it upon another Muslim.",
     benefit:
-      "A morning, evening, and bedtime refuge from the evil of the self, Satan, and harming oneself or another Muslim.",
+      "A morning and evening supplication for refuge from the evil of the self, Satan, and causing harm to oneself or another Muslim.",
     benefitArabic:
       "الاستعاذة من النفس والشيطان\n• شَرَك الشيطان: حبائله ومكائده.\n• أقترف: أرتكب وأكتسب.\n• أجرّه إلى مسلم: أتسبب في إيصال الضرر أو الذنب إلى غيري.",
     repetitionCount: 1,
-    sourceReference: "Jami' at-Tirmidhi 3529.",
-    sourceReferenceArabic: "علّمه النبي ﷺ لأبي بكر رضي الله عنه ليقوله صباحًا ومساءً وعند النوم.",
+    sourceReference: "Jami al-Tirmidhi 3529 (Hasan Gharib, al-Tirmidhi; Hasan, Darussalam).",
+    sourceReferenceArabic: "جامع الترمذي ٣٥٢٩ (حسن غريب عند الترمذي؛ حسن بحسب تصنيف دار السلام).",
     hadithText:
-      "عن أبي بكر الصديق رضي الله عنه أنه قال: يا رسول الله مرني بشيء أقوله إذا أصبحت وإذا أمسيت، قال: «قل: اللهم فاطر السماوات والأرض عالم الغيب والشهادة رب كل شيء ومليكه، أشهد أن لا إله إلا أنت، أعوذ بك من شر نفسي ومن شر الشيطان وشِركه، وأن أقترف على نفسي سوءًا أو أجرَّه إلى مسلم»، قال: «قلها إذا أصبحت، وإذا أمسيت، وإذا أخذت مضجعك». (أخرجه الترمذي 3529، وأبو داود 5067، وصححه الألباني).",
+      "عَنْ أَبِي رَاشِدٍ الْحُبْرَانِيِّ أَنَّهُ أَتَى عَبْدَ اللَّهِ بْنَ عَمْرٍو، فَأَخْرَجَ لَهُ صَحِيفَةً فِيهَا أَنَّ أَبَا بَكْرٍ الصِّدِّيقَ رضي الله عنه قَالَ: يَا رَسُولَ اللَّهِ عَلِّمْنِي مَا أَقُولُ إِذَا أَصْبَحْتُ وَإِذَا أَمْسَيْتُ. فَقَالَ: «يَا أَبَا بَكْرٍ قُلْ: اللَّهُمَّ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، لَا إِلَهَ إِلَّا أَنْتَ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي وَمِنْ شَرِّ الشَّيْطَانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ».",
     hadithTextEnglish:
-      "Abu Bakr al-Siddiq (may Allah be pleased with him) said: Messenger of Allah, instruct me with something to say when I rise in the morning and when I reach the evening. He said: “Say: O Allah, Originator of the heavens and the earth, Knower of the unseen and the seen, Lord of everything and its Sovereign — I bear witness that there is no god but You. I seek refuge in You from the evil of my own self, from the evil of Satan and his associating, and from bringing evil upon myself or drawing it upon a Muslim.” He said: “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.” (al-Tirmidhi 3529; Abu Dawud 5067, graded sahih by al-Albani.)",
+      "Abu Rashid al-Hubrani reported that Abdullah ibn Amr showed him a written report in which Abu Bakr al-Siddiq asked: Messenger of Allah, teach me what to say in the morning and evening. He said: “Abu Bakr, say: O Allah, Creator of the heavens and earth, Knower of the unseen and the seen, none is worthy of worship but You, Lord and Sovereign of everything. I seek refuge in You from the evil of myself, from the evil of Satan and his snares, and from committing evil against myself or bringing it upon another Muslim.”",
     category: "comprehensive_duas",
     orderIndex: 31,
     includedInCore: false,
+
+    sourceUrl: "https://sunnah.com/tirmidhi:3529",
+    authenticityNote: "Hasan Gharib (al-Tirmidhi); Hasan (Darussalam).",
   },
   {
     id: "friday-dua-32",
@@ -797,9 +806,9 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReference: "Sunan Ibn Majah 3857; Sahih (Darussalam).",
     sourceReferenceArabic: "سنن ابن ماجه 3857؛ صحيح بحسب تصنيف دار السلام.",
     hadithText:
-      "عن بريدة بن الحصيب رضي الله عنه، أن رسول الله ﷺ سمع رجلًا يقول: اللهم إني أسألك بأني أشهد أنك أنت الله لا إله إلا أنت الأحد الصمد الذي لم يلد ولم يولد ولم يكن له كفوًا أحد، فقال رسول الله ﷺ: «لقد سأل الله باسمه الأعظم الذي إذا سئل به أعطى، وإذا دعي به أجاب». (أخرجه أبو داود 1493، والترمذي 3475، وابن ماجه 3857، وصححه الألباني).",
+      "عَنْ بُرَيْدَةَ رضي الله عنه قَالَ: سَمِعَ النَّبِيُّ ﷺ رَجُلًا يَقُولُ: «اللَّهُمَّ إِنِّي أَسْأَلُكَ بِأَنَّكَ أَنْتَ اللَّهُ، الْأَحَدُ الصَّمَدُ، الَّذِي لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ». فَقَالَ: «لَقَدْ سَأَلَ اللَّهَ بِاسْمِهِ الْأَعْظَمِ الَّذِي إِذَا سُئِلَ بِهِ أَعْطَى وَإِذَا دُعِيَ بِهِ أَجَابَ».",
     hadithTextEnglish:
-      "Buraydah ibn al-Husayb (may Allah be pleased with him) reported that the Messenger of Allah ﷺ heard a man say: O Allah, I ask You by my bearing witness that You are Allah, there is no god but You, the One, the Eternal Refuge, who neither begets nor is begotten, and to whom none is equal. The Messenger of Allah ﷺ said: “He has asked Allah by His greatest name, by which when He is asked He gives, and when He is called upon He answers.” (Abu Dawud 1493; al-Tirmidhi 3475; Ibn Majah 3857, graded sahih by al-Albani.)",
+      "Buraydah reported: The Prophet ﷺ heard a man say: “O Allah, I ask You by virtue of the fact that You are Allah, the One, the Self-Sufficient Master upon whom all depend; You neither beget nor were begotten, and none is equal or comparable to You.” He said: “He has asked Allah by His greatest name, by which when He is asked He gives, and when He is called upon He answers.”",
     sourceUrl: "https://sunnah.com/ibnmajah%3A3857",
     attributionType: "approved_by_prophet",
     category: "comprehensive_duas",
@@ -821,9 +830,9 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReference: "Sunan Ibn Majah 3858; Hasan (Darussalam).",
     sourceReferenceArabic: "سنن ابن ماجه 3858؛ حسن بحسب تصنيف دار السلام.",
     hadithText:
-      "عن أنس بن مالك رضي الله عنه أنه كان مع رسول الله ﷺ جالسًا ورجل يصلي ثم دعا: اللهم إني أسألك بأن لك الحمد لا إله إلا أنت المنان بديع السماوات والأرض يا ذا الجلال والإكرام يا حي يا قيوم، فقال النبي ﷺ: «لقد دعا الله باسمه العظيم الذي إذا دعي به أجاب، وإذا سئل به أعطى». (أخرجه أبو داود 1495، والترمذي 3544، وابن ماجه 3858، وصححه الألباني).",
+      "عَنْ أَنَسِ بْنِ مَالِكٍ رضي الله عنه قَالَ: سَمِعَ النَّبِيُّ ﷺ رَجُلًا يَقُولُ: «اللَّهُمَّ إِنِّي أَسْأَلُكَ بِأَنَّ لَكَ الْحَمْدَ، لَا إِلَهَ إِلَّا أَنْتَ، وَحْدَكَ لَا شَرِيكَ لَكَ، الْمَنَّانُ، بَدِيعُ السَّمَاوَاتِ وَالْأَرْضِ، ذُو الْجَلَالِ وَالْإِكْرَامِ». فَقَالَ: «لَقَدْ سَأَلَ اللَّهَ بِاسْمِهِ الْأَعْظَمِ الَّذِي إِذَا سُئِلَ بِهِ أَعْطَى وَإِذَا دُعِيَ بِهِ أَجَابَ».",
     hadithTextEnglish:
-      "Anas ibn Malik (may Allah be pleased with him) was sitting with the Messenger of Allah ﷺ while a man prayed and then supplicated: O Allah, I ask You, as Yours is all praise, there is no god but You, the Bestower, Originator of the heavens and the earth, O Possessor of majesty and honour, O Ever-Living, O Sustainer. The Prophet ﷺ said: “He has called upon Allah by His mighty name, by which when He is called upon He answers, and when He is asked He gives.” (Abu Dawud 1495; al-Tirmidhi 3544; Ibn Majah 3858, graded sahih by al-Albani.)",
+      "Anas ibn Malik reported: The Prophet ﷺ heard a man say: “O Allah, I ask You because all praise belongs to You. None has the right to be worshipped except You alone, without partner: the Bestower of abundant favors, the incomparable Originator of the heavens and the earth, the Possessor of majesty and honor.” He said: “He has asked Allah by His greatest name, by which when He is asked He gives, and when He is called upon He answers.”",
     sourceUrl: "https://sunnah.com/ibnmajah%3A3858",
     attributionType: "approved_by_prophet",
     category: "comprehensive_duas",
@@ -865,7 +874,7 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "Jami' at-Tirmidhi 3483; Tirmidhi called it Hasan Gharib, while the displayed Darussalam grading is Da'if.",
     sourceReferenceArabic: "جامع الترمذي 3483؛ وصفه الترمذي بالحسن الغريب، بينما يظهر تصنيف دار السلام: ضعيف.",
     hadithText:
-      "عن عمران بن حصين رضي الله عنهما، أن النبي ﷺ قال لأبيه حصين: «يا حصين كم تعبد اليوم إلهًا؟»، قال: سبعة: ستا في الأرض وواحدا في السماء، قال: «فأيهم تعد لرغبتك ورهبتك؟»، قال: الذي في السماء، قال: «يا حصين أما إنك لو أسلمت علمتك كلمتين تنفعانك»، فلما أسلم حصين قال: يا رسول الله علمني الكلمتين اللتين وعدتني، فقال: «قل: اللهم ألهمك رشدي، وأعذني من شر نفسي». (أخرجه الترمذي 3483، وقال: حديث حسن غريب).",
+      "عن عمران بن حصين رضي الله عنهما، أن النبي ﷺ قال لأبيه حصين: «يا حصين كم تعبد اليوم إلهًا؟»، قال: سبعة: ستا في الأرض وواحدا في السماء، قال: «فأيهم تعد لرغبتك ورهبتك؟»، قال: الذي في السماء، قال: «يا حصين أما إنك لو أسلمت علمتك كلمتين تنفعانك»، فلما أسلم حصين قال: يا رسول الله علمني الكلمتين اللتين وعدتني، فقال: «قل: اللهم ألهمني رشدي، وأعذني من شر نفسي». (أخرجه الترمذي 3483، وقال: حديث حسن غريب).",
     hadithTextEnglish:
       "‘Imran ibn Husayn (may Allah be pleased with them both) reported that the Prophet ﷺ said to his father Husayn: “Husayn, how many gods do you worship today?” He said: Seven — six on earth and one in heaven. He said: “Which of them do you keep for your hope and your fear?” He said: The one in heaven. He said: “Husayn, were you to accept Islam I would teach you two words that would benefit you.” When Husayn accepted Islam he said: Messenger of Allah, teach me the two words you promised me. He said: “Say: O Allah, inspire me with right guidance, and protect me from the evil of my own self.” (al-Tirmidhi 3483, who said: a hasan gharib hadith.)",
     authenticityNote:
@@ -906,11 +915,9 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     transliteration: "",
     translation:
       "My Lord, forgive me and accept my repentance. You are truly the One who repeatedly accepts repentance, the Most Merciful.",
-    benefit:
-      "Recited 3 times (or once). The Prophet ﷺ was observed seeking forgiveness and repenting about 100 times in a single gathering and during the day.",
-    benefitArabic:
-      "دعاء التوبة والاستغفار في المجلس\n• يُقرأ 3 مرات (أو مرة واحدة)، وكان النبي ﷺ يستغفر الله ويتوب إليه في المجلس الواحد نحو مائة مرة، وفي اليوم مائة مرة.\n• تب علي: اقبل توبتي ووفقني للثبات عليها.\n• التواب: كثير التوفيق للتوبة والقبول لها.",
-    repetitionCount: 3,
+    benefit: "The Companions counted this supplication from the Prophet ﷺ one hundred times in a single sitting.",
+    benefitArabic: "كان الصحابة يعدّون للنبي ﷺ هذا الاستغفار مائة مرة في المجلس الواحد.",
+    repetitionCount: 100,
     sourceReference: "Sunan Abi Dawud 1516; Sahih (al-Albani); Sahih Muslim 2702.",
     sourceReferenceArabic: "سنن أبي داود 1516؛ صحيح بحسب تصنيف الألباني؛ صحيح مسلم 2702.",
     hadithText:
@@ -922,6 +929,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     category: "comprehensive_duas",
     orderIndex: 42,
     includedInCore: false,
+
+    countLabel: "100",
   },
   {
     id: "comprehensive-dua-43",
