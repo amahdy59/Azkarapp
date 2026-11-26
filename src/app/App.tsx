@@ -1675,7 +1675,11 @@ function AppContent({
       void audioController
         .buildMushafSurahPlan?.(mushafSurah)
         .then((plan) => {
-          if (request === mushafAudioRequest.current) audioController.startPlan(plan);
+          if (request !== mushafAudioRequest.current) return;
+          const firstPage = getSurahMeta(mushafSurah)!.startPage;
+          setMushafSurahSelection({ page: firstPage, surah: mushafSurah });
+          handleKhatmahPageChange(firstPage);
+          audioController.startPlan(plan);
         })
         .catch((error) => {
           reportError(error, "mushaf-surah-audio");
@@ -1696,7 +1700,7 @@ function AppContent({
       audioLanguage: "ar",
     });
     audioController.startPlan(plan);
-  }, [audioController, buildPlaybackPlan, mushafSurah]);
+  }, [audioController, buildPlaybackPlan, mushafSurah, handleKhatmahPageChange]);
   useEffect(() => {
     if (!queuedBaqarahAudio) return;
     if (view !== "khatmah" || queuedBaqarahContext !== baqarahContext) {

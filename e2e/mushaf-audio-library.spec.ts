@@ -8,6 +8,28 @@ import { listeningCases, openListeningPage } from "./helpers/quran-listening";
 
 test.use({ serviceWorkers: "block" });
 for (const language of ["ar", "en"] as const) {
+  test(`complete-surah audio opens its matching first Mushaf page ${language} @cross-browser`, async ({ page }) => {
+    await openListeningPage(page, listeningCases[0], language);
+    await page.setViewportSize({ width: language === "ar" ? 390 : 1440, height: 900 });
+    await page.evaluate(() => {
+      window.location.hash = "/quran/100";
+    });
+    await expect(page.locator('[data-mushaf-page="100"]').first()).toBeVisible();
+    const direct = page.getByTestId("mushaf-rail-listen");
+    if (await direct.isVisible()) await direct.click();
+    else {
+      await page.getByTestId("mushaf-more-actions").click();
+      await page.getByTestId("mushaf-quick-audio").click();
+    }
+    await expect(page.locator('[data-mushaf-page="77"]').first()).toBeVisible();
+    const recording = records.find((item) => item.surah === 4)!.variants[0]!;
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __listeningAudio: HTMLAudioElement }).__listeningAudio.src),
+      )
+      .toContain(recording.sha256);
+    await expect(page).toHaveURL(/\/quran\/77$/);
+  });
   test(`Mushaf keeps the selected audio surah on a shared page ${language} @cross-browser`, async ({ page }) => {
     await openListeningPage(page, listeningCases[0], language);
     await page.setViewportSize({ width: language === "ar" ? 390 : 1440, height: 900 });
