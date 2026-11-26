@@ -1,3 +1,5 @@
+import { chooseProgressDetail, chooseProgressOption } from "./helpers/progress";
+import { dashboardText } from "../src/app/i18n/progressDashboard";
 import { openDownloadManagement, openDownloadSelection } from "./helpers/downloads";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
@@ -120,30 +122,51 @@ for (const language of ["ar", "en"] as const) {
       );
     }, language);
     await page.goto("/#/progress/month");
-    const chart = page.locator(".recorded-pages-chart");
-    await expect(chart).toBeVisible();
+    await chooseProgressDetail(page, "prayers");
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: dashboardText(language, "metric"), exact: true }),
+      "pages",
+    );
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: dashboardText(language, "dateRange"), exact: true, includeHidden: true }),
+      "custom",
+    );
+    await page.getByLabel(dashboardText(language, "start"), { exact: true }).fill("2026-10-13");
+    await page.getByLabel(dashboardText(language, "end"), { exact: true }).fill("2026-10-19");
+    await page.getByRole("button", { name: dashboardText(language, "apply"), exact: true }).click();
+    const chart = page.getByTestId("progress-main-trend");
+    await chart.getByText(dashboardText(language, "chartTable"), { exact: true }).click();
     for (const scale of [1, 2]) {
       await page.locator("html").evaluate((node, scale) => {
         node.style.fontSize = `${16 * scale}px`;
       }, scale);
-      await page.evaluate(() => document.fonts.ready);
-      await expect
-        .poll(() =>
-          chart
-            .locator("li")
-            .evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().y))).size),
-        )
-        .toBe(7);
-      const dates = await chart.locator("time").evaluateAll((items) => items.map((item) => item.dateTime));
-      expect(dates).toEqual([...dates].sort());
-      expect(await chart.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
-      const fills = await chart
-        .locator(".recorded-pages-track > span")
-        .evaluateAll((items) => items.map((item) => item.getBoundingClientRect().width));
-      expect(fills.filter((width) => width > 1)).toHaveLength(1);
+      const dates = await chart.getByRole("rowheader").allTextContents();
+      expect(dates).toHaveLength(7);
+      const columns = await chart
+        .getByTestId("recording-time-column")
+        .evaluateAll((nodes) => nodes.map((node) => Number(node.getAttribute("height"))));
+      expect(columns).toHaveLength(7);
+      expect(columns.filter((height) => height > 0)).toHaveLength(1);
+      expect(
+        await chart.evaluate((node) => node.scrollWidth - node.clientWidth),
+        JSON.stringify(
+          await chart.evaluate((node) =>
+            [...node.querySelectorAll("*")]
+              .filter((el) => el.clientWidth && el.scrollWidth > el.clientWidth + 1)
+              .map((el) => ({
+                tag: el.tagName,
+                cls: el.getAttribute("class"),
+                scroll: el.scrollWidth,
+                width: el.clientWidth,
+              })),
+          ),
+        ),
+      ).toBeLessThanOrEqual(1);
       await chart.screenshot({ path: info.outputPath(`chart-${language}-${scale}.png`) });
     }
-    expect((await new AxeBuilder({ page }).include(".recorded-pages-chart").analyze()).violations).toEqual([]);
+    expect(
+      (await new AxeBuilder({ page }).include('[data-testid="progress-main-trend"]').analyze()).violations,
+    ).toEqual([]);
   });
 }
 

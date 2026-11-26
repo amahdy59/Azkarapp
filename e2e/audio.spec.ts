@@ -1,3 +1,4 @@
+import { getAzkarForMode } from "../src/app/content/azkar";
 import { playEnglishTranslation } from "./reader-options";
 import { expect, test } from "@playwright/test";
 
@@ -221,7 +222,9 @@ test("100-count tawhid offers prescribed repeat and shows each repetition", asyn
   });
   // Preserve the Arabic Repeat action coverage using a currently approved
   // 100-count recording; the withdrawn istighfar variant is covered separately.
-  await page.goto("/#/azkar/morning/22");
+  const position = getAzkarForMode("morning", "complete").findIndex((zikr) => zikr.id === "m-hm-93") + 1;
+  expect(position).toBeGreaterThan(0);
+  await page.goto(`/#/azkar/morning/${position}`);
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-93");
   await page.getByTestId("reader-audio-dock-button").click();
   const player = page.getByRole("region", { name: "Audio player", exact: true });
@@ -634,7 +637,7 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-100");
   await expect(player).toContainText("سورة الْبَقَرَة (آيَةُ الْكُرْسِيِّ)");
   await expect(player).not.toContainText("أذكار مشتركة");
-  await expect(player).toContainText("المقطع ١ / ١٨");
+  await expect(player).toContainText("المقطع ١ / ١٧");
 
   // 2. Moving to another zikr in the Reader updates the active audio track
   // In desktop reader collection navigator, select Surah Al-Ikhlas (index 2 / s-hm-99-ikhlas)
@@ -642,7 +645,7 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
   await page.locator("#zikr-card-2 button[data-zikr-select]").click();
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-ikhlas");
   await expect(player).toContainText("سورة الْإِخْلَاص");
-  await expect(player).toContainText("المقطع ٣ / ١٨");
+  await expect(player).toContainText("المقطع ٣ / ١٧");
 
   // 3. When current audio track finishes ("ended"), Reader screen updates to the zikr currently being recited
   await page.evaluate(() => {
@@ -651,7 +654,7 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
   });
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-falaq");
   await expect(player).toContainText("سورة الْفَلَق");
-  await expect(player).toContainText("المقطع ٤ / ١٨");
+  await expect(player).toContainText("المقطع ٤ / ١٧");
 });
 
 test("expanded audio player on home screen stays within the desktop canvas and page bounds", async ({ page }) => {

@@ -113,8 +113,7 @@ for (const language of ["ar", "en"] as const) {
               columns: getComputedStyle(dashboard.querySelector(".progress-overview-grid")!).gridTemplateColumns.split(
                 " ",
               ).length,
-              expectedColumns:
-                dashboard.clientWidth >= rootSize * 56 ? 4 : dashboard.clientWidth >= rootSize * 18 ? 2 : 1,
+              expectedColumns: dashboard.clientWidth >= rootSize * 18 ? 2 : 1,
             };
           });
           expect(layout.columns).toBe(layout.expectedColumns);

@@ -101,9 +101,16 @@ export function useLearningPosition(
       if (!updateLearningState(identity, (state) => ({ ...state, position: { unitId, offset }, lastReadAt })))
         onStorageFailure();
     };
-    const frame = requestAnimationFrame(() => {
-      element.scrollTop = offset * Math.max(0, element.scrollHeight - element.clientHeight);
-      restored = true;
+    let cancelled = false;
+    let frame: number | undefined;
+    // Stored fractions refer to settled reading geometry. Restoring before
+    // bundled Arabic fonts load moves the reader when the lines reflow.
+    void Promise.resolve(document.fonts?.ready).then(() => {
+      if (cancelled) return;
+      frame = requestAnimationFrame(() => {
+        element.scrollTop = offset * Math.max(0, element.scrollHeight - element.clientHeight);
+        restored = true;
+      });
     });
     const onScroll = () => {
       if (!restored) return;
@@ -122,7 +129,8 @@ export function useLearningPosition(
     window.addEventListener("pagehide", persist);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      cancelAnimationFrame(frame);
+      cancelled = true;
+      if (frame !== undefined) cancelAnimationFrame(frame);
       clearTimeout(timeout);
       persist();
       element.removeEventListener("scroll", onScroll);

@@ -91,6 +91,7 @@ describe("RecordingTimeline", () => {
       const slider = screen.getByRole("slider");
       expect(slider).toHaveAttribute("dir", rtl ? "rtl" : "ltr");
       const markers = screen.getAllByTestId("recording-time-point");
+      expect(markers[0]!.parentElement).toHaveStyle({ left: "7px", right: "7px" });
       expect(Number.parseFloat(markers[0]!.style.left) > Number.parseFloat(markers[2]!.style.left)).toBe(rtl);
       const control = screen.getByRole("button", { name: /Timeline:/ });
       fireEvent.keyDown(control, { key: "Home" });

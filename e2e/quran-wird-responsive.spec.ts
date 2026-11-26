@@ -66,12 +66,12 @@ for (const language of ["ar", "en"] as const) {
           node.querySelector(`section[aria-labelledby="${id}"]`)!.getBoundingClientRect().toJSON(),
         ),
       );
-      if (width === 390) expect(planBox.y).toBeGreaterThan(todayBox.y + todayBox.height);
+      if (width < 960) expect(planBox.y).toBeGreaterThan(todayBox.y + todayBox.height);
       else {
         expect(Math.abs(todayBox.y - planBox.y)).toBeLessThanOrEqual(1);
         const weekBox = (await week.boundingBox())!;
         const rowBottom = Math.max(todayBox.y + todayBox.height, planBox.y + planBox.height);
-        expect(weekBox.y - rowBottom).toBeCloseTo(16, 0);
+        expect(weekBox.y - rowBottom).toBeCloseTo(24, 0);
         expect(await content.evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length)).toBe(2);
         expect(Math.abs(todayBox.x - planBox.x)).toBeGreaterThan(250);
         const first = (await week.getByRole("listitem").first().boundingBox())!;
@@ -79,26 +79,19 @@ for (const language of ["ar", "en"] as const) {
         expect(Math.abs(first.y - last.y)).toBeLessThanOrEqual(1);
       }
       expect(await content.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
-      const chart = plan.locator(".recorded-pages-chart");
-      const bars = await chart.locator(".recorded-pages-track").evaluateAll((tracks) =>
-        tracks.map((track) => ({
-          height: track.getBoundingClientRect().height,
-          fill: track.firstElementChild!.getBoundingClientRect().height,
-        })),
-      );
-      expect(bars).toHaveLength(7);
-      expect(bars.filter((bar) => bar.fill > 1)).toHaveLength(1);
-      expect(Math.max(...bars.map((bar) => bar.fill))).toBeGreaterThanOrEqual(bars[0]!.height - 3);
-      const chartInsetGap = await plan.evaluate((node) => {
-        const style = getComputedStyle(node);
-        const inset = parseFloat(style.paddingBottom) + parseFloat(style.borderBottomWidth);
-        return Math.abs(
-          node.getBoundingClientRect().bottom -
-            node.querySelector(".recorded-pages-chart")!.getBoundingClientRect().bottom -
-            inset,
-        );
+      // The plan now owns cumulative completion; the one weekly list retains daily records.
+      const cumulative = plan.getByRole("progressbar", {
+        name: t(language, "mushaf.overallProgressTitle"),
+        exact: true,
       });
-      expect(chartInsetGap).toBeLessThanOrEqual(1);
+      await expect(cumulative).toHaveAttribute("aria-valuenow", "2");
+      await expect(cumulative).toHaveAttribute("aria-valuemax", "604");
+      await expect(plan.locator(".recorded-pages-chart")).toHaveCount(0);
+      const weeklyRecords = await week.getByRole("listitem").allTextContents();
+      expect(weeklyRecords).toHaveLength(7);
+      expect(
+        weeklyRecords.filter((row) => row.includes(`${formatNumerals(2, language)} / ${formatNumerals(4, language)}`)),
+      ).toHaveLength(1);
       await expectWholeWeekLabels();
       await week.scrollIntoViewIfNeeded();
       await page.screenshot({ path: testInfo.outputPath(`quran-week-${language}-${width}.png`) });

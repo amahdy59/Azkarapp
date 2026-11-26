@@ -230,5 +230,9 @@ test("failed cold audio loading provides an explicit recovery action", async ({ 
   await failure.getByRole("button", { name: "إعادة تحميل التطبيق", exact: true }).click();
   await expect(failure).toBeHidden();
   await page.getByRole("button", { name: "تشغيل الصوتي للكل", exact: true }).click();
-  await expect(page.getByTestId("reader-screen").or(page.getByRole("dialog"))).toBeVisible();
+  const coverage = page.getByRole("alertdialog");
+  await expect(coverage).toBeVisible();
+  await coverage.getByRole("button", { name: "تشغيل المتاح", exact: true }).click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await expect(page.getByRole("region", { name: "مشغل الصوت", exact: true })).toBeVisible();
 });

@@ -1,3 +1,5 @@
+import { chooseProgressDetail, chooseProgressOption } from "./helpers/progress";
+import { dashboardText } from "../src/app/i18n/progressDashboard";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -65,17 +67,11 @@ for (const scenario of [
     expect(await link.evaluate((node) => getComputedStyle(node, "::after").outlineStyle)).toBe("solid");
     const calendar = page.getByTestId("progress-heatmap");
     const routines = page.getByTestId("progress-routine-bars");
-    const panels = await page.evaluate(() => {
-      const nodes = [
-        document.querySelector('[data-testid="progress-heatmap"]')!,
-        document.querySelector('[data-testid="progress-routine-bars"]')!,
-      ];
-      return nodes.map((node) => {
+    const panelGeometry = (testId: string) =>
+      page.getByTestId(testId).evaluate((node) => {
         const rect = node.getBoundingClientRect(),
           css = getComputedStyle(node);
         return {
-          x: rect.x,
-          y: rect.y,
           width: rect.width,
           radius: css.borderTopLeftRadius,
           padding: css.paddingInlineStart,
@@ -83,40 +79,47 @@ for (const scenario of [
           overflow: node.scrollWidth > node.clientWidth + 1,
         };
       });
-    });
-    expect(panels[0]!.radius).toBe(panels[1]!.radius);
-    expect(panels[0]!.padding).toBe(panels[1]!.padding);
-    expect(panels[0]!.font).toBe(panels[1]!.font);
-    expect(panels.every((panel) => !panel.overflow)).toBe(true);
-    if (scenario.width === 1440) {
-      expect(Math.abs(panels[0]!.y - panels[1]!.y)).toBeLessThanOrEqual(1);
-      expect(panels[0]!.width + panels[1]!.width).toBeLessThan(1281);
-      const aligned = await page.locator(".progress-rhythm-panel").evaluate((panel) => {
-        const calendar = document.querySelector('[data-testid="progress-heatmap"]')!.getBoundingClientRect();
-        const card = panel.getBoundingClientRect();
-        const plot = panel.querySelector(".recorded-pages-chart")!.getBoundingClientRect();
-        return {
-          bottomGap: Math.abs(card.bottom - calendar.bottom),
-          plotInset: card.bottom - plot.bottom,
-          padding:
-            parseFloat(getComputedStyle(panel).paddingBottom) + parseFloat(getComputedStyle(panel).borderBottomWidth),
-          bars: [...panel.querySelectorAll(".recorded-pages-track")].map((track) => ({
-            height: track.getBoundingClientRect().height,
-            fill: track.firstElementChild!.getBoundingClientRect().height,
-          })),
-        };
-      });
-      expect(aligned.bottomGap).toBeLessThanOrEqual(1);
-      expect(Math.abs(aligned.plotInset - aligned.padding)).toBeLessThanOrEqual(1);
-      expect(aligned.bars).toHaveLength(7);
-      expect(aligned.bars.filter((bar) => bar.fill > 1)).toHaveLength(1);
-      expect(Math.max(...aligned.bars.map((bar) => bar.fill))).toBeGreaterThanOrEqual(aligned.bars[0]!.height - 3);
-    } else expect(panels[1]!.y).toBeGreaterThan(panels[0]!.y);
+    const calendarGeometry = await panelGeometry("progress-heatmap");
     await calendar.scrollIntoViewIfNeeded();
-    await page.screenshot({ path: info.outputPath("calendar-routines.png"), scale: "css" });
+    await page.screenshot({ path: info.outputPath("calendar-overview.png"), scale: "css" });
+    await chooseProgressDetail(page, "routines");
+    await expect(routines).toBeVisible();
+    const routineGeometry = await panelGeometry("progress-routine-bars");
+    expect(routineGeometry.radius).toBe(calendarGeometry.radius);
+    expect(routineGeometry.padding).toBe(calendarGeometry.padding);
+    expect(routineGeometry.font).toBe(calendarGeometry.font);
+    expect(calendarGeometry.overflow || routineGeometry.overflow).toBe(false);
+    expect(Math.abs(calendarGeometry.width - routineGeometry.width)).toBeLessThanOrEqual(1);
+    expect(routineGeometry.width).toBeLessThanOrEqual(1280);
+    await expect(routines.getByRole("progressbar")).toHaveCount(3);
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: dashboardText(scenario.language, "metric"), exact: true }),
+      "pages",
+    );
+    await chooseProgressOption(
+      page.getByRole("combobox", {
+        name: dashboardText(scenario.language, "dateRange"),
+        exact: true,
+        includeHidden: true,
+      }),
+      "custom",
+    );
+    await page.getByLabel(dashboardText(scenario.language, "start"), { exact: true }).fill("2026-10-13");
+    await page.getByLabel(dashboardText(scenario.language, "end"), { exact: true }).fill("2026-10-19");
+    await page.getByRole("button", { name: dashboardText(scenario.language, "apply"), exact: true }).click();
+    const timeline = page.getByTestId("progress-main-trend");
+    await expect(timeline.getByTestId("recording-time-column")).toHaveCount(7);
+    const columns = await timeline
+      .getByTestId("recording-time-column")
+      .evaluateAll((nodes) => nodes.map((node) => Number(node.getAttribute("height"))));
+    expect(columns.filter((height) => height > 0)).toHaveLength(1);
+    await timeline.getByText(dashboardText(scenario.language, "chartTable"), { exact: true }).click();
+    await expect(timeline.getByRole("table").getByRole("rowheader")).toHaveCount(7);
+    await expect(timeline.getByRole("row").last()).toContainText(scenario.language === "ar" ? "٢" : "2");
     expect((await new AxeBuilder({ page }).include('[data-testid="progress-dashboard"]').analyze()).violations).toEqual(
       [],
     );
+    await page.screenshot({ path: info.outputPath("page-trend-exact-data.png"), scale: "css" });
     await page.getByTestId("nav-quran").click();
     await expect(page.getByTestId("quran-wird-content")).toBeVisible();
     await expect(page.getByTestId("shared-screen-header").getByRole("button")).toHaveCount(0);

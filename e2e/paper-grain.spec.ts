@@ -90,10 +90,7 @@ for (const theme of ["light", "dark", "midnight"] as const) {
           ],
         ],
         ["/#/azkar", [".library-canvas", ".library-stationary-header", ".library-section-tabs"]],
-        [
-          "/#/quran-wird",
-          [".quran-today-card", ".quran-wird-overview .paper-surface", '.quran-wird-week-day[aria-current="date"]'],
-        ],
+        ["/#/quran-wird", [".quran-today-card", ".quran-wird-overview > section[aria-labelledby=\"wird-plan-title\"]", '.quran-wird-week-day[aria-current="date"]']],
       ] as const) {
         await page.goto(route);
         for (const selector of selectors) {

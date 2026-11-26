@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-26.2",
+  "release": "2026-11-26.3",
   "ar": [
     "اختر التذكيرات في ترحيب أبسط، وحدد مدينتك عند الحاجة، واطلب حماية التخزين من إعدادات الحساب والبيانات.",
     "تابع قراءتك للقرآن وخطتك اليومية بوضوح، واستعرض تقدمك في ملخص وتقويم واتجاهات أبسط مع تصدير السجلات من الإعدادات.",
-    "شاهد اسم الموقع بصورة أوضح، واستخدم قبلة هاتف أكثر اختصارًا، وارجع إلى الكتب المتاحة من الصفحة الرئيسية.",
+    "شاهد أسماء المواقع وقبلة الهاتف بوضوح، وافتح الكتب من الرئيسية واستعد موضع القراءة بثبات بعد إعادة التحميل.",
     "اقرأ الأذكار بألفاظ وأعداد ومراجع مصححة، واختر التسجيلات الإضافية المتاحة لبعض الأدعية وسورة الملك مع بقاء القارئ الافتراضي."
   ],
   "en": [
     "Choose reminders in a simpler welcome, confirm your city when needed, and request storage protection from Account & data settings.",
     "Continue Quran reading with a clearer daily plan, and explore simpler progress summaries, calendar and trends with record exports in Settings.",
-    "See clearer location names, use a more compact phone Qibla, and return to available books from Home.",
+    "See clearer location names and phone Qibla, open books from Home, and restore your reading position reliably after reload.",
     "Read corrected dhikr wording, counts and references, and choose additional available recordings for selected duas and Al-Mulk while keeping the existing default voice."
   ]
 }

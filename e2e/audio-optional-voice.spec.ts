@@ -135,9 +135,21 @@ for (const candidate of pilot.candidates) {
     const bytes = await readFile(`docs/audio/opendua-pilot/media/${candidate.file}`);
     expect(createHash("sha256").update(bytes).digest("hex")).toBe(candidate.sha256);
     await page.route("**/*.r2.dev/**", async (route) => {
-      if (route.request().url().includes(candidate.relativePath))
-        await route.fulfill({ contentType: "audio/mpeg", body: bytes });
-      else await route.abort();
+      if (route.request().url().includes(candidate.relativePath)) {
+        const range = /^bytes=(\d+)-(\d*)$/.exec(route.request().headers().range ?? "");
+        const start = range ? Number(range[1]) : 0;
+        const end = range?.[2] ? Math.min(Number(range[2]), bytes.length - 1) : bytes.length - 1;
+        await route.fulfill({
+          status: range ? 206 : 200,
+          contentType: "audio/mpeg",
+          headers: {
+            "Accept-Ranges": "bytes",
+            "Content-Length": String(end - start + 1),
+            ...(range ? { "Content-Range": `bytes ${start}-${end}/${bytes.length}` } : {}),
+          },
+          body: bytes.subarray(start, end + 1),
+        });
+      } else await route.abort();
     });
     const category =
       candidate.assetId === "friday-dua-22"

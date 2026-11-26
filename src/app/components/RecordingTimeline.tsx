@@ -239,25 +239,26 @@ export function RecordingTimeline({
                     vectorEffect="non-scaling-stroke"
                   />
                 </svg>
-                {points.map(
-                  (point, index) =>
-                    !missing(point) && (
-                      <span
-                        key={point.startKey}
-                        data-testid="recording-time-point"
-                        aria-hidden="true"
-                        className="pointer-events-none absolute rounded-full border-2 border-primary bg-card"
-                        style={{
-                          left: `${x(index) / 5}%`,
-                          top: `${y(point) / 1.92}%`,
-                          width: index === selectedIndex ? 14 : 11,
-                          height: index === selectedIndex ? 14 : 11,
-                          transform: "translate(-50%, -50%)",
-                        }}
-                      />
-                    ),
-                )}
-
+                <div className="pointer-events-none absolute inset-y-0" style={{ left: 7, right: 7 }}>
+                  {points.map(
+                    (point, index) =>
+                      !missing(point) && (
+                        <span
+                          key={point.startKey}
+                          data-testid="recording-time-point"
+                          aria-hidden="true"
+                          className="pointer-events-none absolute rounded-full border-2 border-primary bg-card"
+                          style={{
+                            left: `${x(index) / 5}%`,
+                            top: `${y(point) / 1.92}%`,
+                            width: index === selectedIndex ? 14 : 11,
+                            height: index === selectedIndex ? 14 : 11,
+                            transform: "translate(-50%, -50%)",
+                          }}
+                        />
+                      ),
+                  )}
+                </div>
                 {points.length <= 7 &&
                   points.map(
                     (point, index) =>

@@ -179,7 +179,7 @@ test("@cross-browser English offline reopening and removal preserve the saved Ar
   }
 });
 
-test("@cross-browser More and Azkar open one Learn catalogue and retain reader history", async ({ page }) => {
+test("@cross-browser More and Home open one Learn catalogue and retain reader history", async ({ page }) => {
   await enter(page, "#/more");
   await page.getByRole("button", { name: /Learn Books and guidance/ }).click();
   await expect(page).toHaveURL(/#\/learn$/);
@@ -193,8 +193,8 @@ test("@cross-browser More and Azkar open one Learn catalogue and retain reader h
   await page.goBack();
   await expect(page).toHaveURL(/#\/learn$/);
   await expect(page.getByRole("heading", { name: "Books", exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Azkar", exact: true }).click();
-  await page.getByRole("button", { name: "Learn · books & guidance" }).click();
+  await page.getByTestId("nav-home").click();
+  await page.getByTestId("home-learning").getByRole("button", { name: "All books", exact: true }).click();
   await expect(page).toHaveURL(/#\/learn$/);
   await page.getByRole("button", { name: "Continue reading", exact: true }).first().click();
   await expect(page).toHaveURL(/\/p-5$/);

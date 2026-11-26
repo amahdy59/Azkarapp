@@ -317,10 +317,10 @@ test("Al-Kahf offers only its approved reciter and Escape preserves the expanded
   const options = page.getByRole("dialog", { name: "Audio options", exact: true });
   await expect(options.getByTestId("audio-reciter-select")).toContainText("Muhammad Shari");
   await options.getByTestId("audio-reciter-select").click();
-  for (const name of ["English Translation", "Abdullah Muhammad", "Muhammad Moataz"]) {
-    await expect(page.getByRole("option", { name, exact: true })).toHaveAttribute("data-disabled");
-  }
+  await expect(page.getByRole("option")).toHaveCount(1);
   await expect(page.getByRole("option", { name: "Muhammad Shari", exact: true })).not.toHaveAttribute("data-disabled");
+  for (const name of ["English Translation", "Abdullah Muhammad", "Muhammad Moataz"])
+    await expect(page.getByRole("option", { name, exact: true })).toHaveCount(0);
   await page.keyboard.press("Escape");
   await expect(player).toHaveAttribute("data-variant", "expanded");
   await expect(options.getByTestId("audio-reciter-select")).toBeFocused();
