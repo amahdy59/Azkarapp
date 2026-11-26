@@ -212,17 +212,22 @@ export function ZikrCounterSurface({
           </span>
         ) : (
           <p
-            className="text-display font-black leading-none text-foreground"
+            className="text-3xl font-black leading-none text-foreground"
             dir="ltr"
             style={{
               fontFamily: counterNumeralFontFamily(language),
               fontVariantNumeric: "tabular-nums lining-nums",
             }}
           >
-            <span className="counter-number" key={count}>
+            <bdi className="counter-number" dir="ltr" key={count}>
               {localizedCount}
-            </span>
-            {total > 0 && <span> / {localizedTotal}</span>}
+            </bdi>
+            {total > 0 && (
+              <span>
+                {" "}
+                / <bdi dir="ltr">{localizedTotal}</bdi>
+              </span>
+            )}
           </p>
         )}
       </div>

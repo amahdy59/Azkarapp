@@ -4059,3 +4059,11 @@ null` shape, so a record written before this change still loads and still
 - **Excluded:** Speaker-based haptics, automatic counting, invented ritual combinations, grace-day quotas, decorative sound/number/sky effects, and generic Arabic typography changes. Badges and a canonical Mushaf ruler remain optional research ideas, not this implementation's acceptance criteria.
 - **Authority:** DEC-216-H's local-only restriction remains; no commit, push, or deployment. Preserve unrelated pending edits.
 - **Verification:** Focused unit tests, Arabic/English narrow/tablet/desktop browser checks, axe scans, screenshots, and repository quality gates. Automated evidence does not establish full manual accessibility compliance.
+
+## Devotional footer redesign — owner-authorized local implementation
+
+- Date: 2026-10-03.
+- Authority: The owner requested implementation of the reviewed counter/actions redesign across Reader, Masbaha, and Salawat, then explicitly requested repair of issues and no push.
+- Decision: Implement the compact shared tally, smaller labelled direction-aware Reader navigation, and visible Reader Benefit/Listen/Share support actions. Keep action sets specific to each screen and preserve reviewed content, audio completion ownership, manual advancement rules, and persistence. Use BookOpen for Reader evidence, retain Lightbulb for virtue/Benefits surfaces.
+- Verification: unit regressions, responsive Arabic/English geometry and screenshots, keyboard and axe checks, existing WebKit enlarged-text help regression, full local quality and browser gates.
+- Release: no commit, push, or deployment. Keep concurrent session changes intact.

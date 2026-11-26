@@ -429,7 +429,7 @@ export function CustomCounterScreen({
                         aria-label={t(language, "counter.virtueReference")}
                         title={t(language, "counter.virtueReference")}
                         data-testid="custom-counter-benefit-dock-button"
-                        className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        className="flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       >
                         <Lightbulb size={20} aria-hidden="true" />
                         <span className="text-label font-bold">{t(language, "reader.referencesButton")}</span>
@@ -451,7 +451,7 @@ export function CustomCounterScreen({
                           />
                         </div>
                       </div>
-                      <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
+                      <p className="mt-2 min-h-5 text-center text-label font-medium text-muted-foreground">
                         {t(language, "reader.tapAnywhere")}
                       </p>
                     </div>

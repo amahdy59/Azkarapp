@@ -236,7 +236,8 @@ describe("ReaderScreen audio identity", () => {
     expect(within(headerActions).queryByRole("button", { name: "Benefit" })).not.toBeInTheDocument();
     expect(within(headerActions).getByRole("button", { name: "Reader options" })).toBeInTheDocument();
     expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
-    for (const name of ["Share zikr", "Save zikr", "Counter sound"]) {
+    expect(screen.getByRole("button", { name: "Share zikr" })).toBeVisible();
+    for (const name of ["Save zikr", "Counter sound"]) {
       expect(screen.queryByRole("button", { name })).toBeNull();
     }
   });
@@ -567,6 +568,8 @@ describe("ReaderScreen audio identity", () => {
 
     expect(screen.getByTestId("counter-surface")).toBeInTheDocument();
     expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-share-dock-button")).toHaveTextContent("مشاركة");
+    expect(screen.getByTestId("reader-support-actions").querySelectorAll("button")).toHaveLength(3);
   });
 
   it("morphs center slot into compact audio player when audioModeActive with stable outer slots", () => {

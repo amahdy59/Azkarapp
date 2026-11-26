@@ -20,7 +20,6 @@ import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useWakeLock } from "../hooks/useWakeLock";
 import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import {
-  Lightbulb,
   BookOpen,
   ArrowPrevious,
   Share2,
@@ -793,21 +792,22 @@ export function ReaderScreen({
         aria-label={label}
         className={
           inDock
-            ? "flex size-12 shrink-0 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            : "adaptive-counter-nav flex size-12 shrink-0 items-center justify-center rounded-full border border-border/80 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            ? "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/80 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "adaptive-counter-nav flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/80 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         }
       >
         {isPrevious ? (
           direction === "rtl" ? (
-            <ChevronRight size={20} />
+            <ChevronRight size={18} aria-hidden="true" />
           ) : (
-            <ChevronLeft size={20} />
+            <ChevronLeft size={18} aria-hidden="true" />
           )
         ) : direction === "rtl" ? (
-          <ChevronLeft size={20} />
+          <ChevronLeft size={18} aria-hidden="true" />
         ) : (
-          <ChevronRight size={20} />
+          <ChevronRight size={18} aria-hidden="true" />
         )}
+        {!inDock && <span className="hidden min-[360px]:inline text-label font-bold">{label}</span>}
       </button>
     );
   };
@@ -1018,13 +1018,14 @@ export function ReaderScreen({
               : t(language, "reader.arabicAudioUnavailable")
         }
         data-testid="reader-audio-dock-button"
-        className={`flex size-12 shrink-0 items-center justify-center rounded-full border transition-all duration-fast active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-25 ${
+        className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl px-2 border transition-all duration-fast active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-25 ${
           audioModeActive
             ? "border-primary bg-primary text-primary-foreground shadow-raised"
             : "border-border/80 bg-card text-foreground shadow-sm hover:bg-muted"
         }`}
       >
-        <Headphones size={20} aria-hidden="true" />
+        <Headphones size={18} aria-hidden="true" />
+        <span className="text-label font-bold">{t(language, "reader.menuAudio")}</span>
       </button>
     );
   };
@@ -1041,9 +1042,9 @@ export function ReaderScreen({
       aria-label={t(language, "reader.referencesButton")}
       title={t(language, "reader.referencesButton")}
       data-testid="reader-benefit-dock-button"
-      className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-border/80 bg-card px-2 text-foreground shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
     >
-      <Lightbulb size={20} aria-hidden="true" />
+      <BookOpen size={18} aria-hidden="true" />
       <span className="text-label font-bold">{t(language, "reader.referencesButton")}</span>
     </button>
   );
@@ -1078,7 +1079,7 @@ export function ReaderScreen({
           to the next — the control people aim at moved under their thumb.
           A surah, whose counter already states the instruction on its face,
           keeps the height without printing the same sentence twice. */}
-      <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
+      <p className="mt-2 min-h-5 text-center text-label font-medium text-muted-foreground">
         {longSurah ? "" : counterInstruction}
       </p>
     </div>
@@ -1134,9 +1135,26 @@ export function ReaderScreen({
     return (
       <div data-testid="reader-counter-stack">
         <div className="reader-dock flex w-full flex-col items-center gap-2" data-testid="reader-dock">
-          <div className="flex w-full items-center justify-center gap-3">
-            {renderAudioDockButton()}
+          <div
+            className="flex w-full max-w-sm items-center justify-center gap-2 px-3"
+            data-testid="reader-support-actions"
+          >
             {renderBenefitDockButton()}
+            {renderAudioDockButton()}
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleShare();
+              }}
+              aria-haspopup="dialog"
+              aria-label={t(language, "reader.share")}
+              data-testid="reader-share-dock-button"
+              className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-border/80 bg-card px-2 text-foreground shadow-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <Share2 size={18} aria-hidden="true" />
+              <span className="text-label font-bold">{t(language, "reader.shareAction")}</span>
+            </button>
           </div>
           {renderCounterPanel()}
         </div>
@@ -1448,7 +1466,7 @@ export function ReaderScreen({
                       title={t(language, "reader.referencesButton")}
                       className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     >
-                      <Lightbulb size={18} aria-hidden="true" />
+                      <BookOpen size={18} aria-hidden="true" />
                       <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
                     </button>
                   )}
@@ -1617,7 +1635,7 @@ export function ReaderScreen({
                         aria-label={t(language, "reader.referencesButton")}
                         title={t(language, "reader.referencesButton")}
                       >
-                        <Lightbulb size={18} aria-hidden="true" />
+                        <BookOpen size={18} aria-hidden="true" />
                         <span className="text-xs font-extrabold min-[600px]:text-label">
                           {t(language, "reader.referencesButton")}
                         </span>

@@ -141,3 +141,5 @@ The agent must never interpret “perfect the application” as permission to re
 [Phase 77](phases/PHASE_77_HEADER_SCROLL_CONTAINMENT.md) records the local-only ordinary-header scroll repair under DEC-216-H.
 
 [Phase 78](phases/PHASE_78_PRACTICAL_DEVOTIONAL_ACCESS.md) implements the selected practical devotional access recommendations under DEC-217, preserving reviewed content and local-only authority.
+
+[Devotional footer redesign](phases/DEVOTIONAL_FOOTER_REDESIGN.md) records the owner-authorized local counter and Reader support-action refinement.

@@ -425,3 +425,11 @@ Prayer information uses a localized 44px icon button. The popup presents native 
 ### Reader and audio review
 
 The Reader places listening and the visibly labelled Benefit action in a utility row above the established rectangular counter and Previous/Next controls. The manual counter keeps its shared geometry and type scale. Audio ownership replaces that counter row with compact transport controls; all actions retain 44px targets. The expanded player uses the shared portaled modal, scalable reading type, exact reviewed text, and user-controlled scrolling. Collapse restores focus to Expand; Stop restores counter focus. Closing the wide collection navigator hides its controls from keyboard navigation and returns focus to the sidebar toggle.
+
+## Devotional footer refinement (2026-10-03)
+
+The ordinary Reader uses a quiet labelled support row in logical order: Benefit/evidence, Listen, Share. The evidence sheet uses BookOpen; Lightbulb remains the Benefits catalogue/virtue glyph. Approved audio availability and the existing integrated-player ownership remain authoritative. Audio mode replaces manual counting rather than adding a competing counter. Sharing opens the existing single-zikr share flow without counting.
+
+Reader Previous/Next retain direction-aware arrows and keyboard behavior. Their targets are at least 44px, arrows are 18px, and visible text appears from 360px while the full accessible name remains at every width. Existing tablet/desktop side navigation stays in place. All three ordinary counting views share a 64px minimum-height tally with scalable 30px numerals and a 56px minimum-height single-action face. Controls can grow with enlarged text. This supersedes the older 76px tally geometry; it does not change targets, completion, partial-count persistence, sound, haptics, or reviewed content.
+
+Masbaha and Friday Salawat retain their existing virtue actions and completion choices, without invented audio or Previous/Next controls. Guidance keeps its stable reserved line below the counter with smaller muted type and spacing. Long-surah completion remains counter-only. Functional surfaces and focus use semantic theme tokens.

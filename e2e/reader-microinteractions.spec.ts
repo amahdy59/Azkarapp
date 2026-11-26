@@ -124,7 +124,7 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
       const box = await counter.boundingBox();
       expect(box).not.toBeNull();
       if (box) {
-        expect(Math.round(box.height)).toBe(76);
+        expect(Math.round(box.height)).toBe(64);
         expect(box.width).toBeLessThanOrEqual(220);
         expect(box.width).toBeGreaterThanOrEqual(160);
         expect(box.x).toBeGreaterThanOrEqual(0);

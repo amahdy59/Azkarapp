@@ -1336,6 +1336,7 @@ const en = {
     mushafAccept: "May Allah accept from us and from you",
     mushafReturn: "Return to Azkar",
     translationButton: "English",
+    shareAction: "Share",
     referencesButton: "Benefit",
     openBenefit: "Open benefit",
     closeReference: "Close benefit",
