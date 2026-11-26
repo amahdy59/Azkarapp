@@ -45,7 +45,12 @@ export function displayLocationName(location: LocationSettings | undefined, lang
       entry.longitude === location.longitude &&
       entry.timeZone === location.timeZone,
   );
-  return preset ? (language === "ar" ? preset.nameArabic : preset.nameEnglish) : name;
+  return preset
+    ? t(language, "prayerLocation.cityCountry", {
+        city: language === "ar" ? preset.nameArabic : preset.nameEnglish,
+        country: language === "ar" ? preset.countryArabic : preset.countryEnglish,
+      })
+    : name;
 }
 
 export interface PrayerLocationPreset {

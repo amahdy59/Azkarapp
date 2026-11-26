@@ -256,11 +256,17 @@ html[data-app-material-resolved="glass"]:not(.high-contrast) .mushaf-material-hi
   display: block;
 }
 
-/* Dropdowns cover functional text, unlike scene-backed cards. Protection must
-   survive nested backdrop roots, missing filters and every theme/layout. */
+/* Keep the viewport fallback below utility-layer component measures. An
+   unlayered max-width overrides every narrower dialog/picker width utility. */
+@layer base {
+  :where([data-dropdown-surface]) {
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* Paint protection stays authoritative across themes and nested backdrop roots. */
 html [data-dropdown-surface] {
   background-color: var(--popover) !important;
-  max-width: calc(100vw - 1rem);
 }
 
 @supports (backdrop-filter: blur(1px)) {

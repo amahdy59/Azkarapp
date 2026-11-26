@@ -1,0 +1,21 @@
+# Selected Quran reciters — local review, 2026-11-26
+
+## Owner-accepted activation
+
+After listening to the complete local comparison below, the owner replies “I approve all.” The [checksum-bound acceptance record](activation.json) supersedes the pending status of these three exact recordings. They are now optional app voices for Al-Mulk only, alongside unchanged default Abdullah Muhammad. Every new variant retains owner/date/recording provenance and immutable hosting; existing asset/default/preferences/cache identities stay intact. Quran menus show only available Quran recordings and localized reciter names; dua/translation choices remain separate. About credits the three reciters and links the provider permission policy. Other surahs keep their existing recordings. No provider ayah timing is treated as reviewed app word timing.
+
+`node scripts/upload-quran-reciter-audio.mjs --env-file <existing local configuration>` checks the owner acceptance and permission snapshot, refuses immutable overwrites and verifies public bytes, MIME, CORS and ranges. `node scripts/generate-quran-reciter-waveforms.mjs` appends peaks decoded from the exact retained local MP3s without rewriting existing waveform or failure evidence. The original manifest below retains its historical pending intake; `activation.json` is the dated activation authority.
+
+The owner initially selects exactly Muhammad Siddiq Al-Minshawi (محمد صديق المنشاوي), Mahmoud Khalil Al-Hussary (محمود خليل الحصري) and Yasser Al-Dosari (ياسر الدوسري). Their Hafs/Murattal readings are MP3Quran reading IDs 112, 118 and 92 respectively. That selection prepared the comparison; the later acceptance above approves the exact displayed Al-Mulk files, without inferring word-timing accuracy.
+
+`node scripts/prepare-quran-reciter-review.mjs` produces a local comparison of complete Al-Mulk 67:1–30 under `output/quran-reciter-review/`. The current Abdullah Muhammad recording remains alongside the candidates. This is the first representative complete-surah checkpoint, not full-app voice coverage. The page retains native playback controls, labels, current app text, original source links and a single-playing-recording policy. Open `http://127.0.0.1:5173/output/quran-reciter-review/index.html` while the worktree dev server is running. Core app defaults and Quran playback remain unchanged.
+
+## Source and permission
+
+The provider's [published policy](https://www.mp3quran.net/eng/privacy) permits visitors/developers to copy material and use site links. The exact source page is retained as `provider-permission.html` beside this file, with a local review copy under `output/`; its SHA-256 is pinned in `manifest.json` and enforced by `scripts/quran-reciter-evidence.test.mjs`. Its narrow Prettier exclusion preserves exact evidence bytes. This is provider-authored permission evidence rather than an invented Creative Commons label. Retain source attribution and permission when hosting/caching/exporting the accepted originals. The [official API](https://www.mp3quran.net/eng/api/) supplies reading identities and recording-specific ayah timing endpoints.
+
+The manifest pins the original MP3 byte sizes/checksums and independent timing-response checksums. The generator rejects a different cached evidence file rather than silently replacing it. Source audio totals 23,601,312 bytes and stays outside public/install assets. After acceptance, the three exact originals were uploaded to immutable keys on the existing audio host. Provider timings remain review inputs only. They are not app word annotations and must never be substituted for another recording's timings.
+
+## Activation prerequisites
+
+Listen to each complete recording, compare its beginning/end and all verses against the displayed app text, verify basmalah/seeking-refuge/repetition scope, and retain named findings. Confirm duration and exact media metadata. Only then add selected immutable variants through the existing manifest/hosting process, preserving the current default and saved reciter preferences. More surahs and the Al-Imran partial range require separate source/coverage checks. Existing word/ayah highlighting must remain absent for new variants until their own exact-checksum timing annotations are reviewed.

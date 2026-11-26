@@ -469,7 +469,7 @@ export function FloatingAudioPlayer({
     currentEntry.segmentsByVoice[displayedVoiceId]?.[0]?.voiceName ??
     currentSegment?.voiceName ??
     displayedVoiceId;
-  const mainVoices = getAudioVoices(language);
+  const mainVoices = currentEntry.contentKind === "quran" ? [] : getAudioVoices(language);
   const mainVoiceIds = new Set(mainVoices.map((voice) => voice.id));
   const extraVoiceIds = Array.from(new Set([activeVoiceId, ...currentEntry.availableVoiceIds])).filter(
     (id) => Boolean(id) && !mainVoiceIds.has(id),

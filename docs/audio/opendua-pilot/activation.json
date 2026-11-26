@@ -1,0 +1,21 @@
+{
+  "reviewedBy": "Ahmed Mahdy (owner listening confirmation in chat)",
+  "reviewedAt": "2026-11-26",
+  "decision": "approved-as-optional-voice",
+  "confirmation": "Yes all three samples. there' good as a second option.",
+  "scope": "Owner confirms listening to the three pinned samples and accepts them as a second option. No independent scholarly qualification is asserted. Existing default reciters remain unchanged.",
+  "recordings": [
+    {
+      "assetId": "wu-hm-3",
+      "sha256": "28317506a10d61e8d8387d15a20527f24aef33af8002273a9fefcd65861d083d"
+    },
+    {
+      "assetId": "friday-dua-22",
+      "sha256": "2f573a215507f86d57243950dc8f3e4e160b165cf3d6fac09a3c75b09e97b0da"
+    },
+    {
+      "assetId": "m-hm-91",
+      "sha256": "3a9ec6c9dd0cf80a0626cf3ad80dbc890efcf424ccba28dc0d8e257929572936"
+    }
+  ]
+}

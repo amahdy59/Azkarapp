@@ -13,6 +13,90 @@ function heading(value: number, accuracy?: number) {
   });
 }
 describe("Qibla compass lifecycle", () => {
+  it("starts automatically without a permission request API and stops sensor work on unmount", () => {
+    const remove = vi.spyOn(window, "removeEventListener");
+    const { result, unmount } = renderHook(() => useQiblaCompass(5, true));
+    expect(result.current.enabled).toBe(true);
+    expect(result.current.status).toBe("waiting");
+    heading(100, 2);
+    expect(result.current.reading?.rawHeading).toBe(105);
+    unmount();
+    expect(remove.mock.calls.some(([name]) => name === "deviceorientation")).toBe(true);
+    expect(remove.mock.calls.some(([name]) => name === "deviceorientationabsolute")).toBe(true);
+  });
+
+  it("receives already permitted readings without calling the permission API", () => {
+    const requestPermission = vi.fn().mockResolvedValue("granted");
+    vi.stubGlobal(
+      "DeviceOrientationEvent",
+      class extends Event {
+        static requestPermission = requestPermission;
+      },
+    );
+    const { result } = renderHook(() => useQiblaCompass(0, true));
+    expect(result.current.status).toBe("permissionRequired");
+    act(() => {
+      window.dispatchEvent(
+        Object.assign(new Event("deviceorientationabsolute"), { alpha: null, beta: null, gamma: null, absolute: true }),
+      );
+    });
+    expect(result.current.status).toBe("permissionRequired");
+    heading(100, 2);
+    expect(result.current.status).toBe("live");
+    expect(result.current.reading?.heading).toBe(100);
+    expect(requestPermission).not.toHaveBeenCalled();
+  });
+
+  it("requests access only on explicit action, retains denial and recovers on explicit retry", async () => {
+    const requestPermission = vi.fn().mockResolvedValueOnce("denied").mockResolvedValueOnce("granted");
+    vi.stubGlobal(
+      "DeviceOrientationEvent",
+      class extends Event {
+        static requestPermission = requestPermission;
+      },
+    );
+    const { result, rerender } = renderHook(() => useQiblaCompass(0, true));
+    act(() => vi.advanceTimersByTime(6000));
+    expect(result.current.status).toBe("permissionRequired");
+    expect(requestPermission).not.toHaveBeenCalled();
+    await act(() => result.current.requestAccess());
+    expect(result.current.status).toBe("denied");
+    expect(result.current.enabled).toBe(false);
+    rerender();
+    expect(requestPermission).toHaveBeenCalledTimes(1);
+    await act(() => result.current.retry());
+    heading(100, 2);
+    expect(result.current.status).toBe("live");
+    expect(requestPermission).toHaveBeenCalledTimes(2);
+  });
+
+  it("coalesces rapid permission actions while a request is pending", async () => {
+    let resolve!: (value: "granted") => void;
+    const requestPermission = vi.fn(
+      () =>
+        new Promise<"granted">((done) => {
+          resolve = done;
+        }),
+    );
+    vi.stubGlobal(
+      "DeviceOrientationEvent",
+      class extends Event {
+        static requestPermission = requestPermission;
+      },
+    );
+    const { result } = renderHook(() => useQiblaCompass(0, true));
+    let pending!: Promise<void>;
+    act(() => {
+      pending = result.current.requestAccess();
+      void result.current.requestAccess();
+    });
+    expect(requestPermission).toHaveBeenCalledOnce();
+    await act(async () => {
+      resolve("granted");
+      await pending;
+    });
+    expect(result.current.status).toBe("waiting");
+  });
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-11-24T12:00:00Z"));

@@ -409,6 +409,7 @@ export function ResponsiveSheet({
   origin,
   readerPanel: ReaderPanel,
   protectedSurface = false,
+  onOpenAutoFocus,
   onCloseAutoFocus,
   open,
   onClose,
@@ -468,6 +469,7 @@ export function ResponsiveSheet({
         testId={testId}
         className={drawerClassName}
         onCloseAutoFocus={onCloseAutoFocus}
+        onOpenAutoFocus={onOpenAutoFocus}
       >
         {children}
       </ReaderPanel>
@@ -478,6 +480,7 @@ export function ResponsiveSheet({
     return (
       <Modal
         protectedSurface={protectedSurface}
+        onOpenAutoFocus={onOpenAutoFocus}
         onCloseAutoFocus={onCloseAutoFocus}
         returnFocusRef={returnFocusRef}
         returnFocusScopeId={returnFocusScopeId}
@@ -519,7 +522,8 @@ export function ResponsiveSheet({
         {...focusScope}
         onOpenAutoFocus={(event) => {
           focusScope.onOpenAutoFocus();
-          if (focusOnOpen) {
+          onOpenAutoFocus?.(event);
+          if (!event.defaultPrevented && focusOnOpen) {
             event.preventDefault();
             drawerRef.current?.focus({ preventScroll: true });
           }

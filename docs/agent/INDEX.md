@@ -2,6 +2,12 @@
 
 ## Active phase
 
+[Optional audio activation and local books](phases/OPTIONAL_AUDIO_ACTIVATION_LOCAL_2026_11_26.md) is the current bounded follow-up in this worktree. The owner confirms listening acceptance of the three OpenDua samples, authorizes them as a second voice while preserving all defaults, and selects Al-Minshawi, Al-Hussary and Yasser Al-Dosari for Quran comparison. The owner later accepts all three complete-Al-Mulk comparison files; they are integrated as optional Quran voices for Al-Mulk only, with the current default preserved. All three Arabic books and English Umrah remain visible in the development catalogue with existing review notices. Preserve the preceding candidate below and its local-only publication boundary.
+
+[Consolidated recommendations — separate release](phases/RECOMMENDATIONS_NEXT_RELEASE_2026_11_26.md) is the active phase **in the `recommendations-next-release` worktree only**. The owner requests starting the consolidated follow-ups in isolation. Main's coordinated release remains independently owned; its pending files, checks, notes and deployment must not be changed by this candidate. The phase contains the chat provenance, controlled checkpoints and content/audio review prerequisites.
+
+## Current main release (separate checkout)
+
 [Coordinated implementation and release](phases/COORDINATED_RELEASE_2026_11_25.md) is the current owner-authorized phase. This chat coordinates final handoffs, waits for approved implementation to finish, validates the combined checkout, pushes all verified changes to main and monitors Quality, Pages and production. The new owner instruction supersedes the earlier local publication holds below. Known source-conflicted Arabic books and unreviewed English/audio editions retain review-only availability; physical-device acceptance remains separate. See the [release report](reports/COORDINATED_RELEASE_2026_11_25_REPORT.md).
 
 ## Feature handoffs and historical phase authority
@@ -108,7 +114,7 @@ The [final-touch implementation report](reports/FINAL_TOUCH_QUALITY_MOTION_2026_
 
 ## Working references
 
-- [Additional audio pilot handoff](reports/ADDITIONAL_AUDIO_PILOT_2026_11_25_REPORT.md): three local OpenDua recordings await independent listening review; verified DEV-only comparison/export and the separate Qur'an/du'a preference repair are ready for aggregate release verification. Production catalogue/defaults and hosted files remain unchanged.
+- [Additional audio pilot handoff](reports/ADDITIONAL_AUDIO_PILOT_2026_11_25_REPORT.md): historical pending intake. The subsequent [owner acceptance](../audio/opendua-pilot/activation.json) and [local activation phase](phases/OPTIONAL_AUDIO_ACTIVATION_LOCAL_2026_11_26.md) supersede the activation hold for exactly those three recordings; existing defaults remain unchanged. [Selected Quran comparison](../audio/quran-reciter-pilot/README.md) records the subsequent complete-Al-Mulk listening acceptance and the separate unapproved word-timing status.
 
 - [Owner design and interaction brief — 2026-11-02](OWNER_DESIGN_BRIEF_2026_11_02.md): every live-review comment, preferred Settings reference, accepted/rejected layout decisions, motion matrix and prioritized Mushaf recommendations.
 

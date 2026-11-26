@@ -94,14 +94,16 @@ describe("QiblaScreen", () => {
     expect(screen.getByRole("heading", { name: "Qibla", level: 1 })).toBeVisible();
     expect(screen.getByRole("heading", { name: /Qibla is 136° from north/ })).toBeVisible();
     expect(screen.getByText("Cairo")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Retry compass", hidden: true })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
-    expect(screen.getByText("Static view — does not track your phone")).toBeVisible();
+    expect(screen.getByText("Live compass unavailable")).toBeVisible();
     expect(screen.getByTestId("kaaba-target")).toBeInTheDocument();
     expect(screen.getByTestId("compass-rose")).toHaveAttribute("transform", "rotate(0 160 160)");
     expect(screen.getByRole("heading", { name: "Qibla" }).closest(".app-screen-surface")).toHaveClass(
       "overflow-y-auto",
     );
+    fireEvent.click(screen.getByRole("button", { name: "Details" }));
+    expect(screen.getByText("Static view — does not track your phone")).toBeVisible();
   });
 
   it("turns the saved bearing into practical fine-pointer desktop guidance", () => {
@@ -147,7 +149,8 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Enable live compass" }));
+    expect(screen.getByText("Live compass unavailable")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Details" }));
     expect(await screen.findByText(/supported device and a secure connection/)).toBeVisible();
   });
 
@@ -169,10 +172,12 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Enable live compass" }));
+    expect(requestPermission).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Allow compass access" }));
     expect(requestPermission).toHaveBeenCalledWith(true);
-    expect(screen.getByRole("button", { name: "Stop live compass" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText(/Waiting for an absolute compass heading/)).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Allow compass access" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Stop live compass" })).not.toBeInTheDocument();
+    expect(screen.getByRole("status", { name: /Waiting for an absolute compass heading/ })).toBeVisible();
   });
 
   it("falls back to Safari's legacy no-argument orientation permission", async () => {
@@ -196,11 +201,13 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Enable live compass" }));
+    expect(requestPermission).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Allow compass access" }));
 
     expect(requestPermission).toHaveBeenNthCalledWith(1, true);
     expect(requestPermission).toHaveBeenNthCalledWith(2);
-    expect(screen.getByRole("button", { name: "Stop live compass" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByRole("button", { name: "Allow compass access" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Stop live compass" })).not.toBeInTheDocument();
 
     await act(async () => {
       window.dispatchEvent(
@@ -262,10 +269,13 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Enable live compass" }));
+    expect(requestPermission).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Allow compass access" }));
     expect(requestPermission).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Sensor access blocked")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Details" }));
     expect(screen.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
-    expect(screen.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Retry compass", hidden: true })).toBeInTheDocument();
     expect(screen.getByTestId("qibla-arrow")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(136\./));
   });
 
@@ -288,7 +298,7 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Enable live compass" }));
+    expect(screen.queryByRole("button", { name: "Enable live compass" })).not.toBeInTheDocument();
     await act(async () => {
       window.dispatchEvent(
         Object.assign(new Event("deviceorientation"), {

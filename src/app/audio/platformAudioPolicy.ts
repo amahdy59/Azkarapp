@@ -12,6 +12,8 @@ const ANDROID_ALLOWED_AUDIO_SOURCES = new Set([
   "internal-upload",
   "internal-upload-abdullah-muhammad",
   "english-george-recordings",
+  "opendua-muhammad-jumah",
+  "mp3quran",
 ]);
 
 export function isAudioSourceAllowed(sourceId: string, android = isAndroidRelease()) {

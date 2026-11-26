@@ -1,0 +1,70 @@
+{
+  "preparedOn": "2026-11-26",
+  "inventoryUrl": "https://www.mp3quran.net/api/v3/reciters?language=eng",
+  "timingReadsUrl": "https://www.mp3quran.net/api/v3/ayat_timing/reads",
+  "permissionUrl": "https://www.mp3quran.net/eng/privacy",
+  "permissionSha256": "824d72beb9eb07673b9e999fd964feda310b5944aec48a19b4a1ab45986a73cc",
+  "permissionScope": "Provider explicitly permits visitors/developers to copy material and use site links; no third-party scholarly attestation is inferred.",
+  "recordings": [
+    {
+      "reciterId": 112,
+      "readingId": 112,
+      "nameArabic": "محمد صديق المنشاوي",
+      "nameEnglish": "Muhammad Siddiq Al-Minshawi",
+      "sourceUrl": "https://cdn.mp3quran.net/audio/muhammad-minshawi/r1/067.mp3",
+      "sourceReading": "Rewayat Hafs A'n Assem - Murattal",
+      "file": "reading-112-067.mp3",
+      "sha256": "627d89a5dff939c67ded14d47737a0770192b505a261fca4a10c6d6b230c5016",
+      "byteSize": 6673458,
+      "timingUrl": "https://www.mp3quran.net/api/v3/ayat_timing?surah=67&read=112",
+      "timingSha256": "6bec975ed85251364cb088ed6601d66e6f7c9ac4003adaa889b58a5fde8bf9ff",
+      "reviewStatus": "pending",
+      "appAssetId": "s-hm-110b",
+      "requiredRange": {
+        "surah": 67,
+        "ayahStart": 1,
+        "ayahEnd": 30
+      }
+    },
+    {
+      "reciterId": 118,
+      "readingId": 118,
+      "nameArabic": "محمود خليل الحصري",
+      "nameEnglish": "Mahmoud Khalil Al-Hussary",
+      "sourceUrl": "https://cdn.mp3quran.net/audio/mahmoud-husary/r1/067.mp3",
+      "sourceReading": "Rewayat Hafs A'n Assem - Murattal",
+      "file": "reading-118-067.mp3",
+      "sha256": "5ac9965a7dbb77092492bf879d4e56b83412c13ff22115e78ead08cb35d5d2cd",
+      "byteSize": 10795979,
+      "timingUrl": "https://www.mp3quran.net/api/v3/ayat_timing?surah=67&read=118",
+      "timingSha256": "9377db8788c3cba61cc940a99ca6d84eeb65abf190b5fcac471006dee6af1634",
+      "reviewStatus": "pending",
+      "appAssetId": "s-hm-110b",
+      "requiredRange": {
+        "surah": 67,
+        "ayahStart": 1,
+        "ayahEnd": 30
+      }
+    },
+    {
+      "reciterId": 92,
+      "readingId": 92,
+      "nameArabic": "ياسر الدوسري",
+      "nameEnglish": "Yasser Al-Dosari",
+      "sourceUrl": "https://cdn.mp3quran.net/audio/yasser-dosari/r1/067.mp3",
+      "sourceReading": "Rewayat Hafs A'n Assem - Murattal",
+      "file": "reading-92-067.mp3",
+      "sha256": "a5f4312a63c77c9f831a9a1afb741c6a1d6197fdbb32908e2135ef3408fe9911",
+      "byteSize": 6131875,
+      "timingUrl": "https://www.mp3quran.net/api/v3/ayat_timing?surah=67&read=92",
+      "timingSha256": "561dfe5a8de1861c4ed80f5a7f86428b8c75dbd8330a4e853c3b42e611b7e767",
+      "reviewStatus": "pending",
+      "appAssetId": "s-hm-110b",
+      "requiredRange": {
+        "surah": 67,
+        "ayahStart": 1,
+        "ayahEnd": 30
+      }
+    }
+  ]
+}

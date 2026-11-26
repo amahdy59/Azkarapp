@@ -2,6 +2,8 @@ import type { LearningEditionId, LearningLanguage } from "./types";
 
 export const LEARNING_STATE_KEY = "azkar.learning.v1";
 export interface LearningReadingState {
+  /** Optional device-only recency; legacy positions/bookmarks remain valid. */
+  lastReadAt?: number;
   position?: { unitId: string; offset: number };
   bookmarks: string[];
   contentLanguage?: LearningLanguage;
@@ -16,9 +18,10 @@ export function normalizeLearningState(value: unknown): LearningState {
   for (const id of ids) {
     const raw = (value as Record<string, unknown>)[id];
     if (!raw || typeof raw !== "object") continue;
-    const { bookmarks, position, contentLanguage } = raw as Partial<LearningReadingState>;
+    const { bookmarks, position, contentLanguage, lastReadAt } = raw as Partial<LearningReadingState>;
     result[id] = {
       bookmarks: Array.isArray(bookmarks) ? [...new Set(bookmarks.filter(validUnit))].slice(0, 1000) : [],
+      ...(typeof lastReadAt === "number" && Number.isSafeInteger(lastReadAt) && lastReadAt > 0 ? { lastReadAt } : {}),
       ...(id === "dalil-al-mutamir" && (contentLanguage === "ar" || contentLanguage === "en")
         ? { contentLanguage }
         : {}),

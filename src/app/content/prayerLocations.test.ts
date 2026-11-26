@@ -38,7 +38,8 @@ describe("searchPrayerLocations", () => {
   it("localizes known coordinates while preserving custom location names", () => {
     const preset = PRAYER_LOCATION_PRESETS.find(({ id }) => id === "cairo")!;
     const location = { ...preset, cityName: preset.nameEnglish, calculationMethod: 5, autoDetect: false };
-    expect(displayLocationName(location, "ar")).toBe(preset.nameArabic);
+    expect(displayLocationName(location, "ar")).toBe("القاهرة، مصر");
+    expect(displayLocationName(location, "en")).toBe("Cairo, Egypt");
     expect(displayLocationName({ ...location, latitude: 0 }, "ar")).toBe("Cairo");
     expect(displayLocationName({ ...location, cityName: "My home" }, "ar")).toBe("My home");
   });

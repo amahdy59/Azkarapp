@@ -1,5 +1,64 @@
 .qibla-dial {
-  inline-size: min(100%, clamp(12rem, 38svh, 20rem));
+  inline-size: min(100cqw, 100cqh, 20rem);
+  block-size: min(100cqw, 100cqh, 20rem);
+}
+
+.qibla-frame,
+.qibla-layout {
+  flex: 1;
+  min-block-size: 0;
+}
+
+.qibla-main {
+  display: grid;
+  grid-template-rows: auto auto minmax(5rem, 1fr) auto auto;
+  align-items: center;
+  justify-items: center;
+  gap: 0.5rem;
+}
+
+.qibla-location-row {
+  min-block-size: 4rem;
+}
+
+.qibla-mode {
+  display: grid;
+  align-items: center;
+  min-block-size: 2.5rem;
+  margin: 0;
+}
+
+.qibla-dial-slot {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  inline-size: 100%;
+  min-block-size: 5rem;
+  container-type: size;
+}
+
+.qibla-direction {
+  display: grid;
+  align-content: center;
+  min-block-size: 5rem;
+}
+
+.qibla-actions {
+  display: grid;
+  align-items: center;
+  min-block-size: 3rem;
+}
+
+/* Ordinary phone states share the same slots. Enlarged/narrow content keeps
+   intrinsic rows and the screen's existing vertical-scroll recovery. */
+@container qibla-screen (min-width: 18rem) {
+  .qibla-mode,
+  .qibla-actions {
+    block-size: 3rem;
+  }
+  .qibla-direction {
+    block-size: 5rem;
+  }
 }
 
 /* Text-over-text surfaces need an opaque fill in every material mode. */

@@ -140,6 +140,11 @@ export function AudioSettingsPanel({
               ))}
             </SelectContent>
           </Select>
+          {preferences.duaVoiceId === "opendua-muhammad-jumah" && (
+            <p className="mt-2 text-sm text-muted-foreground" role="status">
+              {t(language, "settings.additionalReciterCoverage")}
+            </p>
+          )}
           <h2 className="mt-4 border-t border-border/40 pt-4 text-sm font-semibold">
             {t(language, "settings.playbackSpeed")}
           </h2>

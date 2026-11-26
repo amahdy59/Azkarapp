@@ -348,6 +348,8 @@ The approved downloads overview replaces the full-height active resource edge wi
 
 ## Qibla clarity — 2026-11-24
 
+The isolated 2026-11-26 owner follow-up removes ordinary Start/Stop and adds automatic permitted-sensor activation. The mobile dial consumes the remaining space in a stable grid; waiting/live/aligned/poor/stale transitions do not animate or move location/direction/action geometry. No new loop, polling, transition or easing is added. Hidden/unmounted sensor listeners and expiry work retain cleanup, and permission prompts stay gesture-owned. The existing shortest-angle smoother and 350ms known-accuracy alignment dwell remain; test fixtures must feed steady samples rather than expecting one exact sample to skip smoothing. App/OS Reduce Motion remain authoritative.
+
 Sensor rotation retains shortest-angle smoothing without a second CSS rotation transition. North labels and Kaaba artwork counter-rotate upright. A confirmed check waits for raw and displayed alignment for 350ms and known acceptable sensor accuracy, with one optional existing haptic and five-degree re-arm. Unknown/poor/stale readings never trigger confirmation; hidden listeners/timers pause. Shared sheet motion and existing reduced-motion preferences apply without ambient loops.
 
 ## Prayer-settings picker stability — 2026-11-24

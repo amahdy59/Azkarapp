@@ -13,6 +13,9 @@ skills-lock.json
 docs/audio/opendua-pilot/audio-licence.html
 docs/audio/opendua-pilot/catalogue.json
 
+# Exact provider permission snapshot; verified by quran-reciter-evidence.test.mjs.
+docs/audio/quran-reciter-pilot/provider-permission.html
+
 public/data/mushaf/
 public/data/word-meanings/
 public/data/translations/

@@ -17,6 +17,7 @@ export function ToolbarPanel({
   children,
   testId,
   className,
+  onOpenAutoFocus,
   onCloseAutoFocus,
 }: {
   open: boolean;
@@ -29,6 +30,7 @@ export function ToolbarPanel({
   children: ReactNode;
   testId?: string;
   className?: string;
+  onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -36,14 +38,16 @@ export function ToolbarPanel({
   const back = useOverlayBack(open, onClose);
   const replaced = useToolbarPanel(open, ref, onClose);
   const retained = useOverlayPresence(open);
-  const callbacks = useRef({ onClose, onCloseAutoFocus });
-  callbacks.current = { onClose, onCloseAutoFocus };
+  const callbacks = useRef({ onClose, onCloseAutoFocus, onOpenAutoFocus });
+  callbacks.current = { onClose, onCloseAutoFocus, onOpenAutoFocus };
   useLayoutEffect(() => {
     if (!open) return;
     const panel = ref.current;
     const frame = host.closest<HTMLElement>(".mushaf-reader-viewer");
     if (panel) registerOverlayOpener(panel, opener);
-    panel?.focus({ preventScroll: true });
+    const openEvent = new Event("openAutoFocus", { cancelable: true });
+    callbacks.current.onOpenAutoFocus?.(openEvent);
+    if (!openEvent.defaultPrevented) panel?.focus({ preventScroll: true });
     return () => {
       queueMicrotask(() => {
         // Run after any replaced Radix scope has released its focus ownership.

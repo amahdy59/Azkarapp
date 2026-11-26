@@ -22,7 +22,7 @@ describe("Home location updates", () => {
       timeZone: "Europe/London",
       autoDetect: true,
     });
-    expect(result.current.message).toBeTruthy();
+    expect(result.current.message).toContain("Near London, United Kingdom");
     expect(result.current.locating).toBe(false);
   });
   it("retains the saved location on denial and announces recovery", async () => {

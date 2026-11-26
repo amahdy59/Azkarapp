@@ -13,6 +13,17 @@ beforeEach(() => {
 });
 
 describe("device-local learning state", () => {
+  it("preserves optional visit recency while rejecting malformed values and retaining legacy records", () => {
+    for (const invalid of [-1, 0, 1.5, NaN, Infinity, "100", null]) {
+      expect(normalizeLearningState({ "al-mukhtar": { bookmarks: ["p-3"], lastReadAt: invalid } })).toEqual({
+        "al-mukhtar": { bookmarks: ["p-3"] },
+      });
+    }
+    const legacy = { bookmarks: ["p-6"], position: { unitId: "p-6", offset: 0.3 } };
+    updateLearningState("dalil-al-mutamir", () => legacy);
+    updateLearningState("dalil-al-mutamir", (previous) => ({ ...previous, lastReadAt: 1795669000000 }));
+    expect(readLearningState()["dalil-al-mutamir"]).toEqual({ ...legacy, lastReadAt: 1795669000000 });
+  });
   it("keeps legacy Arabic records and separate English positions/bookmarks without migration", () => {
     const arabic = { position: { unitId: "p-8", offset: 0.35 }, bookmarks: ["p-6"] };
     localStorage.setItem(LEARNING_STATE_KEY, JSON.stringify({ "dalil-al-mutamir": arabic }));

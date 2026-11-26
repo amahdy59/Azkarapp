@@ -37,11 +37,19 @@ describe("Home split location control", () => {
     expect(onSelect).toHaveBeenCalledOnce();
   });
 
-  it("retains honest device-location context instead of an old city name", () => {
-    render(<HomeLocationRow language="en" name="Cairo" deviceLocation locating={false} />);
+  it.each(["ar", "en"] as const)("shows the resolved GPS place while describing its source in %s", (language) => {
+    const name = language === "ar" ? "بالقرب من القاهرة، مصر" : "Near Cairo, Egypt";
+    render(<HomeLocationRow language={language} name={name} deviceLocation locating={false} />);
+    const city = screen.getByRole("button", { name: `${t(language, "home.chooseLocation")}: ${name}` });
+    expect(city).toHaveTextContent(name);
+    expect(city).toHaveAccessibleDescription(t(language, "home.devicePrayerLocation"));
+    expect(screen.getAllByRole("button").every((button) => (button as HTMLButtonElement).disabled)).toBe(true);
+  });
+
+  it.each([undefined, "", "   "])("retains device-location recovery when a name is unavailable: %s", (name) => {
+    render(<HomeLocationRow language="en" name={name} deviceLocation locating={false} />);
     const city = screen.getByRole("button", { name: /Change prayer location/ });
     expect(city).toHaveTextContent(t("en", "qibla.deviceLocation"));
-    expect(city).not.toHaveTextContent("Cairo");
     expect(city).toHaveAccessibleDescription(t("en", "home.devicePrayerLocation"));
     expect(screen.getAllByRole("button").every((button) => (button as HTMLButtonElement).disabled)).toBe(true);
   });

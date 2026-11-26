@@ -6,8 +6,15 @@ import { fileURLToPath } from "node:url";
 // Explicit feature selection is a development aid, never a release gate or
 // an inferred guarantee that unrelated features cannot be affected.
 export const FEATURE_SPECS = {
-  learning: ["learning-library.spec.ts", "learning-production.spec.ts", "navigation.spec.ts", "offline-core.spec.ts"],
+  learning: [
+    "home-learning-entry.spec.ts",
+    "learning-library.spec.ts",
+    "learning-production.spec.ts",
+    "navigation.spec.ts",
+    "offline-core.spec.ts",
+  ],
   home: [
+    "next-release-location-dialogs.spec.ts",
     "adaptive-navigation.spec.ts",
     "compact-practice.spec.ts",
     "home-*.spec.ts",
@@ -58,6 +65,8 @@ export const FEATURE_SPECS = {
     "manual-checklist.spec.ts",
   ],
   controls: [
+    "qibla-automatic-mobile.spec.ts",
+    "next-release-location-dialogs.spec.ts",
     "masbaha-quiet.spec.ts",
     "masbaha-settings.spec.ts",
     "mushaf-balanced-reader.spec.ts",
@@ -87,6 +96,7 @@ export const FEATURE_SPECS = {
     "first-use-calm-controls.spec.ts",
   ],
   settings: [
+    "next-release-location-dialogs.spec.ts",
     "button-family-consistency.spec.ts",
     "adaptive-navigation.spec.ts",
     "focus-highlight-surfaces.spec.ts",

@@ -13,15 +13,15 @@ import {
 
 beforeEach(() => localStorage.clear());
 describe("OpenDua additive review pilot", () => {
-  it("matches explicit existing segments without modifying the live catalogue, defaults or preferences", () => {
+  it("retains pinned intake identities after owner acceptance without changing defaults or preferences", () => {
     const snapshot = JSON.stringify(AUDIO_CATALOG);
     const before = OPEN_DUA_PILOT.candidates.map((candidate) => resolveAudioAssetById(candidate.assetId));
     for (const candidate of OPEN_DUA_PILOT.candidates) {
       expect(candidate.reviewStatus).toBe("pending");
       expect(matchesOpenDuaCandidate(candidate, AUDIO_CATALOG)).toBe(true);
       expect(
-        AUDIO_CATALOG.assets[candidate.assetId]!.segments[0]!.variants.every(
-          (v) => v.voiceId !== OPEN_DUA_PILOT.voiceId,
+        AUDIO_CATALOG.assets[candidate.assetId]!.segments[0]!.variants.some(
+          (v) => v.voiceId === OPEN_DUA_PILOT.voiceId && v.sha256 === candidate.sha256,
         ),
       ).toBe(true);
     }
@@ -44,14 +44,15 @@ describe("OpenDua additive review pilot", () => {
     asset.segments[0]!.variants.push({
       ...asset.segments[0]!.variants[0]!,
       id: "pending-opendua",
-      voiceId: OPEN_DUA_PILOT.voiceId,
+      voiceId: "pending-other-voice",
       reviewStatus: "pending",
     });
     const resolution = resolveAudioAssetById(candidate.assetId, { catalog });
-    expect(resolution?.availableVoiceIds).not.toContain(OPEN_DUA_PILOT.voiceId);
+    expect(resolution?.availableVoiceIds).not.toContain("pending-other-voice");
     expect(resolution?.asset.defaultVoiceId).toBe(AUDIO_CATALOG.assets[candidate.assetId]!.defaultVoiceId);
   });
   it("keys review notes by recording checksum and never treats notes as activation", () => {
+    const before = resolveAudioAssetById(OPEN_DUA_PILOT.candidates[0]!.assetId);
     const candidate = OPEN_DUA_PILOT.candidates[0]!;
     const review = { reviewer: "Test reviewer", notes: "Test evidence only", decision: "reviewed-match" as const };
     expect(saveOpenDuaReviews({ [candidate.sha256]: review })).toBe(true);
@@ -59,7 +60,7 @@ describe("OpenDua additive review pilot", () => {
     const exported = exportOpenDuaReviews(loadOpenDuaReviews());
     expect(exported.candidates[0]).toMatchObject({ sha256: candidate.sha256, reviewStatus: "pending", review });
     expect(exported.candidates[1]!.review).toEqual(EMPTY_OPEN_DUA_REVIEW);
-    expect(resolveAudioAssetById(candidate.assetId)?.availableVoiceIds).not.toContain(OPEN_DUA_PILOT.voiceId);
+    expect(resolveAudioAssetById(candidate.assetId)).toEqual(before);
     localStorage.setItem("azkar.opendua-pilot-review.v1", JSON.stringify({ "retired-checksum": review }));
     expect(loadOpenDuaReviews()).toEqual({});
   });

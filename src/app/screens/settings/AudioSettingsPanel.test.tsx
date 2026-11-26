@@ -46,6 +46,19 @@ describe("AudioSettingsPanel", () => {
     expect(screen.getByRole("option", { name: "Abdullah Muhammad" })).not.toHaveAttribute("data-disabled");
   });
 
+  it("selects the additional voice explicitly, explains partial coverage and preserves the Quran preference", async () => {
+    const user = userEvent.setup();
+    render(<AudioSettingsPanel language="en" controller={null} onBack={() => undefined} />);
+    expect(screen.getByRole("combobox", { name: "Azkar and dua voice" })).toHaveTextContent("Abdullah Muhammad");
+    await user.click(screen.getByRole("combobox", { name: "Azkar and dua voice" }));
+    await user.click(screen.getByRole("option", { name: "Muhammad Jumah" }));
+    expect(screen.getByRole("status")).toHaveTextContent("available for three recordings");
+    expect(JSON.parse(window.localStorage.getItem("azkar.audio-preferences.v1")!)).toMatchObject({
+      duaVoiceId: "opendua-muhammad-jumah",
+      quranReciterId: "alafasy",
+    });
+  });
+
   it("uses the shared themed select instead of a browser-native dropdown", () => {
     const { container } = render(<AudioSettingsPanel language="en" controller={null} onBack={() => undefined} />);
 
