@@ -305,7 +305,7 @@ test("ordinary Reader retains an early Listen tap while audio code loads @cross-
     .toContain("/dua/m-hm-91/abdullah-muhammad/v2/");
 });
 
-test("Al-Kahf offers only its approved reciter and Escape preserves the expanded player @cross-browser", async ({
+test("Al-Kahf retains its default alongside verified Quran reciters and Escape preserves the expanded player @cross-browser", async ({
   page,
 }) => {
   await prepareAudio(page);
@@ -317,7 +317,7 @@ test("Al-Kahf offers only its approved reciter and Escape preserves the expanded
   const options = page.getByRole("dialog", { name: "Audio options", exact: true });
   await expect(options.getByTestId("audio-reciter-select")).toContainText("Muhammad Shari");
   await options.getByTestId("audio-reciter-select").click();
-  await expect(page.getByRole("option")).toHaveCount(1);
+  await expect(page.getByRole("option")).toHaveCount(4);
   await expect(page.getByRole("option", { name: "Muhammad Shari", exact: true })).not.toHaveAttribute("data-disabled");
   for (const name of ["English Translation", "Abdullah Muhammad", "Muhammad Moataz"])
     await expect(page.getByRole("option", { name, exact: true })).toHaveCount(0);

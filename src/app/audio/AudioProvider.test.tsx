@@ -589,9 +589,8 @@ describe("AudioProvider integration", () => {
     expect(timeline).toHaveValue("0");
 
     fireEvent.click(screen.getByRole("button", { name: "خيارات الصوت" }));
-    fireEvent.click(screen.getByTestId("audio-reciter-select"));
     expect(screen.queryByTestId("audio-recording-source")).not.toBeInTheDocument();
-    expect(screen.getByTestId("audio-reciter-select")).not.toHaveTextContent("المصدر");
+    expect(screen.getByTestId("audio-reciter-current")).not.toHaveTextContent("المصدر");
   });
 
   it("keeps lock-screen metadata and controls synchronized with the actual recording", async () => {

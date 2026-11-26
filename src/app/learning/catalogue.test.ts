@@ -31,13 +31,18 @@ describe("language-specific Learn editions", () => {
     vi.stubGlobal("__LEARNING_REVIEW__", false);
     expect(learningCatalogue("en", "en")).toEqual([]);
     const production = learningEditions("en");
-    expect(production.map((item) => [item.id, item.language])).toEqual([["dalil-al-mutamir", "ar"]]);
+    expect(production.map((item) => [item.id, item.language])).toEqual([
+      ["al-mukhtar", "ar"],
+      ["dalil-al-mutamir", "ar"],
+      ["al-wird-an-nabawi", "ar"],
+    ]);
     expect(allLearningEditions("en")).toHaveLength(4);
-    expect(resolveLearningResource("en", "al-mukhtar", "ar")).toBeUndefined();
-    expect(resolveLearningResource("en", "al-wird-an-nabawi", "ar")).toBeUndefined();
-    expect(resolveLearningResource("en", "dalil-al-mutamir", "en")).toEqual(production[0]);
+    expect(resolveLearningResource("en", "al-mukhtar", "ar")).toEqual(production[0]);
+    expect(resolveLearningResource("en", "al-wird-an-nabawi", "ar")).toEqual(production[2]);
+    expect(resolveLearningResource("en", "dalil-al-mutamir", "en")).toEqual(production[1]);
     expect(resolveLearningResource("en", "dalil-al-mutamir", "ar", [])).toBeUndefined();
-    expect(learningEditionNotice("en", production[0]!, true)).toContain("not the complete original");
+    expect(learningEditionNotice("en", production[1]!, true)).toContain("not the complete original");
+    expect(learningEditionNotice("en", production[0]!, true)).toContain("Source verification is pending");
     vi.stubGlobal("__LEARNING_REVIEW__", true);
     expect(learningCatalogue("en", "en")).toHaveLength(1);
   });

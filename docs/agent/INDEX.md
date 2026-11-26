@@ -2,6 +2,8 @@
 
 ## Active phase
 
+[Audio choices and complete book access](phases/AUDIO_LIBRARY_EXPANSION_2026_11_26.md) extends the release below under the owner's latest instruction. Improve responsive audio options, expand automatically verified Mushaf/dua recordings and expose all three books/PDFs without another owner confirmation. Deferred human review is not represented as completed; exact text/source/byte verification remains mandatory.
+
 [Consolidated main release](phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md) is the owner-authorized integration and publication phase. Consolidate pending work and branch-only developments, preserve review boundaries, pass the release gates and verify exact-commit Quality, Pages and production. This supersedes the preceding local-only publication holds. The [integration report](reports/CONSOLIDATED_MAIN_RELEASE_2026_11_26_REPORT.md) maps the combined scope and verification evidence.
 
 ## Feature handoffs and historical phase authority

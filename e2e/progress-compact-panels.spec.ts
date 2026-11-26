@@ -1,7 +1,7 @@
 import { chooseProgressDetail, chooseProgressOption } from "./helpers/progress";
 import { dashboardText } from "../src/app/i18n/progressDashboard";
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 for (const scenario of [
   { language: "en", width: 1440, theme: "midnight", material: "solid", enlarged: false },
@@ -9,9 +9,7 @@ for (const scenario of [
   { language: "en", width: 834, theme: "light", material: "solid", enlarged: false },
   { language: "ar", width: 320, theme: "light", material: "solid", enlarged: true },
 ] as const) {
-  test(`compact Progress panels and stable card hit geometry ${scenario.language}-${scenario.width} @cross-browser`, async ({
-    page,
-  }, info) => {
+  const prepare = async (page: Page) => {
     await page.setViewportSize({ width: scenario.width, height: 1000 });
     await page.clock.setFixedTime(new Date("2026-10-20T12:00:00+03:00"));
     await page.addInitScript((settings) => {
@@ -36,6 +34,11 @@ for (const scenario of [
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "200%";
       });
+  };
+  test(`compact Progress panels and stable card hit geometry ${scenario.language}-${scenario.width} @cross-browser`, async ({
+    page,
+  }, info) => {
+    await prepare(page);
     await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "month");
     await expect(page.getByText(/Saved records only;|غياب السجل لا يعني/)).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
@@ -120,6 +123,14 @@ for (const scenario of [
       [],
     );
     await page.screenshot({ path: info.outputPath("page-trend-exact-data.png"), scale: "css" });
+  });
+  test(`ordinary Quran and Azkar chrome after Progress ${scenario.language}-${scenario.width} @cross-browser`, async ({
+    page,
+  }, info) => {
+    await prepare(page);
+    await chooseProgressDetail(page, "routines");
+    const routines = page.getByTestId("progress-routine-bars");
+    await expect(routines).toBeVisible();
     await page.getByTestId("nav-quran").click();
     await expect(page.getByTestId("quran-wird-content")).toBeVisible();
     await expect(page.getByTestId("shared-screen-header").getByRole("button")).toHaveCount(0);

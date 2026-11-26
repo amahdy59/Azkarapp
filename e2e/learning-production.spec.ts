@@ -4,6 +4,7 @@ import { createServer } from "node:net";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
 import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 
 test.describe.configure({ mode: "serial" });
 let server: ChildProcess;
@@ -46,7 +47,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("ordinary production exposes only the scoped Arabic Umrah adaptation and no review downloads", async ({
+test("ordinary production exposes three Arabic books with PDF downloads and honest source notices", async ({
   page,
 }) => {
   await page.addInitScript(() =>
@@ -59,7 +60,9 @@ test("ordinary production exposes only the scoped Arabic Umrah adaptation and no
     ),
   );
   await page.goto(`${origin}/#/learn`);
-  await expect(page.getByRole("article")).toHaveCount(1);
+  await expect(page.getByRole("article")).toHaveCount(3);
+  await expect(page.getByRole("button", { name: "Download PDF", exact: true })).toHaveCount(3);
+  await expect(page.getByText(/Source verification is pending/)).toHaveCount(2);
   await expect(page.getByRole("heading", { name: "دليل المعتمر", exact: true })).toBeVisible();
   await expect(page.getByText(/covers 16 source pages/)).toBeVisible();
   await expect(page.getByRole("radio", { name: "English", exact: true })).toHaveCount(0);
@@ -71,11 +74,13 @@ test("ordinary production exposes only the scoped Arabic Umrah adaptation and no
     .locator("summary")
     .filter({ hasText: /^Books$/ })
     .click();
-  await expect(page.getByTestId("learning-downloads").getByRole("region")).toHaveCount(1);
+  await expect(page.getByTestId("learning-downloads").getByRole("region")).toHaveCount(3);
   await expect(page.getByRole("heading", { name: "The Umrah Guide", exact: true })).toHaveCount(0);
 });
 
-test("Home continuation ignores withheld recent editions and keeps their records intact", async ({ page }) => {
+test("Home continues the latest Arabic book while preserving the unavailable English draft's records", async ({
+  page,
+}) => {
   const records = {
     "dalil-al-mutamir": {
       position: { unitId: "p-6", offset: 0.3 },
@@ -95,20 +100,20 @@ test("Home continuation ignores withheld recent editions and keeps their records
   });
   await page.goto(`${origin}/#/home`);
   const section = page.getByTestId("home-learning");
-  await expect(section).toContainText("دليل المعتمر");
+  await expect(section).toContainText("المختار");
   await expect(section).not.toContainText("The Umrah Guide");
-  await expect(section).not.toContainText("المختار");
   expect(requests).toEqual([]);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!))).toEqual(records);
   await section.getByRole("button", { name: "Continue reading", exact: true }).click();
-  await expect(page).toHaveURL(/learn\/dalil-al-mutamir\/p-6$/);
+  await expect(page).toHaveURL(/learn\/al-mukhtar\/p-32$/);
   await expect(page.getByTestId("learning-content")).toHaveAttribute("lang", "ar");
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!));
   expect(saved["dalil-al-mutamir:en"]).toEqual(records["dalil-al-mutamir:en"]);
-  expect(saved["al-mukhtar"]).toEqual(records["al-mukhtar"]);
+  expect(saved["al-mukhtar"].bookmarks).toEqual(records["al-mukhtar"].bookmarks);
+  expect(saved["dalil-al-mutamir"]).toEqual(records["dalil-al-mutamir"]);
 });
 
-test("withheld direct links fetch no publication bytes and preserve old records", async ({ page }) => {
+test("all Arabic direct links load their publication and preserve bookmarks", async ({ page }) => {
   const records = {
     "al-mukhtar": { position: { unitId: "p-32", offset: 0.45 }, bookmarks: ["p-32"] },
     "al-wird-an-nabawi": { position: { unitId: "p-18", offset: 0.6 }, bookmarks: ["p-18"] },
@@ -119,19 +124,13 @@ test("withheld direct links fetch no publication bytes and preserve old records"
     if (request.url().includes("/__learning-assets__/")) requests.push(request.url());
   });
   for (const id of ["al-mukhtar", "al-wird-an-nabawi"]) {
-    const arabicUi = id === "al-wird-an-nabawi";
-    if (arabicUi) await page.getByRole("button", { name: /Language/ }).click();
     await page.goto(`${origin}/#/learn/${id}/p-32`);
-    await expect(
-      page.getByRole("heading", { name: arabicUi ? "الكتاب غير متاح" : "Book unavailable", exact: true }),
-    ).toBeVisible();
-    await expect(page.getByTestId("learning-content")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Download PDF", exact: true })).toHaveCount(0);
-    expect(await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!))).toEqual(records);
-    await page.getByRole("button", { name: arabicUi ? "العودة إلى تعلّم" : "Back to Learn", exact: true }).click();
-    await expect(page).toHaveURL(/#\/learn$/);
+    await expect(page.getByTestId("learning-content")).toBeVisible();
+    await expect(page.getByTestId("learning-content")).toHaveAttribute("lang", "ar");
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!));
+    expect(saved[id].bookmarks).toEqual(records[id as keyof typeof records].bookmarks);
   }
-  expect(requests).toEqual([]);
+  expect(requests.length).toBeGreaterThanOrEqual(2);
 });
 
 test("an unavailable English link recovers to the same book's saved Arabic position without touching English records", async ({
@@ -155,7 +154,7 @@ test("an unavailable English link recovers to the same book's saved Arabic posit
   ).toEqual({ position: { unitId: "p-9", offset: 0.5 }, bookmarks: ["p-9"] });
 });
 
-test("a previously saved withheld edition has removal-only management without reopening or downloading it", async ({
+test("a previously saved Arabic edition remains offline-capable and removable without losing records", async ({
   page,
 }) => {
   const catalogue = JSON.parse(await readFile("src/app/learning/catalogue.json", "utf8"));
@@ -190,11 +189,31 @@ test("a previously saved withheld edition has removal-only management without re
   const saved = page
     .getByTestId("learning-downloads")
     .getByRole("region", { name: "المختار من صحيح الأدعية والأذكار", exact: true });
-  await expect(saved.getByText(/only removal is available/)).toBeVisible();
-  await expect(saved.getByRole("button", { name: "Save offline", exact: true })).toHaveCount(0);
-  await expect(saved.getByText("Available offline", { exact: true })).toHaveCount(0);
+  await expect(saved.getByText("Available offline", { exact: true })).toBeVisible();
   await saved.getByRole("button", { name: "Remove saved book", exact: true }).click();
-  await expect(saved).toHaveCount(0);
+  await expect(saved.getByText("Available offline", { exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!))).toEqual(records);
   expect(requests).toEqual([]);
+});
+
+test("all three book cards download their exact PDF bytes and reflow at enlarged phone size", async ({ page }) => {
+  const catalogue = JSON.parse(await readFile("src/app/learning/catalogue.json", "utf8"));
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto(`${origin}/#/learn`);
+  await page.locator("html").evaluate((node) => {
+    node.style.fontSize = "200%";
+  });
+  for (const resource of catalogue.filter((item: { language: string }) => item.language === "ar")) {
+    const card = page.getByRole("article").filter({ has: page.locator(`#title-${resource.id}`) });
+    const event = page.waitForEvent("download");
+    await card.getByRole("button", { name: "Download PDF", exact: true }).click();
+    const download = await event;
+    expect(download.suggestedFilename()).toBe(`${resource.id}-light.pdf`);
+    const bytes = await readFile((await download.path())!);
+    expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
+    expect(bytes.length).toBe(resource.pdfs.light.bytes);
+    expect(createHash("sha256").update(bytes).digest("hex")).toBe(resource.pdfs.light.sha256);
+    await expect(card.getByRole("status").filter({ hasText: "PDF sent" })).toBeVisible();
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 });

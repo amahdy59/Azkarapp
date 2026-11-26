@@ -115,6 +115,8 @@ export function KhatmahReaderScreen({
   onBack,
   khatmahPage,
   setKhatmahPage,
+  selectedSurah,
+  onSelectSurah,
   mushafTheme: initialTheme = "follow-app",
   colorGestures = true,
   onSelectColorGestures,
@@ -148,6 +150,8 @@ export function KhatmahReaderScreen({
   onBack: () => void;
   khatmahPage: number;
   setKhatmahPage: (page: number) => void;
+  selectedSurah?: number;
+  onSelectSurah?: (surah: number) => void;
   mushafTheme?: MushafTheme;
   colorGestures?: boolean;
   onSelectColorGestures?: (enabled: boolean) => void;
@@ -626,7 +630,7 @@ export function KhatmahReaderScreen({
   const { surahName, surahShortName, juzNumber } = useMemo(() => {
     const juz = getJuzNumberForPage(displayPage);
     if (!pageData || pageData.length === 0) return { surahName: "", surahShortName: "", juzNumber: juz };
-    const canonicalSurah = String(getSurahNumberForPage(displayPage));
+    const canonicalSurah = String(selectedSurah ?? getSurahNumberForPage(displayPage));
     const hasCanonicalSurah = pageData.some((v) => v.k.startsWith(`${canonicalSurah}:`));
     const [firstSurah] = (pageData[0]?.k || "1:1").split(":");
     const surah = hasCanonicalSurah ? canonicalSurah : firstSurah || "1";
@@ -635,7 +639,7 @@ export function KhatmahReaderScreen({
       surahShortName: getSurahShortName(surah, language),
       juzNumber: juz,
     };
-  }, [pageData, displayPage, language]);
+  }, [pageData, displayPage, language, selectedSurah]);
 
   useEffect(() => {
     if (!pageData?.length) return;
@@ -670,7 +674,7 @@ export function KhatmahReaderScreen({
   );
 
   const activeAudioControl: SurahAudioControl | undefined = useMemo(() => {
-    if (baqarahAudio?.available && pageData?.[0]?.k.startsWith("2:")) {
+    if (baqarahAudio?.available) {
       return baqarahAudio;
     }
     if (audioController?.state.plan && audioController.currentEntry) {
@@ -685,7 +689,7 @@ export function KhatmahReaderScreen({
       };
     }
     return undefined;
-  }, [baqarahAudio, pageData, audioController]);
+  }, [baqarahAudio, audioController]);
 
   /** Physical direction is the product rule: right advances, left goes back.
    *  Buttons, keys, and swipes all call the same signed paginator. */
@@ -898,6 +902,8 @@ export function KhatmahReaderScreen({
       currentPage={currentPage}
       onClose={closeIndex}
       onSelectPage={selectPage}
+      selectedSurah={selectedSurah}
+      onSelectSurah={onSelectSurah}
       language={language}
       direction={direction}
       bookmarks={initialBookmarks}

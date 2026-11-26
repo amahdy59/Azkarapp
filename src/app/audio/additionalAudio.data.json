@@ -1,0 +1,2095 @@
+{
+  "additions": {
+    "evening-e-hm-77e": {
+      "evening-e-hm-77e-segment-1": [
+        {
+          "id": "evening-e-hm-77e-segment-1-opendua-recording-000076",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-077-2.mp3",
+          "durationMs": 83251,
+          "byteSize": 833434,
+          "sha256": "20ab2391214d2e73024fd313305d80fd40426556d7384cd96ec4a10da636312c",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-78e": {
+      "evening-e-hm-78e-segment-1": [
+        {
+          "id": "evening-e-hm-78e-segment-1-opendua-recording-000078",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-078-2.mp3",
+          "durationMs": 21428,
+          "byteSize": 215194,
+          "sha256": "3f91bdc30cad9cb53e3670b333aab3ded5c87eb05474b7d54aa55ff4323bcebe",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-79": {
+      "evening-e-hm-79-segment-1": [
+        {
+          "id": "evening-e-hm-79-segment-1-opendua-recording-000079",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-079.mp3",
+          "durationMs": 49634,
+          "byteSize": 497432,
+          "sha256": "f6fc003736bd524e651eab7b510a3a34675d6a1c96c42400e5dc04cc54042338",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-80e": {
+      "evening-e-hm-80e-segment-1": [
+        {
+          "id": "evening-e-hm-80e-segment-1-opendua-recording-000081",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-080-2.mp3",
+          "durationMs": 46915,
+          "byteSize": 470074,
+          "sha256": "5344f5c4fcaa9707fa46f0ca8c01b51421e34674012a735c8057ad9f3555e8b7",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-81e": {
+      "evening-e-hm-81e-segment-1": [
+        {
+          "id": "evening-e-hm-81e-segment-1-opendua-recording-000083",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-081-2.mp3",
+          "durationMs": 19730,
+          "byteSize": 198394,
+          "sha256": "db1cab400e2e87763e79940fd3165b3e18182918696eb64223f6eea2f34bcf1a",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-82": {
+      "evening-e-hm-82-segment-1": [
+        {
+          "id": "evening-e-hm-82-segment-1-opendua-recording-000084",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-082.mp3",
+          "durationMs": 53119,
+          "byteSize": 532232,
+          "sha256": "ec79046d1d53bd0ecb2ebc3026d5da38f80194f171883557ef56d5a51663567f",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-83": {
+      "evening-e-hm-83-segment-1": [
+        {
+          "id": "evening-e-hm-83-segment-1-opendua-recording-000085",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-083.mp3",
+          "durationMs": 13898,
+          "byteSize": 140072,
+          "sha256": "049ef4e5ef32aa2d0736656aae0c32fe496d8f6c412dd53e9f336ddfffd12842",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-84": {
+      "evening-e-hm-84-segment-1": [
+        {
+          "id": "evening-e-hm-84-segment-1-opendua-recording-000086",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-084.mp3",
+          "durationMs": 72021,
+          "byteSize": 721112,
+          "sha256": "1f5f1113cb8ea4bcce864cd8232bd4ec395320319d48b77a66a8c8fa6c86d054",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-86": {
+      "evening-e-hm-86-segment-1": [
+        {
+          "id": "evening-e-hm-86-segment-1-opendua-recording-000088",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-086.mp3",
+          "durationMs": 16198,
+          "byteSize": 162872,
+          "sha256": "09cc95c1a30ada18c3383ce1930aeff1993c69fe51afc55a1c8d86c89b286e65",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-87": {
+      "evening-e-hm-87-segment-1": [
+        {
+          "id": "evening-e-hm-87-segment-1-opendua-recording-000089",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-087.mp3",
+          "durationMs": 17072,
+          "byteSize": 171752,
+          "sha256": "25a44eb0e1824e0ecf8a6e756539cea35661905215eba55a9c991cf11db4efa9",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-88": {
+      "evening-e-hm-88-segment-1": [
+        {
+          "id": "evening-e-hm-88-segment-1-opendua-recording-000090",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-088.mp3",
+          "durationMs": 24149,
+          "byteSize": 242552,
+          "sha256": "67c6a14f436d19b5da4e0033bcc7ccf1eaa20908a82d6b2b6bd665ed02b5687e",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-89e": {
+      "evening-e-hm-89e-segment-1": [
+        {
+          "id": "evening-e-hm-89e-segment-1-opendua-recording-000092",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-089-2.mp3",
+          "durationMs": 36077,
+          "byteSize": 361834,
+          "sha256": "a7410b0b7705643eb2c25db521201f32a69124d5a7a5d62bc152f8d1fee13dee",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-90e": {
+      "evening-e-hm-90e-segment-1": [
+        {
+          "id": "evening-e-hm-90e-segment-1-opendua-recording-000094",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-090-2.mp3",
+          "durationMs": 46172,
+          "byteSize": 462634,
+          "sha256": "8d43cce6a8b3bd915b75ac614c38cf2c5eb04bd72ad90da9f0d37bce41f2ceb4",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-91": {
+      "evening-e-hm-91-segment-1": [
+        {
+          "id": "evening-e-hm-91-segment-1-opendua-recording-000095",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-091.mp3",
+          "durationMs": 3500,
+          "byteSize": 35912,
+          "sha256": "41dbbf2db698c7189a205fb358458216b2a80a5df1c6615a599df2dcb46ebd2a",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-92": {
+      "evening-e-hm-92-segment-1": [
+        {
+          "id": "evening-e-hm-92-segment-1-opendua-recording-000096",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-092.mp3",
+          "durationMs": 18103,
+          "byteSize": 182072,
+          "sha256": "9a4cb219468ef60132392b370eafc3b2ea1326648630d20f468b50209edf1f99",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-96": {
+      "evening-e-hm-96-segment-1": [
+        {
+          "id": "evening-e-hm-96-segment-1-opendua-recording-000100",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-096.mp3",
+          "durationMs": 6415,
+          "byteSize": 65192,
+          "sha256": "e33a17bb7dec1821f76705d9d8a125e60f303fb8d10f69b80550ec3612a2f048",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-97": {
+      "evening-e-hm-97-segment-1": [
+        {
+          "id": "evening-e-hm-97-segment-1-opendua-recording-000101",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-097.mp3",
+          "durationMs": 8695,
+          "byteSize": 87992,
+          "sha256": "ada8ec3d2a902ca936e6b913c04d3cc7ae6f72b53448045231efcfc4ddb6d511",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "evening-e-hm-98": {
+      "evening-e-hm-98-segment-1": [
+        {
+          "id": "evening-e-hm-98-segment-1-opendua-recording-000102",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-098.mp3",
+          "durationMs": 9170,
+          "byteSize": 92792,
+          "sha256": "27a6d4d94fa54c369980e6599c4f1fffdafa1044acdccc9e2989d27d46bc4e7d",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-108": {
+      "s-hm-108-1": [
+        {
+          "id": "s-hm-108-1-opendua-recording-000112",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-108.mp3",
+          "durationMs": 17786,
+          "byteSize": 178952,
+          "sha256": "b73f58fc064f659372fef65d5feeabdbab7c32507cd5d7da8dd94de5725ef805",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-106-alhamdulillah": {
+      "s-hm-106-alhamdulillah-1": [
+        {
+          "id": "s-hm-106-alhamdulillah-1-opendua-recording-000187",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-188-1.mp3",
+          "durationMs": 2378,
+          "byteSize": 24847,
+          "sha256": "7a3ec1d90cbcc849356963d87254a449d60cc96b42fcc46f1308d9684cbc9866",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-106-allahu-akbar": {
+      "s-hm-106-allahu-akbar-1": [
+        {
+          "id": "s-hm-106-allahu-akbar-1-opendua-recording-000231",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-241.mp3",
+          "durationMs": 1826,
+          "byteSize": 19352,
+          "sha256": "52da9f6ef5853117f05681595f37ac5741d784386fd98ba64252010dd2ccdcbb",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-111": {
+      "s-hm-111-1": [
+        {
+          "id": "s-hm-111-1-opendua-recording-000114",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-111.mp3",
+          "durationMs": 38014,
+          "byteSize": 381032,
+          "sha256": "4bef95667d39e04d782720f61ae0e871598c691942663173b99db9515ad18188",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-104": {
+      "s-hm-104-1": [
+        {
+          "id": "s-hm-104-1-opendua-recording-000108",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-104.mp3",
+          "durationMs": 6353,
+          "byteSize": 64472,
+          "sha256": "2d5167d9db7e1002521d5226615dc4d9579223aca117a7921370ddf5e8917d4c",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-105": {
+      "s-hm-105-1": [
+        {
+          "id": "s-hm-105-1-opendua-recording-000109",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-105.mp3",
+          "durationMs": 5699,
+          "byteSize": 57992,
+          "sha256": "c4e2e6ea1b19cea62178832d40357bf6839a00a8b08b601b273de88e898ea43f",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-102": {
+      "s-hm-102-1": [
+        {
+          "id": "s-hm-102-1-opendua-recording-000106",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-102.mp3",
+          "durationMs": 26215,
+          "byteSize": 263192,
+          "sha256": "94573b654228c380cfb653cf51831e828d25e61c89880c0bec5fa3d5d811c7c2",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-106-subhanallah": {
+      "s-hm-106-subhanallah-1": [
+        {
+          "id": "s-hm-106-subhanallah-1-opendua-recording-000230",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-240.mp3",
+          "durationMs": 2429,
+          "byteSize": 25352,
+          "sha256": "9447189125a07d06a65e1549aa508deb24e456843c0364daa6605ff477ac6114",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-79": {
+      "m-hm-79-1": [
+        {
+          "id": "m-hm-79-1-opendua-recording-000079",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-079.mp3",
+          "durationMs": 49634,
+          "byteSize": 497432,
+          "sha256": "f6fc003736bd524e651eab7b510a3a34675d6a1c96c42400e5dc04cc54042338",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-82": {
+      "m-hm-82-1": [
+        {
+          "id": "m-hm-82-1-opendua-recording-000084",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-082.mp3",
+          "durationMs": 53119,
+          "byteSize": 532232,
+          "sha256": "ec79046d1d53bd0ecb2ebc3026d5da38f80194f171883557ef56d5a51663567f",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-83": {
+      "m-hm-83-1": [
+        {
+          "id": "m-hm-83-1-opendua-recording-000085",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-083.mp3",
+          "durationMs": 13898,
+          "byteSize": 140072,
+          "sha256": "049ef4e5ef32aa2d0736656aae0c32fe496d8f6c412dd53e9f336ddfffd12842",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-84": {
+      "m-hm-84-1": [
+        {
+          "id": "m-hm-84-1-opendua-recording-000086",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-084.mp3",
+          "durationMs": 72021,
+          "byteSize": 721112,
+          "sha256": "1f5f1113cb8ea4bcce864cd8232bd4ec395320319d48b77a66a8c8fa6c86d054",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-86": {
+      "m-hm-86-1": [
+        {
+          "id": "m-hm-86-1-opendua-recording-000088",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-086.mp3",
+          "durationMs": 16198,
+          "byteSize": 162872,
+          "sha256": "09cc95c1a30ada18c3383ce1930aeff1993c69fe51afc55a1c8d86c89b286e65",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-87": {
+      "m-hm-87-1": [
+        {
+          "id": "m-hm-87-1-opendua-recording-000089",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-087.mp3",
+          "durationMs": 17072,
+          "byteSize": 171752,
+          "sha256": "25a44eb0e1824e0ecf8a6e756539cea35661905215eba55a9c991cf11db4efa9",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-88": {
+      "m-hm-88-1": [
+        {
+          "id": "m-hm-88-1-opendua-recording-000090",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-088.mp3",
+          "durationMs": 24149,
+          "byteSize": 242552,
+          "sha256": "67c6a14f436d19b5da4e0033bcc7ccf1eaa20908a82d6b2b6bd665ed02b5687e",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-94": {
+      "m-hm-94-1": [
+        {
+          "id": "m-hm-94-1-opendua-recording-000098",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-094.mp3",
+          "durationMs": 17852,
+          "byteSize": 179432,
+          "sha256": "daf91827f523a5fd39de671632e56ccd26de682e3519dea49e039a30c39c0d11",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-96": {
+      "m-hm-96-1": [
+        {
+          "id": "m-hm-96-1-opendua-recording-000100",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-096.mp3",
+          "durationMs": 6415,
+          "byteSize": 65192,
+          "sha256": "e33a17bb7dec1821f76705d9d8a125e60f303fb8d10f69b80550ec3612a2f048",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-97": {
+      "m-hm-97-1": [
+        {
+          "id": "m-hm-97-1-opendua-recording-000101",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-097.mp3",
+          "durationMs": 8695,
+          "byteSize": 87992,
+          "sha256": "ada8ec3d2a902ca936e6b913c04d3cc7ae6f72b53448045231efcfc4ddb6d511",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-98": {
+      "m-hm-98-1": [
+        {
+          "id": "m-hm-98-1-opendua-recording-000102",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-098.mp3",
+          "durationMs": 9170,
+          "byteSize": 92792,
+          "sha256": "27a6d4d94fa54c369980e6599c4f1fffdafa1044acdccc9e2989d27d46bc4e7d",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "ap-tasbeeh-tawhid": {
+      "ap-tasbeeh-tawhid-1": [
+        {
+          "id": "ap-tasbeeh-tawhid-1-opendua-recording-000096",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-092.mp3",
+          "durationMs": 18103,
+          "byteSize": 182072,
+          "sha256": "9a4cb219468ef60132392b370eafc3b2ea1326648630d20f468b50209edf1f99",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "wu-hm-1-english": {
+      "wu-hm-1-seg-1-en": [
+        {
+          "id": "wu-hm-1-seg-1-en-opendua-recording-000001",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-001.mp3",
+          "durationMs": 16006,
+          "byteSize": 160952,
+          "sha256": "5ec821cf0c6538f5fc1f34833af8bdbff4da515849ae6e29a8a9d2430644f128",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-90m": {
+      "m-hm-90m-1": [
+        {
+          "id": "m-hm-90m-1-opendua-recording-000093",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-090-1.mp3",
+          "durationMs": 46586,
+          "byteSize": 466954,
+          "sha256": "8373a9052cd86eaaa741e9343dc55e2f5197689906e0f6398717e5ba0800b04c",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-89m": {
+      "m-hm-89m-1": [
+        {
+          "id": "m-hm-89m-1-opendua-recording-000091",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-089-1.mp3",
+          "durationMs": 37630,
+          "byteSize": 377194,
+          "sha256": "398cd51f6bc9b6c9738b1f3e104ba6676200e0bc31e4bea90f329d12f5807083",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-77m": {
+      "m-hm-77m-1": [
+        {
+          "id": "m-hm-77m-1-opendua-recording-000075",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-077-1.mp3",
+          "durationMs": 78050,
+          "byteSize": 781594,
+          "sha256": "bb5fbcd0cce781c52d225aba7b6a200eaaa1f6fceef75b69e75ac4f80e906e6d",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-80m": {
+      "m-hm-80m-1": [
+        {
+          "id": "m-hm-80m-1-opendua-recording-000080",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-080-1.mp3",
+          "durationMs": 41679,
+          "byteSize": 417754,
+          "sha256": "371efbbe72e36c2d1d09448b07031d6f606d3e496f138cbb75c2d4f8246b0fae",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-95": {
+      "m-hm-95-1": [
+        {
+          "id": "m-hm-95-1-opendua-recording-000071",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-073.mp3",
+          "durationMs": 18297,
+          "byteSize": 183992,
+          "sha256": "724fbaf854e00dd8e138a699fc2a85b78b07fd62fd889ea933cd7a2127cdc7fe",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-78m": {
+      "m-hm-78m-1": [
+        {
+          "id": "m-hm-78m-1-opendua-recording-000077",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-078-1.mp3",
+          "durationMs": 18974,
+          "byteSize": 190714,
+          "sha256": "a078a281afb99a48205da157a2329fa1428502a0d9bc88b3746fcc2f454a2f95",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "m-hm-81m": {
+      "m-hm-81m-1": [
+        {
+          "id": "m-hm-81m-1-opendua-recording-000082",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-081-1.mp3",
+          "durationMs": 22558,
+          "byteSize": 226474,
+          "sha256": "044e3d601b2984d1365bada321b15218898eb9b7e4896ec79ce1a0e024141573",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "wu-hm-2": {
+      "wu-hm-2-1": [
+        {
+          "id": "wu-hm-2-1-opendua-recording-000002",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-002.mp3",
+          "durationMs": 49337,
+          "byteSize": 494312,
+          "sha256": "3414621c99d694cad116cdf6c4560c77222fdbb47f722fb114fe890a8b2c0035",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "ap-ref-7-english": {
+      "ap-ref-7-seg-1-en": [
+        {
+          "id": "ap-ref-7-seg-1-en-opendua-recording-000070",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-072.mp3",
+          "durationMs": 23220,
+          "byteSize": 233192,
+          "sha256": "6c76beede422ec3c212b19b6e4fe7eaf1f208e3bd2fbf55d94b7d977d113854c",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "clo-ref-4-english": {
+      "clo-ref-4-seg-1-en": [
+        {
+          "id": "clo-ref-4-seg-1-en-opendua-recording-000009",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-009.mp3",
+          "durationMs": 2237,
+          "byteSize": 23432,
+          "sha256": "fc2a12f8010c5f53128b25d742a7c90fcf0e27c40d7bd3fa2ac0336d23a77eb3",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "da-ref-3-english": {
+      "da-ref-3-seg-1-en": [
+        {
+          "id": "da-ref-3-seg-1-en-opendua-recording-000126",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-125.mp3",
+          "durationMs": 9270,
+          "byteSize": 93752,
+          "sha256": "46348f230a394645ec360fd2d8ef4e3f8de4a4cde6a3a011d8a2c12eed5106ef",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "da-ref-4-english": {
+      "da-ref-4-seg-1-en": [
+        {
+          "id": "da-ref-4-seg-1-en-opendua-recording-000124",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-123.mp3",
+          "durationMs": 19838,
+          "byteSize": 199352,
+          "sha256": "17d506b7c6e46a7a781f6fe8fdeeeebf6d3ce1171e4091ab46095fce2f880743",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "da-ref-6-english": {
+      "da-ref-6-seg-1-en": [
+        {
+          "id": "da-ref-6-seg-1-en-opendua-recording-000121",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-120.mp3",
+          "durationMs": 62225,
+          "byteSize": 623192,
+          "sha256": "5f65378cce9af9443c9319357dde37f9124398f65ea75e871173396dd5bd02e4",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "fd-ref-2-english": {
+      "fd-ref-2-seg-1-en": [
+        {
+          "id": "fd-ref-2-seg-1-en-opendua-recording-000177",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-178-2.mp3",
+          "durationMs": 4246,
+          "byteSize": 43327,
+          "sha256": "07f9ce087551e351d13e1b62fd61b6ef10b19f7169bcee4e20b537b96f14af67",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "fd-ref-4-english": {
+      "fd-ref-4-seg-1-en": [
+        {
+          "id": "fd-ref-4-seg-1-en-opendua-recording-000181",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-181.mp3",
+          "durationMs": 21698,
+          "byteSize": 218072,
+          "sha256": "8902057c6e6315fdae2448586e46cd026c2f7f2c7da00d4ce795fabd63bf0091",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "ir-ref-4-english": {
+      "ir-ref-4-seg-1-en": [
+        {
+          "id": "ir-ref-4-seg-1-en-opendua-recording-000145",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-148.mp3",
+          "durationMs": 5414,
+          "byteSize": 55085,
+          "sha256": "482e478c4d56485cb621528497d03ace5bc37bf634761a1c4c58129c021f2345",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "misc-ref-4-english": {
+      "misc-ref-4-seg-1-en": [
+        {
+          "id": "misc-ref-4-seg-1-en-opendua-recording-000239",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-256.mp3",
+          "durationMs": 7456,
+          "byteSize": 75512,
+          "sha256": "4c36d2db12f54bbdacb3d20714164dc5c786c33946e69d26a07654e5b4f9d095",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "misc-ref-6-english": {
+      "misc-ref-6-seg-1-en": [
+        {
+          "id": "misc-ref-6-seg-1-en-opendua-recording-000022",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-022.mp3",
+          "durationMs": 5811,
+          "byteSize": 59192,
+          "sha256": "ab427080f1f3ee5f3ca7fa1e97be67ffd9b2e48219bc71132855863957311854",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "misc-ref-7-english": {
+      "misc-ref-7-seg-1-en": [
+        {
+          "id": "misc-ref-7-seg-1-en-opendua-recording-000245",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-262-2.mp3",
+          "durationMs": 8369,
+          "byteSize": 84634,
+          "sha256": "1347cbe383cf3a150f51cf35536f8feb5b479646bcc3709b191681362efdccd6",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "msq-hm-20-english": {
+      "msq-hm-20-seg-1-en": [
+        {
+          "id": "msq-hm-20-seg-1-en-opendua-recording-000020",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-020.mp3",
+          "durationMs": 31421,
+          "byteSize": 315272,
+          "sha256": "6cb854f2f767112e8700c35ad18c45f11bde7c005d4a8bc7c355068abbb3eac1",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "msq-hm-21-english": {
+      "msq-hm-21-seg-1-en": [
+        {
+          "id": "msq-hm-21-seg-1-en-opendua-recording-000021",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-021.mp3",
+          "durationMs": 22619,
+          "byteSize": 227192,
+          "sha256": "5b900ddca06233b5aa491477503700385f0b8be41d00d8f4536615807738f14d",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "ne-ref-2-english": {
+      "ne-ref-2-seg-1-en": [
+        {
+          "id": "ne-ref-2-seg-1-en-opendua-recording-000170",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-172.mp3",
+          "durationMs": 5121,
+          "byteSize": 52232,
+          "sha256": "31d0e4c3e665c1188e8acd59fba27737e50856ceb09c32736c3870cb1ca4c8e3",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "ne-ref-3-english": {
+      "ne-ref-3-seg-1-en": [
+        {
+          "id": "ne-ref-3-seg-1-en-opendua-recording-000171",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-173.mp3",
+          "durationMs": 4813,
+          "byteSize": 49112,
+          "sha256": "8580d943a389a4072b039ec5b2fee6f8f8f558b5fad4fd3e66c35ad5deb425c7",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "ne-ref-4-english": {
+      "ne-ref-4-seg-1-en": [
+        {
+          "id": "ne-ref-4-seg-1-en-opendua-recording-000166",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-168.mp3",
+          "durationMs": 10525,
+          "byteSize": 106232,
+          "sha256": "b4f5d49830d911aedfdc795e3eaa057bf34253aacff5d3e38e96dc979e2dc743",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "pur-ref-4-english": {
+      "pur-ref-4-seg-1-en": [
+        {
+          "id": "pur-ref-4-seg-1-en-opendua-recording-000011",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-011.mp3",
+          "durationMs": 1645,
+          "byteSize": 17432,
+          "sha256": "f4c32bf530de8ee45599cbfe9de32a6b46015c946f684d8e952b3bc35735624d",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "pur-ref-5-english": {
+      "pur-ref-5-seg-1-en": [
+        {
+          "id": "pur-ref-5-seg-1-en-opendua-recording-000013",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-013.mp3",
+          "durationMs": 19148,
+          "byteSize": 192392,
+          "sha256": "2baf9b29015694376eb651a96793c31bba9add9604efd5949207f5892271819c",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "pur-ref-6-english": {
+      "pur-ref-6-seg-1-en": [
+        {
+          "id": "pur-ref-6-seg-1-en-opendua-recording-000015",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-015.mp3",
+          "durationMs": 16822,
+          "byteSize": 169112,
+          "sha256": "23c005d55ef8acb4ad5e997dc3007644958f7e2da94296fedc9a2647d8cab2c0",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "sc-ref-3-english": {
+      "sc-ref-3-seg-1-en": [
+        {
+          "id": "sc-ref-3-seg-1-en-opendua-recording-000188",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-188-2.mp3",
+          "durationMs": 2894,
+          "byteSize": 29887,
+          "sha256": "c52f61864ea4404529a945d236c6eae2e65c743dbbae759b2f80061f9f1f5010",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "sc-ref-4-english": {
+      "sc-ref-4-seg-1-en": [
+        {
+          "id": "sc-ref-4-seg-1-en-opendua-recording-000189",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-188-3.mp3",
+          "durationMs": 4889,
+          "byteSize": 49807,
+          "sha256": "2a50d247a9fb3ab83cb328e5ba3d3e69020086f906d5158c3a9786cfa79cf332",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "sc-ref-5-english": {
+      "sc-ref-5-seg-1-en": [
+        {
+          "id": "sc-ref-5-seg-1-en-opendua-recording-000199",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-198.mp3",
+          "durationMs": 3173,
+          "byteSize": 32792,
+          "sha256": "83467ff882dc0a50aa7bf48902f42973685b974a92b723635e78a04a0db28191",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "sc-ref-7-english": {
+      "sc-ref-7-seg-1-en": [
+        {
+          "id": "sc-ref-7-seg-1-en-opendua-recording-000191",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-190.mp3",
+          "durationMs": 10582,
+          "byteSize": 106712,
+          "sha256": "775408b327ce9e01ccef010188a4ae8faf210c4286ccf516234b71fa64c8778a",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "sc-ref-8-english": {
+      "sc-ref-8-seg-1-en": [
+        {
+          "id": "sc-ref-8-seg-1-en-opendua-recording-000150",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-154.mp3",
+          "durationMs": 19886,
+          "byteSize": 199832,
+          "sha256": "6fabd47bfc3f340f30afbed21bd9582ee4657695c799ff34b36110fb88abdfcb",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "tr-ref-1-english": {
+      "tr-ref-1-seg-1-en": [
+        {
+          "id": "tr-ref-1-seg-1-en-opendua-recording-000207",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-207-1.mp3",
+          "durationMs": 78377,
+          "byteSize": 784714,
+          "sha256": "26f75d751bc3f87da62a9a86691ea6dfdceb41a4232a994e0696d8bbb3dd9660",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-03-english": {
+      "friday-dua-03-complete": [
+        {
+          "id": "friday-dua-03-complete-opendua-recording-000055",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-057.mp3",
+          "durationMs": 23359,
+          "byteSize": 234632,
+          "sha256": "d984b1a8ce123208402dc02f24b8f22c4bf71dbe7f1085d9f29f391057fbbf62",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-06": {
+      "friday-dua-06-1": [
+        {
+          "id": "friday-dua-06-1-opendua-recording-000057",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-059.mp3",
+          "durationMs": 9615,
+          "byteSize": 97112,
+          "sha256": "4241744f6c3575f7c74620f535f080ad14f1249c3643e9f63ec89f303a622b57",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-19": {
+      "friday-dua-19-1": [
+        {
+          "id": "friday-dua-19-1-opendua-recording-000059",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-061.mp3",
+          "durationMs": 11976,
+          "byteSize": 120632,
+          "sha256": "bbe998b93e317f72ec5868330266829df1a03c66ddfb78583966833428ab914b",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-29": {
+      "friday-dua-29-1": [
+        {
+          "id": "friday-dua-29-1-opendua-recording-000045",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-047.mp3",
+          "durationMs": 23276,
+          "byteSize": 233672,
+          "sha256": "f40acdd211e3fa5a5162fed15bcfe655dc8e46389f3f06b6b7277e68d13dedf9",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "comprehensive-dua-36": {
+      "comprehensive-dua-36-1": [
+        {
+          "id": "comprehensive-dua-36-1-opendua-recording-000246",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-263.mp3",
+          "durationMs": 9129,
+          "byteSize": 92312,
+          "sha256": "45b37cd77d05029b8397424591e74d7ee5561d6e177f6f0038ea0b18c572001b",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-33": {
+      "friday-dua-33-1": [
+        {
+          "id": "friday-dua-33-1-opendua-recording-000136",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-136.mp3",
+          "durationMs": 14415,
+          "byteSize": 145112,
+          "sha256": "f4a857bc183555253f5380111f7b5135ef136ab8105f7c864f5f93adf0f137ea",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-04": {
+      "friday-dua-04-1": [
+        {
+          "id": "friday-dua-04-1-opendua-recording-000225",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-235.mp3",
+          "durationMs": 14340,
+          "byteSize": 144392,
+          "sha256": "a96c2d139f9dd41d22a3bab43dee9815045c4d2658a7e6224c463b164bd4cb81",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-20": {
+      "friday-dua-20-1": [
+        {
+          "id": "friday-dua-20-1-opendua-recording-000125",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-124.mp3",
+          "durationMs": 13898,
+          "byteSize": 140072,
+          "sha256": "e5d5239e0e269750fd46b4cd7c3a66e0860fe4fbf31a8129009c739493a99135",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-03": {
+      "friday-dua-03-1": [
+        {
+          "id": "friday-dua-03-1-opendua-recording-000055",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-057.mp3",
+          "durationMs": 23359,
+          "byteSize": 234632,
+          "sha256": "d984b1a8ce123208402dc02f24b8f22c4bf71dbe7f1085d9f29f391057fbbf62",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "friday-dua-12": {
+      "friday-dua-12-1": [
+        {
+          "id": "friday-dua-12-1-opendua-recording-000124",
+          "voiceId": "opendua-muhammad-jumah",
+          "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-123.mp3",
+          "durationMs": 19838,
+          "byteSize": 199352,
+          "sha256": "17d506b7c6e46a7a781f6fe8fdeeeebf6d3ce1171e4091ab46095fce2f880743",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "quran-002": {
+      "quran-002-complete": [
+        {
+          "id": "quran-002-mp3quran-al-minshawi-5587a9c67978",
+          "voiceId": "mp3quran-al-minshawi",
+          "relativePath": "quran/mp3quran/112/r1/002.mp3",
+          "durationMs": 8216563,
+          "byteSize": 131473974,
+          "sha256": "5587a9c679781aac634409cf36af2925957ce459087c052ae69ec1fba53afbdb",
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "quran-002-mp3quran-al-hussary-49e6bc731092",
+          "voiceId": "mp3quran-al-hussary",
+          "relativePath": "quran/mp3quran/118/r1/002.mp3",
+          "durationMs": 11957350,
+          "byteSize": 191343486,
+          "sha256": "49e6bc7310928aa360addc5b7ad8a034c049ec1613ce6bf36a0bb0390581f9d3",
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "quran-002-mp3quran-yasser-al-dosari-d390ae18bf32",
+          "voiceId": "mp3quran-yasser-al-dosari",
+          "relativePath": "quran/mp3quran/92/r1/002.mp3",
+          "durationMs": 7247412,
+          "byteSize": 115965282,
+          "sha256": "d390ae18bf320e6073e4736a72e8dd4a24ea363a80ab4696281e2b990d2aeb25",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "quran-018": {
+      "quran-018-complete": [
+        {
+          "id": "quran-018-mp3quran-al-minshawi-906edf29272e",
+          "voiceId": "mp3quran-al-minshawi",
+          "relativePath": "quran/mp3quran/112/r1/018.mp3",
+          "durationMs": 2102343,
+          "byteSize": 33646454,
+          "sha256": "906edf29272ecc1e87a74e3496f48bc5cc344a04abd1dabc2eb94b37bce06009",
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "quran-018-mp3quran-al-hussary-a310366fb99a",
+          "voiceId": "mp3quran-al-hussary",
+          "relativePath": "quran/mp3quran/118/r1/018.mp3",
+          "durationMs": 2869350,
+          "byteSize": 45935480,
+          "sha256": "a310366fb99a45aeb4b371a893ee1bf3af5b3cbf43ea1ff4fe8fbd2c27a664a4",
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "quran-018-mp3quran-yasser-al-dosari-1da146d6f2ab",
+          "voiceId": "mp3quran-yasser-al-dosari",
+          "relativePath": "quran/mp3quran/92/r1/018.mp3",
+          "durationMs": 1743517,
+          "byteSize": 27902951,
+          "sha256": "1da146d6f2abbdfc8dcadc0404ad66aa217da41c127b93c6b9f7687526105b92",
+          "reviewStatus": "approved"
+        }
+      ]
+    },
+    "s-hm-110a": {
+      "s-hm-110a-1": [
+        {
+          "id": "s-hm-110a-mp3quran-al-minshawi-990eb9d15753",
+          "voiceId": "mp3quran-al-minshawi",
+          "relativePath": "quran/mp3quran/112/r1/032.mp3",
+          "durationMs": 448243,
+          "byteSize": 7180865,
+          "sha256": "990eb9d15753a70e380f44c3561d777440d400e844ca273cae6ff1749c818177",
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "s-hm-110a-mp3quran-al-hussary-9b8e4c8776ba",
+          "voiceId": "mp3quran-al-hussary",
+          "relativePath": "quran/mp3quran/118/r1/032.mp3",
+          "durationMs": 826810,
+          "byteSize": 13254837,
+          "sha256": "9b8e4c8776ba7f947e10b4e128217347b6c5adbc869924778015bc401acc6151",
+          "reviewStatus": "approved"
+        },
+        {
+          "id": "s-hm-110a-mp3quran-yasser-al-dosari-43373a3f1448",
+          "voiceId": "mp3quran-yasser-al-dosari",
+          "relativePath": "quran/mp3quran/92/r1/032.mp3",
+          "durationMs": 494707,
+          "byteSize": 7921996,
+          "sha256": "43373a3f14481b1216c53ec2f0eeedac3a3f1c1427939fd427a73ed92d482385",
+          "reviewStatus": "approved"
+        }
+      ]
+    }
+  },
+  "assets": {
+    "opendua-home-hm-15": {
+      "id": "opendua-home-hm-15",
+      "titleArabic": "بِسْمِ اللَّهِ",
+      "titleEnglish": "In the Name of Allah, I have placed my trust in Allah, there is no might and no power except by Allah",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ.",
+      "normalizedTextHash": "arabic-v1-e680ec0c8ddb7b8e",
+      "segments": [
+        {
+          "id": "opendua-home-hm-15-1",
+          "order": 1,
+          "transcriptArabic": "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ.",
+          "normalizedTranscriptHash": "arabic-v1-e680ec0c8ddb7b8e",
+          "variants": [
+            {
+              "id": "opendua-home-hm-15-recording-000016",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-016.mp3",
+              "durationMs": 13605,
+              "byteSize": 136952,
+              "sha256": "509d426c9cbd355e29943ee6f20fbb9b9aee422f412e8b673439c1db51d21eca",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-home-hm-18": {
+      "id": "opendua-home-hm-18",
+      "titleArabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أَضِلَّ أَوْ أُضَلَّ",
+      "titleEnglish": "O Allah, I seek refuge in You lest I should stray or be led astray, or stumble or be made to stumble, or oppress or be oppressed, or behave ignorantly or be treated with ignorance",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أَضِلَّ أَوْ أُضَلَّ، أَوْ أَزِلَّ أَوْ أُزَلَّ، أَوْ أَظْلِمَ أَوْ أُظْلَمَ، أَوْ أَجْهَلَ أَوْ يُجْهَلَ عَلَيَّ.",
+      "normalizedTextHash": "arabic-v1-a5838511b37b25aa",
+      "segments": [
+        {
+          "id": "opendua-home-hm-18-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أَضِلَّ أَوْ أُضَلَّ، أَوْ أَزِلَّ أَوْ أُزَلَّ، أَوْ أَظْلِمَ أَوْ أُظْلَمَ، أَوْ أَجْهَلَ أَوْ يُجْهَلَ عَلَيَّ.",
+          "normalizedTranscriptHash": "arabic-v1-a5838511b37b25aa",
+          "variants": [
+            {
+              "id": "opendua-home-hm-18-recording-000017",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-017.mp3",
+              "durationMs": 18170,
+              "byteSize": 182792,
+              "sha256": "08d0d9120a9c11b6e2d8483dbb5797e3488c73f9ff8a1d7ee9966c4932c5bce9",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-opening-praise": {
+      "id": "opendua-in-prayer-opening-praise",
+      "titleArabic": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ",
+      "titleEnglish": "Glory and praise be to You, O Allah",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ",
+      "normalizedTextHash": "arabic-v1-1371c2618cb87b77",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-opening-praise-1",
+          "order": 1,
+          "transcriptArabic": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ",
+          "normalizedTranscriptHash": "arabic-v1-1371c2618cb87b77",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-opening-praise-recording-000026",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-028.mp3",
+              "durationMs": 16020,
+              "byteSize": 161192,
+              "sha256": "982af3b30889296f32cc3e7627422fa340512334ca0aa07b969f6d19b4a9a158",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-ruku-tasbih": {
+      "id": "opendua-in-prayer-ruku-tasbih",
+      "titleArabic": "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+      "titleEnglish": "Glory be to my Lord, the Magnificent",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+      "normalizedTextHash": "arabic-v1-dede01654fc54930",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-ruku-tasbih-1",
+          "order": 1,
+          "transcriptArabic": "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+          "normalizedTranscriptHash": "arabic-v1-dede01654fc54930",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-ruku-tasbih-recording-000031",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-033.mp3",
+              "durationMs": 3807,
+              "byteSize": 39032,
+              "sha256": "70e8490b837dc86ec1b36642dd8f4b57a9b611c71cf05e1b81742ad8879bc1b5",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-ruku-sujud-forgiveness": {
+      "id": "opendua-in-prayer-ruku-sujud-forgiveness",
+      "titleArabic": "سُبْحَانَكَ اللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ",
+      "titleEnglish": "Glory and praise be to You, O Allah our Lord",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سُبْحَانَكَ اللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، اللَّهُمَّ اغْفِرْ لِي",
+      "normalizedTextHash": "arabic-v1-f48a9bdef64244f0",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-ruku-sujud-forgiveness-1",
+          "order": 1,
+          "transcriptArabic": "سُبْحَانَكَ اللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، اللَّهُمَّ اغْفِرْ لِي",
+          "normalizedTranscriptHash": "arabic-v1-f48a9bdef64244f0",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-ruku-sujud-forgiveness-recording-000032",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-034.mp3",
+              "durationMs": 10305,
+              "byteSize": 104072,
+              "sha256": "b132c6f690bac402d6d0d57d03dc2c71a484b429dfa6af3a24e1b0abf32a874a",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-ruku-sujud-holy": {
+      "id": "opendua-in-prayer-ruku-sujud-holy",
+      "titleArabic": "سُبُّوحٌ قُدُّوسٌ",
+      "titleEnglish": "All-Glorious, All-Holy, Lord of the angels and the Spirit",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سُبُّوحٌ قُدُّوسٌ، رَبُّ الْمَلَائِكَةِ وَالرُّوحِ",
+      "normalizedTextHash": "arabic-v1-9a979e61cb9a42c2",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-ruku-sujud-holy-1",
+          "order": 1,
+          "transcriptArabic": "سُبُّوحٌ قُدُّوسٌ، رَبُّ الْمَلَائِكَةِ وَالرُّوحِ",
+          "normalizedTranscriptHash": "arabic-v1-9a979e61cb9a42c2",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-ruku-sujud-holy-recording-000033",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-035.mp3",
+              "durationMs": 7442,
+              "byteSize": 75512,
+              "sha256": "16e4ebaa7ab9722ab7f23cd8ec7c1f715e93c4f4edee587d27610483deba1b5d",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-ruku-sujud-majesty": {
+      "id": "opendua-in-prayer-ruku-sujud-majesty",
+      "titleArabic": "سُبْحَانَ ذِي الْجَبَرُوتِ وَالْمَلَكُوتِ وَالْكِبْرِيَاءِ وَالْعَظَمَةِ",
+      "titleEnglish": "Glory be to the Possessor of absolute power, the dominion, grandeur, and supreme majesty",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سُبْحَانَ ذِي الْجَبَرُوتِ وَالْمَلَكُوتِ وَالْكِبْرِيَاءِ وَالْعَظَمَةِ",
+      "normalizedTextHash": "arabic-v1-e86912249627c740",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-ruku-sujud-majesty-1",
+          "order": 1,
+          "transcriptArabic": "سُبْحَانَ ذِي الْجَبَرُوتِ وَالْمَلَكُوتِ وَالْكِبْرِيَاءِ وَالْعَظَمَةِ",
+          "normalizedTranscriptHash": "arabic-v1-e86912249627c740",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-ruku-sujud-majesty-recording-000035",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-037.mp3",
+              "durationMs": 14028,
+              "byteSize": 141272,
+              "sha256": "6c938682cae82653fd07a861f9ff3dc75a9bae7f14b0ddd6eeb04df1211033e6",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-rising-abundant-praise": {
+      "id": "opendua-in-prayer-rising-abundant-praise",
+      "titleArabic": "رَبَّنَا وَلَكَ الْحَمْدُ",
+      "titleEnglish": "Our Lord, all praise is Yours—abundant, good, and blessed praise",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "رَبَّنَا وَلَكَ الْحَمْدُ، حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ",
+      "normalizedTextHash": "arabic-v1-ef454bd77ad64ea3",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-rising-abundant-praise-1",
+          "order": 1,
+          "transcriptArabic": "رَبَّنَا وَلَكَ الْحَمْدُ، حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ",
+          "normalizedTranscriptHash": "arabic-v1-ef454bd77ad64ea3",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-rising-abundant-praise-recording-000037",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-039.mp3",
+              "durationMs": 11322,
+              "byteSize": 114152,
+              "sha256": "6b3886ec724032276a6ff25cdbb8beaed54fbf0b7bc336e029b592afe303ec51",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-sujud-tasbih": {
+      "id": "opendua-in-prayer-sujud-tasbih",
+      "titleArabic": "سُبْحَانَ رَبِّيَ الْأَعْلَى",
+      "titleEnglish": "Glory be to my Lord, the Most High",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سُبْحَانَ رَبِّيَ الْأَعْلَى",
+      "normalizedTextHash": "arabic-v1-627e18a4fd6e6a4b",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-sujud-tasbih-1",
+          "order": 1,
+          "transcriptArabic": "سُبْحَانَ رَبِّيَ الْأَعْلَى",
+          "normalizedTranscriptHash": "arabic-v1-627e18a4fd6e6a4b",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-sujud-tasbih-recording-000039",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-041.mp3",
+              "durationMs": 3638,
+              "byteSize": 37352,
+              "sha256": "9fa9c9aaf60bd583b45e72c074390b406243ee6c8c88de6b22936772bbe96ada",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-sujud-submission": {
+      "id": "opendua-in-prayer-sujud-submission",
+      "titleArabic": "اللَّهُمَّ لَكَ سَجَدْتُ",
+      "titleEnglish": "O Allah, unto You I prostrate, in You I believe, and to You I surrender",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ لَكَ سَجَدْتُ، وَبِكَ آمَنْتُ، وَلَكَ أَسْلَمْتُ، سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ وَصَوَّرَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ، تَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ",
+      "normalizedTextHash": "arabic-v1-bfde8c686ed0e1e7",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-sujud-submission-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ لَكَ سَجَدْتُ، وَبِكَ آمَنْتُ، وَلَكَ أَسْلَمْتُ، سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ وَصَوَّرَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ، تَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ",
+          "normalizedTranscriptHash": "arabic-v1-bfde8c686ed0e1e7",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-sujud-submission-recording-000042",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-044.mp3",
+              "durationMs": 29207,
+              "byteSize": 292952,
+              "sha256": "65254151ee96f53e2a3ba8f686d13007519704f6a597330e6cc54995d9a0dfe6",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-sujud-tilawah": {
+      "id": "opendua-in-prayer-sujud-tilawah",
+      "titleArabic": "سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ",
+      "titleEnglish": "My face has prostrated to the One Who created it and brought forth its hearing and sight by His might and power",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ، بِحَوْلِهِ وَقُوَّتِهِ، فَتَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ",
+      "normalizedTextHash": "arabic-v1-fcfd5b97ed9539dc",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-sujud-tilawah-1",
+          "order": 1,
+          "transcriptArabic": "سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ، بِحَوْلِهِ وَقُوَّتِهِ، فَتَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ",
+          "normalizedTranscriptHash": "arabic-v1-fcfd5b97ed9539dc",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-sujud-tilawah-recording-000048",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-050.mp3",
+              "durationMs": 25229,
+              "byteSize": 253352,
+              "sha256": "b5e288acf2f076ac22201171399f936bd5bd64d158c45bdf644e606a9df274cc",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-between-prostrations-brief": {
+      "id": "opendua-in-prayer-between-prostrations-brief",
+      "titleArabic": "رَبِّ اغْفِرْ لِي",
+      "titleEnglish": "My Lord, forgive me",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي",
+      "normalizedTextHash": "arabic-v1-75593275da047c57",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-between-prostrations-brief-1",
+          "order": 1,
+          "transcriptArabic": "رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي",
+          "normalizedTranscriptHash": "arabic-v1-75593275da047c57",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-between-prostrations-brief-recording-000046",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-048.mp3",
+              "durationMs": 3694,
+              "byteSize": 37832,
+              "sha256": "509369ed6ee327d7c9d101cd59440e7aa54dd7ff980353b488c0f0e30e6471fc",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-tashahhud": {
+      "id": "opendua-in-prayer-tashahhud",
+      "titleArabic": "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ",
+      "titleEnglish": "All greetings, prayers, and pure words are for Allah",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+      "normalizedTextHash": "arabic-v1-a138a8dde677d4b0",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-tashahhud-1",
+          "order": 1,
+          "transcriptArabic": "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+          "normalizedTranscriptHash": "arabic-v1-a138a8dde677d4b0",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-tashahhud-recording-000050",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-052.mp3",
+              "durationMs": 43085,
+              "byteSize": 431912,
+              "sha256": "6d3209b86fe61e14c0d53c456bc89dfae78500959a7aa3463584a539455645eb",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-in-prayer-before-salam-forgiveness": {
+      "id": "opendua-in-prayer-before-salam-forgiveness",
+      "titleArabic": "اللَّهُمَّ اغْفِرْ لِي مَا قَدَّمْتُ وَمَا أَخَّرْتُ",
+      "titleEnglish": "O Allah, forgive me what I have sent forward and what I have held back, what I have concealed and what I have made public, where I have exceeded, and what You know better than I",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ اغْفِرْ لِي مَا قَدَّمْتُ وَمَا أَخَّرْتُ، وَمَا أَسْرَرْتُ وَمَا أَعْلَنْتُ، وَمَا أَسْرَفْتُ، وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّي، أَنْتَ الْمُقَدِّمُ وَأَنْتَ الْمُؤَخِّرُ، لَا إِلَهَ إِلَّا أَنْتَ",
+      "normalizedTextHash": "arabic-v1-538aa2380da7c77e",
+      "segments": [
+        {
+          "id": "opendua-in-prayer-before-salam-forgiveness-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ اغْفِرْ لِي مَا قَدَّمْتُ وَمَا أَخَّرْتُ، وَمَا أَسْرَرْتُ وَمَا أَعْلَنْتُ، وَمَا أَسْرَفْتُ، وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّي، أَنْتَ الْمُقَدِّمُ وَأَنْتَ الْمُؤَخِّرُ، لَا إِلَهَ إِلَّا أَنْتَ",
+          "normalizedTranscriptHash": "arabic-v1-538aa2380da7c77e",
+          "variants": [
+            {
+              "id": "opendua-in-prayer-before-salam-forgiveness-recording-000056",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-058.mp3",
+              "durationMs": 28641,
+              "byteSize": 287432,
+              "sha256": "31cb991ed277e2091d06af305db53b420d8e85e66fcdc166d479893e26f310b2",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-fasting-iftar-supplication": {
+      "id": "opendua-fasting-iftar-supplication",
+      "titleArabic": "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
+      "titleEnglish": "The thirst has gone, the veins are moistened, and the reward is assured, if Allah wills",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
+      "normalizedTextHash": "arabic-v1-ece91111c57e3ea4",
+      "segments": [
+        {
+          "id": "opendua-fasting-iftar-supplication-1",
+          "order": 1,
+          "transcriptArabic": "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
+          "normalizedTranscriptHash": "arabic-v1-ece91111c57e3ea4",
+          "variants": [
+            {
+              "id": "opendua-fasting-iftar-supplication-recording-000174",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-176.mp3",
+              "durationMs": 13759,
+              "byteSize": 138632,
+              "sha256": "727f772c89d1b4d741a04ebfc2cc9a625de8fae4d03cffdcd04753c1055021a6",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-fasting-iftar-host": {
+      "id": "opendua-fasting-iftar-host",
+      "titleArabic": "أَفطَرَ عِندَكُمُ الصَّائِمُونَ وَأَكَلَ طَعَامَكُمُ الأَبرَارُ وَصَلَّت عَلَيكُمُ المَلَائِكَةُ",
+      "titleEnglish": "May the fasting break their fast with you, may the righteous eat your food, and may the angels send blessings upon you",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "أَفطَرَ عِندَكُمُ الصَّائِمُونَ وَأَكَلَ طَعَامَكُمُ الأَبرَارُ وَصَلَّت عَلَيكُمُ المَلَائِكَةُ",
+      "normalizedTextHash": "arabic-v1-37974e8f481804e9",
+      "segments": [
+        {
+          "id": "opendua-fasting-iftar-host-1",
+          "order": 1,
+          "transcriptArabic": "أَفطَرَ عِندَكُمُ الصَّائِمُونَ وَأَكَلَ طَعَامَكُمُ الأَبرَارُ وَصَلَّت عَلَيكُمُ المَلَائِكَةُ",
+          "normalizedTranscriptHash": "arabic-v1-37974e8f481804e9",
+          "variants": [
+            {
+              "id": "opendua-fasting-iftar-host-recording-000184",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-184.mp3",
+              "durationMs": 18549,
+              "byteSize": 186392,
+              "sha256": "cafe7516692652c320e7017ea31e00fd59915476eb90075fc5396ce6f9530560",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-fd-ref-5": {
+      "id": "opendua-fd-ref-5",
+      "titleArabic": "اللَّهُمَّ بَارِك لَنَا فِيهِ وَأَطعِمنَا خَيرًا مِنهُ",
+      "titleEnglish": "O Allah, bless it for us and feed us something better than it",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ بَارِك لَنَا فِيهِ وَأَطعِمنَا خَيرًا مِنهُ",
+      "normalizedTextHash": "arabic-v1-903cc7afe0cad4d9",
+      "segments": [
+        {
+          "id": "opendua-fd-ref-5-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ بَارِك لَنَا فِيهِ وَأَطعِمنَا خَيرًا مِنهُ",
+          "normalizedTranscriptHash": "arabic-v1-903cc7afe0cad4d9",
+          "variants": [
+            {
+              "id": "opendua-fd-ref-5-recording-000178",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-179-1.mp3",
+              "durationMs": 10315,
+              "byteSize": 104074,
+              "sha256": "26c96b055e3300b06610f8690ab108d02714250f89fefb4b5246b976c2eea8e6",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-fd-ref-6": {
+      "id": "opendua-fd-ref-6",
+      "titleArabic": "اللَّهُمَّ أَطعِم مَن أَطعَمَنِي وَاسقِ مَن سَقَانِي",
+      "titleEnglish": "O Allah, feed the one who fed me and give drink to the one who gave me drink",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ أَطعِم مَن أَطعَمَنِي وَاسقِ مَن سَقَانِي",
+      "normalizedTextHash": "arabic-v1-33d8e835a19ff42a",
+      "segments": [
+        {
+          "id": "opendua-fd-ref-6-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ أَطعِم مَن أَطعَمَنِي وَاسقِ مَن سَقَانِي",
+          "normalizedTranscriptHash": "arabic-v1-33d8e835a19ff42a",
+          "variants": [
+            {
+              "id": "opendua-fd-ref-6-recording-000183",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-183.mp3",
+              "durationMs": 10574,
+              "byteSize": 106712,
+              "sha256": "acc06b9e7810ca41b1f905f575567f4749c38dcd353ff26a632f41dd1e4cbc9a",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-fd-ref-8": {
+      "id": "opendua-fd-ref-8",
+      "titleArabic": "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+      "titleEnglish": "O Allah, bless it for us and increase it for us",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+      "normalizedTextHash": "arabic-v1-4749179a9f836d84",
+      "segments": [
+        {
+          "id": "opendua-fd-ref-8-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+          "normalizedTranscriptHash": "arabic-v1-4749179a9f836d84",
+          "variants": [
+            {
+              "id": "opendua-fd-ref-8-recording-000179",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-179-2.mp3",
+              "durationMs": 8272,
+              "byteSize": 83674,
+              "sha256": "28461ff74557c11077067c1bfcd4d6b6c2ed4ca78e181be491d5158f6d9c376a",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-tr-ref-3": {
+      "id": "opendua-tr-ref-3",
+      "titleArabic": "أَسْتَوْدِعُكُمُ اللَّهَ الَّذِي لَا تَضِيعُ وَدَائِعُهُ",
+      "titleEnglish": "I place you in the trust of Allah, whose trusts are never lost",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "أَسْتَوْدِعُكُمُ اللَّهَ الَّذِي لَا تَضِيعُ وَدَائِعُهُ",
+      "normalizedTextHash": "arabic-v1-5eae87ed925b30f4",
+      "segments": [
+        {
+          "id": "opendua-tr-ref-3-1",
+          "order": 1,
+          "transcriptArabic": "أَسْتَوْدِعُكُمُ اللَّهَ الَّذِي لَا تَضِيعُ وَدَائِعُهُ",
+          "normalizedTranscriptHash": "arabic-v1-5eae87ed925b30f4",
+          "variants": [
+            {
+              "id": "opendua-tr-ref-3-recording-000212",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-211.mp3",
+              "durationMs": 6656,
+              "byteSize": 67592,
+              "sha256": "69709bcc0f324989588a0e459672dffad5f704cef84e00a11f85e61d1f0da7bf",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-tr-ref-5": {
+      "id": "opendua-tr-ref-5",
+      "titleArabic": "أَسْتَوْدِعُ اللَّهَ دِينَكَ",
+      "titleEnglish": "I place in Allah's trust your religion, your commitments, and the conclusions of your deeds",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "أَسْتَوْدِعُ اللَّهَ دِينَكَ، وَأَمَانَتَكَ، وَخَوَاتِيمَ عَمَلِكَ",
+      "normalizedTextHash": "arabic-v1-a9631abc8d5a206c",
+      "segments": [
+        {
+          "id": "opendua-tr-ref-5-1",
+          "order": 1,
+          "transcriptArabic": "أَسْتَوْدِعُ اللَّهَ دِينَكَ، وَأَمَانَتَكَ، وَخَوَاتِيمَ عَمَلِكَ",
+          "normalizedTranscriptHash": "arabic-v1-a9631abc8d5a206c",
+          "variants": [
+            {
+              "id": "opendua-tr-ref-5-recording-000213",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-212.mp3",
+              "durationMs": 8649,
+              "byteSize": 87512,
+              "sha256": "13f48137dce501242e046582f78aabe93a9d01faaf7cc9f45637b87c513a1ac7",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-tr-ref-8": {
+      "id": "opendua-tr-ref-8",
+      "titleArabic": "سَمِعَ سَامِعٌ بِحَمْدِ اللَّهِ وَحُسْنِ بَلَائِهِ عَلَيْنَا",
+      "titleEnglish": "May a listener bear witness to our praise of Allah and His good favor upon us",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "سَمِعَ سَامِعٌ بِحَمْدِ اللَّهِ وَحُسْنِ بَلَائِهِ عَلَيْنَا، رَبَّنَا صَاحِبْنَا وَأَفْضِلْ عَلَيْنَا، عَائِذًا بِاللَّهِ مِنَ النَّارِ",
+      "normalizedTextHash": "arabic-v1-e3b7654b7b66d47e",
+      "segments": [
+        {
+          "id": "opendua-tr-ref-8-1",
+          "order": 1,
+          "transcriptArabic": "سَمِعَ سَامِعٌ بِحَمْدِ اللَّهِ وَحُسْنِ بَلَائِهِ عَلَيْنَا، رَبَّنَا صَاحِبْنَا وَأَفْضِلْ عَلَيْنَا، عَائِذًا بِاللَّهِ مِنَ النَّارِ",
+          "normalizedTranscriptHash": "arabic-v1-e3b7654b7b66d47e",
+          "variants": [
+            {
+              "id": "opendua-tr-ref-8-recording-000215",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-215.mp3",
+              "durationMs": 23405,
+              "byteSize": 235112,
+              "sha256": "735d849b9e8283c24a2645f3b72603e00c2c7a3253658c6a6d5295139b7da260",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-ir-ref-7": {
+      "id": "opendua-ir-ref-7",
+      "titleArabic": "لَا إِلَهَ إِلَّا اللَّهُ",
+      "titleEnglish": "There is no god but Allah",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "لَا إِلَهَ إِلَّا اللَّهُ",
+      "normalizedTextHash": "arabic-v1-427b7709d59c8b9a",
+      "segments": [
+        {
+          "id": "opendua-ir-ref-7-1",
+          "order": 1,
+          "transcriptArabic": "لَا إِلَهَ إِلَّا اللَّهُ",
+          "normalizedTranscriptHash": "arabic-v1-427b7709d59c8b9a",
+          "variants": [
+            {
+              "id": "opendua-ir-ref-7-recording-000149",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-153.mp3",
+              "durationMs": 5498,
+              "byteSize": 56072,
+              "sha256": "56c0da9868c2f5e88165169dab4cc4173604bdd7912ac80cebcb40fc4a5bc444",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-sc-ref-11": {
+      "id": "opendua-sc-ref-11",
+      "titleArabic": "بِسْمِ اللَّهِ",
+      "titleEnglish": "In the name of Allah",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "بِسْمِ اللَّهِ، اللَّهُمَّ جَنِّبْنَا الشَّيْطَانَ، وَجَنِّبِ الشَّيْطَانَ مَا رَزَقْتَنَا",
+      "normalizedTextHash": "arabic-v1-d44270796c8df625",
+      "segments": [
+        {
+          "id": "opendua-sc-ref-11-1",
+          "order": 1,
+          "transcriptArabic": "بِسْمِ اللَّهِ، اللَّهُمَّ جَنِّبْنَا الشَّيْطَانَ، وَجَنِّبِ الشَّيْطَانَ مَا رَزَقْتَنَا",
+          "normalizedTranscriptHash": "arabic-v1-d44270796c8df625",
+          "variants": [
+            {
+              "id": "opendua-sc-ref-11-recording-000193",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-192.mp3",
+              "durationMs": 15842,
+              "byteSize": 159512,
+              "sha256": "b80e10a5a14d9f9300b21965435173c2f571ee0afd08b7fb2f3f003af348d04e",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-sc-ref-13": {
+      "id": "opendua-sc-ref-13",
+      "titleArabic": "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ",
+      "titleEnglish": "All praise is for Allah who spared me from what He afflicted you with, and favored me over much of what He created",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ، وَفَضَّلَنِي عَلَى كَثِيرٍ مِمَّنْ خَلَقَ تَفْضِيلًا",
+      "normalizedTextHash": "arabic-v1-75fb59fa6b0677c0",
+      "segments": [
+        {
+          "id": "opendua-sc-ref-13-1",
+          "order": 1,
+          "transcriptArabic": "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ، وَفَضَّلَنِي عَلَى كَثِيرٍ مِمَّنْ خَلَقَ تَفْضِيلًا",
+          "normalizedTranscriptHash": "arabic-v1-75fb59fa6b0677c0",
+          "variants": [
+            {
+              "id": "opendua-sc-ref-13-recording-000195",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-194.mp3",
+              "durationMs": 16727,
+              "byteSize": 168152,
+              "sha256": "378fbe9c04aeb111f58587356bb4cac4bb715dfe977792e09cb137018009b92f",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-ne-ref-1": {
+      "id": "opendua-ne-ref-1",
+      "titleArabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا وَخَيْرَ مَا فِيهَا وَخَيْرَ مَا أُرْسِلَتْ بِهِ",
+      "titleEnglish": "O Allah, I ask You for its good, the good within it and the good it was sent with",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا وَخَيْرَ مَا فِيهَا وَخَيْرَ مَا أُرْسِلَتْ بِهِ، وَأَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ مَا فِيهَا وَشَرِّ مَا أُرْسِلَتْ بِهِ",
+      "normalizedTextHash": "arabic-v1-639fc36e716a82f1",
+      "segments": [
+        {
+          "id": "opendua-ne-ref-1-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا وَخَيْرَ مَا فِيهَا وَخَيْرَ مَا أُرْسِلَتْ بِهِ، وَأَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ مَا فِيهَا وَشَرِّ مَا أُرْسِلَتْ بِهِ",
+          "normalizedTranscriptHash": "arabic-v1-639fc36e716a82f1",
+          "variants": [
+            {
+              "id": "opendua-ne-ref-1-recording-000165",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-167.mp3",
+              "durationMs": 20989,
+              "byteSize": 210872,
+              "sha256": "dcbbb4a44739de9e49eb1ad5df58adcedb128365cc0dd914ab26061f714db957",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-ne-ref-7": {
+      "id": "opendua-ne-ref-7",
+      "titleArabic": "اللَّهُمَّ حَوَالَيْنَا وَلَا عَلَيْنَا",
+      "titleEnglish": "O Allah, around us and not upon us",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ حَوَالَيْنَا وَلَا عَلَيْنَا، اللَّهُمَّ عَلَى الْآكَامِ وَالظِّرَابِ، وَبُطُونِ الْأَوْدِيَةِ، وَمَنَابِتِ الشَّجَرِ",
+      "normalizedTextHash": "arabic-v1-774c187f2c24cdcb",
+      "segments": [
+        {
+          "id": "opendua-ne-ref-7-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ حَوَالَيْنَا وَلَا عَلَيْنَا، اللَّهُمَّ عَلَى الْآكَامِ وَالظِّرَابِ، وَبُطُونِ الْأَوْدِيَةِ، وَمَنَابِتِ الشَّجَرِ",
+          "normalizedTranscriptHash": "arabic-v1-774c187f2c24cdcb",
+          "variants": [
+            {
+              "id": "opendua-ne-ref-7-recording-000172",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-174.mp3",
+              "durationMs": 22619,
+              "byteSize": 227192,
+              "sha256": "5ba32c25aa8494015758fa761184371499ec2f17051b02e723ec74beb854416b",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-misc-ref-11": {
+      "id": "opendua-misc-ref-11",
+      "titleArabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+      "titleEnglish": "None has the right to be worshipped except Allah alone, without partner",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "normalizedTextHash": "arabic-v1-f3b20dba8577579d",
+      "segments": [
+        {
+          "id": "opendua-misc-ref-11-1",
+          "order": 1,
+          "transcriptArabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+          "normalizedTranscriptHash": "arabic-v1-f3b20dba8577579d",
+          "variants": [
+            {
+              "id": "opendua-misc-ref-11-recording-000210",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-209.mp3",
+              "durationMs": 30076,
+              "byteSize": 301832,
+              "sha256": "6c166934e5a89ea93a0c802e5b347ec7b5f80aa696d6e557545e33bcd3020b4f",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-misc-ref-12": {
+      "id": "opendua-misc-ref-12",
+      "titleArabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ",
+      "titleEnglish": "O Allah, I seek refuge in You from knowingly associating any partner with You, and I ask Your forgiveness for that which I do not know",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ",
+      "normalizedTextHash": "arabic-v1-fdd1218829091cbd",
+      "segments": [
+        {
+          "id": "opendua-misc-ref-12-1",
+          "order": 1,
+          "transcriptArabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ",
+          "normalizedTranscriptHash": "arabic-v1-fdd1218829091cbd",
+          "variants": [
+            {
+              "id": "opendua-misc-ref-12-recording-000203",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-203.mp3",
+              "durationMs": 15257,
+              "byteSize": 153512,
+              "sha256": "6307fb6a6032b034b216b2d6035da54c7b564161568ef0e2023c86a7b27e0e18",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    },
+    "opendua-misc-ref-14": {
+      "id": "opendua-misc-ref-14",
+      "titleArabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      "titleEnglish": "I seek refuge in Allah from Satan the accursed",
+      "contentKind": "dua",
+      "kind": "single",
+      "canonicalArabicText": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      "normalizedTextHash": "arabic-v1-bb1603a20473d534",
+      "segments": [
+        {
+          "id": "opendua-misc-ref-14-1",
+          "order": 1,
+          "transcriptArabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+          "normalizedTranscriptHash": "arabic-v1-bb1603a20473d534",
+          "variants": [
+            {
+              "id": "opendua-misc-ref-14-recording-000138",
+              "voiceId": "opendua-muhammad-jumah",
+              "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-138.mp3",
+              "durationMs": 5472,
+              "byteSize": 55592,
+              "sha256": "98fc6347d9d25f2b095cfb006eb6ead5f237301da560dd1e31bddd613766be4b",
+              "reviewStatus": "approved"
+            }
+          ]
+        }
+      ],
+      "defaultVoiceId": "opendua-muhammad-jumah",
+      "reviewStatus": "approved",
+      "version": 1
+    }
+  }
+}

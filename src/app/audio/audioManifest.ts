@@ -1,11 +1,14 @@
 import { APPROVED_AUDIO_ASSIGNMENTS } from "./audioAssignments";
 import { CORE_AUDIO_ASSETS } from "./audioAssetsCore";
 import { DUA_AUDIO_ASSETS } from "./audioAssetsDuas";
+import additional from "./additionalAudio.data.json" with { type: "json" };
+import { expandLibraryAsset, expandLibraryVariant } from "./libraryVerification";
+import type { LibraryAsset, LibraryVariant } from "./libraryVerification";
 import type { AudioCatalog, AudioAsset, AudioSourceRecord } from "./audioTypes";
 import { validateAudioCatalog } from "./validateAudioCatalog";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
 
-export const AUDIO_MANIFEST_VERSION = 9;
+export const AUDIO_MANIFEST_VERSION = 10;
 
 export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object.freeze({
   mp3quran: {
@@ -13,12 +16,12 @@ export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object
     name: "MP3Quran",
     nameArabic: "MP3Quran",
     attribution:
-      "Al-Mulk recitations by Muhammad Siddiq Al-Minshawi, Mahmoud Khalil Al-Hussary and Yasser Al-Dosari, via MP3Quran.",
-    attributionArabic: "تلاوات سورة الملك لمحمد صديق المنشاوي ومحمود خليل الحصري وياسر الدوسري، من MP3Quran.",
+      "Quran recitations by Muhammad Siddiq Al-Minshawi, Mahmoud Khalil Al-Hussary and Yasser Al-Dosari, via MP3Quran.",
+    attributionArabic: "تلاوات القرآن لمحمد صديق المنشاوي ومحمود خليل الحصري وياسر الدوسري، من MP3Quran.",
     licenseName: "MP3Quran developer copying permission",
     licenseEvidence: "https://www.mp3quran.net/eng/privacy",
     notes:
-      "Original complete Al-Mulk files and provider permission snapshot are checksum-pinned in docs/audio/quran-reciter-pilot/manifest.json. Owner accepted all three local comparison recordings on 2026-11-26. Current defaults and timings are unchanged.",
+      "Original Al-Mulk listening acceptance remains pinned. The owner subsequently authorized expanded automatically verified source recordings without a human review gate; see docs/audio/expanded-library/evidence.json. Current defaults and reviewed timings are preserved.",
   },
   "opendua-muhammad-jumah": {
     id: "opendua-muhammad-jumah",
@@ -29,7 +32,7 @@ export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object
     licenseName: "CC BY 4.0",
     licenseEvidence: "https://opendua.org/licence/audio",
     notes:
-      "Three pinned v0.0.2 recordings accepted after owner listening on 2026-11-26; see docs/audio/opendua-pilot/activation.json. Optional voice only; existing defaults are unchanged.",
+      "Three pilot files retain owner listening acceptance. Additional v0.0.2 recordings use exact source-transcript/byte/decode verification under the owner's 2026-11-26 authority; human listening is deferred. See docs/audio/expanded-library/evidence.json. Existing defaults are preserved.",
   },
   "internal-upload": {
     id: "internal-upload",
@@ -61,8 +64,29 @@ export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object
 });
 
 export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze({
-  ...CORE_AUDIO_ASSETS,
-  ...DUA_AUDIO_ASSETS,
+  ...Object.fromEntries(
+    Object.entries({ ...CORE_AUDIO_ASSETS, ...DUA_AUDIO_ASSETS }).map(([id, asset]) => [
+      id,
+      {
+        ...asset,
+        segments: asset.segments.map((segment) => ({
+          ...segment,
+          variants: [
+            ...segment.variants,
+            ...((additional.additions as Record<string, Record<string, LibraryVariant[]>>)[id]?.[segment.id] ?? []).map(
+              expandLibraryVariant,
+            ),
+          ],
+        })),
+      },
+    ]),
+  ),
+  ...Object.fromEntries(
+    Object.entries(additional.assets as Record<string, LibraryAsset>).map(([id, asset]) => [
+      id,
+      expandLibraryAsset(asset),
+    ]),
+  ),
 });
 export const AUDIO_CATALOG: AudioCatalog = Object.freeze({
   version: AUDIO_MANIFEST_VERSION,

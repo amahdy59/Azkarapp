@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowPrevious, BookOpen } from "../components/icons";
+import { ArrowPrevious, BookOpen, Download } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -8,11 +8,11 @@ import { LearningLanguageChoices } from "../components/LearningLanguageChoices";
 import { learningCatalogue, learningEditions, learningDescription, learningEditionNotice } from "../learning/catalogue";
 import { updateLearningState } from "../learning/learningState";
 import { cancelLearningDownload, startLearningDownload } from "../learning/learningDownloads";
-import { useLearningOffline, useLearningState } from "../hooks/useLearningLibrary";
+import { useLearningOffline, useLearningPdf, useLearningState } from "../hooks/useLearningLibrary";
 import { learningT } from "../i18n/learning";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import type { LearningResourceId } from "../learning/types";
+import type { LearningResource, LearningResourceId } from "../learning/types";
 import { learningEditionId, type LearningLanguage } from "../learning/types";
 import "./learn.css";
 
@@ -124,6 +124,7 @@ export function LearnScreen({
                   <BookOpen aria-hidden="true" />
                   {learningT(language, state[learningEditionId(resource)]?.position ? "continue" : "read")}
                 </Button>
+                <BookPdfDownload language={language} resource={resource} />
                 <LearningOfflineActions
                   language={language}
                   resourceId={learningEditionId(resource)}
@@ -142,5 +143,30 @@ export function LearnScreen({
         </section>
       </div>
     </ScreenContainer>
+  );
+}
+
+function BookPdfDownload({ language, resource }: { language: AppLanguage; resource: LearningResource }) {
+  const pdf = useLearningPdf(resource);
+  return (
+    <div className="space-y-2">
+      <Button
+        variant="outline"
+        className="w-full"
+        disabled={pdf.phase === "busy"}
+        aria-describedby={`title-${resource.id}`}
+        onClick={() => void pdf.download()}
+      >
+        <Download aria-hidden="true" />
+        {learningT(language, pdf.phase === "busy" ? "pdfBusy" : "pdf")}
+      </Button>
+      <p role={pdf.phase === "failed" ? "alert" : "status"} className="text-sm text-muted-foreground">
+        {pdf.phase === "failed"
+          ? learningT(language, "pdfFailed")
+          : pdf.phase === "saved"
+            ? learningT(language, "pdfSaved")
+            : ""}
+      </p>
+    </div>
   );
 }

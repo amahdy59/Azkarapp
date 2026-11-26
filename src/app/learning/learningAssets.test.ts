@@ -52,8 +52,13 @@ describe("verified learning downloads", () => {
   it("rejects a withheld production edition before loading or saving any asset", async () => {
     vi.stubEnv("DEV", false);
     vi.stubGlobal("__LEARNING_REVIEW__", false);
-    await expect(loadLearningPack(resource)).rejects.toThrow("unavailable");
-    await startLearningDownload(resource);
+    const unavailable = learningEditions("en").find((edition) => edition.language === "en") ?? {
+      ...resource,
+      id: "dalil-al-mutamir" as const,
+      language: "en" as const,
+    };
+    await expect(loadLearningPack(unavailable)).rejects.toThrow("unavailable");
+    await startLearningDownload(unavailable);
     expect(getLearningDownload()?.phase).toBe("failed");
     expect(network).not.toHaveBeenCalled();
     expect(stored.size).toBe(0);

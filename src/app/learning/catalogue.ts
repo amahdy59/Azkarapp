@@ -26,7 +26,9 @@ export function allLearningEditions(language: AppLanguage): LearningResource[] {
 
 export function learningEditions(language: AppLanguage): LearningResource[] {
   const review = import.meta.env.DEV || (typeof __LEARNING_REVIEW__ !== "undefined" && __LEARNING_REVIEW__);
-  return allLearningEditions(language).filter((item) => !item.status || review);
+  // Owner enabled the three Arabic adaptations for subsequent review. Keep
+  // their honest source notices; unfinished English publication stays gated.
+  return allLearningEditions(language).filter((item) => item.language === "ar" || !item.status || review);
 }
 
 export function isLearningResourceAvailable(resource: Pick<LearningResource, "id" | "language">) {

@@ -56,6 +56,12 @@ const approvedVariants = Object.values(manifest.AUDIO_CATALOG.assets)
   .flatMap((asset) =>
     asset.segments.flatMap((segment) => segment.variants.filter((variant) => variant.reviewStatus === "approved")),
   );
+// Main Mushaf recordings are loaded only on a listening request, preserving
+// the startup/content graph. Their separate pinned registry has the same live
+// availability gate as ordinary collection recordings.
+const mushafRecords = JSON.parse(fs.readFileSync(path.join(root, "src/app/audio/mushafAudio.data.json"), "utf8"));
+const { expandLibraryVariant } = loadTypeScriptModule("src/app/audio/libraryVerification.ts");
+approvedVariants.push(...mushafRecords.flatMap((record) => record.variants.map(expandLibraryVariant)));
 const baseUrl = (process.env.VITE_AUDIO_BASE_URL || "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev").replace(
   /\/+$/,
   "",

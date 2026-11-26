@@ -19,6 +19,7 @@ import { applyAppAppearance } from "./theme";
 import { scheduleStartupMaintenance } from "./startupMaintenance";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "./audio/audioAssignments";
 import { BAQARAH_METADATA } from "./content/baqarahMetadata";
+import { getSurahMeta, getSurahNumberForPage } from "./content/surahInfo";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkarCore";
 import { isPrayerName } from "./content/prayerTimes";
 import type {
@@ -443,6 +444,7 @@ function AppContent({
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [dailyHabits, setDailyHabits] = useState(initialState.dailyHabits ?? []);
   const [khatmahPage, setKhatmahPage] = useState(() => quranPage ?? initialState.khatmahPage ?? 1);
+  const [mushafSurahSelection, setMushafSurahSelection] = useState<{ page: number; surah: number } | null>(null);
 
   useEffect(() => {
     if (quranPage && quranPage !== khatmahPage) {
@@ -1643,13 +1645,47 @@ function AppContent({
   };
 
   const [queuedBaqarahContext, setQueuedBaqarahContext] = useState<string | null>(null);
-  const baqarahContext = JSON.stringify([view, selectedLang, khatmahPage]);
+  const [mushafAudioLoading, setMushafAudioLoading] = useState(false);
+  const [mushafAudioError, setMushafAudioError] = useState(false);
+  const mushafAudioRequest = useRef(0);
+  const mushafSurah =
+    mushafSurahSelection?.page === khatmahPage ? mushafSurahSelection.surah : getSurahNumberForPage(khatmahPage);
+  const baqarahContext = JSON.stringify([view, selectedLang, khatmahPage, mushafSurah]);
+  useEffect(() => {
+    mushafAudioRequest.current += 1;
+    setMushafAudioLoading(false);
+    setMushafAudioError(false);
+  }, [baqarahContext]);
   const queuedBaqarahAudio = queuedBaqarahContext !== null;
-  const baqarahOwnsAudio =
-    audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === BAQARAH_METADATA.id;
-  const baqarahAudioStatus = queuedBaqarahAudio ? "loading" : baqarahOwnsAudio ? audioController!.state.status : "idle";
+  const baqarahOwnsAudio = audioController?.currentEntry?.quranRange?.surah === mushafSurah;
+  const baqarahAudioStatus =
+    queuedBaqarahAudio || mushafAudioLoading
+      ? "loading"
+      : mushafAudioError
+        ? "error"
+        : baqarahOwnsAudio
+          ? audioController!.state.status
+          : "idle";
   const startBaqarahAudio = useCallback(() => {
     if (!audioController || !buildPlaybackPlan) return;
+    if (mushafSurah !== 2) {
+      const request = ++mushafAudioRequest.current;
+      setMushafAudioLoading(true);
+      setMushafAudioError(false);
+      void audioController
+        .buildMushafSurahPlan?.(mushafSurah)
+        .then((plan) => {
+          if (request === mushafAudioRequest.current) audioController.startPlan(plan);
+        })
+        .catch((error) => {
+          reportError(error, "mushaf-surah-audio");
+          if (request === mushafAudioRequest.current) setMushafAudioError(true);
+        })
+        .finally(() => {
+          if (request === mushafAudioRequest.current) setMushafAudioLoading(false);
+        });
+      return;
+    }
     const baqarahZikr = getAzkarForMode(BAQARAH_METADATA.category).find((item) => item.id === BAQARAH_METADATA.id);
     if (!baqarahZikr) return;
     const plan = buildPlaybackPlan({
@@ -1660,7 +1696,7 @@ function AppContent({
       audioLanguage: "ar",
     });
     audioController.startPlan(plan);
-  }, [audioController, buildPlaybackPlan]);
+  }, [audioController, buildPlaybackPlan, mushafSurah]);
   useEffect(() => {
     if (!queuedBaqarahAudio) return;
     if (view !== "khatmah" || queuedBaqarahContext !== baqarahContext) {
@@ -1683,6 +1719,7 @@ function AppContent({
     startBaqarahAudio,
   ]);
   const toggleBaqarahAudio = () => {
+    if (mushafAudioLoading) return;
     if (!audioController || !buildPlaybackPlan) {
       setQueuedBaqarahContext(baqarahContext);
       requestAudioModule();
@@ -1865,7 +1902,7 @@ function AppContent({
               {t(selectedLang, "audioPlayer.loading")}
             </p>
           )}
-          {(playAllAction.failed || audioModuleError) && (
+          {(playAllAction.failed || audioModuleError || mushafAudioError) && (
             <div className="sync-status" role="alert">
               <span>{t(selectedLang, "audioPlayer.moduleLoadError")}</span>
               <button
@@ -2752,10 +2789,15 @@ function AppContent({
                   direction={layoutDirection}
                   onBack={pop}
                   khatmahPage={khatmahPage}
+                  selectedSurah={mushafSurah}
+                  onSelectSurah={(surah) => {
+                    const metadata = getSurahMeta(surah);
+                    if (metadata) setMushafSurahSelection({ page: metadata.startPage, surah });
+                  }}
                   audioController={audioController}
                   textSize={textSize}
                   baqarahAudio={{
-                    available: Boolean(APPROVED_AUDIO_ASSIGNMENTS[BAQARAH_METADATA.id]),
+                    available: mushafSurah !== 2 || Boolean(APPROVED_AUDIO_ASSIGNMENTS[BAQARAH_METADATA.id]),
                     status: baqarahAudioStatus,
                     onToggle: toggleBaqarahAudio,
                   }}

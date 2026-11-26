@@ -489,7 +489,7 @@ export function FloatingAudioPlayer({
         id,
       disabled: false,
     })),
-  ];
+  ].filter((option) => !option.disabled);
 
   const liveMessage =
     state.status === "error"
@@ -1331,53 +1331,69 @@ export function FloatingAudioPlayer({
                           <div className="audio-options-section">
                             <div className={AUDIO_OPTION_GROUP}>
                               <div className="audio-option-field">
-                                <label htmlFor="audio-voice-field" className="text-sm font-semibold">
+                                <label
+                                  id="audio-voice-label"
+                                  htmlFor={reciterOptions.length > 1 ? "audio-voice-field" : undefined}
+                                  className="text-sm font-semibold"
+                                >
                                   {t(language, "audioPlayer.reciterShort")}
                                 </label>
-                                <Select
-                                  open={voiceMenuOpen}
-                                  onOpenChange={setVoiceMenuOpen}
-                                  value={displayedVoiceId}
-                                  onValueChange={controller.setVoice}
-                                  dir={language === "ar" ? "rtl" : "ltr"}
-                                >
-                                  <SelectTrigger
-                                    aria-label={t(language, "audioPlayer.voice")}
-                                    data-testid="audio-reciter-select"
+                                {reciterOptions.length > 1 ? (
+                                  <Select
+                                    open={voiceMenuOpen}
+                                    onOpenChange={setVoiceMenuOpen}
+                                    value={displayedVoiceId}
+                                    onValueChange={controller.setVoice}
+                                    dir={language === "ar" ? "rtl" : "ltr"}
+                                  >
+                                    <SelectTrigger
+                                      aria-label={t(language, "audioPlayer.voice")}
+                                      data-testid="audio-reciter-select"
+                                      id="audio-voice-field"
+                                      size="sm"
+                                      className="h-auto min-h-11 w-full min-w-0 shrink justify-between gap-2 rounded-xl border-border bg-card px-3 py-2 text-sm font-medium text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                                    >
+                                      <Headphones size={15} className="shrink-0 text-primary" aria-hidden="true" />
+                                      <SelectValue className="min-w-0 whitespace-normal text-start font-medium flex-1">
+                                        {reciterDisplayName}
+                                      </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent
+                                      data-audio-options-child=""
+                                      align="start"
+                                      className="audio-option-list z-[110] max-w-[calc(100vw-2rem)]"
+                                      onEscapeKeyDown={(event) => {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        setVoiceMenuOpen(false);
+                                      }}
+                                    >
+                                      <SelectGroup>
+                                        {reciterOptions.map((option) => (
+                                          <SelectItem
+                                            key={option.id}
+                                            value={option.id}
+                                            disabled={option.disabled}
+                                            tabIndex={option.id === displayedVoiceId ? 0 : -1}
+                                            aria-label={option.label}
+                                          >
+                                            {option.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectGroup>
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <div
                                     id="audio-voice-field"
-                                    size="sm"
-                                    className="h-11 w-full min-w-0 shrink justify-between gap-2 rounded-xl border-border bg-card px-3 py-1 text-sm font-medium text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                                    aria-labelledby="audio-voice-label"
+                                    data-testid="audio-reciter-current"
+                                    className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground"
                                   >
                                     <Headphones size={15} className="shrink-0 text-primary" aria-hidden="true" />
-                                    <SelectValue className="truncate text-start font-medium flex-1">
-                                      {reciterDisplayName}
-                                    </SelectValue>
-                                  </SelectTrigger>
-                                  <SelectContent
-                                    data-audio-options-child=""
-                                    align="center"
-                                    className="audio-option-list z-[110] min-w-[10rem] max-w-[min(18rem,calc(100vw-2rem))]"
-                                    onEscapeKeyDown={(event) => {
-                                      event.preventDefault();
-                                      event.stopPropagation();
-                                      setVoiceMenuOpen(false);
-                                    }}
-                                  >
-                                    <SelectGroup>
-                                      {reciterOptions.map((option) => (
-                                        <SelectItem
-                                          key={option.id}
-                                          value={option.id}
-                                          disabled={option.disabled}
-                                          tabIndex={option.id === displayedVoiceId ? 0 : -1}
-                                          aria-label={option.label}
-                                        >
-                                          {option.label}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectGroup>
-                                  </SelectContent>
-                                </Select>
+                                    <span className="min-w-0">{reciterDisplayName}</span>
+                                  </div>
+                                )}
                                 {language === "en" && (
                                   <span className="text-micro text-muted-foreground px-1">
                                     {t(
@@ -1407,7 +1423,9 @@ export function FloatingAudioPlayer({
                                       aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
                                       className={`audio-speed-select w-auto min-h-11 gap-2 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground shadow-2xs hover:bg-muted ${ACTION_FOCUS}`}
                                     >
-                                      <SelectValue />
+                                      <SelectValue>
+                                        <bdi dir="ltr">{formatNumerals(state.playbackRate, language)}×</bdi>
+                                      </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent
                                       data-audio-options-child=""
@@ -1432,7 +1450,13 @@ export function FloatingAudioPlayer({
                             </div>
                           </div>
                           {(currentEntry.contentKind === "quran" || englishFirst || listeningTiming) && (
-                            <div className="audio-options-section">
+                            <details className="audio-options-section audio-reading-options">
+                              <summary
+                                className={`flex min-h-11 cursor-pointer items-center justify-between gap-2 rounded-xl text-sm font-semibold ${ACTION_FOCUS}`}
+                              >
+                                {t(language, "mushaf.readingSettings")}
+                                <ChevronDown size={16} aria-hidden="true" />
+                              </summary>
                               {currentEntry.quranRange && currentEntry.mushafPages?.length ? (
                                 <div ref={setQuranPreferencesHost} className="audio-quran-preferences" />
                               ) : null}
@@ -1495,7 +1519,7 @@ export function FloatingAudioPlayer({
                                   </div>
                                 )}
                               </div>
-                            </div>
+                            </details>
                           )}
 
                           {controller.setSleepTimer && (

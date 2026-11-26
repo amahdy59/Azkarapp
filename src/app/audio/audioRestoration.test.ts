@@ -19,7 +19,7 @@ describe("owner-reviewed Arabic audio restoration", () => {
       expect(arabic.entries).toHaveLength(1);
       const entry = arabic.entries[0]!;
       expect(entry.availableVoiceIds).toEqual(
-        ["m-hm-91", "e-hm-91", "misc-ref-3"].includes(id)
+        ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96"].includes(id)
           ? ["abdullah-muhammad", "opendua-muhammad-jumah"]
           : ["abdullah-muhammad"],
       );

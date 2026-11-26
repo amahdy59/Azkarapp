@@ -12,7 +12,8 @@ const en = {
   arabicContent: "Arabic text",
   englishContent: "English text",
   reviewCopyShort: "Review copy · source verification pending",
-  reviewCopy: "Source verification is pending. This edition is available for local review only.",
+  reviewCopy:
+    "Source verification is pending. This adaptation is available for review; check it against the original source.",
   umrahScopeShort: "16-source-page adaptation · selected excerpts",
   umrahScope:
     "This adaptation covers 16 source pages of The Umrah Guide, not the complete original. Some remembrances are excerpted; an ellipsis marks omitted wording rather than a complete recitation.",
@@ -110,7 +111,7 @@ const ar: typeof en = {
   arabicContent: "نص عربي",
   englishContent: "نص إنجليزي",
   reviewCopyShort: "نسخة للمراجعة · التحقق من المصدر لم يكتمل",
-  reviewCopy: "لم يكتمل التحقق من المصدر. هذه النسخة متاحة للمراجعة المحلية فقط.",
+  reviewCopy: "لم يكتمل التحقق من المصدر. هذه النسخة المكيّفة متاحة للمراجعة؛ يُرجى مقابلتها بالمصدر الأصلي.",
   umrahScopeShort: "نسخة مختصرة من ١٦ صفحة مصدر · مقتطفات مختارة",
   umrahScope:
     "تغطي هذه النسخة المختصرة ١٦ صفحة مصدر من دليل المعتمر، وليست النسخة الأصلية الكاملة. بعض الأذكار مقتطفة؛ تشير علامة الحذف إلى كلام محذوف، ولا تمثّل النص الكامل للذكر.",

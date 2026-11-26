@@ -906,9 +906,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A5095",
       "count": 1,
-      "sha256": "dedf538a613128a127220ee843cca0c19185e0dbc7f353b6ce51677e6a8fb163",
+      "sha256": "5abb9b7422c393e3a7e0c63083d058528dd89ae56b00d373e2b48c2b793b98f0",
       "previousSha256": "dedf538a613128a127220ee843cca0c19185e0dbc7f353b6ce51677e6a8fb163",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "dedf538a613128a127220ee843cca0c19185e0dbc7f353b6ce51677e6a8fb163",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "home-hm-16",
@@ -941,9 +943,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A5094",
       "count": 1,
-      "sha256": "66da29bf6de1c6074e2bae4c74a5d5546f4064141a7937963e6f10f442b11d12",
+      "sha256": "ab038104c679ec1eb2b58a720f1820824eb354c2f3f64acb6335d92ca2fbdafb",
       "previousSha256": "66da29bf6de1c6074e2bae4c74a5d5546f4064141a7937963e6f10f442b11d12",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "66da29bf6de1c6074e2bae4c74a5d5546f4064141a7937963e6f10f442b11d12",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "msq-hm-20",
@@ -1199,9 +1203,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A775",
       "count": 1,
-      "sha256": "dbbe2ca7ac00e32fc90ef2569dff07827d007d6bc32e336d0e43f2e788df191a",
+      "sha256": "3e5296e4c2aa60b2f8a288d96d2596bc38ef2a95c5c1e3df33733467f6b39804",
       "previousSha256": "dbbe2ca7ac00e32fc90ef2569dff07827d007d6bc32e336d0e43f2e788df191a",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "dbbe2ca7ac00e32fc90ef2569dff07827d007d6bc32e336d0e43f2e788df191a",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-ruku-tasbih",
@@ -1210,9 +1216,11 @@
       "sourceProbe": "unavailable",
       "sourceUrl": "https://sunnah.com/hisn%3A33",
       "count": 3,
-      "sha256": "6eeb51d185bf9d5c73bd81e133e93d6b96096a65d946d875a4b366e0e38c198c",
+      "sha256": "0047ae4fb4580591d2d4a1bab37c73ca7bdb13894830688e4c5a048aaa6dc5e1",
       "previousSha256": "6eeb51d185bf9d5c73bd81e133e93d6b96096a65d946d875a4b366e0e38c198c",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "6eeb51d185bf9d5c73bd81e133e93d6b96096a65d946d875a4b366e0e38c198c",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-ruku-submission",
@@ -1232,9 +1240,11 @@
       "sourceProbe": "unavailable",
       "sourceUrl": "https://sunnah.com/muslim/4/247",
       "count": 1,
-      "sha256": "c39fa85e9f32099e9ab76f13c8a57a0396f215a1eab66e533c38fc75b8d6fb20",
+      "sha256": "dc2163a113f636c50a8764df522cc9f564b36ec3f4917b068cf260674789cff6",
       "previousSha256": "c39fa85e9f32099e9ab76f13c8a57a0396f215a1eab66e533c38fc75b8d6fb20",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "c39fa85e9f32099e9ab76f13c8a57a0396f215a1eab66e533c38fc75b8d6fb20",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-ruku-sujud-holy",
@@ -1243,9 +1253,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A872",
       "count": 1,
-      "sha256": "8f20e876d7a7029e84eb58512b18da6acc46e450cbf4b4a4f79624b5e8265228",
+      "sha256": "9e2fc8ff7f7f8e0130934f44c616f04f3b85ed7ee7aba0e8e6ba562d86822c4b",
       "previousSha256": "8f20e876d7a7029e84eb58512b18da6acc46e450cbf4b4a4f79624b5e8265228",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "8f20e876d7a7029e84eb58512b18da6acc46e450cbf4b4a4f79624b5e8265228",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-ruku-sujud-majesty",
@@ -1254,9 +1266,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A873",
       "count": 1,
-      "sha256": "e54dc878ba82200f0afa11f3dfd35ea0a25fcce608806991ca4f2dd039461fd0",
+      "sha256": "a4b79fd902ddc11125aff57ee00751c83f9c01b6a788e800d4ca087e284be988",
       "previousSha256": "e54dc878ba82200f0afa11f3dfd35ea0a25fcce608806991ca4f2dd039461fd0",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "e54dc878ba82200f0afa11f3dfd35ea0a25fcce608806991ca4f2dd039461fd0",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-rising-praise",
@@ -1276,9 +1290,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/bukhari%3A799",
       "count": 1,
-      "sha256": "6e4f8d2642d71a55de7a71c7c9d92e47f8dac3276c8a407d9fcc34c2f6ed360f",
+      "sha256": "189d860f89ed4564980bcbf565b73e45b55442a7d1d2f94798d2dfd88cac7ed7",
       "previousSha256": "6e4f8d2642d71a55de7a71c7c9d92e47f8dac3276c8a407d9fcc34c2f6ed360f",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "6e4f8d2642d71a55de7a71c7c9d92e47f8dac3276c8a407d9fcc34c2f6ed360f",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-sujud-tasbih",
@@ -1287,9 +1303,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/hisn%3A41",
       "count": 3,
-      "sha256": "cf091716544188715063860e3c7614718766905caceaadceb86f40a71a04dc50",
+      "sha256": "2dfafb4ee652adfb7882d264d9a684e63795315eca675065937a3b15893ef5a5",
       "previousSha256": "cf091716544188715063860e3c7614718766905caceaadceb86f40a71a04dc50",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "cf091716544188715063860e3c7614718766905caceaadceb86f40a71a04dc50",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-sujud-submission",
@@ -1298,9 +1316,11 @@
       "sourceProbe": "2026-10-18-snapshot",
       "sourceUrl": "https://sunnah.com/muslim%3A771",
       "count": 1,
-      "sha256": "c00d003c1f2093e70322cd512347f3d6b1f2166d1ac0cf99661ccde17559f707",
+      "sha256": "691421da576b179615926c4070fd8de5592efabc1dfbcea8bb90ebefd546698d",
       "previousSha256": "c00d003c1f2093e70322cd512347f3d6b1f2166d1ac0cf99661ccde17559f707",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "c00d003c1f2093e70322cd512347f3d6b1f2166d1ac0cf99661ccde17559f707",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-sujud-complete-forgiveness",
@@ -1331,9 +1351,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A1414",
       "count": 1,
-      "sha256": "92360bdf96a5b533d58306272c79edfc603ca901be27a1467ebf67fc045c3fc6",
+      "sha256": "8b7e6f4f2efd1cf3e92187b00392270162c2a2ef8d93f5d0a7857db4eb291f86",
       "previousSha256": "92360bdf96a5b533d58306272c79edfc603ca901be27a1467ebf67fc045c3fc6",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "92360bdf96a5b533d58306272c79edfc603ca901be27a1467ebf67fc045c3fc6",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-between-prostrations",
@@ -1353,9 +1375,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A874",
       "count": 1,
-      "sha256": "6f35a4d6cf46b40eed8a505dc32bddb2a186940505217954c0a7f41e7d12f9ec",
+      "sha256": "abc6e0f89001de353628adaaec529ad99a0b4322da5e53f234447652e3cd720c",
       "previousSha256": "6f35a4d6cf46b40eed8a505dc32bddb2a186940505217954c0a7f41e7d12f9ec",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "6f35a4d6cf46b40eed8a505dc32bddb2a186940505217954c0a7f41e7d12f9ec",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-tashahhud",
@@ -1364,9 +1388,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/bukhari/10/225",
       "count": 1,
-      "sha256": "ab44c52c538ac4c968e1f6b909544730a6a907f5ef5d16294c5851d501742983",
+      "sha256": "9f26ed119cc160fe76efe548a7d00a40f54ed0bd355b1b9adf4f37dd8041eb5d",
       "previousSha256": "ab44c52c538ac4c968e1f6b909544730a6a907f5ef5d16294c5851d501742983",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "ab44c52c538ac4c968e1f6b909544730a6a907f5ef5d16294c5851d501742983",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-ibrahimiyyah",
@@ -1419,9 +1445,11 @@
       "sourceProbe": "2026-10-18-snapshot",
       "sourceUrl": "https://sunnah.com/muslim%3A771",
       "count": 1,
-      "sha256": "48cf461640c78bfe7a04415c9e0cdbd3bd40a99e8430c015c8862a907e909682",
+      "sha256": "55cc82e09f096fa3a544376280ca7bd54329879964871f20eeca996877c5adfa",
       "previousSha256": "48cf461640c78bfe7a04415c9e0cdbd3bd40a99e8430c015c8862a907e909682",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "48cf461640c78bfe7a04415c9e0cdbd3bd40a99e8430c015c8862a907e909682",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "in-prayer-witr-qunut",
@@ -1463,9 +1491,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A2357",
       "count": 1,
-      "sha256": "0e561851a25ab1fedd490ebbae0e920de65acfb48ac9894b6ac29056dc6eea3f",
+      "sha256": "37f8709250195576dcefabe2b681b1726257a7ff4e165f936d38fa7c3a91d42a",
       "previousSha256": "0e561851a25ab1fedd490ebbae0e920de65acfb48ac9894b6ac29056dc6eea3f",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "0e561851a25ab1fedd490ebbae0e920de65acfb48ac9894b6ac29056dc6eea3f",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "fasting-affront-response",
@@ -1507,9 +1537,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A3854",
       "count": 1,
-      "sha256": "23ea0cfa7d6f5509a4652966bfac504a6cc95ee532672a8d7a0ee0dc8e5d5336",
+      "sha256": "05df9856bc3e7eca618838e3c87eb29d39dbc15901ef08185860230cf8f00848",
       "previousSha256": "23ea0cfa7d6f5509a4652966bfac504a6cc95ee532672a8d7a0ee0dc8e5d5336",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "23ea0cfa7d6f5509a4652966bfac504a6cc95ee532672a8d7a0ee0dc8e5d5336",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "pur-ref-1",
@@ -1631,9 +1663,11 @@
       "sourceProbe": "unavailable",
       "sourceUrl": "https://sunnah.com/abudawud:3730",
       "count": 1,
-      "sha256": "75c151024139835e71ee6d02dc11c8e1c71d9630d644265068896b4fee4a0b14",
+      "sha256": "b2f6fd4d65a414b20ed9321d4faf687fcefe24d29cc36ef4a4da7bdd61fec540",
       "previousSha256": "e90c9f552538a90bb91e2b03b1365da9e06ee65b812de15c4dc573930cc4a80a",
-      "findings": ["Precise source and named grading for the selected wording."]
+      "findings": ["Precise source and named grading for the selected wording."],
+      "previousAudioAssignmentSha256": "75c151024139835e71ee6d02dc11c8e1c71d9630d644265068896b4fee4a0b14",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "fd-ref-6",
@@ -1642,9 +1676,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/muslim%3A2055",
       "count": 1,
-      "sha256": "0cae3a2e104a06c86956370a0387f4f701cc941ca106d1cf0312047038289b2b",
+      "sha256": "a98930aa5c2f55b1be0b0685bcb3b4cdd744212fa0e0fbb94e03c4f7507828b1",
       "previousSha256": "0cae3a2e104a06c86956370a0387f4f701cc941ca106d1cf0312047038289b2b",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "0cae3a2e104a06c86956370a0387f4f701cc941ca106d1cf0312047038289b2b",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "fd-ref-7",
@@ -1653,9 +1689,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A3854",
       "count": 1,
-      "sha256": "ffc029db21ec3e21ab0ae5a2b18fd76641e8b427358f62d28e2efc6bae83205d",
+      "sha256": "a739981e3ef68f936206490382d10dd43ac68397c718dd8cdcbb8a20f148e1b1",
       "previousSha256": "ffc029db21ec3e21ab0ae5a2b18fd76641e8b427358f62d28e2efc6bae83205d",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "ffc029db21ec3e21ab0ae5a2b18fd76641e8b427358f62d28e2efc6bae83205d",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "fd-ref-8",
@@ -1664,9 +1702,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A3730",
       "count": 1,
-      "sha256": "4d76ac627d393b3beada926020ae6798c14bb6855ca4c24dc5423b88366548d4",
+      "sha256": "1d4760eac9a580096931017bddafe649ad13a271965abd6c8aea95d55939eb59",
       "previousSha256": "4d76ac627d393b3beada926020ae6798c14bb6855ca4c24dc5423b88366548d4",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "4d76ac627d393b3beada926020ae6798c14bb6855ca4c24dc5423b88366548d4",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "fd-ref-9",
@@ -1755,9 +1795,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/ibnmajah%3A2825",
       "count": 1,
-      "sha256": "de6916c0f3c19c59812457828c77adc902a12f70969fdfd3429f49b148d7b6a4",
+      "sha256": "687773c992685f4547fa933e476ab74df41dbe304b027e24fefc2e828164a070",
       "previousSha256": "de6916c0f3c19c59812457828c77adc902a12f70969fdfd3429f49b148d7b6a4",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "de6916c0f3c19c59812457828c77adc902a12f70969fdfd3429f49b148d7b6a4",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "tr-ref-5",
@@ -1766,9 +1808,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/abudawud%3A2600",
       "count": 1,
-      "sha256": "bbef734897f51c3ae5bd6f3e88448cfab7bf050ac9fd2980e3a973d18bc4fcd2",
+      "sha256": "2d3ff4973da2d07ae0489a89550b3a1ce7893000daa91b74ee665189dd34e23f",
       "previousSha256": "bbef734897f51c3ae5bd6f3e88448cfab7bf050ac9fd2980e3a973d18bc4fcd2",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "bbef734897f51c3ae5bd6f3e88448cfab7bf050ac9fd2980e3a973d18bc4fcd2",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "tr-ref-6",
@@ -1799,9 +1843,11 @@
       "sourceProbe": "2026-10-18-snapshot",
       "sourceUrl": "https://sunnah.com/muslim%3A2718",
       "count": 1,
-      "sha256": "e3ba01985240d4264384d16c29393ef30689c2901a55ea9cfe105bb1c8f1e6d9",
+      "sha256": "e64410576a49a60e55cd2a2e3d9f319c76464348055df24891f10ce2656b676d",
       "previousSha256": "e3ba01985240d4264384d16c29393ef30689c2901a55ea9cfe105bb1c8f1e6d9",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "e3ba01985240d4264384d16c29393ef30689c2901a55ea9cfe105bb1c8f1e6d9",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "tr-ref-4",
@@ -2013,9 +2059,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/muslim%3A916a",
       "count": 1,
-      "sha256": "af2d70b9601a8ee74a96e106a9a75c0760f1f14551dcdc0cc9d39f18fcddeb48",
+      "sha256": "57d3bcf1b42816a3114875c9735f7ab405296bf175b2edf4f21e3905addb9871",
       "previousSha256": "af2d70b9601a8ee74a96e106a9a75c0760f1f14551dcdc0cc9d39f18fcddeb48",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "af2d70b9601a8ee74a96e106a9a75c0760f1f14551dcdc0cc9d39f18fcddeb48",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "ir-baqarah",
@@ -2145,9 +2193,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/bukhari%3A6388",
       "count": 1,
-      "sha256": "36aad5c90d2d01ab5ef0fc3fd905fe7d25e4b143aeb97fdf7f89b99569d10883",
+      "sha256": "15fa89bbc43e5caf8c4e45118490ddf0e806f936905d71157d90e927fb45e6fd",
       "previousSha256": "36aad5c90d2d01ab5ef0fc3fd905fe7d25e4b143aeb97fdf7f89b99569d10883",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "36aad5c90d2d01ab5ef0fc3fd905fe7d25e4b143aeb97fdf7f89b99569d10883",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "sc-ref-12",
@@ -2167,12 +2217,14 @@
       "sourceProbe": "2026-10-18-snapshot",
       "sourceUrl": "https://sunnah.com/tirmidhi:3432",
       "count": 1,
-      "sha256": "b8a124210c117cbdbef4a19bb72e353bfe9f2afc44dc65ad576df0bc5060a050",
+      "sha256": "4498b792645b37795cecc18ba3f436a07075221cf8fea212be7116c0a9ce5c34",
       "previousSha256": "8ccb3c3b7a7bfa8d9d297b0568206fdda5992ef0b22db56cf901e4642478497a",
       "findings": [
         "Use one Abu Hurayrah/Tirmidhi 3432 route; do not import Umar 3431 lifetime wording or commentary into the quotation.",
         "Precise source and named grading for the selected wording."
-      ]
+      ],
+      "previousAudioAssignmentSha256": "b8a124210c117cbdbef4a19bb72e353bfe9f2afc44dc65ad576df0bc5060a050",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "sc-ref-14",
@@ -2192,9 +2244,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/muslim%3A899b",
       "count": 1,
-      "sha256": "5e7f1f9b2582b8d258f8e4858850e4b961dcb679a842cf6c836640d908cc46b3",
+      "sha256": "120f678810963c77d481cc3af39603d96492c9b2f40662824148948d275a4ab8",
       "previousSha256": "060319905f1d3a3f4c2ca935e52e2ca5866e21c4edcd9d50e0aa276ae9d69228",
-      "findings": ["Complete both omitted sent-with clauses in the recited wind dua, matching Muslim 899b."]
+      "findings": ["Complete both omitted sent-with clauses in the recited wind dua, matching Muslim 899b."],
+      "previousAudioAssignmentSha256": "5e7f1f9b2582b8d258f8e4858850e4b961dcb679a842cf6c836640d908cc46b3",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "ne-ref-2",
@@ -2262,9 +2316,11 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/bukhari%3A1014",
       "count": 1,
-      "sha256": "349739c04a35819d52af659b072c2d7cf2d9e5ef4a95786268256487d00f0bee",
+      "sha256": "411b3a60b57a59e79ba4d8973c003fff36e98f8d8dee6a7385c0f121d219566f",
       "previousSha256": "349739c04a35819d52af659b072c2d7cf2d9e5ef4a95786268256487d00f0bee",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "349739c04a35819d52af659b072c2d7cf2d9e5ef4a95786268256487d00f0bee",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "misc-ref-1",
@@ -2383,9 +2439,11 @@
       "sourceProbe": "2026-10-18-snapshot",
       "sourceUrl": "https://sunnah.com/tirmidhi%3A3428",
       "count": 1,
-      "sha256": "795e82ecb8664f0302bee602c01c91495adc0a6e9982b3c078602c9c18208cb7",
+      "sha256": "af325438a2c96334feab201772a2592c1d30583561ba763322aae7645caff3f3",
       "previousSha256": "795e82ecb8664f0302bee602c01c91495adc0a6e9982b3c078602c9c18208cb7",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "795e82ecb8664f0302bee602c01c91495adc0a6e9982b3c078602c9c18208cb7",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "misc-ref-12",
@@ -2394,11 +2452,13 @@
       "sourceProbe": "2026-11-24-download",
       "sourceUrl": "https://sunnah.com/adab%3A716",
       "count": 1,
-      "sha256": "ec3ff34e0e49aedb4090140f5879f90e34935343eb657ecfb604376c387ad1f6",
+      "sha256": "1e02cce1154f39700c07124e96a97bcf38fb6ceb7167a48148b410d993be1ff5",
       "previousSha256": "612c4a8d713b2a5d4b844b33a1fe600e0a72897ae5562cf8651ef13fcaa6c05a",
       "findings": [
         "Remove the unsupported threefold prescription and the added three-times sentence from the narration."
-      ]
+      ],
+      "previousAudioAssignmentSha256": "ec3ff34e0e49aedb4090140f5879f90e34935343eb657ecfb604376c387ad1f6",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "misc-ref-13",
@@ -2418,9 +2478,11 @@
       "sourceProbe": "2026-10-18-snapshot",
       "sourceUrl": "https://sunnah.com/bukhari%3A6115",
       "count": 1,
-      "sha256": "26cdb6a5a10463be8075bf74ddbcd6a6185eeddb8644129086b368100e85f6a0",
+      "sha256": "e1c783d6b5dbd096e56405267380e72f182bb3b84dc3cc876e91a8826d27055a",
       "previousSha256": "26cdb6a5a10463be8075bf74ddbcd6a6185eeddb8644129086b368100e85f6a0",
-      "findings": []
+      "findings": [],
+      "previousAudioAssignmentSha256": "26cdb6a5a10463be8075bf74ddbcd6a6185eeddb8644129086b368100e85f6a0",
+      "audioAssignmentUpdate": "2026-11-26 exact-source automated OpenDua expansion; all wording/source/count fields unchanged"
     },
     {
       "id": "comprehensive-duas-introduction",

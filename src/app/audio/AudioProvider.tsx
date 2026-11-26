@@ -70,6 +70,7 @@ export interface AudioController {
   /** Read-only clock access for reviewed learner alignment; never creates another media element. */
   getPlaybackTime?: () => number;
   startPlan: (plan: PlaybackPlan, options?: { initialEntryIndex?: number; autoPlay?: boolean }) => boolean;
+  buildMushafSurahPlan?: (surah: number) => Promise<PlaybackPlan>;
   selectEntry: (entryIndex: number, autoPlay?: boolean) => boolean;
   play: () => void;
   pause: () => void;
@@ -808,6 +809,10 @@ export function AudioProvider({
   const currentSegment =
     (state.currentVoiceId ? currentEntry?.segmentsByVoice[state.currentVoiceId]?.[state.segmentIndex] : undefined) ??
     null;
+  const buildMushafSurahPlan = useCallback(async (surah: number) => {
+    const module = await import("./mushafAudio");
+    return module.buildMushafSurahPlan(surah, preferencesRef.current);
+  }, []);
   const controller = useMemo<AudioController>(
     () => ({
       sleepDeadline,
@@ -823,6 +828,7 @@ export function AudioProvider({
       currentSegment,
       getPlaybackTime,
       startPlan,
+      buildMushafSurahPlan,
       selectEntry,
       play,
       pause,
@@ -869,6 +875,7 @@ export function AudioProvider({
       setContinueOnNavigation,
       skip,
       startPlan,
+      buildMushafSurahPlan,
       state,
       stop,
       toggleMuted,

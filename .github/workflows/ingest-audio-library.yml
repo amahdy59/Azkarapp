@@ -1,0 +1,42 @@
+name: Ingest verified audio library
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audio-library-ingestion
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Verify pinned evidence and copy immutable originals
+        shell: bash
+        env:
+          AUDIO_UPLOAD_CONFIGURATION: ${{ secrets.AZKAR_AUDIO_UPLOAD_CONFIGURATION }}
+        run: |
+          test -n "$AUDIO_UPLOAD_CONFIGURATION"
+          configuration="$RUNNER_TEMP/azkar-audio-upload.env"
+          trap 'rm -f "$configuration"' EXIT
+          printf '%s' "$AUDIO_UPLOAD_CONFIGURATION" > "$configuration"
+          chmod 600 "$configuration"
+          node scripts/ingest-audio-library.mjs --env-file "$configuration"
+      - name: Preserve non-secret recording verification
+        uses: actions/upload-artifact@v7
+        with:
+          name: verified-audio-library
+          path: output/audio-ingestion/verification.json
+          if-no-files-found: error
+          retention-days: 14

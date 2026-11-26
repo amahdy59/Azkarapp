@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-11-26.4",
+    "ar": [
+      "اختر التذكيرات في ترحيب أبسط، وحدد مدينتك عند الحاجة، وشاهد أسماء المواقع وقبلة الهاتف بوضوح.",
+      "تابع قراءتك للقرآن وخطتك اليومية بوضوح، واستعرض تقدمك في ملخص وتقويم واتجاهات أبسط مع تصدير السجلات من الإعدادات.",
+      "افتح الكتب العربية الثلاثة وملفات PDF من المكتبة والرئيسية، واستعد موضع القراءة بعد إعادة التحميل مع بيان نطاق النسخة وحالة مراجعتها.",
+      "استمع إلى سور المصحف واختر من التسجيلات المتاحة، مع خيارات صوت أوضح وأدعية إضافية بصوت محمد جمعة وألفاظ وأعداد ومراجع أذكار مصححة."
+    ],
+    "en": [
+      "Choose reminders in a simpler welcome, confirm your city when needed, and see clearer location names and phone Qibla.",
+      "Continue Quran reading with a clearer daily plan, and explore simpler progress summaries, calendar and trends with record exports in Settings.",
+      "Open all three Arabic books and their PDFs from the library and Home, with reliable reading-position recovery and clear edition scope and review notices.",
+      "Listen to Mushaf surahs and choose available reciters, with clearer audio options, more matching duas by Muhammad Jumah, and corrected dhikr wording, counts and references."
+    ]
+  },
+  {
     "release": "2026-11-26.3",
     "ar": [
       "اختر التذكيرات في ترحيب أبسط، وحدد مدينتك عند الحاجة، واطلب حماية التخزين من إعدادات الحساب والبيانات.",

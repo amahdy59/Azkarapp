@@ -37,6 +37,8 @@ export function MushafNavigationModal({
   onClose,
   currentPage,
   onSelectPage,
+  selectedSurah,
+  onSelectSurah,
   language,
   direction,
   bookmarks: allBookmarks = [],
@@ -51,6 +53,8 @@ export function MushafNavigationModal({
   onClose: () => void;
   currentPage: number;
   onSelectPage: (page: number) => void;
+  selectedSurah?: number;
+  onSelectSurah?: (surah: number) => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   bookmarks?: number[];
@@ -321,13 +325,18 @@ export function MushafNavigationModal({
           <div className="mushaf-index-surahs grid gap-2">
             {filteredSurahs.map((surah) => {
               const isCurrent =
-                currentPage >= surah.startPage &&
-                (surah.number === 114 || currentPage < (SURAHS[surah.number]?.startPage ?? 605));
+                selectedSurah !== undefined
+                  ? surah.number === selectedSurah
+                  : currentPage >= surah.startPage &&
+                    (surah.number === 114 || currentPage < (SURAHS[surah.number]?.startPage ?? 605));
               return (
                 <button
                   key={surah.number}
                   type="button"
-                  onClick={() => handleJump(surah.startPage)}
+                  onClick={() => {
+                    onSelectSurah?.(surah.number);
+                    handleJump(surah.startPage);
+                  }}
                   onMouseEnter={() => prefetchMushafPage(surah.startPage)}
                   onPointerDown={() => prefetchMushafPage(surah.startPage)}
                   aria-current={isCurrent ? "true" : undefined}

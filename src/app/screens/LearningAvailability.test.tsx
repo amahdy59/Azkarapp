@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { LearningReaderScreen } from "./LearningReaderScreen";
 import { LearnScreen } from "./LearnScreen";
 import { LearningDownloadsPanel } from "./settings/LearningDownloadsPanel";
-import { allLearningEditions, learningCatalogue } from "../learning/catalogue";
+import { allLearningEditions, learningCatalogue, resolveLearningResource } from "../learning/catalogue";
 import * as library from "../hooks/useLearningLibrary";
 
 vi.mock("../learning/catalogue", async (importOriginal) => {
@@ -12,6 +12,7 @@ vi.mock("../learning/catalogue", async (importOriginal) => {
     ...actual,
     allLearningEditions: vi.fn(actual.allLearningEditions),
     learningCatalogue: vi.fn(actual.learningCatalogue),
+    resolveLearningResource: vi.fn(actual.resolveLearningResource),
   };
 });
 vi.mock("../hooks/useLearningLibrary", () => ({
@@ -34,6 +35,7 @@ afterEach(() => {
 it.each(["al-mukhtar", "al-wird-an-nabawi"] as const)(
   "recovers a withheld %s link without mounting reader/data hooks or changing saved records",
   (resourceId) => {
+    vi.mocked(resolveLearningResource).mockReturnValueOnce(undefined);
     const stored = JSON.stringify({ [resourceId]: { position: { unitId: "p-32", offset: 0.4 }, bookmarks: ["p-32"] } });
     localStorage.setItem("azkar.learning.v1", stored);
     const onBack = vi.fn(),

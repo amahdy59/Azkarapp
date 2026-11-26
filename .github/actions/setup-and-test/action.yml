@@ -91,6 +91,17 @@ runs:
       env:
         BROWSER_PROJECTS: ${{ inputs.browser-projects }}
 
+    - name: Provide a headless audio output for native playback
+      if: inputs.scope != 'quality' && runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get install -y --no-install-recommends pulseaudio pulseaudio-utils
+        pulseaudio --check || pulseaudio --start --exit-idle-time=-1
+        pactl load-module module-null-sink sink_name=azkar_ci_output sink_properties=device.description=AzkarCINativeAudio
+        pactl set-default-sink azkar_ci_output
+        echo "PULSE_SINK=azkar_ci_output" >> "$GITHUB_ENV"
+        pactl info
+
     - name: Run E2E tests
       if: inputs.scope != 'quality'
       run: |

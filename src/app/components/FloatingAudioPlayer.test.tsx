@@ -400,7 +400,7 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("region", { name: "Audio player" })).toHaveAttribute("data-variant", "expanded");
   });
 
-  it("disables unavailable voices and displays a selection only after the controller accepts it", () => {
+  it("omits unavailable voices and displays a selection only after the controller accepts it", () => {
     const controller = createController();
     controller.state.currentVoiceId = "abdullah-muhammad";
     controller.currentEntry = {
@@ -420,11 +420,8 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(reciterTrigger);
     expect(screen.getByRole("option", { name: "عبد الله محمد" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "الترجمة الإنجليزية" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "محمد شرعي" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "محمد معتز" })).toBeInTheDocument();
-
-    expect(screen.getByRole("option", { name: "محمد شرعي" })).toHaveAttribute("data-disabled");
-    expect(screen.getByRole("option", { name: "محمد معتز" })).toHaveAttribute("data-disabled");
+    expect(screen.queryByRole("option", { name: "محمد شرعي" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "محمد معتز" })).not.toBeInTheDocument();
     expect(screen.getByRole("option", { name: "الترجمة الإنجليزية" })).not.toHaveAttribute("data-disabled");
 
     fireEvent.click(screen.getByRole("option", { name: "الترجمة الإنجليزية" }));
@@ -440,14 +437,13 @@ describe("FloatingAudioPlayer", () => {
     render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
-    fireEvent.click(screen.getByTestId("audio-reciter-select"));
+    expect(screen.queryByTestId("audio-reciter-select")).not.toBeInTheDocument();
     for (const name of ["English Translation", "Abdullah Muhammad"]) {
       expect(screen.queryByRole("option", { name })).not.toBeInTheDocument();
     }
-    expect(screen.getAllByRole("option")).toHaveLength(1);
-    expect(screen.getByRole("option", { name: "Test reciter" })).not.toHaveAttribute("data-disabled");
+    expect(screen.queryAllByRole("option")).toHaveLength(0);
     expect(controller.setVoice).not.toHaveBeenCalled();
-    expect(screen.getByTestId("audio-reciter-select")).toHaveTextContent("Test reciter");
+    expect(screen.getByTestId("audio-reciter-current")).toHaveTextContent("Test reciter");
   });
 
   it("keeps native seeking continuous with an exact left-to-right progress fill", () => {
@@ -582,13 +578,13 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     fireEvent.click(screen.getByRole("button", { name: "خيارات الصوت" }));
 
-    const reciterSelect = screen.getByTestId("audio-reciter-select");
+    const reciterSelect = screen.getByTestId("audio-reciter-current");
     const identity = screen.getByTestId("audio-expanded-identity");
     expect(identity).not.toContainElement(reciterSelect);
     expect(identity).not.toHaveTextContent("Test reciter");
     expect(reciterSelect).toHaveTextContent("Test reciter");
     expect(identity).toHaveClass("justify-center");
-    expect(reciterSelect).toHaveClass("justify-between", "w-full", "rounded-xl");
+    expect(reciterSelect).toHaveClass("min-h-11", "rounded-xl");
     expect(identity).not.toHaveTextContent(entry.titleArabic);
     expect(identity).toContainElement(screen.getByRole("button", { name: "خيارات الصوت" }));
     expect(screen.getByRole("region", { name: "مشغل الصوت" })).toHaveTextContent(entry.titleArabic);
@@ -622,9 +618,8 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "خيارات الصوت" }));
     expect(screen.queryByTestId("audio-attribution-trigger")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: "خيارات الصوت" })).toBeVisible();
-    fireEvent.click(screen.getByTestId("audio-reciter-select"));
     expect(screen.queryByTestId("audio-recording-source")).not.toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Test reciter" })).toBeVisible();
+    expect(screen.getByTestId("audio-reciter-current")).toHaveTextContent("Test reciter");
   });
 
   it("prioritizes English and reveals Arabic without changing playback", async () => {

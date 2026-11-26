@@ -1,8 +1,30 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MushafNavigationModal } from "./MushafNavigationModal";
+import { getSurahMeta } from "../content/surahInfo";
 
 describe("MushafNavigationModal", () => {
+  it.each([112, 113, 114])("preserves surah %s when multiple surahs share page 604", (surah) => {
+    const onSelectSurah = vi.fn();
+    const onSelectPage = vi.fn();
+    render(
+      <MushafNavigationModal
+        isOpen
+        onClose={vi.fn()}
+        currentPage={604}
+        selectedSurah={surah}
+        onSelectSurah={onSelectSurah}
+        onSelectPage={onSelectPage}
+        language="ar"
+        direction="rtl"
+      />,
+    );
+    const button = screen.getByText(getSurahMeta(surah)!.nameArabic).closest("button")!;
+    expect(button).toHaveAttribute("aria-current", "true");
+    fireEvent.click(button);
+    expect(onSelectSurah).toHaveBeenCalledExactlyOnceWith(surah);
+    expect(onSelectPage).toHaveBeenCalledExactlyOnceWith(604);
+  });
   it("renders tabs and surah list when opened", () => {
     const handleSelectPage = vi.fn();
     const handleClose = vi.fn();

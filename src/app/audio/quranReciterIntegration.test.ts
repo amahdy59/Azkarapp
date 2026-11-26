@@ -18,7 +18,7 @@ describe("accepted optional Al-Mulk reciters", () => {
       version: 1,
       requiredQuranRange: { surah: 67, ayahStart: 1, ayahEnd: 30 },
     });
-    expect(AUDIO_MANIFEST_VERSION).toBe(9);
+    expect(AUDIO_MANIFEST_VERSION).toBe(10);
     expect(getPreferredVoiceId({ available: true, ...resolution }, DEFAULT_AUDIO_PREFERENCES)).toBe(
       "abdullah-muhammad",
     );
@@ -64,12 +64,12 @@ describe("accepted optional Al-Mulk reciters", () => {
           { available: true, ...kahf },
           { ...DEFAULT_AUDIO_PREFERENCES, quranReciterId: accepted.voiceId },
         ),
-      ).toBe(kahf.asset.defaultVoiceId);
+      ).toBe(accepted.voiceId);
     }
     const extra = Object.values(AUDIO_CATALOG.assets).filter((asset) =>
       asset.segments.some((segment) => segment.variants.some((variant) => variant.sourceId === "mp3quran")),
     );
-    expect(extra.map((asset) => asset.id)).toEqual(["s-hm-110b"]);
+    expect(extra.map((asset) => asset.id)).toEqual(["quran-002", "quran-018", "s-hm-110b", "s-hm-110a"]);
     expect(DEFAULT_AUDIO_PREFERENCES).toMatchObject({ duaVoiceId: "abdullah-muhammad", quranReciterId: "alafasy" });
   });
 });

@@ -1,3 +1,5 @@
+import additional from "./additionalAudioAssignments.json" with { type: "json" };
+
 export const APPROVED_AUDIO_ASSIGNMENTS: Readonly<Record<string, string>> = Object.freeze({
   "s-hm-102": "s-hm-102",
   "s-hm-104": "s-hm-104",
@@ -191,4 +193,5 @@ export const APPROVED_AUDIO_ASSIGNMENTS: Readonly<Record<string, string>> = Obje
   "misc-ref-13": "comprehensive-dua-42",
   "wu-hm-3": "wu-hm-3",
   "wu-hm-4": "wu-hm-4",
+  ...additional,
 });

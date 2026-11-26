@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-26.3",
+  "release": "2026-11-26.4",
   "ar": [
-    "اختر التذكيرات في ترحيب أبسط، وحدد مدينتك عند الحاجة، واطلب حماية التخزين من إعدادات الحساب والبيانات.",
+    "اختر التذكيرات في ترحيب أبسط، وحدد مدينتك عند الحاجة، وشاهد أسماء المواقع وقبلة الهاتف بوضوح.",
     "تابع قراءتك للقرآن وخطتك اليومية بوضوح، واستعرض تقدمك في ملخص وتقويم واتجاهات أبسط مع تصدير السجلات من الإعدادات.",
-    "شاهد أسماء المواقع وقبلة الهاتف بوضوح، وافتح الكتب من الرئيسية واستعد موضع القراءة بثبات بعد إعادة التحميل.",
-    "اقرأ الأذكار بألفاظ وأعداد ومراجع مصححة، واختر التسجيلات الإضافية المتاحة لبعض الأدعية وسورة الملك مع بقاء القارئ الافتراضي."
+    "افتح الكتب العربية الثلاثة وملفات PDF من المكتبة والرئيسية، واستعد موضع القراءة بعد إعادة التحميل مع بيان نطاق النسخة وحالة مراجعتها.",
+    "استمع إلى سور المصحف واختر من التسجيلات المتاحة، مع خيارات صوت أوضح وأدعية إضافية بصوت محمد جمعة وألفاظ وأعداد ومراجع أذكار مصححة."
   ],
   "en": [
-    "Choose reminders in a simpler welcome, confirm your city when needed, and request storage protection from Account & data settings.",
+    "Choose reminders in a simpler welcome, confirm your city when needed, and see clearer location names and phone Qibla.",
     "Continue Quran reading with a clearer daily plan, and explore simpler progress summaries, calendar and trends with record exports in Settings.",
-    "See clearer location names and phone Qibla, open books from Home, and restore your reading position reliably after reload.",
-    "Read corrected dhikr wording, counts and references, and choose additional available recordings for selected duas and Al-Mulk while keeping the existing default voice."
+    "Open all three Arabic books and their PDFs from the library and Home, with reliable reading-position recovery and clear edition scope and review notices.",
+    "Listen to Mushaf surahs and choose available reciters, with clearer audio options, more matching duas by Muhammad Jumah, and corrected dhikr wording, counts and references."
   ]
 }

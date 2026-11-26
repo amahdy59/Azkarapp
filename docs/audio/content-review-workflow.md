@@ -1,5 +1,9 @@
 # Content review workflow
 
+## Owner-authorized automated expansion — 2026-11-26
+
+For the current phase only, the owner explicitly replaces the human-listening/confirmation activation gate with automated source-transcript, full-range, byte identity, duration, complete decoding and hosted-integrity checks. [Expanded-library evidence](expanded-library/README.md) identifies the exact enabled files and rejected candidates. Source permissions, immutable hosting, explicit normalized assignments, default preservation and exact-checksum timing boundaries remain. `approved` records publication eligibility under this owner decision, not completed human or scholarly review. No old rejected recording is relabelled. The historical workflow below remains the normal review process outside this explicit phase.
+
 1. Start the development app and open `?audio-review=1`.
 2. Compare the displayed Arabic, source transcript, canonical key, asset ID, source, voice, duration, and normalized-match result.
 3. Listen with headphones to every segment in order. Automated matching is only a hint.

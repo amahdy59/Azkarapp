@@ -44,9 +44,9 @@ describe("Home Learn composition", () => {
       allBooks = vi.fn();
     render(<HomeLearningSection language="en" onGlass onOpenBooks={allBooks} onOpenResource={open} />);
     const resume = screen.getByRole("button", { name: "Continue reading" });
-    expect(resume).toHaveAccessibleDescription("دليل المعتمر Source page 6");
+    expect(resume).toHaveAccessibleDescription("المختار من صحيح الأدعية والأذكار Source page 32");
     fireEvent.click(resume);
-    expect(open).toHaveBeenCalledExactlyOnceWith("dalil-al-mutamir", "p-6", "ar");
+    expect(open).toHaveBeenCalledExactlyOnceWith("al-mukhtar", "p-32", "ar");
     fireEvent.click(screen.getByRole("button", { name: "All books" }));
     expect(allBooks).toHaveBeenCalledOnce();
     expect(localStorage.getItem(LEARNING_STATE_KEY)).toBe(records);

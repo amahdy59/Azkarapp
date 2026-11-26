@@ -949,7 +949,8 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
   gap: 8px 16px;
 }
-.audio-options-help[open] summary > svg {
+.audio-options-help[open] summary > svg,
+.audio-reading-options[open] summary > svg {
   transform: rotate(180deg);
 }
 .audio-options-scroll > :not(:first-child) {
@@ -968,4 +969,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 .audio-option-field > label {
   line-height: 1.5;
+}
+.audio-reading-options:not([open]) > :not(summary) {
+  display: none;
 }

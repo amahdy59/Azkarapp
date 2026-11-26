@@ -52,7 +52,7 @@ describe("AudioSettingsPanel", () => {
     expect(screen.getByRole("combobox", { name: "Azkar and dua voice" })).toHaveTextContent("Abdullah Muhammad");
     await user.click(screen.getByRole("combobox", { name: "Azkar and dua voice" }));
     await user.click(screen.getByRole("option", { name: "Muhammad Jumah" }));
-    expect(screen.getByRole("status")).toHaveTextContent("available for three recordings");
+    expect(screen.getByRole("status")).toHaveTextContent("where a matching recording is available");
     expect(JSON.parse(window.localStorage.getItem("azkar.audio-preferences.v1")!)).toMatchObject({
       duaVoiceId: "opendua-muhammad-jumah",
       quranReciterId: "alafasy",

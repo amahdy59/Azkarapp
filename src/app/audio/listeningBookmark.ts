@@ -76,6 +76,22 @@ export function saveListeningBookmark(value: ListeningBookmark | null) {
 }
 /** Rebuild from reviewed current content. Stored URLs or sacred text are never trusted. */
 export async function restoreListeningPlan(bookmark: ListeningBookmark, preferences: AudioPreferences) {
+  if (bookmark.context.subCategory === "mushaf") {
+    const match = /^mushaf-surah-(\d+)$/.exec(bookmark.ids[0] ?? "");
+    if (
+      !match ||
+      bookmark.ids.length !== 1 ||
+      bookmark.entry !== 0 ||
+      bookmark.segment !== 0 ||
+      bookmark.repetition !== 0
+    )
+      return null;
+    const { buildMushafSurahPlan } = await import("./mushafAudio");
+    const plan = await buildMushafSurahPlan(Number(match[1]), { ...preferences, quranReciterId: bookmark.voice }).catch(
+      () => null,
+    );
+    return plan && recordingFingerprint(plan, 0, 0, bookmark.voice) === bookmark.fingerprint ? plan : null;
+  }
   const { CATEGORIES } = await import("../content/categories");
   if (!CATEGORIES.some((category) => category.id === bookmark.context.category)) return null;
   const [{ ALL_AZKAR }, { buildPlaybackPlan }] = await Promise.all([

@@ -6,6 +6,7 @@ import { FRIDAY_KAHF } from "./fridayKahf";
 import { AUTHENTIC_AZKAR_COLLECTION } from "./authenticAzkar";
 import { getLocalizedZikrBenefit, getLocalizedSourceReference } from "./localizedZikr";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "../audio/audioAssignments";
+import { AUDIO_CATALOG } from "../audio/audioManifest";
 import review from "../../../docs/agent/evidence/dhikr-source-review-2026-11-24.json";
 
 const corpus = [...ALL_AZKAR, ...COMPREHENSIVE_DUAS, ...FRIDAY_KAHF];
@@ -72,9 +73,18 @@ describe("source-specific dhikr evidence alignment", () => {
   });
 
   it("suspends changed-text recordings without rewriting approved recording identities", () => {
-    for (const { id } of review.suspendedAudio) {
-      expect(APPROVED_AUDIO_ASSIGNMENTS[id], id).toBeUndefined();
-      expect(byId.get(id)!.audioAssetId, id).toBeUndefined();
+    for (const { id, assignment } of review.suspendedAudio) {
+      const current = APPROVED_AUDIO_ASSIGNMENTS[id];
+      const previous = /: "([^"]+)"/.exec(assignment)![1];
+      expect(current, id).not.toBe(previous);
+      if (current) {
+        expect(byId.get(id)!.audioAssetId).toBe(current);
+        expect(
+          AUDIO_CATALOG.assets[current]!.segments.every((segment) =>
+            segment.variants.every((variant) => variant.sourceId === "opendua-muhammad-jumah"),
+          ),
+        ).toBe(true);
+      } else expect(byId.get(id)!.audioAssetId, id).toBeUndefined();
     }
     expect(byId.get("m-hm-93")!.audioAssetId).toBe("ap-tasbeeh-tawhid");
     expect(byId.get("s-hm-104")!.audioAssetId).toBe("s-hm-104");

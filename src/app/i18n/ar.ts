@@ -2652,7 +2652,7 @@ const ar = {
     audioRecitationsDesc: "الصوت المفضل وسرعة التشغيل وسلوك الاستماع",
     audioVoice: "الصوت المفضل",
     preferredReciter: "صوت الأذكار والدعاء",
-    additionalReciterCoverage: "يتوفر صوت محمد جمعة لثلاثة تسجيلات. تبقى بقية الأذكار بصوت قارئها الحالي.",
+    additionalReciterCoverage: "يُستخدم صوت محمد جمعة حيث يتوفر تسجيل مطابق. تبقى بقية الأذكار بصوت قارئها الحالي.",
     preferredReciterHint: "تظهر فقط الأصوات المراجعة والمتاحة داخل التطبيق.",
     playbackSpeed: "سرعة التشغيل",
     audioBehavior: "سلوك الاستماع",

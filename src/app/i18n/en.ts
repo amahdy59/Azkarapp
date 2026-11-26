@@ -2661,7 +2661,7 @@ const en = {
     audioVoice: "Preferred voice",
     preferredReciter: "Azkar and dua voice",
     additionalReciterCoverage:
-      "Muhammad Jumah is available for three recordings. Other items keep their existing reciter.",
+      "Muhammad Jumah is used where a matching recording is available. Other items keep their existing reciter.",
     preferredReciterHint: "Only reviewed voices available in the app are listed.",
     playbackSpeed: "Playback speed",
     audioBehavior: "Listening behavior",
