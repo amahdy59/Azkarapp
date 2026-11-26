@@ -1,3 +1,7 @@
+## Quran/Progress clarity — local 2026-11-26
+
+Owner-approved continuation hierarchy uses a compact secondary plan, side artwork where width permits, visible Undo and one quiet weekly strip. Progress uses four fixed 2×2 summaries and one full-width recording calendar; secondary analysis belongs in Trends. No metric customization, composition doughnut, duplicate overview chart or garden/reflection UI. Keep shared responsive header, protected menus, semantic themes and enlarged reflow.
+
 ## Seamless page headers — 2026-11-25, local
 
 The owner approves seamless headers across page families. Replace the old fixed navy wide Reader/Masbaha/Salawat bands with shared ReadingHeaderSurface, semantic foreground titles, readable muted progress labels and theme-aware 44px round ghost actions. These headers sit in flow above their own scrollports and borrow the owning canvas without a second rounded panel, vignette, gradient, shadow or blur. This supersedes the earlier always-dark reading/counting header contract. Keep full labels, existing reading interactions and the responsive tiers; enlarged text reflows without clipping. Icon targets remain 44 CSS px while text grows, avoiding an oversized phone toolbar.
@@ -1704,3 +1708,7 @@ The owner's approved quiet Masbaha supersedes the older counter footer anatomy: 
 ## Settings menu summaries — 2026-11-25 (local)
 
 Audio, Downloads, Prayer and Progress rows use passive localized descriptions within the existing row anatomy. Show voice/rate, last-checked group readiness with approximate app storage, saved reminder choices alongside location, and weekly-goal context. “Reminders selected” describes configuration rather than permission or confirmed delivery; hidden Garden does not disable recording. Unknown downloads invite a check and active downloads show a stable busy description. Labels and summaries wrap naturally at enlarged text sizes; no truncation, extra row actions or menu live region. Downloads owns its selected row on desktop.
+
+## Notification-first welcome — 2026-11-26, local
+
+FirstUseSetup composes the shared protected ResponsiveSheet, explicit notification service and existing App location callback. One benefit/preview and collapsed actual reminder selections precede Enable/Later; permission grant proceeds directly or offers optional city confirmation for location-dependent reminders. Fresh-install fallback coordinates are not treated as reader-confirmed. PrayerCitySearch shares prepared offline results with prayer Settings, with a separate fixed search field and scrolling choices. StorageProtection now lives beside Account & data saving/backup and is requested only by gesture. Existing reminders, overnight opt-in, ordinary saving, source content and persistence schemas are unchanged. Denial, dismissal, unsupported capability and iOS installation guidance preserve reading and explain actual browser delivery limits. Verify Arabic/English keyboard focus, Escape/Back, narrow/enlarged scrolling, opaque surfaces and permission/location refusal; native OS delivery and human assistive-technology acceptance remain separate. See agent/phases/FIRST_USE_CLARITY_LOCAL_2026_11_26.md.

@@ -37,10 +37,7 @@ test.describe("Baseline Capture Suite", () => {
     await page.getByTestId("language-option-ar").click();
     await page.getByTestId("confirm-language").click();
     await page.getByTestId("onboarding-get-started").click();
-    await page
-      .getByTestId("first-use-setup")
-      .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-      .click();
+    await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
 
     await expect(page.getByRole("navigation")).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-home-ar-midnight.png"), fullPage: true });
@@ -64,10 +61,7 @@ test.describe("Baseline Capture Suite", () => {
     await page.getByTestId("language-option-en").click();
     await page.getByTestId("confirm-language").click();
     await page.getByTestId("onboarding-get-started").click();
-    await page
-      .getByTestId("first-use-setup")
-      .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-      .click();
+    await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
 
     await page.getByTestId("nav-azkar").click();
     await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
@@ -90,10 +84,7 @@ test.describe("Baseline Capture Suite", () => {
     await page.getByTestId("language-option-ar").click();
     await page.getByTestId("confirm-language").click();
     await page.getByTestId("onboarding-get-started").click();
-    await page
-      .getByTestId("first-use-setup")
-      .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-      .click();
+    await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
 
     await page.getByTestId("nav-azkar").click();
     await page.getByTestId("category-card-morning").click();
@@ -117,10 +108,7 @@ test.describe("Baseline Capture Suite", () => {
     await page.getByTestId("language-option-en").click();
     await page.getByTestId("confirm-language").click();
     await page.getByTestId("onboarding-get-started").click();
-    await page
-      .getByTestId("first-use-setup")
-      .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-      .click();
+    await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
 
     if (await page.getByTestId("nav-more").isVisible()) {
       await page.getByTestId("nav-more").click();

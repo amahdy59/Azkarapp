@@ -14,7 +14,7 @@ test("onboarding offers a visible skip action for pointer and keyboard users", a
   await skip.focus();
   await expect(skip).toBeFocused();
   await skip.click();
-  await page.getByTestId("first-use-setup").getByRole("button", { name: "Continue to Home" }).click();
+  await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
 
   await expect(page.getByTestId("nav-home").first()).toBeVisible();
   await expect(page.locator('#main-content[data-view="home"]')).toBeVisible();

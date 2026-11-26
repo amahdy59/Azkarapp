@@ -2,8 +2,9 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { PrayerCalculationPicker } from "../../components/PrayerCalculationPicker";
 import { Modal, ResponsiveSheet, SheetHeader } from "../../components/ResponsiveSheet";
+import { PrayerCitySearch } from "../../components/PrayerCitySearch";
 import { useNow } from "../../hooks/useNow";
-import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS, FormField } from "../../components/FormField";
+import { FormField } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { ChevronDown, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
@@ -50,7 +51,6 @@ export function PrayerLocationPanel({
   const manualSaveTrigger = useRef<HTMLButtonElement>(null);
   const noticeTrigger = useRef<HTMLElement | null>(null);
   const noticeDescriptionId = useId();
-  const cityDescriptionId = useId();
   const direction = isArabic ? "rtl" : "ltr";
   // Which coordinate the last save attempt rejected, so the message can sit on
   // that field rather than only in the status line under the form.
@@ -460,7 +460,6 @@ export function PrayerLocationPanel({
         language={language}
         protectedSurface
         focusOnOpen
-        describedById={cityDescriptionId}
         testId="prayer-city-sheet"
         drawerClassName="prayer-settings-surface"
         dialogClassName="prayer-settings-surface"
@@ -477,60 +476,14 @@ export function PrayerLocationPanel({
           onClose={() => setCityPickerOpen(false)}
           className="prayer-settings-heading"
         />
-        <div className="prayer-settings-search shrink-0 space-y-2 px-5 py-3">
-          <p id={cityDescriptionId} className="sr-only">
-            {t(language, "notifications.citySearchHint")}
-          </p>
-          <label htmlFor="city-search" className={FIELD_LABEL_CLASS}>
-            {t(language, "notifications.citySearchLabel")}
-          </label>
-          <input
-            id="city-search"
-            type="search"
-            value={citySearch}
-            onChange={(event) => setCitySearch(event.target.value)}
-            placeholder={t(language, "notifications.citySearchPlaceholder")}
-            className={FIELD_CONTROL_CLASS}
-          />
-        </div>
-        <div className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-3" data-vaul-no-drag>
-          <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">
-            {t(language, citySearch.trim() ? "notifications.cityResults" : "notifications.popularCities")}
-          </p>
-          {cityResults.length > 0 ? (
-            <ul className="space-y-1">
-              {cityResults.map((city) => (
-                <li key={city.id}>
-                  <button
-                    type="button"
-                    onClick={() => handleCitySelect(city)}
-                    className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
-                    aria-pressed={selectedCity?.id === city.id}
-                  >
-                    <MapPin size={18} className="shrink-0 text-primary" aria-hidden="true" />
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold">
-                        {isArabic ? city.nameArabic : city.nameEnglish}
-                      </span>
-                      <span className="block text-xs text-muted-foreground">
-                        {isArabic ? city.countryArabic : city.countryEnglish}
-                      </span>
-                    </span>
-                    {selectedCity?.id === city.id && (
-                      <span className="ms-auto shrink-0 text-xs text-primary">
-                        {t(language, "prayerLocation.current")}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p role="status" className="px-2 py-4 text-label leading-relaxed text-muted-foreground">
-              {t(language, "prayerLocation.noCitiesFound")}
-            </p>
-          )}
-        </div>
+        <PrayerCitySearch
+          language={language}
+          query={citySearch}
+          onQueryChange={setCitySearch}
+          results={cityResults}
+          onSelect={handleCitySelect}
+          selectedId={selectedCity?.id}
+        />
       </ResponsiveSheet>
       <Modal
         open={noticeOpen}

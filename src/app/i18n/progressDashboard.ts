@@ -2,6 +2,7 @@ import { translateDictionary } from "./index";
 import type { AppLanguage } from "../types";
 
 const en = {
+  individualZikr: "Individual azkar",
   last30: "Last 30 days",
   dateFilters: "Date filters",
   progressExport: "Progress data",
@@ -150,6 +151,7 @@ const en = {
   chronological: "Earlier to later: left to right in English, right to left in Arabic.",
 };
 const ar: Record<keyof typeof en, string> = {
+  individualZikr: "الأذكار المفردة",
   last30: "آخر ٣٠ يومًا",
   dateFilters: "تصفية التاريخ",
   progressExport: "بيانات التقدم",

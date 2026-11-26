@@ -2,7 +2,7 @@
 
 ## Active phase
 
-[Coordinated implementation and release](phases/COORDINATED_RELEASE_2026_11_25.md) is the current owner-authorized phase. This chat coordinates final handoffs, waits for approved implementation to finish, validates the combined checkout, pushes all verified changes to main and monitors Quality, Pages and production. The new owner instruction supersedes the earlier local publication holds below. Known source-conflicted Arabic books and unreviewed English/audio editions retain review-only availability; physical-device acceptance remains separate. See the [release report](reports/COORDINATED_RELEASE_2026_11_25_REPORT.md).
+[Notification-first welcome](phases/FIRST_USE_CLARITY_LOCAL_2026_11_26.md) is the owner-approved local phase after review of the desktop/mobile concepts. Implement all recommendations locally; no commit or push. Preserve the prior coordinated-release evidence and independent content/device acceptance limits.
 
 ## Feature handoffs and historical phase authority
 

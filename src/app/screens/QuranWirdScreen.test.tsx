@@ -181,7 +181,10 @@ describe("QuranWirdScreen", () => {
     const props = renderScreen();
     render(<QuranWirdScreen {...props} language="ar" direction="rtl" />);
     expect(screen.getAllByTestId("quran-wird-content")[1]).toHaveClass("text-right");
-    expect(screen.getAllByRole("progressbar")[1]).toHaveAttribute("dir", "rtl");
+    expect(within(screen.getAllByTestId("quran-wird-content")[1]!).getAllByRole("progressbar")[0]).toHaveAttribute(
+      "dir",
+      "rtl",
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "تعديل" }));
     const readingPlan = screen.getByRole("combobox", { name: "خطة القراءة" });

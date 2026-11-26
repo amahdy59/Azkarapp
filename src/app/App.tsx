@@ -1925,7 +1925,21 @@ function AppContent({
           >
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
               {firstUseSetupOpen && view === "home" && (
-                <FirstUseSetup language={selectedLang} onClose={() => setFirstUseSetupOpen(false)} />
+                <FirstUseSetup
+                  language={selectedLang}
+                  reminders={reminders}
+                  location={locationSettings}
+                  needsLocation={
+                    (isNewInstallation &&
+                      !locationSettings.autoDetect &&
+                      locationSettings.latitude === DEFAULT_LOCATION.latitude &&
+                      locationSettings.longitude === DEFAULT_LOCATION.longitude) ||
+                    locationSettings.latitude === undefined ||
+                    locationSettings.longitude === undefined
+                  }
+                  onLocationChange={handleLocationChange}
+                  onClose={() => setFirstUseSetupOpen(false)}
+                />
               )}
               {/* Phase 2 — onboarding flow */}
               {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}

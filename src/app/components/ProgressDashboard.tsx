@@ -1,6 +1,3 @@
-import { RecordedPagesChart } from "./RecordedPagesChart";
-import { recordedPageRhythm } from "../recordedPageRhythm";
-import { t } from "../i18n";
 import { ProgressSelectField } from "./ProgressSelectField";
 import {
   BarChart3,
@@ -14,16 +11,14 @@ import {
   Repeat,
   Sun,
   Sunrise,
-  Lightbulb,
   Sprout,
 } from "./icons";
 import { ProgressBar } from "./ProgressBar";
-import { useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useState, type ReactNode } from "react";
 import type { AppLanguage } from "../types";
 import type { CalendarType } from "../calendarPeriods";
 import { dashboardText as text } from "../i18n/progressDashboard";
 import { formatNumerals, formatPercentage } from "../formatting";
-import { getProgressDayKey } from "../progress";
 import {
   DEFAULT_PROGRESS_METRICS,
   compareProgressMetric,
@@ -33,7 +28,6 @@ import {
   matchedDashboardRanges,
   metricProgressRange,
   summarizeProgressMetric,
-  scopeProgressDailyRecords,
   type ProgressDailyRecord,
   type ProgressMetric,
   type ProgressPreset,
@@ -43,10 +37,8 @@ import { RecordingTimeline } from "./RecordingTimeline";
 import { ProgressHeatmap } from "./ProgressHeatmap";
 import { ProgressRoutineComparison } from "./ProgressRoutineComparison";
 import { ProgressMetricCard } from "./ProgressMetricCard";
-import { IconButton } from "./LayoutShells";
 import { Button } from "./ui/button";
-import { ChevronUp, ChevronDown } from "./icons";
-import { Modal, SheetHeader } from "./ResponsiveSheet";
+import { ChevronDown } from "./icons";
 
 const summary = "progress-disclosure";
 export type ProgressDashboardView = "overview" | "trends";
@@ -76,6 +68,8 @@ export function ProgressDashboard({
   view = "overview",
   onShowTrend,
   onChooseWeek,
+  renderBreakdown,
+  renderSpecial,
 }: {
   records: readonly ProgressDailyRecord[];
   range: ProgressRange;
@@ -89,14 +83,12 @@ export function ProgressDashboard({
   view?: ProgressDashboardView;
   onShowTrend?: () => void;
   onChooseWeek?: () => void;
+  renderBreakdown?: (metric: ProgressMetric, range: ProgressRange) => ReactNode;
+  renderSpecial?: (topic: "friday" | "zikr") => ReactNode;
 }) {
   const id = useId();
-  const [metrics, setMetrics] = useState<readonly ProgressMetric[]>(DEFAULT_PROGRESS_METRICS);
-  const [draft, setDraft] = useState<readonly ProgressMetric[]>(DEFAULT_PROGRESS_METRICS);
-  const [choosing, setChoosing] = useState(false);
-  const chooseButton = useRef<HTMLButtonElement>(null);
   const [metric, setMetric] = useState<ProgressMetric>("prayers");
-  const [chartDisplay, setChartDisplay] = useState<"line" | "columns">("columns");
+  const [special, setSpecial] = useState<"friday" | "zikr" | null>(null);
   const values = useMemo(
     () =>
       Object.fromEntries(
@@ -130,10 +122,6 @@ export function ProgressDashboard({
           total: formatNumerals(value.possible!, language),
         })
       : `${formatNumerals(value.count, language)} ${text(language, "pagesUnit")}`;
-  const scopedRows = useMemo(
-    () => scopeProgressDailyRecords(records, range, now, dayStart, currentDay),
-    [records, range, now, dayStart, currentDay],
-  );
   const quantity = (key: ProgressMetric) => {
     const value = values[key];
     return (key === "quranGoals" && !value.possible) || (key === "pages" && value.count === 0)
@@ -144,15 +132,6 @@ export function ProgressDashboard({
             count: formatNumerals(value.count, language),
             total: formatNumerals(value.possible, language),
           });
-  };
-  const hasActivity = scopedRows.some((row) => PROGRESS_METRICS.some((key) => (row[key] ?? 0) > 0));
-  const move = (key: ProgressMetric, step: number) => {
-    const next = [...draft];
-    const index = next.indexOf(key);
-    const target = index + step;
-    if (target < 0 || target >= next.length) return;
-    [next[index], next[target]] = [next[target]!, next[index]!];
-    setDraft(next);
   };
   return (
     <div className="progress-dashboard space-y-5" data-testid="progress-dashboard">
@@ -166,129 +145,14 @@ export function ProgressDashboard({
             >
               {text(language, "overview")}
             </h2>
-            <Button
-              ref={chooseButton}
-              type="button"
-              variant="pill"
-              size="pill"
-              data-testid="progress-choose-metrics"
-              className="min-w-11"
-              title={text(language, "choose")}
-              aria-expanded={choosing}
-              aria-haspopup="dialog"
-              aria-controls={`${id}-choices`}
-              onClick={() => {
-                setDraft(metrics);
-                setChoosing(!choosing);
-              }}
-            >
-              <BarChart3 className="size-5" aria-hidden="true" />
-              <span>{text(language, "choose")}</span>
-            </Button>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             {text(language, "currentRange", {
               range: values.prayers.days ? formatProgressRange(values.prayers.range, language, calendar) : "—",
             })}
           </p>
-          <Modal
-            open={choosing}
-            onClose={() => setChoosing(false)}
-            onCloseAutoFocus={(event) => {
-              event.preventDefault();
-              chooseButton.current?.focus({ preventScroll: true });
-            }}
-            title={text(language, "choose")}
-            language={language}
-            direction={language === "ar" ? "rtl" : "ltr"}
-            showCloseButton={false}
-            className="filter-sheet"
-            testId="progress-metric-dialog"
-          >
-            <SheetHeader
-              title={text(language, "choose")}
-              language={language}
-              onClose={() => setChoosing(false)}
-              className="filter-sheet-header"
-            />
-            <fieldset id={`${id}-choices`} className="min-h-0 min-w-0 space-y-3 overflow-y-auto p-3">
-              <p className="progress-help">{text(language, "chooseHelp")}</p>
-              <div className="progress-metric-choices">
-                {PROGRESS_METRICS.map((key) => (
-                  <label
-                    key={key}
-                    className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={draft.includes(key)}
-                      onChange={() =>
-                        setDraft(draft.includes(key) ? draft.filter((item) => item !== key) : [...draft, key])
-                      }
-                      className="size-5 shrink-0 accent-primary progress-focus"
-                    />
-                    {text(language, key)}
-                  </label>
-                ))}
-              </div>
-              <ol className="divide-y divide-border">
-                {draft.map((key, index) => (
-                  <li key={key} className="flex min-w-0 items-center justify-between gap-2 py-1 text-sm">
-                    <span>{text(language, key)}</span>
-                    <span className="flex shrink-0 gap-1">
-                      <IconButton
-                        label={text(language, "moveUp", { metric: text(language, key) })}
-                        disabled={index === 0}
-                        onClick={() => move(key, -1)}
-                      >
-                        <ChevronUp size={18} aria-hidden="true" />
-                      </IconButton>
-                      <IconButton
-                        label={text(language, "moveDown", { metric: text(language, key) })}
-                        disabled={index === draft.length - 1}
-                        onClick={() => move(key, 1)}
-                      >
-                        <ChevronDown size={18} aria-hidden="true" />
-                      </IconButton>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-              <p role="status" className="text-xs text-muted-foreground">
-                {draft.length
-                  ? text(language, "selected", { count: formatNumerals(draft.length, language) })
-                  : text(language, "chooseOne")}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="pill"
-                  disabled={!draft.length}
-                  onClick={() => {
-                    setMetrics(draft);
-                    setChoosing(false);
-                  }}
-                >
-                  {text(language, "apply")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="pill"
-                  size="pill"
-                  onClick={() => {
-                    setChoosing(false);
-                  }}
-                >
-                  {text(language, "cancel")}
-                </Button>
-                <Button type="button" variant="ghost" size="pill" onClick={() => setDraft(DEFAULT_PROGRESS_METRICS)}>
-                  {text(language, "reset")}
-                </Button>
-              </div>
-            </fieldset>
-          </Modal>
           <dl className="progress-overview-grid mt-3" data-testid="progress-overview">
-            {metrics.map((key) => {
+            {DEFAULT_PROGRESS_METRICS.map((key) => {
               const value = values[key];
               const caption =
                 key === "quranGoals"
@@ -319,6 +183,7 @@ export function ProgressDashboard({
                   }
                   onExplore={() => {
                     setMetric(key);
+                    setSpecial(null);
                     onShowTrend?.();
                   }}
                 />
@@ -333,35 +198,6 @@ export function ProgressDashboard({
             key={`${range.startKey}:${range.endKey}:${currentDay}:${calendar}`}
             {...{ records, range, now, dayStart, currentDay, language, calendar, period, displayDate }}
           />
-          <div className="progress-routine-column">
-            <ProgressRoutineComparison values={values} language={language} />
-            <div className="progress-summary-card progress-rhythm-panel" data-material-card="dense">
-              <RecordedPagesChart
-                title={t(language, "home.recordedPagesRhythm")}
-                language={language}
-                points={recordedPageRhythm(
-                  range.startKey,
-                  range.endKey,
-                  getProgressDayKey(now, dayStart),
-                  new Map(records.map((record) => [record.dayKey, record.pages])),
-                )}
-              />
-            </div>
-          </div>
-          {hasActivity && values.morning.days >= 3 && values.morning.count !== values.evening.count && (
-            <aside className="progress-insight-card" data-material-card aria-label={text(language, "insight")}>
-              <Lightbulb className="progress-practice-icon" aria-hidden="true" />
-              <div>
-                <h3 className="text-sm font-bold">{text(language, "insight")}</h3>
-                <p className="mt-1 text-sm leading-relaxed">
-                  {text(language, "routineInsight", {
-                    morning: formatNumerals(values.morning.count, language),
-                    evening: formatNumerals(values.evening.count, language),
-                  })}
-                </p>
-              </div>
-            </aside>
-          )}
         </div>
       )}
       {view === "trends" && (
@@ -377,27 +213,31 @@ export function ProgressDashboard({
               </h2>
               <ProgressSelectField
                 label={text(language, "metric")}
-                value={metric}
-                onChange={setMetric}
+                value={special ?? metric}
+                onChange={(value: ProgressMetric | "friday" | "zikr") => {
+                  if (value === "friday" || value === "zikr") setSpecial(value);
+                  else {
+                    setSpecial(null);
+                    setMetric(value);
+                  }
+                }}
                 language={language}
                 icon={BarChart3}
                 className="w-full sm:w-72 sm:max-w-full"
-                options={PROGRESS_METRICS.map((key) => ({ value: key, label: text(language, `short_${key}`) }))}
+                options={[
+                  ...DEFAULT_PROGRESS_METRICS.map((key) => ({ value: key, label: text(language, `short_${key}`) })),
+                  ...(renderSpecial
+                    ? (["friday", "zikr"] as const).map((key) => ({
+                        value: key,
+                        label: text(language, key === "friday" ? "detail_friday" : "individualZikr"),
+                      }))
+                    : []),
+                ]}
               />
             </div>
-            {period !== "day" && (
-              <div className="progress-chart-display mb-3">
-                <ProgressSelectField
-                  label={text(language, "chartDisplay")}
-                  value={chartDisplay}
-                  onChange={setChartDisplay}
-                  language={language}
-                  icon={BarChart3}
-                  options={(["columns", "line"] as const).map((value) => ({ value, label: text(language, value) }))}
-                />
-              </div>
-            )}
-            {period === "day" ? (
+            {special ? (
+              renderSpecial?.(special)
+            ) : period === "day" ? (
               <div className="space-y-3">
                 <p className="text-sm leading-relaxed text-muted-foreground">{text(language, "dayView")}</p>
                 {onChooseWeek && (
@@ -424,7 +264,7 @@ export function ProgressDashboard({
                   title={text(language, metric)}
                   testId="progress-main-trend"
                   hideSeriesControls
-                  chartDisplay={chartDisplay}
+                  chartDisplay={metric === "pages" ? "columns" : "line"}
                   valueKind={metric === "pages" ? "count" : "rate"}
                   countUnit={text(language, "pagesUnit")}
                   bucketDescription={text(language, metric === "pages" ? "countBuckets" : "rateBuckets")}
@@ -499,39 +339,17 @@ export function ProgressDashboard({
               </>
             )}
           </section>
-          <details className="rounded-xl border border-border bg-card px-4 sm:px-5">
-            <summary className={summary}>
-              {text(language, "categories")}
-              <ChevronDown size={18} aria-hidden="true" />
-            </summary>
-            <p className="mb-3 progress-help">{text(language, "categoryHelp")}</p>
-            <ul className="space-y-3 pb-4">
-              {PROGRESS_METRICS.filter((key) => key !== "pages" && key !== "quranGoals").map((key) => (
-                <li key={key} className="space-y-1">
-                  <p className="flex flex-wrap justify-between gap-2 text-sm">
-                    <span>{text(language, key)}</span>
-                    <bdi className="font-semibold">{quantity(key)}</bdi>
-                  </p>
-                  <div
-                    role="img"
-                    aria-label={`${text(language, key)}: ${quantity(key)}`}
-                    className="flex h-2 overflow-hidden rounded-full bg-muted"
-                    dir={language === "ar" ? "rtl" : "ltr"}
-                  >
-                    <div
-                      className="h-full bg-primary"
-                      style={{
-                        width: `${values[key].possible ? Math.min(100, (values[key].count / values[key].possible!) * 100) : 0}%`,
-                      }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </details>
+          {!special && (
+            <>
+              {(["routines", "morning", "evening", "sleep"] as ProgressMetric[]).includes(metric) && (
+                <ProgressRoutineComparison values={values} language={language} />
+              )}
+              {renderBreakdown?.(metric, complete)}
+            </>
+          )}
         </>
       )}
-      {view !== "trends" && (
+      {view === "trends" && (
         <details className="rounded-xl border border-border bg-card px-4 sm:px-5">
           <summary className={summary}>
             {text(language, "boundaries")}

@@ -9,10 +9,7 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page
-    .getByTestId("first-use-setup")
-    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-    .click();
+  await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
   // Tier-agnostic: the shell mounts BottomNav, NavRail or NavSidebar by width.
   await expect(page.getByRole("navigation")).toBeVisible();
 }

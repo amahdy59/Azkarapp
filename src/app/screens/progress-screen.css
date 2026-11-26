@@ -281,7 +281,7 @@
 }
 .heatmap-legend-card {
   padding: 0.75rem;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--ds-radius-control);
 }
 .heatmap-legend-card .heatmap-scale {
@@ -299,9 +299,10 @@
 .heatmap-day {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 4px;
   align-items: center;
-  min-block-size: 56px;
+  min-block-size: 48px;
   min-inline-size: 44px;
   padding: 4px 2px;
   border: 1px solid var(--border-subtle);
@@ -332,7 +333,7 @@
   min-block-size: 14px;
   border-radius: 4px;
 }
-@container progress-calendar (width < 20.5rem) {
+@container progress-calendar (width < 20.25rem) {
   .heatmap-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 3.5rem), 1fr));
     gap: 8px;
@@ -367,7 +368,7 @@
   color: var(--primary-foreground);
 }
 .heatmap-day[aria-pressed="true"] {
-  outline: 2px solid var(--foreground);
+  outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
 .heatmap-day[data-kind="unavailable"] {
@@ -393,8 +394,8 @@
 .progress-date-details {
   padding: 0.875rem;
   border-radius: var(--ds-radius-control);
-  background-color: color-mix(in srgb, var(--muted) 45%, var(--card));
-  border: 1px solid var(--border);
+  background: none;
+  border: 0;
 }
 .progress-date-detail-row,
 .progress-composition-label {
@@ -500,7 +501,7 @@
 }
 @container progress-dashboard (min-width: 64rem) {
   .progress-overview-support {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (forced-colors: active) {
@@ -676,7 +677,7 @@
 }
 @container progress-dashboard (min-width: 56rem) {
   .progress-overview-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -855,5 +856,61 @@
   }
   .progress-rhythm-panel {
     flex: 1;
+  }
+}
+
+/* Fixed summaries lead into a single, full-width recording history. */
+.progress-overview-summary {
+  max-inline-size: 52rem;
+  margin-inline: auto;
+}
+.progress-overview-grid {
+  gap: 12px;
+}
+.progress-metric-card {
+  padding: 16px;
+  gap: 8px;
+}
+.progress-metric-footer {
+  min-block-size: 0;
+}
+.progress-dashboard {
+  padding-block-start: 8px;
+}
+.progress-overview-support {
+  gap: 24px;
+}
+.heatmap-scroll {
+  padding: 2px;
+}
+.heatmap-grid {
+  gap: 2px;
+}
+@container progress-calendar (width < 20.25rem) {
+  .heatmap-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 3.5rem), 1fr));
+    gap: 8px;
+  }
+  .heatmap-weekdays {
+    display: none;
+  }
+  .heatmap-weekday {
+    display: block;
+  }
+}
+.progress-comparison-card {
+  border: 0;
+  border-block-start: 1px solid var(--border);
+  border-radius: 0;
+  padding: 16px 0 0;
+}
+@container progress-calendar (min-width: 42rem) {
+  .heatmap-layout {
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+    gap: 24px;
+  }
+  .heatmap-detail-rail {
+    border-inline-start: 1px solid var(--border);
+    padding-inline-start: 16px;
   }
 }

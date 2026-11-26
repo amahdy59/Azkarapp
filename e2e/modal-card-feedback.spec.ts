@@ -29,19 +29,16 @@ for (const language of ["ar", "en"] as const) {
       await card.hover();
       await expect.poll(paint).not.toEqual(resting);
     }
-    const choose = page.getByRole("button", {
-      name: language === "ar" ? "اختيار المقاييس" : "Choose metrics",
-      exact: true,
-    });
+    const choose = page.getByTestId("progress-filters-toggle");
     const before = await card.boundingBox();
     await choose.click();
-    const dialog = page.getByTestId("progress-metric-dialog");
+    const dialog = page.getByTestId("progress-filter-sheet");
     await expect(dialog).toBeVisible();
     expect(await card.boundingBox()).toEqual(before);
     expect(
-      (await new AxeBuilder({ page }).include('[data-testid="progress-metric-dialog"]').analyze()).violations,
+      (await new AxeBuilder({ page }).include('[data-testid="progress-filter-sheet"]').analyze()).violations,
     ).toEqual([]);
-    await page.screenshot({ path: info.outputPath("metric-modal.png") });
+    await page.screenshot({ path: info.outputPath("date-modal.png") });
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await expect(choose).toBeFocused();
