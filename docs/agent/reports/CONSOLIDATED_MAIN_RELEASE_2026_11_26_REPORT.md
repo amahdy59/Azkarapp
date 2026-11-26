@@ -69,6 +69,8 @@ Physical Android/iPhone permission/delivery, sensor accuracy, TalkBack/VoiceOver
 
 ## Out-of-scope findings
 
+Post-push local integration verification exposed one migrated prayer-test fixture selecting an empty completed-week range on its fixed date. Selecting the elapsed month preserves every five-prayer, resize and no-recording-controls assertion; its focused rerun passed (1 case, 5.9s). The superseded CI run 45816709146 was cancelled before the browser matrix to avoid knowingly running that stale fixture; its Android job had passed. A fresh exact-commit run is required for the repair. This is a browser-test correction only; application behavior and current release notes are unchanged.
+
 Older worktrees contained already integrated drafts. Their source snapshots and historical branch ancestry are retained; no stale CSS, old native implementation or former Progress gamification was replayed over newer approved work. No branch was deleted or force-pushed.
 
 ## Recommended next step

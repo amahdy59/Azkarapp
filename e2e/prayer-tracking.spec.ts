@@ -87,9 +87,11 @@ test.describe("after-prayer tracking", () => {
     await openHome(page);
     await page.goto("/#/progress/day");
     await chooseProgressDetail(page, "prayers");
+    // The fixture starts a localized week with no completed days. Select an
+    // elapsed month so this read-only breakdown has real dates to summarize.
     await chooseProgressOption(
       page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true }),
-      "week",
+      "month",
     );
     const group = await openPrayerBreakdown(page, "ar");
     await expect(group.locator("input[type=checkbox], textarea")).toHaveCount(0);
