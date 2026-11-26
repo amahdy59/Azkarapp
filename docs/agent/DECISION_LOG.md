@@ -5585,11 +5585,6 @@ Release inspection found confirmed original/adaptation differences in Arabic Al-
 
 The owner approves all reviewed desktop/mobile onboarding recommendations and asks to apply them locally without pushing. Replace the initial multi-permission presentation with one optional notification decision, illustrative preview and collapsed real selections; continue after grant, ask for city only when location-dependent reminders need it, retain Later and usable denied/unsupported/iOS recovery, move storage protection to Account & data. Preserve explicit existing choices, overnight opt-in, independent saving, prayer calculation and honest web closure limitations. This supersedes earlier first-use presentation only. No commit or push for this phase.
 
-## Consolidate all developments into main — 2026-11-26
-
-The owner explicitly requests consolidating and pushing all uncommitted work and auditing other branches for missing developments. This lifts prior implementation/publication holds for the combined release, including the exact-source dhikr branch and accepted optional-audio candidate, while preserving content, recording, translation and device-review boundaries. Follow phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md through exact-commit Quality, Pages and production verification.
-
-
 ## Exact dhikr evidence alignment — 2026-11-24
 
 The owner requests reviewing all dhikr text, benefits and supporting narrations, and explicitly selects exact sourced wording and counts with audio and progress checks. Correct source-specific mismatches in both languages; retain permanent IDs and historical records. Suspend changed-text audio assignments pending independent recording review rather than modifying approved transcripts or matching rules. Remove the evening-specific threefold protection step from the morning routine while keeping its old identity resolvable. Grading disagreement alone remains distinct from a mismatch. See phases/DHIKR_EVIDENCE_ALIGNMENT_2026_11_24.md.
@@ -5597,3 +5592,7 @@ The owner requests reviewing all dhikr text, benefits and supporting narrations,
 ### Dhikr review publication hold — 2026-11-24
 
 The owner instructs: finish applying and validating the corrections, but do not push; the owner is modifying other elements and will push later. Retain this phase locally in its isolated worktree. No application deployment is authorized after this instruction.
+
+## Consolidate all developments into main — 2026-11-26
+
+The owner explicitly requests consolidating and pushing all uncommitted work and auditing other branches for missing developments. This lifts prior implementation/publication holds for the combined release, including the exact-source dhikr branch and accepted optional-audio candidate, while preserving content, recording, translation and device-review boundaries. Follow phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md through exact-commit Quality, Pages and production verification.

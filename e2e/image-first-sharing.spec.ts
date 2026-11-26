@@ -1,12 +1,12 @@
 import { sharingScope, sharingStep } from "./helpers/sharing";
-import { chooseProgressDetail } from "./helpers/progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { t } from "../src/app/i18n";
+import { WIRD_EVIDENCE_BY_SECTION } from "../src/app/content/wirdBenefits";
 
 for (const language of ["ar", "en"] as const) {
-  test(`image-first sharing and milestone PNG ${language} @cross-browser`, async ({ page }, testInfo) => {
+  test(`image-first evidence sharing and PNG ${language} @cross-browser`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -18,20 +18,18 @@ for (const language of ["ar", "en"] as const) {
         }),
       );
     }, language);
-    await page.goto("/#/progress/day");
-    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-    await chooseProgressDetail(page, "reflection");
-    await page.getByTestId("oasis-stage-card").locator(":scope > summary").click();
-    await page
-      .getByRole("button", { name: language === "ar" ? "مشاركة بطاقة التقدم" : "Share Progress Card", exact: true })
-      .click();
+    await page.goto("/#/quran-wird/benefits");
+    await page.getByTestId("wird-benefits-list").locator("article").first().getByRole("button").click();
     const modal = page.getByTestId("collection-share-modal");
     // The owner-approved single image workflow replaces the Image/Text/Link chooser.
     await expect(modal.getByRole("group", { name: t(language, "shareStudio.method"), exact: true })).toHaveCount(0);
+    await sharingStep(modal, "design");
+    await modal.getByRole("combobox", { name: t(language, "shareStudio.format") }).click();
+    await page.getByRole("option", { name: t(language, "shareStudio.portrait"), exact: true }).click();
     await sharingStep(modal, "share");
     await expect(
       modal.getByRole("button", { name: t(language, "shareStudio.copyReadingLink"), exact: true }),
-    ).toHaveCount(0);
+    ).toBeVisible();
     const preview = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(preview).toBeVisible();
     await expect(preview).toHaveAttribute("width", "1080");
@@ -39,8 +37,22 @@ for (const language of ["ar", "en"] as const) {
     await modal
       .getByText(language === "ar" ? "قراءة نص هذه البطاقة" : "Read the text on this card", { exact: true })
       .click();
-    const cardText = modal.getByText(language === "ar" ? "أيام النخيل: ٠" : "Palm days: 0", { exact: false }).first();
+    const cardText = modal
+      .locator(".sharing-disclosure")
+      .filter({ hasText: t(language, "shareStudio.readCard") })
+      .locator('p[lang="ar"]')
+      .first();
     await expect(cardText).toBeVisible();
+    // Verified QCF glyphs are aria-hidden; the original source words remain semantic text.
+    await expect
+      .poll(() =>
+        cardText.evaluate((node) => {
+          const copy = node.cloneNode(true) as HTMLElement;
+          copy.querySelectorAll('[aria-hidden="true"]').forEach((glyph) => glyph.remove());
+          return copy.textContent?.replace(/\s+/gu, " ").trim();
+        }),
+      )
+      .toBe(WIRD_EVIDENCE_BY_SECTION.quran[0].text.ar);
     const download = page.waitForEvent("download");
     await modal
       .getByTestId("sharing-actions")

@@ -1,8 +1,13 @@
-import { progressText } from "../src/app/i18n/progressInsights";
-import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
-import { mkdir, readFile } from "node:fs/promises";
+import {
+  chooseProgressOption,
+  chooseProgressDetail,
+  openPrayerBreakdown,
+  openProgressExport,
+} from "./helpers/progress";
+import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { dashboardText } from "../src/app/i18n/progressDashboard";
 
 async function seedProgress(page: Page, language: "ar" | "en", theme = "midnight", glass = false) {
   await page.clock.setFixedTime(new Date("2026-10-18T12:00:00+02:00"));
@@ -59,304 +64,170 @@ async function seedProgress(page: Page, language: "ar" | "en", theme = "midnight
 }
 
 for (const language of ["ar", "en"] as const) {
-  test(`@cross-browser ${language} optional patterns preserve exact data, rankings and complete exports`, async ({
+  test(`@cross-browser ${language} activity patterns preserve exact data, comparisons and item history`, async ({
     page,
-  }, testInfo) => {
-    test.setTimeout(180_000);
+  }, info) => {
     const ar = language === "ar";
     await seedProgress(page, language);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/#/progress/month");
-    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-    const garden = page.getByTestId("today-garden-card");
-    const prayers = page.getByTestId("prayer-comparison");
-    await expect(prayers.getByRole("list").getByRole("img")).toHaveCount(5);
-    const prayerTimeline = prayers.getByTestId("prayer-trends");
-    await expect(prayerTimeline.getByTestId("recording-time-line")).toBeVisible();
-    await chooseProgressOption(
-      prayerTimeline.getByRole("combobox", { name: progressText(language, "insights.prayerFilter"), exact: true }),
-      "fajr",
-    );
-    await expect(prayerTimeline.getByTestId("timeline-readout")).toContainText(ar ? "١٠٠٪" : "100%");
+    await expect(page.getByTestId("progress-overview").getByRole("button")).toHaveCount(4);
+    await chooseProgressDetail(page, "prayers");
+    const prayers = await openPrayerBreakdown(page, language);
+    await expect(prayers.locator(":scope > ul > li")).toHaveCount(5);
+    await expect(prayers.getByRole("img").first()).toHaveAccessibleName(`${ar ? "الفجر" : "Fajr"}: 17/17`);
+    const timeline = page.getByTestId("progress-main-trend");
+    await expect(timeline.getByTestId("recording-time-point")).toHaveCount(17);
+    await expect(timeline.getByTestId("recording-time-line")).toBeVisible();
     await expect(page.getByRole("table")).toHaveCount(0);
-    // The date picker is unmounted; trend, detail topic and two prayer selectors remain.
-    await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(4);
-    await expect(page.getByTestId("prayer-coverage-hint")).toContainText(ar ? "١٧" : "17 complete days");
-    await expect(prayers.getByTestId("insight-fajr").getByRole("img")).toHaveAccessibleName(
-      ar ? /١٠٠٪/ : /100%; 17 days/,
-    );
-    await expect(prayers.getByTestId("insight-isha").getByRole("img")).toHaveAccessibleName(ar ? /٤٧٪/ : /47%; 8 days/);
+    await chooseProgressOption(prayers.getByRole("combobox"), "rawatib");
+    await expect(prayers.getByRole("list").getByRole("img")).toHaveCount(4);
+    await expect(prayers.getByTestId("insight-asr")).toHaveCount(0);
     await chooseProgressDetail(page, "routines");
-    await expect(garden.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(
-      ar ? /١٠٠٪/ : /100%; 17 days/,
-    );
-    await expect(garden.getByTestId("insight-before_sleep").getByRole("img")).toHaveAccessibleName(
-      ar ? /١٨٪/ : /18%; 3 days/,
-    );
-    await expect(garden.getByRole("definition").first()).toContainText(ar ? "الصباح" : "Morning");
-    const routineTimeline = page.getByTestId("routine-trends");
-    await expect(routineTimeline.getByRole("img")).toHaveCount(1);
-    await expect(routineTimeline.getByTestId("recording-time-line")).toBeVisible();
-    await expect(routineTimeline.getByTestId("recording-time-point")).toHaveCount(3);
-    for (const [label, percentage] of ar
-      ? [
-          ["الصباح", "١٠٠٪"],
-          ["المساء", "٣٣٪"],
-          ["النوم", "٣٣٪"],
-        ]
-      : [
-          ["Morning", "100%"],
-          ["Evening", "33%"],
-          ["Sleep", "33%"],
-        ]) {
-      await chooseProgressOption(
-        routineTimeline.getByRole("combobox", { name: progressText(language, "insights.routineFilter"), exact: true }),
-        (
-          {
-            Morning: "morning",
-            Evening: "evening",
-            Sleep: "before_sleep",
-            الصباح: "morning",
-            المساء: "evening",
-            النوم: "before_sleep",
-          } as Record<string, string>
-        )[label!]!,
-      );
-      await expect(routineTimeline.getByTestId("timeline-readout")).toContainText(percentage!);
+    const routines = page.getByTestId("progress-routine-bars");
+    for (const [name, value] of [
+      ["morning", "18"],
+      ["evening", "9"],
+      ["sleep", "3"],
+    ] as const) {
+      const bar = routines.getByRole("progressbar", { name: dashboardText(language, name), exact: true });
+      await expect(bar).toHaveAttribute("aria-valuenow", value);
+      await expect(bar).toHaveAttribute("aria-valuemax", "18");
     }
-    const scrubber = routineTimeline.getByRole("slider");
-    await scrubber.focus();
+    const slider = timeline.getByRole("slider");
+    await slider.focus();
     await page.keyboard.press("Home");
-    await expect(scrubber).toHaveValue("0");
-    await expect(routineTimeline.getByTestId("timeline-readout")).toContainText(ar ? "١٤٪" : "14%");
+    await expect(slider).toHaveValue("0");
     await page.keyboard.press(ar ? "ArrowLeft" : "ArrowRight");
-    await expect(scrubber).toHaveValue("1");
-    await expect(routineTimeline.getByTestId("timeline-change")).toContainText(ar ? "لم تتغيّر" : "unchanged");
-    const chart = routineTimeline.getByRole("button", {
-      name: ar ? /الأذكار عبر الوقت: اختر تاريخًا/ : /Remembrance over time: Choose a date/,
-    });
-    const chartBox = (await chart.boundingBox())!;
-    await chart.click({ position: { x: ar ? chartBox.width - 8 : 8, y: 80 } });
-    await expect(scrubber).toHaveValue("0");
-    await chart.focus();
+    await expect(slider).toHaveValue("1");
     await page.keyboard.press("End");
-    await expect(scrubber).toHaveValue("2");
-    await expect(routineTimeline.getByTestId("timeline-change")).toHaveCount(0);
-    await expect(garden.getByTestId("period-comparison")).toContainText(ar ? "١٧" : "first 17 days of each");
-    const individual = garden.getByTestId("zikr-insights");
+    await expect(slider).toHaveValue("16");
+    await expect(page.getByTestId("progress-period-comparison")).toContainText(ar ? "١٧" : "17");
+    await timeline.getByText(dashboardText(language, "chartTable"), { exact: true }).click();
+    await expect(timeline.getByRole("table").getByRole("rowheader")).toHaveCount(17);
+    await expect(timeline.getByRole("row").nth(1)).toContainText(ar ? "٣٣٪" : "33%");
+    await chooseProgressDetail(page, "zikr");
+    const individual = page.getByTestId("zikr-insights");
     await expect(individual.getByRole("link")).toHaveCount(2);
     await expect(individual.getByRole("img").first()).toHaveAccessibleName(
       ar ? /أُتمّ في ٠ من ٣/ : /Completed on 0 of 3/,
     );
-    await chooseProgressOption(
-      routineTimeline.getByRole("combobox", { name: progressText(language, "insights.routineFilter"), exact: true }),
-      "all",
-    );
-    await chooseProgressDetail(page, "prayers");
-    await chooseProgressOption(
-      prayers.getByRole("combobox", { name: progressText(language, "insights.practiceFilter"), exact: true }),
-      "rawatib",
-    );
-    await expect(prayers.getByRole("list").getByRole("img")).toHaveCount(4);
-    await expect(prayers.getByTestId("insight-asr")).toHaveCount(0);
-    await prayerTimeline
-      .getByRole("combobox", { name: progressText(language, "insights.prayerFilter"), exact: true })
-      .click();
-    await expect(page.getByRole("option", { name: ar ? "العصر" : "Asr", exact: true })).toHaveCount(0);
-    await expect(page.getByRole("option")).toHaveCount(5);
-    await page.keyboard.press("Escape");
-    const directory = `output/playwright/progress-refinements/${testInfo.project.name}`;
-    await mkdir(directory, { recursive: true });
-    await page.getByTestId("progress-prayer-group").evaluate((node) => node.scrollIntoView({ block: "start" }));
-    await page.screenshot({ path: `${directory}/${language}-prayer-phone.png` });
-    await prayerTimeline
-      .getByTestId("recording-time-plot")
-      .evaluate((node) => node.scrollIntoView({ block: "center" }));
-    await page.screenshot({ path: `${directory}/${language}-prayer-chart-phone.png` });
-    await chooseProgressDetail(page, "routines");
-    await garden.evaluate((node) => node.scrollIntoView({ block: "start" }));
-    await page.screenshot({ path: `${directory}/${language}-month-phone.png` });
-    await individual.evaluate((node) => node.scrollIntoView({ block: "start" }));
-    await page.screenshot({ path: `${directory}/${language}-zikr-phone.png` });
+    await page.screenshot({ path: info.outputPath(`${language}-individual-phone.png`) });
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
-      "year",
-    );
-    await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(10);
-    await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
-      "custom",
-    );
-    await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2025-01-01");
-    await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2025-12-31");
-    await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
-    await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "٢٠٢٥" : "2025");
-    // Custom ranges use the dashboard timeline; historical detail widgets remain preset-only.
-    await page.getByTestId("progress-tab-trends").click();
-    await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true }),
-      "routines",
-    );
-    const historical = page.getByTestId("progress-main-trend");
-    await expect(historical.getByTestId("recording-time-point")).toHaveCount(23);
-    await historical.getByRole("slider").press("Home");
-    await expect(historical.getByTestId("timeline-readout")).toContainText(ar ? "٠" : "0");
-    await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
-      "year",
-    );
-    await page.getByTestId("progress-tab-overview").click();
-    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
     await chooseProgressDetail(page, "routines");
-    await garden.evaluate((node) => node.scrollIntoView({ block: "start" }));
-    await page.screenshot({ path: `${directory}/${language}-year-desktop.png` });
+    const period = page.getByRole("combobox", {
+      name: dashboardText(language, "dateRange"),
+      exact: true,
+      includeHidden: true,
+    });
+    await chooseProgressOption(period, "year");
+    await expect(timeline.getByTestId("recording-time-point")).toHaveCount(10);
+    await chooseProgressOption(period, "custom");
+    await page.getByLabel(dashboardText(language, "start"), { exact: true }).fill("2025-01-01");
+    await page.getByLabel(dashboardText(language, "end"), { exact: true }).fill("2025-12-31");
+    await page.getByRole("button", { name: dashboardText(language, "apply"), exact: true }).click();
+    await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "٢٠٢٥" : "2025");
+    await expect(timeline.getByTestId("recording-time-point")).toHaveCount(23);
+    await slider.press("Home");
+    await expect(timeline.getByTestId("timeline-readout")).toContainText(ar ? "٠" : "0");
+    await chooseProgressOption(period, "month");
     await page.context().setOffline(true);
-    await chooseProgressOption(
-      page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
-      "month",
-    );
-    await expect(garden.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(ar ? /١٠٠٪/ : /100%/);
+    await expect(routines.getByRole("progressbar").first()).toHaveAttribute("aria-valuenow", "18");
+    await page.screenshot({ path: info.outputPath(`${language}-month-desktop-offline.png`) });
   });
 
-  test(`@cross-browser ${language} exact JSON export retains routine counts, matched periods and item history`, async ({
+  test(`@cross-browser ${language} exact JSON export retains routine counts, date boundaries and item history`, async ({
     page,
   }) => {
     await seedProgress(page, language);
     await page.goto("/#/progress/month");
-    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-    await chooseProgressDetail(page, "routines");
+    const menu = await openProgressExport(page, language);
+    await menu.getByLabel(dashboardText(language, "start"), { exact: true }).fill("2026-10-01");
+    await menu.getByLabel(dashboardText(language, "end"), { exact: true }).fill("2026-10-17");
     const [download] = await Promise.all([
       page.waitForEvent("download"),
-      page
-        .getByTestId("today-garden-card")
-        .getByRole("button", {
-          name: language === "ar" ? "تصدير الأوراد" : "Azkar JSON",
-        })
-        .click(),
+      menu.getByRole("button", { name: dashboardText(language, "export"), exact: true }).click(),
     ]);
     const file = JSON.parse(await readFile((await download.path())!, "utf8"));
-    expect(file.days).toBe(17);
-    expect(file.endKey).toBe("2026-10-17");
-    expect(file.calendarType).toBe("gregorian");
-    expect(file.progressDayStartHour).toBe(0);
-    expect(file.rows.map((row: { count: number }) => row.count)).toEqual([17, 8, 3]);
-    expect(file.matchedPeriods.previous).toEqual({ startKey: "2026-09-01", endKey: "2026-09-17", days: 17 });
-    expect(file.matchedCounts).toEqual({ current: 28, previous: 28, possible: 51 });
+    expect(file.schema).toBe("azkarapp.progress.v1");
+    expect(file.selectedRange).toEqual({ startKey: "2026-10-01", endKey: "2026-10-17" });
+    expect(file.calendar).toBe("gregorian");
+    expect(file.devotionalDayStartHour).toBe(0);
+    expect(file.dailyRecords).toHaveLength(17);
+    expect([file.metrics.morning.count, file.metrics.evening.count, file.metrics.sleep.count]).toEqual([17, 8, 3]);
+    expect(file.metrics.routines).toMatchObject({ count: 28, possible: 51, days: 17 });
+    expect(file.records.dailyCompletions).toHaveLength(28);
     expect(file.zikrHistory).toHaveLength(3);
-    expect(file.zikrItems).toEqual([
-      { id: "m-hm-78m", category: "morning", recorded: 0, possible: 3 },
-      { id: "m-hm-77m", category: "morning", recorded: 3, possible: 3 },
-    ]);
+    for (const row of file.zikrHistory) expect(row.completedIds).toEqual(["m-hm-77m"]);
+    expect(file.definitions).toMatchObject({
+      prayerDay: "civil",
+      routineAndQuranDay: "devotional",
+      trendsUseCompleteDays: true,
+      missingRecordsAreNotMissedWorship: true,
+    });
   });
 
   for (const width of [320, 390, 900, 1440]) {
     test(`@cross-browser ${language} insight controls, contrast and sticky focus at ${width}px`, async ({
       page,
-    }, testInfo) => {
-      const ar = language === "ar";
+    }, info) => {
       await seedProgress(page, language, width === 320 ? "light" : width === 900 ? "dark" : "midnight", width === 390);
       await page.setViewportSize({ width, height: width === 320 ? 480 : 900 });
       await page.goto("/#/progress/year");
       if (width === 320)
-        await page.evaluate(() => {
-          document.documentElement.style.fontSize = "200%";
+        await page.locator("html").evaluate((node) => {
+          node.style.fontSize = "200%";
         });
-      // Detailed topics are deliberately optional; open real chart content
-      // before exercising the historical page's sticky scrolling contract.
-      await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-      await expect(page.getByTestId("prayer-comparison")).toBeVisible();
+      await chooseProgressDetail(page, "prayers");
+      const prayers = await openPrayerBreakdown(page, language);
       const controls = page.getByTestId("progress-sticky-controls");
-      const scrollport = page.locator(".progress-screen");
+      const viewport = page.locator(".progress-screen");
       const before = await controls.boundingBox();
-      await scrollport.evaluate((node) => {
+      await viewport.evaluate((node) => {
         node.scrollTop = 600;
       });
       await expect
         .poll(() => controls.evaluate((node) => node.getBoundingClientRect().top))
         .toBeLessThanOrEqual(before!.y);
-      expect(await scrollport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
-      const title = controls.getByRole("heading", { level: 1, name: ar ? "التقدم" : "Progress", exact: true });
-      await expect(title).toBeInViewport();
-      const titleBounds = (await title.boundingBox())!;
-      const controlsBounds = (await controls.boundingBox())!;
-      expect(titleBounds.y).toBeGreaterThanOrEqual(controlsBounds.y);
-      expect(titleBounds.y + titleBounds.height).toBeLessThanOrEqual(controlsBounds.y + controlsBounds.height);
-      const height = await scrollport.evaluate((node) => node.clientHeight);
-      expect((await controls.boundingBox())!.height).toBeLessThanOrEqual(height * 0.7);
-      for (const name of ar ? ["يوم", "أسبوع", "شهر", "سنة"] : ["Day", "Week", "Month", "Year"]) {
-        const period = page.getByRole("combobox", {
-          name: ar ? "نطاق التاريخ" : "Date range",
-          exact: true,
-          includeHidden: true,
-        });
-        const value = (
-          {
-            يوم: "day",
-            أسبوع: "week",
-            شهر: "month",
-            سنة: "year",
-            Day: "day",
-            Week: "week",
-            Month: "month",
-            Year: "year",
-          } as Record<string, string>
-        )[name]!;
+      expect(await viewport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+      await expect(controls.getByRole("heading", { level: 1 })).toBeInViewport();
+      expect((await controls.boundingBox())!.height).toBeLessThanOrEqual(
+        (await viewport.evaluate((node) => node.clientHeight)) * 0.7,
+      );
+      const period = page.getByRole("combobox", {
+        name: dashboardText(language, "dateRange"),
+        exact: true,
+        includeHidden: true,
+      });
+      for (const value of ["day", "week", "month", "year"]) {
         await chooseProgressOption(period, value);
         await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", value);
-        expect(
-          await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
-        ).toBe(true);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
-      const metric = page
-        .getByTestId("prayer-comparison")
-        .getByRole("combobox", { name: progressText(language, "insights.practiceFilter"), exact: true });
+      const metric = prayers.getByRole("combobox");
       await metric.focus();
       await page.keyboard.press("Enter");
       await page.keyboard.press("ArrowDown");
-      await expect(page.getByRole("option").and(page.locator('[data-progress-value="rawatib"]'))).toBeFocused();
+      await expect(page.getByRole("option").and(page.locator('[data-progress-value="mosque"]'))).toBeFocused();
       await page.keyboard.press("Enter");
-      await expect(metric).toHaveAttribute("data-progress-value", "rawatib");
+      await expect(metric).toHaveAttribute("data-progress-value", "mosque");
+      await expect(metric).toBeFocused();
       await expect
-        .poll(async () => {
-          const target = await metric.boundingBox();
-          const chrome = await controls.boundingBox();
-          return target!.y >= chrome!.y + chrome!.height;
-        })
+        .poll(
+          async () =>
+            (await metric.boundingBox())!.y >=
+            (await controls.boundingBox())!.y + (await controls.boundingBox())!.height,
+        )
         .toBe(true);
       const targets = await page
         .locator(".progress-screen button")
         .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect()).filter((rect) => rect.width));
       expect(targets.every((rect) => rect.width >= 44 && rect.height >= 44)).toBe(true);
-      const timeline = page.getByTestId("prayer-trends");
-      if (width < 768) {
-        const firstFilter = (await metric.boundingBox())!;
-        const prayerFilter = (await timeline
-          .getByRole("combobox", { name: progressText(language, "insights.prayerFilter"), exact: true })
-          .boundingBox())!;
-        expect(prayerFilter.y).toBeGreaterThanOrEqual(firstFilter.y + firstFilter.height);
-        expect(Math.abs(prayerFilter.width - firstFilter.width)).toBeLessThan(1);
-        expect(
-          await metric
-            .locator('[data-slot="select-value"]')
-            .evaluate((node) => node.scrollWidth <= node.clientWidth + 1),
-        ).toBe(true);
-      }
+      const timeline = page.getByTestId("progress-main-trend");
       const plot = await timeline.getByTestId("recording-time-plot").boundingBox();
       const scale = await timeline.getByTestId("recording-time-scale").boundingBox();
       expect(scale!.y).toBeCloseTo(plot!.y, 0);
       expect(scale!.height).toBeCloseTo(plot!.height, 0);
-      const lineFocus = timeline.getByRole("combobox", {
-        name: progressText(language, "insights.prayerFilter"),
-        exact: true,
-      });
-      await lineFocus.focus();
-      await page.keyboard.press("Enter");
-      await page.keyboard.press("ArrowDown");
-      await expect(page.getByRole("option").and(page.locator('[data-progress-value="fajr"]'))).toBeFocused();
-      await page.keyboard.press("Enter");
-      await expect(lineFocus).toHaveAttribute("data-progress-value", "fajr");
-      await expect(timeline.getByTestId("recording-flat-summary")).toBeVisible();
       expect(
         await timeline.getByTestId("recording-time-point").evaluateAll((nodes) =>
           nodes.every((node) => {
@@ -365,13 +236,12 @@ for (const language of ["ar", "en"] as const) {
           }),
         ),
       ).toBe(true);
-      const scrubber = timeline.getByRole("slider");
-      await scrubber.focus();
-      await page.keyboard.press("Home");
-      await expect(scrubber).toHaveValue("0");
-      const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
-      expect(axe.violations).toEqual([]);
-      await page.screenshot({ path: testInfo.outputPath(`${language}-insights-${width}.png`) });
+      await timeline.getByRole("slider").press("Home");
+      await expect(timeline.getByRole("slider")).toHaveValue("0");
+      expect(
+        (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations,
+      ).toEqual([]);
+      await page.screenshot({ path: info.outputPath(`${language}-insights-${width}.png`) });
     });
   }
 }
@@ -379,26 +249,20 @@ for (const language of ["ar", "en"] as const) {
 test("installed Progress restores meaningful charts after an offline reload", async ({ page }) => {
   await seedProgress(page, "en");
   await page.goto("/#/progress/month");
-  await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
-  await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(3);
+  await expect(page.getByTestId("progress-main-trend").getByTestId("recording-time-point")).toHaveCount(17);
   await page.evaluate(async () => navigator.serviceWorker.ready);
   await page.reload();
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
   await page.context().setOffline(true);
   await page.reload();
-  await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
-  await expect(page.getByTestId("today-garden-card")).toBeVisible();
-  await chooseProgressOption(
-    page.getByRole("combobox", { name: "Date range", exact: true, includeHidden: true }),
-    "month",
-  );
-  await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(3);
+  const routines = page.getByTestId("progress-routine-bars");
+  await expect(routines.getByRole("progressbar").first()).toHaveAttribute("aria-valuenow", "18");
+  await expect(page.getByTestId("progress-main-trend").getByTestId("recording-time-point")).toHaveCount(17);
   await chooseProgressDetail(page, "prayers");
-  await expect(page.getByTestId("prayer-trends").getByTestId("recording-time-line")).toBeVisible();
-  await chooseProgressDetail(page, "routines");
-  await expect(
-    page.getByTestId("today-garden-card").getByTestId("insight-morning").getByRole("img"),
-  ).toHaveAccessibleName(/100%; 17 days/);
+  const prayers = await openPrayerBreakdown(page, "en");
+  await expect(prayers.getByRole("img").first()).toHaveAccessibleName("Fajr: 17/17");
+  await chooseProgressDetail(page, "zikr");
+  await expect(page.getByTestId("zikr-insights").getByRole("link")).toHaveCount(2);
 });

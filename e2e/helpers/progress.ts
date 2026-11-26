@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 import { t } from "../../src/app/i18n";
+import { dashboardText } from "../../src/app/i18n/progressDashboard";
 
 export async function openProgressExport(page: Page, language: "ar" | "en") {
   await page.goto("/#/settings/account-data");
@@ -9,12 +10,22 @@ export async function openProgressExport(page: Page, language: "ar" | "en") {
   return menu;
 }
 
-export async function chooseProgressDetail(page: Page, topic: "prayers" | "routines" | "friday" | "reflection") {
+export async function chooseProgressDetail(page: Page, topic: "prayers" | "routines" | "friday" | "zikr") {
   await page.getByTestId("progress-tab-trends").click();
-  await chooseProgressOption(
-    page.getByRole("combobox", { name: /Show trend for|عرض اتجاه/ }),
-    topic === "routines" ? "zikr" : topic,
-  );
+  await chooseProgressOption(page.getByRole("combobox", { name: /Show trend for|عرض اتجاه/ }), topic);
+}
+
+export async function openPrayerBreakdown(page: Page, language: "ar" | "en") {
+  const region = page.getByRole("region", {
+    name: dashboardText(language, "perPrayer"),
+    exact: true,
+    includeHidden: true,
+  });
+  const disclosure = page.locator(".progress-screen details").filter({ has: region });
+  if (!(await disclosure.evaluate((node) => (node as HTMLDetailsElement).open)))
+    await disclosure.locator(":scope > summary").click();
+  await expect(region).toBeVisible();
+  return region;
 }
 
 export async function expectProgressFilterFocus(control: Locator) {

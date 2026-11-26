@@ -2,7 +2,7 @@
 
 ## Active phase
 
-[Consolidated main release](phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md) is the owner-authorized integration and publication phase. Consolidate pending work and branch-only developments, preserve review boundaries, pass the release gates and verify exact-commit Quality, Pages and production. This supersedes the preceding local-only publication holds.
+[Consolidated main release](phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md) is the owner-authorized integration and publication phase. Consolidate pending work and branch-only developments, preserve review boundaries, pass the release gates and verify exact-commit Quality, Pages and production. This supersedes the preceding local-only publication holds. The [integration report](reports/CONSOLIDATED_MAIN_RELEASE_2026_11_26_REPORT.md) maps the combined scope and verification evidence.
 
 ## Feature handoffs and historical phase authority
 
@@ -105,6 +105,13 @@ The [final-touch implementation report](reports/FINAL_TOUCH_QUALITY_MOTION_2026_
 5. [Content authoring](../CONTENT_AUTHORING.md)
 6. The active phase above and [decision log](DECISION_LOG.md)
 7. Relevant prayer/audio/motion/domain contracts
+
+## Consolidated feature handoffs
+
+- [Branch/worktree audit](reports/CONSOLIDATION_BRANCH_AUDIT_2026_11_26.md): missing work integrated; historical squashes and superseded drafts preserved without reverting newer behavior.
+- [Dhikr source corrections](reports/DHIKR_EVIDENCE_ALIGNMENT_2026_11_24_REPORT.md): exact-source/count changes and recording suspensions, with review limitations retained.
+- [Next-release recommendations](reports/RECOMMENDATIONS_NEXT_RELEASE_2026_11_26_REPORT.md): Home books, location, shared focus and compact Qibla, reconciled with deployed main.
+- [Accepted optional audio](reports/OPTIONAL_AUDIO_ACTIVATION_LOCAL_2026_11_26_REPORT.md): three exact dua files and three exact Al-Mulk recordings accepted by the owner; defaults and coverage limits retained. This later acceptance supersedes the earlier pilot's pending status for these six files only.
 
 ## Working references
 

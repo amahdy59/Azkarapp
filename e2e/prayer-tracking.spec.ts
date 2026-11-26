@@ -1,3 +1,4 @@
+import { chooseProgressDetail, chooseProgressOption, openPrayerBreakdown } from "./helpers/progress";
 import { expect, test, type Page } from "@playwright/test";
 import { assertPrayerOverview } from "./helpers/home-overview";
 
@@ -85,16 +86,20 @@ test.describe("after-prayer tracking", () => {
   test("all five prayer records stay available without bringing recording controls into Progress", async ({ page }) => {
     await openHome(page);
     await page.goto("/#/progress/day");
-    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-    const group = page.getByTestId("progress-prayer-group");
-    await expect(group.locator("input, select, button")).toHaveCount(0);
-    const records = group.getByTestId("prayer-progress-summary").getByRole("listitem");
+    await chooseProgressDetail(page, "prayers");
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: "نطاق التاريخ", exact: true, includeHidden: true }),
+      "week",
+    );
+    const group = await openPrayerBreakdown(page, "ar");
+    await expect(group.locator("input[type=checkbox], textarea")).toHaveCount(0);
+    const records = group.locator(":scope > ul > li");
     await expect(records).toHaveCount(5);
     for (const name of ["الفجر", "الظهر", "العصر", "المغرب", "العشاء"])
       await expect(records.filter({ hasText: name })).toHaveCount(1);
     await page.setViewportSize({ width: 375, height: 812 });
     await expect(records).toHaveCount(5);
-    await expect(group.locator("input, select, button, table")).toHaveCount(0);
+    await expect(group.locator("input[type=checkbox], textarea, table")).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 });

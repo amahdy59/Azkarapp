@@ -1,4 +1,3 @@
-import { chooseProgressDetail } from "./helpers/progress";
 import { expect, test } from "@playwright/test";
 import { sharingContent, sharingStep, sharingCaption, sharingReadingLink } from "./helpers/sharing";
 import { t } from "../src/app/i18n";
@@ -91,10 +90,9 @@ for (const language of ["ar", "en"] as const) {
       await page.screenshot({ path: testInfo.outputPath(`wird-evidence-${language}.png`) });
       if (section === "quran") {
         await page.goto("/#/progress/day");
-        await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-        await chooseProgressDetail(page, "reflection");
-        await page.getByTestId("oasis-stage-card").locator("summary").click();
-        await expect(page.getByRole("heading", { name: t(language, "garden.explanationLabel") })).toBeVisible();
+        await expect(page.getByTestId("progress-overview")).toBeVisible();
+        await expect(page.getByTestId("oasis-stage-card")).toHaveCount(0);
+        await expect(page.getByRole("heading", { name: t(language, "garden.explanationLabel") })).toHaveCount(0);
       }
     });
   }

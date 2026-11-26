@@ -1,4 +1,9 @@
-import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
+import {
+  chooseProgressOption,
+  chooseProgressDetail,
+  openPrayerBreakdown,
+  openProgressExport,
+} from "./helpers/progress";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
@@ -34,26 +39,24 @@ for (const language of ["ar", "en"] as const) {
         { language, width },
       );
       await page.goto("/#/progress/day");
-      await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
       await chooseProgressDetail(page, "routines");
-      const garden = page.getByTestId("today-garden-card");
+      const garden = page.getByTestId("progress-routine-bars");
       await expect(garden).toBeVisible();
       await expect(garden.locator("img")).toHaveCount(0);
       await chooseProgressOption(
         page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
         "month",
       );
-      const monthChart = page.getByTestId("today-garden-card");
+      const monthChart = page.getByTestId("progress-routine-bars");
       await expect(monthChart).toBeVisible();
       const chartBounds = await monthChart.boundingBox();
       await chooseProgressDetail(page, "prayers");
-      const prayerBounds = await page.getByTestId("progress-prayer-group").boundingBox();
+      const prayerBounds = await (await openPrayerBreakdown(page, language)).locator("xpath=..").boundingBox();
       await chooseProgressDetail(page, "routines");
       expect(Math.abs(prayerBounds!.x - chartBounds!.x)).toBeLessThanOrEqual(1);
       expect(Math.abs(prayerBounds!.width - chartBounds!.width)).toBeLessThanOrEqual(1);
-      await expect(monthChart.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(
-        ar ? /١٠٠٪/ : /100%/,
-      );
+      await expect(monthChart.getByRole("progressbar").first()).toHaveAttribute("aria-valuenow", "1");
+      await expect(monthChart.getByRole("progressbar").first()).toHaveAttribute("aria-valuemax", "2");
       await expect(page.getByRole("table")).toHaveCount(0);
       const directory = `output/playwright/settings-progress-clarity/${testInfo.project.name}`;
       await mkdir(directory, { recursive: true });
@@ -62,20 +65,22 @@ for (const language of ["ar", "en"] as const) {
         page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
         "year",
       );
-      const chart = page.getByTestId("today-garden-card");
+      const chart = page.getByTestId("progress-routine-bars");
       await expect(chart).toBeVisible();
-      await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(3);
+      await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(1);
       await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("aria-expanded", "false");
-      const exportButton = chart.getByRole("button", {
-        name: ar ? "تصدير الأوراد" : "Azkar JSON",
-      });
-      await exportButton.focus();
-      await expect(exportButton).toBeFocused();
+      const activity = page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true });
+      await activity.focus();
+      await expect(activity).toBeFocused();
       const axeProgress = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
         .analyze();
       expect(axeProgress.violations).toEqual([]);
       await page.screenshot({ path: `${directory}/${language}-${width}-year.png` });
+      const exportMenu = await openProgressExport(page, language);
+      const exportButton = exportMenu.getByRole("button", { name: ar ? "تصدير JSON" : "Export JSON", exact: true });
+      await exportButton.focus();
+      await expect(exportButton).toBeFocused();
       if (width === 320) {
         await page.evaluate(() => {
           document.documentElement.style.fontSize = "200%";

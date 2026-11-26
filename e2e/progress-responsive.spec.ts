@@ -1,4 +1,9 @@
-import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
+import {
+  chooseProgressOption,
+  chooseProgressDetail,
+  openPrayerBreakdown,
+  openProgressExport,
+} from "./helpers/progress";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -23,9 +28,8 @@ async function openProgress(page: Page) {
     );
   });
   await page.goto("/#/progress/day");
-  await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await chooseProgressDetail(page, "routines");
-  await expect(page.getByTestId("today-garden-card")).toBeVisible();
+  await expect(page.getByTestId("progress-routine-bars")).toBeVisible();
 }
 
 /** Elements whose content is wider than the box they are drawn in. */
@@ -53,7 +57,7 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
       { يوم: "day", أسبوع: "week", شهر: "month", سنة: "year" }[tab]!,
     );
     // The chart is the slowest thing to settle; wait on the panel, not a timer.
-    await expect(page.getByTestId("today-garden-card")).toBeVisible();
+    await expect(page.getByTestId("progress-routine-bars")).toBeVisible();
 
     await expect.poll(() => overflowingElements(page), { timeout: 10_000 }).toEqual([]);
 
@@ -75,12 +79,14 @@ test("longer Progress periods compare five prayers with exact data available as 
   );
 
   await chooseProgressDetail(page, "prayers");
-  await expect(page.getByTestId("prayer-comparison").getByRole("list").getByRole("img")).toHaveCount(5);
+  const prayers = await openPrayerBreakdown(page, "ar");
+  await expect(prayers.locator(":scope > ul > li")).toHaveCount(5);
   await expect(page.getByRole("table")).toHaveCount(0);
-  // One range selector, detail topic and the two prayer selectors.
-  await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(4);
-  const download = page.getByTestId("prayer-comparison").getByRole("button", { name: "تصدير الصلاة" });
+  // Trend activity and the contextual prayer metric, with range editing modal-only.
+  await expect(page.getByRole("combobox", { includeHidden: true })).toHaveCount(2);
+  await expect(prayers.getByRole("img").first()).toHaveAccessibleName(/^الفجر:/);
+  const menu = await openProgressExport(page, "ar");
+  const download = menu.getByRole("button", { name: "تصدير JSON", exact: true });
   await download.focus();
   await expect(download).toBeFocused();
-  await expect(page.getByTestId("prayer-comparison").getByTestId("insight-fajr")).toBeVisible();
 });

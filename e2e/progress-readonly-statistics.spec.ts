@@ -1,4 +1,4 @@
-import { chooseProgressOption } from "./helpers/progress";
+import { chooseProgressOption, chooseProgressDetail, openPrayerBreakdown } from "./helpers/progress";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
@@ -37,15 +37,14 @@ for (const language of ["ar", "en"] as const) {
         { language, width },
       );
       await page.goto("/#/progress/day");
-      await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-      const summary = page.getByTestId("prayer-progress-summary");
+      const summary = page.getByTestId("progress-overview");
       await expect(summary).toBeVisible();
       const before = await page.evaluate(() => {
         const state = JSON.parse(localStorage.getItem("azkarapp.state.v1")!);
         return { prayers: state.prayerTracking, completions: state.dailyCompletions, habits: state.dailyHabits };
       });
-      await expect(summary.getByRole("listitem")).toHaveCount(5);
-      await expect(summary.getByText(ar ? "في المنزل" : "At home", { exact: true })).toBeVisible();
+      await expect(summary.getByRole("button")).toHaveCount(4);
+      await expect(page.getByTestId("progress-metric-prayers")).toContainText(ar ? "١ من ٥" : "1 of 5");
       await expect(page.locator(".progress-screen input[type=checkbox], .progress-screen textarea")).toHaveCount(0);
       await expect(page.getByRole("button", { name: ar ? "فتح الفجر" : "Open Fajr", exact: true })).toHaveCount(0);
       await expect(summary.locator("details, table")).toHaveCount(0);
@@ -56,7 +55,7 @@ for (const language of ["ar", "en"] as const) {
       const directory = `output/playwright/progress-statistics/${testInfo.project.name}`;
       await mkdir(directory, { recursive: true });
       await page.screenshot({ path: `${directory}/${language}-${width}-overview.png` });
-      await expect(summary.getByRole("listitem")).toHaveCount(5);
+      await expect(summary.getByRole("button")).toHaveCount(4);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
       ).toBe(true);
@@ -70,8 +69,8 @@ for (const language of ["ar", "en"] as const) {
       await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-17");
       await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-17");
       await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
-      await expect(page.getByTestId("progress-detailed-context")).toHaveAttribute("open");
-      const historical = page.getByRole("region", { name: ar ? "حسب الصلاة" : "By prayer", exact: true });
+      await chooseProgressDetail(page, "prayers");
+      const historical = await openPrayerBreakdown(page, language);
       await expect(historical).not.toContainText(ar ? "أتممت أذكار الصلاة" : "Completed the azkar");
       await expect(historical).toContainText(ar ? "في المسجد" : "At the mosque");
       await expect(page.locator(".progress-screen input[type=checkbox], .progress-screen textarea")).toHaveCount(0);
@@ -82,10 +81,10 @@ for (const language of ["ar", "en"] as const) {
       expect(after).toEqual(before);
       await chooseProgressOption(
         page.getByRole("combobox", { name: ar ? "نطاق التاريخ" : "Date range", exact: true, includeHidden: true }),
-        "week",
+        "month",
       );
       await expect(summary).toHaveCount(0);
-      await expect(page.getByTestId("prayer-comparison")).toBeVisible();
+      await expect(historical.locator(":scope > ul > li")).toHaveCount(5);
     });
   }
 }

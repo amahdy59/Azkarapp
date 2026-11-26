@@ -275,6 +275,27 @@ describe("collectionShareCard", () => {
       expect(context.scale).toHaveBeenCalledWith(64 / 56, 64 / 56);
     });
   }
+  it("keeps an independent QR inside the content-fitted tall canvas", async () => {
+    const { canvas, context } = createMockCanvas();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
+      tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({ blob: async () => new Blob(["mock"]) } as Response);
+    await generateCollectionStoryPage({
+      ...SAMPLE_PAGE,
+      format: "tall",
+      single: true,
+      qr: true,
+      url: "https://example.com/#/azkar/morning/1",
+      items: [{ id: "one", arabicText: "سبحان الله" }],
+    });
+    expect(canvas.height).toBe(2920);
+    const rectangles = vi.mocked(context.fillRect).mock.calls;
+    expect(rectangles.length).toBeGreaterThan(10);
+    for (const [, y, , height] of rectangles) expect(y + height).toBeLessThanOrEqual(canvas.height);
+    expect(context.fillText).toHaveBeenCalledWith("wa-zaker.com", 540, expect.any(Number));
+  });
+
   it("always embeds the exact Mushaf QR in a long-surah reminder", async () => {
     const { canvas, context } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);

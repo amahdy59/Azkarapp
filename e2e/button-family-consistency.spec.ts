@@ -31,10 +31,12 @@ for (const scenario of [
         const s = getComputedStyle(node);
         return { fill: s.backgroundColor, border: s.borderColor, width: s.borderWidth, radius: s.borderRadius };
       });
-    const verifyAction = async (button: Locator) => {
+    const verifyAction = async (button: Locator, iconOnly = false, variant = "pill") => {
       await button.scrollIntoViewIfNeeded();
-      await expect(button).toHaveAttribute("data-variant", "pill");
-      await expect(button).toHaveAttribute("data-size", "pill");
+      if (!iconOnly) {
+        await expect(button).toHaveAttribute("data-variant", variant);
+        await expect(button).toHaveAttribute("data-size", "pill");
+      } else await expect(button).toHaveAttribute("aria-haspopup", "dialog");
       const geometry = await button.evaluate((node) => {
         const r = node.getBoundingClientRect();
         const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
@@ -47,7 +49,7 @@ for (const scenario of [
         };
       });
       expect(geometry.width).toBeGreaterThanOrEqual(44);
-      expect(geometry.height).toBeGreaterThanOrEqual(54);
+      expect(geometry.height).toBeGreaterThanOrEqual(iconOnly || variant === "ghost" ? 44 : 54);
       expect(geometry.contained).toBe(true);
       expect(geometry.hit).toBe(true);
       expect(geometry.overflow).toBeLessThanOrEqual(1);
@@ -64,30 +66,26 @@ for (const scenario of [
       expect(ring.shadow !== "none" || ring.outline !== "none").toBe(true);
     };
     await page.goto("/#/progress");
-    const choose = page.getByTestId("progress-choose-metrics");
+    const choose = page.getByTestId("progress-filters-toggle");
     await expect(choose).toBeVisible();
     if (scenario.enlarged)
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "200%";
       });
-    await verifyAction(choose);
+    await verifyAction(choose, true);
     await page.mouse.move(0, 0);
     expect(await paint(choose)).toEqual(await paint(page.locator(".progress-view-tabs")));
     const icon = await choose.locator("svg").boundingBox();
-    expect(icon!.width).toBe(scenario.enlarged ? 40 : 20);
-    expect(icon!.height).toBe(scenario.enlarged ? 40 : 20);
+    expect(icon!.width).toBe(20);
+    expect(icon!.height).toBe(20);
     await page.screenshot({ path: info.outputPath("progress-pill-choose.png") });
     await page.keyboard.press("Enter");
-    const dialog = page.getByTestId("progress-metric-dialog");
+    const dialog = page.getByTestId("progress-filter-sheet");
     await expect(dialog).toBeVisible();
-    const apply = dialog.getByRole("button", { name: dashboardText(scenario.language, "apply"), exact: true });
-    const cancel = dialog.getByRole("button", { name: dashboardText(scenario.language, "cancel"), exact: true });
-    await expect(apply).toHaveAttribute("data-variant", "default");
-    await expect(cancel).toHaveAttribute("data-variant", "pill");
-    await expect(apply).toHaveAttribute("data-size", "pill");
-    for (const checkbox of await dialog.getByRole("checkbox").all())
-      if (await checkbox.isChecked()) await checkbox.uncheck();
-    await expect(apply).toBeDisabled();
+    const cancel = dialog.getByRole("button", { name: t(scenario.language, "common.close"), exact: true });
+    await expect(
+      dialog.getByRole("combobox", { name: dashboardText(scenario.language, "dateRange"), exact: true }),
+    ).toBeVisible();
     await cancel.click();
     await expect(dialog).toBeHidden();
     await expect(choose).toHaveAttribute("aria-expanded", "false");
@@ -109,8 +107,8 @@ for (const scenario of [
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "200%";
       });
-    await verifyAction(edit);
-    const quranPaint = await paint(edit);
+    await verifyAction(edit, false, "ghost");
+    expect((await paint(edit)).fill).toBe("rgba(0, 0, 0, 0)");
     await page.screenshot({ path: info.outputPath("quran-pill-edit.png") });
     await page.keyboard.press("Enter");
     await expect(page.getByRole("dialog")).toBeVisible();
@@ -129,7 +127,7 @@ for (const scenario of [
       });
     await verifyAction(location);
     await page.mouse.move(0, 0);
-    expect(await paint(location)).toEqual(quranPaint);
+    expect((await paint(location)).fill).not.toBe("rgba(0, 0, 0, 0)");
     await page.screenshot({ path: info.outputPath("settings-pill-location.png") });
   });
 }
@@ -149,7 +147,7 @@ test("pill actions keep stationary ink and geometry with both motion preferences
     );
   });
   await page.goto("/#/progress");
-  const action = page.getByTestId("progress-choose-metrics");
+  const action = page.getByTestId("progress-filters-toggle");
   await expect(action).toBeVisible();
   const box = await action.boundingBox();
   const ink = await action.evaluate((node) => getComputedStyle(node).color);

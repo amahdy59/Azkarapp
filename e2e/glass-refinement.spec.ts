@@ -1,3 +1,4 @@
+import { chooseProgressDetail, chooseProgressOption, openPrayerBreakdown } from "./helpers/progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -40,8 +41,12 @@ for (const [language, width] of [
       await capture(route.replaceAll("/", "-"));
       if (route === "home" || route === "progress") {
         if (route === "progress") {
-          await page.getByTestId("progress-detailed-context").locator("summary").click();
-          await expect(page.getByTestId("progress-prayer-group")).toBeVisible();
+          await chooseProgressDetail(page, "prayers");
+          await chooseProgressOption(
+            page.getByRole("combobox", { name: /Date range|نطاق التاريخ/, includeHidden: true }),
+            "month",
+          );
+          await openPrayerBreakdown(page, language);
         }
         const scrollport = page.locator(route === "home" ? ".home-content-scroll" : ".app-screen-surface");
         await scrollport.evaluate((node) => {

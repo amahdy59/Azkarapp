@@ -1,3 +1,4 @@
+import { chooseProgressDetail, chooseProgressOption, openPrayerBreakdown } from "./helpers/progress";
 import { openProgress } from "./helpers/open-progress";
 import { expect, test } from "@playwright/test";
 
@@ -108,8 +109,12 @@ for (const width of [390, 1440]) {
       if (route === "progress") {
         // The focused overview now fits on desktop. Inspect real optional
         // prayer details to exercise scrolling without inventing tall content.
-        await page.getByTestId("progress-detailed-context").locator("summary").click();
-        await expect(page.getByTestId("progress-prayer-group")).toBeVisible();
+        await chooseProgressDetail(page, "prayers");
+        await chooseProgressOption(
+          page.getByRole("combobox", { name: /Date range|نطاق التاريخ/, includeHidden: true }),
+          "month",
+        );
+        await openPrayerBreakdown(page, "ar");
       }
       await expect
         .poll(() =>

@@ -130,7 +130,7 @@ for (const language of ["ar", "en"] as const) {
       .click();
     await expect(page.getByRole("region", { name: ar ? "حسب الصلاة" : "By prayer", exact: true })).toBeVisible();
     await expect(page.getByTestId("zikr-insights")).toHaveCount(0);
-    await chooseProgressDetail(page, "routines");
+    await chooseProgressDetail(page, "zikr");
     await expect(page.getByRole("region", { name: ar ? "حسب الصلاة" : "By prayer", exact: true })).toHaveCount(0);
     await expect(page.getByTestId("zikr-insights")).toBeVisible();
     await chooseProgressDetail(page, "friday");
