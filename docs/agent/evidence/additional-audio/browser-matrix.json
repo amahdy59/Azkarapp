@@ -1,0 +1,329 @@
+[
+  {
+    "engine": "chromium",
+    "results": [
+      {
+        "scenario": {
+          "language": "en",
+          "themeMode": "light",
+          "appMaterial": "solid",
+          "width": 1440,
+          "height": 1000,
+          "scale": ""
+        },
+        "root": "theme-light reduce-motion",
+        "material": "solid",
+        "menuGeometry": {
+          "left": 272,
+          "right": 1170,
+          "top": 403,
+          "bottom": 561,
+          "background": "rgb(251, 249, 245)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 1438,
+          "scroll": 1438
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "ar",
+          "themeMode": "midnight",
+          "appMaterial": "glass",
+          "width": 768,
+          "height": 1024,
+          "scale": ""
+        },
+        "root": "theme-midnight dark reduce-motion",
+        "material": "glass",
+        "menuGeometry": {
+          "left": 15,
+          "right": 751,
+          "top": 379,
+          "bottom": 537,
+          "background": "rgb(15, 23, 42)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 766,
+          "scroll": 766
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "en",
+          "themeMode": "dark",
+          "appMaterial": "glass",
+          "width": 320,
+          "height": 800,
+          "scale": "200%"
+        },
+        "root": "theme-dark dark reduce-motion",
+        "material": "glass",
+        "menuGeometry": {
+          "left": 22,
+          "right": 310,
+          "top": 485,
+          "bottom": 798,
+          "background": "rgb(15, 23, 42)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 318,
+          "scroll": 318
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "ar",
+          "themeMode": "light",
+          "appMaterial": "solid",
+          "width": 390,
+          "height": 844,
+          "scale": ""
+        },
+        "root": "theme-light reduce-motion",
+        "material": "solid",
+        "menuGeometry": {
+          "left": 15,
+          "right": 373,
+          "top": 450,
+          "bottom": 608,
+          "background": "rgb(251, 249, 245)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 388,
+          "scroll": 388
+        },
+        "exportPending": true,
+        "accessibility": []
+      }
+    ]
+  },
+  {
+    "engine": "firefox",
+    "results": [
+      {
+        "scenario": {
+          "language": "en",
+          "themeMode": "light",
+          "appMaterial": "solid",
+          "width": 1440,
+          "height": 1000,
+          "scale": ""
+        },
+        "root": "theme-light reduce-motion",
+        "material": "solid",
+        "menuGeometry": {
+          "left": 272,
+          "right": 1170,
+          "top": 403,
+          "bottom": 561,
+          "background": "rgb(251, 249, 245)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 1438,
+          "scroll": 1438
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "ar",
+          "themeMode": "midnight",
+          "appMaterial": "glass",
+          "width": 768,
+          "height": 1024,
+          "scale": ""
+        },
+        "root": "theme-midnight dark reduce-motion",
+        "material": "glass",
+        "menuGeometry": {
+          "left": 15,
+          "right": 751,
+          "top": 379,
+          "bottom": 537,
+          "background": "rgb(15, 23, 42)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 766,
+          "scroll": 766
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "en",
+          "themeMode": "dark",
+          "appMaterial": "glass",
+          "width": 320,
+          "height": 800,
+          "scale": "200%"
+        },
+        "root": "theme-dark dark reduce-motion",
+        "material": "glass",
+        "menuGeometry": {
+          "left": 22,
+          "right": 310,
+          "top": 485,
+          "bottom": 798,
+          "background": "rgb(15, 23, 42)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 318,
+          "scroll": 318
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "ar",
+          "themeMode": "light",
+          "appMaterial": "solid",
+          "width": 390,
+          "height": 844,
+          "scale": ""
+        },
+        "root": "theme-light reduce-motion",
+        "material": "solid",
+        "menuGeometry": {
+          "left": 15,
+          "right": 373,
+          "top": 450,
+          "bottom": 608,
+          "background": "rgb(251, 249, 245)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 388,
+          "scroll": 388
+        },
+        "exportPending": true,
+        "accessibility": []
+      }
+    ]
+  },
+  {
+    "engine": "webkit",
+    "results": [
+      {
+        "scenario": {
+          "language": "en",
+          "themeMode": "light",
+          "appMaterial": "solid",
+          "width": 1440,
+          "height": 1000,
+          "scale": ""
+        },
+        "root": "theme-light reduce-motion",
+        "material": "solid",
+        "menuGeometry": {
+          "left": 272,
+          "right": 1170,
+          "top": 403,
+          "bottom": 561,
+          "background": "rgb(251, 249, 245)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 1438,
+          "scroll": 1438
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "ar",
+          "themeMode": "midnight",
+          "appMaterial": "glass",
+          "width": 768,
+          "height": 1024,
+          "scale": ""
+        },
+        "root": "theme-midnight dark reduce-motion",
+        "material": "glass",
+        "menuGeometry": {
+          "left": 15,
+          "right": 751,
+          "top": 379,
+          "bottom": 537,
+          "background": "rgb(15, 23, 42)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 766,
+          "scroll": 766
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "en",
+          "themeMode": "dark",
+          "appMaterial": "glass",
+          "width": 320,
+          "height": 800,
+          "scale": "200%"
+        },
+        "root": "theme-dark dark reduce-motion",
+        "material": "glass",
+        "menuGeometry": {
+          "left": 22,
+          "right": 310,
+          "top": 485,
+          "bottom": 798,
+          "background": "rgb(15, 23, 42)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 318,
+          "scroll": 318
+        },
+        "exportPending": true,
+        "accessibility": []
+      },
+      {
+        "scenario": {
+          "language": "ar",
+          "themeMode": "light",
+          "appMaterial": "solid",
+          "width": 390,
+          "height": 844,
+          "scale": ""
+        },
+        "root": "theme-light reduce-motion",
+        "material": "solid",
+        "menuGeometry": {
+          "left": 15,
+          "right": 373,
+          "top": 450,
+          "bottom": 608,
+          "background": "rgb(251, 249, 245)",
+          "opacity": "1"
+        },
+        "overflow": {
+          "client": 388,
+          "scroll": 388
+        },
+        "exportPending": true,
+        "accessibility": []
+      }
+    ]
+  }
+]

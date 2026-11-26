@@ -4,6 +4,12 @@ The app downloads and validates a candidate ZIP in the background. It records th
 
 # Android host and release verification
 
+## Seamless light system bars — 2026-11-25, local
+
+The appearance boundary sends the resolved opaque CSS system-bar ground through the custom AzkarSystemBars bridge. Native luminance selects dark icons on light paper and light icons on dark/Midnight/Glass/high-contrast grounds. The activity retains the last ground for focus return and stores only that native presentation value for subsequent launches. Android 7 retains a dark navigation bar because it cannot draw dark navigation buttons. Current Android edge-to-edge uses the matching protected web status inset; legacy bar colors remain fallbacks. Safe-area ownership remains in the app shell once, including Mushaf. No plugin dependency, application-state field or permission was added.
+
+Rebuild and install the native APK to receive this Java bridge; web OTA alone cannot update an existing binary. Browser screenshots do not contain actual Android status icons. Real-device switching, process restart, cutouts, gesture/three-button navigation and TalkBack acceptance remain separate checks.
+
 Start with the [Android developer handoff](ANDROID_DEVELOPER_HANDOFF.md) for the shared-code map, existing native services, missing persistent native-file download backend and implementation/acceptance sequence. Current offline audio uses device-local WebView Cache Storage; native document export does not make it an app-private file repository.
 
 The owner approved Capacitor 8 on 2026-10-15, retaining the React/PWA application. The host uses Android API 36, minimum API 24, Java 21, a checksum-pinned Gradle wrapper and the package version for `versionName`. `versionCode` begins at 1 and must increase for each Play upload. The application ID is `m.azkar.com`, matching the existing Google Play listing.

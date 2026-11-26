@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { exportBookEdition } from "./book-presentation.mjs";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -102,7 +103,7 @@ function buildHtml(theme) {
     if (p.page === 1) {
       // Cover Page
       pagesHtml += `
-      <div class="page" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
+      <div class="page" id="p-1" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
         <div class="page-frame-outer" style="border-color:${t.gold}; opacity:0.75;"></div>
         <div class="page-frame-inner" style="border-color:${t.gold}; opacity:0.4;"></div>
 
@@ -147,12 +148,12 @@ function buildHtml(theme) {
     if (p.page === 2) {
       // Publication Cataloging & Legal Deposit
       pagesHtml += `
-      <div class="page" style="background:${t.bg}; color:${t.text};">
+      <div class="page" id="p-2" style="background:${t.bg}; color:${t.text};">
         <div class="page-frame-outer"></div>
         <div class="page-frame-inner"></div>
         <div class="page-header">
           <div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div>
-          <div class="header-chapter">بَيَانَاتُ النَّشْرِ وَالإِيدَاعِ</div>
+          <a href="#p-134" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">بَيَانَاتُ النَّشْرِ وَالإِيدَاعِ ↰</a>
         </div>
 
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:4mm; padding:0 3mm;">
@@ -194,12 +195,12 @@ function buildHtml(theme) {
     if (p.page === 17) {
       // Chapter 1 Title Splash
       pagesHtml += `
-      <div class="page" style="background:${t.bg}; color:${t.text};">
+      <div class="page" id="p-17" style="background:${t.bg}; color:${t.text};">
         <div class="page-frame-outer"></div>
         <div class="page-frame-inner"></div>
         <div class="page-header">
           <div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div>
-          <div class="header-chapter">وِرْدُ الصَّبَاحِ وَالْمَسَاءِ</div>
+          <a href="#p-134" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">وِرْدُ الصَّبَاحِ وَالْمَسَاءِ ↰</a>
         </div>
 
         <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
@@ -230,7 +231,7 @@ function buildHtml(theme) {
     if (p.page === 137) {
       // Back Cover Page
       pagesHtml += `
-      <div class="page" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
+      <div class="page" id="p-137" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
         <div class="page-frame-outer" style="border-color:${t.gold}; opacity:0.75;"></div>
         <div class="page-frame-inner" style="border-color:${t.gold}; opacity:0.4;"></div>
 
@@ -268,6 +269,60 @@ function buildHtml(theme) {
       continue;
     }
 
+    // Dedicated Table of Contents rendering (Pages 134, 135, 136)
+    if (p.page >= 134 && p.page <= 136) {
+      const partNumber = p.page === 134 ? "الأَوَّلُ" : p.page === 135 ? "الثَّانِي" : "الثَّالِثُ";
+      const tocItems = (p.lines || [])
+        .map((line) => {
+          const match = line.match(/^(\d+)\s*\.{3,}\s*(.+)$/);
+          if (match) {
+            return { pageNum: parseInt(match[1], 10), title: match[2].trim() };
+          }
+          return null;
+        })
+        .filter(Boolean);
+
+      pagesHtml += `
+      <div class="page" id="p-${p.page}" style="background:${t.bg}; color:${t.text};">
+        <div class="page-frame-outer"></div>
+        <div class="page-frame-inner"></div>
+
+        <div class="page-header">
+          <div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div>
+          <div class="header-chapter">فِهْرِسُ المَوْضُوعَاتِ</div>
+        </div>
+
+        <div class="devotional-body" style="justify-content:flex-start; gap:2mm;">
+          <div class="chapter-banner" style="margin-bottom:1.5mm;">
+            <div class="chapter-badge"><span>✦</span><span>فِهْرِسُ الكِتَابِ</span></div>
+            <h2 class="chapter-title" style="font-size:11pt;">فِهْرِسُ المَوْضُوعَاتِ — الجُزْءُ ${partNumber}</h2>
+          </div>
+
+          <div class="toc-container">
+            ${tocItems
+              .map(
+                (item) => `
+            <a href="#p-${item.pageNum}" class="toc-item">
+              <span class="toc-item-title">${item.title}</span>
+              <span class="toc-item-dots"></span>
+              <span class="toc-item-page">${toArabicNumeral(item.pageNum)}</span>
+            </a>
+            `,
+              )
+              .join("")}
+          </div>
+        </div>
+
+        <div class="page-footer">
+          <span>الورد النبوي (الصغير)</span>
+          <span class="footer-page-pill">— ص ${toArabicNumeral(p.page)} —</span>
+          <span>فهرس الموضوعات</span>
+        </div>
+      </div>
+      `;
+      continue;
+    }
+
     // Normal Devotional Content Pages
     const isChapterStart = [
       3, 17, 33, 45, 49, 50, 51, 52, 53, 54, 56, 59, 60, 62, 67, 75, 76, 79, 81, 83, 85, 87, 92, 94, 97, 99, 101, 103,
@@ -282,21 +337,23 @@ function buildHtml(theme) {
       .replace(/[ \t]{2,}/g, " ")
       .trim();
     const totalChars = fullText.length + (p.vocab || []).join(" ").length;
-    let densityClass = "density-normal";
-    if (totalChars > 850) {
-      densityClass = "density-dense";
-    } else if (totalChars < 680 && (!p.vocab || p.vocab.length <= 3)) {
-      densityClass = fullText.length < 180 ? "density-sparse-center" : "density-roomy";
+    let densityClass = p.page === 11 ? "density-roomy" : "density-normal";
+    if (p.page !== 11) {
+      if (totalChars > 850) {
+        densityClass = "density-dense";
+      } else if (totalChars < 680 && (!p.vocab || p.vocab.length <= 3)) {
+        densityClass = fullText.length < 180 ? "density-sparse-center" : "density-roomy";
+      }
     }
 
     pagesHtml += `
-    <div class="page ${densityClass}" style="background:${t.bg}; color:${t.text};">
+    <div class="page ${densityClass}" id="p-${p.page}" style="background:${t.bg}; color:${t.text};">
       <div class="page-frame-outer"></div>
       <div class="page-frame-inner"></div>
 
       <div class="page-header">
         <div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div>
-        <div class="header-chapter">${p.chapter}</div>
+        <a href="#p-134" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">${p.chapter} ↰</a>
       </div>
 
       <div class="devotional-body">
@@ -311,11 +368,7 @@ function buildHtml(theme) {
             : ""
         }
 
-        <div class="hadith-flow">
-          <div class="hadith-card">
-            <div class="hadith-text">${formatHadithContent(fullText, t)}</div>
-          </div>
-        </div>
+<div class="hadith-flow"><div class="hadith-card"><div class="hadith-text">${formatHadithContent(fullText, t)}</div></div></div>
 
         ${
           p.vocab && p.vocab.length > 0
@@ -521,6 +574,80 @@ function buildHtml(theme) {
       justify-content: center;
     }
 
+    /* TOC Interactive Styles */
+    .toc-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2.8mm;
+      flex: 1;
+      justify-content: space-evenly;
+      padding: 4mm 5mm;
+      background: ${t.canvasBg};
+      border: 1px solid ${t.divider};
+      border-radius: 8px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: baseline;
+      text-decoration: none;
+      color: inherit;
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 8.4pt;
+      transition: color 0.15s ease;
+    }
+    .toc-item:hover {
+      color: ${t.gold};
+    }
+    .toc-item-title {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .toc-item-dots {
+      flex: 1;
+      border-bottom: 1px dotted ${t.divider};
+      margin: 0 2mm;
+      min-width: 5mm;
+      height: 1px;
+    }
+    .toc-item-page {
+      font-weight: 700;
+      color: ${t.gold};
+      min-width: 6mm;
+      text-align: left;
+    }
+
+    /* Repetition & Virtue Badges */
+    .repeat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 1mm;
+      background: ${t.goldLight};
+      color: ${t.amber};
+      border: 0.75px solid ${t.amber};
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 6.8pt;
+      padding: 0.2mm 2.2mm;
+      line-height: 1.2;
+    }
+    .virtue-callout {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5mm;
+      background: rgba(19, 111, 72, 0.05);
+      border: 0.5px solid ${t.emerald};
+      border-radius: 4px;
+      padding: 1mm 2.2mm;
+      margin-top: 1.8mm;
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 7.2pt;
+      color: ${t.text};
+    }
+    .virtue-tag {
+      font-weight: 700;
+      color: ${t.emerald};
+      white-space: nowrap;
+    }
     .hadith-card {
       flex: 1;
       background: ${t.canvasBg};
@@ -627,35 +754,27 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   const themes = ["light", "dark", "navy"];
 
-  for (const th of themes) {
-    console.log(`Generating Luxury Book 3 (${th})...`);
-    const page = await browser.newPage();
-    const htmlContent = buildHtml(th);
+  try {
+    for (const th of themes) {
+      console.log(`Generating Luxury Book 3 (${th})...`);
+      const page = await browser.newPage();
+      const htmlContent = buildHtml(th);
 
-    const htmlPath = path.join(outputDir, `al_wird_an_nabawi_${th}.html`);
-    fs.writeFileSync(htmlPath, htmlContent, "utf-8");
+      const htmlPath = path.join(outputDir, `al_wird_an_nabawi_${th}.html`);
+      const pdfPath = htmlPath.replace(/\.html$/, ".pdf");
+      await exportBookEdition(page, { html: htmlContent, htmlPath, pdfPath, book: 3, theme: th });
 
-    await page.setContent(htmlContent, { waitUntil: "load" });
-    await page.evaluate(async () => {
-      await globalThis.document.fonts.ready;
-    });
-
-    const pdfPath = path.join(outputDir, `al_wird_an_nabawi_${th}.pdf`);
-    await page.pdf({
-      path: pdfPath,
-      format: "A5",
-      printBackground: true,
-      preferCSSPageSize: true,
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    });
-
-    const stat = fs.statSync(pdfPath);
-    console.log(`Generated: ${pdfPath} (${(stat.size / 1024).toFixed(1)} KB)`);
-    await page.close();
+      const stat = fs.statSync(pdfPath);
+      console.log(`Generated: ${pdfPath} (${(stat.size / 1024).toFixed(1)} KB)`);
+      await page.close();
+    }
+  } finally {
+    await browser.close();
   }
-
-  await browser.close();
   console.log("Book 3 regenerated with Luxury Typography & Design!");
 }
 
-run().catch(console.error);
+run().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

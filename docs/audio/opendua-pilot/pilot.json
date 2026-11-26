@@ -1,0 +1,57 @@
+{
+  "catalogueUrl": "https://opendua.org/v0.0.4/catalogue.json",
+  "catalogueSha256": "231dfca7b1d0b5bea8ead8125c8d556121a115c40c9e348e08f4b3ede5194958",
+  "dataVersion": "0.0.4",
+  "audioVersion": "0.0.2",
+  "licenceUrl": "https://opendua.org/licence/audio",
+  "licenceSha256": "e7ffd43439799fe280a067dd1c0f4d1047455520768d3e8f16261187e0b4f05a",
+  "licence": "CC-BY-4.0",
+  "attribution": "Recitation by Muhammad Jumah for OpenDua.",
+  "voiceId": "opendua-muhammad-jumah",
+  "voiceName": "Muhammad Jumah",
+  "voiceNameArabic": "محمد جمعة",
+  "candidates": [
+    {
+      "assetId": "wu-hm-3",
+      "entryId": "entry-000003",
+      "file": "OD-003.mp3",
+      "segmentId": "wu-hm-3-1",
+      "recordingId": "recording-000003",
+      "transcriptArabic": "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي فِي جَسَدِي، وَرَدَّ عَلَيَّ رُوحِي، وَأَذِنَ لي بِذِكْرِهِ",
+      "sourceUrl": "https://audio.opendua.org/hisn/v0.0.2/OD-003.mp3",
+      "sourceDeclaredDurationMs": 13000,
+      "byteSize": 130472,
+      "sha256": "28317506a10d61e8d8387d15a20527f24aef33af8002273a9fefcd65861d083d",
+      "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-003.mp3",
+      "reviewStatus": "pending"
+    },
+    {
+      "assetId": "friday-dua-22",
+      "entryId": "entry-000046",
+      "file": "OD-046.mp3",
+      "segmentId": "friday-dua-22-1",
+      "recordingId": "recording-000044",
+      "transcriptArabic": "اللَّهُمَّ اغْفِرْ لِي ذَنْبِي كُلَّهُ: دِقَّهُ وَجِلَّهُ، وَأَوَّلَهُ وَآخِرَهُ، وَعَلاَنِيَّتَهُ وَسِرَّهُ",
+      "sourceUrl": "https://audio.opendua.org/hisn/v0.0.2/OD-046.mp3",
+      "sourceDeclaredDurationMs": 14000,
+      "byteSize": 138872,
+      "sha256": "2f573a215507f86d57243950dc8f3e4e160b165cf3d6fac09a3c75b09e97b0da",
+      "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-046.mp3",
+      "reviewStatus": "pending"
+    },
+    {
+      "assetId": "m-hm-91",
+      "entryId": "entry-000254",
+      "file": "OD-254.mp3",
+      "segmentId": "m-hm-91-1",
+      "recordingId": "recording-000237",
+      "transcriptArabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "sourceUrl": "https://audio.opendua.org/hisn/v0.0.2/OD-254.mp3",
+      "sourceDeclaredDurationMs": 4000,
+      "byteSize": 35912,
+      "sha256": "3a9ec6c9dd0cf80a0626cf3ad80dbc890efcf424ccba28dc0d8e257929572936",
+      "relativePath": "dua/opendua/muhammad-jumah/v0.0.2/OD-254.mp3",
+      "reviewStatus": "pending"
+    }
+  ]
+}

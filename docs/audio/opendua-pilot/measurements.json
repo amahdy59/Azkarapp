@@ -1,0 +1,33 @@
+{
+  "measuredOn": "2026-11-25",
+  "method": "Chromium 1228 HTMLMediaElement metadata and successful play/timeupdate; automated technical evidence, not human listening approval",
+  "candidates": [
+    {
+      "assetId": "wu-hm-3",
+      "file": "OD-003.mp3",
+      "sha256": "28317506a10d61e8d8387d15a20527f24aef33af8002273a9fefcd65861d083d",
+      "sourceDeclaredDurationMs": 13000,
+      "measuredDurationMs": 12947,
+      "playbackAdvanced": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "assetId": "friday-dua-22",
+      "file": "OD-046.mp3",
+      "sha256": "2f573a215507f86d57243950dc8f3e4e160b165cf3d6fac09a3c75b09e97b0da",
+      "sourceDeclaredDurationMs": 14000,
+      "measuredDurationMs": 13782,
+      "playbackAdvanced": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "assetId": "m-hm-91",
+      "file": "OD-254.mp3",
+      "sha256": "3a9ec6c9dd0cf80a0626cf3ad80dbc890efcf424ccba28dc0d8e257929572936",
+      "sourceDeclaredDurationMs": 4000,
+      "measuredDurationMs": 3500,
+      "playbackAdvanced": true,
+      "reviewStatus": "pending"
+    }
+  ]
+}

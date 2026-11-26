@@ -1,0 +1,348 @@
+/* Shared font, theme, typography and document primitives. */
+:root {
+  --paper: #fbf9f5;
+  --canvas: #efede8;
+  --ink: #20211e;
+  --secondary: #53584f;
+  --accent: #72510b;
+  --line: #b9b5a9;
+  --tint: #f0eade;
+  --reading-scale: 1;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --paper: #171916;
+  --canvas: #10120f;
+  --ink: #f2f1e9;
+  --secondary: #d0d4c8;
+  --accent: #ebc86b;
+  --line: #747b6c;
+  --tint: #24291f;
+  color-scheme: dark;
+}
+:root[data-theme="navy"] {
+  --paper: #101a2e;
+  --canvas: #080f1e;
+  --ink: #f3f4f9;
+  --secondary: #d0d9ed;
+  --accent: #f0cb77;
+  --line: #697b9b;
+  --tint: #1d2b42;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  font-size: 100%;
+}
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: PublicationUI, sans-serif;
+  font-size: calc(1rem * var(--reading-scale));
+  line-height: 1.7;
+  font-synthesis: none;
+}
+main {
+  max-inline-size: 52rem;
+  margin: 1.5rem auto;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  padding: clamp(1rem, 5vw, 3rem);
+  overflow-wrap: break-word;
+}
+svg {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+h1,
+h2,
+h3,
+p,
+figure {
+  margin: 0;
+}
+h1 {
+  font-size: 2em;
+  line-height: 1.25;
+  margin-block: 0.75em 0.35em;
+}
+h2 {
+  font-size: 1.2em;
+  line-height: 1.5;
+  margin-block-end: 0.6em;
+}
+p + p {
+  margin-block-start: 0.65em;
+}
+a {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+  overflow-wrap: anywhere;
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+main:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.skip-link {
+  position: absolute;
+  inset-inline-start: 1rem;
+  top: -6rem;
+  z-index: 2;
+  background: var(--paper);
+  padding: 0.75rem;
+}
+.skip-link:focus {
+  top: 0.5rem;
+}
+.reader-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-inline-size: 52rem;
+  margin: 1rem auto;
+  padding-inline: 1rem;
+  font-size: 1rem;
+}
+.download {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 44px;
+}
+.size-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.size-controls button {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.size-controls button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
+}
+legend {
+  font-size: 0.85rem;
+  color: var(--secondary);
+}
+fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-block-size: 44px;
+  padding-inline: 0.5rem;
+}
+input {
+  accent-color: var(--accent);
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8em;
+  color: var(--accent);
+  font-weight: 700;
+}
+.author {
+  font-size: 0.9em;
+  color: var(--secondary);
+}
+.draft-notice {
+  margin-block-start: 1.25rem;
+  padding: 0.75rem 1rem;
+  border-inline-start: 3px solid var(--accent);
+  background: var(--tint);
+  font-size: 0.85em;
+}
+.label {
+  font-size: 0.8em;
+  font-weight: 700;
+  color: var(--secondary);
+}
+.quran-pair {
+  margin-block: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  overflow: hidden;
+  break-inside: avoid;
+}
+.pair-reference {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25em 1em;
+  justify-content: space-between;
+  padding: 0.6em 1em;
+  background: var(--tint);
+  font-size: 0.8em;
+}
+.quran-arabic {
+  padding: 0.7em 0.8em;
+  font-family: PublicationQuran, serif;
+  font-weight: 400;
+  font-size: 1.5em;
+  line-height: 1.9;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.meaning {
+  border-block-start: 1px solid var(--line);
+  padding: 0.8em 1em;
+}
+.meaning .label {
+  margin-block-end: 0.5em;
+}
+.translator {
+  font-size: 0.75em;
+  color: var(--secondary);
+  margin-block-start: 0.5em;
+}
+.context {
+  display: flex;
+  align-items: start;
+  gap: 0.65em;
+  margin-block: 1rem;
+  padding: 0.8em;
+  border-inline-start: 3px solid var(--accent);
+  background: var(--tint);
+  font-size: 0.85em;
+  break-inside: avoid;
+}
+.context svg {
+  margin-block-start: 0.25em;
+}
+.context p {
+  min-inline-size: 0;
+}
+.publication-photo {
+  margin-block: 1rem 1.5rem;
+  break-inside: avoid;
+}
+.publication-photo img {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 2.5;
+  object-fit: cover;
+  border-radius: 0.8rem;
+}
+figcaption {
+  font-size: 0.8em;
+  line-height: 1.6;
+  color: var(--secondary);
+  padding-block-start: 0.5em;
+}
+.publication-notes {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 1rem;
+  margin-block-start: 2rem;
+  font-size: 0.8em;
+  color: var(--secondary);
+}
+@media (max-width: 35rem) {
+  main {
+    margin: 0;
+    border-inline: 0;
+    border-radius: 0;
+  }
+  h1 {
+    font-size: 1.6em;
+  }
+}
+@media (forced-colors: active) {
+  :root {
+    --paper: Canvas;
+    --canvas: Canvas;
+    --ink: CanvasText;
+    --secondary: CanvasText;
+    --accent: LinkText;
+    --line: CanvasText;
+    --tint: Canvas;
+  }
+}
+@page {
+  size: A5;
+  margin: 13mm 12mm 16mm;
+}
+@media print {
+  :root {
+    --paper: #fff;
+    --canvas: #fff;
+    --ink: #20211e;
+    --secondary: #53584f;
+    --accent: #72510b;
+    --line: #b9b5a9;
+    --tint: #f0eade;
+  }
+  body {
+    font-size: 10.5pt;
+    line-height: 1.55;
+    background: white;
+  }
+  main {
+    display: block;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    max-inline-size: none;
+    border-radius: 0;
+  }
+  .reader-tools,
+  .skip-link,
+  .sample-contents {
+    display: none;
+  }
+  h1 {
+    font-size: 21pt;
+  }
+  h2 {
+    font-size: 13pt;
+    break-after: avoid;
+  }
+  .quran-arabic {
+    font-size: 17pt;
+    line-height: 1.8;
+  }
+  .sample-section {
+    margin-block: 1rem;
+  }
+  .quran-pair {
+    margin-block: 0.7rem;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  a {
+    text-decoration: none;
+  }
+  .publication-header {
+    break-inside: avoid;
+  }
+  .publication-notes {
+    break-inside: avoid;
+  }
+}

@@ -1,13 +1,13 @@
 import { chromium } from "playwright";
+import { exportBookEdition } from "./book-presentation.mjs";
 import fs from "node:fs";
+import { loadRestoredMukhtar } from "./book-content.mjs";
 import path from "node:path";
 
 const outputDir = path.resolve(import.meta.dirname, "book1_al_mukhtar");
 fs.mkdirSync(outputDir, { recursive: true });
 
-const pagesData = JSON.parse(
-  fs.readFileSync(path.resolve(import.meta.dirname, "book1_al_mukhtar_pages.json"), "utf-8"),
-);
+const pagesData = loadRestoredMukhtar().records;
 const fonts = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "fonts_base64.json"), "utf-8"));
 
 const ICONS = {
@@ -121,7 +121,7 @@ function buildHtml(theme) {
     if (p.page === 2 || p.page === 3) {
       // Table of Contents - Luxury 2-Column Balanced Design
       pagesHtml += `
-      <div class="page" style="background:${t.bg}; color:${t.text};">
+      <div class="page" id="p-${p.page}" style="background:${t.bg}; color:${t.text};">
         <div class="page-frame-outer"></div>
         <div class="page-frame-inner"></div>
 
@@ -149,11 +149,11 @@ function buildHtml(theme) {
                     pageNum = tmp;
                   }
                   return `
-                <div class="toc-item">
+                <a href="#p-${pageNum}" class="toc-item">
                   <span class="toc-item-title">${title}</span>
                   <span class="toc-item-leader"></span>
                   <span class="toc-item-page">${toArabicNumeral(pageNum)}</span>
-                </div>`;
+                </a>`;
                 }
                 if (l && !l.includes("الفهرس") && l !== str(p.page)) {
                   return `<div class="toc-section-header">${l}</div>`;
@@ -177,7 +177,7 @@ function buildHtml(theme) {
     // Special Page: Introduction (Pages 4 and 5)
     if (p.page === 4 || p.page === 5) {
       pagesHtml += `
-      <div class="page page-intro" style="background:${t.bg}; color:${t.text};">
+      <div class="page page-intro" id="p-${p.page}" style="background:${t.bg}; color:${t.text};">
         <div class="page-frame-outer"></div>
         <div class="page-frame-inner"></div>
 
@@ -283,7 +283,7 @@ function buildHtml(theme) {
 
         <div class="page-header">
           <div class="header-book-title">${ICONS.bookOpen}<span>المختار من صحيح الأدعية والأذكار</span></div>
-          <div class="header-chapter">آدَابُ الدُّعَاءِ وَأَسْبَابُ إِجَابَتِهِ</div>
+          <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">آدَابُ الدُّعَاءِ ↰</a>
         </div>
 
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
@@ -329,7 +329,7 @@ function buildHtml(theme) {
 
         <div class="page-header">
           <div class="header-book-title">${ICONS.bookOpen}<span>المختار من صحيح الأدعية والأذكار</span></div>
-          <div class="header-chapter">تَنْبِيهٌ خَاصٌّ بِالحُجَّاجِ وَالمُعْتَمِرِينَ</div>
+          <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">تَنْبِيهٌ لِلْحُجَّاجِ ↰</a>
         </div>
 
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
@@ -364,7 +364,7 @@ function buildHtml(theme) {
 
         <div class="page-header">
           <div class="header-book-title">${ICONS.bookOpen}<span>المختار من صحيح الأدعية والأذكار</span></div>
-          <div class="header-chapter">كَفَّارَةُ المَجْلِسِ وَالخَاتِمَةُ</div>
+          <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">كَفَّارَةُ المَجْلِسِ ↰</a>
         </div>
 
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; text-align:center;">
@@ -419,7 +419,7 @@ function buildHtml(theme) {
 
       <div class="page-header">
         <div class="header-book-title">${ICONS.bookOpen}<span>المختار من صحيح الأدعية والأذكار</span></div>
-        <div class="header-chapter">${p.chapter}</div>
+        <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">${p.chapter} ↰</a>
       </div>
 
       ${
@@ -650,6 +650,49 @@ function buildHtml(theme) {
       gap: 2mm;
     }
 
+    .toc-item {
+      display: flex;
+      align-items: baseline;
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 7.2pt;
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.15s ease;
+    }
+    .toc-item:hover {
+      color: ${t.gold};
+    }
+    .repeat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 1mm;
+      background: ${t.goldLight};
+      color: ${t.amber};
+      border: 0.75px solid ${t.amber};
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 6.8pt;
+      padding: 0.2mm 2mm;
+      line-height: 1.2;
+    }
+    .virtue-callout {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5mm;
+      background: rgba(19, 111, 72, 0.05);
+      border: 0.5px solid ${t.emerald};
+      border-radius: 4px;
+      padding: 1mm 2.2mm;
+      margin-top: 1mm;
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 7.4pt;
+      color: ${t.text};
+    }
+    .virtue-tag {
+      font-weight: 700;
+      color: ${t.emerald};
+      white-space: nowrap;
+    }
     .dua-num-pill {
       display: inline-flex;
       align-items: center;
@@ -1134,7 +1177,7 @@ function formatLuxuryFlow(lines, t, chapter) {
     // Extract takhrij/reference
     let takhrij = "";
     const refMatch = raw.match(
-      /(\[(?:صحيح|رواه|مسلم|البخاري|أحمد|الترمذي|أبو داود|النسائي|ابن ماجه|الطبراني|الحاكم|الدارمي|النووي|حسن|بإِسناد|بإسناد|الأعراف|البقرة|هود|إبراهيم|المؤمنون|الفرقان|القصص|الحشر|الأنبياء|الممتحنة|التحريم|التوبة|الأنعام|يونس|الكهف|الفاتحة|آل عمران|الأحقاف)[^\]]*\])/,
+      /(\[(?:صحيح|رواه|مسلم|البخاري|أحمد|الترمذي|أبو داود|النسائي|ابن ماجه|الطبراني|الحاكم|الدارمي|النووي|حسن|بإِسناد|بإسناد|الأعراف|البقرة|هود|إبراهيم|المؤمنون|الفرقان|القصص|الحشر|الأنبياء|الممتحنة|التحريم|التوبة|الأنعام|يونس|الكهف|الفاتحة|آل عمران|الأحقاف|نوح|النمل|الإسراء|الشعراء|طه|يوسف)[^\]]*\])/,
     );
     if (refMatch) {
       takhrij = refMatch[1].trim();
@@ -1193,35 +1236,27 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   const themes = ["light", "dark", "navy"];
 
-  for (const th of themes) {
-    console.log(`Generating Luxury Book 1 (${th})...`);
-    const page = await browser.newPage();
-    const htmlContent = buildHtml(th);
+  try {
+    for (const th of themes) {
+      console.log(`Generating Luxury Book 1 (${th})...`);
+      const page = await browser.newPage();
+      const htmlContent = buildHtml(th);
 
-    const htmlPath = path.join(outputDir, `al_mukhtar_${th}.html`);
-    fs.writeFileSync(htmlPath, htmlContent, "utf-8");
+      const htmlPath = path.join(outputDir, `al_mukhtar_${th}.html`);
+      const pdfPath = htmlPath.replace(/\.html$/, ".pdf");
+      await exportBookEdition(page, { html: htmlContent, htmlPath, pdfPath, book: 1, theme: th });
 
-    await page.setContent(htmlContent, { waitUntil: "load" });
-    await page.evaluate(async () => {
-      await globalThis.document.fonts.ready;
-    });
-
-    const pdfPath = path.join(outputDir, `al_mukhtar_${th}.pdf`);
-    await page.pdf({
-      path: pdfPath,
-      format: "A5",
-      printBackground: true,
-      preferCSSPageSize: true,
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    });
-
-    const stat = fs.statSync(pdfPath);
-    console.log(`Generated: ${pdfPath} (${(stat.size / 1024).toFixed(1)} KB)`);
-    await page.close();
+      const stat = fs.statSync(pdfPath);
+      console.log(`Generated: ${pdfPath} (${(stat.size / 1024).toFixed(1)} KB)`);
+      await page.close();
+    }
+  } finally {
+    await browser.close();
   }
-
-  await browser.close();
   console.log("Book 1 regenerated with Luxury Typography & Design!");
 }
 
-run().catch(console.error);
+run().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

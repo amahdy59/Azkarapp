@@ -1,8 +1,22 @@
 # Design specification coverage
 
+- Shared overlay family (2026-11-25, local): edge-directed sheets, protected contextual/dialog surfaces, consistent headers and named non-modal phone reader panels between usable bars. Unit/browser evidence and human acceptance limits belong to the global overlay phase report.
+
 This file maps the supplied July 2026 design specification to implementation evidence. It follows the engineering and release rules in `QUALITY_CHECKLIST.md`.
 
 ## Implemented
+
+- Seamless page headers (2026-11-25, local): shared canvas-borrowing wide Reader/Masbaha/Salawat headers, semantic ink and one round 44px action family, with ordinary-page and protected-scroll audits. This supersedes the old navy reading/counting header treatment while retaining content imagery and actual safe areas. Evidence and limits belong to agent/reports/SEAMLESS_PAGE_HEADERS_LOCAL_2026_11_25_REPORT.md.
+
+- Seamless light native system bars (2026-11-25, local): continuous phone reader, actual-ground native icon contrast, protected single status inset and a quiet visible light progress track. Actual RTL/LTR phone/tablet/desktop images and 30 passing feature cases are recorded in agent/reports/SEAMLESS_LIGHT_SYSTEM_BARS_LOCAL_2026_11_25_REPORT.md. Physical status/navigation icon and assistive-technology acceptance remain pending.
+
+- Meaningful completion (2026-11-25, local): owner-approved centered, source-bearing hadith/Quran card, compact header/summary and native optional elapsed-time details. Actual collection sharing reuses balanced studio cards, current routine length/prayer, reviewed repetitions/sources and all-card scope, excluding private progress. Glass uses a protected opaque reading ground; English enlarged headings gain a semantic-preserving wrap opportunity. Preserve offline completion/restart and both motion preferences. See agent/phases/COMPLETION_REFLECTION_LOCAL_2026_11_25.md and its report for actual browser evidence and remaining human/device acceptance.
+
+- Home prayer density and motion (2026-11-25, local): supplied grouped-phone rail with retained corner badges, intrinsic wide-card heights with original timing type, one phone material owner and existing tracking/location recovery. Shared route snapshots explicitly honor both still preferences and ordinary reduced-motion delays clear immediately. Route-family/Settings motion audit and existing interaction tests provide bounded evidence; physical animation quality remains separate. See agent/phases/HOME_PRAYER_RAIL_MOTION_LOCAL_2026_11_25.md.
+
+- Home compact status (2026-11-25, local): owner-corrected floating corner status badges with the original desktop/tablet card appearance, blank readable future states, independent current top marker, naturally reflowing one-line Now/Next and a content-width city/crosshair split control. Existing prayer dates, recording, disclosure, settings routing and explicit device-location recovery remain. Verification and actual screenshots belong to agent/reports/HOME_PRAYER_STATUS_LOCAL_2026_11_25_REPORT.md; physical-device and human assistive-technology acceptance remain separate.
+
+- Learn (2026-11-25, local): owner-selected More entry and Azkar shortcut, three Arabic books, native reflowing HTML, contents/search, section bookmarks, reading-position recovery, verified optional content/PDF acquisition and Downloads → Books management. Existing icons/fonts/tokens and the protected Modal remain shared. Compact controls keep a readable source region at 320px/200%; an opaque reader base keeps Glass photography behind the reading surface. Future prayer/ablution guides and hadith collections share the Learn destination without empty placeholder modules or main-navigation changes. Evidence and acceptance limits belong to `docs/agent/reports/LEARN_LIBRARY_LOCAL_2026_11_25_REPORT.md`; real assistive-technology and religious-source review remain separate.
 
 - Owner visual-consistency continuation (2026-11-01): ordinary-page title/frame/gutters, visible Search heading and native label, responsive utility tiles, matched Progress picker/tabs, compact rounded empty artwork, adaptive neutral metric cards, protected mobile date disclosure and Settings backup/progress JSON export. Progress has Overview/Trends only and defaults to Last 30 days; this supersedes earlier Records-tab/hidden-title descriptions below. See docs/agent/phases/PROGRESS_FILTER_EXPORT_2026_11_01.md and the corresponding consistency report for exact tested scope, theme/material evidence and manual acceptance limits.
 

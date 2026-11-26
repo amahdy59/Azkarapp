@@ -1,3 +1,31 @@
+## Global overlay family — 2026-11-25, local
+
+Shared overlay surfaces use the existing 260ms entrance token/enter curve, 150ms exit token/exit curve and a restrained 16px edge-directed travel. Anchored popups use 8px travel from their collision-resolved side. Side panels retain physical horizontal direction; centered dialogs use opacity only. Scrims use the shared standard timing. Explicit selectors override Vaul's injected 500ms defaults. Reader bars and sacred text do not scale or move; one panel surface owns the transition. A reader-panel replacement removes the outgoing panel immediately to avoid two competing content layers; ordinary dismissal retains a short inert exiting surface. App and OS Reduce Motion suppress all overlay travel, animation and delays. No new animation dependency, loop, layout interpolation or animated blur.
+
+## Completion reflection — 2026-11-25, local
+
+The approved completion removes its requestAnimationFrame confetti burst/loop. One 440ms opacity/scale check arrival and the shared entrance-token page fade acknowledge completion without moving reading geometry or cycling reminders. App Reduce Motion, the global still class and OS preference explicitly remove both local animations. Haptics retain their independent preference. Existing quiet-progress garden feedback keeps its shared finite/still contract. Source text remains stationary through details, sharing, language changes and ordinary rerenders.
+
+## Shared route snapshots and responsive prayer density — 2026-11-25, local
+
+Group, old and new app-content snapshot pseudo-elements use the same 220ms standard token/easing. Both `.reduce-motion` on the root and the OS preference explicitly remove these pseudo-animations; ordinary universal element rules do not reach the View Transition tree. Existing safe callback execution, unsupported-browser fallback, persistent-navigation exclusion and Glass snapshot opt-out remain.
+
+Both still paths also clear animation-delay and transition-delay. Shortening duration alone leaves delayed stagger/completion content waiting at its initial frame. Audit resolved delay plus duration, including per-child inline delays; retain immediate inputs and truthful loading status. No normal-motion sequence or completion value changes.
+
+Settings passes its shared transition as the Motion element's transition prop, rather than as an unrelated variant name. This makes the intended 220ms directional transition and 100ms reduced opacity alternative effective instead of silently using Motion's 300ms default. Direction, target/exit values, panel ownership and actions are preserved.
+
+Home's phone material switches to one shared rail and wide cards size intrinsically. Resize/text changes remain immediate, badges reserve no layout space and no repeated card entrance or new timer is added. Existing explicit disclosure and reduced-motion endpoints remain authoritative. The cross-page audit covers ordinary route families, Settings subpages, default/app/OS modes and interrupted snapshot preferences, plus existing keyboard/control/overlay journeys. Frame pacing on physical devices and human acceptance remain separate; do not call simulated endpoint checks perfect field animation. See agent/phases/HOME_PRAYER_RAIL_MOTION_LOCAL_2026_11_25.md.
+
+## Corner Home status and split location — 2026-11-25, local
+
+The approved compact presentation adds no recurring motion. The current top marker and passive corner badges are static model-driven cues. Future prayers have no status badge; showing or removing a badge does not change card or time geometry. The split city/crosshair buttons reuse shared finite action feedback and existing explicit location busy/result behavior. Now/Next reflows immediately with the reader's text size; no type or geometry animation is added. Existing explicit Show/Hide, stationary scroll chrome, protected overlay transitions and app/OS still alternatives remain authoritative.
+
+## Explicit prayer disclosure and shared scroll chrome — 2026-11-25, local
+
+The owner replaces automatic Home prayer folding with deliberate Show/Hide. Scroll elevation uses shared useScrollElevation (enter past 8px, leave at 2px), one stationary full-width protective material/edge and the existing glass reading tint. Dates/Now/Next retain geometry; the timings scroll normally. Scroll, clock, resizing and modal dismissal never override disclosure. Touch scrolling releases a previously focused summary action without changing its state.
+
+One 220ms standard-curve grid/opacity transition owns explicit timing disclosure; its chevron follows actual expanded state. There is no repeated card entrance, animated blur or secondary sticky copy. App and OS Reduce Motion apply immediate equivalent endpoints, including interrupted transitions. The compact tracking sheet and tablet/desktop dialog retain the shared finite overlay motion and focus recovery; reading screens retain their existing focus controls. This supersedes previous Home 96px/8px automatic-fold and registered-expansion-variable descriptions. Countdown data still updates through the existing minute model without per-second live announcements.
+
 # Azkarapp Motion System
 
 ## Home compact overview — 2026-11-24 (local)

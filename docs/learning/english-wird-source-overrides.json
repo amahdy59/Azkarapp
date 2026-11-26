@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "status": "draft-for-review",
+  "book": "al-wird-an-nabawi",
+  "authority": "Owner decision, 2026-11-25: use the author's original PDF for affected English passages; record differences for separate Arabic review.",
+  "sourceUrl": "https://alialowashez.com/9007/",
+  "originalPdfSha256": "8b8d8482ed0c7f1a8a9c3714414a0c1c4488bfd87567c644837f0979c06d5816",
+  "adaptationBeforeRestorationSha256": "3b7a852577e2d3ea675629a3fbf14ce0783b65fc21f8723a51d3f0826d3d51d6",
+  "originalPdfUrl": "https://alialowashez.com/wp-content/uploads/2024/03/%D8%A7%D9%84%D9%88%D8%B1%D8%AF-%D8%A7%D9%84%D9%86%D8%A8%D9%8A-%D8%A7%D9%84%D8%B5%D8%BA%D9%8A%D8%B1-%D9%86%D8%B3%D8%AE%D8%A9-%D9%A1%D9%A4%D9%A4%D9%A6.pdf",
+  "pageNumbering": "PDF pages are one-based; the printed page number is one less on these pages.",
+  "changes": [
+    {
+      "id": "wird-18-narrator-order",
+      "originalPdfPages": [18],
+      "printedPages": [17],
+      "adaptationPages": [18],
+      "difference": "The adaptation breaks Abdullah ibn Masud's name around the narration marker and places part of the evening introduction inside the quoted supplication. The original PDF has a continuous narrator chain and introduction.",
+      "englishIntroduction": "Abd al-Rahman ibn Yazid narrated from Abdullah ibn Masud, may Allah be pleased with him, who said: When evening came, the Prophet of Allah, peace and blessings be upon him, would say:",
+      "englishSupplication": "We have reached the evening, and all dominion belongs to Allah. All praise belongs to Allah. There is no deity except Allah alone, with no partner. To Him belongs dominion and to Him belongs all praise, and He has power over all things. My Lord, I ask You for the good in this night and the good after it, and I seek refuge in You from the evil in this night and the evil after it. My Lord, I seek refuge in You from laziness and the hardship of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.",
+      "referenceContinuation": "The morning variant and the attribution to Muslim continue on PDF page 19. The glossary discussion of kibr/kibar must be kept with that continuation.",
+      "arabicReviewStatus": "pending; existing Arabic editions unchanged",
+      "englishReviewStatus": "draft; visually checked against original PDF page 18; independent language/source review pending"
+    },
+    {
+      "id": "wird-125-126-complete-travel",
+      "originalPdfPages": [125, 126],
+      "printedPages": [124, 125],
+      "adaptationPages": [125, 126],
+      "difference": "The adaptation shortens the narrator chain, ends the travel supplication after 'deeds that please You' with an ellipsis, and leaves the concluding words 'and family' out of order on the next page. The original PDF supplies the complete supplication across both pages.",
+      "englishIntroduction": "Ibn Jurayj said: Abu al-Zubayr informed me that Ali al-Azdi told him that Ibn Umar taught them: When the Messenger of Allah, peace and blessings be upon him, had mounted his camel to set out on a journey, he declared Allah's greatness three times, then recited the following Qur'anic passage.",
+      "quran": [
+        {
+          "ref": "43:13",
+          "mode": "excerpt",
+          "selector": "#p-125 .hadith-text",
+          "arabicStart": "سُبْحَانَ",
+          "arabicEnd": "مُقْرِنِينَ",
+          "start": "Exalted is He",
+          "end": "subdued it."
+        },
+        {
+          "ref": "43:14",
+          "mode": "full",
+          "selector": "#p-125 .hadith-text",
+          "arabicStart": "وَإِنَّا",
+          "arabicEnd": "لَمُنقَلِبُونَ"
+        }
+      ],
+      "englishSupplication": "O Allah, we ask You on this journey of ours for righteousness and mindfulness of You, and for deeds that please You. O Allah, make this journey of ours easy for us and shorten its distance for us. O Allah, You are the Companion on the journey and the Guardian of the family we leave behind. O Allah, I seek refuge in You from the hardship of travel, from a distressing sight, and from an ill return in property and family.",
+      "englishReturnInstruction": "When he returned, he said those words and added:",
+      "englishReturnSupplication": "We are returning, repenting, worshipping and praising our Lord.",
+      "reference": "Reported by Muslim, as cited by the author.",
+      "repetition": { "action": "Declaring Allah's greatness before the supplication", "count": 3 },
+      "glossary": [
+        { "term": "Muqrinin", "meaning": "Able to manage and control it." },
+        {
+          "term": "Wa-twi",
+          "meaning": "Bring the distance of our journey nearer and shorten it, so that we may cross it easily."
+        },
+        { "term": "Wa'tha al-safar", "meaning": "The severity and hardship of travel." },
+        {
+          "term": "Ka'abat al-manzar",
+          "meaning": "The soul's distress and dejection from intense worry and sorrow caused by something one sees."
+        },
+        { "term": "Su' al-munqalab", "meaning": "A return that brings distress rather than joy." }
+      ],
+      "nextNarration": "Salim ibn Abi al-Jad narrated from Jabir ibn Abdullah, may Allah be pleased with them both, who said: When we went uphill, we declared Allah's greatness; when we went downhill, we glorified Him. Reported by al-Bukhari.",
+      "arabicReviewStatus": "pending; existing Arabic editions unchanged",
+      "englishReviewStatus": "draft; complete text and glossary visually checked against original PDF pages 125–126; independent language/source review pending"
+    }
+  ]
+}

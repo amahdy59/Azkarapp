@@ -2,6 +2,48 @@
 
 ## Active phase
 
+[Coordinated implementation and release](phases/COORDINATED_RELEASE_2026_11_25.md) is the current owner-authorized phase. This chat coordinates final handoffs, waits for approved implementation to finish, validates the combined checkout, pushes all verified changes to main and monitors Quality, Pages and production. The new owner instruction supersedes the earlier local publication holds below. Known source-conflicted Arabic books and unreviewed English/audio editions retain review-only availability; physical-device acceptance remains separate. See the [release report](reports/COORDINATED_RELEASE_2026_11_25_REPORT.md).
+
+## Feature handoffs and historical phase authority
+
+The following records preserve their original local scope and evidence. Their historical “current” wording and publication holds do not supersede the coordinated phase above.
+
+[Seamless page headers](phases/SEAMLESS_PAGE_HEADERS_LOCAL_2026_11_25.md) is this chat's current owner-approved local follow-up: replace the remaining fixed navy Reader/Masbaha/Salawat bands with shared theme/material-aware chrome, audit ordinary page families, preserve scrolling/menu protection and genuine safe areas, and collect actual responsive evidence. Preserve independent overlay, Home, Settings, Learn and completion work. No commit or push.
+
+[Global overlay consistency](phases/GLOBAL_OVERLAY_CONSISTENCY_LOCAL_2026_11_25.md) is the current owner-approved overlay scope: apply the reviewed index-based reader panels and shared directional overlay family globally, locally only. Preserve independent Home/Settings/Learn/document work and the publication hold.
+
+Its [local phase report](reports/GLOBAL_OVERLAY_CONSISTENCY_LOCAL_2026_11_25_REPORT.md) records implementation, complete-gate and focused follow-up results; the [actual-app gallery](evidence/global-overlays/README.md) covers both languages, 320px/200% text, page themes and tablet. Changes remain local; real-device assistive-technology acceptance remains separate.
+
+[Seamless light system bars](phases/SEAMLESS_LIGHT_SYSTEM_BARS_LOCAL_2026_11_25.md) is this chat's owner-approved local header correction. Preserve the continuous warm reader, resolve native system-icon contrast from the actual protected surface, and retain independent Home/Settings/Learn work. No commit or publication is authorized by this local instruction.
+
+[Meaningful completion and collection sharing](phases/COMPLETION_REFLECTION_LOCAL_2026_11_25.md) is this chat's owner-approved local scope: centered reviewed hadith/Quran reminders, symmetrical reading-card anatomy, quiet optional session details and real collection sharing. Preserve all independent Home/Settings/Learn work and the publication hold.
+
+Its [local report](reports/COMPLETION_REFLECTION_LOCAL_2026_11_25_REPORT.md) records 20 passing focused unit tests, 15 final browser cases across three engines, passing Pages build/budgets and the [actual-app gallery](evidence/completion-reflection/README.md). Two unchanged Mushaf-cache test timeouts remain a separate complete-gate limitation. The owner explicitly reiterates local implementation and no push; no commit or publication was performed.
+
+[English Learn integration](phases/ENGLISH_LEARN_INTEGRATION_LOCAL_2026_11_25.md) is the owner's current local follow-up: connect the completed English Umrah adaptation, three PDFs, bilingual Quran and source-bound diagrams to the native reader, with explicit language choices and separate reading/offline records. Preserve all Arabic routes/records, unfinished translation boundaries, independent Home/Settings work and the publication hold. The draft remains available only in development/isolated review builds until independent review; ordinary production excludes it.
+
+[English reader polish](phases/ENGLISH_READER_POLISH_2026_11_25.md) is this chat's current local follow-up after the owner requests all final UX/accessibility/visual/maintainability recommendations. It refines the complete English Umrah adaptation and shared export tooling: compact persistent controls, normalized standalone preferences, source-bound diagrams and verified English PDF pagination. Preserve the full-English content work below, independent Home/Settings/Learn scopes and the publication hold. The [polish report](reports/ENGLISH_READER_POLISH_2026_11_25_REPORT.md) records final artifact evidence and remaining independent acceptance.
+
+[Full English book editions](phases/ENGLISH_BOOK_EDITIONS_2026_11_25.md) is this chat's current authoring checkpoint following owner approval of all three samples. Preserve Arabic Qur'an beside attributed English meanings. The owner identifies the supplied originals as authoritative for **both languages**, with traceable source corrections. Use available files/working links for now; the Umrah draft covers only its current 16-page adaptation. The [source review](../learning/SOURCE_REVIEW_2026_11_25.md) records original/adaptation mismatches and prepared Wird English corrections. Full Al-Mukhtar/Wird translation and their Arabic correction batch remain ongoing; preserve the publication hold.
+
+[English book review samples](phases/ENGLISH_BOOK_SAMPLES_2026_11_25.md) records the owner-approved pilot preceding the full-English phase. The [Umrah authoring checkpoint](reports/ENGLISH_UMRAH_CHECKPOINT_2026_11_25_REPORT.md) records its first complete adaptation draft, verification and remaining source/translation work. Preserve every independent local scope and the publication hold.
+
+[Learn library and integrated books](phases/LEARN_LIBRARY_LOCAL_2026_11_25.md) is the current local document-integration scope. The owner selects Learn under More with an Azkar shortcut, an integrated HTML reader and optional PDFs/offline management; anticipate future prayer, ablution and hadith modules without changing the primary navigation. Preserve the independent Home/Settings scopes below and the publication hold.
+
+[Home prayer density, phone rail and shared motion](phases/HOME_PRAYER_RAIL_MOTION_LOCAL_2026_11_25.md) is the owner's latest correction after actual responsive screenshots: use the supplied grouped-phone reference, content-sized wide cards and the existing corner badges, then audit shared motion across page families. Preserve all existing prayer/location behavior, independent English-book/Settings/Learn work and publication hold. The [density/motion report](reports/HOME_PRAYER_RAIL_MOTION_LOCAL_2026_11_25_REPORT.md) and [actual responsive gallery](evidence/home-prayer-rail/README.md) record the local result.
+
+[Home corner status and compact location](phases/HOME_PRAYER_STATUS_LOCAL_2026_11_25.md) records the preceding verified checkpoint. Its badge, one-line/reflowing summary, split location, tracking and disclosure behavior remain; the newer scope supersedes fixed wide-card height and separate phone boxes.
+
+The [Home status report](reports/HOME_PRAYER_STATUS_LOCAL_2026_11_25_REPORT.md) and [actual responsive screenshots](evidence/home-prayer-status/README.md) record this correction and its verification separately from the earlier concepts.
+
+[Home prayer cards and tracking dialog](phases/HOME_PRAYER_DIALOG_LOCAL_2026_11_25.md) records the preceding owner-approved local implementation. Its dated recording, protected overlay, manual Show/Hide and shared scroll contracts remain authoritative; the newer phase supersedes presentation only.
+
+The [Home prayer implementation report](reports/HOME_PRAYER_DIALOG_LOCAL_2026_11_25_REPORT.md) records local verification and the [actual-app evidence gallery](evidence/home-prayer-dialog/README.md). Publication remains on hold; aggregate shared-checkout gate limitations are recorded separately from passing feature checks.
+
+[Settings audio, downloads and location](phases/SETTINGS_AUDIO_LOCATION_LOCAL_2026_11_25.md) is this chat's current focused local change. The latest owner instruction holds publication; preserve independent devotional-document work. Earlier release descriptions below remain historical authority for their own batches.
+
+The owner-approved [Settings summaries follow-up](reports/SETTINGS_SUMMARIES_LOCAL_2026_11_25_REPORT.md) applies all four recommendations within that same local phase.
+
 [Approved Concept A and release regression repair](phases/PRAYER_CARD_CONCEPT_A_RELEASE_2026_11_24.md) is the current controlled follow-up after the owner's new image selection. Preserve the combined batch in c28fa0ca, repair all exact-commit CI failures and finish publication only after the final commit passes every required gate. This chat remains the single release owner.
 
 [Resumed verification report](reports/PRAYER_RELEASE_RESUME_2026_11_24_REPORT.md) records the remaining inset assertions, proven desktop-to-phone measurement repair and daily-reset test readiness correction after Quality 45482870944. Final exact-commit CI/Pages/production results belong to the resumed release evidence, not the earlier interrupted status.
@@ -65,6 +107,8 @@ The [final-touch implementation report](reports/FINAL_TOUCH_QUALITY_MOTION_2026_
 7. Relevant prayer/audio/motion/domain contracts
 
 ## Working references
+
+- [Additional audio pilot handoff](reports/ADDITIONAL_AUDIO_PILOT_2026_11_25_REPORT.md): three local OpenDua recordings await independent listening review; verified DEV-only comparison/export and the separate Qur'an/du'a preference repair are ready for aggregate release verification. Production catalogue/defaults and hosted files remain unchanged.
 
 - [Owner design and interaction brief — 2026-11-02](OWNER_DESIGN_BRIEF_2026_11_02.md): every live-review comment, preferred Settings reference, accepted/rejected layout decisions, motion matrix and prioritized Mushaf recommendations.
 

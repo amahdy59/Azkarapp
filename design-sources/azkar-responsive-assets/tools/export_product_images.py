@@ -25,7 +25,8 @@ SOURCE_ROOT = PACKAGE_ROOT / "source-assets" / "images"
 REPO_ROOT = Path(__file__).resolve().parents[3]
 OUTPUT_ROOT = REPO_ROOT / "public" / "images"
 
-IMAGES = ("mosque_prophet", "benefits_zikr")
+# The unused Benefits illustration is preserved in design-sources/retired-illustrations.
+IMAGES = ("mosque_prophet",)
 
 # AVIF carries fine detail at a lower quality number than WebP does; both were
 # checked against the source rather than chosen from a table.

@@ -1,0 +1,45 @@
+{
+  "capturedAt": "2026-11-25T21:18:06.015Z",
+  "assessment": "technical-integrity-only-not-religious-source-approval",
+  "resources": [
+    {
+      "id": "al-mukhtar",
+      "language": "ar",
+      "status": null,
+      "ordinaryProductionExposed": true,
+      "units": 64,
+      "pdfAppearances": ["light", "dark", "navy"],
+      "packSha256": "2de538c40261561f5d7add34f1ab1ff8116452e0ffbc55f062adb26550a0e707"
+    },
+    {
+      "id": "dalil-al-mutamir",
+      "language": "ar",
+      "status": null,
+      "ordinaryProductionExposed": true,
+      "units": 16,
+      "pdfAppearances": ["light", "dark", "navy"],
+      "packSha256": "7018db19863382814687303bf4b0d8b63639b2de05c0996cb498bbe2977e7776"
+    },
+    {
+      "id": "al-wird-an-nabawi",
+      "language": "ar",
+      "status": null,
+      "ordinaryProductionExposed": true,
+      "units": 137,
+      "pdfAppearances": ["light", "dark", "navy"],
+      "packSha256": "51c648ad00334f62f44f7865d951d7bad1a8ae2116f28bf65393a1e89a05ef76"
+    },
+    {
+      "id": "dalil-al-mutamir",
+      "language": "en",
+      "status": "draft-for-review",
+      "ordinaryProductionExposed": false,
+      "units": 16,
+      "pdfAppearances": ["light", "dark", "navy"],
+      "packSha256": "1af08d344e6ceb2d4fd34f826b57f54d79c46f517f81474ab29a179f50f56bcc"
+    }
+  ],
+  "assetReferences": 22,
+  "distinctAssets": 19,
+  "allAssetSizesAndSha256Verified": true
+}

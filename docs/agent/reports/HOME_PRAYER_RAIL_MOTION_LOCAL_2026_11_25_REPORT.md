@@ -1,0 +1,101 @@
+# Phase Report — Home density, phone rail and shared motion
+
+## Objective
+
+Apply the supplied grouped-phone reference, remove excess tablet/desktop prayer-card whitespace and verify motion across ordinary application page families while retaining badges and devotional behavior. Keep all work local.
+
+## Scope completed
+
+- Phones use one rounded material surface with transparent icon/name/time items and a quiet next-prayer pill. Five native prayer actions retain chronology and protected dialog semantics, rather than adopting misleading tab/radio roles.
+- The follow-up wrapping screenshot is corrected: compact prayer names stay whole, time digits and their smaller 0.75em AM/PM annotation share one baseline, and the phone row no longer inherits the tallest wrapped-name/time tracks. The existing xs/label steps adapt narrower content measures without another global type size.
+- Wide cards derive height from their existing header/time steps and padding. The fixed 152px minimum and empty footer area are removed; large timing type, existing materials, current marker and floating corner badges remain. The normal wide-card regression bounds height at 120px without constraining enlarged text.
+- The existing media-query hook switches one material owner on phones versus individual wide surfaces without duplicated DOM or nested blur. Responsive/text changes do not animate geometry.
+- Shared route snapshot group/old/new pseudo-elements use consistent 220ms standard tokens/easing and explicit app/OS still rules. Reduced motion clears retained animation/transition delays, including inline stagger delays.
+- Settings supplies its intended transition through the actual Motion prop. Its previous variants-map metadata was ignored, causing a 300ms default even under Reduce Motion. Targets, direction, callbacks and panel ownership remain; actual normal/reduced timing is now 220ms/100ms.
+
+## Files changed
+
+Presentation: `src/app/components/HomePrayerOverview.tsx`, `home-prayer-overview.css`, `src/app/screens/settings/SettingsScreen.tsx`, `src/styles/theme/motion.css` and `surfaces.css`.
+
+Browser verification: new `e2e/app-motion-audit.spec.ts`; updated `home-prayer-status.spec.ts`, `home-glass-material.spec.ts`, `prayer-glass-hierarchy.spec.ts` and `seamless-home-material.spec.ts`. Existing unit, navigation, Home-motion, overview and Settings suites remain in use.
+
+Documentation: README; architecture/design/motion/prayer/quality/coverage contracts; agent index/decision log; scoped phase; this report and the actual-app gallery. Independent pending English-book, Settings, Learn and document work is preserved.
+
+## Components added or modified
+
+HomePrayerOverview reuses useMediaQuery and existing material/icon conventions. SettingsScreen retains Motion/AnimatePresence and corrects transition ownership. No new runtime dependency or shared primitive is introduced.
+
+## User-visible changes
+
+The phone prayer strip follows the supplied reference while retaining floating badges and large enough native actions. Names and times fit single lines at 360px and 390px, with smaller proportional AM/PM text and no reserved second-line whitespace. Tablet/desktop timings occupy shorter, aligned cards with the same type hierarchy. Reduce Motion no longer retains delayed stagger starts or route snapshot fades. Settings panel motion follows its configured duration instead of a library fallback.
+
+Prayer calculations, opening/recording windows, exact dates, reviewed text, data normalization, persistence, sync, selected prayer, explicit disclosure, location detection/results and focus recovery remain unchanged.
+
+## Accessibility work
+
+Preserved semantic native actions, localized time/status descriptions, unavailable explanations, 44px targets, visible focus, pointer-transparent badges, RTL/LTR chronology and enlarged reflow. Both still preferences suppress route-snapshot motion and retained delays; Settings uses a short opacity alternative. Material checks retain the protected opaque overlay contract and validate one phone surface without nested blur.
+
+The motion audit covers 36 ordinary routes in four scenarios: Arabic/default phone, English/default desktop, Arabic/app-reduced narrow and English/OS-reduced tablet. Families include Home, Quran overview/reader, Azkar/reader/saved, Progress, More, Learn/reader, Qibla, counter, Benefits, Friday, prayer, search, completion and all Settings destinations. It records finite visible effects, resolved delay plus duration, bounded viewport quiescence, main-canvas stability and runtime errors, plus live interruption of native route snapshots. Existing keyboard, tab, loading-flash, panel, disclosure, dialog and frame-sampling journeys remain.
+
+These are browser/route-family checks, not a guarantee of perfect physical frame pacing, every possible account/content state or human screen-reader acceptance.
+
+## Tests added or updated
+
+The new motion audit retains failures when timing exceeds the policy and checks app/OS pseudo-element rules explicitly. Its browser-owned native-frame probe waits only for active, visible finite non-busy effects and requires three quiet frames, two further geometry samples, full main opacity and no active effect at the endpoint; paused/offscreen effects are not required to finish. Actual duration plus delay remains capped at 100.1ms under Reduce Motion and 5,000ms for ordinary finite feedback. Route readiness uses the repository's existing 15-second assertion budget; no existing global timeout or motion limit is increased.
+
+Harness diagnostics are retained rather than hidden. An unbounded finished-promise observation timed out in Downloads; fixed-date clock injection produced negative native animation times; and an experimental 1,200ms wall-clock frame deadline failed even with zero active effects because Windows headless WebKit delivered zero or one rendering frame during that interval. The final observer uses the native clock and a background rAF probe instead of holding an automation call open through rendering. It verifies actual timing separately from automated page readiness. Requesting a screenshot did not resolve the scheduling delay and is not used to mask it. A subsequent trace identified a pending 90ms transition on MushafDownloadSelection's button inside a **closed native details** element: Gecko retained geometry, so the initial bounding-box-only visibility filter was incorrect. The probe now checks rendered visibility and closed disclosure ancestry before measuring visible effects. This preserves the native [disclosure semantics](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-details-element) and does not change download controls or their timing. Overlapping separate WebKit runs also competed for rendering; the diagnostic motion run was interrupted and final acceptance runs one browser invocation at a time, honoring WebKit's one-worker policy. Physical frame pacing remains an explicit limitation.
+
+Home regressions preserve badges with zero layout displacement, future blank state, dated recording/reload, original wide timing type, intrinsic wide height, shared phone material, one-line phone labels/time groups at 360px/390px, smaller scalable AM/PM, complete locations and action targets. Material counts now assert the approved responsive owners, preserving exact blur/fill, contrast and reading checks. No skip, reduced coverage, raised budget or weakened inventory assertion was introduced. The final Settings retest confirmed hash-only goto was reusing and progressively stalling one WebKit document. The route endpoint sweep now reloads hash-only entries so every route uses an independent document; navigation motion remains exercised by the existing interaction journeys and live snapshot test.
+
+## Commands run
+
+Results are per run, not additive counts of unique identities. Detailed diagnostic logs remain in ignored `output/`. Additional harness probes (passed/failed) were: disconnected preview 0/4, fixed-clock isolation 1/3, native clock 3/1, rendering handoff 1/3, short samples 1/3, native frame sampling 2/2, background observer 2/2 and forced paint 0/2. These explain the observer repair above; none is presented as a passing acceptance run. The overlapping motion run was interrupted after 55 passes and five failures, with 15 identities unfinished. The first full non-browser gate was interrupted after the owner's new screenshot changed the required input; final verification uses the completed follow-up.
+
+| Command                                                                                                                                     | Result                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Targeted Home/media-query/view-transition units                                                                                             | Passed: 5 files / 39 tests. `output/home-rail-units.log`.                                                                                                                                                                                                                       |
+| `pnpm typecheck`                                                                                                                            | Passed before final full gate. `output/home-rail-typecheck-final.log`.                                                                                                                                                                                                          |
+| Scoped ESLint and Prettier                                                                                                                  | Passed; final documentation formatting recorded after completion.                                                                                                                                                                                                               |
+| Initial grouped-rail Chromium cases                                                                                                         | Passed: all 16 language/material/viewport cases. `output/home-rail-first.log`.                                                                                                                                                                                                  |
+| Chromium Home/material/navigation/page-motion selection                                                                                     | 70 passed / 4 failed. All four failures exposed Settings' real 300ms reduced-motion fallback. `output/home-rail-chromium.log`.                                                                                                                                                  |
+| Settings repair and existing Settings interactions                                                                                          | 18 passed / 1 observer timeout in default English Downloads; all reduced-motion cases and ten Settings journeys passed. `output/home-rail-settings-motion.log`.                                                                                                                 |
+| Motion observer/Settings retest                                                                                                             | Passed: 9 cases covering all Settings destinations in the four scenarios and interrupted native snapshot preferences. `output/home-rail-motion-retest.log`.                                                                                                                     |
+| Initial Firefox/WebKit Home, page-motion and navigation selection                                                                           | 87 passed / 11 settling-observer failures; Home status, disclosure and navigation cases passed. `output/home-rail-cross-results.json`.                                                                                                                                          |
+| Initial updated-width responsive run                                                                                                        | Passed: 48/48 across Chromium, Firefox and WebKit before the final AM/PM follow-up. `output/home-rail-responsive-final.log`.                                                                                                                                                    |
+| `pnpm test:e2e e2e/home-prayer-status.spec.ts --project=desktop-chromium --workers=1 --grep "corner prayer statuses en solid (360\|390)px"` | Passed: 2/2 with whole names, one-line times, 0.75em periods and a phone row at most 110px. `output/home-rail-phone-followup.log`.                                                                                                                                              |
+| Final combined motion/phone acceptance                                                                                                      | 109 passed / 2 WebKit default-English motion groups timed out; all 36 final phone layout cases passed. `output/home-rail-acceptance.log`.                                                                                                                                       |
+| WebKit independent-entry retest                                                                                                             | Passed: both previously failing groups, covering all 15 Settings routes. `output/home-rail-direct-entry.log`: 2/2 in 47.4s. Direct-entry isolation replaces hash-document reuse; interaction navigation and snapshot checks remain.                                             |
+| `pnpm test:e2e:inventory`                                                                                                                   | Passed: 3,838 identities, exactly once across nine partitions. `output/home-rail-final-inventory.log`. Includes concurrent independent Learn test additions.                                                                                                                    |
+| `pnpm check`                                                                                                                                | Failed in 562.8s: 12/14 stages passed. Unit stage: 374 files / 2,711 tests passed, 3 Completion-sharing assertions failed in one concurrently edited file. Bundle guard: initial route 194,096 gzip bytes, 2.6% above the 189,241 baseline. `output/home-rail-check-final.log`. |
+| `pnpm build:pages`                                                                                                                          | Vite/PWA build completed; command failed on the unchanged bundle growth guard: initial route 194,128 gzip bytes, 2.6% above baseline; Home startup 524,346 gzip bytes. `output/home-rail-pages-final.log`.                                                                      |
+| `pnpm exec vitest run src/app/screens/CompletionScreen.sharing.test.tsx`                                                                    | Passed: 1 file / 7 tests on the current concurrent version. That source and test file changed at 18:11 during the full gate; this Home phase does not modify them. `output/home-rail-completion-recheck.log`.                                                                   |
+| `node scripts/check-bundle-budget.mjs output/home-rail-phone-final-preview`                                                                 | Passed on the immutable tested Home snapshot, including unchanged growth limits and all backstops. Home startup: 521,027 gzip bytes. `output/home-rail-frozen-budget.log`. Later shared native/overlay/Completion changes were not part of this snapshot.                       |
+| `git diff --check`                                                                                                                          | Passed after completion, with Git line-ending normalization warnings on shared documentation.                                                                                                                                                                                   |
+
+Browser runs use a freshly built isolated loopback preview, with its unchanged build shared through the supported E2E_BASE_URL option. No production visitor/device/snapshot writes occur. Repeats are limited to source repairs, unresolved observations and distinct engine/material/route coverage.
+
+## Visual/manual evidence
+
+The [actual-app gallery](../evidence/home-prayer-rail/README.md) contains eight captures: Arabic phone/tablet/desktop, narrow 200% reflow, English light phone/desktop, a 360px phone and a native browser close-up of its prayer rail. The close-up is a DOM-element screenshot, not a generated or raster-edited mockup. A fixed Cairo clock and synthetic guest records keep states reproducible. Earlier fixed-height corner-card captures are preserved separately as historical evidence.
+
+## Documentation updated
+
+Current contract additions document the supplied phone reference, intrinsic wide sizing, responsive material ownership, explicit snapshot still rules, cleared delays and corrected Settings transition prop. The phase and decision log record which preceding presentation constraints are superseded. Sources: [W3C interaction-animation guidance](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions) and [CSS prefers-reduced-motion technique](https://www.w3.org/WAI/WCAG22/Techniques/css/C39); repository motion tokens remain authoritative.
+
+## Decisions recorded
+
+The latest owner instruction supersedes the fixed 9.5rem wide minimum and separate phone boxes only. Badge, summary, location, tracking and disclosure behavior remain approved. The owner explicitly reaffirms applying all agreed changes locally and prohibiting push. No commit, push, deployment or release-note rewrite is performed under the continuing publication hold.
+
+## Known limitations or remaining risks
+
+The repository-wide gate is **not green**. The full gate captured three Completion assertions before that concurrent source/test update; its current targeted suite passes. The newer shared checkout still exceeds the initial-route baseline growth limit, while the frozen Home screenshot/test snapshot passes the original guard. No baseline, ceiling, threshold or assertion is relaxed. Current shared native-system-bar, overlay, Completion and Learn work needs its own integrated acceptance before any release. The shared checkout changed while validation ran, so these logs are not a release receipt for its later contents.
+
+Physical Android/iOS frame pacing, human screen-reader review, authenticated account/OAuth states and exhaustive content/interaction combinations remain separate acceptance. Enlarged text intentionally reflows instead of being forced into a fixed compact height.
+
+## Out-of-scope findings
+
+Independent English reader/export, native-system-bar, overlay and Completion work has its own local changes and acceptance records. No source/religious content, account/sync boundary, router, data schema or dependency was changed here.
+
+## Recommended next step
+
+Review the supplied-reference phone rail and denser wide screenshots, then reconcile the independent shared bundle growth and run integrated validation on a stable snapshot. Complete physical-device motion and assistive-technology acceptance. Keep publication on hold until separately authorized and the intact current-input release gates and exact-commit CI pass.

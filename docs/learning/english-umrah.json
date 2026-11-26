@@ -1,0 +1,733 @@
+{
+  "schema": 1,
+  "id": "dalil-al-mutamir",
+  "status": "draft-for-review",
+  "title": "The Umrah Guide",
+  "author": "Compiled by Abu Muhammad Yusuf ibn Zabn Allah al-Utayr",
+  "sourceFolder": "book2_dalil_al_mutamir",
+  "sourceFile": "dalil_al_mutamir",
+  "sourceSha256": "f14da4e59bbf39f725dedaeccd8885da2be22ef750c18fa55238d644a07c36ad",
+  "scope": "Complete translation draft of the existing 16-source-page Arabic digital adaptation. This is not a translation of all 138 pages of its earlier source publication.",
+  "pages": [
+    {
+      "sourcePage": 1,
+      "title": "The Umrah Guide",
+      "blocks": [
+        {
+          "type": "quran",
+          "binding": "bismillah"
+        },
+        {
+          "type": "paragraph",
+          "text": "The rites of Umrah • Common mistakes • Visiting Madinah • Supplications and remembrances"
+        },
+        {
+          "type": "paragraph",
+          "text": "A comprehensive guide to the rulings of pilgrimage rites in the light of the Qur'an and authentic Sunnah."
+        },
+        {
+          "type": "paragraph",
+          "text": "Compiled by Abu Muhammad Yusuf ibn Zabn Allah al-Utayr."
+        },
+        {
+          "type": "note",
+          "text": "The Arabic adaptation credits supervision and review to the Agency of the General Presidency for the Affairs of the Prophet's Mosque. It describes itself as an approved, documented digital edition. Those are source-edition statements; this English draft has not received that approval."
+        },
+        {
+          "type": "paragraph",
+          "text": "Distributed free of charge, not for sale. An endowment for the sake of Allah, Most High."
+        }
+      ]
+    },
+    {
+      "sourcePage": 2,
+      "title": "Contents",
+      "blocks": [
+        {
+          "type": "contents",
+          "entries": [
+            [4, "The virtue of Umrah and encouragement to undertake it"],
+            [5, "Travel, the five spatial miqats and entering ihram by air"],
+            [6, "Sunnah practices of ihram, the talbiyah, stipulating a condition and a child's Umrah"],
+            [7, "The nine prohibitions of ihram and what remains permissible"],
+            [8, "Entering Makkah and al-Masjid al-Haram; tawaf around the Ka'bah"],
+            [9, "Sa'i between al-Safa and al-Marwah, cutting the hair and leaving ihram"],
+            [10, "Common mistakes during ihram, tawaf, sa'i and leaving ihram"],
+            [11, "The virtue of Madinah and the etiquette of visiting the Prophet's Mosque"],
+            [12, "Greeting the Prophet and his two Companions; the Rawdah and Quba"],
+            [13, "Tawassul: its permitted and prohibited forms"],
+            [14, "Guidance for pilgrims, including advice for women"],
+            [15, "Selected comprehensive supplications and the book's sixteen sources"]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Contents entries follow the Arabic source exactly. Some headings mention topics not developed separately in this digital adaptation. Numbers refer to source pages; an English source section may span several PDF pages."
+        }
+      ]
+    },
+    {
+      "sourcePage": 3,
+      "title": "Foreword and the route through Umrah",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "The agency's foreword to the source edition"
+        },
+        {
+          "type": "quote",
+          "text": "Out of its concern to guide visitors to the Two Holy Mosques, the Agency of the General Presidency for the Affairs of the Prophet's Mosque has attended to reviewing and publishing this blessed book, The Umrah Guide, to help Muslims perform their rites correctly and lawfully, in accordance with the guidance of the Messenger of Allah, peace and blessings be upon him."
+        },
+        {
+          "type": "heading",
+          "text": "Six stages of Umrah"
+        },
+        {
+          "type": "steps",
+          "items": [
+            {
+              "title": "Enter ihram at the miqat",
+              "text": "Bathe, remove ordinary fitted clothing, make the intention and recite the talbiyah: “Here I am for Umrah.”",
+              "artwork": 1,
+              "target": 6
+            },
+            {
+              "title": "Perform tawaf",
+              "text": "Make seven circuits of the House, beginning at the Black Stone. Men perform idtiba', uncovering the right shoulder.",
+              "artwork": 2,
+              "target": 8
+            },
+            {
+              "title": "Pray two rak'ahs after tawaf",
+              "text": "Pray behind the Station of Ibrahim, reciting Surah al-Kafirun and Surah al-Ikhlas.",
+              "artwork": 3,
+              "target": 8
+            },
+            {
+              "title": "Drink Zamzam water",
+              "text": "Drink your fill of the blessed water, keeping your intention and supplication in mind.",
+              "artwork": 4,
+              "target": 8
+            },
+            {
+              "title": "Perform sa'i",
+              "text": "Make seven passages between al-Safa and al-Marwah, beginning at al-Safa and ending at al-Marwah, with remembrance at those places.",
+              "artwork": 5,
+              "target": 9
+            },
+            {
+              "title": "Shave or shorten the hair",
+              "text": "For men, shaving is preferable, or shorten the hair over the whole head. Women shorten it by a fingertip's length.",
+              "artwork": 6,
+              "target": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 4,
+      "title": "The virtue and obligation of Umrah, and sincere repentance",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "The virtue of Umrah in the authentic Prophetic Sunnah"
+        },
+        {
+          "type": "quote",
+          "text": "One Umrah followed by another expiates what occurs between them, and an accepted Hajj has no reward other than Paradise.",
+          "reference": "Agreed upon by al-Bukhari and Muslim, from Abu Hurayrah, may Allah be pleased with him."
+        },
+        {
+          "type": "quote",
+          "text": "Follow Hajj with Umrah, for they remove poverty and sins as the bellows remove impurities from iron, gold and silver.",
+          "reference": "Reported by al-Tirmidhi and al-Nasa'i with an authentic chain, as stated in the Arabic adaptation."
+        },
+        {
+          "type": "heading",
+          "text": "What a person intending Umrah must attend to before travelling"
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Sincere repentance: abandon sins, regret what has passed and make a sincere resolve not to return to them.",
+            "Restore people's rights: repay debts, seek pardon from those whose rights have been infringed and return trusts to their owners.",
+            "Lawful expenditure: pay for the journey from good, blessed earnings. Allah, Most High, is good and accepts only what is good."
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 5,
+      "title": "Travel etiquette and the five spatial miqats",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Supplication when boarding an aircraft or vehicle"
+        },
+        {
+          "type": "quran",
+          "binding": "travel-43-13"
+        },
+        {
+          "type": "quran",
+          "binding": "travel-43-14"
+        },
+        {
+          "type": "quote",
+          "text": "O Allah, on this journey of ours we ask You for righteousness, mindfulness of You and deeds that please You. O Allah, make this journey easy for us and shorten its distance for us.",
+          "reference": "Reported by Muslim in his Sahih, from Ibn Umar, may Allah be pleased with them both."
+        },
+        {
+          "type": "heading",
+          "text": "The five spatial miqats appointed by the Prophet"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Dhu al-Hulayfah (Abyar Ali): the miqat for the people of Madinah and those passing through it. The source describes it as the farthest miqat from Makkah, at 420 km.",
+            "Al-Juhfah (Rabigh): for the people of the Levant, Egypt and the Maghreb, and those whose route comes in line with it.",
+            "Yalamlam (al-Sa'diyyah): for the people of Yemen and those whose route comes in line with it.",
+            "Qarn al-Manazil (al-Sayl al-Kabir / Wadi Muhrim): for the people of Najd, al-Ta'if and the Gulf.",
+            "Dhat Irq: for the people of Iraq and the eastern lands."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "For air travellers: enter ihram when the aircraft comes in line with the miqat. Do not delay entering ihram until landing at Jeddah airport."
+        }
+      ]
+    },
+    {
+      "sourcePage": 6,
+      "title": "Sunnah practices at ihram and the prescribed talbiyah",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Sunnah practices of ihram at the miqat"
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Bathing and cleanliness: men and women, including women who are menstruating or experiencing postnatal bleeding, attend to any needed removal of underarm and pubic hair and trimming of nails.",
+            "Perfume: it is Sunnah for a man to apply good perfume to his body and head, but not to his ihram garments.",
+            "Ihram clothing: a man removes fitted clothing and wears a clean white lower wrap and upper cloth, with sandals. A woman wears her ordinary concealing clothes without adornment and does not wear a niqab or gloves."
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "The Prophetic wording of the talbiyah"
+        },
+        {
+          "type": "quote",
+          "text": "Here I am, O Allah, here I am. Here I am; You have no partner; here I am. All praise and favour are Yours, and all sovereignty. You have no partner."
+        },
+        {
+          "type": "paragraph",
+          "text": "A man raises his voice with it, while a woman lowers hers. A person performing Umrah continues the talbiyah until beginning tawaf, then stops it."
+        },
+        {
+          "type": "heading",
+          "text": "Stipulating a condition when entering ihram"
+        },
+        {
+          "type": "paragraph",
+          "text": "If a pilgrim fears an obstacle that may prevent completion of the rites, such as illness or detention, it is Sunnah to stipulate a condition, saying: “O Allah, my place of leaving ihram is wherever You prevent me from proceeding.” If an obstacle prevents completion, the pilgrim may then leave ihram without a compensatory sacrifice."
+        }
+      ]
+    },
+    {
+      "sourcePage": 7,
+      "title": "The nine prohibitions of ihram and what is permissible",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Nine prohibitions after the intention to enter ihram"
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Removing hair: shaving or cutting hair from the head or any other part of the body.",
+            "Trimming the nails of the hands or feet.",
+            "Covering the head with something resting directly upon it, such as a cap or headcloth. This applies to men.",
+            "Wearing fitted clothing shaped to the body, such as a thobe, undershirt, trousers or leather socks. This applies to men.",
+            "Perfume: applying it to clothing or the body, or deliberately smelling it.",
+            "Land game: killing it, hunting it or directing others to it.",
+            "Concluding a marriage contract for oneself or another, as a guardian or representative.",
+            "Sexual intercourse and its preliminaries: the source describes this as the gravest prohibition and states that intercourse before tawaf and sa'i invalidates Umrah.",
+            "Intimate contact with desire short of intercourse, such as kissing or touching with desire."
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Things permissible without dislike during ihram"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Carrying belongings on the head.",
+            "Taking shade beneath an umbrella or the roof of a vehicle.",
+            "Wearing glasses, a wristwatch, a ring or a money belt.",
+            "Washing with unscented soap.",
+            "Opening a boil, having a tooth extracted or gently scratching the head."
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 8,
+      "title": "Tawaf around the Ka'bah: seven circuits",
+      "image": {
+        "selector": "#p-8 .photo-hero-img",
+        "alt": "The Ka'bah and pilgrims in the courtyard of al-Masjid al-Haram.",
+        "caption": "The Ka'bah. Tawaf begins and ends in line with the Black Stone. Al-Masjid al-Haram, Makkah."
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "The prescribed manner of tawaf"
+        },
+        {
+          "type": "diagram",
+          "kind": "tawaf",
+          "sourcePage": 8,
+          "title": "Tawaf: seven anticlockwise circuits",
+          "description": "Begin at the Black Stone and make seven anticlockwise circuits, keeping the Ka'bah on your left.",
+          "caption": "Complete seven circuits anticlockwise, beginning at the Black Stone and keeping the Ka'bah on your left. Follow the complete instructions below."
+        },
+        {
+          "type": "paragraph",
+          "text": "1. Begin in line with the Black Stone, keeping the Ka'bah on your left. Touch it or gesture towards it with your right hand, saying: “Allah is greatest.”"
+        },
+        {
+          "type": "paragraph",
+          "text": "2. Idtiba': for men, uncover the right shoulder throughout the circuits of the Umrah tawaf only."
+        },
+        {
+          "type": "paragraph",
+          "text": "3. Ramal: men, but not women, walk briskly with short steps during the first three circuits."
+        },
+        {
+          "type": "paragraph",
+          "text": "4. Between the Yemeni Corner and the Black Stone, it is Sunnah to say:"
+        },
+        {
+          "type": "quran",
+          "binding": "tawaf-2-201"
+        },
+        {
+          "type": "paragraph",
+          "text": "5. After completing seven circuits, pray two rak'ahs behind the Station of Ibrahim, reciting Surah al-Kafirun and Surah al-Ikhlas."
+        },
+        {
+          "type": "note",
+          "text": "The book identifies the surahs by their opening words. These paired quotations reproduce those opening verses, not the complete surahs."
+        },
+        {
+          "type": "quran",
+          "binding": "tawaf-109-1"
+        },
+        {
+          "type": "quran",
+          "binding": "tawaf-112-1"
+        },
+        {
+          "type": "reference",
+          "text": "Sahih Muslim, Book of Pilgrimage, chapter on the Hajj of the Prophet, hadith 1218.",
+          "url": "https://sunnah.com/muslim:1218a"
+        }
+      ]
+    },
+    {
+      "sourcePage": 9,
+      "title": "Sa'i, cutting the hair and leaving ihram",
+      "image": {
+        "selector": "#p-9 .photo-hero-img",
+        "alt": "The passage for sa'i between al-Safa and al-Marwah.",
+        "caption": "The passage between al-Safa and al-Marwah. Sa'i consists of seven passages, beginning at al-Safa and ending at al-Marwah."
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "The prescribed manner of sa'i"
+        },
+        {
+          "type": "diagram",
+          "kind": "sai",
+          "sourcePage": 9,
+          "title": "Sa'i: seven passages from al-Safa to al-Marwah",
+          "description": "Passages 1, 3, 5 and 7 go from al-Safa to al-Marwah. Passages 2, 4 and 6 return to al-Safa. Begin at al-Safa and finish at al-Marwah.",
+          "caption": "Each numbered arrow represents one passage along the same route. Make seven passages, starting at al-Safa and finishing at al-Marwah. Follow the complete instructions below."
+        },
+        {
+          "type": "paragraph",
+          "text": "1. Begin at al-Safa. When approaching it, recite:"
+        },
+        {
+          "type": "quran",
+          "binding": "safa-2-158"
+        },
+        {
+          "type": "quote",
+          "text": "We begin with what Allah began with."
+        },
+        {
+          "type": "paragraph",
+          "text": "2. Remembrance at al-Safa: face the Ka'bah and supplicate: “There is no deity except Allah alone, without partner. His is the dominion and to Him belongs all praise, and He has power over all things…”"
+        },
+        {
+          "type": "note",
+          "text": "The ellipsis above is present in the source adaptation; it is not presented as the complete wording."
+        },
+        {
+          "type": "paragraph",
+          "text": "3. Between the green markers, men, but not women, run briskly."
+        },
+        {
+          "type": "paragraph",
+          "text": "4. Al-Marwah: finish the passage there and supplicate as at al-Safa. Continue until seven complete passages have been made, ending at al-Marwah."
+        },
+        {
+          "type": "paragraph",
+          "text": "5. Shaving or shortening the hair: a man shaves his entire head or shortens the hair throughout it. A woman shortens her hair by a fingertip's length. This completes leaving ihram."
+        }
+      ]
+    },
+    {
+      "sourcePage": 10,
+      "title": "Common mistakes and their correction",
+      "blocks": [
+        {
+          "type": "mistake",
+          "wrong": "Performing tawaf through the Hijr of Isma'il.",
+          "right": "The Hijr is part of the Ka'bah. A circuit passing through it does not go around the entire House and is invalid."
+        },
+        {
+          "type": "mistake",
+          "wrong": "Circling and making supplication collectively in a loud voice behind a leader.",
+          "right": "The source describes this as an introduced innovation that disturbs other pilgrims. Each pilgrim should make personal supplication humbly and earnestly."
+        },
+        {
+          "type": "mistake",
+          "wrong": "Wiping the walls or coverings of the Ka'bah, or the Station of Ibrahim, seeking blessing.",
+          "right": "Only the Black Stone and the Yemeni Corner are touched, following the authentic Sunnah."
+        },
+        {
+          "type": "mistake",
+          "wrong": "Crowding and inconveniencing people to kiss the Black Stone.",
+          "right": "Kissing the Stone is Sunnah, whereas harming Muslims is forbidden. Touching it, or gesturing towards it and saying the takbir from a distance, is sufficient."
+        },
+        {
+          "type": "mistake",
+          "wrong": "Assigning a particular supplication to every circuit of tawaf or passage of sa'i.",
+          "right": "No specific supplication for each circuit is reported from the Prophet. Supplicate for whatever good of this world and the Hereafter Allah enables you to ask for."
+        },
+        {
+          "type": "mistake",
+          "wrong": "Cutting only a few hairs from one part of the head when leaving ihram.",
+          "right": "The source states that this is insufficient: the hair over the whole head must be shortened, or the entire head shaved."
+        },
+        {
+          "type": "note",
+          "text": "A guiding principle for the pilgrim: acts of worship are based on revealed guidance. Follow the Prophet's guidance, make your intention sincere for Allah, avoid introducing innovations, and maintain tranquillity and gentleness towards Muslims."
+        }
+      ]
+    },
+    {
+      "sourcePage": 11,
+      "title": "Madinah and visiting the Prophet's Mosque",
+      "image": {
+        "selector": "#p-11 .photo-hero-img",
+        "alt": "The Prophet's Mosque and its green dome in Madinah.",
+        "caption": "The Prophet's Mosque in Madinah. The source caption mentions the reward of one thousand prayers; the hadith below retains its complete comparison and exception."
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "The virtue of the Prophet's Mosque"
+        },
+        {
+          "type": "quote",
+          "text": "A prayer in this mosque of mine is better than a thousand prayers elsewhere, except al-Masjid al-Haram.",
+          "reference": "Agreed upon by al-Bukhari and Muslim, from Abu Hurayrah, may Allah be pleased with him."
+        },
+        {
+          "type": "heading",
+          "text": "Etiquette of visiting the Prophet's Mosque"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Visiting the Prophet's Mosque involves neither ihram nor talbiyah and is not connected to the validity of Umrah. It is a separate prescribed Sunnah that may be undertaken at any time.",
+            "It is Sunnah to purify oneself, enter the mosque calmly with the right foot first and pray two rak'ahs as the greeting of the mosque.",
+            "Seek to pray in the Rawdah, in view of the Prophet's statement: “Between my house and my pulpit is a garden from the gardens of Paradise.”"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 12,
+      "title": "Greeting the Prophet and his two Companions",
+      "image": {
+        "selector": "#p-12 .photo-hero-img",
+        "alt": "The Prophet's Mosque, the green dome and the area of the noble chamber.",
+        "caption": "The Prophet's Mosque, the green dome and the noble chamber in Madinah."
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Greeting the Prophet calmly and respectfully"
+        },
+        {
+          "type": "quote",
+          "text": "Peace be upon you, O Messenger of Allah, and Allah's mercy and blessings. I bear witness that you conveyed the message, fulfilled the trust, counselled the community and strove for Allah as was His due. May Allah reward you on behalf of your community with the best reward He has given a prophet on behalf of his community."
+        },
+        {
+          "type": "heading",
+          "text": "Greeting Abu Bakr and Umar, may Allah be pleased with them both"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Abu Bakr al-Siddiq: take a step to the right and say: “Peace be upon you, O Abu Bakr, successor of the Messenger of Allah. May Allah be pleased with you and reward you with good on behalf of the community of Muhammad.”",
+            "Umar ibn al-Khattab: take another step to the right and say: “Peace be upon you, O Umar, Commander of the Believers. May Allah be pleased with you and reward you with good on behalf of the community of Muhammad.”",
+            "The visitor stands humbly and calmly, lowering the voice and facing the noble chamber, then moves on gently without lingering, so as not to crowd other Muslims."
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 13,
+      "title": "Tawassul: its meaning and permitted and prohibited forms",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Three permitted forms of tawassul"
+        },
+        {
+          "type": "paragraph",
+          "text": "1. Through Allah's names and attributes, as in His statement:"
+        },
+        {
+          "type": "quran",
+          "binding": "names-7-180"
+        },
+        {
+          "type": "paragraph",
+          "text": "For example: “O Allah, I ask You, because You are the Entirely Merciful, the Especially Merciful, to have mercy upon me.”"
+        },
+        {
+          "type": "paragraph",
+          "text": "2. Through righteous deeds, as in His statement:"
+        },
+        {
+          "type": "quran",
+          "binding": "believed-3-53"
+        },
+        {
+          "type": "paragraph",
+          "text": "The hadith of the three men in the cave is another example."
+        },
+        {
+          "type": "paragraph",
+          "text": "3. Through the supplication of a righteous person who is alive and present: ask that person to supplicate to Allah for you during their lifetime, as the Companions asked the Prophet to pray for rain."
+        },
+        {
+          "type": "heading",
+          "text": "Prohibited tawassul that conflicts with tawhid"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Calling upon the dead and seeking their help: asking someone dead or absent to fulfil needs or relieve distress. The source classifies this as major shirk, contrary to the foundation of Allah's oneness.",
+            "Tawassul through a created being's status or person, such as saying, “I ask You by the status of Your prophet,” or by the status of another person. The source describes this as a prohibited innovation and a means leading to shirk."
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 14,
+      "title": "General guidance and advice for women",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "General guidance for the guests of the Most Merciful"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Keep the greatness of the time and place in mind. Guard the tongue against disputation, arguments and unnecessary speech.",
+            "Maintain calm, dignity and gentleness towards others in the tawaf and sa'i areas, on the Haramain train and in lifts.",
+            "Beware of becoming preoccupied with photographs and worship selfies; use the available minutes for earnest supplication."
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Specific advice for women performing Umrah or visiting Madinah"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Hijab and covering: wear concealing, loose-fitting clothing that is neither transparent nor perfumed.",
+            "Avoid crowding among men: perform tawaf towards the outer edges of the area and keep away from severe congestion.",
+            "Lower the voice when reciting the talbiyah, making supplication and reading the Qur'an.",
+            "A mahram: the source instructs women not to travel for Umrah or a visit without a mahram, citing the hadith: “A woman must not travel except with a mahram.”"
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 15,
+      "title": "Comprehensive supplications and the book's sources",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "A comprehensive transmitted supplication for use in the Two Holy Mosques"
+        },
+        {
+          "type": "quote",
+          "text": "O Allah, I ask You for all good, immediate and later, what I know of it and what I do not know. I seek refuge in You from all evil, immediate and later, what I know of it and what I do not know. O Allah, I ask You for the good that Your servant and prophet asked You for, and I seek refuge in You from the evil from which Your servant and prophet sought refuge."
+        },
+        {
+          "type": "heading",
+          "text": "The sixteen sources listed by the Arabic adaptation"
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Al-Tahqiq wa al-Idah li-Masa'il al-Hajj wa al-Umrah wa al-Ziyarah (Ibn Baz).",
+            "Majmu' Fatawa wa Maqalat (Ibn Baz).",
+            "Al-Manhaj li-Murid al-Umrah wa al-Hajj (Ibn Uthaymin).",
+            "Akhta' Yartakibuha Ba'd al-Hujjaj (Ibn Uthaymin).",
+            "Jalasat al-Hajj.",
+            "Majmu' Fatawa wa Rasa'il Ibn Uthaymin.",
+            "Fiqh al-Ibadat (Ibn Uthaymin).",
+            "Fadl al-Madinah wa Adab Suknaha (al-Abbad).",
+            "Ad'iyah wa Adhkar min al-Kitab wa al-Sunnah (al-Abbad).",
+            "Sahih al-Targhib wa al-Tarhib (al-Albani).",
+            "Sharh al-Sunnah (al-Baghawi).",
+            "Al-Ifsah Sharh al-Tahqiq (al-Jibrin).",
+            "Durus Aqadiyyah Mustafadah min al-Hajj (al-Badr).",
+            "Al-Du'a min al-Kitab wa al-Sunnah (al-Qahtani).",
+            "Adab Ziyarat al-Masjid al-Nabawi (Presidency for the Affairs of the Prophet's Mosque).",
+            "Sifat al-Umrah wa Yalihi Jawami' al-Du'a (Presidency of al-Masjid al-Haram)."
+          ]
+        }
+      ]
+    },
+    {
+      "sourcePage": 16,
+      "title": "Conclusion",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Completed with Allah's praise and enabling grace"
+        },
+        {
+          "type": "paragraph",
+          "text": "We ask Allah, the Generous, to make this work sincerely for His noble countenance and a means of attaining His pleasure; to accept the Hajj, Umrah and visits of all the guests of the Most Merciful; and to return them to their countries safe, rewarded and forgiven."
+        },
+        {
+          "type": "heading",
+          "text": "The source edition's printing and publishing notice"
+        },
+        {
+          "type": "paragraph",
+          "text": "An endowment for the sake of Allah, Most High, for every Muslim. Printing, publishing and distributing it free of charge are permitted without alteration to its reviewed religious texts. May Allah reward with good everyone who helps publish and distribute it."
+        },
+        {
+          "type": "quote",
+          "text": "Glory and praise be to You, O Allah. I bear witness that there is no deity except You. I seek Your forgiveness and turn to You in repentance."
+        },
+        {
+          "type": "paragraph",
+          "text": "The Arabic adaptation records completion of its digital production in Rabi' al-Akhir 1448 AH."
+        },
+        {
+          "type": "note",
+          "text": "This English translation is a separate review draft. The preceding dates, credits and publishing notice describe the supplied Arabic adaptation and do not claim approval of this English edition."
+        }
+      ]
+    }
+  ],
+  "quranBindings": {
+    "bismillah": {
+      "sourcePage": 1,
+      "selector": "#p-1",
+      "arabicStart": "بِسْمِ",
+      "arabicEnd": "الرَّحِيمِ",
+      "ref": "1:1",
+      "mode": "full"
+    },
+    "travel-43-13": {
+      "sourcePage": 5,
+      "selector": "#p-5 .dua-matn",
+      "arabicStart": "سُبْحَانَ",
+      "arabicEnd": "مُقْرِنِينَ",
+      "ref": "43:13",
+      "mode": "excerpt",
+      "start": "Exalted is He",
+      "end": "subdued it."
+    },
+    "travel-43-14": {
+      "sourcePage": 5,
+      "selector": "#p-5 .dua-matn",
+      "arabicStart": "وَإِنَّا",
+      "arabicEnd": "لَمُنْقَلِبُونَ",
+      "ref": "43:14",
+      "mode": "full"
+    },
+    "tawaf-2-201": {
+      "sampleBinding": ["dalil-al-mutamir", "corners", "2:201"]
+    },
+    "tawaf-109-1": {
+      "sampleBinding": ["dalil-al-mutamir", "prayer", "109:1"]
+    },
+    "tawaf-112-1": {
+      "sampleBinding": ["dalil-al-mutamir", "prayer", "112:1"]
+    },
+    "safa-2-158": {
+      "sourcePage": 9,
+      "selector": "#p-9 .step-text",
+      "index": 0,
+      "arabicStart": "إِنَّ",
+      "arabicEnd": "اللَّهِ",
+      "ref": "2:158",
+      "mode": "excerpt",
+      "start": "Indeed, as-Safa",
+      "end": "symbols of Allah."
+    },
+    "names-7-180": {
+      "sourcePage": 13,
+      "selector": "#p-13 .body-text",
+      "index": 0,
+      "arabicStart": "وَلِلَّهِ",
+      "arabicEnd": "بِهَا",
+      "ref": "7:180",
+      "mode": "excerpt",
+      "start": "And to Allah",
+      "end": "invoke Him by them."
+    },
+    "believed-3-53": {
+      "sourcePage": 13,
+      "selector": "#p-13 .body-text",
+      "index": 0,
+      "arabicStart": "رَبَّنَا",
+      "arabicEnd": "الشَّاهِدِينَ",
+      "ref": "3:53",
+      "mode": "full"
+    }
+  },
+  "kind": "book",
+  "presentation": {
+    "coverSourcePage": 1,
+    "contentsSourcePage": 2,
+    "coverAuthorBlock": 3,
+    "aboutCoverBlocks": [4, 5],
+    "draftLabel": "English review draft · 16-page adaptation. Independent review pending."
+  }
+}

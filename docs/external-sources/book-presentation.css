@@ -1,0 +1,806 @@
+:root {
+  --book-bg: #fbf9f5;
+  --book-card: #ffffff;
+  --book-ink: #231f19;
+  --book-muted: #625b51;
+  --book-accent: #785514;
+  --book-soft: #f3ecde;
+  --book-line: #d9cbb2;
+  --book-green: #136b48;
+  --book-red: #ab2345;
+  --book-cover-gold: #e5c981;
+  --book-size: 1;
+}
+html[data-edition="dark"] {
+  --book-bg: #100f0e;
+  --book-card: #1b1916;
+  --book-ink: #f5f0e8;
+  --book-muted: #c0b7a8;
+  --book-accent: #e0be62;
+  --book-soft: #2a241a;
+  --book-line: #544632;
+  --book-green: #69d4ab;
+  --book-red: #ff96ae;
+}
+html[data-edition="navy"] {
+  --book-bg: #0a1124;
+  --book-card: #101b36;
+  --book-ink: #f5f0e8;
+  --book-muted: #bcc7dc;
+  --book-accent: #edc967;
+  --book-soft: #19284a;
+  --book-line: #3f5173;
+  --book-green: #73dfb3;
+  --book-red: #ffa8bd;
+}
+* {
+  box-sizing: border-box;
+  font-synthesis: none;
+}
+body {
+  background: var(--book-bg);
+  color: var(--book-ink);
+}
+.page {
+  padding: 9mm 10mm 8mm;
+  gap: 3mm;
+  background: var(--book-bg) !important;
+  color: var(--book-ink) !important;
+  justify-content: flex-start;
+}
+.page-frame-outer {
+  border-color: var(--book-line);
+  border-radius: 5px;
+}
+.page-frame-inner {
+  display: none;
+}
+.page-header,
+.page-footer {
+  flex: 0 0 auto;
+  color: var(--book-muted);
+  border-color: var(--book-line);
+  background: var(--book-bg);
+  font-size: 8pt;
+  line-height: 1.5;
+  gap: 3mm;
+}
+.page-header {
+  margin-bottom: 0;
+  padding-bottom: 2mm;
+}
+.page-footer {
+  margin-top: auto;
+  padding-top: 2mm;
+  font-size: 7.5pt;
+}
+.page-footer > :first-child {
+  max-width: 39%;
+}
+.page-footer > :last-child {
+  max-width: 33%;
+}
+.page-footer > span {
+  overflow-wrap: anywhere;
+}
+.header-book-title,
+.header-chapter {
+  color: var(--book-accent) !important;
+}
+.header-book-title {
+  gap: 1.5mm;
+  font-size: 8pt;
+}
+.header-chapter {
+  font-size: 8pt;
+}
+.header-book-title svg,
+.book-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.footer-page-pill {
+  color: var(--book-accent);
+  background: var(--book-soft);
+  border-color: var(--book-line);
+  white-space: nowrap;
+  font-size: 8pt;
+}
+.chapter-banner {
+  margin: 0 !important;
+  padding: 0 0 2mm;
+  flex-shrink: 0;
+}
+.chapter-title {
+  color: var(--book-ink) !important;
+  font-family: "IBM Plex Arabic", sans-serif !important;
+  font-size: 15pt !important;
+  line-height: 1.65 !important;
+}
+.chapter-badge {
+  color: var(--book-accent);
+  background: var(--book-soft);
+  border: none;
+  font-size: 8pt;
+  padding: 0.7mm 2.5mm;
+  margin-bottom: 1mm;
+}
+.devotional-flow,
+.content-flow,
+.devotional-body,
+.intro-page-container,
+.mistakes-container,
+.editorial-flow {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start !important;
+  gap: 3mm !important;
+  overflow: visible;
+  padding: 0;
+}
+.dua-card,
+.hadith-flow,
+.hadith-card,
+.section-box,
+.mistake-card,
+.intro-card-luxury,
+.adab-card,
+.advisory-card,
+.conclusion-card {
+  flex: 0 0 auto !important;
+  justify-content: flex-start !important;
+  background: var(--book-card);
+  border: 1px solid var(--book-line);
+  border-inline-start: 2px solid var(--book-accent);
+  border-radius: 6px;
+  padding: 3.5mm 4mm !important;
+  box-shadow: none;
+  gap: 1.5mm;
+}
+.hadith-flow {
+  border: 0;
+  padding: 0 !important;
+  background: transparent;
+}
+.hadith-card {
+  min-height: 0 !important;
+  height: auto !important;
+}
+.devotional-flow[class] .dua-text,
+.devotional-body .hadith-text,
+.page .dua-matn,
+.page .dua-matn-center,
+.page .body-text,
+.page .advisory-body,
+.page .intro-body-p {
+  color: var(--book-ink);
+  font-size: 12pt;
+  line-height: 1.85;
+  font-weight: 400;
+  text-align: start;
+  margin: 0;
+}
+.devotional-body .hadith-text {
+  font-size: 13pt;
+  line-height: 1.95;
+}
+.devotional-flow[class] .dua-card {
+  padding: 3mm 4mm !important;
+}
+.dua-card-header {
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1.3mm 3mm;
+  margin-bottom: 0.8mm;
+}
+.dua-card-meta-right {
+  flex-wrap: wrap;
+  gap: 2mm;
+}
+.devotional-flow[class] .dua-num-pill,
+.adab-num-pill {
+  color: var(--book-accent);
+  background: var(--book-soft);
+  border-color: var(--book-line);
+  font-size: 8.5pt;
+  line-height: 1.5;
+  padding: 0.3mm 2mm;
+}
+.devotional-flow[class] .takhrij-inline,
+.takhrij,
+.takhrij-micro,
+.ayah-ref,
+.ayah-ref-inline {
+  color: var(--book-muted) !important;
+  background: var(--book-soft) !important;
+  border-color: var(--book-line) !important;
+  font-size: 8.5pt !important;
+  line-height: 1.7;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.devotional-flow[class] .narrator-line {
+  color: var(--book-muted);
+  font-size: 9pt;
+}
+.quran-quote,
+.quran-ayah-text {
+  color: var(--book-accent) !important;
+  font-family: "Amiri Quran", serif !important;
+  font-weight: 400 !important;
+  font-size: inherit;
+  line-height: inherit;
+}
+.quran-quote-box {
+  background: var(--book-soft);
+  border-color: var(--book-line);
+  padding: 2.5mm 3mm;
+}
+.quran-ayah-text {
+  font-size: 12pt;
+  line-height: 1.95;
+}
+.intro-besmalah,
+.hadith-inline-quote,
+.signature-title,
+.vocab-title {
+  color: var(--book-accent);
+}
+.intro-divider-fleuron {
+  color: var(--book-accent);
+  opacity: 1;
+}
+.signature-name {
+  color: var(--book-ink);
+}
+.signature-dua {
+  color: var(--book-muted);
+  font-size: 8.5pt;
+}
+.intro-signature-box {
+  background: var(--book-soft);
+  border-color: var(--book-line);
+}
+.section-title {
+  color: var(--book-accent) !important;
+  font-size: 10pt !important;
+  line-height: 1.6;
+  margin-bottom: 1.5mm !important;
+}
+.vocab-panel {
+  flex: 0 0 auto;
+  margin: 1mm 0 0;
+  padding: 3mm 4mm;
+  background: var(--book-soft);
+  border-color: var(--book-line);
+  border-inline-start: 2px solid var(--book-accent);
+}
+.vocab-title {
+  font-size: 9pt;
+  line-height: 1.7;
+  margin: 0 0 1mm;
+}
+.vocab-item {
+  color: var(--book-muted);
+  font-size: 9.5pt;
+  line-height: 1.85;
+}
+.adab-list {
+  gap: 2.5mm;
+}
+.adab-row {
+  font-size: 11pt;
+  line-height: 1.85;
+}
+.adab-footnote {
+  color: var(--book-muted);
+  font-size: 8.5pt;
+}
+.source-note {
+  margin: 1.5mm 0 0;
+  padding: 2mm 3mm;
+  border: 1px solid var(--book-line);
+  border-radius: 4px;
+  background: var(--book-soft);
+  font-size: 9pt;
+  line-height: 1.8;
+  color: var(--book-ink);
+}
+.source-note-title {
+  display: flex;
+  align-items: center;
+  gap: 1.5mm;
+  color: var(--book-accent);
+  font-size: 8.5pt;
+  font-weight: 600;
+  margin-bottom: 1mm;
+}
+.source-note-virtue {
+  border-inline-start: 2px solid var(--book-green);
+}
+.source-note-virtue .source-note-title {
+  color: var(--book-green);
+}
+.toc-container,
+.toc-grid {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+.editorial-flow.contents-flow {
+  gap: 0 !important;
+}
+.contents-flow .chapter-banner {
+  margin-bottom: 3mm !important;
+}
+.toc-item {
+  color: var(--book-ink);
+  text-decoration: none;
+  align-items: center;
+  font-size: 10pt !important;
+  line-height: 1.8;
+  padding: 1mm 1mm;
+  border-bottom: 1px solid var(--book-line);
+  gap: 2mm;
+}
+.toc-item-title {
+  white-space: normal;
+  font-weight: 500;
+}
+.toc-item-page {
+  color: var(--book-accent);
+  background: var(--book-soft);
+  font-size: 8.5pt;
+  flex-shrink: 0;
+}
+.toc-item-leader,
+.toc-item-dots {
+  border: 0;
+  margin: 0;
+}
+.toc-section-header {
+  color: var(--book-accent);
+  font-size: 10pt;
+  margin: 2mm 0;
+}
+.contents-list,
+.roadmap-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.source-page-notice {
+  flex-shrink: 0;
+  font-size: 8pt;
+  line-height: 1.8;
+  color: var(--book-muted);
+  margin: 1mm 0;
+}
+.photo-hero-box {
+  height: 38mm;
+  flex-shrink: 0;
+  border-color: var(--book-line);
+  box-shadow: none;
+  margin: 0 0 1mm;
+}
+.photo-hero-overlay {
+  background: #151b24;
+  position: absolute;
+  font-size: 8pt;
+  padding: 1mm 2mm;
+}
+.mistake-card {
+  margin: 0;
+}
+.mistake-row,
+.correct-row {
+  font-size: 10.5pt;
+  line-height: 1.8;
+  align-items: baseline;
+}
+.mistake-tag {
+  color: var(--book-red);
+  font-size: 9pt;
+}
+.correct-tag {
+  color: var(--book-green);
+  font-size: 9pt;
+}
+.mistake-row {
+  color: var(--book-ink);
+}
+.step-item {
+  font-size: 11pt;
+  line-height: 1.8;
+}
+.step-num {
+  color: var(--book-accent);
+  background: var(--book-soft);
+  border-color: var(--book-line);
+}
+.roadmap-box {
+  flex: 0 0 auto !important;
+  background: transparent;
+  border: none;
+  padding: 0;
+  gap: 2mm;
+  justify-content: flex-start !important;
+}
+.roadmap-header {
+  margin: 0;
+  font-size: 10pt;
+  line-height: 1.7;
+  color: var(--book-accent);
+  padding: 0 0 2mm;
+  border-color: var(--book-line);
+}
+.roadmap-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+}
+.roadmap-card {
+  position: relative;
+  color: var(--book-ink);
+  background: var(--book-card);
+  border: 1px solid var(--book-line);
+  display: grid;
+  grid-template-columns: 7mm 15mm 1fr;
+  align-items: center;
+  gap: 2.5mm;
+  padding: 2mm 3mm;
+  border-radius: 5px;
+  min-height: 19mm;
+  text-decoration: none;
+}
+.roadmap-grid li + li .roadmap-card::before {
+  content: "";
+  position: absolute;
+  right: 6.5mm;
+  top: -2.3mm;
+  height: 2.3mm;
+  border-inline-start: 1.5px solid var(--book-accent);
+}
+.step-num-pill {
+  color: var(--book-bg);
+  background: var(--book-accent);
+  width: 6mm;
+  height: 6mm;
+  font-size: 9pt;
+}
+.step-title {
+  color: var(--book-ink);
+  font-size: 10.5pt;
+  line-height: 1.6;
+}
+.step-desc {
+  color: var(--book-muted);
+  font-size: 8.5pt;
+  line-height: 1.7;
+}
+.step-art {
+  width: 15mm;
+  height: 15mm;
+  color: var(--book-accent);
+}
+.book-cover {
+  background: #101b2b !important;
+  color: #f5f0e8 !important;
+  justify-content: space-between;
+}
+.book-cover [data-cover-gold] {
+  color: var(--book-cover-gold) !important;
+}
+.book-cover [data-cover-pill] {
+  color: #101b2b !important;
+  background: var(--book-cover-gold) !important;
+}
+.book-cover .page-frame-outer {
+  border-color: #9b814d;
+}
+.book-cover h1 {
+  font-size: 32pt !important;
+  line-height: 1.7 !important;
+}
+.book-cover [style*="Amiri"] {
+  font-weight: 400 !important;
+}
+.book-cover-mark {
+  width: 33mm;
+  height: 33mm;
+  margin: 3mm auto 5mm;
+  color: var(--book-cover-gold);
+  display: block;
+}
+.book-toolbar,
+.skip-link {
+  display: none;
+}
+@media screen {
+  html {
+    scroll-padding-top: 100px;
+  }
+  body {
+    padding: 86px 20px 40px;
+    background: var(--book-soft);
+  }
+  main {
+    max-width: 760px;
+    margin: auto;
+  }
+  .page {
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 0 20px;
+    padding: clamp(16px, 4vw, 38px);
+    border: 1px solid var(--book-line);
+    border-radius: 12px;
+    gap: 18px;
+  }
+  .page-frame-outer {
+    display: none;
+  }
+  .page > div[style*="flex:1"] {
+    justify-content: flex-start !important;
+  }
+  .page-footer {
+    margin-top: 20px;
+  }
+  .book-toolbar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: var(--book-card);
+    border-bottom: 1px solid var(--book-line);
+    padding: 8px max(12px, env(safe-area-inset-right));
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .book-toolbar a,
+  .book-toolbar button {
+    color: var(--book-ink);
+    background: var(--book-soft);
+    border: 1px solid var(--book-line);
+    border-radius: 8px;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font:
+      500 14px "IBM Plex Arabic",
+      sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .book-toolbar .reader-size-value {
+    font-size: 13px;
+    min-width: 34px;
+    text-align: center;
+  }
+  .book-toolbar .toolbar-title {
+    margin-inline-end: auto;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .skip-link {
+    display: block;
+    position: fixed;
+    top: 5px;
+    right: 10px;
+    z-index: 100;
+    background: var(--book-card);
+    color: var(--book-ink);
+    padding: 12px;
+    transform: translateY(-150%);
+  }
+  .skip-link:focus {
+    transform: none;
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid var(--book-accent);
+    outline-offset: 3px;
+  }
+  main a {
+    min-height: 44px;
+  }
+  .toc-item {
+    padding: 8px 0;
+    min-height: 48px;
+    font-size: calc(16px * var(--book-size)) !important;
+  }
+  .header-chapter {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .page .dua-text,
+  .page .hadith-text,
+  .page .dua-matn,
+  .page .body-text,
+  .page .intro-body-p,
+  .page .advisory-body,
+  .page .adab-row,
+  .page .step-item {
+    font-size: calc(20px * var(--book-size)) !important;
+    line-height: 1.95;
+  }
+  .page .quran-ayah-text {
+    font-size: calc(21px * var(--book-size)) !important;
+    line-height: 2;
+  }
+  .page .chapter-title {
+    font-size: calc(23px * var(--book-size)) !important;
+  }
+  .page .vocab-item,
+  .page .source-note {
+    font-size: calc(16px * var(--book-size));
+  }
+  .page .takhrij-inline,
+  .page .ayah-ref-inline,
+  .page .takhrij,
+  .page .ayah-ref,
+  .page .takhrij-micro {
+    font-size: calc(14px * var(--book-size)) !important;
+  }
+  .page .step-title {
+    font-size: calc(18px * var(--book-size));
+  }
+  .page .step-desc {
+    font-size: calc(15px * var(--book-size));
+  }
+  .page .section-title {
+    font-size: calc(17px * var(--book-size)) !important;
+  }
+  .source-note-title,
+  .vocab-title {
+    font-size: calc(14px * var(--book-size));
+  }
+  .photo-hero-box {
+    height: 180px;
+  }
+  .photo-hero-overlay {
+    font-size: calc(12px * var(--book-size));
+    flex-wrap: wrap;
+    position: static;
+  }
+  .photo-hero-img {
+    height: 140px;
+  }
+  .photo-hero-box {
+    height: auto;
+  }
+  .book-cover {
+    min-height: 640px;
+  }
+  .book-cover > div[style] {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .dua-card-header {
+    align-items: flex-start;
+  }
+  .page-header {
+    flex-wrap: wrap;
+  }
+  .page-footer {
+    flex-wrap: wrap;
+  }
+  .page-footer > :first-child,
+  .page-footer > :last-child {
+    max-width: 100%;
+  }
+  .roadmap-card {
+    grid-template-columns: 30px 45px minmax(0, 1fr);
+    padding: 12px;
+    gap: 10px;
+  }
+  .roadmap-card .step-art {
+    width: 42px;
+    height: 42px;
+  }
+  .page .mistake-row,
+  .page .correct-row {
+    font-size: calc(17px * var(--book-size));
+    flex-wrap: wrap;
+  }
+  .page .mistake-tag,
+  .page .correct-tag {
+    font-size: calc(15px * var(--book-size));
+    white-space: normal;
+  }
+  .page [style*="max-width"] {
+    max-width: 100% !important;
+  }
+  @media (max-width: 480px) {
+    body {
+      padding: 116px 8px 24px;
+    }
+    .toolbar-title {
+      width: 100%;
+    }
+    .book-toolbar a,
+    .book-toolbar button {
+      padding: 6px 9px;
+    }
+    .roadmap-card {
+      grid-template-columns: 30px minmax(0, 1fr);
+    }
+    .roadmap-card .step-art {
+      display: none;
+    }
+  }
+}
+@media print {
+  .section-box {
+    margin-bottom: 0 !important;
+  }
+  html[data-book="2"] #p-3 .dua-matn {
+    font-size: 10.5pt;
+    line-height: 1.75;
+  }
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2mm;
+  }
+  .roadmap-card {
+    height: 100%;
+    grid-template-columns: 6mm 1fr;
+    gap: 1.5mm 2mm;
+    padding: 2.5mm;
+  }
+  .roadmap-card .step-art {
+    grid-column: 2;
+    grid-row: 1;
+    width: 11mm;
+    height: 11mm;
+  }
+  .roadmap-card .step-body {
+    grid-column: 1 / -1;
+  }
+  .roadmap-grid li + li .roadmap-card::before {
+    display: none;
+  }
+  .page {
+    break-after: page;
+  }
+  .page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+  .page [data-print-compact] {
+    font-size: 8.5pt !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (forced-colors: active) {
+  .page,
+  .book-toolbar {
+    border: 1px solid CanvasText;
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline-color: Highlight;
+  }
+}

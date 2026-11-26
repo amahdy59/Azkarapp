@@ -1,0 +1,58 @@
+/* Pilot-only presentation. Shared reading foundations live in publication-base.css. */
+.subtitle {
+  color: var(--accent);
+  font-size: 1.2em;
+  line-height: 1.5;
+}
+
+.sample-contents {
+  margin-block: 1.5rem 2rem;
+  padding-block-end: 1rem;
+  border-block-end: 1px solid var(--line);
+}
+
+.sample-contents ol {
+  margin-block: 0.5rem 0;
+  padding-inline-start: 1.5em;
+}
+
+.sample-contents a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+}
+
+.sample-section {
+  margin-block: 1.75rem;
+}
+
+.number {
+  display: inline-block;
+  min-inline-size: 2em;
+  padding: 0.1em 0.4em;
+  margin-inline-end: 0.6em;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  color: var(--accent);
+  text-align: center;
+  font-size: 0.8em;
+}
+
+.english-body {
+  margin-block-end: 0.85em;
+}
+
+.prophet-name {
+  white-space: nowrap;
+}
+
+.arabic-phrase {
+  font-size: 1.3em;
+  text-align: start;
+}
+
+@media print {
+  .sample-section {
+    margin-block: 1rem;
+  }
+}

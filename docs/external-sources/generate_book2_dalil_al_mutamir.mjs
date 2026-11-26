@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { exportBookEdition } from "./book-presentation.mjs";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -7,20 +8,11 @@ fs.mkdirSync(outputDir, { recursive: true });
 
 const fonts = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "fonts_base64.json"), "utf-8"));
 
-const scratchImgDir = `C:\\Users\\AhmedMahdy\\.gemini\\antigravity\\brain\\4b1887b6-cfd7-403d-a007-472c7efd6742\\scratch\\holy_sites`;
-const kaabaPath = path.join(scratchImgDir, "kaaba.jpg");
-const mosquePath = path.join(scratchImgDir, "prophets_mosque.jpg");
-const safaMarwaPath = path.join(scratchImgDir, "safa_marwa.jpg");
-
-const kaabaImgBase64 = fs.existsSync(kaabaPath)
-  ? `data:image/jpeg;base64,${fs.readFileSync(kaabaPath).toString("base64")}`
-  : "";
-const prophetsMosqueImgBase64 = fs.existsSync(mosquePath)
-  ? `data:image/jpeg;base64,${fs.readFileSync(mosquePath).toString("base64")}`
-  : "";
-const safaMarwaImgBase64 = fs.existsSync(safaMarwaPath)
-  ? `data:image/jpeg;base64,${fs.readFileSync(safaMarwaPath).toString("base64")}`
-  : "";
+const asset = (name) =>
+  `data:image/jpeg;base64,${fs.readFileSync(path.join(import.meta.dirname, "assets", name)).toString("base64")}`;
+const kaabaImgBase64 = asset("holy-site-1.jpg");
+const safaMarwaImgBase64 = asset("holy-site-2.jpg");
+const prophetsMosqueImgBase64 = asset("holy-site-3.jpg");
 
 const ICONS = {
   bookOpen: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
@@ -441,6 +433,91 @@ function buildHtml(theme) {
       align-items: baseline;
       font-family: 'IBM Plex Arabic', sans-serif;
       font-size: 7.2pt;
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.15s ease;
+    }
+    .toc-item:hover {
+      color: ${t.gold};
+    }
+
+    /* Visual Roadmap Infographic */
+    .roadmap-box {
+      background: ${t.goldLight};
+      border: 1px solid ${t.frameOuter};
+      border-radius: 8px;
+      padding: 3mm 4mm;
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+    }
+    .roadmap-header {
+      display: flex;
+      align-items: center;
+      gap: 2mm;
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 8.2pt;
+      font-weight: 700;
+      color: ${t.gold};
+      border-bottom: 0.5px solid ${t.divider};
+      padding-bottom: 1.2mm;
+    }
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8mm 3mm;
+    }
+    .roadmap-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 2mm;
+      background: ${t.canvasBg};
+      border: 0.5px solid ${t.divider};
+      border-radius: 6px;
+      padding: 2mm 2.5mm;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.1s ease, border-color 0.1s ease;
+    }
+    .roadmap-card:hover {
+      border-color: ${t.gold};
+    }
+    .step-num-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4.8mm;
+      height: 4.8mm;
+      border-radius: 50%;
+      background: ${t.gold};
+      color: #FFFFFF;
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 7.2pt;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4mm;
+    }
+    .step-title {
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 7.8pt;
+      font-weight: 700;
+      color: ${t.text};
+    }
+    .step-desc {
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 6.6pt;
+      line-height: 1.35;
+      color: ${t.textMuted};
+    }
+
+      display: flex;
+      align-items: baseline;
+      font-family: 'IBM Plex Arabic', sans-serif;
+      font-size: 7.2pt;
     }
     .toc-item-title {
       font-weight: 600;
@@ -486,7 +563,7 @@ function buildHtml(theme) {
 <body>
 
   <!-- ================= PAGE 1: COVER ================= -->
-  <div class="page" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
+  <div class="page" id="p-1" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
     <div class="page-frame-outer" style="border-color:${t.gold}; opacity:0.75;"></div>
     <div class="page-frame-inner" style="border-color:${t.gold}; opacity:0.4;"></div>
 
@@ -526,7 +603,7 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 2: TABLE OF CONTENTS ================= -->
-  <div class="page">
+  <div class="page" id="p-2">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
@@ -534,73 +611,73 @@ function buildHtml(theme) {
       <div class="header-chapter">فِهْرِسُ المَوْضُوعَاتِ</div>
     </div>
 
-    <div style="flex:1; display:flex; flex-direction:column;">
-      <div class="chapter-banner">
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div class="chapter-banner" style="margin-bottom:2mm;">
         <div class="chapter-badge"><span>✦</span><span>دَلِيلُ أَبْوَابِ الكِتَابِ</span></div>
-        <h2 class="chapter-title">فِهْرِسُ مَوْضُوعَاتِ دَلِيلِ المُعْتَمِرِ</h2>
+        <h2 class="chapter-title" style="font-size:13pt;">فِهْرِسُ مَوْضُوعَاتِ دَلِيلِ المُعْتَمِرِ</h2>
       </div>
 
       <div class="toc-grid">
-        <div class="toc-item">
+        <a href="#p-4" class="toc-item">
           <span class="toc-item-title">١. فضل العمرة والترغيب فيها والمبادرة إليها</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ٤</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-5" class="toc-item">
           <span class="toc-item-title">٢. أحكام السفر والمواقيت المكانية الخمسة وإحرام الجو</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ٥</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-6" class="toc-item">
           <span class="toc-item-title">٣. سنن الإحرام والتلبية والاشتراط وعمرة الصبي</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ٦</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-7" class="toc-item">
           <span class="toc-item-title">٤. محظورات الإحرام التسعة وما يباح للمحرم</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ٧</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-8" class="toc-item">
           <span class="toc-item-title">٥. دخول مكة والمسجد الحرام وأحكام الطواف حول الكعبة</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ٨</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-9" class="toc-item">
           <span class="toc-item-title">٦. السعي بين الصفا والمروة والحلق والتقصير والتحلل</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ٩</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-10" class="toc-item">
           <span class="toc-item-title">٧. أخطاء شائعة في الإحرام والطواف والسعي والتحلل</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ١٠</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-11" class="toc-item">
           <span class="toc-item-title">٨. فضل المدينة المنورة وآداب زيارة المسجد النبوي</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ١١</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-12" class="toc-item">
           <span class="toc-item-title">٩. السلام على النبي ﷺ وصاحبيه وزيارة الروضة وقباء</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ١٢</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-13" class="toc-item">
           <span class="toc-item-title">١٠. التوسل وأحكامه (المشروع والممنوع)</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ١٣</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-14" class="toc-item">
           <span class="toc-item-title">١١. نصائح وتوجيهات للمعتمرين وللمرأة المعتمرة</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ١٤</span>
-        </div>
-        <div class="toc-item">
+        </a>
+        <a href="#p-15" class="toc-item">
           <span class="toc-item-title">١٢. المختار من أدعية الحرم والمشاعر ومصادر الكتاب الـ ١٦</span>
           <span class="toc-item-leader"></span>
           <span class="toc-item-page">ص ١٥</span>
-        </div>
+        </a>
       </div>
     </div>
 
@@ -611,34 +688,77 @@ function buildHtml(theme) {
     </div>
   </div>
 
-  <!-- ================= PAGE 3: OFFICIAL APPROVAL ================= -->
-  <div class="page">
+  <!-- ================= PAGE 3: OFFICIAL APPROVAL & ROADMAP ================= -->
+  <div class="page" id="p-3">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">مُقَدِّمَةُ الرِّئَاسَةِ العَامَّةِ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">مُقَدِّمَةُ الرِّئَاسَةِ وَخَرِيطَةُ المَنَاسِكِ ↰</a>
     </div>
 
     <div class="content-flow">
-      <div class="chapter-banner">
+      <div class="chapter-banner" style="margin-bottom:2mm;">
         <div class="chapter-badge"><span>✦</span><span>إِشَادَةٌ وَتَقْدِيمٌ رَسْمِيٌّ</span></div>
-        <h2 class="chapter-title">كَلِمَةُ وِكَالَةِ شُؤُونِ المَسْجِدِ النَّبَوِيِّ الشَّرِيفِ</h2>
+        <h2 class="chapter-title">كَلِمَةُ وِكَالَةِ شُؤُونِ المَسْجِدِ النَّبَوِيِّ وَخَرِيطَةُ المَنَاسِكِ</h2>
       </div>
 
-      <div class="section-box gold-accent">
-        <div class="section-title" style="color:${t.gold};">تَقْدِيمُ الوِكَالَةِ لِلطَّبْعَةِ:</div>
-        <div class="dua-matn">
-          «الْحَمْدُ للهِ رَبِّ العَالَمِينَ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى نَبِيِّنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ. وَبَعْدُ: فَإِنَّ وِكَالَةَ الرِّئَاسَةِ العَامَّةِ لِشُؤُونِ المَسْجِدِ النَّبَوِيِّ الشَّرِيفِ، انْطِلَاقًا مِنْ حِرْصِهَا عَلَى تَبْصِيرِ قَاصِدِي الحَرَمَيْنِ الشَّرِيفَيْنِ، قَدِ اعْتَنَتْ بِمُرَاجَعَةِ وَنَشْرِ هَذَا الكِتَابِ المُبَارَكِ: «دَلِيلِ المُعْتَمِرِ» لِيَكُونَ عَوْنًا لِلْمُسْلِمِ عَلَى أَدَاءِ نُسُكِهِ عَلَى الوَجْهِ الصَّحِيحِ المَشْرُوعِ وَفْقَ هَدْيِ رَسُولِ اللهِ ﷺ.»
+      <div class="section-box gold-accent" style="flex:initial; padding:3.5mm 4.5mm; margin-bottom:2mm;">
+        <div class="section-title" style="color:${t.gold}; font-size:8pt; margin-bottom:1mm;">تَقْدِيمُ الوِكَالَةِ لِلطَّبْعَةِ:</div>
+        <div class="dua-matn" style="font-size:8.4pt; line-height:1.65; margin:0;">
+          «فَإِنَّ وِكَالَةَ الرِّئَاسَةِ العَامَّةِ لِشُؤُونِ المَسْجِدِ النَّبَوِيِّ الشَّرِيفِ، انْطِلَاقًا مِنْ حِرْصِهَا عَلَى تَبْصِيرِ قَاصِدِي الحَرَمَيْنِ، قَدِ اعْتَنَتْ بِمُرَاجَعَةِ وَنَشْرِ هَذَا الكِتَابِ المُبَارَكِ: «دَلِيلِ المُعْتَمِرِ» لِيَكُونَ عَوْنًا لِلْمُسْلِمِ عَلَى أَدَاءِ نُسُكِهِ عَلَى الوَجْهِ الصَّحِيحِ المَشْرُوعِ وَفْقَ هَدْيِ رَسُولِ اللهِ ﷺ.»
         </div>
       </div>
 
-      <div class="section-box emerald-accent">
-        <div class="section-title" style="color:${t.emerald};">تَوْجِيهَاتُ الوِكَالَةِ لِقَاصِدِي الحَرَمَيْنِ الشَّرِيفَيْنِ:</div>
-        <div class="body-text">
-          • <strong>إِخْلَاصُ النِّيَّةِ:</strong> إخلاص النية لله تعالى وتجريد المتابعة لرسول الله ﷺ لقوله: «خُذُوا عَنِّي مَنَاسِكَكُمْ».<br>
-          • <strong>اسْتِثْمَارُ الأَوْقَاتِ:</strong> استثمار الأوقات في الذكر والصلاة وتلاوة القرآن، والحذر من التشويش والمزاحمة والتصوير.<br>
-          • <strong>الرِّفْقُ وَالإِعَانَةُ:</strong> الحرص على إعانة المرضى وكبار السن وإفساح الطريق لهم في الممرات والمصليات.
+      <!-- VISUAL INFOGRAPHIC UMRAH ROADMAP -->
+      <div class="roadmap-box" style="flex:1; justify-content:space-around;">
+        <div class="roadmap-header">
+          <span>🗺️</span>
+          <span>خَرِيطَةُ مَسَارِ مَنَاسِكِ العُمْرَةِ (المَرَاحِلُ التَّنْفِيذِيَّةُ السِّتّ)</span>
+        </div>
+        <div class="roadmap-grid">
+          <a href="#p-5" class="roadmap-card">
+            <div class="step-num-pill">١</div>
+            <div class="step-body">
+              <div class="step-title">الإِحْرَامُ مِنَ المِيقَاتِ</div>
+              <div class="step-desc">اغتسال وتجرد ونية وتلبية: «لَبَّيْكَ عُمْرَةً»</div>
+            </div>
+          </a>
+          <a href="#p-8" class="roadmap-card">
+            <div class="step-num-pill">٢</div>
+            <div class="step-body">
+              <div class="step-title">طَوَافُ العُمْرَةِ</div>
+              <div class="step-desc">٧ أشواط بالبيت بدءاً بالحجر الأسود واضطباع للرجل</div>
+            </div>
+          </a>
+          <a href="#p-8" class="roadmap-card">
+            <div class="step-num-pill">٣</div>
+            <div class="step-body">
+              <div class="step-title">رَكْعَتَا الطَّوَافِ</div>
+              <div class="step-desc">خلف مقام إبراهيم، يُقرأ فيهما بالكافرون والإخلاص</div>
+            </div>
+          </a>
+          <a href="#p-8" class="roadmap-card">
+            <div class="step-num-pill">٤</div>
+            <div class="step-body">
+              <div class="step-title">الشُّرْبُ مِنْ زَمْزَمَ</div>
+              <div class="step-desc">التضلع بالماء المبارك واستحضار النية والدعاء</div>
+            </div>
+          </a>
+          <a href="#p-9" class="roadmap-card">
+            <div class="step-num-pill">٥</div>
+            <div class="step-body">
+              <div class="step-title">السَّعْيُ بَيْنَ الصَّفَا وَالمَرْوَةِ</div>
+              <div class="step-desc">٧ أشواط بدءاً بالصفا وختاماً بالمروة والذكر عليها</div>
+            </div>
+          </a>
+          <a href="#p-9" class="roadmap-card">
+            <div class="step-num-pill">٦</div>
+            <div class="step-body">
+              <div class="step-title">الحَلْقُ أَوِ التَّقْصِيرُ</div>
+              <div class="step-desc">الحلق للرجل (أفضل) أو التقصير لجميع الرأس، وقص أنملة للمرأة</div>
+            </div>
+          </a>
         </div>
       </div>
     </div>
@@ -646,17 +766,17 @@ function buildHtml(theme) {
     <div class="page-footer">
       <span>دليل المعتمر</span>
       <span class="footer-page-pill">— ص ٣ —</span>
-      <span>مقدمة الرئاسة</span>
+      <span>مقدمة الرئاسة وخريطة المناسك</span>
     </div>
   </div>
 
   <!-- ================= PAGE 4: VIRTUES & PREPARATION ================= -->
-  <div class="page">
+  <div class="page" id="p-4">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">فَضْلُ العُمْرَةِ وَالمُبَادَرَةُ إِلَيْهَا</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">فَضْلُ العُمْرَةِ وَالمُبَادَرَةُ إِلَيْهَا ↰</a>
     </div>
 
     <div class="content-flow">
@@ -698,12 +818,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 5: TRAVEL & MIQATS ================= -->
-  <div class="page">
+  <div class="page" id="p-5">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">السَّفَرُ وَالمَوَاقِيتُ المَكَانِيَّةُ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">السَّفَرُ وَالمَوَاقِيتُ المَكَانِيَّةُ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -743,12 +863,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 6: IHRAM SUNNAHS & TALBIYAH ================= -->
-  <div class="page">
+  <div class="page" id="p-6">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">سُنَنُ الإِحْرَامِ وَالتَّلْبِيَةُ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">سُنَنُ الإِحْرَامِ وَالتَّلْبِيَةُ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -792,12 +912,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 7: PROHIBITIONS OF IHRAM ================= -->
-  <div class="page">
+  <div class="page" id="p-7">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">مَحْظُورَاتُ الإِحْرَامِ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">مَحْظُورَاتُ الإِحْرَامِ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -837,12 +957,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 8: TAWAF WITH REAL KAABA PHOTOGRAPHY ================= -->
-  <div class="page">
+  <div class="page" id="p-8">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">صِفَةُ العُمْرَةِ • الطَّوَافُ حَوْلَ الكَعْبَةِ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">صِفَةُ العُمْرَةِ • الطَّوَافُ حَوْلَ الكَعْبَةِ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -897,12 +1017,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 9: SA'I WITH REAL SAFA MARWA PHOTOGRAPHY ================= -->
-  <div class="page">
+  <div class="page" id="p-9">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">صِفَةُ العُمْرَةِ • السَّعْيُ وَالتَّحَلُّلُ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">صِفَةُ العُمْرَةِ • السَّعْيُ وَالتَّحَلُّلُ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -954,12 +1074,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 10: COMMON MISTAKES & CORRECTIONS ================= -->
-  <div class="page">
+  <div class="page" id="p-10">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">أَخْطَاءٌ شَائِعَةٌ وَتَصْحِيحُهَا</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">أَخْطَاءٌ شَائِعَةٌ وَتَصْحِيحُهَا ↰</a>
     </div>
 
     <div style="flex:1; display:flex; flex-direction:column;">
@@ -1014,12 +1134,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 11: MADINAH WITH PROPHET'S MOSQUE REAL PHOTOGRAPHY ================= -->
-  <div class="page">
+  <div class="page" id="p-11">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">فَضْلُ المَدِينَةِ وَآدَابُ الزِّيَارَةِ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">فَضْلُ المَدِينَةِ وَآدَابُ الزِّيَارَةِ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -1063,12 +1183,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 12: SALAM ON PROPHET & PROPHET'S MOSQUE PHOTOGRAPHY ================= -->
-  <div class="page">
+  <div class="page" id="p-12">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">السَّلَامُ عَلَى النَّبِيِّ ﷺ وَصَاحِبَيْهِ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">السَّلَامُ عَلَى النَّبِيِّ ﷺ وَصَاحِبَيْهِ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -1116,12 +1236,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 13: TAWASSUL & ITS RULINGS ================= -->
-  <div class="page">
+  <div class="page" id="p-13">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">التَّوَسُّلُ وَأَحْكَامُهُ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">التَّوَسُّلُ وَأَحْكَامُهُ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -1156,12 +1276,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 14: ADVICES FOR PILGRIMS & SISTERS ================= -->
-  <div class="page">
+  <div class="page" id="p-14">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">نَصَائِحُ لِلْمُعْتَمِرِينَ وَالزَّائِرَاتِ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">نَصَائِحُ لِلْمُعْتَمِرِينَ وَالزَّائِرَاتِ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -1198,12 +1318,12 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 15: DUAS IN HARAM & 16 SOURCES ================= -->
-  <div class="page">
+  <div class="page" id="p-15">
     <div class="page-frame-outer"></div>
     <div class="page-frame-inner"></div>
     <div class="page-header">
       <div class="header-book-title">${ICONS.bookOpen}<span>دليل المعتمر</span></div>
-      <div class="header-chapter">الأَدْعِيَةُ وَمَصَادِرُ الكِتَابِ</div>
+      <a href="#p-2" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">الأَدْعِيَةُ وَمَصَادِرُ الكِتَابِ ↰</a>
     </div>
 
     <div class="content-flow">
@@ -1235,7 +1355,7 @@ function buildHtml(theme) {
   </div>
 
   <!-- ================= PAGE 16: BACK COVER & WAQF ================= -->
-  <div class="page" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
+  <div class="page" id="p-16" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
     <div class="page-frame-outer" style="border-color:${t.gold}; opacity:0.75;"></div>
     <div class="page-frame-inner" style="border-color:${t.gold}; opacity:0.4;"></div>
 
@@ -1278,35 +1398,27 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   const themes = ["light", "dark", "navy"];
 
-  for (const th of themes) {
-    console.log(`Generating Luxury Book 2 (${th})...`);
-    const page = await browser.newPage();
-    const htmlContent = buildHtml(th);
+  try {
+    for (const th of themes) {
+      console.log(`Generating Luxury Book 2 (${th})...`);
+      const page = await browser.newPage();
+      const htmlContent = buildHtml(th);
 
-    const htmlPath = path.join(outputDir, `dalil_al_mutamir_${th}.html`);
-    fs.writeFileSync(htmlPath, htmlContent, "utf-8");
+      const htmlPath = path.join(outputDir, `dalil_al_mutamir_${th}.html`);
+      const pdfPath = htmlPath.replace(/\.html$/, ".pdf");
+      await exportBookEdition(page, { html: htmlContent, htmlPath, pdfPath, book: 2, theme: th });
 
-    await page.setContent(htmlContent, { waitUntil: "load" });
-    await page.evaluate(async () => {
-      await globalThis.document.fonts.ready;
-    });
-
-    const pdfPath = path.join(outputDir, `dalil_al_mutamir_${th}.pdf`);
-    await page.pdf({
-      path: pdfPath,
-      format: "A5",
-      printBackground: true,
-      preferCSSPageSize: true,
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    });
-
-    const stat = fs.statSync(pdfPath);
-    console.log(`Generated: ${pdfPath} (${(stat.size / 1024).toFixed(1)} KB)`);
-    await page.close();
+      const stat = fs.statSync(pdfPath);
+      console.log(`Generated: ${pdfPath} (${(stat.size / 1024).toFixed(1)} KB)`);
+      await page.close();
+    }
+  } finally {
+    await browser.close();
   }
-
-  await browser.close();
   console.log("Book 2 regenerated with Luxury Typography & Design!");
 }
 
-run().catch(console.error);
+run().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

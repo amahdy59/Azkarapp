@@ -9,6 +9,10 @@ pnpm-lock.yaml
 .agents
 skills-lock.json
 
+# Byte-identical upstream review evidence; SHA-256 is checked by opendua-pilot.test.mjs.
+docs/audio/opendua-pilot/audio-licence.html
+docs/audio/opendua-pilot/catalogue.json
+
 public/data/mushaf/
 public/data/word-meanings/
 public/data/translations/

@@ -1,6 +1,18 @@
+Ordinary phone Mushaf tools share the index content area between usable reading bars. Shared sheets open from the triggering edge; dialogs, menus and pickers share finite motion, opaque text protection and predictable focus/Back recovery.
+
+Home uses one shared prayer rail on phones, with a quiet highlighted next prayer and floating status badges. Tablet/desktop cards size to their icon/name/time content, retaining large timings and the existing materials without a fixed empty footer area. A recorded check, eligible-unrecorded circle or next arrow floats over the corner without reserving name/time space. Future unrecorded prayers have no badge. Now/Next shares one line where it fits and wraps at enlarged text. The city and explicit device-location crosshair form one compact split control below timings. The existing protected tracking dialog, manual Show/Hide, dated records and focus recovery are preserved.
+
 # Azkarapp
 
-Home keeps all five prayer times together with a two-line current/next summary, centered compact phone tiles and the original large-time desktop cards. Prayer names align beneath their labels, with remaining time beside the next prayer. Location sits below the timings with grouped Change and Refresh actions; long names and enlarged text reflow without squeezing controls. Location results open in a closable dialog. Expanded desktop cards present complete guidance and references directly, with tighter headings and a visible recording date.
+Reading and counting headers share their active page canvas on phones, tablets and desktops. Light, Dark, Midnight and Glass retain readable theme-aware title/actions/progress; scrolling headers and menus keep their protected surfaces.
+
+Completion offers one stable, source-linked reminder from the reviewed Benefits catalogue in a centered reading card. Counts and optional quiet progress sit below; session details disclose elapsed time including pauses. Sharing opens the completed collection with its current routine length/prayer, full sources and repetitions, rather than personal achievement text.
+
+Settings exposes Audio & recitations and Downloads separately. Coordinate-only prayer locations show a localized nearby city/country from the offline catalogue when within 75 km, or Device location outside coverage. Exact GPS coordinates still drive prayer calculations without an online naming service.
+
+Settings summaries show the selected voice/speed, saved reminder choices and weekly goal. Downloads reuses its last completed file check for category readiness and approximate app storage usage; opening the menu does not scan files. A fresh session or changed voice asks for a new check.
+
+Home keeps all five prayer times together with a compact current/next summary, centered phone tiles and large-time desktop cards. Remaining time stays beside the next prayer when space permits. Location sits below the timings; long names and enlarged text reflow without squeezing controls. Location results open in a closable dialog. Expanded desktop tracking presents complete guidance and references directly, with tighter headings and a visible recording date.
 
 Surah entry uses a compact interface title, inset landscape artwork and one clear reading action. Single-surah entry omits the redundant collection tally; recorded completion remains visible. The bundled cover paints first, while optional sharper desktop artwork never replaces it with a blank loading state. Mushaf text, reading position, completion and audio behavior are preserved.
 
@@ -300,6 +312,8 @@ Documentation sources of truth:
 Local pnpm check validates audio catalog metadata offline. Use pnpm validate:audio for audio-host/catalog changes and live recording verification; Quality CI requires this full live validation before every release. pnpm validate:audio:local performs the same structural checks without network probes.
 
 ## Local adaptive navigation checkpoint
+
+Learn is available under **More**, with an Azkar shortcut. The three Arabic books use an integrated reflowing HTML reader with contents/search, bookmarks, reading-position recovery and optional verified PDF editions. Settings → Downloads → Books manages explicitly saved reader content. This local checkpoint preserves the main navigation and leaves room for reviewed prayer/ablution guides and hadith collections. See [Learn content and offline delivery](docs/learning/README.md); publication remains held.
 
 Phone/tablet navigation keeps Home, Quran, Azkar, Qibla and Settings visible. Masbaha additionally appears when the bar has room; its Home card remains available. Progress is reachable through Today's path and More, and stays in wide navigation. Home provides a More action. These owner-approved refinements remain local under the publication hold.
 

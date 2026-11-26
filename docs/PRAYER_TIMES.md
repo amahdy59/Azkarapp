@@ -1,4 +1,24 @@
+## Home prayer density and phone rail — 2026-11-25, local
+
+The latest owner screenshot correction uses a shared phone rail and intrinsically sized wide cards with unchanged timing type. It supersedes the fixed wide-card minimum and individual phone surfaces; passive corner badges, current/next identity, dated recording, disclosure and split location behavior remain. One phone material owner replaces nested independent card blur. No calculation, date, availability, persistence, reminder or location-provider behavior changes. See agent/phases/HOME_PRAYER_RAIL_MOTION_LOCAL_2026_11_25.md.
+
+The owner's follow-up screenshot requires whole phone prayer names and one-line times with smaller AM/PM. Grouped times use a baseline-aligned, nonwrapping digit/period pair; the secondary period scales to 0.75em. Below a 22rem content measure, existing xs/label tokens keep names/times complete without introducing another global type step. Shared row height follows those single-line contents instead of reserving wrapped-name or AM/PM tracks. Enlarged text still uses the existing roomier two-column reflow and all actions retain 44px targets.
+
+## Home corner state and device-location control — 2026-11-25, local
+
+The owner corrects inline status to floating top-corner check/circle/next-arrow badges, with no badge for future unrecorded prayers. Badges occupy no layout space, and the original desktop/tablet card dimensions, typography and materials are preserved. Localized hidden descriptions retain time and temporal/recorded meaning. The current marker is independent of the saved dated record; only trackedLocation counts as recorded. Now/Next is one line where it fits and naturally wraps at enlarged measures. The compact city/crosshair split control below timings replaces separate visible Change/Refresh actions: city still opens existing location settings, while the crosshair still explicitly requests fresh coordinates through the unchanged provider. Busy, failed-request retention, protected results and focus recovery are preserved. This supersedes earlier presentation descriptions only; calculations, availability/recordability, dates, DST, persistence and synchronization do not change.
+
+## Home tracking dialog and dated recorded status — 2026-11-25, local
+
+The approved presentation keeps tablet timers in the desktop card anatomy when the content measure fits, with a recorded check derived only from trackedLocation for the supplied dayKey/prayer. Legacy home records remain recorded; independently completed Sunnah/adhkar never imply attendance. Current/next and saved state remain independent. Home's exact record date and existing App-owned writes remain authoritative across calendar choices, midnight and Friday naming.
+
+An eligible card opens the shared protected tracking overlay only on intent. Compact guidance expands inside the same sheet; wide desktop retains complete inline evidence. Read remains separate from marking completion, and no reading route is gated by recording. Done closes the overlay; changes use existing immediate persistence, not a draft/Save transaction. Dates and Now/Next persist above a manual timings/location disclosure. Existing prayer calculation, selected location/timezone/method, DST, eligibility windows, notifications and data contracts are unchanged.
+
 # Prayer times, location, timezone, and DST
+
+## Named location summaries — 2026-11-25 (local)
+
+Settings and shared location summaries resolve unnamed/coordinate-only locations against the existing offline city catalogue. A nearest entry less than 75 km away produces “Near city, country” in the active language; outside coverage, a neutral Device location or Saved location label avoids guessing. Custom names and exact recognized preset localization remain authoritative. This is approximate presentation context, not administrative-boundary geocoding. Precise saved coordinates, timezone, calculation settings and persistence are unchanged, and no coordinate/network request is added. Location details retain the exact coordinates for review.
 
 ## Home overview and location refresh — 2026-11-24 (local)
 

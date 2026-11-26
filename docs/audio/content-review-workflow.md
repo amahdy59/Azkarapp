@@ -8,3 +8,5 @@
 6. Transfer the signed-off decision into reviewed manifest metadata (`reviewedBy`, `reviewedAt`, notes) and the exact assignment registry through code review.
 
 Local review-screen decisions never enable production playback. Only a schema-valid approved manifest plus an exact assignment can do so.
+
+The [OpenDua additional-voice pilot](opendua-pilot/README.md) provides three pinned comparison recordings through the same development-only entry, with `&audio-source=opendua`. Its named, checksum-bound exports are review evidence only. Production builds exclude the pilot screen, source catalogue and MP3s; independent listening approval and immutable hosting remain required before activation.

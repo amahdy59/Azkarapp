@@ -1,0 +1,27 @@
+{
+  "resourceId": "dalil-al-mutamir",
+  "language": "en",
+  "status": "draft-for-review",
+  "authoringSha256": "952acc8e71876f9022bbd9d732083918cab5c3c7d72f52000be0902902244e5d",
+  "sourceSha256": "f14da4e59bbf39f725dedaeccd8885da2be22ef750c18fa55238d644a07c36ad",
+  "pdfs": {
+    "light": {
+      "path": "ca49b5ed382c5fe785c4ed4e235748e5ef4aa5b1858c1059ec3e2ecda62b3f0d.pdf",
+      "sha256": "ca49b5ed382c5fe785c4ed4e235748e5ef4aa5b1858c1059ec3e2ecda62b3f0d",
+      "bytes": 1272740,
+      "mime": "application/pdf"
+    },
+    "dark": {
+      "path": "0d87e881732e17a9f4809307579d4a88e1ed60644510f31bae4129d9414440f9.pdf",
+      "sha256": "0d87e881732e17a9f4809307579d4a88e1ed60644510f31bae4129d9414440f9",
+      "bytes": 1272716,
+      "mime": "application/pdf"
+    },
+    "navy": {
+      "path": "038579ac313c361cb3041e7dd6a68fc71c5bf4b129f03c35f6e4bc05c982f30e.pdf",
+      "sha256": "038579ac313c361cb3041e7dd6a68fc71c5bf4b129f03c35f6e4bc05c982f30e",
+      "bytes": 1272731,
+      "mime": "application/pdf"
+    }
+  }
+}

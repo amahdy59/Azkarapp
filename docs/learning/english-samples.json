@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "status": "draft-for-review",
+  "quranTranslation": "Saheeh International",
+  "samples": [
+    {
+      "id": "al-mukhtar",
+      "title": "Selected Authentic Supplications and Remembrances",
+      "subtitle": "Prayers for parents and descendants",
+      "author": "Compiled by Abu Muhammad Yusuf ibn Zabn Allah al-Utayr",
+      "folder": "book1_al_mukhtar",
+      "file": "al_mukhtar",
+      "sourcePage": 32,
+      "scope": "Selected supplications 103–104 from source page 32, including its continuation sheet.",
+      "sections": [
+        {
+          "id": "parents",
+          "title": "For one's parents",
+          "number": "103",
+          "kind": "quran",
+          "selector": "#p-32 .dua-card:nth-of-type(5) .dua-text",
+          "quran": [{ "ref": "17:24", "mode": "excerpt", "start": "My Lord, have mercy", "end": "small." }]
+        },
+        {
+          "id": "descendants",
+          "title": "Prayer, descendants and forgiveness",
+          "number": "104",
+          "kind": "quran",
+          "selector": "#p-32-part-2 .dua-card:first-child .dua-text",
+          "quran": [
+            { "ref": "14:40", "mode": "full" },
+            { "ref": "14:41", "mode": "full" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dalil-al-mutamir",
+      "title": "The Umrah Guide",
+      "subtitle": "Tawaf around the Ka'bah",
+      "author": "Compiled by Abu Muhammad Yusuf ibn Zabn Allah al-Utayr",
+      "folder": "book2_dalil_al_mutamir",
+      "file": "dalil_al_mutamir",
+      "sourcePage": 8,
+      "scope": "The five tawaf guidance points on source page 8. Qur'an references are made explicit beside the English meanings.",
+      "imageSelector": "#p-8 .photo-hero-img",
+      "imageAlt": "The Ka'bah and pilgrims in the courtyard of al-Masjid al-Haram.",
+      "imageCaption": "The Ka'bah. Tawaf begins and ends in line with the Black Stone.",
+      "reference": "Sahih Muslim, Book of Pilgrimage, hadith 1218, as cited by the publication.",
+      "referenceUrl": "https://sunnah.com/muslim:1218a",
+      "sections": [
+        {
+          "id": "begin",
+          "number": "1",
+          "title": "Begin at the Black Stone",
+          "kind": "prose",
+          "selector": "#p-8 .step-item:nth-of-type(1) .step-text",
+          "english": "Begin tawaf in line with the Black Stone, keeping the Ka'bah on your left. Touch the Black Stone or gesture towards it with your right hand, saying: “Allah is greatest.”",
+          "arabicPhrase": "الله أكبر"
+        },
+        {
+          "id": "idtiba",
+          "number": "2",
+          "title": "Idtiba': uncovering the right shoulder",
+          "kind": "prose",
+          "selector": "#p-8 .step-item:nth-of-type(2) .step-text",
+          "english": "For men, uncover the right shoulder throughout the circuits of the Umrah tawaf only."
+        },
+        {
+          "id": "ramal",
+          "number": "3",
+          "title": "Ramal: walking briskly",
+          "kind": "prose",
+          "selector": "#p-8 .step-item:nth-of-type(3) .step-text",
+          "english": "Men, but not women, walk briskly with short steps during the first three circuits."
+        },
+        {
+          "id": "corners",
+          "number": "4",
+          "title": "Between the two corners",
+          "kind": "prose",
+          "selector": "#p-8 .step-item:nth-of-type(4) .step-text",
+          "english": "Between the Yemeni Corner and the Black Stone, it is Sunnah to say the following supplication:",
+          "quran": [
+            {
+              "ref": "2:201",
+              "mode": "excerpt",
+              "arabicStart": "رَبَّنَا",
+              "arabicEnd": "النَّارِ",
+              "start": "Our Lord, give us",
+              "end": "Fire."
+            }
+          ]
+        },
+        {
+          "id": "prayer",
+          "number": "5",
+          "title": "The two rak'ahs after tawaf",
+          "kind": "prose",
+          "selector": "#p-8 .step-item:nth-of-type(5) .step-text",
+          "english": "After completing seven circuits, pray two rak'ahs behind the Station of Ibrahim, reciting Surah al-Kafirun and Surah al-Ikhlas.",
+          "note": "The book identifies these surahs by their opening words. The paired quotations below reproduce those opening verses, not the complete surahs.",
+          "quran": [
+            { "ref": "109:1", "mode": "full", "opening": true },
+            { "ref": "112:1", "mode": "full", "opening": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "al-wird-an-nabawi",
+      "title": "The Prophetic Wird: Short Edition",
+      "subtitle": "Recitation before sleep",
+      "author": "By Dr Ali ibn Abd al-Rahman al-Uwaishiz",
+      "folder": "book3_al_wird_an_nabawi",
+      "file": "al_wird_an_nabawi",
+      "sourcePage": 34,
+      "scope": "The complete selected hadith on source page 34. The glossary beginning on this page continues elsewhere and is outside this sample.",
+      "reference": "Reported by al-Bukhari, as cited by the publication. Source comparison: Sahih al-Bukhari 5017.",
+      "referenceUrl": "https://sunnah.com/bukhari:5017",
+      "sections": [
+        {
+          "id": "bedtime",
+          "title": "A report from Aishah",
+          "kind": "hadith",
+          "selector": "#p-34 .hadith-text",
+          "english": "Aishah (may Allah be pleased with her) reported that whenever the Prophet ﷺ went to bed at night, he brought his palms together, blew lightly into them and recited Surah al-Ikhlas, Surah al-Falaq and Surah an-Nas. He then wiped as much of his body as he could with his hands, beginning with his head, his face and the front of his body. He did this three times.",
+          "note": "The source identifies the three surahs by their opening words. These paired verses identify the surahs; they are not a substitute for reciting the complete surahs.",
+          "repetition": "Three times, as stated in the report.",
+          "quran": [
+            { "ref": "112:1", "mode": "full", "opening": true },
+            { "ref": "113:1", "mode": "full", "opening": true },
+            { "ref": "114:1", "mode": "full", "opening": true }
+          ]
+        }
+      ]
+    }
+  ]
+}

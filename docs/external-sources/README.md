@@ -1,5 +1,30 @@
 # External Devotional Resources Inventory & Documentation
 
+## Document export finish - 2026-11-25
+
+The three generators now share `book-presentation.mjs` and `book-presentation.css`. Each produces a tagged Arabic PDF with real bookmarks and resolved internal links, plus a self-contained responsive HTML companion with embedded fonts/images, keyboard focus, a contents shortcut, a sibling PDF download and reading-size controls from 100% to 200%. These are standalone documents, not a deployed in-app library.
+
+The source pagination remains the contents index: larger type may add a continuation sheet marked with the same source page. Current PDF lengths are **73 / 18 / 138** pages for al-Mukhtar / Umrah / al-Wird, identically across light, dark and navy. The printed original is still identified separately below.
+
+Build with Node/pnpm from the repository and a Python interpreter containing `pypdf`. Set `BOOK_PYTHON` to that interpreter if `python` is not on PATH; the Codex bundled Python already provides pypdf.
+
+```powershell
+node docs/external-sources/generate_book1_al_mukhtar.mjs
+node docs/external-sources/generate_book2_dalil_al_mutamir.mjs
+node docs/external-sources/generate_book3_al_wird_an_nabawi.mjs
+pnpm test:run --project tooling scripts/devotional-documents.test.mjs
+node docs/external-sources/verify-books.mjs
+python docs/external-sources/verify-book-pdfs.py
+```
+
+Each export repairs combined Arabic marks in the PDF's Unicode map, without changing its painted glyphs or source wording. Font synthesis is disabled so a synthetic bold face cannot become an inaccessible Type 3 text fallback. Generation fails on incomplete source ranges, missing excerpt text, broken fragment targets or content that cannot fit a sheet at the selected reading size. HTML is formatted with the existing repository Prettier configuration.
+
+`book-content.mjs` records 19 source-identified Quran excerpts restored on al-Mukhtar source pages 32-35, where earlier extraction omitted passages and mismatched several numbered items. The printed source was visually compared; the restored words are copied unchanged from the existing reviewed Mushaf assets, with explicit verse/word ranges. The raw extraction JSON is preserved. This is source comparison by a coding agent, not independent scholarly approval of these external publications.
+
+Wird repetition/virtue notes quote exact existing text, retaining alternatives and time conditions. The old keyword summaries are removed from the active generators: a tenfold reward is not a ten-repeat instruction, and thirty-four is not four. Some passages still inherit transcription/order issues from the previous external-source extraction; this phase does not certify the whole corpus. Independent content and real Arabic screen-reader review remain required before presenting these drafts as fully reviewed publications.
+
+The old `apply_*`, `fix_*`, `update_*` and inspection snippets are historical authoring utilities, **not build steps**. Do not rerun the old string patchers over the finished generators. See [the controlled phase](../agent/phases/DEVOTIONAL_DOCUMENT_FINISH_2026_11_25.md) and [the report](../agent/reports/DEVOTIONAL_DOCUMENT_FINISH_2026_11_25_REPORT.md) for verification and limits.
+
 **فهرس وتوثيق المراجع والكتيبات المأخوذة للدراسة والتطوير**
 
 تم تحميل هذه المراجع وتوثيقها بصيغة Markdown لحفظ النصوص، وسلاسل العزو، والتخريج، وأسماء المؤلفين والكتب لاستخدامها في التخطيط المستقبلي لتطوير تطبيق «أذكار» (Azkarapp).
