@@ -197,8 +197,10 @@ const BENEFIT_OVERRIDES: Readonly<Record<string, string>> = {
   "e-hm-81e": "Said in the evening as gratitude for the blessings of the night.",
   "e-hm-89e": "A comprehensive evening request for the good of the night and protection from its evil.",
   "e-hm-90e": "An evening testimony to faith in Allah and the religion of Islam.",
-  "m-hm-98": "Ten blessings upon the Prophet ﷺ in the morning; reported as a means to his intercession.",
-  "e-hm-98": "Ten blessings upon the Prophet ﷺ in the evening; reported as a means to his intercession.",
+  "m-hm-98":
+    "The report promises intercession for sending ten blessings upon the Prophet ﷺ in the morning and ten in the evening.",
+  "e-hm-98":
+    "The report promises intercession for sending ten blessings upon the Prophet ﷺ in the morning and ten in the evening.",
 };
 
 const QURAN_RELIANCE_CORRECTION: Partial<Zikr> = {
@@ -243,9 +245,9 @@ const TEXT_OVERRIDES: Readonly<Record<string, Partial<Zikr>>> = {
   },
   "s-hm-109": {
     transliteration:
-      "Allāhumma ‘Ālimal-ghaybi wash-shahādah, Fāṭiras-samāwāti wal-arḍ, Rabba kulli shay’in wa malīkah, ashhadu an lā ilāha illā Ant. A‘ūdhu bika min sharri nafsī, wa min sharrish-shayṭāni wa shirkih, wa an aqtarifa ‘alā nafsī sū’an aw ajurrahu ilā Muslim.",
+      "Allahumma ‘alimal-ghaybi wash-shahadah, fatiras-samawati wal-ard, rabba kulli shay’in wa malikah, ashhadu an la ilaha illa ant. A‘udhu bika min sharri nafsi wa min sharrish-shaytani wa shirkih.",
     translation:
-      "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself, from the evil and idolatrous promptings of Satan, and from committing evil against myself or bringing it upon another Muslim.",
+      "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and earth, Lord and Sovereign of everything, I testify that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk.",
   },
   "s-hm-111": {
     transliteration:

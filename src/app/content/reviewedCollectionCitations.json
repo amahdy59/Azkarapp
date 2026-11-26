@@ -45,9 +45,9 @@
     "referenceArabic": "سنن أبي داود ٥٠٧٤"
   },
   "m-hm-85": {
-    "reference": "Jami al-Tirmidhi 3392",
-    "url": "https://sunnah.com/tirmidhi%3A3392",
-    "referenceArabic": "جامع الترمذي ٣٣٩٢"
+    "reference": "Jami al-Tirmidhi 3392 (Hasan Sahih, al-Tirmidhi).",
+    "referenceArabic": "جامع الترمذي ٣٣٩٢ (حسن صحيح عند الترمذي).",
+    "url": "https://sunnah.com/tirmidhi:3392"
   },
   "m-hm-86": {
     "reference": "Sunan Abi Dawud 5088",
@@ -80,14 +80,14 @@
     "referenceArabic": "سنن ابن ماجه ٩٢٥"
   },
   "m-hm-96": {
-    "reference": "Sunan Abi Dawud 1516",
-    "url": "https://sunnah.com/abudawud%3A1516",
-    "referenceArabic": "سنن أبي داود ١٥١٦"
+    "reference": "Hisn al-Muslim 96; Sahih al-Bukhari 6307; Sahih Muslim 2702b.",
+    "referenceArabic": "حصن المسلم ٩٦؛ صحيح البخاري ٦٣٠٧؛ صحيح مسلم ٢٧٠٢ب.",
+    "url": "https://sunnah.com/hisn:96"
   },
   "m-hm-97": {
-    "reference": "Sahih Muslim 2709a",
-    "url": "https://sunnah.com/muslim%3A2709a",
-    "referenceArabic": "صحيح مسلم ٢٧٠٩أ"
+    "reference": "Musnad Ahmad 7898; Ibn Baz, Majmu Fatawa 26/32 (Hasan chain); Sahih Muslim 2709 without the threefold wording.",
+    "referenceArabic": "مسند أحمد ٧٨٩٨؛ مجموع فتاوى ابن باز ٢٦/٣٢ (إسناده حسن)؛ صحيح مسلم ٢٧٠٩ دون ذكر الثلاث.",
+    "url": "https://dorar.net/h/6HH9rv6I?osoul=1"
   },
   "e-hm-75a": {
     "reference": "Sunan Abi Dawud 3667",
@@ -135,9 +135,9 @@
     "referenceArabic": "سنن أبي داود ٥٠٧٤"
   },
   "e-hm-85": {
-    "reference": "Jami al-Tirmidhi 3392",
-    "url": "https://sunnah.com/tirmidhi%3A3392",
-    "referenceArabic": "جامع الترمذي ٣٣٩٢"
+    "reference": "Jami al-Tirmidhi 3392 (Hasan Sahih, al-Tirmidhi).",
+    "referenceArabic": "جامع الترمذي ٣٣٩٢ (حسن صحيح عند الترمذي).",
+    "url": "https://sunnah.com/tirmidhi:3392"
   },
   "e-hm-86": {
     "reference": "Sunan Abi Dawud 5088",
@@ -160,14 +160,14 @@
     "referenceArabic": "صحيح البخاري ٣٢٩٣"
   },
   "e-hm-96": {
-    "reference": "Sunan Abi Dawud 1516",
-    "url": "https://sunnah.com/abudawud%3A1516",
-    "referenceArabic": "سنن أبي داود ١٥١٦"
+    "reference": "Hisn al-Muslim 96; Sahih al-Bukhari 6307; Sahih Muslim 2702b.",
+    "referenceArabic": "حصن المسلم ٩٦؛ صحيح البخاري ٦٣٠٧؛ صحيح مسلم ٢٧٠٢ب.",
+    "url": "https://sunnah.com/hisn:96"
   },
   "e-hm-97": {
-    "reference": "Sahih Muslim 2709a",
-    "url": "https://sunnah.com/muslim%3A2709a",
-    "referenceArabic": "صحيح مسلم ٢٧٠٩أ"
+    "reference": "Musnad Ahmad 7898; Ibn Baz, Majmu Fatawa 26/32 (Hasan chain); Sahih Muslim 2709 without the threefold wording.",
+    "referenceArabic": "مسند أحمد ٧٨٩٨؛ مجموع فتاوى ابن باز ٢٦/٣٢ (إسناده حسن)؛ صحيح مسلم ٢٧٠٩ دون ذكر الثلاث.",
+    "url": "https://dorar.net/h/6HH9rv6I?osoul=1"
   },
   "s-hm-99-ikhlas": {
     "reference": "Sahih al-Bukhari 5017",
@@ -230,9 +230,9 @@
     "referenceArabic": "صحيح البخاري ٦٣١٢"
   },
   "s-hm-104": {
-    "reference": "Jami al-Tirmidhi 3399",
-    "url": "https://sunnah.com/tirmidhi%3A3399",
-    "referenceArabic": "جامع الترمذي ٣٣٩٩"
+    "reference": "Jami al-Tirmidhi 3398 (Hasan Sahih, al-Tirmidhi; Sahih, Darussalam).",
+    "referenceArabic": "جامع الترمذي ٣٣٩٨ (حسن صحيح عند الترمذي؛ صحيح بحسب تصنيف دار السلام).",
+    "url": "https://sunnah.com/tirmidhi:3398"
   },
   "s-hm-108": {
     "reference": "Sahih Muslim 2715",
@@ -245,9 +245,9 @@
     "referenceArabic": "صحيح مسلم ٢٧١٣أ"
   },
   "s-hm-109": {
-    "reference": "Sunan Abi Dawud 5067",
-    "url": "https://sunnah.com/abudawud%3A5067",
-    "referenceArabic": "سنن أبي داود ٥٠٦٧"
+    "reference": "Jami al-Tirmidhi 3392 (Hasan Sahih, al-Tirmidhi).",
+    "referenceArabic": "جامع الترمذي ٣٣٩٢ (حسن صحيح عند الترمذي).",
+    "url": "https://sunnah.com/tirmidhi:3392"
   },
   "s-hm-111": {
     "reference": "Sahih al-Bukhari 247",
@@ -260,9 +260,9 @@
     "referenceArabic": "صحيح البخاري ٦٣١٢"
   },
   "wu-hm-2": {
-    "reference": "Sahih al-Bukhari 1154",
-    "url": "https://sunnah.com/bukhari%3A1154",
-    "referenceArabic": "صحيح البخاري ١١٥٤"
+    "reference": "Sunan Ibn Majah 3878 (selected wording); Sahih al-Bukhari 1154.",
+    "referenceArabic": "سنن ابن ماجه ٣٨٧٨ (اللفظ المختار)؛ صحيح البخاري ١١٥٤.",
+    "url": "https://sunnah.com/ibnmajah:3878"
   },
   "wu-hm-3": {
     "reference": "Jami al-Tirmidhi 3401",
@@ -360,9 +360,9 @@
     "referenceArabic": "سنن أبي داود ١٥٢٢"
   },
   "ap-ref-7": {
-    "reference": "Jami al-Tirmidhi 3474",
-    "url": "https://sunnah.com/tirmidhi%3A3474",
-    "referenceArabic": "جامع الترمذي ٣٤٧٤"
+    "reference": "Jami al-Tirmidhi 3474 (Fajr); Jami al-Tirmidhi 3534 (Maghrib); Hasan (Darussalam).",
+    "referenceArabic": "جامع الترمذي ٣٤٧٤ (الفجر)؛ جامع الترمذي ٣٥٣٤ (المغرب)؛ حسن بحسب تصنيف دار السلام.",
+    "url": "https://sunnah.com/tirmidhi:3474"
   },
   "ap-ref-8": {
     "reference": "Jami al-Tirmidhi 3233",

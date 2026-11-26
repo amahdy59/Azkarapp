@@ -151,7 +151,6 @@ describe("explicit audio content architecture", () => {
     const expectedAssignments = [
       "s-hm-100",
       "s-hm-101",
-      "s-hm-109",
       "s-hm-99-falaq",
       "s-hm-99-ikhlas",
       "s-hm-99-nas",
@@ -342,7 +341,7 @@ describe("explicit audio content architecture", () => {
     expect(incompatible.supportedModes).toEqual(["play-once"]);
   });
 
-  it("plays the owner's three embedded repentance recitations only once and keeps English repetition independent", () => {
+  it("never rounds the three embedded repentance recitations to the corrected hundredfold target", () => {
     const zikr = COMPREHENSIVE_DUAS.find((item) => item.id === "comprehensive-dua-42")!;
     const plan = buildPlaybackPlan({
       zikrs: [zikr],
@@ -351,11 +350,12 @@ describe("explicit audio content architecture", () => {
     });
     const entry = plan.entries[0]!;
     expect(entry.embeddedRepetitions).toBe(3);
-    expect(entry.prescribedRepetitions).toBe(3);
+    expect(entry.prescribedRepetitions).toBe(100);
     expect(entry.repetitions).toBe(1);
+    expect(entry.supportedModes).toEqual(["play-once"]);
     const english = withPlaybackVoice(entry, "english-george");
     expect(english.embeddedRepetitions).toBe(1);
-    expect(english.repetitions).toBe(3);
+    expect(english.repetitions).toBe(1);
     expect(withPlaybackVoice(english, entry.defaultVoiceId).repetitions).toBe(1);
     const hundred = ALL_AZKAR.find((item) => item.id === "misc-ref-13")!;
     const other = buildPlaybackPlan({
@@ -423,12 +423,16 @@ describe("explicit audio content architecture", () => {
     }
   });
 
-  it("provides full English translation audio coverage for all morning azkar", () => {
+  it("checks every morning recording, including the explicitly suspended corrected formula", () => {
     const morningAzkar = getAzkarForMode("morning", "complete");
     expect(morningAzkar.length).toBeGreaterThan(0);
 
     for (const zikr of morningAzkar) {
       const resolution = resolveAudioAsset(zikr, { baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev" });
+      if (zikr.id === "m-hm-85") {
+        expect(resolution).toEqual({ available: false, reason: "unassigned" });
+        continue;
+      }
       expect(resolution.available, `Expected audio for ${zikr.id} to be available, but got: ${resolution.reason}`).toBe(
         true,
       );
@@ -438,12 +442,16 @@ describe("explicit audio content architecture", () => {
     }
   });
 
-  it("provides full English translation audio coverage for comprehensive duas collection", () => {
+  it("checks all 47 comprehensive-dua recordings and their three explicit source-review suspensions", () => {
     const duas = COMPREHENSIVE_DUAS.filter((item) => !item.isCollectionIntroduction);
     expect(duas).toHaveLength(47);
 
     for (const dua of duas) {
       const resolution = resolveAudioAsset(dua, { baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev" });
+      if (["friday-dua-13", "friday-dua-18", "friday-dua-31"].includes(dua.id)) {
+        expect(resolution).toEqual({ available: false, reason: "unassigned" });
+        continue;
+      }
       expect(resolution.available, `Expected audio for ${dua.id} to be available, but got: ${resolution.reason}`).toBe(
         true,
       );

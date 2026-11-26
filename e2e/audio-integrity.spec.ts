@@ -109,7 +109,7 @@ test("Aa reader settings retain keyboard focus, persisted text sizing and access
   await expect(trigger).toBeFocused();
 });
 
-test("owner-reviewed Friday dua loads exact registered timings and clears cues on opt-out and voice change @cross-browser", async ({
+test("corrected Friday dua keeps reading available while its old recording is suspended @cross-browser", async ({
   page,
 }) => {
   await prepareAudio(page);
@@ -118,93 +118,14 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   expect(index).toBeGreaterThanOrEqual(0);
   await page.goto(`/#/azkar/comprehensive-duas/${index + 1}?mode=complete`);
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "friday-dua-18");
-  await page.getByTestId("reader-audio-dock-button").click();
-  const player = page.getByRole("region", { name: "Audio player", exact: true });
-  await player.getByRole("button", { name: "Expand player", exact: true }).click();
-  const optionsTrigger = player.getByRole("button", { name: "Audio options", exact: true });
-  const options = page.getByRole("dialog", { name: "Audio options", exact: true });
-  await optionsTrigger.click();
-  const emphasis = options.getByRole("button", { name: "Highlight words", exact: true });
-  await expect(emphasis).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("zikr-text")).toContainText("الثبات");
+  await expect(page.getByTestId("reader-audio-dock-button")).toBeDisabled();
+  await expect(page.getByRole("region", { name: "Audio player", exact: true })).toHaveCount(0);
+  await expect(page.locator("[data-listening-word]")).toHaveCount(0);
+  await page.getByTestId("reader-benefit-dock-button").click();
+  await expect(page.getByTestId("reference-source")).toContainText("1304");
   await page.keyboard.press("Escape");
-  const clock = async (time: number) =>
-    page.evaluate((time) => {
-      const audio = (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio;
-      audio.currentTime = time;
-      audio.dispatchEvent(new Event("timeupdate"));
-    }, time);
-  await clock(0.5);
-  await expect(player.locator("[data-listening-word]")).toHaveText("اللهم");
-  await clock(1.2);
-  await expect(player.locator("[data-listening-word]")).toHaveText("إني");
-  await optionsTrigger.click();
-  await emphasis.click();
-  await page.keyboard.press("Escape");
-  await expect(player.locator("[data-listening-word]")).toHaveCount(0);
-  expect(
-    await page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.paused),
-  ).toBe(false);
-  await optionsTrigger.click();
-  await emphasis.click();
-  await page.keyboard.press("Escape");
-  await clock(1.05);
-  await expect(player.locator("[data-listening-word]")).toHaveCount(0);
-  await clock(0.5);
-  await expect(player.locator("[data-listening-word]")).toHaveText("اللهم");
-  await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
-  await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await playEnglishTranslation(page);
-  await player.getByRole("button", { name: "Expand player", exact: true }).click();
-  await expect(player.locator('[data-listening-word]:has-text("اللهم")')).toHaveCount(0);
-  await optionsTrigger.click();
-  await expect(options.getByRole("button", { name: "Estimated word highlights", exact: true })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
-  await page.keyboard.press("Escape");
-  const pack: OwnerTimingPack = JSON.parse(
-    gunzipSync(readFileSync(`public/data/listening-timings/owner-${OWNER_TIMING_PACK_SHA}.bin`)).toString(),
-  );
-  const text = COMPREHENSIVE_DUAS.find((entry) => entry.id === "friday-dua-18")!.translation!;
-  const source = await page.evaluate(
-    () => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src,
-  );
-  const { createHash } = await import("node:crypto");
-  const digest = createHash("sha256").update(text).digest("hex");
-  const audioSha = new URL(source).searchParams.get("sha256");
-  expect(audioSha).toMatch(/^[a-f0-9]{64}$/);
-  const record = pack.records.find((record) => record.l === "en" && record.h === digest && record.s === audioSha)!;
-  const annotation = expandOwnerTiming(pack, record, text);
-  if (!("words" in annotation)) throw new Error("Expected English timing");
-  const firstWord = annotation.words[0]!;
-  await clock((firstWord.startMs + 1) / 1000);
-  const englishWord = player.locator("[data-listening-word]");
-  await expect(englishWord).toHaveText(text.slice(firstWord.startOffset, firstWord.endOffset));
-  expect(await englishWord.evaluate((word) => getComputedStyle(word).color)).not.toBe(
-    await englishWord.evaluate((word) => getComputedStyle(word.parentElement!).color),
-  );
-  expect(await englishWord.evaluate((word) => getComputedStyle(word).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
-  const geometry = await englishWord.evaluate((word) => ({
-    width: word.getBoundingClientRect().width,
-    height: word.getBoundingClientRect().height,
-    font: getComputedStyle(word).fontSize,
-  }));
-  const estimated = options.getByRole("button", { name: "Estimated word highlights", exact: true });
-  await optionsTrigger.click();
-  await estimated.click();
-  await page.keyboard.press("Escape");
-  await expect(englishWord).toHaveCount(0);
-  await optionsTrigger.click();
-  await estimated.click();
-  await page.keyboard.press("Escape");
-  await expect(englishWord).toHaveCount(1);
-  expect(
-    await englishWord.evaluate((word) => ({
-      width: word.getBoundingClientRect().width,
-      height: word.getBoundingClientRect().height,
-      font: getComputedStyle(word).fontSize,
-    })),
-  ).toEqual(geometry);
+  await expect(page.getByTestId("reader-benefit-dock-button")).toBeFocused();
 });
 
 test("English narrated words retain readable contrast in light and dark travel palettes @cross-browser", async ({

@@ -21,6 +21,27 @@
 
 /** English authenticity note to its Arabic rendering. */
 export const AUTHENTICITY_ARABIC: Readonly<Record<string, string>> = Object.freeze({
+  "Hasan Sahih (al-Tirmidhi).": "حسن صحيح عند الترمذي.",
+  "Hasan chain according to Ibn Baz and Shuayb al-Arnaut; graded Daif by al-Albani.":
+    "إسناده حسن عند ابن باز وشعيب الأرناؤوط؛ وضعفه الألباني.",
+  "Sahih al-Bukhari and Sahih Muslim; the selected formula and daily count are recorded in Hisn al-Muslim 96.":
+    "صحيح البخاري وصحيح مسلم؛ واللفظ المختار وعدد التكرار اليومي في حصن المسلم ٩٦.",
+  "Hasan chain (Ibn Baz, Majmu Fatawa 26/32).": "إسناده حسن عند ابن باز، مجموع الفتاوى ٢٦/٣٢.",
+  "Hasan Sahih (al-Tirmidhi); Sahih (Darussalam). No repetition number in this report.":
+    "حسن صحيح عند الترمذي؛ صحيح بحسب دار السلام. لا يحدد هذا الحديث عددًا للتكرار.",
+  "Sahih (Darussalam); also reported with a wording variant in Sahih al-Bukhari.":
+    "صحيح بحسب دار السلام؛ ورواه البخاري بلفظ آخر.",
+  "Both reports graded Hasan (Darussalam); the Maghrib report is also Hasan according to al-Albani, Sahih al-Tirmidhi 3534.":
+    "الحديثان حسنان بحسب دار السلام؛ وحديث المغرب حسن أيضًا عند الألباني، صحيح الترمذي ٣٥٣٤.",
+  "Sahih chain according to al-Nawawi, al-Adhkar 44; other scholars question the chain.":
+    "إسناده صحيح عند النووي، الأذكار ٤٤؛ وتكلم علماء آخرون في إسناده.",
+  "Hasan (al-Albani), Sunan Abi Dawud 3730; al-Tirmidhi calls 3455 Hasan; Darussalam grades that route Daif.":
+    "حسن عند الألباني، سنن أبي داود ٣٧٣٠؛ وحسّن الترمذي حديثه ٣٤٥٥، وضعّف دار السلام ذلك الطريق.",
+  "Sahih (al-Albani, Sahih al-Jami 3610).": "صحيح عند الألباني، صحيح الجامع ٣٦١٠.",
+  "Hasan Gharib (al-Tirmidhi); Hasan (al-Albani, al-Kalim al-Tayyib 229); Daif (Darussalam).":
+    "حسن غريب عند الترمذي؛ حسن عند الألباني، الكلم الطيب ٢٢٩؛ ضعيف بحسب دار السلام.",
+  "Hasan Gharib (al-Tirmidhi); Daif (Darussalam).": "حسن غريب عند الترمذي؛ ضعيف بحسب دار السلام.",
+
   "Authentic/Hasan as cited by Hisn al-Muslim/Sunnah.com.": "صحيح/حسن، كما في حصن المسلم وموقع Sunnah.com.",
   "Authenticated by Ibn Hibban and al-Albani.": "صححه ابن حبان والألباني.",
   "Authenticated by al-Albani in Sahih al-Targhib wa al-Tarhib as cited in Hisn al-Muslim/Sunnah.com.":

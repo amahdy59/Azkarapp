@@ -17,7 +17,7 @@ export interface OwnerTimingPack {
   approval: TimingApproval;
   records: PackedTimingRecord[];
 }
-export const OWNER_TIMING_PACK_SHA = "20246e0bef318b372127bcda8175880c02deb31898a719549c21c5d50fbc5221";
+export const OWNER_TIMING_PACK_SHA = "4741b2b9ca29cb72b9b1ce4daef7a235e7739cb9a020820e45042b7956d30469";
 
 export function expandOwnerTiming(
   pack: OwnerTimingPack,
