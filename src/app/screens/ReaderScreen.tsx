@@ -1966,7 +1966,7 @@ export function ReaderScreen({
                   the wide branch alone, so on a phone — where the swipe and the
                   tap are the only ways to drive the reader — the page followed
                   nothing and a tap to count moved nothing at all. */}
-                <div style={dragStyle} className="flex min-h-full w-full flex-col py-2">
+                <div style={dragStyle} className={`flex min-h-full w-full flex-col ${isShortSurah ? "py-0" : "py-2"}`}>
                   <ReadingTextTransition
                     entryId={z.id}
                     index={idx}

@@ -356,6 +356,10 @@
 .masbaha-counter.adaptive-counter-surface:hover:not(:focus-visible) {
   box-shadow: none;
 }
+.masbaha-counter.counter-ring-ready::after {
+  content: none;
+  animation: none;
+}
 .masbaha-ring {
   position: relative;
   display: grid;

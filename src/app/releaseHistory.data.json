@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-11-26.1",
+    "ar": [
+      "تابع المواقيت في شريط هاتف أوضح، وأظهرها أو أخفها وافتح تفاصيل الصلاة وسجلها مع موقع مختصر.",
+      "استخدم مسبحة أبسط بأزرار واضحة وتراجع عن العد، واختر الذكر بالبحث أو فعّل التركيز، وشارك بطاقات المجموعات الجاهزة أو تصميمك.",
+      "اقرأ القرآن بأجزاء مكبرة تلائم الشاشة ثم عد إلى المصحف، مع قوائم مقروءة وعناوين تتكيف مع المظهر وتكبير النص.",
+      "افتح دليل العمرة المتاح واحفظ موضعك وموارده دون اتصال، وراجع ملخصات الصوت والتنزيلات واختم الذكر بتذكير موثق."
+    ],
+    "en": [
+      "Follow clearer phone prayer timings, show or hide the rail, and open dated prayer details beside compact location controls.",
+      "Use a simpler counter with readable actions and Undo, search for a dhikr or enter Focus, and share prepared collection cards or your own design.",
+      "Read Quran in enlarged portions fitted to the screen and return to the Mushaf, with readable menus and headers that adapt to themes and text size.",
+      "Open the available Umrah guide with saved position and offline resources, review audio and download summaries, and finish dhikr with a sourced reminder."
+    ]
+  },
+  {
     "release": "2026-11-26",
     "ar": [
       "اعرض المواقيت في شريط أوضح على الهاتف، وافتح تفاصيل الصلاة وسجلها مع موقع مختصر وتحكم مباشر في إظهار المواقيت.",

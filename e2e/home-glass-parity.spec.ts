@@ -24,9 +24,17 @@ for (const language of ["ar", "en"] as const) {
           );
         }, language);
         await page.goto("/#/home");
-        // Compact tiles share their overview's material; desktop tiles own it.
-        const home = page.getByTestId(width >= 1200 ? "prayer-card-asr" : "prayer-tracker-cards");
+        // Phone tiles inherit the shared rail; wide tiles own their material.
+        const home = page.getByTestId(width < 768 ? "home-all-prayers-row" : "prayer-card-asr");
         await expect(home).toHaveClass(/hero-glass.*home-glass-surface/);
+        await expect(page.getByTestId("prayer-tracker-cards")).not.toHaveClass(/hero-glass/);
+        if (width < 768) {
+          await expect(home.locator(":scope > article")).toHaveCount(5);
+          for (const tile of await home.locator(":scope > article").all()) {
+            await expect(tile).toHaveCSS("backdrop-filter", "none");
+            await expect(tile).toHaveCSS("background-image", "none");
+          }
+        }
         const filter = await home.evaluate((n) => getComputedStyle(n).backdropFilter);
         const tint = await home.evaluate((n) => getComputedStyle(n).backgroundColor);
         const scene = await page.getByTestId("time-of-day-scene-window").last().locator("img").getAttribute("src");
@@ -93,7 +101,9 @@ for (const language of ["ar", "en"] as const) {
             await expect(page.getByTestId("reader-card")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
           await page.screenshot({ path: testInfo.outputPath("reader.png"), scale: "css" });
           await page.getByRole("button", { name: language === "ar" ? "الفائدة" : "Benefit", exact: true }).click();
-          await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");
+          // Functional overlay text uses the shared fully opaque surface even
+          // when the underlying reading canvas uses Glass.
+          await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgb(15, 23, 42)");
           await expect(page.getByRole("dialog")).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
           expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
           await page.screenshot({ path: testInfo.outputPath("benefit-dialog.png"), scale: "css" });

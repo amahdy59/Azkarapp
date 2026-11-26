@@ -37,6 +37,7 @@ export async function expectProgressFilterFocus(control: Locator) {
 }
 
 export async function chooseProgressOption(control: Locator, value: string) {
+  const opensDateEditor = value === "custom" || value === "editDates";
   const filters = control.page().getByTestId("progress-filters-toggle");
   if (!(await control.isVisible()) && (await filters.isVisible())) await filters.click();
   await control.waitFor({ state: "attached" });
@@ -46,6 +47,9 @@ export async function chooseProgressOption(control: Locator, value: string) {
     await control.page().getByTestId("progress-filters-toggle").click();
   const id = await control.getAttribute("id");
   const previousValue = await control.getAttribute("data-progress-value");
+  const inFilterSheet = await control.evaluate((node) =>
+    Boolean(node.closest('[data-testid="progress-filter-sheet"]')),
+  );
   await control.click();
   await control
     .page()
@@ -56,10 +60,18 @@ export async function chooseProgressOption(control: Locator, value: string) {
   // Dismiss that unchanged editor through its real keyboard recovery path.
   if (
     previousValue === value &&
-    value !== "custom" &&
+    !opensDateEditor &&
     (await control.page().getByTestId("progress-filter-sheet").isVisible())
   )
     await control.page().keyboard.press("Escape");
+  if (inFilterSheet && !opensDateEditor) {
+    // Applying a preset closes this owner. Wait for its exit before querying
+    // the now-unmounted combobox or starting another filter interaction.
+    await expect(control.page().getByTestId("progress-filter-sheet")).toBeHidden();
+    await expect(filters).toHaveAttribute("data-progress-value", value);
+    await expect(filters).toBeFocused();
+    return;
+  }
   const applied = id ? control.page().locator(`[id="${id}"]`) : control;
   if (await applied.isVisible()) await expect(applied).toHaveAttribute("data-progress-value", value);
   else await expect(filters).toHaveAttribute("data-progress-value", value);

@@ -193,6 +193,10 @@ test("exact Mushaf glyphs retain word geometry and clear neighboring ayah ink @c
   await expect.poll(async () => (await word.boundingBox())!.width).toBeCloseTo(geometry!.width, 1);
   await expect.poll(async () => (await word.boundingBox())!.height).toBeCloseTo(geometry!.height, 1);
   await page.keyboard.press("Escape");
+  // Let the options scope finish closing before cancelling animations. Changing
+  // the OS preference during its exit can otherwise retain the closing portal.
+  await expect(page.getByRole("dialog", { name: t("ar", "audioPlayer.options"), exact: true })).toBeHidden();
+  await expect(player.getByRole("button", { name: t("ar", "audioPlayer.options"), exact: true })).toBeFocused();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(word).toHaveCSS("animation-name", "none");
   await player.screenshot({ path: testInfo.outputPath("exact-glyphs-normal.png"), scale: "css" });

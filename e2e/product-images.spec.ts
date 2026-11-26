@@ -65,6 +65,17 @@ test("the retired PNG illustrations are no longer served", async ({ page }) => {
       "image/",
     );
 
+    if (name === "benefits_zikr") {
+      // The entire unused Benefits illustration was archived outside public/.
+      for (const filename of ["benefits_zikr.avif", "benefits_zikr.webp", "benefits_zikr-placeholder.webp"]) {
+        const archived = await page.request.get(`/images/${filename}`);
+        expect(archived.headers()["content-type"] ?? "", `${filename} must remain outside deployment`).not.toContain(
+          "image/",
+        );
+      }
+      continue;
+    }
+
     for (const stem of name === "mosque_prophet" ? [192, 384, 768].map((width) => `${name}-${width}`) : [name]) {
       for (const extension of ["avif", "webp"]) {
         if (stem === "mosque_prophet-768" && extension === "webp") continue;
@@ -74,7 +85,7 @@ test("the retired PNG illustrations are no longer served", async ({ page }) => {
       }
     }
   }
-  for (const name of ["mosque_prophet", "benefits_zikr"]) {
+  for (const name of ["mosque_prophet"]) {
     const preview = await page.request.get(`/images/${name}-placeholder.webp`);
     expect(preview.status()).toBe(200);
     expect(preview.headers()["content-type"]).toContain("image/webp");

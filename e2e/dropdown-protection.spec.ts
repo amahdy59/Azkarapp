@@ -106,7 +106,7 @@ for (const fallback of [
     await expectProtectedPopup(page.locator('[data-slot="combobox-content"]'), 320, 700);
     await page.screenshot({ path: testInfo.outputPath(`dropdown-${fallback}.png`) });
     await page.keyboard.press("Escape");
-    await page.goto("/#/counter");
+    await page.goto("/#/friday/salawat");
     await page.getByRole("button", { name: "More options" }).click();
     await expectProtectedPopup(page.locator('[data-slot="dropdown-menu-content"]'), 320, 700);
   });

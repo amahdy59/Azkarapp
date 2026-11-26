@@ -7,7 +7,7 @@ import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
-import { paginateQuranWords, portionForWord, type QuranReadingWord } from "./quranReadingPortions";
+import { portionForWord, type QuranReadingWord } from "./quranReadingPortions";
 import "./quran-reading-zoom.css";
 
 /** A separately named view: canonical pages stay mounted and keep their geometry. */
@@ -220,26 +220,85 @@ function EnlargedQuran({
     const frame = viewport.current,
       text = measure.current;
     if (!frame || !text || !frame.clientHeight) return;
-    const nodes = [...text.querySelectorAll<HTMLElement>("[data-measure-word]")];
-    const rects = nodes.map((node) => node.getBoundingClientRect());
-    const width = Math.max(0, ...rects.map((rect) => rect.width));
-    const height = Math.max(0, ...rects.map((rect) => rect.height));
-    const factor = Math.min(
-      1,
-      (frame.clientWidth - 2) / Math.max(1, width),
-      (frame.clientHeight - 12) / Math.max(1, height),
-    );
-    if (factor < 0.99) {
-      setFont((value) => Math.max(1, value * factor * 0.98));
-      return;
+    // A QCF glyph's baseline and the surrounding line box vary by font and
+    // platform. Measure each proposed portion from its own first line, including
+    // padding, rather than projecting line bottoms from a nominal font size.
+    // The temporary probe is outside React's owned children and never painted.
+    const source = [...text.children];
+    const probe = text.cloneNode(false) as HTMLDivElement;
+    probe.inert = true;
+    frame.append(probe);
+    const bounds = frame.getBoundingClientRect();
+    const place = (start: number, end: number) => {
+      probe.replaceChildren(...source.slice(start, end).map((node) => node.cloneNode(true)));
+    };
+    const fits = () => {
+      const block = probe.getBoundingClientRect();
+      return (
+        block.bottom <= bounds.bottom + 0.5 &&
+        probe.scrollWidth <= probe.clientWidth + 0.5 &&
+        [...probe.querySelectorAll<HTMLElement>("[data-measure-word]")].every((node) => {
+          const word = node.getBoundingClientRect();
+          return (
+            word.left >= bounds.left - 0.5 &&
+            word.right <= bounds.right + 0.5 &&
+            word.top >= bounds.top - 0.5 &&
+            word.bottom <= bounds.bottom + 0.5
+          );
+        })
+      );
+    };
+    try {
+      const next: [number, number][] = [];
+      for (let start = 0; start < source.length;) {
+        let end = start;
+        let candidateSize = 1;
+        let upper = start;
+        // Grow only around this portion's capacity. Searching the entire
+        // remaining surah for every page would repeatedly clone a long suffix.
+        while (end < source.length) {
+          const candidate = Math.min(source.length, start + candidateSize);
+          place(start, candidate);
+          if (!fits()) {
+            upper = candidate - 1;
+            break;
+          }
+          end = candidate;
+          candidateSize *= 2;
+        }
+        let lower = end + 1;
+        // Each word has its own unbroken box, so extending a prefix can only
+        // retain its lines or add another. Keep every reviewed word exactly once.
+        while (lower <= upper) {
+          const candidate = Math.floor((lower + upper) / 2);
+          place(start, candidate);
+          if (fits()) {
+            end = candidate;
+            lower = candidate + 1;
+          } else upper = candidate - 1;
+        }
+        if (end === start) {
+          // Only a single word that cannot fit may reduce the effective size;
+          // ordinary overflow always continues in another portion.
+          place(start, start + 1);
+          const word = probe.querySelector<HTMLElement>("[data-measure-word]")!.getBoundingClientRect();
+          const factor = Math.min(
+            1,
+            (frame.clientWidth - 2) / Math.max(1, probe.scrollWidth, word.width),
+            (frame.clientHeight - 2) / Math.max(1, probe.getBoundingClientRect().height, word.bottom - bounds.top),
+          );
+          setReady(false);
+          setFont((value) => Math.max(1, value * factor * 0.98));
+          return;
+        }
+        next.push([start, end]);
+        start = end;
+      }
+      setPortions(next);
+      setReady(true);
+    } finally {
+      probe.remove();
     }
-    setPortions(
-      paginateQuranWords(
-        rects.map((rect) => ({ top: rect.top, bottom: rect.top + font * 1.85 })),
-        frame.clientHeight - 12,
-      ),
-    );
-    setReady(true);
   }, [font, words, layout]);
   useEffect(() => {
     const frame = viewport.current;
@@ -299,6 +358,7 @@ function EnlargedQuran({
         <div
           className="quran-enlarged-text"
           data-testid="quran-enlarged-text"
+          data-layout-ready={ready}
           dir="rtl"
           lang="ar"
           translate="no"

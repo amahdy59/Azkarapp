@@ -356,11 +356,11 @@ for (const language of ["ar", "en"] as const) {
               weight: getComputedStyle(time).fontWeight,
             })),
           );
+          // The grouped rail uses the approved 13px label step below its
+          // 22rem content breakpoint; larger phone rows retain 14px timings.
+          const expectedTimeSize = width >= 1440 ? 36 : width >= 820 ? 28 : width === 320 ? 13 : 14;
           expect(
-            timeStyles.every(
-              (time) =>
-                parseFloat(time.size) === (width >= 1440 ? 36 : width >= 820 ? 28 : 14) && Number(time.weight) >= 600,
-            ),
+            timeStyles.every((time) => parseFloat(time.size) === expectedTimeSize && Number(time.weight) >= 600),
           ).toBe(true);
           if ((width === 390 && prayer === "fajr") || (width === 1440 && prayer === "dhuhr")) {
             await page.screenshot({

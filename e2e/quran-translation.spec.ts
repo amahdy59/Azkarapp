@@ -134,8 +134,12 @@ for (const item of listeningCases) {
     }
     const translation = player.getByTestId("quran-page-translation");
     await expect(translation).toHaveAttribute("open", "");
-    const layout = await player.evaluate((element) => {
-      const paper = element.querySelector(".audio-listening-arabic")!.getBoundingClientRect();
+    const layout = await player.evaluate((element, continuous) => {
+      // A paged passage now has an enlargement action before its printed page.
+      // Compare the actual reading surfaces, rather than that control's wrapper.
+      const paper = element
+        .querySelector(continuous ? ".audio-listening-arabic" : ".audio-listening-page")!
+        .getBoundingClientRect();
       const translation = element.querySelector(".audio-listening-translation")!.getBoundingClientRect();
       const text = element.querySelector(".audio-listening-translation-text")!.getBoundingClientRect();
       return {
@@ -143,7 +147,7 @@ for (const item of listeningCases) {
         topGap: Math.abs(translation.top - paper.top),
         width: text.width,
       };
-    });
+    }, continuous);
     expect(layout.beside).toBe(true);
     expect(layout.topGap).toBeLessThanOrEqual(1);
     expect(layout.width).toBeLessThan(650);

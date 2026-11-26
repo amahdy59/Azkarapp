@@ -50,6 +50,22 @@ async function seed(page: Page, language: "ar" | "en", theme = "midnight", glass
     { language, theme, glass },
   );
 }
+async function openDateEditor(page: Page, language: "ar" | "en") {
+  const dateButton = page.getByRole("combobox", {
+    name: language === "ar" ? "نطاق التاريخ" : "Date range",
+    exact: true,
+    includeHidden: true,
+  });
+  if (!(await dateButton.isVisible())) await page.getByTestId("progress-filters-toggle").click();
+  const current = await dateButton.getAttribute("data-progress-value");
+  await dateButton.click();
+  await page
+    .getByRole("option")
+    .and(page.locator(`[data-progress-value="${current === "custom" ? "editDates" : "custom"}"]`))
+    .click();
+  return dateButton;
+}
+
 for (const language of ["ar", "en"] as const) {
   test(`one shared date picker controls day, month, range and records in ${language} @cross-browser`, async ({
     page,
@@ -67,16 +83,12 @@ for (const language of ["ar", "en"] as const) {
       exact: true,
       includeHidden: true,
     });
-    const openDates = async () => {
-      if (!(await dateButton.isVisible())) await page.getByTestId("progress-filters-toggle").click();
-      const current = await dateButton.getAttribute("data-progress-value");
-      await dateButton.click();
-      await page
-        .getByRole("option")
-        .and(page.locator(`[data-progress-value="${current === "custom" ? "editDates" : "custom"}"]`))
-        .click();
-    };
+    const openDates = () => openDateEditor(page, language);
     await openDates();
+    // Compact sheets initially focus their named scroll container, avoiding
+    // automatic mobile keyboard activation; Close remains the first Tab stop.
+    await expect(page.getByTestId("progress-date-sheet")).toBeFocused();
+    await page.keyboard.press("Tab");
     await expect(page.getByTestId("progress-date-sheet").getByTestId("modal-close-button")).toBeFocused();
     await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-03");
     await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-03");
@@ -122,11 +134,41 @@ for (const language of ["ar", "en"] as const) {
     await expect(
       page.getByRole("combobox", { name: ar ? "استكشاف التفاصيل" : "Explore details", exact: true }),
     ).toBeFocused();
+    const exportMenu = await openProgressExport(page, language);
+    await exportMenu.getByLabel(ar ? "تاريخ البداية" : "Start date").fill("2026-10-02");
+    await exportMenu.getByLabel(ar ? "تاريخ النهاية" : "End date").fill("2026-10-08");
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      exportMenu.getByRole("button", { name: ar ? "تصدير JSON" : "Export JSON" }).click(),
+    ]);
+    const file = JSON.parse(await readFile((await download.path())!, "utf8"));
+    expect(file.selectedRange).toEqual({ startKey: "2026-10-02", endKey: "2026-10-08" });
+    expect(file.dailyRecords).toHaveLength(7);
+  });
+  test(`enlarged Custom dates preserve input and focus recovery in ${language} @cross-browser`, async ({
+    page,
+  }, info) => {
+    const ar = language === "ar";
+    await seed(page, language);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/#/progress/month");
+    // Establish the same applied Custom range without consuming this scenario's
+    // budget on the independent metric, detail and export journeys above.
+    const dateButton = await openDateEditor(page, language);
+    await expect(page.getByTestId("progress-date-sheet")).toBeFocused();
+    await page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true }).fill("2026-10-02");
+    await page.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true }).fill("2026-10-08");
+    await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
+    await expect(page.getByTestId("progress-date-sheet")).not.toBeVisible();
+    await expect(page.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "custom");
+    await expect(page.getByTestId("progress-filters-toggle")).toBeFocused();
     await page.setViewportSize({ width: 320, height: 700 });
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";
     });
-    await openDates();
+    await openDateEditor(page, language);
+    await expect(page.getByTestId("progress-date-sheet")).toBeFocused();
+    await page.keyboard.press("Tab");
     await expect(page.getByTestId("progress-date-sheet").getByTestId("modal-close-button")).toBeFocused();
     const enlargedDate = page.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true });
     await enlargedDate.click();
@@ -140,16 +182,6 @@ for (const language of ["ar", "en"] as const) {
     await enlargedDate.press("Escape");
     await expect(page.getByTestId("progress-date-sheet")).not.toBeVisible();
     await expect(dateButton).toBeFocused();
-    const exportMenu = await openProgressExport(page, language);
-    await exportMenu.getByLabel(ar ? "تاريخ البداية" : "Start date").fill("2026-10-02");
-    await exportMenu.getByLabel(ar ? "تاريخ النهاية" : "End date").fill("2026-10-08");
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      exportMenu.getByRole("button", { name: ar ? "تصدير JSON" : "Export JSON" }).click(),
-    ]);
-    const file = JSON.parse(await readFile((await download.path())!, "utf8"));
-    expect(file.selectedRange).toEqual({ startKey: "2026-10-02", endKey: "2026-10-08" });
-    expect(file.dailyRecords).toHaveLength(7);
   });
   test(`Progress cards open their own trend and preserve the range across keyboard tabs in ${language} @cross-browser`, async ({
     page,

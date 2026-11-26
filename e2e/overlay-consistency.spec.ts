@@ -164,12 +164,13 @@ test("an open reader tool adapts through phone, tablet and desktop without losin
 test("global top sheets and anchored menus share the protected overlay family @cross-browser", async ({ page }) => {
   await seed(page, "en");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/#/counter");
+  await page.goto("/#/friday/salawat");
   await page.getByRole("button", { name: "More options", exact: true }).click();
   const menu = page.locator('[data-slot="dropdown-menu-content"]');
   await expect(menu).toHaveAttribute("data-overlay-surface", "contextual");
   await expect(menu).toHaveCSS("background-color", "rgb(15, 23, 42)");
   await page.keyboard.press("Escape");
+  await page.goto("/#/counter");
   await page.getByRole("button", { name: t("en", "counter.settings"), exact: true }).click();
   const sheet = page.getByTestId("masbaha-settings-sheet");
   await expect(sheet).toHaveAttribute("data-overlay-surface", "sheet");

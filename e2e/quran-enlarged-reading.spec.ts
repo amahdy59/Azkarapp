@@ -67,6 +67,7 @@ for (const scenario of [
     const next = modal.getByRole("button", { name: t(scenario.language, "common.next"), exact: true });
     for (let portion = 0; portion <= expected.length; portion += 1) {
       await expect(text).toBeVisible();
+      await expect(text).toHaveAttribute("data-layout-ready", "true");
       expect((await modal.locator(".quran-portion-context").boundingBox())!.height).toBeCloseTo(contextHeight, 0);
       seen.push(
         ...(await text
@@ -80,6 +81,7 @@ for (const scenario of [
         return {
           overflow: node.scrollWidth - node.clientWidth,
           bottom: text.bottom - frame.bottom,
+          top: frame.top - text.top,
           ink: boxes.every(
             (box) =>
               box.left >= frame.left - 1 &&
@@ -92,6 +94,7 @@ for (const scenario of [
       expect(bounds, JSON.stringify(bounds)).toMatchObject({ ink: true });
       expect(bounds.overflow).toBeLessThanOrEqual(1);
       expect(bounds.bottom).toBeLessThanOrEqual(1);
+      expect(bounds.top).toBeLessThanOrEqual(1);
       if (await next.isDisabled()) break;
       // Exercise pointer entry and native keyboard continuation. WebKit's
       // per-click stabilization otherwise dominates large-text word portions.

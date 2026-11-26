@@ -77,7 +77,7 @@ for (const width of [390, 1440]) {
         .evaluate((node) => parseFloat((node as HTMLElement).style.getPropertyValue("--interval-elapsed")));
     await expect(current).toHaveAttribute("data-prayer-state", "current");
     const originalTextColors = await next
-      .locator("h3, p")
+      .locator("h3, [data-prayer-time]")
       .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).color));
     let previousElapsed = -1;
     for (const minutes of [45, 15, 1]) {
@@ -91,12 +91,16 @@ for (const width of [390, 1440]) {
       const selected = page.locator('[data-density="summary"][data-selected]');
       expect(await selected.count()).toBeLessThanOrEqual(1);
       expect(
-        await next.locator("h3, p").evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).color)),
+        await next
+          .locator("h3, [data-prayer-time]")
+          .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).color)),
       ).toEqual(originalTextColors);
+      // Phones frost the shared rail once; wide tiles own their surfaces.
+      await assertPrayerMaterials(page);
       for (const card of await page.locator('[data-density="summary"]').all()) {
         await expect(card).toHaveCSS("opacity", "1");
         await expect(card).toHaveCSS("filter", "none");
-        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+        await expect(card).toHaveCSS("backdrop-filter", width < 768 ? "none" : "blur(22px) saturate(1.35)");
       }
       const a11y = await new AxeBuilder({ page }).include('[data-testid="home-prayer-strip"]').analyze();
       expect(a11y.violations).toEqual([]);
@@ -142,8 +146,10 @@ for (const width of [390, 834, 1440]) {
         .locator('article[data-prayer-state="past"], article[data-prayer-state="upcoming"]')
         .first();
       await assertPrayerMaterials(page);
-      await expect(standard).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
-      const quietBorder = await standard.evaluate((node) => getComputedStyle(node).borderTopColor);
+      const materialOwner = width < 768 ? page.getByTestId("home-all-prayers-row") : standard;
+      await expect(materialOwner).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+      await expect(standard).toHaveCSS("backdrop-filter", width < 768 ? "none" : "blur(22px) saturate(1.35)");
+      const quietBorder = await materialOwner.evaluate((node) => getComputedStyle(node).borderTopColor);
       expect(quietBorder).not.toBe("rgba(0, 0, 0, 0)");
       await expect(standard).not.toHaveAttribute("data-selected");
       // Verify the whole Home material inventory, not just the prayer strip.

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
+import { sharingStep } from "./helpers/sharing";
 
 for (const width of [320, 390, 1440]) {
   test(`English main meaning stays reachable and survives navigation/reload at ${width}px @cross-browser`, async ({
@@ -174,6 +175,7 @@ test("shared feedback has appropriate press depth, clean cancellation and disabl
   await share.press("Enter");
   const modal = page.getByTestId("collection-share-modal");
   await expect(modal).toBeVisible();
+  await sharingStep(modal, "content");
   const summary = modal
     .locator("summary")
     .filter({ hasText: /Customize content/ })

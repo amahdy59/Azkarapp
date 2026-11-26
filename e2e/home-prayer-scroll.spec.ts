@@ -1,62 +1,66 @@
 import { assertPrayerOverview } from "./helpers/home-overview";
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
   const later = page.getByRole("button", { name: /^(Later|لاحقاً)$/ });
   await page.addLocatorHandler(later, async () => later.click());
 });
 
+async function openHomeScrollJourney(page: Page, language: "ar" | "en", width: number) {
+  await page.setViewportSize({ width, height: 900 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
+  await page.route("**/v1/visitors", (route) => route.fulfill({ json: { active: 12 } }));
+  await page.addInitScript((language) => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: {
+          language,
+          themeMode: "midnight",
+          appMaterial: "glass",
+          homeMaterial: "glass",
+          reduceMotion: false,
+        },
+        profile: { isGuest: true },
+      }),
+    );
+  }, language);
+  await page.goto("/#/home");
+  const sticky = page.getByTestId("home-sticky-prayers");
+  const scroll = sticky.locator("..");
+  const activeHandoffAnimations = () =>
+    page.evaluate(() => {
+      const sticky = document.querySelector('[data-testid="home-sticky-prayers"]')!;
+      return sticky.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running").length;
+    });
+  const next = page.locator('[data-density="summary"][data-prayer-state="next"]');
+  const label = next.locator("h3");
+  await expect(label).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  await expect
+    .poll(() =>
+      sticky.evaluate(
+        (node) => node.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running").length,
+      ),
+    )
+    .toBe(0);
+  const expanded = await assertPrayerOverview(page);
+  const grid = page.getByTestId("home-context-grid");
+  const documentTop = () =>
+    grid.evaluate((node) => node.getBoundingClientRect().top + node.closest(".home-content-scroll")!.scrollTop);
+  const contentBefore = await documentTop();
+  const toggle = page.getByTestId("home-prayer-disclosure");
+  return { scroll, activeHandoffAnimations, next, expanded, documentTop, contentBefore, toggle };
+}
+
 for (const language of ["ar", "en"] as const) {
   for (const width of [390, 1440]) {
     test(`stable prayer badge and scroll handoff ${language} ${width} @cross-browser`, async ({ page }, testInfo) => {
-      await page.setViewportSize({ width, height: 900 });
-      await page.emulateMedia({ reducedMotion: "no-preference" });
-      await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
-      await page.route("**/v1/visitors", (route) => route.fulfill({ json: { active: 12 } }));
-      await page.addInitScript((language) => {
-        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-        localStorage.setItem(
-          "azkarapp.state.v1",
-          JSON.stringify({
-            settings: {
-              language,
-              themeMode: "midnight",
-              appMaterial: "glass",
-              homeMaterial: "glass",
-              reduceMotion: false,
-            },
-            profile: { isGuest: true },
-          }),
-        );
-      }, language);
-      await page.goto("/#/home");
-      const sticky = page.getByTestId("home-sticky-prayers");
-      const scroll = sticky.locator("..");
-      const activeHandoffAnimations = () =>
-        page.evaluate(() => {
-          const sticky = document.querySelector('[data-testid="home-sticky-prayers"]')!;
-          return sticky.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running")
-            .length;
-        });
-      const next = page.locator('[data-density="summary"][data-prayer-state="next"]');
-      const label = next.locator("h3");
-      await expect(label).toBeVisible();
-      await page.evaluate(() => document.fonts.ready);
-      await expect
-        .poll(() =>
-          sticky.evaluate(
-            (node) =>
-              node.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running").length,
-          ),
-        )
-        .toBe(0);
-      const expanded = await assertPrayerOverview(page);
-      const grid = page.getByTestId("home-context-grid");
-      const documentTop = () =>
-        grid.evaluate((node) => node.getBoundingClientRect().top + node.closest(".home-content-scroll")!.scrollTop);
-      const contentBefore = await documentTop();
-      const toggle = page.getByTestId("home-prayer-disclosure");
+      const { scroll, activeHandoffAnimations, next, expanded, documentTop, contentBefore, toggle } =
+        await openHomeScrollJourney(page, language, width);
       for (const top of [150, 0, 180]) {
         await scroll.evaluate((node, top) => {
           node.scrollTop = top;
@@ -71,6 +75,24 @@ for (const language of ["ar", "en"] as const) {
       }
       await expect(next.locator("progress")).toHaveCount(0);
       await page.screenshot({ path: testInfo.outputPath(`scrolled-${language}-${width}.png`) });
+    });
+
+    test(`prayer disclosure re-expansion preserves footer and reduced motion ${language} ${width} @cross-browser`, async ({
+      page,
+    }) => {
+      const { scroll, activeHandoffAnimations, documentTop, contentBefore, toggle } = await openHomeScrollJourney(
+        page,
+        language,
+        width,
+      );
+      // Start the disclosure journey from the same scrolled state independently
+      // of the preceding card-stability checks and their screenshot cost.
+      await scroll.evaluate((node) => {
+        node.scrollTop = 180;
+      });
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      await expect.poll(documentTop).toBeCloseTo(contentBefore, 0);
+      await expect.poll(activeHandoffAnimations).toBe(0);
       await toggle.click();
       await expect(toggle).toHaveAttribute("aria-expanded", "false");
       await expect(page.locator("#home-prayer-timings")).toHaveAttribute("inert", "");
@@ -80,6 +102,11 @@ for (const language of ["ar", "en"] as const) {
       await expect(toggle).toHaveAttribute("aria-expanded", "false");
       await toggle.click();
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      // Expanded state changes before the grid-row transition finishes. Measure
+      // document coordinates only after the actual handoff has settled, then
+      // require the original expanded height before checking ordinary scroll.
+      await expect.poll(activeHandoffAnimations).toBe(0);
+      await expect.poll(documentTop).toBeCloseTo(contentBefore, 0);
       await assertPrayerOverview(page);
       const footer = page.getByTestId("home-visitor-footer");
       await expect(footer).toContainText(language === "ar" ? "١٢" : "12");

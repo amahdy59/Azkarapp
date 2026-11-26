@@ -37,12 +37,12 @@ async function openHome(page: Page, language: "ar" | "en", material = "glass") {
 
 for (const language of ["ar", "en"] as const) {
   for (const material of ["glass", "solid"]) {
-    test(`desktop prayer card keeps every source visible ${language} ${material} @cross-browser`, async ({
-      page,
-    }, info) => {
-      await page.setViewportSize({ width: 1440, height: 1000 });
-      await openHome(page, language, material);
-      for (const prayer of ["asr", "dhuhr", "fajr", "maghrib", "isha"] as const) {
+    for (const prayer of ["asr", "dhuhr", "fajr", "maghrib", "isha"] as const) {
+      test(`desktop prayer card keeps every source visible ${language} ${material} ${prayer} @cross-browser`, async ({
+        page,
+      }, info) => {
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        await openHome(page, language, material);
         const time = getEstimatedPrayerTimes(new Date("2026-11-24T12:00:00+02:00"))[prayer];
         const instant = new Date(`2026-11-24T${time}:00+02:00`);
         instant.setMinutes(instant.getMinutes() + 5);
@@ -162,11 +162,11 @@ for (const language of ["ar", "en"] as const) {
             path: `output/playwright/prayer-card-polish/${info.project.name}-${language}-${material}-${prayer}.png`,
           });
         }
-      }
-      expect(
-        (await new AxeBuilder({ page }).include('[data-testid="prayer-actions-card"]').analyze()).violations,
-      ).toEqual([]);
-    });
+        expect(
+          (await new AxeBuilder({ page }).include('[data-testid="prayer-actions-card"]').analyze()).violations,
+        ).toEqual([]);
+      });
+    }
   }
 
   test(`prayer card preserves compact recovery and enlarged text ${language} @cross-browser`, async ({

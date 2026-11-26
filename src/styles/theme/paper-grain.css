@@ -68,6 +68,11 @@ html[data-app-material-resolved="glass"] :is(.app-shell, [role="dialog"], [data-
 .home-prayer-overview-v2 {
   background-image: none;
 }
+/* Solid phone items reveal one textured rail. Glass keeps its existing grain
+   and sheen recipe; wide grids remain clear between individual surfaces. */
+.home-prayer-overview-v2[data-grouped] .home-prayer-grid:not(.hero-glass) {
+  background-image: var(--paper-grain);
+}
 
 :is(.high-contrast, .reduce-transparency, [data-paper-texture="off"]) *,
 :root:is(.high-contrast, .reduce-transparency, [data-paper-texture="off"]) {

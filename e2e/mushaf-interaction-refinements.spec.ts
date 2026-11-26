@@ -1,7 +1,45 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { t } from "../src/app/i18n";
 import { getAzkarForMode } from "../src/app/content/azkar";
+
+async function expectReaderPanel(page: Page, panel: Locator) {
+  await expect(panel).toHaveAttribute("data-toolbar-panel", "");
+  await expect(panel).toBeFocused();
+  const top = page.locator(".mushaf-control-band--top");
+  const bottom = page.locator(".mushaf-control-band--bottom");
+  await expect
+    .poll(async () => {
+      const [bounds, header, footer] = await Promise.all([
+        panel.boundingBox(),
+        top.boundingBox(),
+        bottom.boundingBox(),
+      ]);
+      return (
+        !!bounds &&
+        !!header &&
+        !!footer &&
+        bounds.y >= header.y + header.height - 1 &&
+        bounds.y + bounds.height <= footer.y + 1 &&
+        bounds.x >= 0 &&
+        bounds.x + bounds.width <= page.viewportSize()!.width + 1 &&
+        bounds.height > 150
+      );
+    })
+    .toBe(true);
+  for (const bar of [top, bottom]) {
+    await expect(bar).toBeVisible();
+    expect(
+      await bar.evaluate((node) => {
+        const bounds = node.getBoundingClientRect();
+        return (
+          !node.closest("[inert], [aria-hidden=true]") &&
+          node.contains(document.elementFromPoint(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2))
+        );
+      }),
+    ).toBe(true);
+  }
+}
 
 test("Mushaf controls stay clear of the paper with safe areas and short windows @cross-browser", async ({
   page,
@@ -81,6 +119,25 @@ test("short zikr surah fits with basmalah and no decorative title @cross-browser
   await page.evaluate(() => document.fonts.ready);
   const scroll = page.locator(".reader-text-scroll");
   await expect.poll(() => scroll.evaluate((node) => node.scrollHeight - node.clientHeight)).toBeLessThanOrEqual(1);
+  const enlargement = passage.getByRole("button", { name: t("ar", "quranZoom.open"), exact: true });
+  await enlargement.focus();
+  await expect(enlargement).toBeFocused();
+  // WebKit's observer rounds an intrinsic Arabic label width by 1/64px.
+  // Check the actual full target and its scrollport instead of that ratio.
+  const target = (await enlargement.boundingBox())!;
+  const viewport = (await scroll.boundingBox())!;
+  expect(target.x).toBeGreaterThanOrEqual(viewport.x);
+  expect(target.x + target.width).toBeLessThanOrEqual(viewport.x + viewport.width);
+  expect(target.y).toBeGreaterThanOrEqual(viewport.y);
+  expect(target.y + target.height).toBeLessThanOrEqual(viewport.y + viewport.height);
+  expect(target.width).toBeGreaterThanOrEqual(44);
+  expect(target.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await enlargement.evaluate((node) => {
+      const box = node.getBoundingClientRect();
+      return node.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+    }),
+  ).toBe(true);
   await page.screenshot({ path: info.outputPath("short-zikr-surah.png") });
 });
 
@@ -301,16 +358,17 @@ for (const language of ["ar", "en"] as const) {
     await expect(initialPage).toHaveAttribute("data-mushaf-page", initialNumber!);
     await page.getByTestId("mushaf-more-actions").click();
     const quick = page.getByTestId("mushaf-quick-menu");
-    const quickBounds = (await quick.boundingBox())!;
-    expect(Math.abs(quickBounds.y + quickBounds.height - 844)).toBeLessThan(2);
+    // Phone options replace the paper between the stationary bars, matching the
+    // index; they no longer cover the bottom controls as a viewport sheet.
+    await expectReaderPanel(page, quick);
     await expect(quick.getByTestId("modal-close-button")).toBeVisible();
     await page.getByTestId("quick-theme-follow-app").click();
     await expect(page.getByTestId("quick-theme-follow-app")).toHaveAttribute("aria-checked", "true");
     await page.getByTestId("mushaf-quick-settings").click();
     const settings = page.getByTestId("mushaf-settings-sheet");
     await expect(settings).toBeVisible();
-    const bounds = (await settings.boundingBox())!;
-    expect(Math.abs(bounds.y + bounds.height - 844)).toBeLessThan(2);
+    await expect(quick).toBeHidden();
+    await expectReaderPanel(page, settings);
     await expect(settings.getByTestId("modal-close-button")).toBeVisible();
     expect(
       (

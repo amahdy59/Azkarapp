@@ -138,7 +138,7 @@ test("radio menu items keep their logical-end indicator gutter in Arabic", async
   await page.goto("/#/friday/salawat");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
 
-  await page.getByTestId("salawat-target-filter").click();
+  await page.getByTestId("counter-target-filter").click();
   const menu = page.locator('[data-slot="dropdown-menu-content"]');
   await expect(menu).toBeVisible();
 

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { openPrayerDialog } from "./helpers/home-overview";
 
 /**
  * The overlay surfaces added alongside the reader and prayer tracking.
@@ -72,12 +73,10 @@ test("the interactive word-meaning card is named, reachable, and has no automati
 test("the prayer information dialog has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await seed(page, "/#/home");
-  await page.getByTestId("prayer-card-isha").getByRole("button").click();
-  const actions = page.getByTestId("prayer-actions-card");
-  await expect(actions).toBeVisible();
-  await actions.getByTestId("prayer-actions-more-info").click();
-  await expect(page.getByTestId("prayer-actions-info-modal")).toBeVisible();
-  expect(await scan(page, '[data-testid="prayer-actions-info-modal"]')).toEqual([]);
+  const dialog = await openPrayerDialog(page, "isha");
+  await dialog.getByTestId("prayer-moment-virtue").getByRole("button").click();
+  await expect(dialog.locator(".prayer-evidence-body")).toBeVisible();
+  expect(await scan(page, '[data-testid="home-prayer-moment"]')).toEqual([]);
 });
 
 test("the collection share modal has no automatically detectable WCAG A/AA violations", async ({ page }, testInfo) => {

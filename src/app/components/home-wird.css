@@ -32,6 +32,11 @@
   background-color: var(--on-media-surface);
   background-image: none;
   backdrop-filter: none;
+  box-shadow: none;
+}
+
+.reduce-transparency .home-photo-canvas:not(.home-force-glass) .hero-glass.home-glass-surface {
+  box-shadow: none;
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -39,6 +44,9 @@
     background-color: var(--on-media-surface);
     background-image: var(--paper-grain, none);
     backdrop-filter: none;
+  }
+  .home-photo-canvas:not(.home-force-glass) .hero-glass.home-glass-surface {
+    box-shadow: none;
   }
 }
 

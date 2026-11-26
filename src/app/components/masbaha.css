@@ -80,6 +80,10 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
+.masbaha-actions button:disabled {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
 .masbaha-actions > button:only-child {
   grid-column: 2;
 }

@@ -212,10 +212,22 @@ for (const homeMaterial of ["solid", "glass"] as const) {
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       const owners = page.locator(
-        ".home-prayer-overview-v2 .home-prayer-tile, .home-prayer-overview-v2 .home-prayer-location, .home-prayer-interval",
+        width < 768
+          ? ".home-prayer-overview-v2 .home-prayer-grid, .home-prayer-overview-v2 .home-prayer-location, .home-prayer-interval"
+          : ".home-prayer-overview-v2 .home-prayer-tile, .home-prayer-overview-v2 .home-prayer-location, .home-prayer-interval",
       );
-      await expect(owners).toHaveCount(7);
+      await expect(owners).toHaveCount(width < 768 ? 3 : 7);
       await expect(overview).toHaveCSS("background-image", "none");
+      if (width < 768) {
+        // The visible grain belongs to the one filled rail, never another
+        // layer on its transparent items or a nested backdrop filter.
+        const tiles = page.getByTestId("home-all-prayers-row").locator(":scope > article");
+        await expect(tiles).toHaveCount(5);
+        for (const tile of await tiles.all()) {
+          await expect(tile).toHaveCSS("background-image", "none");
+          await expect(tile).toHaveCSS("backdrop-filter", "none");
+        }
+      }
       for (const owner of await owners.all()) {
         await expect(owner).toHaveCSS("background-image", asset);
         for (const fallback of ["high-contrast", "reduce-transparency"]) {

@@ -121,36 +121,38 @@ for (const [language, mode, width] of [
   ["en", "os", 768],
 ] as const) {
   for (const [family, routes] of Object.entries(families)) {
-    test(`page motion endpoints ${family} ${language} ${mode} @cross-browser`, async ({ page }, info) => {
-      const errors: string[] = [];
-      page.on("pageerror", (error) => errors.push(error.message));
-      await fixtureReminderCatalogue(page);
-      await page.setViewportSize({ width, height: 900 });
-      // Motion measurements use the native document/rAF timeline. Prayer-date
-      // behavior is independently tested with fixed clocks in the Home suites.
-      await page.emulateMedia({ reducedMotion: mode === "os" ? "reduce" : "no-preference" });
-      await page.addInitScript(
-        ({ language, mode }) => {
-          localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-          if (!localStorage.getItem("azkarapp.state.v1"))
-            localStorage.setItem(
-              "azkarapp.state.v1",
-              JSON.stringify({
-                settings: { language, appMaterial: "solid", reduceMotion: mode === "app" },
-                profile: { isGuest: true },
-              }),
-            );
-        },
-        { language, mode },
-      );
-      const evidence = [];
-      for (const route of routes) {
+    // Each direct endpoint owns a fresh page and the unchanged test deadline;
+    // earlier routes cannot consume its motion budget or abort its async work.
+    for (const route of routes) {
+      test(`page motion endpoints ${family} ${language} ${mode}: ${route} @cross-browser`, async ({ page }, info) => {
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(error.message));
+        await fixtureReminderCatalogue(page);
+        await page.setViewportSize({ width, height: 900 });
+        // Motion measurements use the native document/rAF timeline. Prayer-date
+        // behavior is independently tested with fixed clocks in the Home suites.
+        await page.emulateMedia({ reducedMotion: mode === "os" ? "reduce" : "no-preference" });
+        await page.addInitScript(
+          ({ language, mode }) => {
+            localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+            if (!localStorage.getItem("azkarapp.state.v1"))
+              localStorage.setItem(
+                "azkarapp.state.v1",
+                JSON.stringify({
+                  settings: { language, appMaterial: "solid", reduceMotion: mode === "app" },
+                  profile: { isGuest: true },
+                }),
+              );
+          },
+          { language, mode },
+        );
+        const evidence = [];
         await test.step(route, async () => {
-          const response = await page.goto(`/#${route}`);
-          // Hash-only goto reuses the prior document. This endpoint sweep needs
-          // independent direct entries; interaction transitions have their own
-          // navigation tests below and in navigation-motion.spec.ts.
-          if (!response) await page.reload();
+          // A route-specific query creates one fresh document directly. A
+          // hash-only goto followed by reload starts the intermediate route's
+          // async work and immediately aborts it, producing WebKit page errors.
+          // Interaction transitions have separate navigation coverage below.
+          await page.goto(`/?motion-endpoint=${encodeURIComponent(route)}#${route}`);
           await page.bringToFront();
           expect(await page.evaluate(() => document.visibilityState)).toBe("visible");
           const main = page.locator("#main-content");
@@ -204,10 +206,10 @@ for (const [language, mode, width] of [
           if (mode !== "default") expect(result.pseudoName).toBe("none");
           evidence.push({ route, ...result, observed: [...observed.values()] });
         });
-      }
-      await info.attach("motion-endpoints.json", { body: JSON.stringify(evidence), contentType: "application/json" });
-      expect(errors).toEqual([]);
-    });
+        await info.attach("motion-endpoints.json", { body: JSON.stringify(evidence), contentType: "application/json" });
+        expect(errors).toEqual([]);
+      });
+    }
   }
 }
 

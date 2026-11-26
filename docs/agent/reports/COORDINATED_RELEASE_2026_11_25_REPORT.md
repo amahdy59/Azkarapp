@@ -2,6 +2,8 @@
 
 ## Objective
 
+Publication status and exact-commit browser remediation continue in the [CI remediation report](COORDINATED_RELEASE_CI_REMEDIATION_2026_11_26.md). The initial verified batch is pushed as `974cb93d`; its first complete CI browser matrix correctly blocks Pages pending repairs. The current release manifest is `2026-11-26.1` for the forthcoming remediation.
+
 Coordinate the pending shared-checkout phases, finish approved implementation, validate the combined result, push main and verify the exact production deployment. The owner supersedes prior local publication holds; source-review and physical-device boundaries remain.
 
 ## Scope completed

@@ -164,7 +164,7 @@ for (const mode of ["default", "app", "os"] as const) {
       seconds: parseFloat(getComputedStyle(node).animationDuration),
     }));
     if (mode === "default") {
-      expect(animation.name).toContain("enter");
+      expect(animation.name).toBe("overlay-modal-arrive");
       expect(animation.seconds).toBeGreaterThan(0);
     } else {
       expect(animation.seconds).toBeLessThanOrEqual(0.001);

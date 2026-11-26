@@ -14,7 +14,7 @@ for (const themeMode of ["light", "midnight", "dark"] as const) {
         }),
       );
     }, themeMode);
-    await page.goto("/#/counter");
+    await page.goto("/#/friday/salawat");
     const trigger = page.getByRole("button", { name: "More options" });
     await trigger.click();
     await page.keyboard.press("ArrowDown");
