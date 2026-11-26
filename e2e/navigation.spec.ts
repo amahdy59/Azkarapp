@@ -79,10 +79,11 @@ for (const viewport of [
     expect(overflow).toBeLessThanOrEqual(1);
     if (viewport.width === 320) {
       await expect(page.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Enable live compass" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Stop live compass" })).toHaveCount(0);
       const qiblaSurface = page.locator(".app-screen-surface");
       await expect(qiblaSurface).toHaveCSS("overflow-y", "auto");
-      await qiblaSurface.evaluate((element) => {
+      await page.locator("html").evaluate((element) => {
         element.style.fontSize = "200%";
       });
       await expect
@@ -90,9 +91,13 @@ for (const viewport of [
         .toBe(true);
       await qiblaSurface.evaluate((element) => element.scrollTo({ top: element.scrollHeight }));
       expect(await qiblaSurface.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-      await page.getByRole("button", { name: "Accuracy and calibration tips" }).click();
+      await page.getByRole("button", { name: "Details", exact: true }).click();
+      await page.getByTestId("qibla-details").locator("summary").click();
       await expect(page.getByText(/Keep the device flat/)).toBeVisible();
       await page.getByTestId("qibla-details").getByTestId("modal-close-button").click();
+      await page.locator("html").evaluate((element) => {
+        element.style.fontSize = "";
+      });
     }
 
     await page.getByTestId("nav-home").click();
@@ -184,9 +189,11 @@ test("Qibla keeps the static bearing and explains Android sensor denial", async 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#/qibla");
 
-  await page.getByRole("button", { name: "Enable live compass" }).click();
+  await page.getByRole("button", { name: "Allow compass access" }).click();
+  await expect(page.getByText("Sensor access blocked")).toBeVisible();
+  await page.getByRole("button", { name: "Details", exact: true }).click();
   await expect(page.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
-  await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveCount(0);
   await expect(page.getByText("Static view — does not track your phone")).toBeVisible();
   await expect(page.getByTestId("qibla-arrow")).toHaveAttribute("transform", /^rotate\(136\./);
 });

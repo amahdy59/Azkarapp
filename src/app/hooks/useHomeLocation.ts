@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCATION, detectUserCoordinates, type CoordinateDetectionResult } from "../content/prayerCalculation";
+import { displayLocationName } from "../content/prayerLocations";
 import { t } from "../i18n";
 import type { AppLanguage, LocationSettings } from "../types";
 
@@ -36,15 +37,16 @@ export function useHomeLocation(
     }
     if (id !== request.current) return;
     if (result.ok) {
-      onChange({
+      const detectedLocation: LocationSettings = {
         ...(location ?? DEFAULT_LOCATION),
         latitude: result.latitude,
         longitude: result.longitude,
         cityName: `${result.latitude.toFixed(2)}°, ${result.longitude.toFixed(2)}°`,
         autoDetect: true,
         timeZone: result.timeZone ?? DEFAULT_LOCATION.timeZone,
-      });
-      setMessage(t(language, "notifications.locationUpdated"));
+      };
+      onChange(detectedLocation);
+      setMessage(`${t(language, "notifications.locationUpdated")} ${displayLocationName(detectedLocation, language)}`);
     } else {
       const reason = result.reason === "unknown" ? "Error" : result.reason[0]!.toUpperCase() + result.reason.slice(1);
       setMessage(t(language, `notifications.location${reason}`));

@@ -122,7 +122,9 @@ export function PrayerLocationPanel({
          something the device already knows: `detectUserCoordinates` reads it
          from `Intl.DateTimeFormat`. Times are calculated here, so there is
          nothing left to wait for and nothing deferred to report. */
-      setLocationStatus(t(language, "notifications.locationUpdated"));
+      setLocationStatus(
+        `${t(language, "notifications.locationUpdated")} ${displayLocationName(detectedLocation, language)}`,
+      );
     } else {
       const reasonKey =
         result.ok || result.reason === "unknown"
@@ -495,6 +497,7 @@ export function PrayerLocationPanel({
         protectedSurface
         showCloseButton={false}
         testId="prayer-location-notice"
+        maxWidthClassName="max-w-md"
         className="prayer-settings-surface"
         onCloseAutoFocus={(event) => {
           if (noticeTrigger.current?.isConnected) {

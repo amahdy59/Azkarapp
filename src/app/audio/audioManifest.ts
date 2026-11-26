@@ -8,6 +8,29 @@ import { FRIDAY_KAHF } from "../content/fridayKahf";
 export const AUDIO_MANIFEST_VERSION = 9;
 
 export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object.freeze({
+  mp3quran: {
+    id: "mp3quran",
+    name: "MP3Quran",
+    nameArabic: "MP3Quran",
+    attribution:
+      "Al-Mulk recitations by Muhammad Siddiq Al-Minshawi, Mahmoud Khalil Al-Hussary and Yasser Al-Dosari, via MP3Quran.",
+    attributionArabic: "تلاوات سورة الملك لمحمد صديق المنشاوي ومحمود خليل الحصري وياسر الدوسري، من MP3Quran.",
+    licenseName: "MP3Quran developer copying permission",
+    licenseEvidence: "https://www.mp3quran.net/eng/privacy",
+    notes:
+      "Original complete Al-Mulk files and provider permission snapshot are checksum-pinned in docs/audio/quran-reciter-pilot/manifest.json. Owner accepted all three local comparison recordings on 2026-11-26. Current defaults and timings are unchanged.",
+  },
+  "opendua-muhammad-jumah": {
+    id: "opendua-muhammad-jumah",
+    name: "OpenDua",
+    nameArabic: "OpenDua",
+    attribution: "Recitation by Muhammad Jumah for OpenDua.",
+    attributionArabic: "تلاوة محمد جمعة لصالح OpenDua.",
+    licenseName: "CC BY 4.0",
+    licenseEvidence: "https://opendua.org/licence/audio",
+    notes:
+      "Three pinned v0.0.2 recordings accepted after owner listening on 2026-11-26; see docs/audio/opendua-pilot/activation.json. Optional voice only; existing defaults are unchanged.",
+  },
   "internal-upload": {
     id: "internal-upload",
     name: "Internal Upload",

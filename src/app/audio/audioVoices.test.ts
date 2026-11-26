@@ -5,7 +5,7 @@ describe("audio voices", () => {
   it("orders Arabic names by the Arabic alphabet, not by code point", () => {
     const names = getAudioVoices("ar").map((voice) => voice.nameArabic);
     // Translation (الترجمة) sorts before عبد/محمد in Arabic collation
-    expect(names).toEqual(["الترجمة الإنجليزية", "عبد الله محمد", "محمد شرعي", "محمد معتز"]);
+    expect(names).toEqual(["الترجمة الإنجليزية", "عبد الله محمد", "محمد جمعة", "محمد شرعي", "محمد معتز"]);
   });
 
   it("orders English names alphabetically", () => {
@@ -42,5 +42,6 @@ describe("audio voices", () => {
     const availableIds = voices.filter((voice) => !voice.disabled).map((voice) => voice.id);
     expect(availableIds).toContain("abdullah-muhammad");
     expect(availableIds).toContain("english-george");
+    expect(availableIds).toContain("opendua-muhammad-jumah");
   });
 });

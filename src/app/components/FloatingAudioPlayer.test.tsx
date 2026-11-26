@@ -406,6 +406,7 @@ describe("FloatingAudioPlayer", () => {
     controller.currentEntry = {
       ...entry,
       availableVoiceIds: ["abdullah-muhammad", "english-george"],
+      contentKind: "dua",
       defaultVoiceId: "abdullah-muhammad",
       segmentsByVoice: { "abdullah-muhammad": [segment], "english-george": [segment] },
     };
@@ -434,17 +435,17 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByTestId("audio-reciter-select")).toHaveTextContent("الترجمة الإنجليزية");
   });
 
-  it("cannot select English narration or an adhkar reciter for an entry without those recordings", () => {
+  it("shows only actual Quran recordings and excludes unrelated dua or translation choices", () => {
     const controller = createController();
     render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
     for (const name of ["English Translation", "Abdullah Muhammad"]) {
-      const option = screen.getByRole("option", { name });
-      expect(option).toHaveAttribute("data-disabled");
-      fireEvent.click(option);
+      expect(screen.queryByRole("option", { name })).not.toBeInTheDocument();
     }
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(screen.getByRole("option", { name: "Test reciter" })).not.toHaveAttribute("data-disabled");
     expect(controller.setVoice).not.toHaveBeenCalled();
     expect(screen.getByTestId("audio-reciter-select")).toHaveTextContent("Test reciter");
   });

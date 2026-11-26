@@ -1,6 +1,21 @@
 import { expect, test } from "vitest";
 import { featureBrowserArguments } from "./run-feature-browser-tests.mjs";
 
+test("selects the separate-release location and Home learning regressions with their owning features", () => {
+  for (const feature of ["home", "controls", "settings"]) {
+    const patterns = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    expect(patterns.some((pattern) => pattern.test("e2e/next-release-location-dialogs.spec.ts"))).toBe(true);
+  }
+  for (const feature of ["home", "learning"]) {
+    const patterns = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    expect(patterns.some((pattern) => pattern.test("e2e/home-learning-entry.spec.ts"))).toBe(true);
+  }
+});
+
 test("shared configuration pills are covered by each owning screen feature", () => {
   for (const feature of ["quran", "progress", "controls", "settings"]) {
     const patterns = featureBrowserArguments(feature)

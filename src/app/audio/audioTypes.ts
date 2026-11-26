@@ -38,6 +38,9 @@ export interface AudioVariant {
   sourceId: string;
   reviewStatus: AudioReviewStatus;
   embeddedRepetitions?: number;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  reviewNotes?: string;
 }
 
 export interface AudioSegment {

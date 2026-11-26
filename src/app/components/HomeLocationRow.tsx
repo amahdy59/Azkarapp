@@ -20,7 +20,7 @@ export function HomeLocationRow({
   onRefresh?: (trigger: HTMLButtonElement) => void;
 }) {
   const descriptionId = useId();
-  const label = deviceLocation ? t(language, "qibla.deviceLocation") : (name ?? t(language, "qibla.savedLocation"));
+  const label = name?.trim() || t(language, deviceLocation ? "qibla.deviceLocation" : "qibla.savedLocation");
   const changeLabel = `${t(language, "home.chooseLocation")}: ${label}`;
   const locateLabel = t(language, locating ? "qibla.locating" : "qibla.useCurrentLocation");
   return (

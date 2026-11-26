@@ -1,0 +1,30 @@
+{
+  "reviewedBy": "Ahmed Mahdy (owner listening confirmation in chat)",
+  "reviewedAt": "2026-11-26",
+  "decision": "approved-as-optional-quran-voices",
+  "confirmation": "I approve all.",
+  "scope": "Owner accepts the three complete Al-Mulk recordings presented in the local comparison. Existing default reciters remain unchanged. No other surah, independent scholarly qualification or word-timing approval is inferred.",
+  "recordings": [
+    {
+      "voiceId": "mp3quran-al-minshawi",
+      "assetId": "s-hm-110b",
+      "readingId": 112,
+      "durationMs": 416530,
+      "sha256": "627d89a5dff939c67ded14d47737a0770192b505a261fca4a10c6d6b230c5016"
+    },
+    {
+      "voiceId": "mp3quran-al-hussary",
+      "assetId": "s-hm-110b",
+      "readingId": 118,
+      "durationMs": 673131,
+      "sha256": "5ac9965a7dbb77092492bf879d4e56b83412c13ff22115e78ead08cb35d5d2cd"
+    },
+    {
+      "voiceId": "mp3quran-yasser-al-dosari",
+      "assetId": "s-hm-110b",
+      "readingId": 92,
+      "durationMs": 382824,
+      "sha256": "a5f4312a63c77c9f831a9a1afb741c6a1d6197fdbb32908e2135ef3408fe9911"
+    }
+  ]
+}

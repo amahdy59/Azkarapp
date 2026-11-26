@@ -11,6 +11,7 @@ type OrientationConstructor = typeof DeviceOrientationEvent & {
 };
 export type CompassStatus =
   | "off"
+  | "permissionRequired"
   | "waiting"
   | "live"
   | "poor"
@@ -41,7 +42,7 @@ export function headingFromOrientation(event: OrientationEventWithCompass, fromA
   return normalizeDegrees(360 - event.alpha! + screenAngle);
 }
 
-export function useQiblaCompass(declination: number | null) {
+export function useQiblaCompass(declination: number | null, autoStart = false) {
   const [enabled, setEnabled] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [requesting, setRequesting] = useState(false);
@@ -49,12 +50,35 @@ export function useQiblaCompass(declination: number | null) {
   const [reading, setReading] = useState<{ heading: number; rawHeading: number; accuracy: number | null } | null>(null);
   const mounted = useRef(true);
   const requestId = useRef(0);
+  const permissionRequired = useRef(false);
+  const accessGranted = useRef(false);
+  const requestingAccess = useRef(false);
   useEffect(() => {
     mounted.current = true;
+    requestId.current++;
     return () => {
       mounted.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!autoStart) return;
+    if (declination === null) {
+      setEnabled(false);
+      setReading(null);
+      setStatus("referenceUnavailable");
+      return;
+    }
+    if (!window.isSecureContext || typeof DeviceOrientationEvent === "undefined") {
+      setStatus("unsupported");
+      return;
+    }
+    // Listening never invokes a permission prompt. Previously granted browsers
+    // can deliver events immediately; requestPermission stays gesture-owned.
+    permissionRequired.current =
+      Boolean((DeviceOrientationEvent as OrientationConstructor).requestPermission) && !accessGranted.current;
+    setEnabled(true);
+  }, [autoStart, declination]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -73,6 +97,11 @@ export function useQiblaCompass(declination: number | null) {
         raw.type !== "deviceorientationabsolute"
       )
         return;
+      // Browsers can emit empty orientation events before access is granted.
+      // They are not evidence of consent and must not hide the permission action.
+      if (permissionRequired.current && magnetic === null) return;
+      accessGranted.current = true;
+      permissionRequired.current = false;
       const accuracy =
         typeof event.webkitCompassAccuracy === "number" && Number.isFinite(event.webkitCompassAccuracy)
           ? event.webkitCompassAccuracy
@@ -114,10 +143,10 @@ export function useQiblaCompass(declination: number | null) {
         setStatus("paused");
         return;
       }
-      setStatus("waiting");
+      setStatus(permissionRequired.current ? "permissionRequired" : "waiting");
       window.addEventListener("deviceorientationabsolute", listen);
       window.addEventListener("deviceorientation", listen);
-      expiry = setTimeout(() => setStatus("unavailable"), 5000);
+      expiry = setTimeout(() => setStatus(permissionRequired.current ? "permissionRequired" : "unavailable"), 5000);
     };
     resume();
     document.addEventListener("visibilitychange", resume);
@@ -127,14 +156,8 @@ export function useQiblaCompass(declination: number | null) {
     };
   }, [enabled, declination, attempt]);
 
-  const toggle = useCallback(async () => {
-    if (enabled) {
-      requestId.current++;
-      setEnabled(false);
-      setReading(null);
-      setStatus("off");
-      return;
-    }
+  const requestAccess = useCallback(async () => {
+    if (requestingAccess.current) return;
     if (declination === null) {
       setStatus("referenceUnavailable");
       return;
@@ -146,6 +169,7 @@ export function useQiblaCompass(declination: number | null) {
     const id = ++requestId.current;
     const orientation = DeviceOrientationEvent as OrientationConstructor;
     if (orientation.requestPermission) {
+      requestingAccess.current = true;
       setRequesting(true);
       try {
         let permission: "granted" | "denied";
@@ -157,24 +181,48 @@ export function useQiblaCompass(declination: number | null) {
         }
         if (!mounted.current || requestId.current !== id) return;
         if (permission !== "granted") {
+          accessGranted.current = false;
+          permissionRequired.current = true;
+          setReading(null);
+          setEnabled(false);
           setStatus("denied");
           return;
         }
       } catch {
-        if (mounted.current && requestId.current === id) setStatus("denied");
+        if (mounted.current && requestId.current === id) {
+          accessGranted.current = false;
+          permissionRequired.current = true;
+          setReading(null);
+          setEnabled(false);
+          setStatus("denied");
+        }
         return;
       } finally {
+        requestingAccess.current = false;
         if (mounted.current && requestId.current === id) setRequesting(false);
       }
     }
-    if (mounted.current && requestId.current === id) setEnabled(true);
-  }, [declination, enabled]);
-  const retry = useCallback(async () => {
+    if (mounted.current && requestId.current === id) {
+      accessGranted.current = true;
+      permissionRequired.current = false;
+      setEnabled(true);
+      setAttempt((previous) => previous + 1);
+    }
+  }, [declination]);
+  const toggle = useCallback(async () => {
     if (enabled) {
+      requestId.current++;
+      setEnabled(false);
+      setReading(null);
+      setStatus("off");
+    } else await requestAccess();
+  }, [enabled, requestAccess]);
+  const retry = useCallback(async () => {
+    if (enabled && !permissionRequired.current) {
       setReading(null);
       setStatus("waiting");
       setAttempt((previous) => previous + 1);
-    } else await toggle();
-  }, [enabled, toggle]);
-  return { enabled, requesting, status, reading, toggle, retry };
+    } else await requestAccess();
+  }, [enabled, requestAccess]);
+  return { enabled, requesting, status, reading, toggle, retry, requestAccess };
 }

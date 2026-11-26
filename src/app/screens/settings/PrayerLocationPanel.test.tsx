@@ -40,6 +40,7 @@ describe("PrayerLocationPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Use my current location" }));
     const notice = await screen.findByRole("dialog", { name: "Location update" });
     expect(notice).toHaveTextContent("Location and time zone updated successfully.");
+    expect(notice).toHaveTextContent("Near Riyadh, Saudi Arabia");
     expect(changed).toHaveBeenCalledWith(
       expect.objectContaining({
         latitude: 24.5,

@@ -1,0 +1,236 @@
+{
+  "capturedOn": "2026-11-26",
+  "branch": "codex/recommendations-next-release",
+  "base": "974cb93dcc493310fa78a3efd72a9c01a6134f74",
+  "kind": "actual application screenshots; automated viewport and sensor fixtures",
+  "items": [
+    {
+      "file": "qibla-ar-390-live-simulated.png",
+      "title": "Qibla AR · 390×844",
+      "detail": "live-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-d6e58-mobile-ar-390-cross-browser-desktop-firefox-smoke/live-simulated.png",
+      "sha256": "9b052124a93f3fe00f83437cc7cad899a98a97938be7d63bb43e59608f4e2dcc",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-390-aligned-simulated.png",
+      "title": "Qibla AR · 390×844",
+      "detail": "aligned-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-d6e58-mobile-ar-390-cross-browser-desktop-firefox-smoke/aligned-simulated.png",
+      "sha256": "20081a67cda665f88906d521c20f6950bfbccbe9fc19556556ce1ffed280b0a5",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-390-poor-simulated.png",
+      "title": "Qibla AR · 390×844",
+      "detail": "poor-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-d6e58-mobile-ar-390-cross-browser-desktop-firefox-smoke/poor-simulated.png",
+      "sha256": "3751bc4e0193e0e976c3bf5739a39f30ba183211a26f0aa6ba3b0a54f63b3460",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-390-stale-simulated.png",
+      "title": "Qibla AR · 390×844",
+      "detail": "stale-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-d6e58-mobile-ar-390-cross-browser-desktop-firefox-smoke/stale-simulated.png",
+      "sha256": "5aa05d21fbae715a949531d4f6a1113671cd271203f33fa87ca56d15d6083aaa",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-390-permission-needed.png",
+      "title": "Qibla AR · 390×844",
+      "detail": "permission-needed; mocked permission result, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-cbabd-ture-owned-ar-cross-browser-desktop-firefox-smoke/permission-needed.png",
+      "sha256": "b7585eceb4bf38d2fc152ad5a99060fe18de40c291fa5f9eb8bf6e4bbc13f203",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-390-permission-denied.png",
+      "title": "Qibla AR · 390×844",
+      "detail": "permission-denied; mocked permission result, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-cbabd-ture-owned-ar-cross-browser-desktop-firefox-smoke/permission-denied.png",
+      "sha256": "c0204570bf99828646bc12b8f9981e22528d19d04ca781a768d7d331bc957010",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-390-permission-recovery.png",
+      "title": "Qibla AR · 390×844",
+      "detail": "permission-recovery; mocked permission result, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-cbabd-ture-owned-ar-cross-browser-desktop-firefox-smoke/permission-recovery.png",
+      "sha256": "fe114003099dec00b8c437a20226c1da30237356a3f72e1bf00cf27c715554a8",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-320-enlarged-recovery.png",
+      "title": "Qibla AR · 320×700 · 200% text",
+      "detail": "enlarged-recovery; scrollable enlarged-text recovery, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-a06e9-l-recovery-ar-cross-browser-desktop-firefox-smoke/enlarged-recovery.png",
+      "sha256": "fad10c83c88f1841598da4109c7c52c814fda1a4ee03498a034502e7da4bf757",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-ar-320-enlarged-details.png",
+      "title": "Qibla AR · 320×700 · 200% text",
+      "detail": "enlarged-details; scrollable enlarged-text recovery, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-a06e9-l-recovery-ar-cross-browser-desktop-firefox-smoke/enlarged-details.png",
+      "sha256": "4f91f15153b71b615af6f58955932cbbe4a2d80d05f27492e4ee053d937bc0c4",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "home-ar-390-discover.png",
+      "title": "Home books AR · 390×1000",
+      "detail": "First visit; compact discovery below daily routines; light solid; no publication requests",
+      "source": "output/next-release-candidate-chromium/home-learning-entry-Home-books-ar-390-discover-cross-browser-desktop-chromium/home-books.png",
+      "sha256": "21a705d55b3fcdd49f8c3b16be4a6a2ceaf89ded1381882168e73813d4d6a7af"
+    },
+    {
+      "file": "home-ar-834-continue.png",
+      "title": "Home books AR · 834×1000",
+      "detail": "Saved Arabic Umrah source page 6; light solid; no publication requests",
+      "source": "output/next-release-candidate-chromium/home-learning-entry-Home-books-ar-834-continue-cross-browser-desktop-chromium/home-books.png",
+      "sha256": "8e994764d7f2523f509f93b5568d76b1f2a921a94cecc60d37112f38f0de10b3"
+    },
+    {
+      "file": "qibla-en-390-live-simulated.png",
+      "title": "Qibla EN · 390×844",
+      "detail": "live-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-5de20-mobile-en-390-cross-browser-desktop-firefox-smoke/live-simulated.png",
+      "sha256": "49c477ca6ca7a3c4202f4194ae8a4d89265c50be2dc9e58852d7602cde362488",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-390-aligned-simulated.png",
+      "title": "Qibla EN · 390×844",
+      "detail": "aligned-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-5de20-mobile-en-390-cross-browser-desktop-firefox-smoke/aligned-simulated.png",
+      "sha256": "a2da32e42a1120fb7ea505b3a05ac6e285730c3a12bd4a5f231adff88ac9adb4",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-390-poor-simulated.png",
+      "title": "Qibla EN · 390×844",
+      "detail": "poor-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-5de20-mobile-en-390-cross-browser-desktop-firefox-smoke/poor-simulated.png",
+      "sha256": "d35a8d8630f311251f9b5f780bec15efdd89f4d5db46f6417d03901690ad9f70",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-390-stale-simulated.png",
+      "title": "Qibla EN · 390×844",
+      "detail": "stale-simulated; synthetic orientation samples, Glass; geometry verified unchanged",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-aut-5de20-mobile-en-390-cross-browser-desktop-firefox-smoke/stale-simulated.png",
+      "sha256": "fdb77b0d3e5055c28bb6d51d924f1503b50a809d072eff154e5c7f2a05de3207",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-390-permission-needed.png",
+      "title": "Qibla EN · 390×844",
+      "detail": "permission-needed; mocked permission result, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-ff5b1-ture-owned-en-cross-browser-desktop-firefox-smoke/permission-needed.png",
+      "sha256": "0e0af82abe5a2a0bd9d0c1961071090ff359e5d6aab59f5b7cf0850930ab1a9f",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-390-permission-denied.png",
+      "title": "Qibla EN · 390×844",
+      "detail": "permission-denied; mocked permission result, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-ff5b1-ture-owned-en-cross-browser-desktop-firefox-smoke/permission-denied.png",
+      "sha256": "17b596813a91a09c57c87eca8b7a123f116ca1ee6fe5d17d3b123c35084d0b26",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-390-permission-recovery.png",
+      "title": "Qibla EN · 390×844",
+      "detail": "permission-recovery; mocked permission result, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-ff5b1-ture-owned-en-cross-browser-desktop-firefox-smoke/permission-recovery.png",
+      "sha256": "2f0a0aade10fa7b15ffb5d6bd8c75ca39bf536d69c6c292dc618202a29ff632c",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-320-enlarged-recovery.png",
+      "title": "Qibla EN · 320×700 · 200% text",
+      "detail": "enlarged-recovery; scrollable enlarged-text recovery, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-68709-l-recovery-en-cross-browser-desktop-firefox-smoke/enlarged-recovery.png",
+      "sha256": "b4c4e1f34e5efd0b41071566adb5758ee5a0ea49a6d3f948caf0f84a2ab9b774",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "qibla-en-320-enlarged-details.png",
+      "title": "Qibla EN · 320×700 · 200% text",
+      "detail": "enlarged-details; scrollable enlarged-text recovery, light solid",
+      "source": "output/qibla-auto-engines/qibla-automatic-mobile-Qib-68709-l-recovery-en-cross-browser-desktop-firefox-smoke/enlarged-details.png",
+      "sha256": "043306fda8cbfd0547c4e94d3f1903c979f7f39441f0c3716154fa7cc85c5753",
+      "engine": "Firefox · final automatic-permission regression snapshot"
+    },
+    {
+      "file": "home-en-390-discover.png",
+      "title": "Home books EN · 390×1000",
+      "detail": "First visit; compact discovery below daily routines; light solid; no publication requests",
+      "source": "output/next-release-candidate-chromium/home-learning-entry-Home-books-en-390-discover-cross-browser-desktop-chromium/home-books.png",
+      "sha256": "566b952fa01e19419cd08eb71f1ad63fcca3a5587a569faa7a3b4a5db6e69fa4"
+    },
+    {
+      "file": "home-en-834-continue.png",
+      "title": "Home books EN · 834×1000",
+      "detail": "Saved Arabic Umrah source page 6; light solid; no publication requests",
+      "source": "output/next-release-candidate-chromium/home-learning-entry-Home-books-en-834-continue-cross-browser-desktop-chromium/home-books.png",
+      "sha256": "45c05c3c96e929a9053d618187e102a51437cdeb9f2dc994bf052557bc79150d"
+    },
+    {
+      "file": "home-location-ar-1440.png",
+      "title": "Home location AR · 1440×900",
+      "detail": "Compact protected dialog; 448px maximum; Glass; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-98674--ar-1440-none-cross-browser-desktop-chromium/home-location.png",
+      "sha256": "8370b051a2280075035893b1d9bb088c9785bec73b9f686759e833471f69b685"
+    },
+    {
+      "file": "home-location-ar-320-text200.png",
+      "title": "Home location AR · 320×700 · 200% text",
+      "detail": "Opaque bounded dialog with reachable Close; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-1e767-g-ar-320-none-cross-browser-desktop-chromium/home-location.png",
+      "sha256": "28632b11c5cd95a441e169e1cc0f9a7ce057210d17c627cd959628130f574cfd"
+    },
+    {
+      "file": "settings-location-ar-1440.png",
+      "title": "Settings location AR · 1440×900",
+      "detail": "Compact protected dialog; 448px maximum; Glass; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-ab81f--ar-1440-none-cross-browser-desktop-chromium/settings-location.png",
+      "sha256": "56217bf6a18e81a95dc564d4ddc86ae286f949b872e77d5048818b228ffbd7de"
+    },
+    {
+      "file": "settings-location-ar-320-text200.png",
+      "title": "Settings location AR · 320×700 · 200% text",
+      "detail": "Opaque bounded dialog with reachable Close; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-54ebd-g-ar-320-none-cross-browser-desktop-chromium/settings-location.png",
+      "sha256": "f2624c3a455554ff15d41dd3e3dd0ce988a59df28b474435ab0fb6bdfef0414f"
+    },
+    {
+      "file": "home-location-en-1440.png",
+      "title": "Home location EN · 1440×900",
+      "detail": "Compact protected dialog; 448px maximum; Glass; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-81406--en-1440-none-cross-browser-desktop-chromium/home-location.png",
+      "sha256": "083431927e6f74a2cee6812c71a0d78dd14ccf7c64576a98784461a4814df47a"
+    },
+    {
+      "file": "home-location-en-320-text200.png",
+      "title": "Home location EN · 320×700 · 200% text",
+      "detail": "Opaque bounded dialog with reachable Close; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-f7aa7-g-en-320-none-cross-browser-desktop-chromium/home-location.png",
+      "sha256": "8000d3e6e38c26495b2968ac924ffc475491f4c7260b52e55a881d35b6ddbfec"
+    },
+    {
+      "file": "settings-location-en-1440.png",
+      "title": "Settings location EN · 1440×900",
+      "detail": "Compact protected dialog; 448px maximum; Glass; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-3671c--en-1440-none-cross-browser-desktop-chromium/settings-location.png",
+      "sha256": "ed040e7d448c87acd1d1711c6f7d86a4b2dddc40b04553fb37e02ed290ff9303"
+    },
+    {
+      "file": "settings-location-en-320-text200.png",
+      "title": "Settings location EN · 320×700 · 200% text",
+      "detail": "Opaque bounded dialog with reachable Close; deterministic Cairo GPS fixture",
+      "source": "output/next-release-candidate-chromium/next-release-location-dial-69cae-g-en-320-none-cross-browser-desktop-chromium/settings-location.png",
+      "sha256": "04095b542b575b7ace1f0b8c58c845003aa11af014d9dc612c945d88480e21ce"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+[
+  {
+    "engine": "chromium",
+    "name": "Muhammad Siddiq Al-Minshawi",
+    "sha256": "627d89a5dff939c67ded14d47737a0770192b505a261fca4a10c6d6b230c5016",
+    "duration": 416.530438,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "chromium",
+    "name": "Mahmoud Khalil Al-Hussary",
+    "sha256": "5ac9965a7dbb77092492bf879d4e56b83412c13ff22115e78ead08cb35d5d2cd",
+    "duration": 673.131256,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "chromium",
+    "name": "Yasser Al-Dosari",
+    "sha256": "a5f4312a63c77c9f831a9a1afb741c6a1d6197fdbb32908e2135ef3408fe9911",
+    "duration": 382.824438,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "chromium",
+    "width": 390,
+    "textPercent": 100,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "chromium",
+    "width": 320,
+    "textPercent": 200,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "chromium",
+    "width": 1280,
+    "textPercent": 100,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "firefox",
+    "name": "Muhammad Siddiq Al-Minshawi",
+    "sha256": "627d89a5dff939c67ded14d47737a0770192b505a261fca4a10c6d6b230c5016",
+    "duration": 416.530438,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "firefox",
+    "name": "Mahmoud Khalil Al-Hussary",
+    "sha256": "5ac9965a7dbb77092492bf879d4e56b83412c13ff22115e78ead08cb35d5d2cd",
+    "duration": 673.13125,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "firefox",
+    "name": "Yasser Al-Dosari",
+    "sha256": "a5f4312a63c77c9f831a9a1afb741c6a1d6197fdbb32908e2135ef3408fe9911",
+    "duration": 382.824438,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "firefox",
+    "width": 390,
+    "textPercent": 100,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "firefox",
+    "width": 320,
+    "textPercent": 200,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "firefox",
+    "width": 1280,
+    "textPercent": 100,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "webkit",
+    "name": "Muhammad Siddiq Al-Minshawi",
+    "sha256": "627d89a5dff939c67ded14d47737a0770192b505a261fca4a10c6d6b230c5016",
+    "duration": 416.5224375,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "webkit",
+    "name": "Mahmoud Khalil Al-Hussary",
+    "sha256": "5ac9965a7dbb77092492bf879d4e56b83412c13ff22115e78ead08cb35d5d2cd",
+    "duration": 673.12325,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "webkit",
+    "name": "Yasser Al-Dosari",
+    "sha256": "a5f4312a63c77c9f831a9a1afb741c6a1d6197fdbb32908e2135ef3408fe9911",
+    "duration": 382.8244375,
+    "paused": false,
+    "error": null
+  },
+  {
+    "engine": "webkit",
+    "width": 390,
+    "textPercent": 100,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "webkit",
+    "width": 320,
+    "textPercent": 200,
+    "axeViolations": 0,
+    "overflow": false
+  },
+  {
+    "engine": "webkit",
+    "width": 1280,
+    "textPercent": 100,
+    "axeViolations": 0,
+    "overflow": false
+  }
+]

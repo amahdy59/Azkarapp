@@ -91,12 +91,15 @@ export function useLearningPosition(
     const identity = learningEditionId(resource);
     const previous = readLearningState()[identity]?.position;
     let offset = previous?.unitId === unitId ? previous.offset : 0;
-    if (!updateLearningState(identity, (state) => ({ ...state, position: { unitId, offset } }))) onStorageFailure();
+    const lastReadAt = Date.now();
+    if (!updateLearningState(identity, (state) => ({ ...state, position: { unitId, offset }, lastReadAt })))
+      onStorageFailure();
     let restored = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const persist = () => {
       if (!restored) return;
-      if (!updateLearningState(identity, (state) => ({ ...state, position: { unitId, offset } }))) onStorageFailure();
+      if (!updateLearningState(identity, (state) => ({ ...state, position: { unitId, offset }, lastReadAt })))
+        onStorageFailure();
     };
     const frame = requestAnimationFrame(() => {
       element.scrollTop = offset * Math.max(0, element.scrollHeight - element.clientHeight);

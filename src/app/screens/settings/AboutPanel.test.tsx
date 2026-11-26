@@ -41,6 +41,16 @@ describe("AboutPanel", () => {
     for (const key of ["ahmedRole", "mohamedRole", "ahmedBio", "mohamedBio"] as const) {
       expect(screen.getByText(t(language, `about.${key}`))).toBeVisible();
     }
+    expect(screen.getByText("Recitation by Muhammad Jumah for OpenDua.")).toBeVisible();
+    expect(screen.getByRole("link", { name: t(language, "about.openDuaLicence") })).toHaveAttribute(
+      "href",
+      "https://opendua.org/licence/audio",
+    );
+    expect(screen.getByText(t(language, "about.mp3QuranCredit"))).toBeVisible();
+    expect(screen.getByRole("link", { name: t(language, "about.mp3QuranPermission") })).toHaveAttribute(
+      "href",
+      "https://www.mp3quran.net/eng/privacy",
+    );
     for (const kind of ["reportBug", "suggestFeature"] as const) {
       const href = screen.getByRole("link", { name: t(language, `about.${kind}`) }).getAttribute("href")!;
       expect(href.split("?")[0]).toBe("mailto:amahdy59@yahoo.com,m.hussien.m44@gmail.com");

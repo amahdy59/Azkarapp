@@ -18,7 +18,17 @@ describe("owner-reviewed Arabic audio restoration", () => {
       const arabic = buildPlaybackPlan({ ...options, audioLanguage: "ar", mode: "repeat-prescribed-count" });
       expect(arabic.entries).toHaveLength(1);
       const entry = arabic.entries[0]!;
-      expect(entry.availableVoiceIds).toEqual(["abdullah-muhammad"]);
+      expect(entry.availableVoiceIds).toEqual(
+        ["m-hm-91", "e-hm-91", "misc-ref-3"].includes(id)
+          ? ["abdullah-muhammad", "opendua-muhammad-jumah"]
+          : ["abdullah-muhammad"],
+      );
+      expect(entry.defaultVoiceId).toBe("abdullah-muhammad");
+      if (["m-hm-91", "e-hm-91", "misc-ref-3"].includes(id)) {
+        expect(entry.segmentsByVoice["opendua-muhammad-jumah"]?.[0]?.sha256).toBe(
+          "3a9ec6c9dd0cf80a0626cf3ad80dbc890efcf424ccba28dc0d8e257929572936",
+        );
+      }
       const segments = entry.segmentsByVoice[entry.defaultVoiceId]!;
       expect(segments).toHaveLength(1);
       const segment = segments[0]!;

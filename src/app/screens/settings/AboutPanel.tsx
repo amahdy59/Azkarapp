@@ -175,6 +175,32 @@ export function AboutPanel({
               hasDivider={false}
               onPress={onSources}
             />
+            <div className="border-t border-border/40 p-4">
+              <p className="font-semibold">{t(language, "about.openDuaAudio")}</p>
+              <p lang="en" dir="ltr" className="mt-1 text-sm text-muted-foreground">
+                {t(language, "about.openDuaCredit")}
+              </p>
+              <a
+                href="https://opendua.org/licence/audio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-flex min-h-11 items-center rounded-lg text-sm text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "about.openDuaLicence")}
+              </a>
+            </div>
+            <div className="border-t border-border/40 p-4">
+              <p className="font-semibold">{t(language, "about.mp3QuranAudio")}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t(language, "about.mp3QuranCredit")}</p>
+              <a
+                href="https://www.mp3quran.net/eng/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-flex min-h-11 items-center rounded-lg text-sm text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "about.mp3QuranPermission")}
+              </a>
+            </div>
           </div>
         </div>
 

@@ -20,6 +20,9 @@ export const ISOLATED_SUITES = [
   "src/app/native/liveUpdate.consent.test.ts",
   // Vaul/Radix focus-scope state must not carry across unrelated overlay suites.
   "src/app/components/ResponsiveFilters.test.tsx",
+  "src/app/components/ResponsiveSheet.focus.test.tsx",
+  // This suite proves zero acquisition; unrelated async fetches must not carry in.
+  "src/app/screens/HomeLearningSection.test.tsx",
   "src/app/progressExport.test.ts",
   "src/app/share/curatedRoutineCards.test.ts",
   "src/app/content/reminderReadings.test.ts",

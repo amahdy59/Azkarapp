@@ -1,6 +1,6 @@
 # OpenDua additional-voice review pilot
 
-Prepared on 2026-11-25. All three recordings remain **pending**. They are local review inputs, excluded from the production catalogue and production build. No existing audio file, hosted URL, assignment, default voice, timing annotation, manifest version or download-cache version changes.
+Prepared on 2026-11-25 as pending intake. On 2026-11-26 the owner confirmed listening to all three and accepted them as a second option. The checksum-bound [acceptance record](activation.json) supersedes the original pending-activation status. The three variants are now registered under optional Muhammad Jumah with immutable hosting and CC BY 4.0 credits. Existing recordings, assignments, defaults, timings, asset versions and download-cache version remain unchanged. The original pilot/measurements below retain their historical pending status; they are intake evidence, not the activation record.
 
 ## Review the actual recordings
 
@@ -22,7 +22,11 @@ The pilot covers `wu-hm-3` (praise upon waking), `friday-dua-22` (forgiveness fo
 
 Run `node scripts/prepare-opendua-pilot.mjs` to verify/retrieve the pinned intake. It rejects a changed upstream response instead of replacing retained evidence or media. It does not upload files, change the live catalogue or enable a voice. The two original evidence snapshots are intentionally excluded from Prettier; tests verify their exact hashes.
 
-## Activation remains a separate checkpoint
+## Activation checkpoint — 2026-11-26
+
+The owner accepted all three retained samples after listening. Each additive variant carries its own dated owner-review metadata; `activation.json` records the exact statement without asserting an independent scholarly qualification. `scripts/upload-opendua-audio.mjs` validates that acceptance, refuses overwrites and verifies hosted SHA-256, MIME, production CORS and byte ranges. About retains the required credit and licence link. Settings exposes the optional voice and its three-recording coverage; uncovered items retain the existing resolver fallback. The same source is eligible for Android under its explicit CC BY 4.0 permission. Source MP3s stay out of the app installation bundle.
+
+Any later recording still requires its own review:
 
 Follow [the content review workflow](../content-review-workflow.md). Transfer independently signed findings through code review into schema-valid variant/source metadata only after immutable hosting, exact metadata and permission checks. Retain all current assets/defaults. Add the new voice as an explicit optional selection and recheck coverage, download preservation and About attribution. Do not copy Qur'an timings between recordings.
 

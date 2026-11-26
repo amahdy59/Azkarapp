@@ -118,7 +118,9 @@ for (const language of ["ar", "en"] as const) {
       page,
     }, info) => {
       await openSettings(page, language, viewport.width, viewport.height, viewport.scale, viewport.fallback);
-      await expect(page.getByTestId("prayer-location-name")).toHaveText(language === "ar" ? "مكة المكرمة" : "Makkah");
+      await expect(page.getByTestId("prayer-location-name")).toHaveText(
+        language === "ar" ? "مكة المكرمة، السعودية" : "Makkah, Saudi Arabia",
+      );
       await expect(page.getByTestId("daylight-saving-status")).toContainText("Asia/Riyadh");
       const trigger = page.locator("#calculation-method-select");
       await trigger.scrollIntoViewIfNeeded();
@@ -203,9 +205,9 @@ test("all prayer methods apply offline, survive reload and preserve location/adj
   await page.getByRole("button", { name: "Choose another city" }).click();
   await page.getByRole("searchbox").fill("London");
   await page.getByRole("button", { name: /London.*United Kingdom/ }).click();
-  await expect(page.getByTestId("prayer-location-name")).toHaveText("London");
+  await expect(page.getByTestId("prayer-location-name")).toHaveText("London, United Kingdom");
   await page.reload();
-  await expect(page.getByTestId("prayer-location-name")).toHaveText("London");
+  await expect(page.getByTestId("prayer-location-name")).toHaveText("London, United Kingdom");
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.location);
   expect(saved).toMatchObject({
     cityName: "London",
@@ -264,5 +266,5 @@ test("location denial shows recovery without shifting settings and returns focus
   await page.keyboard.press("Escape");
   await expect(trigger).toBeFocused();
   expect(await page.locator("#calculation-method-select").boundingBox()).toEqual(before);
-  await expect(page.getByTestId("prayer-location-name")).toHaveText("Makkah");
+  await expect(page.getByTestId("prayer-location-name")).toHaveText("Makkah, Saudi Arabia");
 });

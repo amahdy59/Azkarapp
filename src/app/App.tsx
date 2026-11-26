@@ -2121,6 +2121,8 @@ function AppContent({
                   onOpenMore={() => push("more")}
                   onOpenQibla={showQiblaShortcut ? utilityNavigation.onOpenQibla : undefined}
                   onOpenMasbaha={utilityNavigation.onOpenMasbaha}
+                  onOpenLearn={() => push("learn")}
+                  onOpenLearningResource={navigateLearningResource}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                 />
@@ -2194,7 +2196,6 @@ function AppContent({
                   initialSection={librarySection}
                   onSectionChange={navigateLibrarySection}
                   onOpenBenefits={() => push("benefits")}
-                  onOpenLearn={() => push("learn")}
                   hapticFeedback={hapticFeedback}
                 />
               )}

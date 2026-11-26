@@ -75,6 +75,39 @@ test("ordinary production exposes only the scoped Arabic Umrah adaptation and no
   await expect(page.getByRole("heading", { name: "The Umrah Guide", exact: true })).toHaveCount(0);
 });
 
+test("Home continuation ignores withheld recent editions and keeps their records intact", async ({ page }) => {
+  const records = {
+    "dalil-al-mutamir": {
+      position: { unitId: "p-6", offset: 0.3 },
+      bookmarks: ["p-6"],
+      contentLanguage: "en",
+      lastReadAt: 10,
+    },
+    "dalil-al-mutamir:en": { position: { unitId: "p-9", offset: 0.5 }, bookmarks: ["p-9"], lastReadAt: 30 },
+    "al-mukhtar": { position: { unitId: "p-32", offset: 0.4 }, bookmarks: ["p-32"], lastReadAt: 40 },
+  };
+  await page.addInitScript((records) => {
+    localStorage.setItem("azkar.learning.v1", JSON.stringify(records));
+  }, records);
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/__learning-assets__/")) requests.push(request.url());
+  });
+  await page.goto(`${origin}/#/home`);
+  const section = page.getByTestId("home-learning");
+  await expect(section).toContainText("دليل المعتمر");
+  await expect(section).not.toContainText("The Umrah Guide");
+  await expect(section).not.toContainText("المختار");
+  expect(requests).toEqual([]);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!))).toEqual(records);
+  await section.getByRole("button", { name: "Continue reading", exact: true }).click();
+  await expect(page).toHaveURL(/learn\/dalil-al-mutamir\/p-6$/);
+  await expect(page.getByTestId("learning-content")).toHaveAttribute("lang", "ar");
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!));
+  expect(saved["dalil-al-mutamir:en"]).toEqual(records["dalil-al-mutamir:en"]);
+  expect(saved["al-mukhtar"]).toEqual(records["al-mukhtar"]);
+});
+
 test("withheld direct links fetch no publication bytes and preserve old records", async ({ page }) => {
   const records = {
     "al-mukhtar": { position: { unitId: "p-32", offset: 0.45 }, bookmarks: ["p-32"] },

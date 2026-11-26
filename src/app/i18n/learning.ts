@@ -3,6 +3,9 @@ import type { AppLanguage } from "../types";
 
 const en = {
   title: "Learn",
+  homeTitle: "Learn & books",
+  allBooks: "All books",
+  exploreBooks: "Explore books & guides",
   subtitle: "Read, understand and return at your own pace.",
   books: "Books",
   booksDescription: "Books with their original references and source pages. Choose an available reading language.",
@@ -98,6 +101,9 @@ const en = {
 
 const ar: typeof en = {
   title: "تعلّم",
+  homeTitle: "تعلّم والكتب",
+  allBooks: "كل الكتب",
+  exploreBooks: "استكشف الكتب والأدلة",
   subtitle: "اقرأ وافهم، وعُد إلى موضعك بالوتيرة التي تناسبك.",
   books: "الكتب",
   booksDescription: "كتب بمراجعها وإحالاتها إلى صفحات المصدر. اختر لغة القراءة المتاحة.",

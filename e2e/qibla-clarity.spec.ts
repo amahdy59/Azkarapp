@@ -42,6 +42,26 @@ for (const language of ["ar", "en"] as const) {
   for (const theme of ["light", "midnight", "high-contrast", "forced-colors"]) {
     test(`@cross-browser Qibla instrument readability in ${language} ${theme}`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width: 390, height: 844 });
+      // A known permission-required state keeps the primary consent control
+      // available for the forced-colors contrast check without sensor noise.
+      await page.addInitScript(() => {
+        Object.defineProperty(window, "DeviceOrientationEvent", {
+          configurable: true,
+          value: class extends Event {
+            static async requestPermission() {
+              return "granted";
+            }
+          },
+        });
+        for (const name of ["deviceorientation", "deviceorientationabsolute"])
+          window.addEventListener(
+            name,
+            (event) => {
+              if (event.isTrusted) event.stopImmediatePropagation();
+            },
+            true,
+          );
+      });
       if (theme === "forced-colors") await page.emulateMedia({ forcedColors: "active" });
       await openQibla(page, language, {
         themeMode: theme === "light" ? "light" : "midnight",
@@ -235,15 +255,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(sheet).toBeHidden();
       await expect(details).toBeFocused();
       if (scenario.enlarged) {
-        const help = page.getByRole("button", {
-          name: language === "ar" ? "نصائح الدقة والمعايرة" : "Accuracy and calibration tips",
-        });
-        await help.scrollIntoViewIfNeeded();
-        await expect(help).toBeInViewport();
-        await help.click();
+        await details.scrollIntoViewIfNeeded();
+        await expect(details).toBeInViewport();
+        await details.click();
+        await sheet.locator("summary").click();
         await expect(sheet.locator("details")).toHaveAttribute("open", "");
         await sheet.getByTestId("modal-close-button").click();
-        await expect(help).toBeFocused();
+        await expect(details).toBeFocused();
       }
     });
   }
@@ -271,7 +289,7 @@ test("@cross-browser Qibla refresh uses a fresh device fix without changing pray
   const before = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.location);
   await page.getByRole("button", { name: "Use my location" }).click();
   await page.getByTestId("qibla-location-notice").getByTestId("modal-close-button").click();
-  await expect(page.getByTestId("qibla-location")).toContainText("Device location");
+  await expect(page.getByTestId("qibla-location")).toContainText("Near Madinah, Saudi Arabia");
   await expect(page.getByTestId("qibla-location")).not.toContainText("Cairo");
   await expect(page.getByRole("heading", { name: /Qibla is 176°/ })).toBeVisible();
   await page.getByRole("button", { name: "Details", exact: true }).click();
@@ -297,8 +315,9 @@ test("@cross-browser Qibla drops poor live readings and retains the static fallb
   await openQibla(page, "en");
   const arrow = page.getByTestId("qibla-arrow");
   const staticRotation = await arrow.getAttribute("transform");
-  await page.getByRole("button", { name: "Enable live compass" }).click();
-  await expect(page.getByRole("button", { name: "Stop live compass" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Allow compass access" }).click();
+  await expect(page.getByRole("button", { name: "Stop live compass" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Allow compass access" })).toHaveCount(0);
   await expect
     .poll(async () => {
       await page.evaluate(() =>
@@ -310,13 +329,15 @@ test("@cross-browser Qibla drops poor live readings and retains the static fallb
     })
     .not.toBe(staticRotation);
   await expect(arrow).not.toHaveAttribute("transform", staticRotation!);
-  await expect(page.getByText("Reported compass accuracy: ±2°")).toBeVisible();
+  await expect(page.getByRole("status", { name: "Reported compass accuracy: ±2°", exact: true })).toBeVisible();
   await page.evaluate(() =>
     window.dispatchEvent(
       Object.assign(new Event("deviceorientation"), { webkitCompassHeading: 136, webkitCompassAccuracy: 40 }),
     ),
   );
   await expect(arrow).toHaveAttribute("transform", staticRotation!);
+  await expect(page.getByText("Compass needs calibration")).toBeVisible();
+  await page.getByRole("button", { name: "Details", exact: true }).click();
   await expect(page.getByText(/The heading is unreliable/)).toBeVisible();
   await expect(page.getByText("Static view — does not track your phone")).toBeVisible();
   await expect(page.getByRole("heading", { name: "You are facing the Qibla" })).toHaveCount(0);
@@ -369,11 +390,11 @@ for (const language of ["ar", "en"] as const) {
     ).toBeVisible();
     await capture("saved-location");
     await page
-      .getByRole("button", { name: language === "ar" ? "تشغيل البوصلة المباشرة" : "Enable live compass" })
+      .getByRole("button", { name: language === "ar" ? "السماح باستخدام البوصلة" : "Allow compass access" })
       .click();
     await expect(
       page.getByRole("button", { name: language === "ar" ? "إيقاف البوصلة المباشرة" : "Stop live compass" }),
-    ).toHaveAttribute("aria-pressed", "true");
+    ).toHaveCount(0);
     await page.clock.runFor(5100);
     const retry = page.getByRole("button", {
       name: language === "ar" ? "إعادة محاولة البوصلة" : "Retry compass",
@@ -405,7 +426,7 @@ for (const language of ["ar", "en"] as const) {
     await capture("live-turn-simulated");
     await page.clock.runFor(5100);
     await expect(
-      page.getByText(language === "ar" ? /توقفت قراءات البوصلة/ : /The compass stopped updating/),
+      page.getByRole("status", { name: language === "ar" ? /توقفت قراءات البوصلة/ : /The compass stopped updating/ }),
     ).toBeVisible();
     await capture("stale-retry-simulated");
     await retry.click();
@@ -431,9 +452,9 @@ for (const language of ["ar", "en"] as const) {
     await capture("calibration-details");
     await sheet.getByTestId("modal-close-button").click();
     await expect(calibration).toBeFocused();
-    await page
-      .getByRole("button", { name: language === "ar" ? "إيقاف البوصلة المباشرة" : "Stop live compass" })
-      .click();
+    await expect(
+      page.getByRole("button", { name: language === "ar" ? "إيقاف البوصلة المباشرة" : "Stop live compass" }),
+    ).toHaveCount(0);
     await location.getByRole("button").click();
     await expect(page.getByTestId("qibla-location-warning")).toContainText(
       language === "ar" ? "الموقع تقريبي" : "Location is approximate",
@@ -454,12 +475,11 @@ for (const language of ["ar", "en"] as const) {
     expect(
       await page.locator(".app-screen-surface").evaluate((node) => node.scrollWidth - node.clientWidth),
     ).toBeLessThanOrEqual(1);
-    const help = page.getByRole("button", {
-      name: language === "ar" ? "نصائح الدقة والمعايرة" : "Accuracy and calibration tips",
-    });
+    const help = page.getByRole("button", { name: language === "ar" ? "التفاصيل" : "Details", exact: true });
     await help.scrollIntoViewIfNeeded();
     await expect(help).toBeInViewport();
     await help.click();
+    await sheet.locator("summary").click();
     await expect(sheet.locator("details")).toHaveAttribute("open", "");
     await sheet.getByTestId("modal-close-button").click();
     await expect(help).toBeFocused();

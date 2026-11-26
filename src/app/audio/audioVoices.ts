@@ -16,9 +16,17 @@ export interface AudioVoice {
 
 const VOICES: readonly AudioVoice[] = Object.freeze([
   { id: "abdullah-muhammad", nameArabic: "عبد الله محمد", nameEnglish: "Abdullah Muhammad" },
+  { id: "opendua-muhammad-jumah", nameArabic: "محمد جمعة", nameEnglish: "Muhammad Jumah" },
   { id: "muhammad-alshara", nameArabic: "محمد شرعي", nameEnglish: "Muhammad Shari", disabled: true },
   { id: "muhammad-moataz", nameArabic: "محمد معتز", nameEnglish: "Muhammad Moataz", disabled: true },
   { id: "english-george", nameArabic: "الترجمة الإنجليزية", nameEnglish: "English Translation" },
+]);
+
+/** Names only: Quran options are derived from the active recording's exact coverage. */
+const QURAN_VOICES: readonly AudioVoice[] = Object.freeze([
+  { id: "mp3quran-al-minshawi", nameArabic: "محمد صديق المنشاوي", nameEnglish: "Muhammad Siddiq Al-Minshawi" },
+  { id: "mp3quran-al-hussary", nameArabic: "محمود خليل الحصري", nameEnglish: "Mahmoud Khalil Al-Hussary" },
+  { id: "mp3quran-yasser-al-dosari", nameArabic: "ياسر الدوسري", nameEnglish: "Yasser Al-Dosari" },
 ]);
 
 /**
@@ -37,7 +45,8 @@ export function getAudioVoices(language: AppLanguage): AudioVoice[] {
 }
 
 export function getAudioVoiceName(voiceId: string, language: AppLanguage): string | undefined {
-  const voice = VOICES.find((candidate) => candidate.id === voiceId);
+  const voice =
+    VOICES.find((candidate) => candidate.id === voiceId) ?? QURAN_VOICES.find((candidate) => candidate.id === voiceId);
   if (!voice) return undefined;
   return language === "ar" ? voice.nameArabic : voice.nameEnglish;
 }

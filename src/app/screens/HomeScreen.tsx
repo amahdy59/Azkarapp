@@ -9,7 +9,8 @@ export {
   isFridayMorning,
 } from "../homeTime";
 import { displayLocationName } from "../content/prayerLocations";
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from "react";
+import type { LearningLanguage, LearningResourceId } from "../learning/types";
 import { scheduleIdleAfterPaint } from "../startupMaintenance";
 import { ArrowNext, Compass, Sparkles, Zap } from "../components/icons";
 import { getQiblaBearing } from "../qibla";
@@ -65,6 +66,9 @@ import type {
 import { NAVIGATION_FOCUS } from "../components/ui/controlStyles";
 
 const seenCompletions = new Set<string>();
+const HomeLearningSection = lazy(() =>
+  import("./HomeLearningSection").then((module) => ({ default: module.HomeLearningSection })),
+);
 
 type HomeActionKind = "resume" | "start" | "again";
 
@@ -180,6 +184,8 @@ export function HomeScreen({
   onOpenMore,
   onOpenQibla,
   onOpenMasbaha,
+  onOpenLearn,
+  onOpenLearningResource,
   onContinueKhatmah,
   quranReadingPosition,
   quranWirdPlan,
@@ -226,6 +232,8 @@ export function HomeScreen({
   onOpenMore?: () => void;
   onOpenQibla?: () => void;
   onOpenMasbaha?: () => void;
+  onOpenLearn?: () => void;
+  onOpenLearningResource?: (id: LearningResourceId, unitId?: string, contentLanguage?: LearningLanguage) => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
   /* Widened to PrayerTrackingWrite because the prayer panel records where a
      prayer was prayed, not only that it was. The tracker cards below still
@@ -948,6 +956,19 @@ export function HomeScreen({
             </div>
           )}
 
+          {onOpenLearn && onOpenLearningResource && (
+            <div className="px-page mx-auto w-full">
+              <Suspense fallback={null}>
+                <HomeLearningSection
+                  language={language}
+                  onGlass={homeVisualEffects}
+                  onOpenBooks={onOpenLearn}
+                  onOpenResource={onOpenLearningResource}
+                />
+              </Suspense>
+            </div>
+          )}
+
           <div className="px-page mx-auto w-full">
             <SituationalShortcuts language={language} onOpen={onResume} onGlass={homeVisualEffects} />
           </div>
@@ -1063,7 +1084,7 @@ export function HomeScreen({
             language={language}
             direction={direction}
           />
-          <p role="status" className="p-5 text-base leading-relaxed">
+          <p role="status" className="min-h-0 overflow-y-auto p-5 text-base leading-relaxed">
             {locationUpdate.message}
           </p>
         </Modal>
