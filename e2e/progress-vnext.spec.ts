@@ -136,7 +136,10 @@ for (const language of ["ar", "en"] as const) {
         page.getByRole("combobox", { name: language === "ar" ? "عرض اتجاه" : "Show trend for", exact: true }),
         "routines",
       );
-      await expect(page.getByTestId("recording-time-column").first()).toBeVisible();
+      const trend = page.getByTestId("progress-main-trend");
+      await expect(trend.getByTestId("recording-time-line")).toBeVisible();
+      await expect(trend.getByTestId("recording-time-point")).toHaveCount(19);
+      await expect(trend.getByTestId("recording-time-column")).toHaveCount(0);
       await page.screenshot({ path: info.outputPath(`reference-${language}-${width}-trends.png`), fullPage: true });
       await expect(page.getByRole("tab")).toHaveCount(2);
       await expect(page.getByTestId("progress-tab-records")).toHaveCount(0);
