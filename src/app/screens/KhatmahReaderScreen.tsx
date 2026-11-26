@@ -22,6 +22,8 @@ import {
   Bookmark,
   Translate,
   MoreVertical,
+  Play,
+  Pause,
 } from "../components/icons";
 import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "../components/mushafShell";
 import { vibrateIfEnabled } from "../motionPreferences";
@@ -150,6 +152,7 @@ export function KhatmahReaderScreen({
   reduceMotion = false,
   hapticFeedback = false,
   baqarahAudio,
+  surahAudioFor,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -160,6 +163,7 @@ export function KhatmahReaderScreen({
   appTheme?: ThemeMode;
   setMushafTheme?: (theme: MushafTheme) => void;
   baqarahAudio?: SurahAudioControl;
+  surahAudioFor?: (surah: number) => SurahAudioControl | undefined;
   mushafLayout?: MushafLayout;
   setMushafLayout?: (layout: MushafLayout) => void;
   mushafToolbarSide?: MushafToolbarSide;
@@ -443,6 +447,8 @@ export function KhatmahReaderScreen({
 
   const displayPage = resolved?.page ?? currentPage;
   const pageData = resolved?.data ?? null;
+  const pageSurah = Number(pageData?.[0]?.k.split(":")[0]) || getSurahNumberForPage(displayPage);
+  const currentSurahAudio = surahAudioFor?.(pageSurah) ?? (pageSurah === 2 ? baqarahAudio : undefined);
 
   const isPageBookmarked = initialBookmarks.includes(displayPage);
   const togglePageBookmark = useCallback(() => {
@@ -606,8 +612,8 @@ export function KhatmahReaderScreen({
         }
       } else if (e.key === "f" || e.key === "F") {
         setIsFocusMode((prev) => !prev);
-      } else if ((e.key === "l" || e.key === "L") && baqarahAudio?.available && pageData?.[0]?.k.startsWith("2:")) {
-        baqarahAudio.onToggle();
+      } else if ((e.key === "l" || e.key === "L") && currentSurahAudio?.available) {
+        currentSurahAudio.onToggle();
       } else handled = false;
       if (handled) e.preventDefault();
     };
@@ -615,7 +621,7 @@ export function KhatmahReaderScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
     activeAyah,
-    baqarahAudio,
+    currentSurahAudio,
     pageData,
     isFocusMode,
     isIndexOpen,
@@ -741,18 +747,41 @@ export function KhatmahReaderScreen({
 
   const mobileMore =
     !useRail && !isFocusMode ? (
-      <button
-        type="button"
-        onClick={() => setIsQuickMenuOpen(true)}
-        data-testid="mushaf-more-actions"
-        aria-label={t(language, "mushaf.moreActions")}
-        title={t(language, "mushaf.moreActions")}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-      >
-        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
-          <MoreVertical size={16} aria-hidden="true" />
-        </span>
-      </button>
+      <div className="flex items-center gap-1">
+        {currentSurahAudio && (
+          <button
+            type="button"
+            onClick={currentSurahAudio.onToggle}
+            disabled={!currentSurahAudio.available}
+            aria-busy={["loading", "buffering"].includes(currentSurahAudio.status)}
+            aria-label={t(
+              language,
+              currentSurahAudio.status === "playing" ? "mushaf.pauseRecitation" : "mushaf.listenSurah",
+            )}
+            title={t(language, "mushaf.listenSurah")}
+            data-testid="mushaf-mobile-listen"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            {currentSurahAudio.status === "playing" ? (
+              <Pause size={18} aria-hidden="true" />
+            ) : (
+              <Play size={18} aria-hidden="true" />
+            )}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => setIsQuickMenuOpen(true)}
+          data-testid="mushaf-more-actions"
+          aria-label={t(language, "mushaf.moreActions")}
+          title={t(language, "mushaf.moreActions")}
+          className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+            <MoreVertical size={16} aria-hidden="true" />
+          </span>
+        </button>
+      </div>
     ) : undefined;
 
   const mobileTopLeft = isRtl ? mobileMore : mobileBack;
@@ -890,7 +919,7 @@ export function KhatmahReaderScreen({
       onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
       onOpenMore={() => setIsQuickMenuOpen(true)}
-      surahAudio={pageData?.[0]?.k.startsWith("2:") ? baqarahAudio : undefined}
+      surahAudio={currentSurahAudio}
     />
   );
 

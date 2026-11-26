@@ -24,6 +24,8 @@ import {
   SkipBack,
   SkipForward,
   X,
+  Maximize,
+  Minimize,
 } from "./icons";
 import type { AppLanguage, TextSizeOption, MushafPageTheme, MushafTextScale } from "../types";
 import { getReadingFontSizeRem } from "../screens/readingTypography";
@@ -156,6 +158,7 @@ export function FloatingAudioPlayer({
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && !hasRoomBesideReading;
   const [isMinimized, setIsMinimized] = useState(true);
+  const [listeningFocus, setListeningFocus] = useState(false);
   const collapseButtonRef = useRef<HTMLButtonElement>(null);
   const expandButtonRef = useRef<HTMLButtonElement>(null);
   const readingTextRef = useRef<HTMLDivElement>(null);
@@ -196,6 +199,7 @@ export function FloatingAudioPlayer({
 
   useEffect(() => {
     if (readingTextRef.current) readingTextRef.current.scrollTop = 0;
+    setListeningFocus(false);
   }, [currentEntry?.entryId]);
 
   useEffect(() => {
@@ -528,7 +532,13 @@ export function FloatingAudioPlayer({
   }
 
   return (
-    <AudioPlayerSurface dockedInReader={dockedInReader} onCollapse={() => setIsMinimized(true)}>
+    <AudioPlayerSurface
+      dockedInReader={dockedInReader}
+      onCollapse={() => setIsMinimized(true)}
+      focusMode={listeningFocus}
+      onExitFocus={() => setListeningFocus(false)}
+      focusLabel={t(language, "quranListening.focus")}
+    >
       <motion.section
         initial={motionReduced ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -537,6 +547,7 @@ export function FloatingAudioPlayer({
         aria-label={t(language, "audioPlayer.region")}
         dir={direction}
         data-variant="expanded"
+        data-listening-focus={listeningFocus || undefined}
         onKeyDown={(event) => {
           event.stopPropagation();
           const viewport = readingTextRef.current;
@@ -563,6 +574,17 @@ export function FloatingAudioPlayer({
         <div className="sr-only" aria-live="polite" aria-atomic="true">
           {liveMessage}
         </div>
+        {listeningFocus && (
+          <button
+            type="button"
+            data-listening-exit-focus=""
+            onClick={() => setListeningFocus(false)}
+            aria-label={t(language, "quranListening.exitFocus")}
+            className="audio-listening-exit inline-flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            <Minimize size={20} aria-hidden="true" />
+          </button>
+        )}
 
         <motion.div
           initial={motionReduced ? false : { opacity: 0, y: 8 }}
@@ -692,8 +714,9 @@ export function FloatingAudioPlayer({
                       theme={mushafTheme}
                       textScale={mushafTextScale}
                       language={language}
+                      focusMode={listeningFocus}
                     />
-                    {currentEntry.translation && language === "en" && (
+                    {currentEntry.translation && language === "en" && !listeningFocus && (
                       <details className="w-full py-2">
                         <summary className="min-h-11 cursor-pointer rounded-lg px-3 py-3 focus-visible:ring-[3px] focus-visible:ring-ring">
                           {t(language, "quranListening.translation")}
@@ -848,6 +871,16 @@ export function FloatingAudioPlayer({
 
           {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
           <div className="audio-expanded-controls mx-auto w-full max-w-2xl shrink-0 border-t border-border pt-2">
+            {currentEntry.contentKind === "quran" && currentEntry.quranRange && currentEntry.mushafPages?.length ? (
+              <button
+                type="button"
+                onClick={() => setListeningFocus(true)}
+                className="mx-auto flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring hover:bg-muted"
+              >
+                <Maximize size={18} aria-hidden="true" />
+                {t(language, "quranListening.focus")}
+              </button>
+            ) : null}
             {/* One waveform seek control with balanced time labels. */}
             <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
               <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">

@@ -53,7 +53,8 @@ import {
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
-import { useAppRouting, isLazyRouteCategory } from "./hooks/useAppRouting";
+import { useAppRouting, isLazyRouteCategory, loadLazyRouteCategory } from "./hooks/useAppRouting";
+import { getMushafRecording } from "./content/mushafAudio";
 
 import { BottomNav, NavRail, NavSidebar } from "./components/LayoutShells";
 import { useLayoutMode } from "./hooks/useLayoutMode";
@@ -1496,45 +1497,63 @@ function AppContent({
     void startAudio([activeZikr], "single", true, "ar");
   };
 
-  const baqarahZikr = useMemo(
-    () => getAzkarForMode("illness_ruqyah", "complete").find((item) => item.id === "ir-baqarah"),
-    [],
-  );
-  const [queuedBaqarahAudio, setQueuedBaqarahAudio] = useState(false);
-  const baqarahOwnsAudio =
-    audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === "ir-baqarah";
-  const baqarahAudioStatus = queuedBaqarahAudio ? "loading" : baqarahOwnsAudio ? audioController!.state.status : "idle";
-  const startBaqarahAudio = useCallback(() => {
-    if (!baqarahZikr || !audioController || !buildPlaybackPlan) return;
-    const plan = buildPlaybackPlan({
-      zikrs: [baqarahZikr],
-      context: { category: "illness_ruqyah", routineMode: "complete", source: "single" },
-      mode: "play-once",
-      preferences: audioController.preferences,
-      audioLanguage: "ar",
-    });
-    audioController.startPlan(plan);
-  }, [baqarahZikr, audioController, buildPlaybackPlan]);
+  const [queuedMushafAudio, setQueuedMushafAudio] = useState<number | null>(null);
   useEffect(() => {
-    if (!queuedBaqarahAudio) return;
+    if (queuedMushafAudio === null) return;
     if (view !== "khatmah") {
-      setQueuedBaqarahAudio(false);
+      setQueuedMushafAudio(null);
       return;
     }
-    if (audioController && buildPlaybackPlan) {
-      setQueuedBaqarahAudio(false);
-      startBaqarahAudio();
-    } else if (!audioModuleLoading) setQueuedBaqarahAudio(false);
-  }, [queuedBaqarahAudio, view, audioController, buildPlaybackPlan, audioModuleLoading, startBaqarahAudio]);
-  const toggleBaqarahAudio = () => {
-    if (!baqarahZikr) return;
     if (!audioController || !buildPlaybackPlan) {
-      setQueuedBaqarahAudio(true);
-      requestAudioModule();
-    } else if (baqarahOwnsAudio && ["playing", "buffering"].includes(audioController.state.status))
-      audioController.pause();
-    else if (baqarahOwnsAudio && ["paused", "ready"].includes(audioController.state.status)) audioController.play();
-    else startBaqarahAudio();
+      if (!audioModuleLoading) setQueuedMushafAudio(null);
+      return;
+    }
+    const recording = getMushafRecording(queuedMushafAudio);
+    if (!recording) return;
+    let cancelled = false;
+    void loadLazyRouteCategory(recording.category)
+      .then(() => {
+        if (cancelled) return;
+        const zikr = getAzkarForMode(recording.category, "complete").find((item) => item.id === recording.zikrId);
+        setQueuedMushafAudio(null);
+        if (!zikr) return;
+        audioController.startPlan(
+          buildPlaybackPlan({
+            zikrs: [zikr],
+            context: { category: recording.category, routineMode: "complete", source: "single" },
+            mode: "play-once",
+            preferences: audioController.preferences,
+            audioLanguage: "ar",
+          }),
+        );
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setQueuedMushafAudio(null);
+        reportError(error, "mushaf-audio");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [queuedMushafAudio, view, audioController, buildPlaybackPlan, audioModuleLoading]);
+  const mushafAudioFor = (surah: number) => {
+    const recording = getMushafRecording(surah);
+    if (!recording) return undefined;
+    const ownsAudio = audioController?.currentEntry?.zikrId === recording.zikrId;
+    const status: AudioStatus =
+      queuedMushafAudio === surah ? "loading" : ownsAudio ? audioController!.state.status : "idle";
+    return {
+      available: true,
+      status,
+      onToggle: () => {
+        if (ownsAudio && ["playing", "buffering"].includes(status)) audioController!.pause();
+        else if (ownsAudio && ["paused", "ready"].includes(status)) audioController!.play();
+        else {
+          setQueuedMushafAudio(surah);
+          requestAudioModule();
+        }
+      },
+    };
   };
 
   const startPlayAllAudio = () => {
@@ -2420,11 +2439,7 @@ function AppContent({
                   direction={layoutDirection}
                   onBack={pop}
                   khatmahPage={khatmahPage}
-                  baqarahAudio={{
-                    available: Boolean(baqarahZikr?.audioAssetId),
-                    status: baqarahAudioStatus,
-                    onToggle: toggleBaqarahAudio,
-                  }}
+                  surahAudioFor={mushafAudioFor}
                   setKhatmahPage={handleKhatmahPageChange}
                   progressDayStartHour={progressDayStartHour}
                   reduceMotion={reduceMotion}

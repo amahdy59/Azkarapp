@@ -37,6 +37,7 @@ export default function QuranListeningReader({
   readTime,
   theme = "light",
   textScale = "medium",
+  focusMode = false,
 }: {
   entry: PlaybackEntry;
   segment: ResolvedAudioSegment | null;
@@ -46,6 +47,7 @@ export default function QuranListeningReader({
   readTime?: () => number;
   theme?: MushafPageTheme;
   textScale?: MushafTextScale;
+  focusMode?: boolean;
 }) {
   const pages = useMemo(() => entry.mushafPages ?? [], [entry.mushafPages]);
   const [manualIndex, setManualIndex] = useState(0);
@@ -130,6 +132,8 @@ export default function QuranListeningReader({
     <section ref={root} className="w-full" aria-label={t(language, "quranListening.reader")}>
       <div
         data-listening-controls=""
+        hidden={focusMode}
+        style={focusMode ? { display: "none" } : undefined}
         className="sticky top-0 z-10 flex flex-wrap items-center justify-center gap-1 bg-background"
       >
         <button

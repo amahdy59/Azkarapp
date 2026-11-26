@@ -977,6 +977,8 @@ const ar = {
     ],
   },
   quranListening: {
+    focus: "التلاوة بملء الصفحة",
+    exitFocus: "إظهار أدوات الاستماع",
     page: "صفحة {page}",
     information: "خيارات الاستماع",
     reader: "المصحف أثناء الاستماع",

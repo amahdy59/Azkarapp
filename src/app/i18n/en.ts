@@ -999,6 +999,8 @@ const en = {
     ],
   },
   quranListening: {
+    focus: "Full-page listening",
+    exitFocus: "Show listening controls",
     page: "Page {page}",
     information: "Listening options",
     reader: "Mushaf while listening",

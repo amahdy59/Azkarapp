@@ -6,14 +6,20 @@ export function AudioPlayerSurface({
   dockedInReader,
   onCollapse,
   children,
+  focusMode = false,
+  onExitFocus,
+  focusLabel,
 }: {
   dockedInReader: boolean;
   onCollapse: () => void;
   children: ReactNode;
+  focusMode?: boolean;
+  onExitFocus?: () => void;
+  focusLabel?: string;
 }) {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [host, setHost] = useState<HTMLElement | null>();
-  const surfaceRef = useRef<HTMLDivElement>(null);
+  const surfaceRef = useRef<HTMLDialogElement>(null);
   const collapseRef = useRef(onCollapse);
   collapseRef.current = onCollapse;
 
@@ -75,10 +81,37 @@ export function AudioPlayerSurface({
     };
   }, [dockedInReader, host]);
 
+  useLayoutEffect(() => {
+    const surface = surfaceRef.current;
+    if (!surface || !focusMode) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    // The native top layer keeps this very same reader mounted while covering
+    // the app, trapping focus and making background controls inert.
+    surface.close();
+    surface.showModal();
+    surface.querySelector<HTMLButtonElement>("[data-listening-exit-focus]")?.focus();
+    return () => {
+      surface.close();
+      surface.setAttribute("open", "");
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [focusMode, host]);
+
   const surface = (
-    <div ref={surfaceRef} className={`audio-player-surface${host ? "" : " audio-player-surface--viewport"}`}>
+    <dialog
+      open
+      ref={surfaceRef}
+      role={focusMode ? "dialog" : "presentation"}
+      aria-label={focusMode ? focusLabel : undefined}
+      aria-modal={focusMode ? true : undefined}
+      onCancel={(event) => {
+        event.preventDefault();
+        onExitFocus?.();
+      }}
+      className={`audio-player-surface${host ? "" : " audio-player-surface--viewport"}${focusMode ? " audio-player-surface--focus" : ""}`}
+    >
       {children}
-    </div>
+    </dialog>
   );
   return (
     <>
