@@ -628,7 +628,8 @@ for (const language of ["ar", "en"] as const) {
     page,
   }, testInfo) => {
     const width = page.viewportSize()!.width;
-    await page.setViewportSize({ width, height: width < 600 ? 600 : 420 });
+    const height = width < 600 ? 600 : 420;
+    await page.setViewportSize({ width, height });
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
       localStorage.setItem(
@@ -641,6 +642,9 @@ for (const language of ["ar", "en"] as const) {
       // The shared header's theme is route-independent: check every route in
       // light mode and every theme on one representative scroll owner.
       for (const route of theme === "light" ? ["quran-wird", "qibla", "friday"] : ["quran-wird"]) {
+        // Ordinary phone Qibla deliberately fits without scrolling. Exercise
+        // its genuine short-window recovery for the scrolling-header contract.
+        await page.setViewportSize({ width, height: route === "qibla" ? 320 : height });
         await page.goto(`/#/${route}`);
         const header = page.getByTestId("shared-screen-header");
         await expect(header).toBeVisible();
