@@ -47,6 +47,12 @@ Feature branches supply content/count/audio suspension, optional-voice identity/
 
 ## Visual/manual evidence
 
+### Pages bundle measurement and deliberate baseline update
+
+The first push was blocked before upload: the Pages build measured initial-route gzip at 193,043 bytes against the recorded 189,241 (+3,802 bytes, just over the 2% growth allowance). The initial graph contains the entry, stylesheet, preload helper and core reviewed-content chunk; deferred audio/Al-Baqarah remain excluded. This release deliberately ships expanded exact-source dhikr evidence plus the approved welcome, Quran/Progress, Home/location and Qibla presentation changes. Removing reviewed source clauses to reduce bytes would violate the source-correction contract; moving startup content boundaries is a separate architectural/performance change.
+
+Updated only the recorded measurement baseline, as required by the repository's deliberate-growth policy: CSS 164,887 raw / 28,401 gzip bytes (+442 / +62); initial route 193,043 gzip (+3,802); complete Home startup 527,852 gzip (+8,862). Date: 2026-11-26. The 250KiB initial ceiling, all per-file/total ceilings and the 2% tolerance are unchanged. Current CSS is 271 gzip bytes below its unchanged 28KiB ceiling; a later focused shared-style cleanup is recommended. The production budget check passes against these measured values. The changed input invalidates the prior quality receipt, so the complete hook must run again; no receipt or hook was bypassed.
+
 Inherited [Qibla/location/Home gallery](../evidence/recommendations-next-release/README.md) and [optional audio gallery](../evidence/optional-audio/README.md) were retained and inspected. Fresh integrated Progress/Settings and cross-engine screenshots are under `output/playwright/` and Playwright test artifacts. Sensor/permission/media fixtures are labelled; screenshots do not establish physical direction, native delivery, complete Quran coverage or word-timing approval.
 
 ## Documentation updated
