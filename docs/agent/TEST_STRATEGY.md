@@ -153,6 +153,8 @@ Hosted-audio validation checks every approved variant with four bounded workers 
 
 Quality CI preserves its browser timing JSON for seven days on success or failure, alongside the existing failure traces. Download that artifact to investigate a slow CI run with `pnpm test:timings <report>`.
 
+Retained trace archives and error contexts must also upload when the job succeeds on retry; a flaky success still needs its failed-attempt evidence. Independent viewport/navigation tasks should have separate test cases instead of exhausting one cumulative deadline. Keep assertion and per-test timeout ceilings unchanged. Routine named visual captures may have one Chromium owner when other engines repeat the same files without image assertions; retain every engine's behavioral/axe checks and failure traces.
+
 Windows WebKit uses one worker for that project: measured expanded-player sweeps improved with less rendering contention. The project keeps every engine assertion and its existing timeout; other platforms retain the global worker limit. This is a measured local allocation, not a guarantee about total suite duration.
 
 The real service-worker update fixture launches Vite through Node, owns a process-specific build directory and binds its server to an operating-system-assigned port. Cleanup checks that directory ownership before removal, so concurrent sessions do not share fixture builds or fixed-port listeners.

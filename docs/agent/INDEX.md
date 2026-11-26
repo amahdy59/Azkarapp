@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Navigation flake and browser timings](phases/NAVIGATION_FLAKE_AND_BROWSER_TIMINGS.md) records the WebKit deadline investigation, independent navigation cases, capture ownership and retained retry evidence.
+
 [Latest changes and testing release review](phases/LATEST_CHANGES_RELEASE_REVIEW.md) records the owner-approved integrated release, citation and repetition repairs, and deterministic local testing with mandatory live audio release verification.
 
 [English audio and refinements release](phases/ENGLISH_AUDIO_AND_REFINEMENTS_RELEASE.md) records the owner-approved English-first audio disclosure and review/publication of all pending refinements.

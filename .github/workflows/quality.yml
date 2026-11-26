@@ -39,7 +39,8 @@ jobs:
         run: pnpm audit:prod
 
       - name: Preserve browser failure evidence
-        if: failure()
+        # A successful retry must not discard the failed attempt's trace.
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: browser-failure-evidence
