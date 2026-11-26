@@ -17,6 +17,18 @@ export function notificationTarget(value: unknown): string | null {
 
 export type BrowserNotificationPermission = NotificationPermission | "unsupported";
 
+/** iOS tab sessions need installation guidance, never an unusable permission action. */
+export function notificationSetupEnvironment(): "android" | "ios-browser" | "browser" {
+  if (isNativeAndroid()) return "android";
+  const appleMobile =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const installed =
+    (navigator as Navigator & { standalone?: boolean }).standalone === true ||
+    window.matchMedia?.("(display-mode: standalone)").matches === true ||
+    window.matchMedia?.("(display-mode: fullscreen)").matches === true;
+  return appleMobile && !installed ? "ios-browser" : "browser";
+}
+
 export function readNotificationPermission(): BrowserNotificationPermission {
   if (isNativeAndroid()) return nativeNotificationPermission();
   return typeof window !== "undefined" && "Notification" in window ? Notification.permission : "unsupported";

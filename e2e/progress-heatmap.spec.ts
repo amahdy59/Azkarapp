@@ -97,18 +97,16 @@ for (const language of ["ar", "en"] as const) {
     await expect(dateSheet).toBeHidden();
     await expect(recorded).toBeFocused();
     await page.getByTestId("progress-metric-routines").getByRole("button").click();
-    await expect(page.getByTestId("recording-time-column")).toHaveCount(29);
-    await chooseProgressOption(
-      page.getByRole("combobox", { name: language === "ar" ? "عرض الرسم" : "Chart display" }),
-      "line",
-    );
+    await expect(page.getByTestId("recording-time-point")).toHaveCount(29);
     await expect(page.getByTestId("recording-time-line")).toBeVisible();
     await expect(page.getByRole("tab")).toHaveCount(2);
     await expect(page.getByTestId("progress-tab-records")).toHaveCount(0);
     await page.getByTestId("progress-tab-overview").click();
-    const composition = page.getByTestId("progress-routine-bars").locator("summary");
-    await composition.click();
-    await expect(page.getByTestId("progress-routine-composition").getByRole("img")).toBeVisible();
+    await expect(page.getByTestId("progress-routine-bars")).toHaveCount(0);
+    await page.getByTestId("progress-tab-trends").click();
+    await expect(page.getByTestId("progress-routine-bars")).toBeVisible();
+    await expect(page.getByTestId("progress-routine-composition")).toHaveCount(0);
+    await page.getByTestId("progress-tab-overview").click();
     expect(
       (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations,
     ).toEqual([]);

@@ -1,5 +1,5 @@
 import { chooseProgressOption } from "../../test/progressSelect";
-import { fireEvent, render, screen, within, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ProgressDashboard } from "./ProgressDashboard";
 import { indexProgressDashboard } from "../progressDashboard";
@@ -48,7 +48,7 @@ describe("ProgressDashboard", () => {
     rerender(<ProgressDashboard {...props()} />);
     expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
   });
-  it("distinguishes first records from an empty selection and reports a factual routine insight", () => {
+  it("distinguishes first records from an empty selection without repeating insight panels", () => {
     const { rerender } = render(<ProgressDashboard {...props()} records={[]} />);
     expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
     expect(screen.getByTestId("progress-metric-pages")).toHaveTextContent("No saved records yet");
@@ -56,9 +56,7 @@ describe("ProgressDashboard", () => {
     expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
     expect(screen.getByTestId("progress-metric-prayers")).toHaveTextContent("No saved records yet");
     rerender(<ProgressDashboard {...props()} />);
-    expect(screen.getByRole("complementary", { name: "From your saved records" })).toHaveTextContent(
-      "Days with morning records: 19. Days with evening records: 0",
-    );
+    expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
     const heatmap = screen.getByTestId("progress-heatmap");
     expect(heatmap.querySelector('[data-day="2026-10-19"]')).toHaveAttribute("data-kind", "recorded");
     expect(heatmap.querySelector('[data-day="2026-10-20"]')).toHaveAttribute("data-kind", "none");
@@ -95,48 +93,20 @@ describe("ProgressDashboard", () => {
     expect(screen.getByTestId("progress-main-trend")).toHaveTextContent("count scale starts at zero");
     expect(screen.getByTestId("recording-time-scale")).not.toHaveTextContent("%");
   });
-  it("keeps selection/order reversible and restores focus after Apply and Cancel", async () => {
+  it("keeps the four summaries fixed and removes redundant overview controls", () => {
     render(<ProgressDashboard {...props()} />);
-    const choose = screen.getByRole("button", { name: "Choose metrics" });
-    fireEvent.click(choose);
-    expect(screen.getByRole("dialog", { name: "Choose metrics" })).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Move Quran pages read up" }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "Prayers at the mosque" }));
-    expect(screen.queryByTestId("progress-metric-mosque")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    await waitFor(() => expect(choose).toHaveFocus());
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
-    fireEvent.click(choose);
-    expect(screen.getByRole("dialog", { name: "Choose metrics" })).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Move Quran pages read up" }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "Prayers at the mosque" }));
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    await waitFor(() => expect(choose).toHaveFocus());
-    expect(
-      Array.from(screen.getByTestId("progress-overview").children).map((node) => node.getAttribute("data-testid")),
-    ).toEqual([
-      "progress-metric-prayers",
-      "progress-metric-pages",
-      "progress-metric-routines",
-      "progress-metric-quranGoals",
-      "progress-metric-mosque",
-    ]);
-    fireEvent.click(choose);
-    fireEvent.click(screen.getByRole("button", { name: "Reset defaults" }));
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
+    expect(screen.queryByRole("button", { name: "Choose metrics" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("progress-routine-bars")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("progress-routine-composition")).not.toBeInTheDocument();
   });
-  it("prevents an empty dashboard and discards unsaved metric edits", () => {
-    render(<ProgressDashboard {...props()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Choose metrics" }));
-    for (const checkbox of screen.getAllByRole("checkbox").filter((element) => (element as HTMLInputElement).checked))
-      fireEvent.click(checkbox);
-    expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
-    expect(screen.getByText("Choose at least one metric.")).toBeInTheDocument();
-    expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
-    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+  it("attaches routine comparisons to the matching trend and selects presentation automatically", async () => {
+    render(<ProgressDashboard {...props()} view="trends" />);
+    expect(screen.queryByRole("combobox", { name: "Chart display" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("progress-routine-bars")).not.toBeInTheDocument();
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Show trend for" }), "routines");
+    expect(screen.getByTestId("progress-routine-bars")).toHaveTextContent("19 of 20");
+    expect(screen.queryByTestId("progress-routine-composition")).not.toBeInTheDocument();
   });
   it("uses a snapshot instead of a one-point line in Day view", () => {
     const { rerender } = render(

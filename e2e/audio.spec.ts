@@ -291,10 +291,7 @@ async function _enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page
-    .getByTestId("first-use-setup")
-    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-    .click();
+  await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
@@ -312,10 +309,7 @@ test("unreviewed audio is unavailable and never autoplays", async ({ page }) => 
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page
-    .getByTestId("first-use-setup")
-    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-    .click();
+  await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-comprehensive_duas").click();
   const playAll = page.getByRole("button", { name: "Play All Audio" });
@@ -335,10 +329,7 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page
-    .getByTestId("first-use-setup")
-    .getByRole("button", { name: /Continue to Home|المتابعة إلى الرئيسية/ })
-    .click();
+  await page.getByTestId("first-use-setup").getByTestId("modal-close-button").click();
 
   // Select the mode in the collection overview before entering ReaderScreen.
   await page.getByTestId("nav-azkar").click();

@@ -1,3 +1,7 @@
+## Quran/Progress clarity — local 2026-11-26
+
+Verify fixed metrics, selected-date details, automatic rate/page chart styles, contextual prayer/routine/Friday/individual-zikr access, unknown historical goals, all date ranges and Settings export. Verify Quran modes/edit/cancel/Continue/Undo, one weekly view, RTL/LTR, narrow/enlarged screens and protected overlays. Legacy browser assertions referencing intentionally removed presentation require migration, not compatibility UI or skipped tests.
+
 ## Seamless page-header acceptance — 2026-11-25, local
 
 Validate Reader, Masbaha and Salawat at 320px/200%, phone, tablet and desktop in Arabic/English, Light/Dark/Midnight/Glass/high contrast. Their in-flow reading headers borrow the canvas, use semantic title/action/progress ink and retain 44px hit targets without fixed navy bands, decorative header scenes or a second rounded surface. Preserve all controls/counting, viewport alignment, keyboard Help, menu/panel focus return and protected popup geometry/hit coverage. Assert actual eventual hit recovery after finite overlay exit using the standard assertion timeout.
@@ -447,3 +451,7 @@ Check Arabic/English at 320px/200%, phone, tablet and desktop: whole action labe
 ## Settings summary acceptance — 2026-11-25 (local)
 
 Verify localized voice/rate updates without an active player, saved reminder selection including optional schedules and an empty prayer selection, weekly-goal context with Garden enabled and local recording context when hidden. Downloads must remain unchecked until both audio and Mushaf scans finish, invalidate on mutations/clear, ignore mismatched voice checks, distinguish origin usage from device storage and avoid menu-time scans. Test direct Downloads selection, Back focus, passive summaries, 44px targets, reflow/scroll access and axe in RTL/LTR at phone, tablet, desktop and 320px/200% text. Human screen-reader/device acceptance remains separate.
+
+## Notification-first welcome — 2026-11-26, local
+
+FirstUseSetup composes the shared protected ResponsiveSheet, explicit notification service and existing App location callback. One benefit/preview and collapsed actual reminder selections precede Enable/Later; permission grant proceeds directly or offers optional city confirmation for location-dependent reminders. Fresh-install fallback coordinates are not treated as reader-confirmed. PrayerCitySearch shares prepared offline results with prayer Settings, with a separate fixed search field and scrolling choices. StorageProtection now lives beside Account & data saving/backup and is requested only by gesture. Existing reminders, overnight opt-in, ordinary saving, source content and persistence schemas are unchanged. Denial, dismissal, unsupported capability and iOS installation guidance preserve reading and explain actual browser delivery limits. Verify Arabic/English keyboard focus, Escape/Back, narrow/enlarged scrolling, opaque surfaces and permission/location refusal; native OS delivery and human assistive-technology acceptance remain separate. See agent/phases/FIRST_USE_CLARITY_LOCAL_2026_11_26.md.

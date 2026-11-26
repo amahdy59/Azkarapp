@@ -10,6 +10,7 @@ import { useDeviceLinkStatus } from "../../hooks/useDeviceLinkStatus";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
 import { QrSyncPanel } from "./QrSyncPanel";
 import { DataExportMenu } from "./DataExportMenu";
+import { StorageProtection } from "./StorageProtection";
 import type { ProgressRange } from "../../progressDashboard";
 
 export function AccountDataPanel({
@@ -198,6 +199,7 @@ export function AccountDataPanel({
           </dl>
           <p className="mt-3 text-label text-muted-foreground">{t(language, "dataSafety.downloadsHelp")}</p>
           <p className="mt-2 text-label text-muted-foreground">{t(language, "dataSafety.backupHelp")}</p>
+          <StorageProtection language={language} />
           <div className="mt-4 flex flex-wrap gap-2">
             {localSaveStatus === "error" && onRetrySave && (
               <Button variant="outline" onClick={onRetrySave}>

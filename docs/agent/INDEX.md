@@ -2,7 +2,7 @@
 
 ## Active phase
 
-[Coordinated implementation and release](phases/COORDINATED_RELEASE_2026_11_25.md) is the current owner-authorized phase. This chat coordinates final handoffs, waits for approved implementation to finish, validates the combined checkout, pushes all verified changes to main and monitors Quality, Pages and production. The new owner instruction supersedes the earlier local publication holds below. Known source-conflicted Arabic books and unreviewed English/audio editions retain review-only availability; physical-device acceptance remains separate. See the [release report](reports/COORDINATED_RELEASE_2026_11_25_REPORT.md).
+[Consolidated main release](phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md) is the owner-authorized integration and publication phase. Consolidate pending work and branch-only developments, preserve review boundaries, pass the release gates and verify exact-commit Quality, Pages and production. This supersedes the preceding local-only publication holds.
 
 ## Feature handoffs and historical phase authority
 

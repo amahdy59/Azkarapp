@@ -123,7 +123,11 @@ for (const language of ["ar", "en"] as const) {
     await expect(page.getByTestId("progress-metric-pages")).toContainText(ar ? "٢٢" : "22");
     await page.screenshot({ path: info.outputPath(`progress-${language}-filtered-overview.png`), scale: "css" });
     await page.getByTestId("progress-tab-overview").click();
-    await page.getByTestId("progress-detailed-context").locator("summary").click();
+    await page.getByTestId("progress-tab-trends").click();
+    await page
+      .getByText(ar ? "حسب الصلاة" : "By prayer", { exact: true })
+      .first()
+      .click();
     await expect(page.getByRole("region", { name: ar ? "حسب الصلاة" : "By prayer", exact: true })).toBeVisible();
     await expect(page.getByTestId("zikr-insights")).toHaveCount(0);
     await chooseProgressDetail(page, "routines");
@@ -131,9 +135,7 @@ for (const language of ["ar", "en"] as const) {
     await expect(page.getByTestId("zikr-insights")).toBeVisible();
     await chooseProgressDetail(page, "friday");
     await expect(page.getByTestId("zikr-insights")).toHaveCount(0);
-    await expect(
-      page.getByRole("combobox", { name: ar ? "استكشاف التفاصيل" : "Explore details", exact: true }),
-    ).toBeFocused();
+    await expect(page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true })).toBeFocused();
     const exportMenu = await openProgressExport(page, language);
     await exportMenu.getByLabel(ar ? "تاريخ البداية" : "Start date").fill("2026-10-02");
     await exportMenu.getByLabel(ar ? "تاريخ النهاية" : "End date").fill("2026-10-08");
@@ -337,16 +339,8 @@ for (const language of ["ar", "en"] as const) {
       await page.goto("/#/progress/month");
       if (width === 320) await page.locator("html").evaluate((root) => (root.style.fontSize = "200%"));
       await expect(page.getByTestId("progress-overview")).toBeVisible();
-      const choose = page.getByRole("button", { name: ar ? "اختيار المقاييس" : "Choose metrics", exact: true });
-      await choose.click();
-      const checkbox = page.getByRole("checkbox", { name: ar ? "صلوات المسجد" : "Prayers at the mosque", exact: true });
-      await checkbox.check();
-      await page
-        .getByRole("button", { name: ar ? "تقديم صلوات المسجد" : "Move Prayers at the mosque up", exact: true })
-        .click();
-      await page.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
-      await expect(choose).toBeFocused();
-      await expect(page.getByTestId("progress-overview").locator(":scope > div")).toHaveCount(5);
+      await expect(page.getByTestId("progress-choose-metrics")).toHaveCount(0);
+      await expect(page.getByTestId("progress-overview").locator(":scope > div")).toHaveCount(4);
       await page.getByTestId("progress-tab-trends").click();
       const metric = page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true });
       await metric.focus();
@@ -477,7 +471,7 @@ for (const language of ["ar", "en"] as const) {
       const metric = page.getByRole("combobox", { name: ar ? "عرض اتجاه" : "Show trend for", exact: true });
       await metric.focus();
       await page.keyboard.press("Enter");
-      await expect(menu.getByRole("option")).toHaveCount(10);
+      await expect(menu.getByRole("option")).toHaveCount(6);
       await page.keyboard.press("End");
       await expect(menu.getByRole("option").last()).toBeFocused();
       await expect(menu.getByRole("option").last()).toBeInViewport();

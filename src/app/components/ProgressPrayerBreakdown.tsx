@@ -14,12 +14,14 @@ export function ProgressPrayerBreakdown({
   records,
   range,
   language,
+  initialMetric = "fard",
 }: {
   records: readonly PrayerTrackingRecord[];
   range: ProgressRange;
   language: AppLanguage;
+  initialMetric?: "fard" | "mosque" | "rawatib" | "adhkar";
 }) {
-  const [metric, setMetric] = useState<"fard" | "mosque" | "rawatib" | "adhkar">("fard");
+  const [metric, setMetric] = useState<"fard" | "mosque" | "rawatib" | "adhkar">(initialMetric);
   const stats = useMemo(
     () => getPrayerPeriodStats(records, range.startKey, range.endKey, progressRangeDays(range)),
     [records, range],

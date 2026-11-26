@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ProgressRoutineComparison } from "./ProgressRoutineComparison";
 
@@ -15,13 +15,8 @@ describe("Progress routine comparison", () => {
       "10",
     ]);
     expect(screen.queryByTestId("progress-routine-composition")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByText("Your recorded routine breakdown"));
-    const composition = await screen.findByTestId("progress-routine-composition");
-    expect(composition).toHaveTextContent("6 · 60%");
-    expect(composition).toHaveTextContent("3 · 30%");
-    expect(composition).toHaveTextContent("1 · 10%");
-    expect(within(composition).getByRole("img")).toHaveAccessibleName(/breakdown/);
-    expect(composition.querySelectorAll("circle")).toHaveLength(3);
+    expect(screen.queryByText("Your recorded routine breakdown")).not.toBeInTheDocument();
+    expect(screen.getByTestId("progress-routine-bars")).toHaveTextContent("6 of 10");
   });
   it("does not draw a composition or false rate when there are no observations/opportunities", async () => {
     render(
@@ -31,8 +26,6 @@ describe("Progress routine comparison", () => {
       />,
     );
     expect(screen.getAllByText("Unavailable")).toHaveLength(4);
-    fireEvent.click(screen.getByText("Your recorded routine breakdown"));
-    expect(await screen.findByText("Save a routine completion to see the breakdown.")).toBeInTheDocument();
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 });

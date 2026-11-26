@@ -1,20 +1,11 @@
 import { chooseProgressOption } from "../../test/progressSelect";
-import { describe, it, expect, onTestFinished, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { act, render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { ProgressScreen } from "./ProgressScreen";
-import * as progressDomain from "../progress";
 import * as dashboardDomain from "../progressDashboard";
 import * as dailyPathDomain from "../dailyPath";
-import type { DailyCollectionCompletion, DailyHabitCompletion } from "../types";
+import type { DailyCollectionCompletion } from "../types";
 
-function openDetailedContext() {
-  const details = screen.getByTestId("progress-detailed-context") as HTMLDetailsElement;
-  details.open = true;
-  fireEvent(details, new Event("toggle"));
-}
-async function chooseDetail(topic: string) {
-  await chooseProgressOption(screen.getByRole("combobox", { name: /Explore details|استكشاف التفاصيل/ }), topic);
-}
 async function choosePeriod(period: string) {
   fireEvent.click(screen.getByTestId("progress-filters-toggle"));
   await chooseProgressOption(screen.getAllByRole("combobox")[0]!, period);
@@ -155,39 +146,10 @@ describe("ProgressScreen", () => {
       cancel.mockRestore();
     }
   });
-  it("refreshes memoized statistics at the configured devotional-day boundary", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date(2026, 9, 20, 2, 59, 30));
-    const summary = vi.spyOn(progressDomain, "getGardenSummary");
-    try {
-      render(
-        <ProgressScreen
-          initialPeriod="day"
-          dailyCompletions={[]}
-          progressDayStartHour={3}
-          calendarType="gregorian"
-          language="en"
-          direction="ltr"
-          onOpenShareModal={vi.fn()}
-        />,
-      );
-      openDetailedContext();
-      const initialCalculations = summary.mock.calls.length;
-      expect(summary.mock.results.at(-1)?.value.today.dayKey).toBe("2026-10-19");
-      act(() => vi.advanceTimersByTime(30050));
-      expect(summary.mock.calls.length).toBeGreaterThan(initialCalculations);
-      expect(summary.mock.results.at(-1)?.value.today.dayKey).toBe("2026-10-20");
-    } finally {
-      summary.mockRestore();
-      vi.useRealTimers();
-    }
-  });
-  it("reuses unchanged historical calculations during header scrolling and recomputes changed records", () => {
-    const summary = vi.spyOn(progressDomain, "getGardenSummary");
+  it("keeps historical calculations stable on scroll and invalidates changed records", () => {
     const index = vi.spyOn(dashboardDomain, "indexProgressDashboard");
-    const pathIndex = vi.spyOn(dailyPathDomain, "createDailyPathIndex");
     const props = {
-      dailyCompletions: [{ dayKey: "2026-08-01", category: "morning", timeZone: "UTC" }] as DailyCollectionCompletion[],
+      dailyCompletions: [] as DailyCollectionCompletion[],
       progressDayStartHour: 3,
       calendarType: "gregorian" as const,
       language: "en" as const,
@@ -195,274 +157,40 @@ describe("ProgressScreen", () => {
       onOpenShareModal: vi.fn(),
     };
     const { container, rerender } = render(<ProgressScreen {...props} />);
-    const viewport = container.querySelector<HTMLElement>(".progress-screen")!;
-    viewport.style.overflowY = "auto";
-    fireEvent.resize(window);
-    const initialCalculations = summary.mock.calls.length;
-    const initialIndexes = index.mock.calls.length;
-    expect(pathIndex).not.toHaveBeenCalled();
-    expect(initialCalculations).toBe(0);
-    fireEvent.scroll(viewport, { target: { scrollTop: 120 } });
-    expect(screen.getByTestId("progress-sticky-controls")).toHaveAttribute("data-scrolled", "true");
-    fireEvent.scroll(viewport, { target: { scrollTop: 0 } });
-    expect(screen.getByTestId("progress-sticky-controls")).not.toHaveAttribute("data-scrolled");
-    expect(summary.mock.calls.length).toBe(initialCalculations);
-    expect(index.mock.calls.length).toBe(initialIndexes);
-    expect(pathIndex).not.toHaveBeenCalled();
-    openDetailedContext();
-    expect(pathIndex).toHaveBeenCalledTimes(1);
+    const count = index.mock.calls.length;
+    fireEvent.scroll(container.querySelector(".progress-screen")!, { target: { scrollTop: 120 } });
+    expect(index.mock.calls.length).toBe(count);
     rerender(
-      <ProgressScreen
-        initialPeriod="day"
-        {...props}
-        dailyCompletions={[...props.dailyCompletions, { dayKey: "2026-08-01", category: "evening", timeZone: "UTC" }]}
-      />,
+      <ProgressScreen {...props} dailyCompletions={[{ dayKey: "2026-08-01", category: "morning", timeZone: "UTC" }]} />,
     );
-    expect(summary.mock.calls.length).toBeGreaterThan(initialCalculations);
-    expect(index.mock.calls.length).toBeGreaterThan(initialIndexes);
-    expect(pathIndex).toHaveBeenCalledTimes(2);
-    summary.mockRestore();
+    expect(index.mock.calls.length).toBeGreaterThan(count);
     index.mockRestore();
-    pathIndex.mockRestore();
   });
-  const mockCompletions: DailyCollectionCompletion[] = [
-    { dayKey: "2026-08-01", category: "morning", timeZone: "UTC" },
-    { dayKey: "2026-08-01", category: "evening", timeZone: "UTC" },
-    { dayKey: "2026-08-01", category: "before_sleep", timeZone: "UTC" },
-  ];
-
-  const mockDailyHabits: DailyHabitCompletion[] = [
-    { dayKey: "2026-08-01", habit: "quran_wird", timeZone: "UTC" },
-    { dayKey: "2026-08-01", habit: "mosque_3", timeZone: "UTC" },
-  ];
-
-  it("renders Arabic version with Oasis Stage Card and 7-day rhythm strip in Day view", async () => {
-    const onOpenShareModal = vi.fn();
-    render(
-      <ProgressScreen
-        initialPeriod="day"
-        dailyCompletions={mockCompletions}
-        dailyHabits={mockDailyHabits}
-        progressDayStartHour={3}
-        calendarType="gregorian"
-        language="ar"
-        direction="rtl"
-        onOpenShareModal={onOpenShareModal}
-      />,
-    );
-
-    expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
-    expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "مشاركة بطاقة التقدم" })).not.toBeInTheDocument();
-    openDetailedContext();
-    expect(screen.getByTestId("progress-prayer-group")).toBeInTheDocument();
-    await chooseDetail("reflection");
-    // Oasis Stage Card remains available as optional context.
-    expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
-    expect(screen.getByTestId("oasis-stage-card")).not.toHaveAttribute("open");
-    expect(screen.getByRole("heading", { name: "كيف تُضاف النخلة", hidden: true })).toBeInTheDocument();
-    expect(screen.getByText("الواحة ومحطاتك السابقة")).toBeInTheDocument();
-    expect(screen.getByText("تأمل فيما سجلته من ممارسات.")).toBeInTheDocument();
-    expect(screen.queryByText(/ليس مقياساً للإيمان أو الأجر/)).not.toBeInTheDocument();
-
-    // Prophetic Constancy Hadith Touchstone
-    expect(screen.getByText(/أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ/)).toBeInTheDocument();
-
-    // Summary Strip in Day view
-    expect(screen.getByTestId("progress-summary-strip")).toBeInTheDocument();
-    expect(screen.getByText("أيام المواظبة المتتالية")).toBeInTheDocument();
-    expect(screen.getByText("النخيل المثمر")).toBeInTheDocument();
-
-    // The owner removed the visible header actions; semantic title remains.
-    expect(
-      within(screen.getByTestId("progress-sticky-controls")).queryByRole("button", { name: "مشاركة بطاقة التقدم" }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByTestId("shared-screen-header")).toContainElement(
-      screen.getByRole("heading", { name: "التقدم", exact: true }),
-    );
-    expect(onOpenShareModal).not.toHaveBeenCalled();
-
-    // 7-Day Rhythm Strip without star glyphs
-    expect(screen.getByText("إيقاع الأيام السبعة")).toBeInTheDocument();
-    expect(screen.queryByText(/★/)).not.toBeInTheDocument();
-
-    await chooseDetail("routines");
-    // Quran and remembrance are available in their own topic.
-    expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
-    expect(screen.getByText("الورد اليومي")).toBeInTheDocument();
-
-    expect(screen.queryByTestId("progress-prayer-group")).not.toBeInTheDocument();
-
-    // Progress uses efficient themed rows, not Home's decorative photo cards.
-    expect(screen.getByTestId("today-garden-card").querySelector("img")).toBeNull();
-  });
-
-  it("renders English version with proper headings and LTR layout", async () => {
-    const onOpenShareModal = vi.fn();
-    render(
-      <ProgressScreen
-        initialPeriod="day"
-        dailyCompletions={mockCompletions}
-        dailyHabits={mockDailyHabits}
-        progressDayStartHour={3}
-        calendarType="gregorian"
-        language="en"
-        direction="ltr"
-        onOpenShareModal={onOpenShareModal}
-      />,
-    );
-
-    expect(screen.getByRole("heading", { name: "Your progress" })).toBeInTheDocument();
-    openDetailedContext();
-    await chooseDetail("reflection");
-    expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
-    expect(screen.getByText("Garden and past milestones")).toBeInTheDocument();
-    expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
-    (screen.getByTestId("oasis-stage-card") as HTMLDetailsElement).open = true;
-    fireEvent.click(screen.getByRole("button", { name: "Share Progress Card" }));
-    expect(onOpenShareModal).toHaveBeenCalledOnce();
-    await chooseDetail("routines");
-    expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
-    expect(screen.getByText("Daily wird records")).toBeInTheDocument();
-  });
-
-  it("shows read-only daily statistics without Quran or prayer recording actions", () => {
-    const onToggleDailyHabit = vi.fn();
-    const onTogglePrayerTracking = vi.fn();
-    const { container } = render(
-      <ProgressScreen
-        initialPeriod="day"
-        dailyCompletions={mockCompletions}
-        dailyHabits={mockDailyHabits}
-        progressDayStartHour={3}
-        calendarType="gregorian"
-        language="ar"
-        direction="rtl"
-        onOpenShareModal={vi.fn()}
-        onToggleDailyHabit={onToggleDailyHabit}
-        onTogglePrayerTracking={onTogglePrayerTracking}
-      />,
-    );
-    openDetailedContext();
-    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
-    expect(screen.queryByRole("button", { name: /ورد القرآن/ })).not.toBeInTheDocument();
-    expect(screen.getByTestId("prayer-progress-summary")).toBeInTheDocument();
-    expect(onToggleDailyHabit).not.toHaveBeenCalled();
-    expect(onTogglePrayerTracking).not.toHaveBeenCalled();
-  });
-
-  it("switches the shared range between Day, Week, Month, and Year", async () => {
-    // Use a week with elapsed devotional days and no recorded Quran goal.
-    vi.setSystemTime(new Date(2026, 10, 6, 12));
-    onTestFinished(() => {
-      vi.useRealTimers();
-    });
-    render(
-      <ProgressScreen
-        initialPeriod="day"
-        dailyCompletions={mockCompletions}
-        dailyHabits={mockDailyHabits}
-        progressDayStartHour={3}
-        calendarType="gregorian"
-        language="ar"
-        direction="rtl"
-        onOpenShareModal={vi.fn()}
-      />,
-    );
-
-    // Switch to Week tab
-    openDetailedContext();
-    await choosePeriod("week");
-    expect(screen.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "week");
-    // Oasis stage card is exclusive to Day view
-    expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
-    await chooseDetail("routines");
-    expect(await screen.findByRole("heading", { name: "إيقاع أذكارك" })).toBeInTheDocument();
-    expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    expect(within(screen.getByTestId("progress-detailed-context")).queryByRole("progressbar")).not.toBeInTheDocument();
-    expect(within(screen.getByTestId("progress-overview")).getAllByRole("progressbar")).toHaveLength(2);
-
-    // Switch to Month tab
-    await choosePeriod("month");
-    expect(screen.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "month");
-
-    // Switch to Year tab
-    await choosePeriod("year");
-    expect(screen.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "year");
-
-    // Switch back to Day tab
-    await choosePeriod("day");
-    expect(screen.getByTestId("progress-filters-toggle")).toHaveAttribute("data-progress-value", "day");
-    await chooseDetail("reflection");
-    expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
-  });
-
-  it("keeps per-prayer detail optional without prayer-entry links", () => {
-    const onPrayerResume = vi.fn();
-    const { container } = render(
-      <ProgressScreen
-        initialPeriod="day"
-        dailyCompletions={[]}
-        progressDayStartHour={3}
-        calendarType="gregorian"
-        language="en"
-        direction="ltr"
-        onOpenShareModal={vi.fn()}
-        onPrayerResume={onPrayerResume}
-      />,
-    );
-    openDetailedContext();
-    const summary = screen.getByTestId("prayer-progress-summary");
-    expect(summary.querySelector("details, table")).toBeNull();
-    expect(summary.querySelectorAll("li")).toHaveLength(5);
-    expect(screen.queryByRole("button", { name: "Open Fajr" })).not.toBeInTheDocument();
-    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
-    expect(onPrayerResume).not.toHaveBeenCalled();
-  });
-
-  it("shows the configured weekly intention on the Week view", async () => {
-    render(
-      <ProgressScreen
-        initialPeriod="day"
-        dailyCompletions={mockCompletions}
-        progressDayStartHour={3}
-        calendarType="gregorian"
-        language="en"
-        direction="ltr"
-        onOpenShareModal={vi.fn()}
-        weeklyGoalDays={4}
-      />,
-    );
-
-    openDetailedContext();
-    await choosePeriod("week");
-    await chooseDetail("routines");
-    expect(await screen.findByText("Your seven-day intention")).toBeInTheDocument();
-  });
-
-  it("keeps both today and past-day statistics read-only", async () => {
-    const onTogglePrayerTracking = vi.fn();
-    const { container } = render(
-      <ProgressScreen
-        initialPeriod="day"
-        dailyCompletions={[]}
-        progressDayStartHour={3}
-        calendarType="gregorian"
-        language="en"
-        direction="ltr"
-        onOpenShareModal={vi.fn()}
-        onTogglePrayerTracking={onTogglePrayerTracking}
-      />,
-    );
-    openDetailedContext();
-    await choosePeriod("custom");
-    fireEvent.change(screen.getByLabelText("Start date"), { target: { value: "2024-02-01" } });
-    fireEvent.change(screen.getByLabelText("End date"), { target: { value: "2024-02-01" } });
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
-    expect(screen.getByTestId("progress-metric-prayers")).toBeInTheDocument();
-    await choosePeriod("day");
-    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
-    expect(onTogglePrayerTracking).not.toHaveBeenCalled();
-  });
+  it.each(["ar", "en"] as const)(
+    "keeps %s Overview focused and historical details discoverable in Trends",
+    async (language) => {
+      render(
+        <ProgressScreen
+          dailyCompletions={[]}
+          progressDayStartHour={3}
+          calendarType="gregorian"
+          language={language}
+          direction={language === "ar" ? "rtl" : "ltr"}
+          onOpenShareModal={vi.fn()}
+        />,
+      );
+      expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
+      expect(screen.queryByTestId("progress-detailed-context")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("progress-routine-bars")).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId("progress-tab-trends"));
+      const selector = screen.getByRole("combobox", { name: language === "ar" ? "عرض اتجاه" : "Show trend for" });
+      await chooseProgressOption(selector, "zikr");
+      expect(screen.getByTestId("zikr-insights")).toBeInTheDocument();
+      expect(screen.queryByTestId("progress-main-trend")).not.toBeInTheDocument();
+      await chooseProgressOption(selector, "friday");
+      expect(screen.queryByTestId("zikr-insights")).not.toBeInTheDocument();
+      expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    },
+  );
 });

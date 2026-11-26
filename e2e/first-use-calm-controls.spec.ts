@@ -7,11 +7,168 @@ import { t } from "../src/app/i18n";
 test.use({ serviceWorkers: "block" });
 
 for (const language of ["ar", "en"] as const) {
+  test(`welcome stays protected across appearance modes in ${language} @cross-browser`, async ({ page }, info) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.addInitScript(
+      ({ language }) => {
+        const mode = JSON.parse(sessionStorage.getItem("welcome-mode") ?? "{}");
+        localStorage.removeItem("azkarapp.onboarding-complete.v1");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({
+            settings: {
+              language,
+              reduceMotion: true,
+              ...mode,
+              reminders: { morning: { enabled: true, time: "07:30" } },
+            },
+            profile: { isGuest: true },
+          }),
+        );
+        Object.defineProperty(navigator, "userAgent", { configurable: true, value: "Test browser" });
+        Object.defineProperty(navigator, "platform", { configurable: true, value: "Test" });
+        Object.defineProperty(window, "Notification", {
+          configurable: true,
+          value: { permission: "default", requestPermission: async () => "default" },
+        });
+      },
+      { language },
+    );
+    const modes = [
+      { themeMode: "light", appMaterial: "solid" },
+      { themeMode: "dark", appMaterial: "glass" },
+      { themeMode: "midnight", appMaterial: "glass" },
+      { themeMode: "light", appMaterial: "glass", highContrast: true },
+      { themeMode: "dark", appMaterial: "glass", reduceTransparency: true },
+    ];
+    await page.goto("/");
+    for (const mode of modes) {
+      await page.evaluate((mode) => sessionStorage.setItem("welcome-mode", JSON.stringify(mode)), mode);
+      await page.goto("/");
+      await page.getByTestId(`language-option-${language}`).click();
+      await page.getByTestId("confirm-language").click();
+      await page.getByTestId("onboarding-get-started").click();
+      await page.locator("html").evaluate((node) => {
+        node.style.fontSize = "200%";
+      });
+      const setup = page.getByTestId("first-use-setup");
+      const button = setup.getByRole("button", { name: t(language, "notifications.requestPermission"), exact: true });
+      await expect(button).toBeVisible();
+      await button.scrollIntoViewIfNeeded();
+      expect(
+        await button.evaluate((node) => {
+          const r = node.getBoundingClientRect();
+          return {
+            target: r.height >= 44,
+            hit: node.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)),
+          };
+        }),
+      ).toEqual({ target: true, hit: true });
+      expect(
+        await setup.evaluate((node) => {
+          const c = getComputedStyle(node).backgroundColor;
+          const s = node.querySelector(".overflow-y-auto")!;
+          return { opaque: !c.startsWith("rgba"), fits: s.scrollWidth <= s.clientWidth + 1 };
+        }),
+      ).toEqual({ opaque: true, fits: true });
+      expect((await new AxeBuilder({ page }).include('[data-testid="first-use-setup"]').analyze()).violations).toEqual(
+        [],
+      );
+      await page.screenshot({
+        path: info.outputPath(
+          `welcome-${language}-${mode.themeMode}-${mode.highContrast ? "contrast" : mode.reduceTransparency ? "opaque" : mode.appMaterial}.png`,
+        ),
+      });
+    }
+  });
+  test(`notification-first layout and city selection in ${language} @cross-browser`, async ({ page }, info) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "userAgent", { configurable: true, value: "Notification-capable test browser" });
+      Object.defineProperty(navigator, "platform", { configurable: true, value: "Test" });
+      Object.defineProperty(window, "Notification", {
+        configurable: true,
+        value: {
+          permission: "default",
+          requestPermission: async () => {
+            Object.defineProperty(Notification, "permission", { value: "granted", configurable: true });
+            return "granted";
+          },
+        },
+      });
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await page.getByTestId(`language-option-${language}`).click();
+    await page.getByTestId("confirm-language").click();
+    await page.getByTestId("onboarding-get-started").click();
+    const setup = page.getByTestId("first-use-setup");
+    const enable = setup.getByRole("button", { name: t(language, "notifications.requestPermission"), exact: true });
+    await expect(enable).toBeVisible();
+    await expect(setup.getByTestId("first-use-reminders")).not.toHaveAttribute("open");
+    for (const [width, height, scale] of [
+      [390, 844, 100],
+      [834, 1112, 100],
+      [1440, 900, 100],
+      [320, 568, 200],
+    ] as const) {
+      await page.setViewportSize({ width, height });
+      await page.locator("html").evaluate((node, scale) => {
+        node.style.fontSize = `${scale}%`;
+      }, scale);
+      await page.evaluate(() => document.fonts.ready);
+      await expect(async () => {
+        await expect(enable).toBeVisible();
+        await enable.scrollIntoViewIfNeeded();
+      }).toPass({ timeout: 15000 });
+      const geometry = await setup.evaluate((node) => {
+        const rect = node.getBoundingClientRect();
+        const scroll = node.querySelector(".overflow-y-auto")!;
+        const color = getComputedStyle(node).backgroundColor;
+        return {
+          fits: rect.left >= -1 && rect.right <= innerWidth + 1 && rect.top >= -1 && rect.bottom <= innerHeight + 1,
+          noOverflow: scroll.scrollWidth <= scroll.clientWidth + 1,
+          bounded: rect.width <= 30 * parseFloat(getComputedStyle(document.documentElement).fontSize) + 1,
+          bottom: node.dataset.overlaySurface !== "sheet" || Math.abs(rect.bottom - innerHeight) <= 1,
+          opaque: !color.startsWith("rgba"),
+        };
+      });
+      expect(geometry).toEqual({ fits: true, noOverflow: true, bounded: true, bottom: true, opaque: true });
+      await expect(enable).toBeInViewport();
+      await page.screenshot({ path: info.outputPath(`welcome-${language}-${width}-${scale}.png`) });
+    }
+    await page.locator("html").evaluate((node) => {
+      node.style.fontSize = "100%";
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect((await new AxeBuilder({ page }).include('[data-testid="first-use-setup"]').analyze()).violations).toEqual(
+      [],
+    );
+    await enable.click();
+    await expect(setup.locator(".first-use-heading")).toHaveText(t(language, "firstUse.locationTitle"));
+    await expect(setup.locator(".first-use-heading")).toBeFocused();
+    await page.screenshot({ path: info.outputPath(`city-step-${language}.png`) });
+    await setup.getByRole("button", { name: t(language, "firstUse.chooseCity"), exact: true }).click();
+    await expect(setup.getByRole("searchbox")).toBeFocused();
+    await setup.getByRole("searchbox").fill("London");
+    await page.screenshot({ path: info.outputPath(`city-search-${language}.png`) });
+    await setup.getByRole("button", { name: language === "ar" ? /لندن/ : /London/ }).click();
+    await expect(setup).toBeHidden();
+    await expect
+      .poll(() =>
+        page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.location.cityName),
+      )
+      .toBe("London");
+    await page.reload();
+    await expect(page.getByTestId("nav-home").first()).toBeVisible();
+    await expect(setup).toBeHidden();
+  });
   test(`first-use permissions are optional and reminders are preselected in ${language} @cross-browser`, async ({
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.addInitScript(() => {
+      Object.defineProperty(navigator, "userAgent", { configurable: true, value: "Notification-capable test browser" });
+      Object.defineProperty(navigator, "platform", { configurable: true, value: "Test" });
       const calls = { notifications: 0, storage: 0 };
       Object.assign(window, { setupPermissionCalls: calls });
       Object.defineProperty(window, "Notification", {
@@ -65,11 +222,13 @@ for (const language of ["ar", "en"] as const) {
         beforeFajrDua: false,
       });
     await setup.getByRole("button", { name: t(language, "notifications.requestPermission"), exact: true }).click();
-    await expect(setup.getByText(t(language, "notifications.permissionDenied"), { exact: true })).toBeVisible();
-    await setup.getByRole("button", { name: t(language, "firstUse.protectStorage"), exact: true }).click();
+    await expect(setup.getByRole("heading", { name: t(language, "firstUse.blockedTitle"), exact: true })).toBeVisible();
+    await expect(setup.getByRole("button", { name: t(language, "firstUse.protectStorage"), exact: true })).toHaveCount(
+      0,
+    );
     expect(
       await page.evaluate(() => (window as unknown as { setupPermissionCalls: object }).setupPermissionCalls),
-    ).toEqual({ notifications: 1, storage: 1 });
+    ).toEqual({ notifications: 1, storage: 0 });
     expect((await new AxeBuilder({ page }).include('[data-testid="first-use-setup"]').analyze()).violations).toEqual(
       [],
     );
@@ -91,6 +250,14 @@ for (const language of ["ar", "en"] as const) {
     await page.screenshot({ path: `output/first-use-setup-${language}-320-200.png` });
     await setup.getByRole("button", { name: t(language, "firstUse.continue"), exact: true }).click();
     await expect(setup).toBeHidden();
+    await page.goto("/#/settings/account-data");
+    const storage = page.getByTestId("storage-protection");
+    await expect(storage).not.toHaveAttribute("open");
+    await storage.locator("summary").click();
+    await storage.getByRole("button", { name: t(language, "firstUse.protectStorage"), exact: true }).click();
+    expect(
+      await page.evaluate(() => (window as unknown as { setupPermissionCalls: object }).setupPermissionCalls),
+    ).toEqual({ notifications: 1, storage: 1 });
     await page.reload();
     await expect(page.getByTestId("nav-home").first()).toBeVisible();
     await expect(setup).toBeHidden();

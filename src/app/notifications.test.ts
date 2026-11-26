@@ -1,12 +1,21 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { notificationTarget, readNotificationPermission, showBrowserNotification } from "./notifications";
+import {
+  notificationSetupEnvironment,
+  notificationTarget,
+  readNotificationPermission,
+  showBrowserNotification,
+} from "./notifications";
+import * as platform from "./native/platform";
 
 const originalWorker = Object.getOwnPropertyDescriptor(navigator, "serviceWorker");
+const originalTouch = Object.getOwnPropertyDescriptor(navigator, "maxTouchPoints");
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
   if (originalWorker) Object.defineProperty(navigator, "serviceWorker", originalWorker);
   else Reflect.deleteProperty(navigator, "serviceWorker");
+  if (originalTouch) Object.defineProperty(navigator, "maxTouchPoints", originalTouch);
+  else Reflect.deleteProperty(navigator, "maxTouchPoints");
 });
 
 function setup(permission: NotificationPermission = "granted", registration?: object) {
@@ -22,6 +31,20 @@ function setup(permission: NotificationPermission = "granted", registration?: ob
 }
 
 describe("browser notification delivery", () => {
+  it("distinguishes iOS tabs, installed apps, touch iPads and native Android for setup guidance", () => {
+    expect(notificationSetupEnvironment()).toBe("browser");
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue("iPhone");
+    expect(notificationSetupEnvironment()).toBe("ios-browser");
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query === "(display-mode: standalone)" }));
+    expect(notificationSetupEnvironment()).toBe("browser");
+    vi.stubGlobal("matchMedia", () => ({ matches: false }));
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue("Desktop Safari");
+    vi.spyOn(navigator, "platform", "get").mockReturnValue("MacIntel");
+    Object.defineProperty(navigator, "maxTouchPoints", { configurable: true, get: () => 5 });
+    expect(notificationSetupEnvironment()).toBe("ios-browser");
+    vi.spyOn(platform, "isNativeAndroid").mockReturnValue(true);
+    expect(notificationSetupEnvironment()).toBe("android");
+  });
   it("uses the active worker without waiting for its ready promise", async () => {
     const showNotification = vi.fn().mockResolvedValue(undefined);
     const { construct } = setup("granted", { active: {}, showNotification });

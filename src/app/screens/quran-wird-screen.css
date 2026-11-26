@@ -43,29 +43,57 @@
 .quran-wird-week-result {
   white-space: nowrap;
 }
-/* The viewport and usable card width both need room for two readable columns.
-   rem follows text enlargement; the phone's established reading order remains. */
-@media (min-width: 48rem) {
+/* Reflow from continuation → plan → week, preserving semantic reading order. */
+@media (min-width: 60rem) {
   .quran-wird-overview {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(20rem, calc(50% - 0.5rem))), 1fr));
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 24px;
+  }
+  .quran-today-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: 24px;
+    align-items: center;
+  }
+  .quran-continuation-art {
+    block-size: 100%;
+    min-block-size: 18rem;
+    margin: 0;
   }
   .quran-wird-week {
     grid-column: 1 / -1;
   }
-  .quran-wird-week-days {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr));
-  }
-  .quran-wird-week-day {
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.5rem;
-    padding-inline: 0.25rem;
-  }
 }
-
-.quran-wird-totals {
+.quran-continuation-copy {
+  min-inline-size: 0;
+}
+.quran-wird-week-days {
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: 8px;
+}
+.quran-wird-week-day {
+  flex-direction: column;
+  justify-content: center;
+  border-color: transparent;
+  text-align: center;
+  padding: 12px 8px;
+}
+.quran-wird-totals {
+  display: grid;
+  gap: 0;
+}
+.quran-total-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-block: 12px;
+  border-block-end: 1px solid var(--border-subtle);
+}
+.quran-plan-value {
+  font-size: var(--text-xl);
 }
 .quran-wird-page-fields {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
@@ -141,4 +169,31 @@
 .quran-wird-overview > section[aria-labelledby="wird-plan-title"] {
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 60rem) {
+  .quran-today-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+  .quran-continuation-copy {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .quran-continuation-art {
+    grid-column: 2;
+    grid-row: 1;
+    block-size: 100%;
+    min-block-size: 18rem;
+    margin-block-end: 0;
+  }
+}
+@media (max-width: 59.999rem) {
+  .quran-wird-overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .quran-wird-overview > section {
+    padding: 16px;
+  }
 }

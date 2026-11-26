@@ -1,3 +1,7 @@
+## Quran and Progress clarity approved locally — 2026-11-26
+
+The owner approves the generated responsive concepts and the subsequent feature-removal plan and requests all improvements locally. Keep four fixed metrics and one calendar in Overview; Trends owns contextual breakdowns, automatic charts and matched comparisons. Remove Progress metric customization, routine doughnut, duplicate overview charts/insights, generic detail navigation and garden/reflection/streak sharing. Preserve Friday/individual-zikr access, Settings exports, saved data and date/goal semantics. Quran retains all modes and Undo, with compact plan and one weekly view. This supersedes the corresponding earlier presentation contracts only. No commit, push or release-note change. See phases/QURAN_PROGRESS_CLARITY_LOCAL_2026_11_26.md.
+
 ## Meaningful completion and symmetrical collection sharing approved locally — 2026-11-25
 
 During final verification the owner explicitly reiterates local implementation and no push. This phase remains local with no commit, push, deployment or release-note rewrite.
@@ -5562,3 +5566,12 @@ The owner approves implementing optional additional voices while preserving curr
 The owner explicitly asks this chat to coordinate all working sessions, ensure their approved implementation is complete, wait for validation, push all changes and verify deployment. This supersedes earlier local-only commit/publication holds for the pending shared-checkout batch. One release owner owns the final combined gates, commit/push and every triggered Quality/Pages workflow through production identity and smoke verification. Preserve independent source/translation/licensing and physical-device acceptance boundaries; release authority does not approve draft religious content.
 
 Release inspection found confirmed original/adaptation differences in Arabic Al-Mukhtar and Wird, while the ordinary production gate excluded only English Umrah. The release owner directs retaining the two source-conflicted Arabic editions in local review and excluding them from ordinary production until correction/review, with safe direct-link recovery, preserved records and removal-only cached-pack management. The available Arabic Umrah adaptation retains an explicit 16-page/excerpt scope; English Umrah and the three additional audio samples remain review-only. No religious text is rewritten as release remediation. See phases/COORDINATED_RELEASE_2026_11_25.md and reports/LEARN_PRODUCTION_HANDOFF_2026_11_25.md.
+
+## 2026-11-26 — Notification-first welcome, local only
+
+The owner approves all reviewed desktop/mobile onboarding recommendations and asks to apply them locally without pushing. Replace the initial multi-permission presentation with one optional notification decision, illustrative preview and collapsed real selections; continue after grant, ask for city only when location-dependent reminders need it, retain Later and usable denied/unsupported/iOS recovery, move storage protection to Account & data. Preserve explicit existing choices, overnight opt-in, independent saving, prayer calculation and honest web closure limitations. This supersedes earlier first-use presentation only. No commit or push for this phase.
+
+## Consolidate all developments into main — 2026-11-26
+
+The owner explicitly requests consolidating and pushing all uncommitted work and auditing other branches for missing developments. This lifts prior implementation/publication holds for the combined release, including the exact-source dhikr branch and accepted optional-audio candidate, while preserving content, recording, translation and device-review boundaries. Follow phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md through exact-commit Quality, Pages and production verification.
+
