@@ -592,3 +592,19 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   gap: 8px;
 }
+
+.sharing-source-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.sharing-collection[data-curated] .sharing-preview-image img {
+  --sharing-preview-height: clamp(160px, 40dvh, 440px);
+}
+.sharing-collection[data-curated] .sharing-export-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sharing-collection[data-curated] .sharing-export-actions > button:first-child {
+  grid-column: 1 / -1;
+  white-space: normal;
+}

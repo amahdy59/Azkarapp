@@ -93,6 +93,8 @@ export type View =
   | "more"
   | "qibla"
   | "library"
+  | "learn"
+  | "learning_reader"
   | "progress"
   | "benefits"
   | "wird_benefits"

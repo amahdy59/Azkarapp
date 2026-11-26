@@ -6,11 +6,13 @@ import {
   cancelDownloadSession,
   getDownloadSession,
   clearDownloadNotice,
+  publishDownloadReadiness,
+  invalidateDownloadReadiness,
 } from "../../downloads/downloadSession";
 import { DownloadOverview } from "../../components/DownloadOverview";
 import { DownloadBatchError, runDownloadBatch, type DownloadCategory } from "../../downloads/downloadBatch";
 import { isNativeAndroid } from "../../native/platform";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
 import { Check, ChevronDown, Database, Download, Headphones, BookOpen, RotateCcw } from "../../components/icons";
@@ -41,6 +43,7 @@ import {
   getMushafDownloadStatus,
   getPreviousMushafDownloadStatus,
   removeDownloadedMushaf,
+  type MushafDownloadStatus,
 } from "../../content/mushafOfflineCache";
 import {
   hasDownloadSpace,
@@ -52,6 +55,9 @@ import {
 } from "../../content/downloadStorage";
 
 type AudioCollection = { id: string; titleKey: string; zikrs: readonly Zikr[]; byteSize: number };
+const LearningDownloadsPanel = lazy(() =>
+  import("./LearningDownloadsPanel").then((module) => ({ default: module.LearningDownloadsPanel })),
+);
 type AudioStatus = { completed: number; total: number; remainingBytes: number };
 type OfflineStatus = {
   cacheCount: number;
@@ -79,6 +85,7 @@ export function DownloadsPanel({
   direction?: "ltr" | "rtl";
 }) {
   const [collections, setCollections] = useState<AudioCollection[]>([]);
+  const [learningOpen, setLearningOpen] = useState(false);
   const [status, setStatus] = useState<OfflineStatus | null>(null);
   const [mushafStatus, setMushafStatus] = useState(() => getPreviousMushafDownloadStatus());
   const [checkingMushaf, setCheckingMushaf] = useState(true);
@@ -152,6 +159,7 @@ export function DownloadsPanel({
   );
 
   const refreshStatus = useCallback(async () => {
+    invalidateDownloadReadiness();
     const request = ++statusRequestRef.current;
     statusController.current?.abort();
     const acquisition = new AbortController();
@@ -160,9 +168,13 @@ export function DownloadsPanel({
     setSuccessMessage("");
     setIsLoading(true);
     setCheckingMushaf(true);
+    let verifiedMushaf: MushafDownloadStatus | undefined;
     const mushafCheck = getMushafDownloadStatus(acquisition.signal)
       .then((value) => {
-        if (!acquisition.signal.aborted) setMushafStatus(value);
+        if (!acquisition.signal.aborted) {
+          verifiedMushaf = value;
+          setMushafStatus(value);
+        }
       })
       .catch((error) => {
         if (!acquisition.signal.aborted) reportError(error, "mushaf-storage-status");
@@ -190,6 +202,7 @@ export function DownloadsPanel({
         ),
         getDownloadPersistence(),
       ]);
+      await mushafCheck;
       if (!mountedRef.current || request !== statusRequestRef.current) return;
 
       const audioSummary = getDownloadedAudioSummary();
@@ -205,6 +218,19 @@ export function DownloadsPanel({
         groups: audioStatus.slice(resources.length),
         audio: audioStatus.slice(0, resources.length),
       });
+      if (verifiedMushaf) {
+        const groups = audioStatus.slice(resources.length);
+        publishDownloadReadiness({
+          status: "checked",
+          readyGroups:
+            groups.filter((group) => group.total > 0 && group.completed === group.total).length +
+            Number(verifiedMushaf.isComplete === true),
+          totalGroups: groups.length + 1,
+          usageBytes: storage.usage,
+          duaVoiceId: audioPreferences.duaVoiceId,
+          quranReciterId: audioPreferences.quranReciterId,
+        });
+      }
     } catch (error) {
       if (acquisition.signal.aborted) return;
       reportError(error, "offline-storage-status");
@@ -354,6 +380,7 @@ export function DownloadsPanel({
   const removeResource = async (id: string, collection?: AudioCollection) => {
     if (operationRef.current || getDownloadSession().job || isLoading) return;
     operationRef.current = true;
+    invalidateDownloadReadiness();
     setRemoving(true);
     setErrorMessage("");
     setSuccessMessage("");
@@ -1326,6 +1353,20 @@ export function DownloadsPanel({
             )}
           </details>
         </Card>
+        <details
+          className="rounded-3xl border border-border bg-card p-4"
+          onToggle={(event) => setLearningOpen(event.currentTarget.open)}
+          data-material-card="dense"
+        >
+          <summary className="min-h-11 cursor-pointer py-2 font-semibold focus-visible:outline focus-visible:outline-ring">
+            {t(language, "learnEntry.downloadsTitle")}
+          </summary>
+          {learningOpen && (
+            <Suspense fallback={<p role="status">{t(language, "common.loading")}</p>}>
+              <LearningDownloadsPanel language={language} />
+            </Suspense>
+          )}
+        </details>
       </div>
     </div>
   );

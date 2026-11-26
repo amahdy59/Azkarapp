@@ -9,6 +9,7 @@ import { ISOLATED_SUITES } from "./src/test/isolatedSuites";
 const APP_SUITES = ["src/**/*.test.{ts,tsx}"];
 
 const nativeAliases = {
+  "@azkar/native-system-bars": path.resolve("src/app/native/systemBars.ts"),
   "@azkar/native-mushaf-download": path.resolve("src/app/content/nativeMushafDownload.ts"),
   "@azkar/native-reminders": path.resolve("src/app/hooks/nativeReminderScheduling.ts"),
 };

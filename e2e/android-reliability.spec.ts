@@ -90,11 +90,11 @@ test("touch dragging releases a previously focused prayer control", async ({ pag
   await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
   await expect(control).not.toBeFocused();
   await expect.poll(() => scroll.evaluate((node) => node.scrollTop)).toBeGreaterThan(96);
-  await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+  await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
   await scroll.evaluate((node) => {
     node.scrollTop = 0;
   });
-  await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+  await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
   await page.screenshot({ path: testInfo.outputPath("home-touch-recovery.png"), scale: "css" });
 });
 

@@ -68,6 +68,36 @@ afterEach(async () => {
 });
 
 describe("DownloadsPanel", () => {
+  it("publishes readiness only after both real status checks finish, using origin storage usage", async () => {
+    const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
+    const { getMushafDownloadStatus } = await import("../../content/mushafOfflineCache");
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: async () => ({ usage: 12_000_000, quota: 1e9 }) },
+    });
+    vi.mocked(getAudioDownloadStatuses).mockImplementationOnce(async (groups) =>
+      groups.map((_, index) => ({ completed: index === groups.length - 2 ? 4 : 0, total: 4, remainingBytes: 0 })),
+    );
+    let finish!: (value: Awaited<ReturnType<typeof getMushafDownloadStatus>>) => void;
+    vi.mocked(getMushafDownloadStatus).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() => expect(getAudioDownloadStatuses).toHaveBeenCalled());
+    expect(getDownloadSession().readiness.status).toBe("unchecked");
+    await act(async () => finish({ downloadedPages: 604, downloadedFonts: 604, totalPages: 604, isComplete: true }));
+    await waitFor(() =>
+      expect(getDownloadSession().readiness).toMatchObject({
+        status: "checked",
+        readyGroups: 2,
+        totalGroups: 3,
+        usageBytes: 12_000_000,
+      }),
+    );
+  });
   it("derives Resume and readiness from verified files after remount, without a session result", async () => {
     const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
     vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>

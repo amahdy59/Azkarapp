@@ -56,10 +56,10 @@ for (const language of ["ar", "en"] as const) {
       await sticky.locator("..").evaluate((node) => {
         node.scrollTop = 0;
       });
-      await expect(sticky).toHaveCSS("--home-prayer-expansion", "1");
+      await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
       const expanded = await assertPrayerOverview(page);
       // The owner retains the original large-time desktop cards; compact tiles have their own cap.
-      expect(expanded.every((card) => card.height <= (width >= 1200 ? 160 : 140))).toBe(true);
+      expect(expanded.every((card) => card.height <= (width >= 768 ? 176 : 180))).toBe(true);
       if (width >= 1200) {
         await expect(page.getByTestId("home-all-prayers-row").locator("[data-prayer-time]").first()).toHaveCSS(
           "font-size",
@@ -70,27 +70,13 @@ for (const language of ["ar", "en"] as const) {
       await sticky.locator("..").evaluate((node) => {
         node.scrollTop = 150;
       });
-      await expect(sticky).toHaveCSS("--home-prayer-expansion", "0");
-      if (width < 768) {
-        await expect(page.getByTestId("home-prayer-strip")).toHaveAttribute("inert", "");
-        await expect(page.getByTestId("home-compact-prayer")).toBeInViewport();
-        await page.screenshot({ path: info.outputPath(`collapsed-${language}-${width}.png`), scale: "css" });
-        if (width === 320) {
-          await page.locator("html").evaluate((node) => (node.style.fontSize = "32px"));
-          await expect(page.getByTestId("home-compact-prayer").getByRole("button")).toBeInViewport();
-          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-        }
-        await sticky.locator("..").evaluate((node) => (node.scrollTop = 0));
-        await expect(sticky).toHaveCSS("--home-prayer-expansion", "1");
-      } else {
-        const collapsed = await assertPrayerOverview(page);
-        for (const [index, card] of collapsed.entries()) {
-          expect(card.width).toBeCloseTo(expanded[index].width, 1);
-          expect(card.height).toBeCloseTo(expanded[index].height, 1);
-        }
-        await page.screenshot({ path: info.outputPath(`collapsed-${language}-${width}.png`), scale: "css" });
+      await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
+      const scrolled = await assertPrayerOverview(page);
+      for (const [index, card] of scrolled.entries()) {
+        expect(card.width).toBeCloseTo(expanded[index].width, 1);
+        expect(card.height).toBeCloseTo(expanded[index].height, 1);
       }
-
+      await page.screenshot({ path: info.outputPath(`scrolled-${language}-${width}.png`), scale: "css" });
       if (width === 320) {
         await page.evaluate(() => {
           document.documentElement.style.fontSize = "32px";
@@ -99,7 +85,7 @@ for (const language of ["ar", "en"] as const) {
           await sticky.locator("..").evaluate((node, top) => {
             node.scrollTop = top;
           }, top);
-          await expect(sticky).toHaveCSS("--home-prayer-expansion", top ? "0" : "1");
+          await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
           await assertPrayerOverview(page);
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
           await page.screenshot({ path: info.outputPath(`large-text-${language}-${top}.png`), scale: "css" });
@@ -119,12 +105,7 @@ for (const language of ["ar", "en"] as const) {
         await sticky.locator("..").evaluate((node, top) => {
           node.scrollTop = top;
         }, top);
-        await expect(sticky).toHaveCSS("--home-prayer-expansion", top ? "0" : "1");
-        if (width < 768 && top) {
-          await expect(page.getByTestId("home-compact-prayer")).toBeInViewport();
-          await expect(page.getByTestId("home-prayer-strip")).toHaveAttribute("inert", "");
-          continue;
-        }
+        await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
         await assertPrayerOverview(page);
       }
     }

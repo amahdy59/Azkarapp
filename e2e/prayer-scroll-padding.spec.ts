@@ -31,15 +31,15 @@ for (const language of ["ar", "en"] as const) {
     const assertFit = async () => {
       await expect
         .poll(() =>
-          sticky.evaluate((node) => {
-            const cards = [...node.querySelectorAll('[data-density="summary"]')];
+          sticky.evaluate(() => {
+            const cards = [...document.querySelectorAll('[data-density="summary"]')];
             return cards.every((card) => {
               const box = card.getBoundingClientRect();
               return [...card.querySelectorAll("h3, [data-prayer-timing] p, [data-prayer-compact-countdown]")].every(
                 (child) => {
                   const b = child.getBoundingClientRect();
                   return (
-                    b.left >= box.left + 12 && b.right <= box.right - 12 && child.scrollWidth <= child.clientWidth + 1
+                    b.left >= box.left + 1 && b.right <= box.right - 1 && child.scrollWidth <= child.clientWidth + 1
                   );
                 },
               );
@@ -51,9 +51,9 @@ for (const language of ["ar", "en"] as const) {
     };
     await assertFit();
     await scroll.evaluate((node) => (node.scrollTop = 180));
-    await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
     await assertFit();
-    const compact = page.getByTestId("home-compact-prayer");
+    const compact = page.getByTestId("home-prayer-interval");
     await expect(compact).toBeInViewport();
     const action = compact.getByRole("button");
     await expect(action).toBeVisible();

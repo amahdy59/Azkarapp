@@ -1,41 +1,33 @@
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { ReferenceCard } from "../components/ReferenceCard";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { MasbahaDhikrSheet } from "../components/MasbahaDhikrSheet";
+import { IconButton } from "../components/LayoutShells";
+import "../components/masbaha.css";
 import { MasbahaSettingsSheet } from "../components/MasbahaSettingsSheet";
-import { useLayoutMode } from "../hooks/useLayoutMode";
-import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
-import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
 import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { useCounterAnnouncement } from "../hooks/useCounterAnnouncement";
-import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
   ArrowPrevious,
+  BookOpen,
   Check,
-  ChevronNext,
-  ChevronPrevious,
-  Lightbulb,
   Keyboard,
-  MoreVertical,
-  Play,
+  List,
+  Maximize,
+  Minimize,
   RotateCcw,
+  Share2,
   SlidersHorizontal,
-  Volume2,
-  VolumeX,
+  Undo,
 } from "../components/icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
-import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
+import { ReadingHeaderSurface, READING_HEADER_ACTION_CLASS } from "../components/ReadingHeaderSurface";
 import { ResponsiveSheet, SheetHeader } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
 import { formatNumerals } from "../formatting";
@@ -72,15 +64,6 @@ function authenticItemToShareZikr(item: AuthenticZikrItem): Zikr {
     repetitionCount: item.recommendedTarget,
   };
 }
-
-const HEADER_ACTION_CLASS =
-  "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
-
-/* The wide band is a fixed navy surface, so its controls take on-media colours
-   rather than theme ones. Reusing the compact class there is what produced
-   white-on-white the last time these two treatments were conflated. */
-const HERO_ACTION_CLASS =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 export interface MasbahaZikrItemState {
   count: number;
@@ -130,7 +113,10 @@ export function CustomCounterScreen({
     AUTHENTIC_AZKAR_COLLECTION[0]!;
   const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(() => initialSelectedAuthentic);
   const compactTouch = useMediaQuery(COMPACT_TOUCH_KEYBOARD_HELP_QUERY);
-  const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
+  const isWide = useMediaQuery("(min-width: 768px)");
+  const [panel, setPanel] = useState<"settings" | "dhikr" | "reference" | "reset" | "keyboard" | "share" | null>(null);
+  const keyboardHelpOpen = panel === "keyboard";
+  const setKeyboardHelpOpen = (open: boolean) => setPanel(open ? "keyboard" : null);
   const moreTriggerRef = useRef<HTMLButtonElement>(null);
 
   const [savedItems, setSavedItems] = useState<Record<string, MasbahaZikrItemState>>(() => {
@@ -159,15 +145,17 @@ export function CustomCounterScreen({
   );
   const [count, setCount] = useState(() => (isDifferentDay ? 0 : (initialZikrSaved?.count ?? 0)));
   const [laps, setLaps] = useState(() => (isDifferentDay ? 0 : (initialZikrSaved?.laps ?? 0)));
-  const [showReference, setShowReference] = useState(false);
+  const showReference = panel === "reference";
+  const setShowReference = useCallback((open: boolean) => setPanel(open ? "reference" : null), []);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
-  const [showResetDialog, setShowResetDialog] = useState(false);
-  const compactSettings = useLayoutMode() === "compact";
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const showResetDialog = panel === "reset";
+  const setShowResetDialog = useCallback((open: boolean) => setPanel(open ? "reset" : null), []);
+  const settingsOpen = panel === "settings";
   const [pendingTarget, setPendingTarget] = useState<number>();
   const [pendingZikr, setPendingZikr] = useState<AuthenticZikrItem | null>(null);
   const [currentTextSize, setCurrentTextSize] = useState<TextSizeOption>(textSize);
-  const [shareOpen, setShareOpen] = useState(false);
+  const shareOpen = panel === "share";
+  const setShareOpen = (open: boolean) => setPanel(open ? "share" : null);
 
   useEffect(() => {
     setCurrentTextSize(textSize);
@@ -214,9 +202,13 @@ export function CustomCounterScreen({
   const activeText = selectedAuthentic.textAr;
   const isTargetComplete = count >= target;
   const counterAnnouncement = useCounterAnnouncement(count, target, language, selectedAuthentic.id);
-  const progressPercent = Math.min(100, Math.round((count / target) * 100));
+  const [sessionHaptics, setSessionHaptics] = useState(hapticFeedback);
+  useEffect(() => setSessionHaptics(hapticFeedback), [hapticFeedback]);
 
+  const suppressTapRef = useRef(false);
+  const touchGesture = useRef<{ x: number; y: number; cancelled: boolean } | null>(null);
   const handleTap = useCallback(() => {
+    if (suppressTapRef.current) return;
     if (isTargetComplete) {
       setShowCompletionDialog(true);
       return;
@@ -227,13 +219,18 @@ export function CustomCounterScreen({
 
     if (nextCount >= target) {
       setShowCompletionDialog(true);
-      vibrateIfEnabled(hapticFeedback, [30, 50, 30, 50, 50]);
+      vibrateIfEnabled(sessionHaptics, [30, 50, 30, 50, 50]);
     } else if (nextCount > 0 && nextCount % 33 === 0) {
-      vibrateIfEnabled(hapticFeedback, [25, 30, 25]);
+      vibrateIfEnabled(sessionHaptics, [25, 30, 25]);
     } else {
-      vibrateIfEnabled(hapticFeedback, 8);
+      vibrateIfEnabled(sessionHaptics, 8);
     }
-  }, [count, hapticFeedback, isTargetComplete, playClickFeedback, target]);
+  }, [count, sessionHaptics, isTargetComplete, playClickFeedback, target]);
+
+  const undoCount = () => {
+    setCount((value) => Math.max(0, value - 1));
+    setShowCompletionDialog(false);
+  };
 
   const handleReset = useCallback(() => {
     setCount(0);
@@ -320,7 +317,6 @@ export function CustomCounterScreen({
     handleSelectAuthenticZikr(nextZikrItem);
   }, [handleSelectAuthenticZikr, nextZikrItem]);
 
-  const suppressTapRef = useRef(false);
   const {
     onTouchStart: swipeTouchStart,
     onTouchMove: swipeTouchMove,
@@ -343,7 +339,7 @@ export function CustomCounterScreen({
   const requestReset = useCallback(() => {
     if (count === 0 && laps === 0) return;
     setShowResetDialog(true);
-  }, [count, laps]);
+  }, [count, laps, setShowResetDialog]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -386,7 +382,7 @@ export function CustomCounterScreen({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleTap, onBack, requestReset, showReference, focusMode, setFocusMode]);
+  }, [handleTap, onBack, requestReset, showReference, setShowReference, focusMode, setFocusMode]);
 
   const changeTarget = (nextTarget: number) => {
     setTarget(nextTarget);
@@ -413,283 +409,240 @@ export function CustomCounterScreen({
     <ScreenContainer
       dir={direction}
       data-reading-focus={focusMode}
-      className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
+      className="masbaha-screen !pb-0"
       screenName={t(language, "counter.tasbeehTitle")}
     >
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        <div data-reading-chrome>
-          <ReadingScreenChrome
-            language={language}
-            direction={direction}
-            title={t(language, "counter.tasbeehTitle")}
-            onBack={onBack}
-            testId="custom-counter"
-            category="neutral"
-            textSize={currentTextSize}
-            onTextSizeChange={handleTextSizeChange}
-            /* An open target has nothing to fill, so it reports the tally and
-             skips the bar rather than drawing a track that never moves. */
-            progress={{
-              value: count,
-              max: target,
-              percentLabel: `${formatNumerals(progressPercent, language)}%`,
-              countLabel: `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`,
-              ariaLabel: t(language, "counter.targetLabel"),
-            }}
-            actions={(tier) => {
-              const isWide = tier === "wide";
-              const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
-              return (
-                <div className="flex items-center gap-1.5">
-                  <DropdownMenu dir={direction}>
-                    <DropdownMenuTrigger
-                      ref={moreTriggerRef}
-                      className={actionClass}
-                      aria-label={t(language, "common.moreOptions")}
-                    >
-                      <MoreVertical size={20} aria-hidden="true" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {isWide && !compactTouch && (
-                        <DropdownMenuItem onSelect={() => setKeyboardHelpOpen(true)}>
-                          <Keyboard size={16} aria-hidden="true" />
-                          {t(language, "reader.keyboardShortcuts")}
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={toggleSound}>
-                        {soundEnabled ? (
-                          <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
-                        ) : (
-                          <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                        )}
-                        <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={requestReset} disabled={count === 0 && laps === 0}>
-                        <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                        <span>{t(language, "reader.resetCounter")}</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              );
-            }}
-          />
-          {compactSettings ? (
-            <div className="mx-4 mt-4 flex items-center gap-3" data-testid="masbaha-controls" data-prevent-count="true">
-              <div className="min-w-0 flex-1 text-sm leading-[2.2]" data-testid="masbaha-settings-summary">
-                <p className="font-semibold [overflow-wrap:anywhere]">
-                  {language === "ar" ? selectedAuthentic.shortNameAr : selectedAuthentic.shortNameEn}
-                </p>
-                <p className="text-muted-foreground">
-                  {t(language, "counter.targetLabel")} {formatNumerals(target, language)}
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                className="size-[44px] shrink-0 p-0"
-                data-testid="masbaha-settings-trigger"
-                aria-label={t(language, "counter.settings")}
-                aria-haspopup="dialog"
-                aria-expanded={settingsOpen}
-                onClick={(event) => {
-                  event.currentTarget.focus({ preventScroll: true });
-                  setSettingsOpen(true);
-                }}
-              >
-                <SlidersHorizontal size={20} aria-hidden="true" />
-              </Button>
-            </div>
-          ) : (
-            <>
-              {" "}
-              <div className="mx-4 mt-4 rounded-2xl border border-border/40 bg-card p-3" data-prevent-count="true">
-                <div className="counter-picker-row flex items-center gap-3" data-testid="masbaha-controls">
-                  <div>
-                    <AuthenticZikrPicker
-                      items={AUTHENTIC_AZKAR_COLLECTION}
-                      selected={selectedAuthentic}
-                      language={language}
-                      direction={direction}
-                      savedItems={liveSavedItems}
-                      onSelect={handleSelectAuthenticZikr}
-                    />
-                  </div>
-                  <div>
-                    <CounterTargetPicker
-                      activeTarget={target}
-                      onTargetChange={changeTarget}
-                      language={language}
-                      direction={direction}
-                      allowOpen={false}
-                    />
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-          {settingsOpen && (
-            <MasbahaSettingsSheet
-              items={AUTHENTIC_AZKAR_COLLECTION}
-              selected={selectedAuthentic}
-              target={target}
-              savedItems={liveSavedItems}
-              language={language}
-              direction={direction}
-              onClose={() => setSettingsOpen(false)}
-              onApply={(item, nextTarget) => {
-                setSettingsOpen(false);
-                if (item.id === selectedAuthentic.id) changeTarget(nextTarget);
-                else if (count > 0 || laps > 0) {
-                  setPendingTarget(nextTarget);
-                  setPendingZikr(item);
-                } else switchToZikr(item, false, nextTarget);
-              }}
-            />
-          )}
-        </div>
-
-        <div className="counter-reading-canvas relative mx-4 mb-4 mt-4 flex flex-1 overflow-hidden bg-transparent">
+      <div className="masbaha-main">
+        <ReadingHeaderSurface data-testid="custom-counter-desktop-hero">
+          <div className="masbaha-header" data-testid="custom-counter-header-toolbar">
+            <IconButton label={t(language, "common.back")} onClick={onBack} className={READING_HEADER_ACTION_CLASS}>
+              <ArrowPrevious size={20} data-rtl-flip aria-hidden="true" />
+            </IconButton>
+            <h1 className="text-xl font-bold">{t(language, "counter.tasbeehTitle")}</h1>
+            <button
+              ref={moreTriggerRef}
+              type="button"
+              className={READING_HEADER_ACTION_CLASS}
+              data-testid="masbaha-settings-trigger"
+              aria-label={t(language, "counter.settings")}
+              aria-haspopup="dialog"
+              aria-expanded={settingsOpen}
+              onClick={() => setPanel("settings")}
+            >
+              <SlidersHorizontal size={20} aria-hidden="true" />
+            </button>
+          </div>
+        </ReadingHeaderSurface>
+        <div
+          ref={readingScrollRef}
+          className="masbaha-reading reader-text-scroll"
+          // A scrollable reading region needs keyboard entry, matching Reader/Salawat.
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          role="region"
+          aria-label={t(language, "reader.readingText")}
+        >
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
             {counterAnnouncement}
           </p>
           <div
-            className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
+            className="masbaha-stage"
             data-testid="reader-card"
             data-counting-mode="canvas"
             {...surfaceProps}
-            onTouchStart={swipeTouchStart}
-            onTouchMove={swipeTouchMove}
-            onTouchEnd={swipeTouchEnd}
+            onKeyDownCapture={() => {
+              suppressTapRef.current = false;
+            }}
+            onPointerDownCapture={(event) => {
+              if (event.pointerType !== "touch") suppressTapRef.current = false;
+            }}
+            onTouchStart={(event) => {
+              const touch = event.touches[0];
+              if (!touch) return;
+              const cancelled = event.touches.length !== 1;
+              touchGesture.current = { x: touch.clientX, y: touch.clientY, cancelled };
+              suppressTapRef.current = cancelled;
+              if (!cancelled) swipeTouchStart(event);
+            }}
+            onTouchMove={(event) => {
+              const start = touchGesture.current;
+              const touch = event.touches[0];
+              if (!start || !touch) return;
+              if (event.touches.length !== 1) start.cancelled = true;
+              if (start.cancelled || Math.abs(touch.clientY - start.y) > 14) suppressTapRef.current = true;
+              if (!start.cancelled) swipeTouchMove(event);
+            }}
+            onTouchEnd={(event) => {
+              if (!touchGesture.current?.cancelled) swipeTouchEnd(event);
+              // Suppression survives the synthesized click; the next touch starts
+              // a new gesture, so rapid intentional taps remain independent.
+            }}
+            onTouchCancel={() => {
+              if (touchGesture.current) touchGesture.current.cancelled = true;
+              suppressTapRef.current = true;
+            }}
           >
-            <div
-              className="custom-counter-stage mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between select-none relative"
-              data-testid="custom-counter-content"
-            >
-              <div className="relative flex min-h-0 flex-1">
-                <div
-                  ref={readingScrollRef}
-                  // The reading viewport needs keyboard scrolling, matching ReaderScreen.
-                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-                  tabIndex={0}
-                  role="region"
-                  aria-label={t(language, "reader.readingText")}
-                  className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0"
+            <div className="masbaha-dhikr" data-testid="custom-counter-content">
+              <div style={pressStyle} className="w-full">
+                <p
+                  className="zikr-text text-center font-medium leading-[2.1] text-foreground"
+                  dir="rtl"
+                  lang="ar"
+                  style={{
+                    fontFamily: "var(--font-zikr)",
+                    fontSize: getReadingFontSize({
+                      textSize: currentTextSize,
+                      arabicLength: activeText.length,
+                      longSurah: false,
+                    }),
+                  }}
                 >
-                  <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
-                    <div style={pressStyle} className="my-auto w-full flex flex-col items-center justify-center">
-                      <p
-                        className="zikr-text max-w-[34rem] text-center font-medium leading-[2.1] text-foreground"
-                        dir="rtl"
-                        lang="ar"
-                        style={{
-                          fontFamily: "var(--font-zikr)",
-                          fontSize: getReadingFontSize({
-                            textSize: currentTextSize,
-                            arabicLength: activeText.length,
-                            longSurah: false,
-                          }),
-                        }}
-                      >
-                        {activeText}
-                      </p>
-                      {!isArabic && (
-                        <p
-                          className="mt-3 max-w-[34rem] text-center text-sm font-semibold leading-7 text-muted-foreground"
-                          dir="ltr"
-                        >
-                          {selectedAuthentic.textEn}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  {activeText}
+                </p>
+                {!isArabic && (
+                  <p className="mt-3 text-center text-sm leading-relaxed text-muted-foreground" dir="ltr">
+                    {selectedAuthentic.textEn}
+                  </p>
+                )}
               </div>
-
-              <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
-                <div data-testid="reader-counter-stack">
-                  <StandaloneCounterFooter
-                    language={language}
-                    direction={direction}
-                    focusMode={focusMode}
-                    onToggleFocus={() => setFocusMode((value) => !value)}
-                    focusToggleRef={focusToggleRef}
-                    soundEnabled={soundEnabled}
-                    onToggleSound={toggleSound}
-                    onReset={requestReset}
-                    resetDisabled={count === 0 && laps === 0}
-                    onShare={() => setShareOpen(true)}
-                    previous={
-                      <DevotionalAction
-                        type="button"
-                        aria-label={t(language, "audioPlayer.previous")}
-                        title={t(language, "audioPlayer.previous")}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePrevZikr();
-                        }}
-                        className="adaptive-counter-nav h-12 min-w-[3rem] px-3 font-semibold"
-                        data-testid="custom-counter-prev-btn"
-                      >
-                        <ChevronPrevious size={20} aria-hidden="true" />
-                        <span className="reader-tool-label text-xs">{t(language, "common.previous")}</span>
-                      </DevotionalAction>
-                    }
-                    next={
-                      <DevotionalAction
-                        type="button"
-                        aria-label={t(language, "audioPlayer.next")}
-                        title={t(language, "audioPlayer.next")}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleNextZikr();
-                        }}
-                        className="adaptive-counter-nav h-12 min-w-[3rem] px-3 font-semibold"
-                        data-testid="custom-counter-next-btn"
-                      >
-                        <span className="reader-tool-label text-xs">{t(language, "common.next")}</span>
-                        <ChevronNext size={20} aria-hidden="true" />
-                      </DevotionalAction>
-                    }
-                    benefit={
-                      <DevotionalAction
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.currentTarget.focus({ preventScroll: true });
-                          setShowReference(true);
-                        }}
-                        aria-haspopup="dialog"
-                        aria-label={t(language, "counter.virtueReference")}
-                        title={t(language, "counter.virtueReference")}
-                        data-testid="custom-counter-benefit-dock-button"
-                      >
-                        <Lightbulb size={20} aria-hidden="true" />
-                        <span className="reader-tool-label text-label font-semibold">
-                          {t(language, "reader.referencesButton")}
-                        </span>
-                      </DevotionalAction>
-                    }
-                    counter={
-                      <ZikrCounterSurface
-                        count={count}
-                        total={target}
-                        complete={isTargetComplete}
-                        onTap={handleTap}
-                        onCompleteTap={() => setShowCompletionDialog(true)}
-                        language={language}
-                        instructionText={t(language, "reader.tapAnywhere")}
-                        testId="custom-counter-surface"
-                        reduceMotion={reduceMotion}
-                      />
-                    }
-                  />
-                </div>
-              </footer>
+            </div>
+            <div className="masbaha-counter-area">
+              <ZikrCounterSurface
+                presentation="masbaha"
+                count={count}
+                total={target}
+                complete={isTargetComplete}
+                onTap={handleTap}
+                onCompleteTap={handleTap}
+                language={language}
+                instructionText={t(language, "reader.tapAnywhere")}
+                testId="custom-counter-surface"
+                reduceMotion={reduceMotion}
+              />
+              {showCompletionDialog && isTargetComplete && (
+                <section className="masbaha-completion" data-testid="masbaha-completion" data-prevent-count="true">
+                  <p className="text-sm font-semibold" role="status">
+                    <Check size={18} aria-hidden="true" className="inline-block me-2" />
+                    {t(language, "counter.completeQuiet")}
+                  </p>
+                  <Button
+                    onClick={() => {
+                      setLaps((value) => value + 1);
+                      setCount(0);
+                      setShowCompletionDialog(false);
+                    }}
+                  >
+                    {t(language, "counter.newRoundShort")}
+                  </Button>
+                  <Button variant="outline" data-testid="custom-counter-return-btn" onClick={onBack}>
+                    {t(language, "counter.finish")}
+                  </Button>
+                </section>
+              )}
+            </div>
+            <div className="masbaha-actions" data-prevent-count="true" data-testid="masbaha-support-actions">
+              {!focusMode && (
+                <DevotionalAction
+                  onClick={undoCount}
+                  disabled={count === 0}
+                  aria-label={t(language, "counter.undoCount")}
+                >
+                  <Undo size={20} aria-hidden="true" />
+                  <span>{t(language, "common.undo")}</span>
+                </DevotionalAction>
+              )}
+              {!focusMode && (
+                <DevotionalAction
+                  data-testid="counter-zikr-filter"
+                  aria-label={t(language, "counter.chooseDhikr")}
+                  aria-haspopup="dialog"
+                  aria-expanded={panel === "dhikr"}
+                  onClick={() => setPanel("dhikr")}
+                >
+                  <List size={20} aria-hidden="true" />
+                  <span>{t(language, "counter.dhikrShort")}</span>
+                </DevotionalAction>
+              )}
+              <DevotionalAction
+                ref={focusToggleRef}
+                data-testid="reader-tools-toggle"
+                aria-label={t(language, focusMode ? "reader.exitFocus" : "reader.enterFocus")}
+                aria-pressed={focusMode}
+                onClick={() => setFocusMode((value) => !value)}
+              >
+                {focusMode ? <Minimize size={20} aria-hidden="true" /> : <Maximize size={20} aria-hidden="true" />}
+                <span>{t(language, focusMode ? "reader.exitFocusShort" : "reader.focusShort")}</span>
+              </DevotionalAction>
             </div>
           </div>
         </div>
       </div>
+
+      {settingsOpen && (
+        <MasbahaSettingsSheet
+          target={target}
+          language={language}
+          direction={direction}
+          textSize={currentTextSize}
+          feedback={{
+            sound: soundEnabled,
+            haptics: sessionHaptics,
+            vibrationAvailable: typeof navigator.vibrate === "function",
+          }}
+          onClose={() => setPanel(null)}
+          onApply={(nextTarget, feedback, size) => {
+            changeTarget(nextTarget);
+            setSessionHaptics(feedback.haptics);
+            if (feedback.sound !== soundEnabled) toggleSound();
+            handleTextSizeChange(size);
+            setPanel(null);
+          }}
+          actions={[
+            {
+              label: t(language, "counter.virtueReference"),
+              icon: <BookOpen aria-hidden="true" />,
+              onClick: () => setPanel("reference"),
+              testId: "custom-counter-benefit-dock-button",
+            },
+            {
+              label: t(language, "reader.shareAction"),
+              icon: <Share2 aria-hidden="true" />,
+              onClick: () => setPanel("share"),
+              testId: "counter-share-button",
+            },
+            {
+              label: t(language, "reader.resetCounter"),
+              icon: <RotateCcw aria-hidden="true" />,
+              onClick: requestReset,
+              disabled: count === 0 && laps === 0,
+              destructive: true,
+            },
+            ...(isWide && !compactTouch
+              ? [
+                  {
+                    label: t(language, "reader.keyboardShortcuts"),
+                    icon: <Keyboard aria-hidden="true" />,
+                    onClick: () => setPanel("keyboard"),
+                  },
+                ]
+              : []),
+          ]}
+        />
+      )}
+      {panel === "dhikr" && (
+        <MasbahaDhikrSheet
+          items={AUTHENTIC_AZKAR_COLLECTION}
+          current={selectedAuthentic}
+          savedItems={liveSavedItems}
+          language={language}
+          direction={direction}
+          onClose={() => setPanel(null)}
+          onContinue={(item) => {
+            if (item.id !== selectedAuthentic.id) switchToZikr(item, true);
+            setPanel(null);
+          }}
+        />
+      )}
 
       <CounterKeyboardHelp
         language={language}
@@ -707,75 +660,14 @@ export function CustomCounterScreen({
           { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
         ]}
       />
-      {showCompletionDialog && (
-        <ResponsiveSheet
-          open
-          onClose={() => setShowCompletionDialog(false)}
-          title={t(language, "counter.goalReached")}
-          direction={direction}
-          language={language}
-          maxWidthClassName="max-w-sm"
-          showCloseButton={false}
-          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-        >
-          <div className="flex min-h-0 flex-col overflow-hidden text-start">
-            <SheetHeader
-              title={t(language, "counter.goalReached")}
-              icon={<Check size={20} strokeWidth={3} aria-hidden="true" />}
-              onClose={() => setShowCompletionDialog(false)}
-              language={language}
-              direction={direction}
-            />
-            <div className="min-h-0 overflow-y-auto p-5 sm:p-6 text-center">
-              <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-success/20 text-success">
-                <Check size={32} strokeWidth={3} aria-hidden="true" />
-              </div>
-              <p className="mb-5 text-sm text-muted-foreground">
-                {t(language, "counter.goalReachedDetail", {
-                  target: formatNumerals(target, language),
-                  zikr: activeText,
-                })}
-              </p>
-              <div className="space-y-2.5">
-                <Button
-                  onClick={() => {
-                    setLaps((value) => value + 1);
-                    setCount(0);
-                    setShowCompletionDialog(false);
-                  }}
-                  size="lg"
-                  className="w-full"
-                >
-                  <Play size={18} aria-hidden="true" />
-                  {t(language, "counter.continueLap", { lap: formatNumerals(laps + 2, language) })}
-                </Button>
-                <Button variant="outline" onClick={handleReset} size="lg" className="w-full">
-                  <RotateCcw size={18} aria-hidden="true" />
-                  {t(language, "counter.resetToZero")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setShowCompletionDialog(false);
-                    onBack();
-                  }}
-                  size="lg"
-                  className="w-full gap-2 text-muted-foreground hover:text-foreground"
-                  data-testid="custom-counter-return-btn"
-                >
-                  <ArrowPrevious size={18} data-rtl-flip aria-hidden="true" />
-                  {t(language, "counter.returnToHub")}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </ResponsiveSheet>
-      )}
-
       {showResetDialog && (
         <ResponsiveSheet
           open
           onClose={() => setShowResetDialog(false)}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            moreTriggerRef.current?.focus();
+          }}
           title={t(language, "counter.resetConfirmTitle")}
           direction={direction}
           language={language}
@@ -864,6 +756,10 @@ export function CustomCounterScreen({
         <ResponsiveSheet
           open
           onClose={() => setShowReference(false)}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            moreTriggerRef.current?.focus();
+          }}
           title={t(language, "counter.virtueReference")}
           direction={direction}
           language={language}
@@ -875,7 +771,7 @@ export function CustomCounterScreen({
           <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
             <SheetHeader
               title={t(language, "counter.virtueReference")}
-              icon={<Lightbulb size={20} aria-hidden="true" />}
+              icon={<BookOpen size={20} aria-hidden="true" />}
               onClose={() => setShowReference(false)}
               language={language}
               direction={direction}

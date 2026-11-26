@@ -72,26 +72,18 @@ for (const language of ["ar", "en"] as const) {
       await sticky.locator("..").evaluate((node) => {
         node.scrollTop = 180;
       });
-      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      if (width < 768) {
-        const compact = page.getByTestId("home-compact-prayer");
-        await expect(compact).toBeInViewport();
-        await expect(compact).toContainText(wording);
-        await expect(compact.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
-      } else {
-        const compact = page.getByTestId("home-prayer-interval");
-        await expect(compact).toBeVisible();
-        await expect(compact).toContainText(wording);
-        await expect(compact.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
-        await assertFit();
-      }
+      await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
+      const compact = page.getByTestId("home-prayer-interval");
+      await expect(compact).toBeInViewport();
+      await expect(compact).toContainText(wording);
+      await expect(compact.locator(".prayer-countdown-seconds, .prayer-countdown-ring")).toHaveCount(0);
+      await assertFit();
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "200%";
       });
       await page.evaluate(() => document.fonts.ready);
-      if (width >= 768) await assertFit();
-      const activeCountdown =
-        width < 768 ? page.getByTestId("home-compact-prayer").locator("[data-prayer-countdown-line]") : countdown;
+      await assertFit();
+      const activeCountdown = countdown;
       await expect.poll(() => activeCountdown.evaluate(fits)).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.screenshot({

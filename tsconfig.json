@@ -16,6 +16,7 @@
     "target": "ES2022",
     "types": ["vite/client", "vite-plugin-pwa/client"],
     "paths": {
+      "@azkar/native-system-bars": ["src/app/native/systemBars.ts"],
       "@azkar/native-mushaf-download": ["src/app/content/nativeMushafDownload.ts"],
       "@azkar/native-reminders": ["src/app/hooks/nativeReminderScheduling.ts"]
     }

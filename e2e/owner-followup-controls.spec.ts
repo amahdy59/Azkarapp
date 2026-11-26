@@ -118,15 +118,22 @@ test("Masbaha owns navigation and separates controls, progress and keyboard help
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
   await expect(page.getByTestId("nav-masbaha")).toHaveAttribute("aria-current", "page");
-  const progress = await page.getByRole("progressbar").boundingBox();
-  const controls = await page.getByTestId("masbaha-controls").boundingBox();
-  expect(controls!.y - progress!.y - progress!.height).toBeGreaterThanOrEqual(12);
-  const footer = page.locator("footer");
-  await expect(footer.getByRole("button", { name: t("ar", "reader.keyboardShortcuts"), exact: true })).toHaveCount(0);
-  for (const label of await footer.locator(".reader-tool-label").all()) await expect(label).toBeHidden();
-  const more = page.getByRole("button", { name: t("ar", "common.moreOptions"), exact: true });
+  await expect(page.getByRole("progressbar")).toHaveCount(0);
+  const controls = page.getByTestId("masbaha-support-actions");
+  await expect(controls.getByRole("button")).toHaveCount(3);
+  const widths = [];
+  for (const action of await controls.getByRole("button").all()) {
+    const box = (await action.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    widths.push(box.width);
+  }
+  expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1);
+  const more = page.getByTestId("masbaha-settings-trigger");
   await more.click();
-  await page.getByRole("menuitem", { name: t("ar", "reader.keyboardShortcuts"), exact: true }).click();
+  await page.getByTestId("masbaha-settings-sheet").locator("summary").press("Enter");
+  await page.getByRole("button", { name: t("ar", "reader.keyboardShortcuts"), exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(1);
   await expect(page.getByTestId("counter-keyboard-help")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(more).toBeFocused();

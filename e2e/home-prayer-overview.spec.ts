@@ -1,3 +1,4 @@
+import { openPrayerDialog, closePrayerDialog } from "./helpers/home-overview";
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
@@ -9,8 +10,8 @@ for (const language of ["ar", "en"] as const) {
     await openHome(page, language, "glass");
     await page.clock.setFixedTime(new Date("2026-09-05T16:29:00+03:00"));
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-    await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", "asr");
-    const sticky = page.getByTestId("home-sticky-prayers");
+    await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
+    await expect(page.getByTestId("prayer-card-asr").locator("button")).toBeEnabled();
     const scroll = page.locator(".home-content-scroll");
     const anchor = page.getByTestId("home-primary-card");
     const documentTop = () =>
@@ -24,18 +25,20 @@ for (const language of ["ar", "en"] as const) {
       await scroll.evaluate((node) => {
         node.scrollTop = 0;
       });
-      await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+      await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
       await page.setViewportSize(viewport);
-      await expect(sticky).toHaveAttribute("data-home-compact-prayer", "true");
+      await expect(page.getByTestId("home-prayer-interval")).toBeVisible();
       const before = await documentTop();
       await scroll.evaluate((node) => {
         node.scrollTop = 180;
       });
-      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+      await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
       await expect.poll(documentTop).toBeCloseTo(before, 0);
+      await openPrayerDialog(page, "asr");
       const action = page.getByTestId("prayer-open-adhkar");
       await action.scrollIntoViewIfNeeded();
       await expect(action).toBeInViewport();
+      await closePrayerDialog(page);
     }
   });
 }
@@ -80,7 +83,7 @@ async function openHome(page: Page, language: "ar" | "en", material: string, lar
   await page.evaluate(() => document.fonts.ready);
 }
 
-async function assertSummary(page: Page, twoLines = false) {
+async function assertSummary(page: Page, singleLine = false) {
   const summary = page.getByTestId("home-prayer-interval");
   const geometry = await summary.evaluate((node) => {
     const side = getComputedStyle(node).direction === "rtl" ? "right" : "left";
@@ -96,8 +99,9 @@ async function assertSummary(page: Page, twoLines = false) {
       return {
         labelTop: label.top,
         nameTop: name.top,
-        start: label[side],
-        nameStart: name[side],
+        ordered: side === "right" ? label.left >= name.right - 1 : name.left >= label.right - 1,
+        labelCenter: label.top + label.height / 2,
+        nameCenter: name.top + name.height / 2,
         countdownOnNameRow: !countdown || countdown.top < name.top + name.height / 2,
         inkFits: [...range.getClientRects()]
           .filter((r) => r.width > 0)
@@ -108,11 +112,13 @@ async function assertSummary(page: Page, twoLines = false) {
   expect(geometry).toHaveLength(2);
   for (const item of geometry) {
     expect(item.inkFits, JSON.stringify(item)).toBe(true);
-    expect(item.start).toBeCloseTo(item.nameStart, 0);
-    expect(item.nameTop).toBeGreaterThan(item.labelTop);
-    if (twoLines) expect(item.countdownOnNameRow).toBe(true);
+    if (singleLine) {
+      expect(item.ordered, JSON.stringify(item)).toBe(true);
+      expect(Math.abs(item.nameCenter - item.labelCenter)).toBeLessThanOrEqual(4);
+      expect(item.countdownOnNameRow).toBe(true);
+    }
   }
-  if (twoLines) {
+  if (singleLine) {
     expect(geometry[0].labelTop).toBeCloseTo(geometry[1].labelTop, 0);
     expect(geometry[0].nameTop).toBeCloseTo(geometry[1].nameTop, 0);
   }
@@ -150,7 +156,7 @@ async function assertLocationFooter(page: Page) {
   const change = group.locator(".home-location-change");
   await expect(page.getByTestId("home-header-content").getByTestId("home-location")).toHaveCount(0);
   await expect(group.getByRole("combobox")).toHaveCount(0);
-  await expect(group.locator("svg")).toHaveCount(2);
+  await expect(group.locator("svg")).toHaveCount(3);
   const geometry = await group.evaluate((node) => {
     const a = node.querySelector(".home-location-change")!.getBoundingClientRect();
     const b = node.querySelector("[data-home-location-refresh]")!.getBoundingClientRect();
@@ -162,6 +168,7 @@ async function assertLocationFooter(page: Page) {
       centers: Math.abs(a.y + a.height / 2 - b.y - b.height / 2),
       targetSizes: [a.width, a.height, b.width, b.height],
       below: footer.top - row.bottom,
+      compact: footer.width < row.width,
       overflow: node.scrollWidth - node.clientWidth,
     };
   });
@@ -175,7 +182,7 @@ async function assertLocationFooter(page: Page) {
 
 for (const language of ["ar", "en"] as const) {
   for (const width of [320, 390]) {
-    test(`Home two-line summary ${language} ${width}px @cross-browser`, async ({ page }, info) => {
+    test(`Home compact inline summary ${language} ${width}px @cross-browser`, async ({ page }, info) => {
       await page.setViewportSize({ width, height: 900 });
       await openHome(page, language, "glass");
       for (const [time, prayer] of [
@@ -186,13 +193,13 @@ for (const language of ["ar", "en"] as const) {
         ["17:15", "maghrib"],
         ["19:30", "isha"],
       ] as const) {
-        await test.step(`two-line summary at ${time}`, async () => {
+        await test.step(`inline summary at ${time}`, async () => {
           await page.clock.setFixedTime(new Date(`2026-11-24T${time}:00+02:00`));
           await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
           await expect(page.locator('[data-prayer-summary-state="current"] strong')).toHaveText(
             t(language, `notifications.${prayer}`),
           );
-          await assertSummary(page, true);
+          await assertSummary(page, width >= 390);
         });
       }
       await page.clock.setFixedTime(new Date("2026-11-27T12:30:00+02:00"));
@@ -200,11 +207,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.locator('[data-prayer-summary-state="current"] strong')).toHaveText(
         t(language, "prayerTracking.jumuah"),
       );
-      await assertSummary(page, true);
+      await assertSummary(page, width >= 390);
       await page.clock.setFixedTime(new Date("2026-11-24T12:30:00+02:00"));
       await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
       await assertLocationFooter(page);
-      await page.screenshot({ path: `output/playwright/home-two-line/${info.project.name}-${language}-${width}.png` });
+      await page.screenshot({
+        path: `output/playwright/home-inline-status/${info.project.name}-${language}-${width}.png`,
+      });
     });
   }
 }
@@ -214,11 +223,12 @@ for (const language of ["ar", "en"] as const) {
     test(`Home overview ${language} ${width}px @cross-browser`, async ({ page }, info) => {
       await page.setViewportSize({ width, height: width === 834 ? 1112 : 900 });
       await openHome(page, language, width === 1440 ? "solid" : "glass", width === 320);
-      await assertSummary(page, width !== 320);
+      await assertSummary(page, width >= 390);
       await assertLocationFooter(page);
       const row = page.getByTestId("home-all-prayers-row");
       await expect(row.locator("[data-prayer-icon]")).toHaveCount(5);
-      await expect(row.locator("[data-prayer-chevron]")).toHaveCount(5);
+      await expect(row.locator("[data-prayer-chevron]")).toHaveCount(0);
+      await expect(row.locator("button[aria-haspopup=dialog]")).toHaveCount(5);
       const geometry = await row.evaluate((element) => {
         const bounds = element.getBoundingClientRect();
         return [...element.querySelectorAll("button")].map((button) => {
@@ -245,8 +255,8 @@ for (const language of ["ar", "en"] as const) {
           .evaluateAll((icons) => icons.map((icon) => icon.getBoundingClientRect().top));
         expect(Math.max(...tops) - Math.min(...tops)).toBeLessThanOrEqual(1);
       }
-      const selected = page.getByTestId("prayer-card-dhuhr").getByRole("button");
-      if ((await selected.getAttribute("aria-expanded")) === "true") await selected.click();
+      const selected = page.getByTestId("prayer-card-dhuhr").locator("button");
+
       await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
       await page.screenshot({
         path: `output/playwright/home-overview/${info.project.name}-${language}-${width}-collapsed.png`,
@@ -254,11 +264,11 @@ for (const language of ["ar", "en"] as const) {
       });
       await selected.focus();
       await selected.press("Enter");
-      await expect(selected).toHaveAttribute("aria-expanded", "true");
+      await expect(selected).toHaveAttribute("aria-haspopup", "dialog");
       const panel = page.getByTestId("home-prayer-moment");
-      await expect(panel).toHaveAttribute("data-prayer", "dhuhr");
+      await expect(panel.locator(".prayer-tracking-body")).toHaveAttribute("data-prayer", "dhuhr");
       const evidence = panel.locator(".prayer-evidence-toggle");
-      if (width >= 834) {
+      if (width >= 1200) {
         await expect(evidence).toBeHidden();
         await expect(panel.getByTestId("prayer-virtue-source")).toBeVisible();
       } else {
@@ -272,10 +282,10 @@ for (const language of ["ar", "en"] as const) {
         path: `output/playwright/home-overview/${info.project.name}-${language}-${width}-expanded.png`,
         fullPage: true,
       });
-      await panel.getByRole("button", { name: t(language, "home.collapsePrayer"), exact: true }).click();
+      await panel.getByRole("button", { name: t(language, "home.prayerTrackingDone"), exact: true }).click();
       await expect(selected).toBeFocused();
       await expect(panel).toHaveCount(0);
-      await expect(page.getByTestId("prayer-card-isha").getByRole("button")).toBeDisabled();
+      await expect(page.getByTestId("prayer-card-isha").locator("button")).toBeDisabled();
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     });
   }
@@ -305,7 +315,8 @@ for (const language of ["ar", "en"] as const) {
         const caption = node.querySelector('[data-testid="home-location-caption"]')!;
         const label = caption.getBoundingClientRect();
         const bounds = node.getBoundingClientRect();
-        const stacked = label.bottom <= a.top;
+        const insideChange =
+          label.left >= a.left - 1 && label.right <= a.right + 1 && label.top >= a.top && label.bottom <= a.bottom;
         const text = caption.firstChild!;
         const words = [...(text.textContent ?? "").matchAll(/\S+/g)];
         const wholeWords = words.every((word) => {
@@ -318,7 +329,7 @@ for (const language of ["ar", "en"] as const) {
           );
         });
         return {
-          stacked,
+          insideChange,
           wholeWords,
           gap: Math.max(a.left, b.left) - Math.min(a.right, b.right),
           overlapY: Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top),
@@ -331,8 +342,8 @@ for (const language of ["ar", "en"] as const) {
           hit: document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2)?.closest("button") === refresh,
         };
       });
-      expect(geometry.gap).toBeCloseTo(large ? 16 : 8, 0);
-      if (large) expect(geometry.stacked).toBe(true);
+      expect(geometry.gap).toBeCloseTo(0, 0);
+      expect(geometry.insideChange).toBe(true);
       expect(geometry.wholeWords, JSON.stringify(geometry)).toBe(true);
       expect(geometry.overlapY).toBeGreaterThanOrEqual(44);
       expect(geometry.clipped, JSON.stringify(geometry)).toBe(false);
@@ -365,13 +376,15 @@ test("Home location uses the saved prayer boundary and retains it after denied r
       },
     });
   });
-  const refresh = page.getByTestId("home-location").getByRole("button", { name: /Refresh/ });
+  const refresh = page
+    .getByTestId("home-location")
+    .getByRole("button", { name: t("en", "qibla.useCurrentLocation"), exact: true });
   await refresh.click();
   await expect(page.getByTestId("home-location").getByRole("button", { name: /Finding location/ })).toBeDisabled();
   await page.locator(".home-content-scroll").evaluate((node) => {
     node.scrollTop = 180;
   });
-  await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute("data-prayer-cards-condensed");
+  await expect(page.getByTestId("home-prayer-disclosure")).toBeDisabled();
   await page.screenshot({ path: `output/playwright/home-overview/${info.project.name}-location-loading.png` });
   await page.evaluate(() => (window as unknown as { finishHomeLocation: () => void }).finishHomeLocation());
   await expect(page.getByTestId("home-location-result").getByRole("status")).toContainText(/updated/i);
@@ -401,7 +414,7 @@ test("Home location uses the saved prayer boundary and retains it after denied r
   );
   await page.screenshot({ path: `output/playwright/home-overview/${info.project.name}-location-denied.png` });
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: t("en", "home.chooseLocation") }).click();
+  await page.getByRole("button", { name: new RegExp(t("en", "home.chooseLocation")) }).click();
   await expect(page).toHaveURL(/settings\/location/);
   await expect(page.getByTestId("home-location")).toHaveCount(0);
 });

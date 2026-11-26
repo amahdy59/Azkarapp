@@ -1,4 +1,5 @@
 import "../../styles/theme/wordPopover.css";
+import "./overlay-surfaces.css";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronUp } from "./icons";
@@ -129,6 +130,8 @@ export function QuranWordPopover({
     <div
       ref={ref}
       role="dialog"
+      data-overlay-surface="contextual"
+      data-state="open"
       aria-label={`${t(language, "reader.wordMeaningLabel")}: ${primary.word}`}
       dir={direction}
       data-testid="quran-word-popover"

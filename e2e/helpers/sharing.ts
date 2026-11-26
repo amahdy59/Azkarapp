@@ -52,6 +52,11 @@ export async function expectSharingStepGeometry(studio: Locator) {
 
 /** Exercise the same labelled step navigation available to readers. */
 export async function sharingStep(studio: Locator, step: "content" | "design" | "share") {
+  await expect(studio).toBeVisible();
+  // Calling a wizard step deliberately enters custom design; prepared sets
+  // now expose their direct actions without a wizard.
+  const custom = studio.getByRole("radio", { name: /^(Custom design|تصميم مخصص)$/u });
+  if ((await custom.count()) && !(await custom.isChecked())) await custom.check();
   const names = { content: /^(Content|المحتوى),/u, design: /^(Design|التصميم),/u, share: /^(Share|المشاركة),/u };
   const navigation = studio.getByRole("navigation", { name: /Sharing steps|خطوات المشاركة/u });
   const control = navigation.getByRole("button", { name: names[step] });
@@ -67,6 +72,12 @@ export async function sharingContent(studio: Locator) {
   const disclosure = studio.getByText(/^(Customize content|تخصيص المحتوى)$/u).locator("xpath=ancestor::details[1]");
   if (!(await disclosure.evaluate((node) => (node as HTMLDetailsElement).open)))
     await disclosure.locator("summary").click();
+}
+
+/** Single-reader regressions explicitly choose the individual text from the prepared-first entry. */
+export async function sharingSingleContent(studio: Locator) {
+  await sharingContent(studio);
+  await studio.getByRole("radio", { name: /^(This zikr|هذا الذكر)$/u }).check();
 }
 
 /** Inspect the exact optional caption without changing the image workflow. */

@@ -36,6 +36,9 @@ async function openSharingBoard(page: Page, language: "ar" | "en") {
   const settings = modal.getByTestId("sharing-settings");
   const image = preview.getByRole("img");
   await expect(image).toBeVisible();
+  await expect(modal.getByRole("radio", { name: t(language, "shareStudio.curatedTab"), exact: true })).toBeChecked();
+  await sharingStep(modal, "content");
+  await expect(image).toBeVisible();
   await expect(preview.getByRole("group")).toHaveAttribute("aria-busy", "false");
   return { errors, modal, preview, settings, image };
 }
@@ -47,9 +50,12 @@ for (const language of ["ar", "en"] as const) {
     test.setTimeout(180_000);
     const { errors, modal, preview, settings, image } = await openSharingBoard(page, language);
     for (const choice of ["curated", "generated"] as const) {
-      const button = modal.getByRole("button", { name: t(language, `shareStudio.${choice}Tab`), exact: true });
-      await expect(button.locator(".sharing-choice-icon svg")).toBeVisible();
-      await expect(button).toHaveAccessibleDescription(t(language, `shareStudio.${choice}Description`));
+      const radio = modal.getByRole("radio", { name: t(language, `shareStudio.${choice}Tab`), exact: true });
+      await expect(radio).toBeVisible();
+      await expect(radio).toHaveAttribute("type", "radio");
+      const target = (await radio.locator("..").boundingBox())!;
+      expect(target.height).toBeGreaterThanOrEqual(44);
+      expect(target.width).toBeGreaterThanOrEqual(44);
     }
     await modal.getByText(t(language, "shareStudio.contentOptions"), { exact: true }).click();
     await page.mouse.move(0, 0);
@@ -153,7 +159,7 @@ for (const language of ["ar", "en"] as const) {
   });
 }
 
-test("illustrated artwork choices retain keyboard control in the light theme @cross-browser", async ({
+test("prepared-first artwork choices retain keyboard control in the light theme @cross-browser", async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -170,18 +176,22 @@ test("illustrated artwork choices retain keyboard control in the light theme @cr
   await page.goto("/#/azkar/before-sleep");
   await page.getByTestId("share-collection-button").click();
   const modal = page.getByTestId("collection-share-modal");
-  const curated = modal.getByRole("button", { name: "Curated cards", exact: true });
-  const custom = modal.getByRole("button", { name: "Custom design", exact: true });
-  await expect(custom).toHaveAttribute("aria-pressed", "true");
+  const curated = modal.getByRole("radio", { name: t("en", "shareStudio.curatedTab"), exact: true });
+  const custom = modal.getByRole("radio", { name: "Custom design", exact: true });
+  await expect(curated).toBeChecked();
+  await expect(custom).not.toBeChecked();
   await curated.focus();
-  await curated.press("Enter");
-  await expect(curated).toHaveAttribute("aria-pressed", "true");
-  await expect(custom).toHaveAttribute("aria-pressed", "false");
+  await curated.press("ArrowRight");
+  await expect(custom).toBeChecked();
+  await expect(custom).toBeFocused();
+  await custom.press("ArrowLeft");
+  await expect(curated).toBeChecked();
+  await expect(curated).toBeFocused();
   await expect(modal.getByRole("img").first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("sharing-board-light-curated.png") });
   await custom.focus();
   await custom.press("Space");
-  await expect(custom).toHaveAttribute("aria-pressed", "true");
+  await expect(custom).toBeChecked();
   await expect(custom).toBeFocused();
   await expect(modal.getByTestId("sharing-preview").getByRole("group")).toHaveAttribute("aria-busy", "false");
   await modal.getByText("Customize content", { exact: true }).click();

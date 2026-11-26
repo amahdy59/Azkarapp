@@ -568,7 +568,11 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     const top = withControls.querySelector(".mushaf-control-band--top")!;
     const bottom = withControls.querySelector(".mushaf-control-band--bottom")!;
     expect(top.compareDocumentPosition(paper) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(paper.nextElementSibling).toBe(bottom);
+    const panelHost = paper.nextElementSibling;
+    expect(panelHost).toHaveAttribute("data-toolbar-panel-host", "");
+    expect(panelHost).toBeEmptyDOMElement();
+    expect(panelHost?.nextElementSibling).toBe(bottom);
+    expect(paper).not.toContainElement(panelHost as HTMLElement);
     expect(paper).not.toContainElement(top);
     expect(canvasWithControls.style.paddingTop).toBe("");
     expect(canvasWithControls.style.paddingBottom).toBe("");
@@ -627,20 +631,20 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     });
 
     // Tap in center (x = 500, ratio = 0.5)
-    fireEvent.pointerDown(paper, { clientX: 500, pointerType: "touch", button: 0 });
-    fireEvent.pointerUp(paper, { clientX: 500, pointerType: "touch", button: 0 });
+    fireEvent.pointerDown(paper, { clientX: 500, pointerType: "touch", pointerId: 1, isPrimary: true, button: 0 });
+    fireEvent.pointerUp(paper, { clientX: 500, pointerType: "touch", pointerId: 1, isPrimary: true, button: 0 });
     expect(onCenterTap).toHaveBeenCalledTimes(1);
     expect(onEdgeTap).not.toHaveBeenCalled();
 
     // Tap on left edge (x = 100, ratio = 0.1 < 0.22)
-    fireEvent.pointerDown(paper, { clientX: 100, pointerType: "touch", button: 0 });
-    fireEvent.pointerUp(paper, { clientX: 100, pointerType: "touch", button: 0 });
+    fireEvent.pointerDown(paper, { clientX: 100, pointerType: "touch", pointerId: 1, isPrimary: true, button: 0 });
+    fireEvent.pointerUp(paper, { clientX: 100, pointerType: "touch", pointerId: 1, isPrimary: true, button: 0 });
     expect(onEdgeTap).toHaveBeenCalledWith("left");
     expect(onCenterTap).toHaveBeenCalledTimes(1);
 
     // Tap on right edge (x = 900, ratio = 0.9 > 0.78)
-    fireEvent.pointerDown(paper, { clientX: 900, pointerType: "touch", button: 0 });
-    fireEvent.pointerUp(paper, { clientX: 900, pointerType: "touch", button: 0 });
+    fireEvent.pointerDown(paper, { clientX: 900, pointerType: "touch", pointerId: 1, isPrimary: true, button: 0 });
+    fireEvent.pointerUp(paper, { clientX: 900, pointerType: "touch", pointerId: 1, isPrimary: true, button: 0 });
     expect(onEdgeTap).toHaveBeenCalledWith("right");
     expect(onCenterTap).toHaveBeenCalledTimes(1);
   });

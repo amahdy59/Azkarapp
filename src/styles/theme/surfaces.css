@@ -40,6 +40,30 @@
   background: color-mix(in srgb, var(--primary) 14%, var(--popover));
 }
 
+:root {
+  --system-bar-background: var(--background);
+}
+
+/* The native icon palette and the protected inset share this exact opaque
+   ground. Match Glass's actual shell fallback, including forced-color recovery. */
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    html[data-app-material-resolved="glass"]:not(.high-contrast) {
+      --system-bar-background: var(--on-media-surface);
+    }
+  }
+}
+
+.app-shell[data-native-android="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top);
+  z-index: 90;
+  pointer-events: none;
+  background-color: var(--system-bar-background);
+}
+
 .app-viewport {
   box-sizing: border-box;
   width: 100%;
@@ -484,11 +508,13 @@ button:is([aria-disabled="true"], [data-disabled]):active {
 .reduce-motion *::before,
 .reduce-motion *::after {
   animation-duration: 0.01ms !important;
+  animation-delay: 0s !important;
   animation-iteration-count: 1 !important;
   /* A nonzero duration enables default `transition-property: all` even on
      plain text/layout nodes. Immediate measurement then sees the OLD page
      width and can lock the Mushaf fitter at phone size after a resize. */
   transition-duration: 0s !important;
+  transition-delay: 0s !important;
   scroll-behavior: auto !important;
 }
 
@@ -524,8 +550,10 @@ button:is([aria-disabled="true"], [data-disabled]):active {
   *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0s !important;
+    transition-delay: 0s !important;
   }
 }
 

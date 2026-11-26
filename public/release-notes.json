@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-24-3",
+  "release": "2026-11-26",
   "ar": [
-    "اقرأ السنن والمراجع وسجّل الصلاة وتاريخها داخل بطاقة الكمبيوتر، مع مواقيت وموقع أوضح وثبات المحتوى عند تغيير حجم النافذة.",
-    "نزّل موارد القراءة والتسجيلات معًا، وتابع ما اكتمل واستكمل التنزيل مع خيارات أوضح عند التعثر.",
-    "تابع مصدر موقع القبلة ودقة الاتجاه، مع وصول مباشر للتحديث والمعايرة.",
-    "ابدأ قراءة السور من بطاقات مرتبة، واختر موقع الصلاة وطريقة الحساب بقوائم تدعم النص الكبير."
+    "اعرض المواقيت في شريط أوضح على الهاتف، وافتح تفاصيل الصلاة وسجلها مع موقع مختصر وتحكم مباشر في إظهار المواقيت.",
+    "عدّ الذكر بواجهة أبسط مع التراجع واختيار الذكر ووضع التركيز، وشارك المجموعات ببطاقاتها الجاهزة أو بتصميمك.",
+    "كبّر نص القرآن إلى أجزاء ملائمة للشاشة ثم عد إلى عرض المصحف، مع قوائم وعناوين تتكيف مع المظهر والنص الكبير.",
+    "اقرأ دليل العمرة المتاح واحفظ موضعك وموارده دون اتصال، واستعرض ملخصات أوضح للصوت والتنزيلات، واختم جلسة الذكر بتذكير موثق."
   ],
   "en": [
-    "Read complete Sunnah guidance beside your desktop prayer checklist and date, with steadier content when resizing.",
-    "Download reading resources and recordings together, track completed files and resume with clearer recovery.",
-    "Check Qibla location source and direction accuracy, with direct refresh and calibration.",
-    "Open surahs from clearer cards and choose prayer locations and calculation methods with larger-text support."
+    "See clearer phone prayer timings, open dated prayer details, and show or hide timings beside compact location controls.",
+    "Count dhikr with simpler controls, Undo, a searchable choice and Focus; share collections using prepared cards or your own design.",
+    "Enlarge Quran text into portions that fit your screen and return to the Mushaf, with menus and headers that adapt to themes and larger text.",
+    "Read the available Umrah guide with saved position and offline resources, see clearer audio and download summaries, and finish dhikr with a sourced reminder."
   ]
 }

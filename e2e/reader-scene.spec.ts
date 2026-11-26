@@ -65,7 +65,7 @@ for (const language of ["ar", "en"] as const) {
   });
 
   for (const category of ["morning", "evening", "before_sleep"] as const) {
-    test(`${category} scene preserves ${language} geometry and contrast @cross-browser`, async ({
+    test(`${category} seamless canvas preserves ${language} geometry and contrast @cross-browser`, async ({
       page,
       browserName,
     }, testInfo) => {
@@ -85,31 +85,30 @@ for (const language of ["ar", "en"] as const) {
           });
           continue;
         }
-        await expect(scene).toBeVisible();
-        await expect(scene).toHaveAttribute("data-scene", category);
+        await expect(scene).toHaveCount(0);
+        await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-reader-category", category);
         const header = page.locator(headerSelector(width));
         await expect(header).toBeVisible();
+        await expect(header).toHaveAttribute("data-seamless-header");
+        await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        await expect(header).toHaveCSS("background-image", "none");
         const before = await header.boundingBox();
-        const art = await scene.boundingBox();
         expect(before).not.toBeNull();
-        expect(art).not.toBeNull();
-        const borderHeight = await header.evaluate((element) => {
-          const style = getComputedStyle(element);
-          return parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
-        });
-        expect(art!.height).toBeCloseTo(before!.height - borderHeight, 1);
-        expect(art!.width).toBeLessThanOrEqual(before!.width);
+        const toolbar = (await page.getByTestId("reader-header-toolbar").boundingBox())!;
+        const progress = (await header.getByRole("progressbar").boundingBox())!;
+        expect(toolbar.width).toBeLessThanOrEqual(before!.width);
+        expect(progress.y).toBeGreaterThanOrEqual(toolbar.y + toolbar.height);
         await page.evaluate(() => document.documentElement.classList.add("reduce-transparency"));
-        await expect(scene).toBeVisible();
-        await expect(scene.locator(".reader-scene__skyline")).toBeVisible();
+        await expect(scene).toHaveCount(0);
+        await expect(header.getByRole("heading", { level: 1 })).toBeVisible();
         expect(await header.boundingBox()).toEqual(before);
         await page.evaluate(() => document.documentElement.classList.remove("reduce-transparency"));
         if (cdp) {
           await cdp.send("Emulation.setEmulatedMedia", {
             features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
           });
-          await expect(scene).toBeVisible();
-          await expect(scene.locator(".reader-scene__skyline")).toBeVisible();
+          await expect(scene).toHaveCount(0);
+          await expect(header.getByRole("heading", { level: 1 })).toBeVisible();
           expect(await header.boundingBox()).toEqual(before);
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -125,7 +124,7 @@ for (const language of ["ar", "en"] as const) {
   }
 
   for (const theme of ["light", "midnight", "dark"] as const) {
-    test(`reader scene ${theme} theme and accessibility fallbacks in ${language} @cross-browser`, async ({
+    test(`seamless reader ${theme} theme and accessibility fallbacks in ${language} @cross-browser`, async ({
       page,
       browserName,
     }, testInfo) => {
@@ -134,8 +133,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.locator("html")).toHaveClass(new RegExp(`theme-${theme}`));
       for (const width of [320, 1440]) {
         await page.setViewportSize({ width, height: 900 });
-        if (width < 768) await expect(page.getByTestId("reader-scene")).toHaveCount(0);
-        else await expect(page.getByTestId("reader-scene")).toBeVisible();
+        await expect(page.getByTestId("reader-scene")).toHaveCount(0);
         await expect(page.locator(headerSelector(width))).toBeVisible();
         expect((await new AxeBuilder({ page }).include(headerSelector(width)).analyze()).violations).toEqual([]);
         await page.screenshot({

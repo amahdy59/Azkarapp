@@ -39,13 +39,8 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("theme-option-midnight")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.goto("/#/counter");
-      if (width < 600) {
-        const sheet = await openMasbahaSettings(page);
-        await sheet.getByRole("radio", { name: t(language, "counter.custom"), exact: true }).check();
-      } else {
-        await page.getByTestId("counter-target-filter").click();
-        await page.getByRole("menuitem", { name: t(language, "counter.custom"), exact: true }).click();
-      }
+      const sheet = await openMasbahaSettings(page);
+      await expect(sheet.getByRole("textbox", { name: t(language, "counter.targetLabel"), exact: true })).toBeVisible();
       await expect(page.getByRole("dialog")).toBeVisible();
       await expect(page.getByRole("dialog")).toHaveCSS("animation-name", "none");
       const ordinaryButtons = page.locator('[data-slot="button"]');

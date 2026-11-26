@@ -1,4 +1,4 @@
-import { checkMasbahaSettings } from "./helpers/masbaha-settings";
+import { checkMasbahaDhikr, checkMasbahaSettings } from "./helpers/masbaha-settings";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
@@ -33,9 +33,53 @@ for (const language of ["ar", "en"] as const) {
       }, language);
       await page.goto(`/#${route}`);
       const counter = page.getByTestId(route === "/counter" ? "custom-counter-surface" : "salawat-counter");
-      const benefit = page.getByTestId(
-        route === "/counter" ? "custom-counter-benefit-dock-button" : "salawat-benefit-dock-button",
-      );
+      if (route === "/counter") {
+        await expect(counter).toBeVisible();
+        const actions = page.getByTestId("masbaha-support-actions").getByRole("button");
+        await expect(actions).toHaveCount(3);
+        for (const action of await actions.all()) {
+          await expect(action).toHaveAccessibleName(/\S/);
+          await expect(action).toBeInViewport({ ratio: 1 });
+          const bounds = (await action.boundingBox())!;
+          expect(bounds.width).toBeGreaterThanOrEqual(44);
+          expect(bounds.height).toBeGreaterThanOrEqual(44);
+        }
+        const before = await counter.getAttribute("aria-label");
+        await page.getByTestId("masbaha-settings-trigger").click();
+        await page.getByTestId("masbaha-settings-sheet").locator("summary").press("Enter");
+        await page.getByRole("button", { name: t(language, "counter.virtueReference"), exact: true }).click();
+        await expect(page.getByRole("dialog")).toHaveCount(1);
+        await page.keyboard.press("Escape");
+        await expect(page.getByTestId("masbaha-settings-trigger")).toBeFocused();
+        await expect(counter).toHaveAttribute("aria-label", before!);
+        await page.screenshot({ path: info.outputPath(`${language}-masbaha-main.png`) });
+        for (const enlarged of [false, true]) {
+          await page.setViewportSize({ width: enlarged ? 320 : 390, height: 844 });
+          await page
+            .locator("html")
+            .evaluate((root, enlarged) => (root.style.fontSize = enlarged ? "200%" : "100%"), enlarged);
+          await checkMasbahaSettings(page, language);
+          await checkMasbahaDhikr(page, language);
+        }
+        await page.goto("/#/settings/reading");
+        await page.getByRole("radio", { name: t(language, "settings.iconsWithLabels"), exact: true }).click();
+        await expect(page.locator("html")).toHaveAttribute("data-reader-tool-labels", "true");
+        await expect
+          .poll(() =>
+            page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.readerToolLabels),
+          )
+          .toBe(true);
+        await page.goto("/#/counter");
+        await page.locator("html").evaluate((root) => (root.style.fontSize = "200%"));
+        for (const action of await actions.all()) {
+          await action.scrollIntoViewIfNeeded();
+          await expect(action).toBeInViewport({ ratio: 1 });
+          expect(await action.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+        }
+        await page.screenshot({ path: info.outputPath(`${language}-masbaha-labels-200.png`) });
+        return;
+      }
+      const benefit = page.getByTestId("salawat-benefit-dock-button");
       const row = page.locator(".reader-tools-row");
       const actions = row.locator("button[data-press-compact]");
       await expect(counter).toBeVisible();
@@ -58,17 +102,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(benefit).toBeFocused();
       await expect(counter).toHaveAttribute("aria-label", before!);
       await page.screenshot({
-        path: info.outputPath(`${language}-${route === "/counter" ? "masbaha" : "salawat"}-icons.png`),
+        path: info.outputPath(`${language}-salawat-icons.png`),
       });
 
       const trigger = page.getByTestId("salawat-formula-filter");
       for (const enlarged of [false, true]) {
         await page.setViewportSize({ width: enlarged ? 320 : 390, height: 844 });
         if (enlarged) await page.locator("html").evaluate((root) => (root.style.fontSize = "200%"));
-        if (route === "/counter") {
-          await checkMasbahaSettings(page, language);
-          continue;
-        }
         await trigger.click();
         const menu = page.getByRole("menu");
         await expect(menu).toBeVisible();
@@ -108,9 +148,7 @@ for (const language of ["ar", "en"] as const) {
           }),
         ).toBe(true);
         await page.screenshot({
-          path: info.outputPath(
-            `${language}-${route === "/counter" ? "masbaha" : "salawat"}-menu-${enlarged ? "200" : "100"}.png`,
-          ),
+          path: info.outputPath(`${language}-salawat-menu-${enlarged ? "200" : "100"}.png`),
         });
         expect(
           (
@@ -149,7 +187,7 @@ for (const language of ["ar", "en"] as const) {
         expect(await action.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
       }
       await page.screenshot({
-        path: info.outputPath(`${language}-${route === "/counter" ? "masbaha" : "salawat"}-labels.png`),
+        path: info.outputPath(`${language}-salawat-labels.png`),
       });
     });
   }

@@ -9,6 +9,7 @@ import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } fro
 import { isAudioControlLocked } from "../audioControlLock";
 import { isNativeAndroid } from "../native/platform";
 import { dismissTopOverlay } from "./useOverlayBack";
+import type { LearningResourceId } from "../learning/types";
 
 function categoryFromShortcutUrl(): CategoryId | null {
   const category = new URLSearchParams(window.location.search).get("category");
@@ -77,6 +78,9 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   );
   const [progressPeriod, setProgressPeriod] = useState<ProgressRoutePeriod>(initialRoute?.progressPeriod ?? "month");
   const [settingsPanel, setSettingsPanel] = useState<SettingsRoutePanel>(initialRoute?.settingsPanel ?? "root");
+  const [learningResourceId, setLearningResourceId] = useState(initialRoute?.learningResourceId);
+  const [learningUnitId, setLearningUnitId] = useState(initialRoute?.learningUnitId);
+  const [learningLanguage, setLearningLanguage] = useState<"ar" | "en">(initialRoute?.learningLanguage ?? "ar");
 
   const [routeContentLoading, setRouteContentLoading] = useState(
     () =>
@@ -196,6 +200,9 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
       librarySection,
       progressPeriod,
       settingsPanel,
+      learningResourceId,
+      learningUnitId,
+      learningLanguage,
       routineMode: sharedRoutineMode,
       subCategory: activeCat === "after_prayer" ? (activeSubCategory as PrayerName | undefined) : undefined,
     });
@@ -216,6 +223,9 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     librarySection,
     progressPeriod,
     settingsPanel,
+    learningResourceId,
+    learningUnitId,
+    learningLanguage,
     sharedRoutineMode,
     activeSubCategory,
   ]);
@@ -263,6 +273,11 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
           if (route.view === "library") setLibrarySection(route.librarySection ?? "collections");
           if (route.view === "progress") setProgressPeriod(route.progressPeriod ?? "month");
           if (route.view === "settings") setSettingsPanel(route.settingsPanel ?? "root");
+          if (route.view === "learning_reader") {
+            setLearningResourceId(route.learningResourceId);
+            setLearningUnitId(route.learningUnitId);
+            setLearningLanguage(route.learningLanguage ?? "ar");
+          }
           setActiveTab(tabForView(route.view));
         });
       },
@@ -316,6 +331,10 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
             void App.exitApp();
           } else if (inAppHistoryDepth.current > 0) {
             window.history.back();
+          } else if (view === "learning_reader") {
+            replace("learn");
+          } else if (view === "learn") {
+            replace("more");
           } else {
             setActiveTab("home");
             replace("home");
@@ -357,6 +376,42 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
       pushRouteState({ view: "library", librarySection: section }, () => setLibrarySection(section), false),
     [pushRouteState],
   );
+
+  const navigateLearningResource = useCallback(
+    (resourceId: LearningResourceId, unitId?: string, contentLanguage: "ar" | "en" = "ar") =>
+      pushRouteState(
+        {
+          view: "learning_reader",
+          learningResourceId: resourceId,
+          learningUnitId: unitId,
+          learningLanguage: contentLanguage,
+        },
+        () => {
+          setLearningResourceId(resourceId);
+          setLearningUnitId(unitId);
+          setLearningLanguage(contentLanguage);
+          setView("learning_reader");
+        },
+        false,
+      ),
+    [pushRouteState],
+  );
+
+  // Section changes replace the reader's entry, so Back returns to its catalogue.
+  const navigateLearningUnit = useCallback((unitId: string) => {
+    if (!isAudioControlLocked()) setLearningUnitId(unitId);
+  }, []);
+  const navigateLearningLanguage = useCallback((contentLanguage: "ar" | "en", unitId?: string) => {
+    if (isAudioControlLocked()) return;
+    setLearningLanguage(contentLanguage);
+    setLearningUnitId(unitId);
+  }, []);
+
+  const backLearningResource = useCallback(() => {
+    if (isAudioControlLocked()) return;
+    if (inAppHistoryDepth.current > 0) window.history.back();
+    else replace("learn");
+  }, [replace]);
 
   const navigateProgressPeriod = useCallback(
     (period: ProgressRoutePeriod) =>
@@ -410,7 +465,13 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
         return;
       }
 
-      if (e.key === "/" && view !== "reader" && view !== "custom_counter" && view !== "friday_salawat") {
+      if (
+        e.key === "/" &&
+        view !== "reader" &&
+        view !== "learning_reader" &&
+        view !== "custom_counter" &&
+        view !== "friday_salawat"
+      ) {
         e.preventDefault();
         push("search");
         return;
@@ -499,6 +560,13 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     librarySection,
     setLibrarySection,
     navigateLibrarySection,
+    learningResourceId,
+    learningUnitId,
+    navigateLearningResource,
+    navigateLearningUnit,
+    learningLanguage,
+    navigateLearningLanguage,
+    backLearningResource,
     progressPeriod,
     navigateProgressPeriod,
     settingsPanel,

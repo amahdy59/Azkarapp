@@ -18,14 +18,16 @@ for (const language of ["ar", "en"] as const) {
         }, language);
         await page.goto(`/#/${route}`);
         const toggle = page.getByTestId("reader-tools-toggle");
-        const actions = page.getByTestId("reader-support-actions");
+        const masbaha = route === "counter";
+        const actions = page.getByTestId(masbaha ? "masbaha-support-actions" : "reader-support-actions");
+        const secondary = masbaha ? page.getByTestId("counter-zikr-filter") : actions;
         await expect(toggle).toBeVisible();
         await expect(actions).toBeVisible();
         await expect(page.getByTestId("counter-tap-hint")).toHaveCount(0);
         await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
-        const controls = page.locator(
-          '[data-testid="reader-support-actions"] .devotional-secondary-action, .reader-tools-toggle',
-        );
+        const controls = masbaha
+          ? actions.getByRole("button")
+          : page.locator('[data-testid="reader-support-actions"] .devotional-secondary-action, .reader-tools-toggle');
         const styles = await controls.evaluateAll((buttons) =>
           buttons.map((button) => {
             const style = getComputedStyle(button);
@@ -40,7 +42,7 @@ for (const language of ["ar", "en"] as const) {
             };
           }),
         );
-        expect(styles.length).toBe(4);
+        expect(styles.length).toBe(masbaha ? 3 : 4);
         for (const style of styles) {
           expect(style.radius).toBe(styles[0].radius);
           expect(style.border).toBe(styles[0].border);
@@ -72,7 +74,7 @@ for (const language of ["ar", "en"] as const) {
           );
           expect(new Set(geometry.map((item) => Math.round(item.top))).size).toBe(
             // Labelled controls wrap on enlarged phones; help lives in More.
-            textScale === 2 && width < 600 ? 2 : 1,
+            textScale === 2 && width < 600 ? (masbaha ? 3 : 2) : 1,
           );
           for (const item of geometry) {
             expect(item.left).toBeGreaterThanOrEqual(0);
@@ -93,7 +95,7 @@ for (const language of ["ar", "en"] as const) {
         expect(
           (
             await new AxeBuilder({ page })
-              .include('[data-testid="reader-dock"]')
+              .include(masbaha ? '[data-testid="masbaha-support-actions"]' : '[data-testid="reader-dock"]')
               .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
               .analyze()
           ).violations,
@@ -105,11 +107,13 @@ for (const language of ["ar", "en"] as const) {
         await page.keyboard.press("Enter");
         await expect(toggle).toHaveAttribute("aria-pressed", "true");
         await expect(toggle).toBeFocused();
-        await expect(actions).not.toBeVisible();
+        await expect(secondary).not.toBeVisible();
         await page.keyboard.press("Escape");
         await expect(toggle).toHaveAttribute("aria-pressed", "false");
-        await expect(actions).toBeVisible();
-        await expect(page.locator(".reader-text-scroll:visible").first()).toBeFocused();
+        await expect(secondary).toBeVisible();
+        await expect(
+          page.locator(masbaha ? ".masbaha-reading:visible" : ".reader-text-scroll:visible").first(),
+        ).toBeFocused();
       });
     }
   }

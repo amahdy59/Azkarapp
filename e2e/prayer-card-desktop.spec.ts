@@ -1,3 +1,4 @@
+import { openPrayerDialog } from "./helpers/home-overview";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
@@ -47,9 +48,9 @@ for (const language of ["ar", "en"] as const) {
         instant.setMinutes(instant.getMinutes() + 5);
         await page.clock.setFixedTime(instant);
         await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-        const trigger = page.getByTestId(`prayer-card-${prayer}`).getByRole("button");
+        const trigger = page.getByTestId(`prayer-card-${prayer}`).locator("button");
         await expect(trigger).toBeEnabled();
-        if ((await trigger.getAttribute("aria-expanded")) !== "true") await trigger.click();
+        await openPrayerDialog(page, prayer);
         const card = page.getByTestId("prayer-actions-card");
         await expect(card).toHaveAttribute("data-inline-information", "true");
         await expect(card.getByTestId("prayer-actions-more-info")).toHaveCount(0);
@@ -82,7 +83,6 @@ for (const language of ["ar", "en"] as const) {
         expect(spacing.main).toBeCloseTo(spacing.reading, 0);
         if (prayer !== "fajr") {
           const header = await card.evaluate((node) => {
-            const heading = node.querySelector("h2")!.getBoundingClientRect();
             const checklist = node.querySelector(".prayer-actions-checklist")!;
             const group = checklist.getBoundingClientRect();
             const label = node.querySelector(".prayer-actions-list label")!.getBoundingClientRect();
@@ -97,15 +97,17 @@ for (const language of ["ar", "en"] as const) {
               return { alpha, lightness: (r! + g! + b!) / 3 };
             };
             const surface = color(checklist);
-            const panel = color(node.closest(".prayer-moment-panel")!);
-            const close = node.querySelector(".home-prayer-detail-close")!.getBoundingClientRect();
+            const panel = color(node.closest(".prayer-tracking-dialog")!);
+            const close = document
+              .querySelector('.prayer-tracking-header [data-testid="modal-close-button"]')!
+              .getBoundingClientRect();
             const titleRange = document.createRange();
             titleRange.selectNodeContents(node.querySelector(".prayer-evidence-desktop-title")!);
             const virtueInk = titleRange.getBoundingClientRect();
             const input = node.querySelector("input")!.getBoundingClientRect();
             const date = node.querySelector(".prayer-actions-context")!.getBoundingClientRect();
             return {
-              gap: group.top - heading.bottom,
+              gap: group.top - node.getBoundingClientRect().top,
               surface,
               panel,
               rowHeight: label.height,
@@ -121,7 +123,10 @@ for (const language of ["ar", "en"] as const) {
                 close.right > virtueInk.left &&
                 close.top < virtueInk.bottom &&
                 close.bottom > virtueInk.top,
-              headingEdge: node.getAttribute("dir") === "rtl" ? heading.right : heading.left,
+              headingEdge:
+                node.getAttribute("dir") === "rtl"
+                  ? node.getBoundingClientRect().right - 24
+                  : node.getBoundingClientRect().left + 24,
               groupEdge: node.getAttribute("dir") === "rtl" ? group.right : group.left,
               labelEdge: node.getAttribute("dir") === "rtl" ? label.right : label.left,
               dateEdge: node.getAttribute("dir") === "rtl" ? date.right : date.left,
@@ -141,7 +146,7 @@ for (const language of ["ar", "en"] as const) {
         }
         await expect(card.getByTestId("prayer-record-date")).toHaveAttribute("datetime", "2026-11-24");
         await expect(card.getByTestId("prayer-record-date")).toBeVisible();
-        await expect(page.getByRole("dialog")).toHaveCount(0);
+        await expect(page.getByRole("dialog")).toHaveCount(1);
         expect(await card.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
         const checkbox = card.getByRole("checkbox").first();
         await checkbox.focus();
@@ -181,23 +186,26 @@ for (const language of ["ar", "en"] as const) {
     });
     for (const width of [834, 390, 320]) {
       await page.setViewportSize({ width, height: 1000 });
-      await expect(card.getByTestId("prayer-inline-info")).toHaveCount(0);
+      await expect(card.getByTestId("prayer-inline-info")).toBeHidden();
       const date = card.getByTestId("prayer-record-date");
       await expect(date).toBeVisible();
-      const trigger = card.getByTestId("prayer-actions-more-info");
-      await trigger.click();
-      const dialog = page.getByTestId("prayer-actions-info-modal");
-      await expect(dialog).toBeVisible();
-      await expect(dialog.getByTestId("prayer-info-points")).toContainText(
+      await expect(card.getByTestId("prayer-actions-more-info")).toHaveCount(0);
+      const guidance = card.locator(".prayer-dialog-guidance").last();
+      await guidance.locator("summary").click();
+      await expect(guidance.getByTestId("prayer-inline-info")).toContainText(
         getPrayerInfoData("asr", language, "2026-11-24").sunnahItems[0]!.rankLabel,
       );
-      await expect(dialog.getByTestId("prayer-record-date")).toHaveCount(0);
-      await page.keyboard.press("Escape");
-      await expect(trigger).toBeFocused();
+      await guidance.locator("summary").click();
       await expect(date).toBeVisible();
       const overflow = await card.evaluate((node) =>
         [...node.querySelectorAll("*")]
-          .filter((el) => el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).display !== "inline")
+          .filter(
+            (el) =>
+              el.getClientRects().length > 0 &&
+              !el.closest(".sr-only") &&
+              el.scrollWidth > el.clientWidth + 1 &&
+              getComputedStyle(el).display !== "inline",
+          )
           .map((el) => ({
             tag: el.tagName,
             class: el.className,
@@ -221,14 +229,16 @@ for (const language of ["ar", "en"] as const) {
     expect(
       (await new AxeBuilder({ page }).include('[data-testid="prayer-actions-card"]').analyze()).violations,
     ).toEqual([]);
-    await card.getByTestId("prayer-actions-more-info").click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await card.locator(".prayer-dialog-guidance").last().locator("summary").click();
+    await expect(page.getByRole("dialog")).toHaveCount(1);
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(card.getByTestId("prayer-open-adhkar")).toBeFocused();
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    expect(await page.getByTestId("home-prayer-moment").evaluate((node) => node.contains(document.activeElement))).toBe(
+      true,
+    );
     await page.setViewportSize({ width: 390, height: 1000 });
-    await expect(card.getByTestId("prayer-actions-more-info")).toBeVisible();
-    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(card.getByTestId("prayer-actions-more-info")).toHaveCount(0);
+    await expect(page.getByRole("dialog")).toHaveCount(1);
     await page.emulateMedia({ forcedColors: "active" });
     await expect(card.getByTestId("prayer-record-date")).toBeVisible();
     expect(await card.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);

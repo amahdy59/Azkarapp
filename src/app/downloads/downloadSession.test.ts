@@ -6,7 +6,54 @@ import {
   runDownloadSession,
   updateDownloadSession,
   useDownloadSession,
+  useDownloadReadiness,
+  publishDownloadReadiness,
+  invalidateDownloadReadiness,
 } from "./downloadSession";
+
+it("reuses the last verified readiness without updating menu subscribers on every transfer chunk", async () => {
+  invalidateDownloadReadiness();
+  const menu = renderHook(useDownloadReadiness);
+  const checked = {
+    status: "checked" as const,
+    readyGroups: 2,
+    totalGroups: 3,
+    usageBytes: 1000,
+    duaVoiceId: "voice",
+    quranReciterId: "reciter",
+  };
+  act(() => publishDownloadReadiness(checked));
+  expect(menu.result.current).toEqual(checked);
+  let finish!: () => void;
+  let pending!: ReturnType<typeof runDownloadSession>;
+  act(() => {
+    pending = runDownloadSession(
+      { id: "test", completed: 0, total: 5 },
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+  });
+  const busy = menu.result.current;
+  expect(busy).toEqual({ status: "busy" });
+  act(() => {
+    publishDownloadReadiness(checked);
+    updateDownloadSession({ id: "test", completed: 1, total: 5 });
+  });
+  expect(menu.result.current).toBe(busy);
+  await act(async () => {
+    finish();
+    await pending;
+  });
+  expect(menu.result.current).toEqual({ status: "unchecked" });
+  act(() => {
+    publishDownloadReadiness(checked);
+    window.dispatchEvent(new Event("azkar-private-data-cleared"));
+  });
+  expect(menu.result.current).toEqual({ status: "unchecked" });
+  menu.unmount();
+});
 
 it("keeps progress across unmounts, rejects overlapping starts and reports completion to the returning screen", async () => {
   let finish!: () => void;

@@ -10,6 +10,20 @@ const testOptions = [
 ];
 
 describe("AccessibleCombobox", () => {
+  it("opens a touch picker without focusing search or summoning its keyboard", () => {
+    render(<AccessibleCombobox label="Surah" options={testOptions} value={1} onChange={vi.fn()} />);
+    const trigger = screen.getByRole("combobox");
+    const pointer = new Event("pointerdown", { bubbles: true });
+    Object.defineProperty(pointer, "pointerType", { value: "touch" });
+    fireEvent(trigger, pointer);
+    fireEvent.click(trigger);
+    expect(screen.getByRole("textbox")).not.toHaveFocus();
+    expect(document.activeElement).toHaveAttribute("data-slot", "combobox-content");
+    fireEvent.focus(screen.getByRole("textbox"));
+    screen.getByRole("textbox").focus();
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Kahf" } });
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+  });
   it("keeps options stationary under the pointer while keyboard navigation scrolls", () => {
     const onChange = vi.fn();
     render(<AccessibleCombobox label="Surah" options={testOptions} value={1} onChange={onChange} />);

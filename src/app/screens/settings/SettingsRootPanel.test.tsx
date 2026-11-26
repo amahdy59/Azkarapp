@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { SettingsRootPanel } from "./SettingsRootPanel";
 
 describe("SettingsRootPanel", () => {
-  it("shows seven primary destinations without inline controls and preserves search for downloads", () => {
+  it("separates audio and downloads as primary destinations and preserves download search", () => {
     const onNav = vi.fn();
     render(
       <SettingsRootPanel
@@ -18,18 +18,30 @@ describe("SettingsRootPanel", () => {
         isSyncing={false}
         syncError=""
         quietProgressEnabled={false}
+        locationSettings={{
+          latitude: 30.55,
+          longitude: 31.06,
+          cityName: "30.55°, 31.06°",
+          autoDetect: true,
+          calculationMethod: 5,
+          timeZone: "Africa/Cairo",
+        }}
         onNav={onNav}
       />,
     );
-    const ids = ["appearance", "reading", "prayer", "audio", "progress", "accessibility", "account-data"];
+    const ids = ["appearance", "reading", "prayer", "audio", "downloads", "progress", "accessibility", "account-data"];
     for (const id of ids) expect(screen.getByTestId("settings-sub-" + id)).toBeInTheDocument();
     expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("settings-sub-downloads")).not.toBeInTheDocument();
+    expect(screen.getByTestId("settings-sub-prayer")).toHaveTextContent("Near Cairo, Egypt");
+    expect(screen.getByTestId("settings-sub-audio")).toHaveTextContent("Audio & recitations");
+    fireEvent.click(screen.getByTestId("settings-sub-downloads"));
+    expect(onNav).toHaveBeenCalledWith("downloads");
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "download" } });
     fireEvent.click(screen.getByTestId("settings-sub-downloads"));
     expect(onNav).toHaveBeenCalledWith("downloads");
+    expect(screen.queryByTestId("settings-sub-audio")).not.toBeInTheDocument();
   });
-  it("displays gardenActive when quietProgressEnabled is true", () => {
+  it("shows the weekly goal instead of a Garden-only status", () => {
     render(
       <SettingsRootPanel
         onNav={vi.fn()}
@@ -44,14 +56,20 @@ describe("SettingsRootPanel", () => {
         isSyncing={false}
         syncError=""
         quietProgressEnabled={true}
+        summaries={{
+          audio: "عبد الله محمد · ١×",
+          downloads: "افتح للتحقق من التنزيلات",
+          reminders: "التذكيرات متوقفة",
+          progress: "الهدف الأسبوعي: ٤ أيام",
+        }}
       />,
     );
 
-    expect(screen.getByText("الحديقة نشطة")).toBeInTheDocument();
+    expect(screen.getByTestId("settings-sub-progress")).toHaveTextContent("الهدف الأسبوعي: ٤ أيام");
     expect(screen.queryByText("الحديقة مخفية")).not.toBeInTheDocument();
   });
 
-  it("displays gardenHidden when quietProgressEnabled is false", () => {
+  it("keeps local progress visible when Garden is hidden", () => {
     render(
       <SettingsRootPanel
         onNav={vi.fn()}
@@ -69,11 +87,11 @@ describe("SettingsRootPanel", () => {
       />,
     );
 
-    expect(screen.getByText("الحديقة مخفية")).toBeInTheDocument();
+    expect(screen.getByText("التقدم محفوظ على هذا الجهاز")).toBeInTheDocument();
     expect(screen.queryByText("الحديقة نشطة")).not.toBeInTheDocument();
   });
 
-  it("displays English garden status accurately", () => {
+  it("renders all four summaries as passive row descriptions", () => {
     render(
       <SettingsRootPanel
         onNav={vi.fn()}
@@ -88,10 +106,20 @@ describe("SettingsRootPanel", () => {
         isSyncing={false}
         syncError=""
         quietProgressEnabled={true}
+        summaries={{
+          audio: "Abdullah Muhammad · 1.25×",
+          downloads: "Last check: 2/3 groups ready",
+          reminders: "Reminders selected",
+          progress: "Weekly goal: 7 days",
+        }}
       />,
     );
 
-    expect(screen.getByText("Garden active")).toBeInTheDocument();
+    expect(screen.getByTestId("settings-sub-audio")).toHaveTextContent("Abdullah Muhammad · 1.25×");
+    expect(screen.getByTestId("settings-sub-downloads")).toHaveTextContent("Last check: 2/3 groups ready");
+    expect(screen.getByTestId("settings-sub-prayer")).toHaveTextContent("Reminders selected");
+    expect(screen.getByTestId("settings-sub-progress")).toHaveTextContent("Weekly goal: 7 days");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.queryByText("Garden hidden")).not.toBeInTheDocument();
   });
 

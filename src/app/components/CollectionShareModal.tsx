@@ -3,20 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Modal } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import {
-  Check,
-  Copy,
-  Download,
-  Share2,
-  Maximize,
-  Minimize,
-  FileText,
-  Brush,
-  Globe,
-  Translate,
-  SlidersHorizontal,
-} from "./icons";
-import { SharingArtworkChoice } from "./SharingArtworkChoice";
+import { Check, Copy, Download, Share2, Maximize, Minimize, Globe, Translate, SlidersHorizontal } from "./icons";
 import { t } from "../i18n";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
@@ -131,7 +118,14 @@ export function CollectionShareModal({
   initialScope = "current",
   contentAlignment = "balanced",
 }: CollectionShareModalProps) {
-  const [wholeCollection, setWholeCollection] = useState(false);
+  const reminderOnly =
+    initialSingle &&
+    (shareItemsByLanguage?.[language] ?? shareItems ?? initialItems.map((item) => toShareItem(item, language))).every(
+      (item) => item.reminder,
+    );
+  const [wholeCollection, setWholeCollection] = useState(() =>
+    Boolean(collection && getCuratedRoutinePack(categoryId) && !reminderOnly),
+  );
   const single = initialSingle && !wholeCollection;
   const items = wholeCollection && collection ? collection.items : initialItems;
   const collectionTitle = wholeCollection && collection ? collection.title : initialTitle;
@@ -141,16 +135,7 @@ export function CollectionShareModal({
   const layoutMode = useLayoutMode();
   const wide = layoutMode === "expanded" || layoutMode === "large";
   const [appearance, setAppearance] = useState<ShareAppearance>(() => defaultShareAppearance(categoryId, themeMode));
-  const [format, setFormat] = useState<ShareFormat>(
-    () =>
-      initialFormat ??
-      (single &&
-      (shareItemsByLanguage?.[language] ?? shareItems ?? items.map((item) => toShareItem(item, language))).every(
-        (item) => item.reminder,
-      )
-        ? "portrait"
-        : "story"),
-  );
+  const [format, setFormat] = useState<ShareFormat>(() => initialFormat ?? (reminderOnly ? "portrait" : "story"));
   const [meaning, setMeaning] = useState(false);
   const [wordMeanings, setWordMeanings] = useState(false);
   const [exportLanguage, setExportLanguage] = useState<AppLanguage>(language);
@@ -162,8 +147,13 @@ export function CollectionShareModal({
   const [mode, setMode] = useState<"image" | "text">("image");
   const [includeCaption, setIncludeCaption] = useState(false);
   const curatedPack = useMemo(() => (!single ? getCuratedRoutinePack(categoryId) : null), [categoryId, single]);
-  const [imageSource, setImageSource] = useState<"curated" | "generated">("generated");
+  const [imageSource, setImageSource] = useState<"curated" | "generated">(() =>
+    curatedPack ? "curated" : "generated",
+  );
   const [curatedIndex, setCuratedIndex] = useState(0);
+  const [selectedCurated, setSelectedCurated] = useState<number[]>(
+    () => curatedPack?.cards.map((_, index) => index) ?? [],
+  );
   const [curatedFiles, setCuratedFiles] = useState<File[]>([]);
   const [curatedPreviewUrls, setCuratedPreviewUrls] = useState<string[]>([]);
   const [curatedLoading, setCuratedLoading] = useState(false);
@@ -266,13 +256,14 @@ export function CollectionShareModal({
 
   const steps: readonly SharingStep[] =
     mode === "image" && imageSource !== "curated" ? ["content", "design", "share"] : ["content", "share"];
-  const currentStep = steps.includes(step) ? step : steps[0]!;
-  const changeStep = (next: SharingStep) => {
+  const currentStep =
+    mode === "image" && curatedPack && imageSource === "curated" ? "share" : steps.includes(step) ? step : steps[0]!;
+  const changeStep = (next: SharingStep, focusHeading = true) => {
     setStep(next);
     setInspect(false);
     setStatus("");
     setError(false);
-    requestAnimationFrame(() => stepHeading.current?.focus());
+    if (focusHeading) requestAnimationFrame(() => stepHeading.current?.focus());
   };
   const presetOptions = (["arabic", "translated", "full"] as const).filter(
     (value) =>
@@ -327,14 +318,15 @@ export function CollectionShareModal({
   const isCuratedActive = mode === "image" && Boolean(curatedPack) && imageSource === "curated";
   const currentCuratedCard: CuratedRoutineCard | undefined = curatedPack?.cards[curatedIndex];
   const totalCurated = curatedPack?.cards.length ?? 0;
+  const scopedCuratedFiles = curatedFiles.filter((_, index) => selectedCurated.includes(index));
   const hasPreview = isCuratedActive ? Boolean(currentCuratedCard) : Boolean(previewPage);
   const reservePreview =
     mode === "image" && currentStep === "content" && Boolean(curatedPack) && !isCuratedActive && !inspect && !failed;
   const scopedNative = isCuratedActive
-    ? curatedFiles.length > 0 && canShareMultipleFiles(curatedFiles)
+    ? scopedCuratedFiles.length > 0 && canShareMultipleFiles(scopedCuratedFiles)
     : scopedPages.length > 0 && canShareMultipleFiles(scopedPages.map((page) => page.file));
   const scopeReady = isCuratedActive
-    ? curatedFiles.length > 0 && !curatedLoading
+    ? scopedCuratedFiles.length > 0 && !curatedLoading
     : scopedPages.length > 0 && (scope === "current" ? ready : allReady);
   const scopedText =
     scope === "current"
@@ -362,7 +354,8 @@ export function CollectionShareModal({
   const payloadReady = scope !== "selected" || selected.length > 0;
   const captionReady = payloadReady && (isCuratedActive || scope === "all" || ready || failed);
   const copyAsImage =
-    mode === "image" && (isCuratedActive ? canCopyImage() : scopedPages.length === 1 && canCopyImage());
+    mode === "image" &&
+    (isCuratedActive ? scopedCuratedFiles.length === 1 && canCopyImage() : scopedPages.length === 1 && canCopyImage());
 
   useEffect(() => {
     const urls = curatedFiles.map((file) => URL.createObjectURL(file));
@@ -371,8 +364,9 @@ export function CollectionShareModal({
   }, [curatedFiles]);
 
   useEffect(() => {
-    setImageSource("generated");
+    setImageSource(curatedPack ? "curated" : "generated");
     setCuratedIndex(0);
+    setSelectedCurated(curatedPack?.cards.map((_, index) => index) ?? []);
   }, [curatedPack]);
 
   useEffect(() => {
@@ -413,7 +407,7 @@ export function CollectionShareModal({
           : "generalSubtitle";
 
   useEffect(() => {
-    if (!open || !exportItems.length) return;
+    if (!open || !exportItems.length || isCuratedActive) return;
     const controller = new AbortController();
     let firstPage = true;
     setGenerating(true);
@@ -504,6 +498,7 @@ export function CollectionShareModal({
     qr,
     retry,
     generationKey,
+    isCuratedActive,
   ]);
 
   useEffect(() => () => releaseSharePages(completedPages.current), []);
@@ -598,9 +593,11 @@ export function CollectionShareModal({
       : isCuratedActive
         ? curatedLoading
           ? t(language, "shareStoryPack.generating")
-          : totalCurated > 1
-            ? t(language, "shareStudio.archiveCount", { count: formatNumerals(totalCurated, language) })
-            : ""
+          : selectedCurated.length === 0
+            ? t(language, "shareStudio.chooseCards")
+            : selectedCurated.length > 1
+              ? t(language, "shareStudio.archiveCount", { count: formatNumerals(selectedCurated.length, language) })
+              : ""
         : fitFailed
           ? t(language, "shareStudio.chooseSize")
           : generating
@@ -629,7 +626,12 @@ export function CollectionShareModal({
       maxWidthClassName="max-w-5xl"
       className="sharing-fullscreen sharing-collection-dialog gap-0"
     >
-      <div ref={surface} className="sharing-surface sharing-collection" data-scroll-whole={scrollWhole || undefined}>
+      <div
+        ref={surface}
+        className="sharing-surface sharing-collection"
+        data-curated={isCuratedActive || undefined}
+        data-scroll-whole={scrollWhole || undefined}
+      >
         <div className="sharing-dialog-header shrink-0 border-b border-border px-[16px] py-[8px] pe-[72px]">
           <span className="sharing-header-icon" aria-hidden="true">
             <Copy />
@@ -641,9 +643,32 @@ export function CollectionShareModal({
             <p className="text-sm text-muted-foreground break-words">{collectionTitle}</p>
           </div>
         </div>
-        <div className="shrink-0 px-4 py-1">
-          <SharingSteps steps={steps} step={currentStep} onChange={changeStep} language={language} disabled={busy} />
-        </div>
+        {curatedPack && (
+          <fieldset className="sharing-source-tabs shrink-0 px-4 py-2" disabled={busy}>
+            <legend className="sr-only">{t(language, "shareStudio.artworkSource")}</legend>
+            {(["curated", "generated"] as const).map((value) => (
+              <label key={value} className="sharing-choice text-sm">
+                <input
+                  type="radio"
+                  name={`${presetId}-artwork`}
+                  checked={imageSource === value && mode === "image"}
+                  onChange={() => {
+                    setMode("image");
+                    setImageSource(value);
+                    // Keep focus in the radio group for native arrow-key selection.
+                    changeStep("content", false);
+                  }}
+                />
+                {t(language, value === "curated" ? "shareStudio.curatedTab" : "shareStudio.generatedTab")}
+              </label>
+            ))}
+          </fieldset>
+        )}
+        {!isCuratedActive && (
+          <div className="shrink-0 px-4 py-1">
+            <SharingSteps steps={steps} step={currentStep} onChange={changeStep} language={language} disabled={busy} />
+          </div>
+        )}
         <div data-testid="sharing-scroll" data-sharing-body className="min-h-0 flex-1 overflow-y-auto scroll-py-4">
           <div className="px-[16px] pb-[8px] space-y-4">
             <div
@@ -692,7 +717,7 @@ export function CollectionShareModal({
                       className="sharing-preview-stage"
                       role="group"
                       aria-label={t(language, "shareStudio.preview")}
-                      aria-busy={generating}
+                      aria-busy={isCuratedActive ? curatedLoading : generating}
                     >
                       {failed && !isCuratedActive ? (
                         <div className="rounded-2xl border border-border bg-muted/30 p-4 text-start space-y-3">
@@ -1015,64 +1040,76 @@ export function CollectionShareModal({
                     </div>
                   </fieldset>
                 )}
-                {currentStep === "content" && curatedPack && !curatedUnavailable && mode === "image" && (
-                  <fieldset
-                    className="sharing-artwork-source mt-3 grid min-w-0 gap-2 items-start"
-                    style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,8rem),1fr))" }}
-                  >
-                    <legend className="mb-2 text-sm font-semibold">{t(language, "shareStudio.artworkSource")}</legend>
-                    <SharingArtworkChoice
-                      icon={<FileText />}
-                      label={t(language, "shareStudio.curatedTab")}
-                      description={t(language, "shareStudio.curatedDescription")}
-                      selected={imageSource === "curated"}
-                      onClick={() => setImageSource("curated")}
-                      disabled={busy}
-                    />
-                    <SharingArtworkChoice
-                      icon={<Brush />}
-                      label={t(language, "shareStudio.generatedTab")}
-                      description={t(language, "shareStudio.generatedDescription")}
-                      selected={imageSource === "generated"}
-                      onClick={() => setImageSource("generated")}
-                      disabled={busy}
-                    />
-                  </fieldset>
+                {curatedUnavailable && (
+                  <div className="space-y-2" role="status">
+                    <p>{t(language, "shareStudio.preparedUnavailable")}</p>
+                    <Button variant="outline" disabled={busy} onClick={() => setImageSource("curated")}>
+                      {t(language, "common.tryAgain")}
+                    </Button>
+                  </div>
                 )}
                 {currentStep === "share" && isCuratedActive && curatedPack && (
-                  <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+                  <div className="space-y-3">
                     <h3 className="font-bold text-sm text-foreground">{t(language, "shareStudio.overview")}</h3>
                     <p className="text-xs text-muted-foreground">{t(language, "shareStudio.curatedHint")}</p>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p role="status">
+                        {t(language, "shareStudio.selectedCount", {
+                          count: formatNumerals(selectedCurated.length, language),
+                        })}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        disabled={busy}
+                        onClick={() => setSelectedCurated(curatedPack.cards.map((_, index) => index))}
+                      >
+                        {t(language, "shareStudio.selectAll")}
+                      </Button>
+                    </div>
                     <div
                       className="grid gap-2 pt-1"
                       style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,6rem),1fr))" }}
                     >
                       {curatedPack.cards.map((card, idx) => (
-                        <button
-                          key={card.id}
-                          type="button"
-                          aria-label={t(language, "shareStudio.goToCard", {
-                            count: formatNumerals(idx + 1, language),
-                          })}
-                          aria-pressed={curatedIndex === idx}
-                          onClick={() => setCuratedIndex(idx)}
-                          disabled={busy}
-                          className={`relative min-h-11 w-full rounded-xl border p-1.5 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${
-                            curatedIndex === idx ? "border-primary bg-muted/60" : "border-border hover:bg-muted/30"
-                          }`}
-                        >
-                          <img
-                            src={curatedPreviewUrls[idx] ?? resolveCuratedImageUrl(card.imagePath)}
-                            alt=""
-                            className="mx-auto h-20 w-full object-contain rounded-lg"
-                          />
-                          <span className="block mt-1 text-xs font-semibold text-center">
-                            {formatNumerals(idx + 1, language)}
-                          </span>
-                          {curatedIndex === idx && (
-                            <Check aria-hidden="true" className="absolute end-1 top-1 size-4 text-primary" />
-                          )}
-                        </button>
+                        <div key={card.id} className="min-w-0">
+                          <button
+                            key={card.id}
+                            type="button"
+                            aria-label={t(language, "shareStudio.goToCard", {
+                              count: formatNumerals(idx + 1, language),
+                            })}
+                            aria-pressed={curatedIndex === idx}
+                            onClick={() => setCuratedIndex(idx)}
+                            disabled={busy}
+                            className={`relative min-h-11 w-full rounded-xl border p-1.5 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${
+                              curatedIndex === idx ? "border-primary bg-muted/60" : "border-border hover:bg-muted/30"
+                            }`}
+                          >
+                            <img
+                              src={curatedPreviewUrls[idx] ?? resolveCuratedImageUrl(card.imagePath)}
+                              alt=""
+                              className="mx-auto h-20 w-full object-contain rounded-lg"
+                            />
+                            <span className="block mt-1 text-xs font-semibold text-center">
+                              {formatNumerals(idx + 1, language)}
+                            </span>
+                          </button>
+                          <label className="flex min-h-11 items-center justify-center gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={selectedCurated.includes(idx)}
+                              disabled={busy}
+                              onChange={(event) =>
+                                setSelectedCurated((previous) =>
+                                  event.target.checked
+                                    ? [...previous, idx].sort((a, b) => a - b)
+                                    : previous.filter((index) => index !== idx),
+                                )
+                              }
+                            />
+                            {t(language, "shareStudio.selectCard", { count: formatNumerals(idx + 1, language) })}
+                          </label>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -1443,15 +1480,15 @@ export function CollectionShareModal({
                       if (mode !== "image") {
                         await shareText(payload);
                       } else if (isCuratedActive) {
-                        if (curatedFiles.length === 1) {
-                          await shareSingleFile(curatedFiles[0]!, {
+                        if (scopedCuratedFiles.length === 1) {
+                          await shareSingleFile(scopedCuratedFiles[0]!, {
                             title,
                             text: includeCaption ? captionText : undefined,
                             downloadFallback: false,
                             onStatus: notify,
                           });
                         } else {
-                          await shareMultipleFiles(curatedFiles, {
+                          await shareMultipleFiles(scopedCuratedFiles, {
                             title,
                             text: includeCaption ? captionText : undefined,
                             downloadFallback: false,
@@ -1480,7 +1517,13 @@ export function CollectionShareModal({
                   }
                 >
                   <Share2 aria-hidden="true" />
-                  <span className="min-w-0 max-w-full break-words">{t(language, "shareStudio.share")}</span>
+                  <span className="min-w-0 max-w-full break-words">
+                    {isCuratedActive
+                      ? t(language, "shareStudio.shareCount", {
+                          count: formatNumerals(selectedCurated.length, language),
+                        })
+                      : t(language, "shareStudio.share")}
+                  </span>
                 </Button>
                 <Button
                   variant={(mode === "image" ? scopedNative : nativeText) ? "outline" : "default"}
@@ -1493,9 +1536,9 @@ export function CollectionShareModal({
                         mode !== "image"
                           ? new File([payload], "azkar.txt", { type: "text/plain;charset=utf-8" })
                           : isCuratedActive
-                            ? curatedFiles.length === 1
-                              ? curatedFiles[0]!
-                              : await createShareArchive(curatedFiles, scopedText)
+                            ? scopedCuratedFiles.length === 1
+                              ? scopedCuratedFiles[0]!
+                              : await createShareArchive(scopedCuratedFiles, captionText)
                             : scopedPages.length === 1
                               ? scopedPages[0]!.file
                               : await createShareArchive(
@@ -1527,8 +1570,8 @@ export function CollectionShareModal({
                   disabled={busy || (mode === "image" ? !scopeReady || !copyAsImage : !payloadReady || !canCopyText)}
                   onClick={() =>
                     void run(async () => {
-                      if (isCuratedActive && currentCuratedCard) {
-                        if (!(await copyCuratedCardImage(currentCuratedCard))) {
+                      if (isCuratedActive && curatedPack) {
+                        if (!(await copyCuratedCardImage(curatedPack.cards[selectedCurated[0]!]!))) {
                           setError(true);
                           setStatus(t(language, "shareStudio.copyCuratedError"));
                           return;

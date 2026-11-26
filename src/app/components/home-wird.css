@@ -1,93 +1,7 @@
 /* Home and interface cards share the routine card's material tokens.
    Reading, chrome and overlays retain their deliberate contrast hierarchy. */
-@property --home-prayer-expansion {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
-.home-prayer-sticky {
-  --home-prayer-expansion: 1;
-  --home-rail-duration: 260ms;
-  transition: --home-prayer-expansion var(--home-rail-duration) var(--motion-ease-standard);
-  margin-block-end: var(--home-prayer-reserved-space, 0px);
-}
-.home-prayer-sticky[data-prayer-cards-condensed] {
-  --home-prayer-expansion: 0;
-}
 .home-prayer-sticky-row {
-  padding-block-start: calc(0.125rem + 0.375rem * var(--home-prayer-expansion));
-  padding-block-end: calc(0.25rem + 0.75rem * var(--home-prayer-expansion));
-}
-.reduce-motion .home-prayer-sticky,
-.home-prayer-sticky[data-home-motion="reduced"] {
-  --home-rail-duration: 0ms;
-  transition: none;
-}
-/* WebKit can cache inherited registered values across size containers when
-   motion is off. Apply the same static endpoint directly in this still path. */
-.reduce-motion .home-prayer-sticky *,
-.home-prayer-sticky[data-home-motion="reduced"] * {
-  --home-prayer-expansion: 1;
-}
-.reduce-motion .home-prayer-sticky[data-prayer-cards-condensed] *,
-.home-prayer-sticky[data-home-motion="reduced"][data-prayer-cards-condensed] * {
-  --home-prayer-expansion: 0;
-}
-@media (prefers-reduced-motion: reduce) {
-  .home-prayer-sticky {
-    --home-rail-duration: 0ms;
-    transition: none;
-  }
-  .home-prayer-sticky * {
-    --home-prayer-expansion: 1;
-  }
-  .home-prayer-sticky[data-prayer-cards-condensed] * {
-    --home-prayer-expansion: 0;
-  }
-}
-
-/* Intrinsic tracks let enlarged labels reflow. The old and new rows never
-   overlap, and the same easing runs in either direction from the current frame. */
-.home-rail-fold {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr);
-  opacity: 1;
-  transition:
-    grid-template-rows var(--home-rail-duration) var(--motion-ease-standard),
-    opacity var(--home-rail-duration) var(--motion-ease-standard),
-    visibility 0s;
-}
-.home-rail-fold > * {
-  overflow: clip;
-}
-.home-prayer-mobile-fold,
-.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-expanded {
-  grid-template-rows: minmax(0, 0fr);
-  opacity: 0;
-  visibility: hidden;
-  transition-delay: 0s, 0s, var(--home-rail-duration);
-}
-.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-mobile-fold {
-  grid-template-rows: minmax(0, 1fr);
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
-}
-/* The expanded phone cards keep their shape while the rail folds away. */
-.home-prayer-sticky[data-home-compact-prayer]
-  .home-prayer-expanded
-  :is(.home-all-prayers-row, .home-all-prayers-row *) {
-  --home-prayer-expansion: 1;
-}
-.home-prayer-sticky[data-home-compact-prayer][data-prayer-cards-condensed] .home-prayer-expanded {
-  pointer-events: none;
-}
-.home-compact-prayer {
-  min-inline-size: 0;
-  padding: min(0.375rem, 6px) min(0.75rem, 12px);
-}
-.home-compact-prayer > div {
-  flex-basis: 8rem;
+  padding-block: 0.25rem 0.5rem;
 }
 
 .home-photo-canvas .hero-glass.home-glass-surface {
@@ -507,7 +421,7 @@ html:not(.high-contrast) .home-photo-canvas {
   html:not(.high-contrast)
     .home-photo-canvas
     .home-prayer-sticky[data-scrolled]:where(:has(> .hero-glass.home-glass-header)) {
-    background-color: color-mix(in srgb, var(--on-media-surface) 60%, transparent);
+    background-color: var(--glass-reading-tint);
     background-image:
       var(--paper-grain, none),
       linear-gradient(135deg, rgb(255 255 255 / 0.045), var(--glass-sheen-midpoint) 55%, transparent);

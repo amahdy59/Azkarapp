@@ -1,7 +1,8 @@
 import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
 import { QuranVerseText } from "../components/QuranVerseText";
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
-import { Search, Bookmark, ChevronNext, Lightbulb, X, Grid } from "../components/icons";
+import { Search, Bookmark, BookOpen, ChevronNext, Lightbulb, X, Grid } from "../components/icons";
+import { Button } from "../components/ui/button";
 import "./AzkarLibraryScreen.css";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
@@ -27,6 +28,7 @@ import { t } from "../i18n";
 import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode, Zikr } from "../types";
 import { categorySlug } from "../routing";
 import { vibrateIfEnabled } from "../motionPreferences";
+import { learningCatalogue } from "../learning/catalogue";
 
 export type LibrarySection = "collections" | "saved";
 type SavedLibraryItem = Pick<
@@ -47,6 +49,7 @@ export function AzkarLibraryScreen({
   savedZikrIds,
   routineModes,
   onOpenBenefits,
+  onOpenLearn,
   initialSection = "collections",
   onSectionChange,
   hapticFeedback = true,
@@ -60,6 +63,7 @@ export function AzkarLibraryScreen({
   savedZikrIds: Set<string>;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onOpenBenefits?: () => void;
+  onOpenLearn?: () => void;
   initialSection?: LibrarySection;
   onSectionChange?: (section: LibrarySection) => void;
   hapticFeedback?: boolean;
@@ -209,6 +213,14 @@ export function AzkarLibraryScreen({
     >
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
         <header className="library-stationary-header shrink-0 bg-background px-page pb-3 pt-2 sm:pb-4">
+          {onOpenLearn && learningCatalogue(language).length > 0 && (
+            <div className="mb-2 flex justify-end">
+              <Button variant="ghost" onClick={onOpenLearn}>
+                <BookOpen aria-hidden="true" />
+                {t(language, "learnEntry.shortcut")}
+              </Button>
+            </div>
+          )}
           <div className="library-header-layout flex min-h-11 min-w-0 flex-wrap items-start justify-between gap-x-2 gap-y-2">
             <div className="min-w-0">
               <h1 aria-label={t(language, "library.title")} className="page-title max-w-full font-sans text-foreground">

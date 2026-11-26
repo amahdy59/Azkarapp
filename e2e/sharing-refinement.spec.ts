@@ -1,4 +1,11 @@
-import { sharingStep, sharingContent, sharingCaption, sharingReadingLink, sharingScope } from "./helpers/sharing";
+import {
+  sharingStep,
+  sharingContent,
+  sharingSingleContent,
+  sharingCaption,
+  sharingReadingLink,
+  sharingScope,
+} from "./helpers/sharing";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { t } from "../src/app/i18n";
 import AxeBuilder from "@axe-core/playwright";
@@ -506,6 +513,7 @@ test("single zikr shares through the same preview without affecting its counter 
   await expect(reader).toBeVisible();
   await reader.getByTestId("reader-share-dock-button").click();
   const modal = page.getByTestId("collection-share-modal");
+  await sharingSingleContent(modal);
   await expect(modal).toHaveAccessibleName("مشاركة هذا الذكر");
   await expect(modal.getByRole("img").first()).toBeVisible();
   expect(await sharingReadingLink(modal)).toMatch(/#\/azkar\/morning\/4\?mode=complete$/u);
@@ -531,7 +539,7 @@ test("single Morning card keeps its contextual title and complete selected detai
   await page.goto(`./#/azkar/morning/${index + 1}`);
   await page.getByTestId("reader-share-dock-button").click();
   await expect(modal.getByRole("img").first()).toBeVisible();
-  await sharingContent(modal);
+  await sharingSingleContent(modal);
   await modal.getByRole("combobox", { name: "محتوى البطاقة" }).click();
   await page.getByRole("option", { name: "التفاصيل كاملة", exact: true }).click();
   await expect(modal.getByRole("img").first().or(modal.getByRole("alert")).first()).toBeVisible();
@@ -738,6 +746,7 @@ test("shared reader links preserve content across recipient routine preferences"
   const expectedId = await reader.getAttribute("data-zikr-id");
   await reader.getByTestId("reader-share-dock-button").click();
   const modal = page.getByTestId("collection-share-modal");
+  await sharingSingleContent(modal);
   const url = await sharingReadingLink(modal);
   const recipient = await browser.newContext();
   try {

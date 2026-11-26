@@ -37,6 +37,7 @@ export function PrayerMomentPanel({
   onGlass = false,
   canRecord = true,
   onClose,
+  inDialog = false,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
@@ -55,6 +56,7 @@ export function PrayerMomentPanel({
   canRecord?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
   onClose?: () => void;
+  inDialog?: boolean;
 }) {
   const [evidenceExpanded, setEvidenceExpanded] = useState(false);
   const times = useMemo(() => getEstimatedPrayerTimes(now, locationSettings), [now, locationSettings]);
@@ -79,6 +81,7 @@ export function PrayerMomentPanel({
       <div data-testid="prayer-journey">
         <PrayerActionsCard
           onClose={onClose}
+          inDialog={inDialog}
           prayer={prayer}
           language={language}
           direction={direction}

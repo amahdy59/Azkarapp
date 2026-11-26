@@ -33,8 +33,7 @@ for (const language of ["ar", "en"] as const) {
       // Compact padding/border and wide toolbar/title/progress geometry.
       // Preserve the fractional CSS height rather than its rounded screenshot value.
       expect(bounds.height).toBeCloseTo(width < 768 ? 56 : 96, 0);
-      // The owner's sidebar controls share their separate card anatomy in
-      // both open and closed states; the remaining header actions are round.
+      // All actions in the seamless header share one round, borderless family.
       const buttons = header.getByRole("button");
       const styles = await buttons.evaluateAll((elements) =>
         elements.map((element) => {
@@ -53,14 +52,9 @@ for (const language of ["ar", "en"] as const) {
       for (const style of styles) {
         expect(style.width).toBeGreaterThanOrEqual(44);
         expect(style.height).toBeGreaterThanOrEqual(44);
-        if (style.sidebarToggle) {
-          expect(style.radius).toBe("14px");
-          expect(style.border).toBe(1);
-        } else {
-          expect(style.radius).toBe(styles[0]!.radius);
-          expect(style.color).toBe(styles[0]!.color);
-        }
-        if (width < 768) expect(style.border).toBe(0);
+        expect(style.radius).toBe(styles[0]!.radius);
+        expect(style.color).toBe(styles[0]!.color);
+        expect(style.border).toBe(0);
       }
       const tools = page.getByTestId("reader-entry-tools");
       await expect(tools).toBeVisible();
@@ -71,11 +65,12 @@ for (const language of ["ar", "en"] as const) {
         expect(Math.abs(toolBounds.x - readingBounds.x)).toBeLessThanOrEqual(8);
         expect(Math.abs(toolBounds.width - readingBounds.width)).toBeLessThanOrEqual(16);
         expect(toolBounds.y).toBeGreaterThanOrEqual(bounds.y + bounds.height);
-        const sky = page.locator(".reader-scene__skyline");
-        expect((await sky.boundingBox())!.width).toBeLessThanOrEqual(bounds.width * 0.24 + 1);
-        const moon = (await page.locator(".reader-scene__celestial").boundingBox())!;
+        await expect(header).toHaveAttribute("data-seamless-header");
+        await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        await expect(header.getByTestId("reader-scene")).toHaveCount(0);
         const progress = (await header.getByRole("progressbar").boundingBox())!;
-        expect(moon.y + moon.height).toBeLessThan(progress.y);
+        const toolbar = (await page.getByTestId("reader-header-toolbar").boundingBox())!;
+        expect(progress.y).toBeGreaterThanOrEqual(toolbar.y + toolbar.height);
       }
       const menu = header.getByRole("button", { name: language === "ar" ? "خيارات القارئ" : "Reader options" });
       await menu.focus();
@@ -117,16 +112,20 @@ for (const language of ["ar", "en"] as const) {
     ]) {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`/#/${route}`);
-      const chrome = page.getByTestId(`${prefix}-session-chrome`);
+      const chromeId = `${prefix}-${prefix === "custom-counter" ? "desktop-hero" : "session-chrome"}`;
+      const chrome = page.getByTestId(chromeId);
       await expect(chrome).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       for (const width of [320, 390, 600, 767]) {
         await page.setViewportSize({ width, height: 844 });
         const bar = chrome.getByRole("progressbar");
         const box = (await chrome.boundingBox())!;
-        const track = (await bar.boundingBox())!;
-        expect(track.width).toBeCloseTo(box.width - 40, 0);
-        expect(track.height).toBe(8);
+        if (prefix === "custom-counter") await expect(bar).toHaveCount(0);
+        else {
+          const track = (await bar.boundingBox())!;
+          expect(track.width).toBeCloseTo(box.width - 40, 0);
+          expect(track.height).toBe(8);
+        }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         if (prefix === "reader") {
           await expect(page.getByTestId("reader-screen")).toHaveClass(/glass-reading/u);
@@ -143,9 +142,7 @@ for (const language of ["ar", "en"] as const) {
         document.documentElement.style.fontSize = "200%";
       });
       expect(await chrome.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
-      expect(
-        (await new AxeBuilder({ page }).include(`[data-testid="${prefix}-session-chrome"]`).analyze()).violations,
-      ).toEqual([]);
+      expect((await new AxeBuilder({ page }).include(`[data-testid="${chromeId}"]`).analyze()).violations).toEqual([]);
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "";
       });

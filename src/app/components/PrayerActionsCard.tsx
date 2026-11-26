@@ -31,6 +31,8 @@ export interface PrayerActionsCardProps {
   headingLevel?: 2 | 3;
   children?: ReactNode;
   onClose?: () => void;
+  /** Compact tracking overlays disclose guidance in place, avoiding nested dialogs. */
+  inDialog?: boolean;
 }
 
 /**
@@ -60,6 +62,7 @@ export function PrayerActionsCard({
   headingLevel = 3,
   children,
   onClose,
+  inDialog = false,
 }: PrayerActionsCardProps) {
   const [infoOpen, setInfoOpen] = useState(false);
   const desktop = useMediaQuery("(min-width: 1200px)");
@@ -83,7 +86,7 @@ export function PrayerActionsCard({
   const infoData = useMemo(() => getPrayerInfoData(prayer, language, dayKey), [prayer, language, dayKey]);
 
   const titleColor = onGlass ? "text-on-media" : "text-foreground";
-  const Heading = headingLevel === 2 ? "h2" : "h3";
+  const Heading = inDialog ? "div" : headingLevel === 2 ? "h2" : "h3";
 
   return (
     <section
@@ -93,6 +96,7 @@ export function PrayerActionsCard({
       data-inline-information={desktop || undefined}
       data-on-glass={onGlass || undefined}
       data-has-close={Boolean(onClose) || undefined}
+      data-in-dialog={inDialog || undefined}
       aria-labelledby={`prayer-actions-heading-${prayer}`}
       dir={direction}
       className={`prayer-actions-card flex min-w-0 flex-col gap-2 p-4 sm:p-5 ${className}`}
@@ -103,7 +107,9 @@ export function PrayerActionsCard({
           <div className="min-w-0 flex-1">
             <Heading
               id={`prayer-actions-heading-${prayer}`}
-              className={`${desktop ? "text-lg" : "text-title"} font-bold leading-normal ${titleColor}`}
+              className={
+                inDialog ? "sr-only" : `${desktop ? "text-lg" : "text-title"} font-bold leading-normal ${titleColor}`
+              }
               dir="auto"
             >
               {t(language, "prayerActions.heading", { prayer: infoData.prayerName })}
@@ -123,7 +129,7 @@ export function PrayerActionsCard({
               {t(language, "home.collapsePrayer")}
             </button>
           )}
-          {!desktop && (
+          {!desktop && !inDialog && (
             <button
               type="button"
               onClick={(event) => {
@@ -236,10 +242,28 @@ export function PrayerActionsCard({
           )}
         </div>
         {desktop && <PrayerRawatibDetails info={infoData} language={language} onGlass={onGlass} />}
+        {!desktop && inDialog && infoData.rawatibVirtue && (
+          <details className="prayer-dialog-guidance">
+            <summary>
+              {infoData.rawatibVirtue.title}
+              <ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <PrayerRawatibDetails info={infoData} language={language} onGlass={false} />
+          </details>
+        )}
       </div>
       <div className="prayer-actions-reading min-w-0">
         {children}
         {desktop && <PrayerSunnahDetails info={infoData} language={language} onGlass={onGlass} />}
+        {!desktop && inDialog && infoData.sunnahItems.length > 0 && (
+          <details className="prayer-dialog-guidance">
+            <summary>
+              {infoData.modalTitle}
+              <ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <PrayerSunnahDetails info={infoData} language={language} onGlass={false} />
+          </details>
+        )}
       </div>
 
       {/* Educational More Info Modal */}

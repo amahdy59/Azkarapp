@@ -1,0 +1,246 @@
+/* Shared geometry and finite motion; modal semantics remain owned by Radix/Vaul. */
+[data-toolbar-panel-frame] {
+  container: reader-tools / inline-size;
+}
+[data-overlay-surface] {
+  overscroll-behavior: contain;
+  --overlay-travel: -16px;
+}
+[data-overlay-origin="bottom"] {
+  --overlay-travel: 16px;
+}
+[data-overlay-surface="contextual"][data-side="top"] {
+  --overlay-travel: 8px;
+}
+[data-overlay-surface="contextual"][data-side="bottom"] {
+  --overlay-travel: -8px;
+}
+[data-overlay-surface="contextual"] {
+  border-radius: var(--ds-radius-overlay);
+}
+html[data-app-material-resolved="glass"]:not(.high-contrast)
+  [data-overlay-surface]:not(.audio-lock-shield):not([data-overlay-surface="panel"]) {
+  background-color: rgb(15 23 42) !important;
+}
+[data-overlay-surface][data-state="open"],
+.toolbar-panel,
+.mushaf-index-inline {
+  animation: overlay-arrive var(--motion-duration-entrance) var(--motion-ease-enter) both;
+}
+[data-overlay-surface][data-state="closed"] {
+  animation: overlay-leave var(--motion-duration-fast) var(--motion-ease-exit) both;
+}
+@keyframes overlay-arrive {
+  from {
+    opacity: 0;
+    translate: 0 var(--overlay-travel, -16px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes overlay-leave {
+  to {
+    opacity: 0;
+    translate: 0 var(--overlay-travel, -16px);
+  }
+}
+[data-overlay-surface="modal"] {
+  --overlay-travel: 0px;
+}
+[data-overlay-surface="modal"][data-state="open"] {
+  animation-name: overlay-modal-arrive;
+}
+[data-overlay-surface="modal"][data-state="closed"] {
+  animation-name: overlay-modal-leave;
+}
+/* Centered dialogs already use translate for positioning. Never overwrite it. */
+@keyframes overlay-modal-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes overlay-modal-leave {
+  to {
+    opacity: 0;
+  }
+}
+[data-overlay-surface="contextual"][data-side="left"] {
+  --overlay-side: 8px;
+}
+[data-overlay-surface="contextual"][data-side="right"] {
+  --overlay-side: -8px;
+}
+[data-overlay-surface="contextual"]:is([data-side="left"], [data-side="right"])[data-state="open"] {
+  animation-name: overlay-side-arrive;
+}
+[data-overlay-surface="contextual"]:is([data-side="left"], [data-side="right"])[data-state="closed"] {
+  animation-name: overlay-side-leave;
+}
+[data-overlay-surface="side-panel"][data-side="left"] {
+  --overlay-side: -16px;
+}
+[data-overlay-surface="side-panel"][data-side="right"] {
+  --overlay-side: 16px;
+}
+[data-overlay-surface="side-panel"][data-state="open"] {
+  animation-name: overlay-side-arrive;
+}
+[data-overlay-surface="side-panel"][data-state="closed"] {
+  animation-name: overlay-side-leave;
+}
+@keyframes overlay-side-arrive {
+  from {
+    opacity: 0;
+    translate: var(--overlay-side) 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes overlay-side-leave {
+  to {
+    opacity: 0;
+    translate: var(--overlay-side) 0;
+  }
+}
+[data-overlay-scrim] {
+  animation-duration: var(--motion-duration-standard);
+  animation-timing-function: var(--motion-ease-standard);
+}
+[data-overlay-scrim][data-state="closed"] {
+  animation: overlay-scrim-out var(--motion-duration-fast) both;
+}
+@keyframes overlay-scrim-out {
+  to {
+    opacity: 0;
+  }
+}
+.overlay-sheet[data-overlay-origin="top"] {
+  top: max(0px, env(safe-area-inset-top));
+  bottom: auto;
+  margin-block: 0;
+  border-radius: 0 0 var(--ds-radius-overlay) var(--ds-radius-overlay);
+  padding-block: 0;
+}
+.overlay-sheet {
+  max-block-size: calc(100dvh - max(12px, env(safe-area-inset-top)) - env(safe-area-inset-bottom));
+  border-radius: var(--ds-radius-overlay) var(--ds-radius-overlay) 0 0;
+}
+.overlay-sheet > [data-slot="drawer-handle"] {
+  display: none;
+}
+/* Vaul injects a more specific 500ms animation. This family owns both endpoints. */
+[data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction][data-overlay-surface="sheet"][data-state="open"] {
+  animation: overlay-arrive var(--motion-duration-entrance) var(--motion-ease-enter) both;
+  transition-duration: var(--motion-duration-standard);
+}
+[data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction][data-overlay-surface="sheet"][data-state="closed"] {
+  animation: overlay-leave var(--motion-duration-fast) var(--motion-ease-exit) both;
+}
+[data-overlay-surface="modal"] {
+  max-block-size: calc(100dvh - max(16px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)));
+  border-radius: var(--ds-radius-overlay);
+}
+[data-overlay-surface] :is(input, button, select, textarea) {
+  scroll-margin-block: 12px;
+}
+[data-overlay-surface] :is(.overflow-y-auto, .overflow-auto),
+.toolbar-panel :is(.overflow-y-auto, .overflow-auto) {
+  overscroll-behavior: contain;
+}
+[data-toolbar-panel-host]:empty {
+  display: none;
+}
+[data-toolbar-panel-host]:not(:empty) {
+  display: flex;
+  flex: 1;
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+[data-toolbar-panel-frame]:has([data-toolbar-panel-host]:not(:empty))
+  > :is(.mushaf-paper, .mushaf-index-inline, .mushaf-tablet-page-navigation) {
+  display: none;
+}
+[data-toolbar-panel-frame]:has(> .mushaf-index-inline) > .mushaf-paper {
+  display: none;
+}
+.toolbar-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  outline: none;
+  background-color: var(--mushaf-paper, var(--card));
+  color: var(--mushaf-ink, var(--foreground));
+}
+/* Ordinary Glass card selectors carry !important; the replacing content plane
+   must remain fully opaque even when settings adds its page-theme class. */
+html [data-toolbar-panel] {
+  background-color: var(--mushaf-paper, var(--card)) !important;
+  backdrop-filter: none !important;
+}
+.toolbar-panel > :last-child {
+  min-block-size: 0;
+  flex: 1;
+}
+/* At enlarged text, let the location take a complete row instead of a narrow
+   middle column. Keep both corner action groups in their original DOM order. */
+@container reader-tools (max-width: 16rem) {
+  .mushaf-control-band--top > [data-testid="mushaf-control-top-center"] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    inline-size: 100%;
+  }
+  .mushaf-control-band--top .mushaf-title-control {
+    inline-size: 100%;
+  }
+  .mushaf-control-band--top .mushaf-title-control > button {
+    max-width: 100% !important;
+    inline-size: 100%;
+  }
+  .toolbar-panel [data-sheet-header] > :first-child > :first-child:not(:last-child) {
+    display: none;
+  }
+  .toolbar-panel [data-sheet-header] {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  /* The stationary location/page controls already carry this context. */
+  .toolbar-panel [data-sheet-header] p {
+    display: none;
+  }
+}
+[data-toolbar-panel-frame] button[aria-expanded="true"] > span {
+  border-color: var(--primary);
+  background-color: color-mix(in srgb, var(--primary) 10%, var(--mushaf-paper));
+}
+.reduce-motion :is([data-overlay-surface], [data-overlay-scrim], .toolbar-panel, .mushaf-index-inline) {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-overlay-surface], [data-overlay-scrim], .toolbar-panel, .mushaf-index-inline) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media (forced-colors: active) {
+  html [data-toolbar-panel] {
+    background-color: Canvas !important;
+    color: CanvasText;
+  }
+  html[data-app-material-resolved="glass"]:not(.high-contrast)
+    [data-overlay-surface]:not(.audio-lock-shield):not([data-overlay-surface="panel"]) {
+    background-color: Canvas !important;
+    color: CanvasText;
+  }
+}

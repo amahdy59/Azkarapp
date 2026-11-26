@@ -17,6 +17,7 @@
 import { CATEGORIES } from "./content/categories";
 import { isPrayerName } from "./content/prayerTimes";
 import type { CategoryId, PrayerName, RoutineMode, View } from "./types";
+import type { LearningResourceId } from "./learning/types";
 
 export type LibraryRouteSection = "collections" | "saved";
 export type ProgressRoutePeriod = "day" | "week" | "month" | "year" | "last30";
@@ -48,6 +49,9 @@ export interface RouteState {
   query?: string;
   page?: number;
   librarySection?: LibraryRouteSection;
+  learningResourceId?: LearningResourceId;
+  learningUnitId?: string;
+  learningLanguage?: "ar" | "en";
   progressPeriod?: ProgressRoutePeriod;
   settingsPanel?: SettingsRoutePanel;
   /** Temporary reading context for shared links; never a persisted preference. */
@@ -62,6 +66,7 @@ const VIEW_PATHS = {
   wird_benefits: "/quran-wird/benefits",
   home: "/home",
   more: "/more",
+  learn: "/learn",
   qibla: "/qibla",
   library: "/azkar",
   progress: "/progress",
@@ -96,6 +101,9 @@ export function routeToHash(route: RouteState): string | null {
   const suffix = context.size ? `?${context}` : "";
 
   if (view === "library") return librarySection === "saved" ? "#/azkar/saved" : "#/azkar";
+  if (view === "learning_reader" && route.learningResourceId) {
+    return `#/learn/${route.learningResourceId}${route.learningUnitId ? `/${route.learningUnitId}` : ""}${route.learningLanguage === "en" ? "?lang=en" : ""}`;
+  }
   if (view === "progress") return progressPeriod ? `#/progress/${progressPeriod}` : "#/progress";
   if (view === "settings")
     return settingsPanel && settingsPanel !== "root" ? `#/settings/${settingsPanel}` : "#/settings";
@@ -144,6 +152,22 @@ export function parseHash(hash: string): RouteState | null {
 
   const path = raw.startsWith("/") ? raw : `/${raw}`;
   const segments = path.split("/").filter(Boolean);
+
+  if (segments[0] === "learn" && segments.length >= 2) {
+    const resourceId = segments[1];
+    if (resourceId !== "al-mukhtar" && resourceId !== "dalil-al-mutamir" && resourceId !== "al-wird-an-nabawi")
+      return null;
+    if (segments.length > 3 || (segments[2] && !/^p-[1-9]\d{0,3}$/.test(segments[2]))) return null;
+    const contentLanguage = contextParams.get("lang");
+    if (contentLanguage && contentLanguage !== "ar" && contentLanguage !== "en") return null;
+    if (contentLanguage === "en" && resourceId !== "dalil-al-mutamir") return null;
+    return {
+      view: "learning_reader",
+      learningResourceId: resourceId,
+      ...(contentLanguage === "en" ? { learningLanguage: "en" as const } : {}),
+      ...(segments[2] ? { learningUnitId: segments[2] } : {}),
+    };
+  }
 
   if (segments[0] === "azkar" && segments[1] === "saved" && segments.length === 2) {
     return { view: "library", librarySection: "saved" };

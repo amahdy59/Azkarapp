@@ -1,4 +1,5 @@
 import "./form-controls.css";
+import "./overlay-surfaces.css";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import "./accessible-combobox.css";
@@ -53,6 +54,7 @@ export function AccessibleCombobox({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  const touchOpen = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -170,7 +172,13 @@ export function AccessibleCombobox({
             aria-haspopup="listbox"
             aria-controls={listboxId}
             aria-labelledby={`${comboboxId}-label ${comboboxId}-trigger`}
-            onKeyDown={handleKeyDown}
+            onPointerDown={(event) => {
+              touchOpen.current = event.pointerType === "touch";
+            }}
+            onKeyDown={(event) => {
+              touchOpen.current = false;
+              handleKeyDown(event);
+            }}
             className="flex min-h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-card px-3.5 py-2 text-start transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2.5">
@@ -206,8 +214,10 @@ export function AccessibleCombobox({
         <Popover.Portal container={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}>
           <Popover.Content
             ref={popupRef}
+            tabIndex={-1}
             data-slot="combobox-content"
             data-dropdown-surface=""
+            data-overlay-surface="contextual"
             aria-labelledby={`${comboboxId}-label`}
             dir={direction}
             align="start"
@@ -216,7 +226,7 @@ export function AccessibleCombobox({
             collisionBoundary={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}
             onOpenAutoFocus={(event) => {
               event.preventDefault();
-              searchInputRef.current?.focus();
+              (touchOpen.current ? popupRef.current : searchInputRef.current)?.focus({ preventScroll: true });
             }}
             className="accessible-combobox-popup z-[110] flex flex-col overflow-hidden rounded-2xl border border-border-control p-2 text-popover-foreground shadow-overlay"
           >

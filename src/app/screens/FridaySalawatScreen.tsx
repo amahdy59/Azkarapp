@@ -20,6 +20,7 @@ import {
   VolumeX,
 } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
+import { READING_HEADER_ACTION_CLASS } from "../components/ReadingHeaderSurface";
 import { ResponsiveSheet, SheetHeader } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -101,14 +102,6 @@ function ReferenceLink({
     />
   );
 }
-
-const HEADER_ACTION_CLASS =
-  "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
-
-/* The wide band is a fixed navy surface, so its controls take on-media colours
-   rather than theme ones — the same split the Reader makes. */
-const HERO_ACTION_CLASS =
-  "flex size-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 function getNextSalawatTarget(currentTarget: number): number {
   const presets = [10, 33, 100, 1000];
@@ -288,7 +281,6 @@ export function FridaySalawatScreen({
             title={t(language, "fridaySalawat.title")}
             onBack={onBack}
             testId="salawat"
-            category="neutral"
             textSize={currentTextSize}
             onTextSizeChange={handleTextSizeChange}
             progress={{
@@ -330,7 +322,7 @@ export function FridaySalawatScreen({
             }
             actions={(tier) => {
               const isWide = tier === "wide";
-              const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
+              const actionClass = READING_HEADER_ACTION_CLASS;
               return (
                 <div className="flex items-center gap-1.5">
                   <DropdownMenu dir={direction}>

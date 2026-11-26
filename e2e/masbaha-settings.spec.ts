@@ -44,35 +44,25 @@ for (const language of ["ar", "en"] as const) {
     await sheet.getByRole("button", { name: t(language, "common.cancel"), exact: true }).click();
     await expect(counter).toHaveAttribute("aria-label", before!);
     sheet = await openMasbahaSettings(page);
-    await sheet.getByRole("radio", { name: t(language, "counter.custom"), exact: true }).check();
-    await sheet.getByRole("spinbutton").fill("55");
-    await sheet.getByRole("button", { name: t(language, "counter.applySettings"), exact: true }).click();
+    await sheet.getByRole("textbox", { name: t(language, "counter.targetLabel"), exact: true }).fill("55");
+    await sheet.getByRole("button", { name: t(language, "counter.saveChanges"), exact: true }).click();
     await expect(sheet).toBeHidden();
-    await expect(page.getByTestId("masbaha-settings-summary")).toContainText(language === "ar" ? "٥٥" : "55");
+    await expect(counter).toHaveAttribute("aria-label", new RegExp(language === "ar" ? "٥٥" : "55"));
     await page.reload();
-    await expect(page.getByTestId("masbaha-settings-summary")).toContainText(language === "ar" ? "٥٥" : "55");
+    await expect(counter).toHaveAttribute("aria-label", new RegExp(language === "ar" ? "٥٥" : "55"));
     await expect(counter.locator(".counter-number")).toHaveText(language === "ar" ? "٣" : "3");
     await page.screenshot({ path: info.outputPath("mobile-settings-summary.png") });
     await openMasbahaSettings(page);
     await page.screenshot({ path: info.outputPath("mobile-settings-sheet.png") });
-    sheet = page.getByTestId("masbaha-settings-sheet");
-    await sheet.locator("summary").click();
-    await sheet
-      .getByRole("group", { name: t(language, "counter.chooseDhikr"), exact: true })
-      .getByRole("radio")
-      .nth(1)
-      .check();
-    await sheet.getByRole("button", { name: t(language, "counter.applySettings"), exact: true }).click();
-    await page.getByRole("button", { name: t(language, "counter.saveAndSwitch"), exact: true }).click();
-    sheet = await openMasbahaSettings(page);
-    await sheet.locator("summary").click();
-    await sheet
-      .getByRole("group", { name: t(language, "counter.chooseDhikr"), exact: true })
-      .getByRole("radio")
-      .first()
-      .check();
-    await sheet.getByRole("button", { name: t(language, "counter.applySettings"), exact: true }).click();
+    await page.keyboard.press("Escape");
+    await page.getByTestId("counter-zikr-filter").click();
+    const chooser = page.getByTestId("masbaha-dhikr-sheet");
+    await chooser.getByTestId("zikr-option-auth_la_hawla_wala_quwwata").click();
+    await chooser.getByRole("button", { name: t(language, "common.continue"), exact: true }).click();
+    await page.getByTestId("counter-zikr-filter").click();
+    await chooser.getByTestId("zikr-option-auth_subhanallah_wabihamdihi").click();
+    await chooser.getByRole("button", { name: t(language, "common.continue"), exact: true }).click();
     await expect(counter.locator(".counter-number")).toHaveText(formatNumerals(3, language));
-    await expect(page.getByTestId("masbaha-settings-summary")).toContainText(formatNumerals(55, language));
+    await expect(counter).toHaveAttribute("aria-label", new RegExp(formatNumerals(55, language)));
   });
 }

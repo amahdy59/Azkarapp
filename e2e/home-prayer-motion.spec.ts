@@ -51,47 +51,54 @@ for (const [language, width] of [
     await sticky.locator("..").evaluate((node) => {
       node.scrollTop = 150;
     });
-    await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    await expect(sticky).toHaveCSS("transition-duration", "0.26s");
+    const toggle = page.getByTestId("home-prayer-disclosure");
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await expect
       .poll(() =>
         sticky.evaluate(
-          (node) =>
-            node.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running").length,
+          (node) => node.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length,
         ),
       )
       .toBe(0);
-    const compact = await assertPrayerOverview(page);
-    for (const [index, cell] of compact.entries()) {
+    const scrolled = await assertPrayerOverview(page);
+    for (const [index, cell] of scrolled.entries()) {
       expect(cell.width).toBeCloseTo(expanded[index].width, 0);
       expect(cell.height).toBeCloseTo(expanded[index].height, 0);
     }
     await expect(page.getByTestId("home-all-prayers-row")).toHaveCSS("animation-name", "none");
     await expect(sticky).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
-    await capture("compact");
-    await sticky.locator("..").evaluate((node) => {
-      node.scrollTop = 0;
-    });
-    await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+    await capture("scrolled");
+    const timings = page.locator("#home-prayer-timings");
+    await expect(timings).toHaveCSS("transition-duration", "0.22s, 0.22s, 0s");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(timings).toBeHidden();
+    await toggle.click();
+    await expect(timings).toBeVisible();
     for (const preference of ["app", "os"] as const) {
       if (preference === "app") await page.locator("html").evaluate((node) => node.classList.add("reduce-motion"));
       else {
         await page.locator("html").evaluate((node) => node.classList.remove("reduce-motion"));
         await page.emulateMedia({ reducedMotion: "reduce" });
       }
-      for (const top of [150, 0]) {
-        await sticky.locator("..").evaluate((node, top) => {
-          node.scrollTop = top;
-        }, top);
-        await expect(sticky).toHaveCSS("--home-prayer-expansion", top ? "0" : "1");
-        await expect.poll(() => sticky.evaluate((node) => node.getAnimations({ subtree: true }).length)).toBe(0);
-        await assertPrayerOverview(page);
+      for (const expanded of [false, true]) {
+        await toggle.click();
+        await expect(toggle).toHaveAttribute("aria-expanded", String(expanded));
+        await expect(timings).toHaveCSS("transition-duration", "0s");
+        await expect
+          .poll(() =>
+            timings.evaluate(
+              (node) => node.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length,
+            ),
+          )
+          .toBe(0);
+        if (expanded) await assertPrayerOverview(page);
       }
     }
     await page.locator("html").evaluate((node) => {
       node.style.fontSize = "32px";
     });
     await assertPrayerOverview(page);
-    await capture("compact-large-text");
+    await capture("large-text");
   });
 }

@@ -54,19 +54,19 @@ test.describe("after-prayer tracking", () => {
     const actions = page.getByTestId("prayer-actions-card");
     const checkbox = actions.getByTestId("prayer-action-location").getByRole("checkbox");
     await checkbox.check();
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    await actions.getByTestId("prayer-actions-more-info").click();
-    const modal = page.getByTestId("prayer-actions-info-modal");
-    await expect(modal).toBeVisible();
-    await expect(modal.getByTestId("prayer-info-points").getByRole("listitem").first()).toBeVisible();
-    await modal.getByTestId("modal-close-button").click();
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    const guidance = actions.locator(".prayer-dialog-guidance").last();
+    await guidance.locator("summary").click();
+    await expect(guidance.getByTestId("prayer-inline-info")).toBeVisible();
+    await guidance.locator("summary").click();
     await checkbox.uncheck();
-    await expect(modal).toBeHidden();
+    await expect(guidance.locator(".prayer-sunnah-details")).toBeHidden();
     await expect(checkbox).not.toBeChecked();
   });
 
   test("summary cards reflow on phones and fit the wide canvas without squeezed text", async ({ page }) => {
     await openHome(page);
+    await page.keyboard.press("Escape");
     const grid = page.getByTestId("home-all-prayers-row");
     const cards = grid.locator("article[data-prayer]");
     await page.setViewportSize({ width: 320, height: 800 });

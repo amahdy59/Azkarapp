@@ -1,4 +1,4 @@
-import { checkMasbahaSettings } from "./helpers/masbaha-settings";
+import { checkMasbahaDhikr, checkMasbahaSettings } from "./helpers/masbaha-settings";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
@@ -173,7 +173,7 @@ for (const scenario of [
       ).toEqual([]);
       await page.screenshot({ path: info.outputPath("aligned-bilingual.png") });
     });
-    test("counting settings and trigger-width menus @cross-browser", async ({ page }, info) => {
+    test("counting settings and direct dhikr choices @cross-browser", async ({ page }, info) => {
       await page.goto("/#/counter");
       const zikr = page.getByTestId("counter-zikr-filter");
       await expect(page.getByTestId("custom-counter-surface")).toBeVisible();
@@ -181,32 +181,10 @@ for (const scenario of [
       await page.locator("html").evaluate((node, scale) => {
         node.style.fontSize = `${scale * 100}%`;
       }, scenario.scale);
-      if (scenario.width < 600) {
-        await checkMasbahaSettings(page, scenario.language);
-        await page.screenshot({ path: info.outputPath("masbaha-sheet-recovery.png") });
-        return;
-      }
-      await expect(zikr).toBeVisible();
-      for (const trigger of [zikr, page.getByTestId("counter-target-filter")]) {
-        await trigger.click();
-        const menu = page.getByRole("menu");
-        await expect(menu).toBeVisible();
-        await expect
-          .poll(async () => {
-            const button = await trigger.boundingBox(),
-              popup = await menu.boundingBox();
-            return Math.abs(button!.width - popup!.width);
-          })
-          .toBeLessThanOrEqual(1);
-        const rect = await menu.boundingBox();
-        expect(rect!.x).toBeGreaterThanOrEqual(0);
-        expect(rect!.x + rect!.width).toBeLessThanOrEqual(scenario.width);
-        expect(await menu.evaluate((n) => n.scrollWidth - n.clientWidth)).toBeLessThanOrEqual(1);
-        await expect(menu).toHaveAttribute("data-dropdown-surface", "");
-        await page.screenshot({ path: info.outputPath(`${await trigger.getAttribute("data-testid")}-width.png`) });
-        await page.keyboard.press("Escape");
-        await expect(trigger).toBeFocused();
-      }
+      await checkMasbahaSettings(page, scenario.language);
+      await checkMasbahaDhikr(page, scenario.language);
+      await expect(zikr).toBeFocused();
+      await page.screenshot({ path: info.outputPath("masbaha-sheet-recovery.png") });
     });
   });
 }

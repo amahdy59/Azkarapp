@@ -48,7 +48,13 @@ for (const { width, language, owner } of [
       const bounds = (await control.boundingBox())!;
       expect(Math.abs(bounds.x + bounds.width / 2 - width / 2)).toBeLessThanOrEqual(1);
     }
-    expect((await bookmark.boundingBox())!.x).toBeLessThan((await opener.boundingBox())!.x);
+    const bookmarkBounds = (await bookmark.boundingBox())!;
+    const openerBounds = (await opener.boundingBox())!;
+    expect(bookmarkBounds.x + bookmarkBounds.width / 2).toBeLessThan(openerBounds.x + openerBounds.width / 2);
+    if (width === 320) {
+      // Enlarged text gives the location its full row; corner actions remain above.
+      expect(bookmarkBounds.y + bookmarkBounds.height).toBeLessThanOrEqual(openerBounds.y + 1);
+    } else expect(bookmarkBounds.x).toBeLessThan(openerBounds.x);
     expect((await focus.boundingBox())!.x).toBeLessThan((await folio.boundingBox())!.x);
     await expect(focus).toHaveText("");
     await page.screenshot({ path: info.outputPath("reading.png") });

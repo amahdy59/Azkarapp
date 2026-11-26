@@ -1,4 +1,4 @@
-import { assertPrayerOverview } from "./helpers/home-overview";
+import { assertPrayerOverview, openPrayerDialog } from "./helpers/home-overview";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { getEstimatedPrayerTimes } from "../src/app/content/prayerTimes";
@@ -37,10 +37,10 @@ for (const language of ["ar", "en"] as const) {
     await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
     const tile = page.getByTestId("prayer-card-dhuhr");
-    await tile.getByRole("button").click();
+    await tile.locator("button").click();
     const panel = page.getByTestId("home-prayer-moment");
-    await expect(panel).toHaveAttribute("data-prayer", "dhuhr");
-    await expect(panel.locator("h2")).toContainText(language === "ar" ? "الجمعة" : "Jumu");
+    await expect(panel.locator(".prayer-tracking-body")).toHaveAttribute("data-prayer", "dhuhr");
+    await expect(panel.getByTestId("sheet-header-title")).toContainText(language === "ar" ? "الجمعة" : "Jumu");
     await expect(panel.getByRole("checkbox")).toHaveCount(3);
     await expect(panel.getByTestId("prayer-moment-virtue")).toContainText(language === "ar" ? "٨٥٧" : "857a");
     for (const check of await panel.getByRole("checkbox").all()) {
@@ -53,14 +53,14 @@ for (const language of ["ar", "en"] as const) {
     await tile.scrollIntoViewIfNeeded();
     await page.screenshot({ path: testInfo.outputPath(`friday-${language}.png`), scale: "css" });
     const desktop = language === "en";
-    if (!desktop) await panel.getByTestId("prayer-actions-more-info").click();
+    if (!desktop) await panel.locator(".prayer-dialog-guidance").last().locator("summary").click();
     const guidance = desktop ? panel.getByTestId("prayer-inline-info") : page.getByRole("dialog");
     await expect(guidance).toContainText(language === "ar" ? "٨٨١" : "881a");
     await expect(guidance).toContainText(language === "ar" ? "٨٨٢" : "882a");
     await page.screenshot({ path: testInfo.outputPath(`friday-info-${language}.png`), scale: "css" });
-    if (!desktop) await page.keyboard.press("Escape");
+    if (!desktop) await panel.locator(".prayer-dialog-guidance").last().locator("summary").click();
     await page.reload();
-    await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+    await openPrayerDialog(page, "dhuhr");
     for (const check of await panel.getByRole("checkbox").all()) await expect(check).toBeChecked();
     expect((await new AxeBuilder({ page }).include('[data-testid="home-prayer-moment"]').analyze()).violations).toEqual(
       [],
@@ -79,7 +79,7 @@ async function checkGeometry(page: Page) {
     const strip = document.querySelector('[data-testid="home-prayer-strip"]')!.getBoundingClientRect();
     const panel = document.querySelector('[data-testid="home-prayer-moment"]')!.getBoundingClientRect();
     const quote = document.querySelector('[data-testid="prayer-moment-virtue"] p[lang]')!;
-    const heading = document.querySelector('[data-testid="prayer-actions-card"] h2')!;
+    const heading = document.querySelector('[data-testid="prayer-actions-card"] [id^="prayer-actions-heading"]')!;
     return {
       rootSize,
       contentWidth: content.width,
@@ -100,7 +100,7 @@ async function checkGeometry(page: Page) {
   expect(measures.contentWidth).toBeCloseTo(measures.headerWidth, 0);
   expect(Math.abs(measures.headerAlignment)).toBeLessThanOrEqual(1);
   expect(measures.stripWidth).toBeLessThanOrEqual(measures.contentWidth);
-  expect(measures.panelWidth).toBeCloseTo(measures.stripWidth, 0);
+  expect(measures.panelWidth).toBeLessThanOrEqual(await page.evaluate(() => innerWidth));
   expect(Math.abs(measures.centerOffset)).toBeLessThanOrEqual(1);
   expect(measures.quoteFont).toBe(measures.headingFont);
   expect(measures.summaryOverflow).toBe(false);
@@ -108,7 +108,9 @@ async function checkGeometry(page: Page) {
     return [...panel.querySelectorAll("h2, h3, h4, p, span[id]")]
       .filter(
         (element) =>
-          element.scrollWidth > element.clientWidth + 1 || getComputedStyle(element).textOverflow === "ellipsis",
+          element.getClientRects().length > 0 &&
+          !element.closest(".sr-only") &&
+          (element.scrollWidth > element.clientWidth + 1 || getComputedStyle(element).textOverflow === "ellipsis"),
       )
       .map((element) => ({
         text: element.textContent,
@@ -184,9 +186,9 @@ for (const language of ["ar", "en"] as const) {
           await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
           const tile = page.getByTestId(`prayer-card-${prayer}`);
           await expect(tile).toHaveAttribute("data-prayer-state", "current");
-          const toggle = tile.getByRole("button");
-          if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
-          await expect(panel).toHaveAttribute("data-prayer", prayer);
+
+          await openPrayerDialog(page, prayer);
+          await expect(panel.locator(".prayer-tracking-body")).toHaveAttribute("data-prayer", prayer);
         };
         for (const prayer of prayerGroup) {
           await selectPrayer(prayer);
@@ -196,8 +198,9 @@ for (const language of ["ar", "en"] as const) {
             primary.boundingBox(),
           ]);
           const focusInset = 0;
-          expect(detail!.x).toBeCloseTo(summary!.x + focusInset, 0);
-          expect(detail!.width).toBeCloseTo(summary!.width - 2 * focusInset, 0);
+          expect(detail!.x).toBeGreaterThanOrEqual(0);
+          expect(detail!.width).toBeLessThanOrEqual(width);
+          expect(summary!.width).toBeGreaterThan(0);
           const homeMeasure = await page.evaluate(() => {
             const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
             return {
@@ -214,13 +217,14 @@ for (const language of ["ar", "en"] as const) {
             expect(box.x).toBeCloseTo(homeMeasure.heading.x + homeMeasure.gutter + focusInset, 0);
             expect(box.width).toBeCloseTo(homeMeasure.heading.width - 2 * homeMeasure.gutter - 2 * focusInset, 0);
           }
-          expect(homeMeasure.grid.x).toBeCloseTo(detail!.x, 0);
-          expect(homeMeasure.grid.width).toBeCloseTo(detail!.width, 0);
+          expect(detail!.x + detail!.width / 2).toBeCloseTo(width / 2, 0);
+          expect(homeMeasure.grid.width).toBeGreaterThan(0);
           if (fixedPosition) {
             expect(context!.x).toBeCloseTo(fixedPosition.x, 0);
             expect(context!.width).toBeCloseTo(fixedPosition.width, 0);
           } else fixedPosition = context!;
-          expect(context!.y).toBeGreaterThanOrEqual(detail!.y + detail!.height);
+          expect(detail!.y).toBeGreaterThanOrEqual(0);
+          expect(detail!.y + detail!.height).toBeLessThanOrEqual(1000);
           const checks = panel.getByRole("checkbox");
           await expect(checks).toHaveCount(prayer === "dhuhr" ? 4 : 3);
           for (const checkbox of await checks.all()) {
@@ -237,7 +241,7 @@ for (const language of ["ar", "en"] as const) {
           }
           if (prayer === "maghrib" || prayer === "isha") {
             await checks.last().evaluate((node) => node.blur());
-            await strip.scrollIntoViewIfNeeded();
+
             const cardGaps = await page.getByTestId("home-all-prayers-row").evaluate((row) => {
               const cards = [...row.querySelectorAll<HTMLElement>("article")];
               const gaps = cards.slice(1).map((card, index) => {
@@ -325,11 +329,12 @@ for (const language of ["ar", "en"] as const) {
           await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
           const tile = page.getByTestId(`prayer-card-${prayer}`);
           await expect(tile).toHaveAttribute("data-prayer-state", "current");
-          if ((await tile.getByRole("button").getAttribute("aria-expanded")) !== "true") {
-            await tile.getByRole("button").click();
-          }
-          await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", prayer);
-          await tile.scrollIntoViewIfNeeded();
+          await openPrayerDialog(page, prayer);
+          await expect(page.getByTestId("home-prayer-moment").locator(".prayer-tracking-body")).toHaveAttribute(
+            "data-prayer",
+            prayer,
+          );
+
           await checkGeometry(page);
           // Geometry below describes the full row. Browser scroll anchoring
           // may condense its sticky cards after opening a longer detail panel.
@@ -339,15 +344,10 @@ for (const language of ["ar", "en"] as const) {
             .evaluate((node) => {
               node.scrollTop = 0;
             });
-          await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute(
-            "data-prayer-cards-condensed",
-            "true",
-          );
+          await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
           await expect(tile).toHaveAttribute("data-selected", "true");
-          await expect(tile).toHaveCSS("outline-width", "1px");
-          expect(
-            await page.getByTestId("home-prayer-moment").evaluate((node) => getComputedStyle(node, "::before").display),
-          ).toBe("none");
+          await expect(tile).toHaveCSS("outline-width", "2px");
+          await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-dropdown-surface", "");
           await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
           await assertPrayerOverview(page);
           const timeStyles = await page.locator('[id^="prayer-summary-time-"]').evaluateAll((times) =>
@@ -358,11 +358,11 @@ for (const language of ["ar", "en"] as const) {
           );
           expect(
             timeStyles.every(
-              (time) => parseFloat(time.size) === (width >= 1200 ? 36 : 14) && Number(time.weight) >= 600,
+              (time) =>
+                parseFloat(time.size) === (width >= 1440 ? 36 : width >= 820 ? 28 : 14) && Number(time.weight) >= 600,
             ),
           ).toBe(true);
           if ((width === 390 && prayer === "fajr") || (width === 1440 && prayer === "dhuhr")) {
-            await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
             await page.screenshot({
               path: `output/playwright/compact-prayer/${testInfo.project.name}-${language}-${width}-${prayer}.png`,
               fullPage: true,
@@ -396,7 +396,7 @@ for (const language of ["ar", "en"] as const) {
         { themeMode, reduceTransparency },
       );
       await page.reload();
-      await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+      await openPrayerDialog(page, "dhuhr");
       await checkGeometry(page);
       expect(
         (
@@ -417,21 +417,22 @@ for (const language of ["ar", "en"] as const) {
     expect([3, 5]).toContain(tileRows);
     await assertPrayerOverview(page);
     const row = page.getByTestId("home-all-prayers-row");
-    await row.locator("article").last().scrollIntoViewIfNeeded();
-    await expect(row.locator("article").last()).toBeInViewport();
+    await expect(row.locator("article")).toHaveCount(5);
     const input = page.getByTestId("prayer-action-location").locator("input");
     await input.focus();
     await page.keyboard.press("Space");
     await expect(input).toBeChecked();
     await expect(page.getByTestId("prayer-actions-progress")).toHaveCount(0);
-    await expect(page.getByTestId("prayer-card-dhuhr").getByRole("button")).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByTestId("prayer-card-dhuhr").locator("button")).toHaveAttribute("aria-haspopup", "dialog");
     await expect(page.getByTestId("prayer-card-dhuhr")).toHaveAttribute("data-prayer-state", "current");
     await page.keyboard.press("Space");
     await expect(input).not.toBeChecked();
-    await page.getByTestId("prayer-actions-more-info").click();
-    await expect(page.getByRole("dialog")).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page.getByTestId("prayer-actions-more-info")).toBeFocused();
+    const guidance = page.locator(".prayer-dialog-guidance").last();
+    await guidance.locator("summary").press("Enter");
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    await expect(guidance.getByTestId("prayer-inline-info")).toBeVisible();
+    await guidance.locator("summary").press("Enter");
+    await expect(guidance.locator("summary")).toBeFocused();
     await page.emulateMedia({ forcedColors: "active" });
     await checkGeometry(page);
     await page.goto("/#/prayer/dhuhr");

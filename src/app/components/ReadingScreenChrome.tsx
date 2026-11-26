@@ -2,20 +2,15 @@ import type { ReactNode } from "react";
 import { ArrowPrevious, Keyboard } from "./icons";
 import { Header, IconButton } from "./LayoutShells";
 import { ProgressBar } from "./ProgressBar";
-import { ReaderSceneArt } from "./ReaderSceneArt";
 import { ReadingHeroToolbar } from "./ReadingHeroToolbar";
+import { ReadingHeaderSurface, READING_HEADER_ACTION_CLASS } from "./ReadingHeaderSurface";
 import { AppearanceMenu } from "./AppearanceMenu";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { t } from "../i18n";
-import type { AppLanguage, CategoryId, TextSizeOption } from "../types";
+import type { AppLanguage, TextSizeOption } from "../types";
 
 /** Shared ghost icon-button treatment for every control in the phone header row. */
-const HEADER_ACTION_CLASS =
-  "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
-
-/** Wide desktop hero action style on the navy brand surface. */
-const HERO_ACTION_CLASS =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+const HEADER_ACTION_CLASS = READING_HEADER_ACTION_CLASS;
 
 export interface ReadingProgress {
   value: number;
@@ -37,7 +32,6 @@ export function ReadingScreenChrome({
   progress,
   subRow,
   testId,
-  category = "neutral",
   textSize,
   onTextSizeChange,
   onKeyboardHelp,
@@ -51,34 +45,21 @@ export function ReadingScreenChrome({
   progress?: ReadingProgress;
   subRow?: ReactNode;
   testId: string;
-  category?: CategoryId | "neutral";
   textSize?: TextSizeOption;
   onTextSizeChange?: (size: TextSizeOption) => void;
   onKeyboardHelp?: () => void;
   keyboardHelpOpen?: boolean;
 }) {
   const isWide = useMediaQuery("(min-width: 768px)");
-  const artCategory: CategoryId = category === "neutral" ? "miscellaneous" : category;
 
   if (isWide) {
     return (
-      <div
-        data-testid={`${testId}-desktop-hero`}
-        data-reading-chrome
-        className="relative isolate w-full flex shrink-0 flex-col items-center overflow-hidden rounded-b-2xl px-6 pb-2.5 pt-2 text-center"
-        style={{
-          gap: "0.375rem",
-          background:
-            "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
-        }}
-      >
-        <ReaderSceneArt category={artCategory} />
-
+      <ReadingHeaderSurface data-testid={`${testId}-desktop-hero`}>
         <ReadingHeroToolbar
           title={title}
           testId={`${testId}-header-toolbar`}
           back={
-            <IconButton onClick={onBack} label={t(language, "common.back")} className={HERO_ACTION_CLASS}>
+            <IconButton onClick={onBack} label={t(language, "common.back")} className={HEADER_ACTION_CLASS}>
               <ArrowPrevious size={20} />
             </IconButton>
           }
@@ -91,7 +72,7 @@ export function ReadingScreenChrome({
                 aria-label={t(language, "reader.keyboardShortcuts")}
                 title={t(language, "reader.keyboardShortcuts")}
                 aria-expanded={keyboardHelpOpen}
-                className={HERO_ACTION_CLASS}
+                className={HEADER_ACTION_CLASS}
                 onClick={onKeyboardHelp}
               >
                 <Keyboard size={20} aria-hidden="true" />
@@ -99,7 +80,7 @@ export function ReadingScreenChrome({
             )}
             {textSize && onTextSizeChange && (
               <AppearanceMenu
-                triggerClass={HERO_ACTION_CLASS}
+                triggerClass={HEADER_ACTION_CLASS}
                 textSize={textSize}
                 onTextSizeChange={onTextSizeChange}
                 language={language}
@@ -116,10 +97,8 @@ export function ReadingScreenChrome({
             {progress && (
               <>
                 <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
-                  <span className="text-label font-semibold text-[color:var(--on-media-accent)]">
-                    {progress.percentLabel ?? ""}
-                  </span>
-                  <span className="text-xs font-bold text-[color:var(--on-media-accent)]" dir="ltr">
+                  <span className="text-label font-semibold text-muted-foreground">{progress.percentLabel ?? ""}</span>
+                  <span className="text-xs font-bold text-muted-foreground" dir="ltr">
                     {progress.countLabel}
                   </span>
                 </div>
@@ -128,8 +107,8 @@ export function ReadingScreenChrome({
                     value={progress.value}
                     max={progress.max}
                     height={8}
-                    trackColor="rgba(255,255,255,0.2)"
-                    fillColor="var(--on-media-accent)"
+                    trackColor="var(--reading-header-progress-track, var(--muted))"
+                    fillColor="var(--primary)"
                     direction={direction}
                     aria-label={progress.ariaLabel}
                   />
@@ -139,7 +118,7 @@ export function ReadingScreenChrome({
             {subRow}
           </div>
         )}
-      </div>
+      </ReadingHeaderSurface>
     );
   }
 

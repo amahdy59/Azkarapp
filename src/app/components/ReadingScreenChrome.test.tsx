@@ -24,6 +24,14 @@ describe("ReadingScreenChrome progress", () => {
         testId="reader"
       />,
     );
+    const heading = screen.getByRole("heading", { level: 1, name: "Morning Azkar" });
+    expect(heading).toHaveClass("text-foreground");
+    expect(heading).not.toHaveClass("text-on-media-accent");
+    expect(screen.queryByTestId("reader-scene")).not.toBeInTheDocument();
+    if (wide) {
+      expect(screen.getByTestId("reader-desktop-hero")).toHaveAttribute("data-seamless-header");
+      expect(screen.getByTestId("reader-desktop-hero")).not.toHaveAttribute("style");
+    }
     const progress = screen.getByRole("progressbar", { name: "Collection completion" });
     expect(progress).toHaveStyle({ height: "8px" });
     expect(progress).toHaveAttribute("dir", direction);

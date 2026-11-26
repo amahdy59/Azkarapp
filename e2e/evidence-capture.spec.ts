@@ -165,9 +165,12 @@ for (const [viewport, size] of [
     test(`${prayer} expanded in Arabic midnight at ${viewport} width`, async ({ page }, testInfo) => {
       await page.setViewportSize(size);
       await enterApp(page, "ar", "midnight", PRAYER_CAPTURE_TIMES[prayer]);
-      const prayerButton = page.getByTestId(`prayer-card-${prayer}`).getByRole("button");
+      const prayerButton = page.getByTestId(`prayer-card-${prayer}`).locator("button");
       if ((await prayerButton.getAttribute("aria-expanded")) !== "true") await prayerButton.click();
-      await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", prayer);
+      await expect(page.getByTestId("home-prayer-moment").locator(".prayer-tracking-body")).toHaveAttribute(
+        "data-prayer",
+        prayer,
+      );
       await expect(page.getByTestId(`prayer-card-${prayer}`)).toHaveAttribute("data-selected", "true");
       await shoot(page, `${viewport}-home-prayer-${prayer}-ar-midnight`, testInfo.outputPath(`${prayer}.png`));
     });
@@ -177,8 +180,11 @@ for (const [viewport, size] of [
 test("expanded prayer in English light at desktop width", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await enterApp(page, "en", "light", PRAYER_CAPTURE_TIMES.dhuhr);
-  const prayerButton = page.getByTestId("prayer-card-dhuhr").getByRole("button");
+  const prayerButton = page.getByTestId("prayer-card-dhuhr").locator("button");
   if ((await prayerButton.getAttribute("aria-expanded")) !== "true") await prayerButton.click();
-  await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", "dhuhr");
+  await expect(page.getByTestId("home-prayer-moment").locator(".prayer-tracking-body")).toHaveAttribute(
+    "data-prayer",
+    "dhuhr",
+  );
   await shoot(page, "desktop-home-prayer-dhuhr-en-light", testInfo.outputPath("dhuhr-en-light.png"));
 });

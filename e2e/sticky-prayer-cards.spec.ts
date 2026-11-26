@@ -30,77 +30,52 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("home-location")).toBeVisible();
       const originalCards = await strip.textContent();
       const scroll = sticky.locator("..");
-      const visibleStrip = width < 768 ? page.getByTestId("home-compact-prayer") : strip;
-      // Down the page, then back up: the original row stays below its header.
+      const toggle = page.getByTestId("home-prayer-disclosure");
       for (const position of [650, 350, 900]) {
         await scroll.evaluate((node, top) => {
           node.scrollTop = top;
         }, position);
         await expect.poll(() => scroll.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
-        await expect(visibleStrip).toBeInViewport();
-        await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-        if (width < 768) {
-          await expect(summary).toBeHidden();
-          await expect(strip).toHaveAttribute("inert", "");
-          await expect(visibleStrip.getByRole("button")).toBeEnabled();
-          await expect(visibleStrip.locator("[data-prayer-countdown-line]")).toBeVisible();
-        } else {
-          // The approved desktop cards retain their anatomy while pinned;
-          // summary and per-card statuses stay visible rather than folding.
-          await expect(summary).toBeVisible();
-          await expect(strip.locator("#home-prayer-countdown")).toBeVisible();
-          await expect(strip).not.toHaveAttribute("inert");
-          for (const status of await strip.locator(".home-prayer-desktop-status").all())
-            await expect(status).toBeVisible();
-        }
+        await expect(summary).toBeInViewport();
+        await expect(sticky).toHaveAttribute("data-scrolled", "true");
+        await expect(toggle).toHaveAttribute("aria-expanded", "true");
         await expect(strip).toHaveText(originalCards!);
-        const geometry = await visibleStrip.evaluate((node) => {
+        const geometry = await summary.evaluate((node) => {
           const box = node.getBoundingClientRect();
           const header = document.querySelector('[data-testid="home-utility-header"]')!.getBoundingClientRect();
-          const scroll = document.querySelector('[data-testid="home-sticky-prayers"]')!.parentElement!;
+          const sticky = node.closest('[data-testid="home-sticky-prayers"]')!;
           return {
             top: box.top,
             headerBottom: header.bottom,
             left: box.left,
             right: box.right,
-            padding: parseFloat(getComputedStyle(scroll).scrollPaddingTop),
-            stickyHeight: document.querySelector('[data-testid="home-sticky-prayers"]')!.getBoundingClientRect().height,
+            padding: parseFloat(getComputedStyle(sticky.parentElement!).scrollPaddingTop),
+            height: sticky.getBoundingClientRect().height,
           };
         });
         expect(geometry.top).toBeGreaterThanOrEqual(geometry.headerBottom);
         expect(geometry.top - geometry.headerBottom).toBeLessThan(20);
         expect(geometry.left).toBeGreaterThanOrEqual(0);
         expect(geometry.right).toBeLessThanOrEqual(width);
-        expect(geometry.padding).toBeGreaterThan(geometry.stickyHeight);
+        expect(geometry.padding).toBeGreaterThan(geometry.height);
       }
       expect(
-        (
-          await new AxeBuilder({ page })
-            .include(`[data-testid="${width < 768 ? "home-compact-prayer" : "home-prayer-strip"}"]`)
-            .analyze()
-        ).violations,
+        (await new AxeBuilder({ page }).include('[data-testid="home-sticky-prayers"]').analyze()).violations,
       ).toEqual([]);
       await page.screenshot({ path: testInfo.outputPath(`sticky-prayers-${language}-${width}.png`) });
-      // Existing card actions and native keyboard operation remain usable while pinned.
-      const current = strip.locator('[data-prayer-state="current"] button');
-      const compactAction = visibleStrip.getByRole("button");
-      if (width < 768) {
-        await compactAction.focus();
-        await expect(compactAction).toBeFocused();
-      } else {
-        await current.focus();
-        await page.keyboard.press("Enter");
-        await expect(current).toHaveAttribute("aria-expanded", "true");
-      }
-      await expect(visibleStrip).toBeInViewport();
-      await page.evaluate(() => {
-        document.documentElement.style.fontSize = "200%";
+      await toggle.focus();
+      await toggle.press("Enter");
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await toggle.press("Enter");
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      await page.locator("html").evaluate((node) => {
+        node.style.fontSize = "200%";
       });
       await expect
         .poll(() =>
           sticky.evaluate((node) => {
-            const scroll = node.parentElement!;
-            const height = node.getBoundingClientRect().height;
+            const scroll = node.parentElement!,
+              height = node.getBoundingClientRect().height;
             const fits = height + 44 < scroll.clientHeight;
             return fits
               ? getComputedStyle(node).position === "sticky" &&
@@ -113,30 +88,10 @@ for (const language of ["ar", "en"] as const) {
       await scroll.evaluate((node) => {
         node.scrollTop = 0;
       });
-      await expect(visibleStrip).toBeInViewport();
       await expect(strip.locator("article")).toHaveCount(5);
-      // A focused action or open prayer holds its layout, including at the top.
-      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      if (width < 768) {
-        await compactAction.evaluate((node) => (node as HTMLElement).blur());
-      } else {
-        await current.click();
-        await current.evaluate((node) => (node as HTMLElement).blur());
-      }
-      await scroll.evaluate((node) => {
-        node.scrollTop = 12;
-      });
-      await scroll.evaluate((node) => {
-        node.scrollTop = 0;
-      });
-      await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed", "true");
-      await expect(summary).toBeVisible();
-      await expect(strip).not.toHaveAttribute("inert");
       await expect(page.getByTestId("home-location")).toBeVisible();
-      // Very short windows must allow the full cards to scroll away rather
-      // than covering every reachable action below them.
-      await page.evaluate(() => {
-        document.documentElement.style.fontSize = "";
+      await page.locator("html").evaluate((node) => {
+        node.style.fontSize = "";
       });
       await page.setViewportSize({ width: 643, height: 150 });
       await expect(sticky).toHaveCSS("position", "relative");

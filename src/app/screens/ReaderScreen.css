@@ -9,6 +9,12 @@
   box-shadow: none !important;
 }
 
+/* Keep the full reading extent visible on light paper without adding a second
+   header surface. The fill and numeric labels retain the shared progress API. */
+html.theme-light:not(.high-contrast)[data-app-material-resolved="solid"] [data-testid="reader-session-chrome"] {
+  --reader-progress-track: color-mix(in srgb, var(--border-subtle) 40%, var(--background));
+}
+
 /* Allow the first/last Quran diacritics to clear the native reading viewport. */
 .reader-text-scroll [data-quran-passage] {
   padding-block: 0.5em;

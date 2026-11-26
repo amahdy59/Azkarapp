@@ -1,0 +1,100 @@
+.quran-enlarged-dialog {
+  height: min(56rem, calc(100dvh - 24px));
+  max-height: calc(100dvh - 24px);
+  gap: 0;
+  padding: 0;
+}
+.quran-enlarged-heading {
+  padding: 16px;
+  padding-inline-end: 64px;
+}
+.quran-portion-context {
+  display: grid;
+  min-height: 1.5rem;
+  padding-inline: 16px;
+}
+.quran-portion-context > span {
+  grid-area: 1 / 1;
+}
+.quran-portion-context-measure {
+  visibility: hidden;
+}
+.quran-enlarged-viewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0 16px;
+  overflow: hidden;
+}
+.quran-enlarged-text,
+.quran-enlarged-measure {
+  padding-block: 6px;
+  text-align: start;
+  width: 100%;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.quran-enlarged-measure {
+  position: absolute;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.quran-enlarged-text [data-zoom-word],
+.quran-enlarged-measure [data-zoom-word] {
+  display: inline-block;
+  white-space: pre;
+  max-width: none;
+}
+.quran-enlarged-controls {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+  display: grid;
+  gap: 8px;
+}
+.quran-size-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.quran-portion-navigation {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.quran-zoom-trigger {
+  min-height: 44px;
+}
+@media (max-width: 599px) {
+  .quran-enlarged-dialog {
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    max-block-size: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    translate: none !important;
+    padding-top: env(safe-area-inset-top);
+  }
+}
+@media (max-height: 400px) {
+  .quran-enlarged-heading {
+    padding-block: 4px;
+  }
+  .quran-enlarged-heading > p:last-child {
+    display: none;
+  }
+  .quran-enlarged-controls {
+    grid-template-columns: 1fr 1fr;
+    padding-block: 4px;
+  }
+  .quran-enlarged-controls > button:last-child {
+    grid-column: 1 / -1;
+  }
+}

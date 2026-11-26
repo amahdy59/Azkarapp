@@ -1,39 +1,54 @@
-import { useId, useState } from "react";
-import type { AuthenticZikrItem } from "../content/authenticAzkar";
-import type { AppLanguage } from "../types";
+import { useState, type ReactNode } from "react";
+import * as RadioGroup from "@radix-ui/react-radio-group";
+import type { AppLanguage, TextSizeOption } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
-import "./responsive-filters.css";
+import { ChoiceRadioItem } from "./ChoiceRadioItem";
+import { FormField } from "./FormField";
+import { ToggleTrack } from "./SettingsRow";
+import { parseMasbahaTarget } from "./masbahaControls";
+import "./masbaha.css";
 
 const GOAL_PRESETS = [10, 33, 100, 1000];
+export interface MasbahaFeedback {
+  sound: boolean;
+  haptics: boolean;
+}
 
-/** Draft-only controls: closing the sheet never changes a saved counter. */
+/** The screen applies drafts together; dismissing this panel changes nothing. */
 export function MasbahaSettingsSheet({
-  items,
-  selected,
   target,
-  savedItems,
   language,
   direction,
   onApply,
   onClose,
+  feedback,
+  textSize,
+  actions,
 }: {
-  items: readonly AuthenticZikrItem[];
-  selected: AuthenticZikrItem;
   target: number;
-  savedItems: Record<string, { target: number }>;
   language: AppLanguage;
   direction: "rtl" | "ltr";
-  onApply: (item: AuthenticZikrItem, target: number) => void;
+  onApply: (target: number, feedback: MasbahaFeedback, textSize: TextSizeOption) => void;
   onClose: () => void;
+  feedback: MasbahaFeedback & { vibrationAvailable: boolean };
+  textSize: TextSizeOption;
+  actions?: {
+    label: string;
+    icon: ReactNode;
+    onClick: () => void;
+    disabled?: boolean;
+    destructive?: boolean;
+    testId?: string;
+  }[];
 }) {
-  const id = useId();
-  const [chosen, setChosen] = useState(selected);
-  const [draftTarget, setDraftTarget] = useState(String(target));
-  const [custom, setCustom] = useState(!GOAL_PRESETS.includes(target));
-  const name = (item: AuthenticZikrItem) => (language === "ar" ? item.shortNameAr : item.shortNameEn);
+  const [draftTarget, setDraftTarget] = useState(() => formatNumerals(target, language));
+  const [touched, setTouched] = useState(false);
+  const [draftFeedback, setDraftFeedback] = useState(feedback);
+  const [draftTextSize, setDraftTextSize] = useState(textSize);
+  const value = parseMasbahaTarget(draftTarget);
   return (
     <ResponsiveSheet
       open
@@ -41,121 +56,136 @@ export function MasbahaSettingsSheet({
       title={t(language, "counter.settings")}
       language={language}
       direction={direction}
+      showCloseButton={false}
       testId="masbaha-settings-sheet"
       focusOnOpen
-      drawerClassName="filter-sheet"
-      dialogClassName="filter-sheet"
+      drawerClassName="masbaha-sheet"
+      dialogClassName="masbaha-sheet"
     >
       <SheetHeader
         title={t(language, "counter.settings")}
-        className="filter-sheet-header"
         onClose={onClose}
         language={language}
         direction={direction}
       />
       <form
-        className="flex min-h-0 flex-col"
+        className="masbaha-sheet-form"
+        noValidate
         onSubmit={(event) => {
           event.preventDefault();
-          const value = Number(draftTarget);
-          if (Number.isInteger(value) && value >= 1 && value <= 100000) onApply(chosen, value);
+          setTouched(true);
+          if (value !== null) onApply(value, draftFeedback, draftTextSize);
         }}
       >
-        <div className="min-h-0 overflow-y-auto p-4 space-y-5">
-          <details className="rounded-2xl border border-border p-3">
-            <summary className="min-h-11 cursor-pointer text-sm font-semibold focus-visible:ring-[3px] focus-visible:ring-ring">
-              {t(language, "counter.chooseDhikr")} · {name(chosen)}
-            </summary>
-            <fieldset className="mt-3 min-w-0 space-y-2">
-              <legend className="sr-only">{t(language, "counter.chooseDhikr")}</legend>
-              {items.map((item) => (
-                <label
-                  key={item.id}
-                  className="flex min-h-11 items-start gap-3 rounded-xl border border-border p-3 text-sm [overflow-wrap:anywhere]"
-                >
-                  <input
-                    type="radio"
-                    name={`${id}-dhikr`}
-                    value={item.id}
-                    checked={chosen.id === item.id}
-                    className="mt-1 shrink-0 accent-primary"
-                    onChange={(event) => {
-                      setChosen(item);
-                      const nextTarget =
-                        item.id === selected.id ? target : savedItems[item.id]?.target || item.recommendedTarget;
-                      setDraftTarget(String(nextTarget));
-                      setCustom(!GOAL_PRESETS.includes(nextTarget));
-                      const details = event.currentTarget.closest("details");
-                      if (details) {
-                        details.open = false;
-                        details.querySelector("summary")?.focus();
-                      }
-                    }}
-                  />
-                  <span>
-                    {/(?:\.{3}|…)$/u.test(name(item)) ? (language === "ar" ? item.textAr : item.textEn) : name(item)}
-                  </span>
-                </label>
+        <div className="masbaha-sheet-body space-y-5">
+          <section className="space-y-3" aria-label={t(language, "counter.targetLabel")}>
+            <RadioGroup.Root
+              value={value !== null && GOAL_PRESETS.includes(value) ? String(value) : ""}
+              onValueChange={(next) => {
+                setDraftTarget(formatNumerals(Number(next), language));
+                setTouched(true);
+              }}
+              dir={direction}
+              className="masbaha-goal-choices"
+              aria-label={t(language, "counter.targetPresets")}
+            >
+              {GOAL_PRESETS.map((preset) => (
+                <ChoiceRadioItem value={String(preset)} key={preset}>
+                  {formatNumerals(preset, language)}
+                </ChoiceRadioItem>
               ))}
-            </fieldset>
-          </details>
-          <fieldset className="min-w-0">
-            <legend className="mb-3 text-sm font-bold">{t(language, "counter.targetLabel")}</legend>
-            <div className="grid grid-cols-2 gap-2">
-              {GOAL_PRESETS.map((value) => (
-                <label
-                  key={value}
-                  className="flex min-h-11 items-center gap-2 rounded-xl border border-border p-3 text-sm"
-                >
-                  <input
-                    type="radio"
-                    name={`${id}-target`}
-                    checked={!custom && Number(draftTarget) === value}
-                    className="accent-primary"
-                    onChange={() => {
-                      setCustom(false);
-                      setDraftTarget(String(value));
-                    }}
-                  />
-                  {formatNumerals(value, language)}
-                </label>
-              ))}
-            </div>
-            <label className="mt-2 flex min-h-11 items-center gap-2 text-sm">
-              <input
-                type="radio"
-                name={`${id}-target`}
-                checked={custom}
-                className="accent-primary"
-                onChange={() => setCustom(true)}
-              />
-              {t(language, "counter.custom")}
-            </label>
-            {custom && (
-              <label className="block text-sm" htmlFor={`${id}-custom`}>
-                {t(language, "counter.setCustomTarget")}
-                <input
-                  id={`${id}-custom`}
-                  type="number"
-                  min={1}
-                  max={100000}
-                  step={1}
-                  required
-                  inputMode="numeric"
-                  value={draftTarget}
-                  onChange={(event) => setDraftTarget(event.target.value)}
-                  className="mt-2 h-12 w-full rounded-xl border border-border-control bg-background px-3 text-foreground"
-                />
-              </label>
+            </RadioGroup.Root>
+            <FormField
+              label={t(language, "counter.targetLabel")}
+              type="text"
+              inputMode="numeric"
+              value={draftTarget}
+              onChange={(event) => {
+                setDraftTarget(event.target.value);
+                setTouched(true);
+              }}
+              onBlur={() => setTouched(true)}
+              error={touched && value === null ? t(language, "counter.invalidTarget") : undefined}
+            />
+          </section>
+          <section className="masbaha-feedback" aria-label={t(language, "counter.feedback")}>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={draftFeedback.haptics}
+              aria-label={t(language, "counter.vibration")}
+              disabled={!feedback.vibrationAvailable}
+              onClick={() => setDraftFeedback({ ...draftFeedback, haptics: !draftFeedback.haptics })}
+              className="masbaha-switch-row"
+            >
+              <span>{t(language, "counter.vibrationShort")}</span>
+              <ToggleTrack checked={draftFeedback.haptics} />
+            </button>
+            {!feedback.vibrationAvailable && (
+              <p className="px-1 text-xs text-muted-foreground">{t(language, "counter.vibrationUnavailable")}</p>
             )}
-          </fieldset>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={draftFeedback.sound}
+              aria-label={t(language, "counter.sound")}
+              onClick={() => setDraftFeedback({ ...draftFeedback, sound: !draftFeedback.sound })}
+              className="masbaha-switch-row"
+            >
+              <span>{t(language, "counter.soundShort")}</span>
+              <ToggleTrack checked={draftFeedback.sound} />
+            </button>
+          </section>
+          <details className="masbaha-more">
+            <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+              {t(language, "common.moreOptions")}
+            </summary>
+            <div className="space-y-4 pt-2">
+              <RadioGroup.Root
+                value={draftTextSize}
+                onValueChange={(size) => setDraftTextSize(size as TextSizeOption)}
+                dir={direction}
+                aria-label={t(language, "settings.textSize")}
+                className="masbaha-size-choices"
+              >
+                {(["small", "medium", "large"] as const).map((size) => (
+                  <ChoiceRadioItem value={size} key={size}>
+                    {t(
+                      language,
+                      size === "small"
+                        ? "settings.textSmall"
+                        : size === "large"
+                          ? "settings.textLarge"
+                          : "settings.medium",
+                    )}
+                  </ChoiceRadioItem>
+                ))}
+              </RadioGroup.Root>
+              <div className="grid gap-2">
+                {actions?.map((action) => (
+                  <Button
+                    key={action.label}
+                    type="button"
+                    variant="ghost"
+                    disabled={action.disabled}
+                    onClick={action.onClick}
+                    data-testid={action.testId}
+                    className={`justify-start ${action.destructive ? "text-destructive" : ""}`}
+                  >
+                    {action.icon}
+                    {action.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </details>
         </div>
-        <div className="flex shrink-0 gap-2 border-t border-border p-4">
-          <Button type="button" variant="outline" onClick={onClose} className="min-w-0 flex-1">
+        <div className="masbaha-sheet-footer masbaha-draft-actions">
+          <Button type="button" variant="outline" onClick={onClose}>
             {t(language, "common.cancel")}
           </Button>
-          <Button type="submit" className="min-w-0 flex-1">
-            {t(language, "counter.applySettings")}
+          <Button type="submit" disabled={value === null}>
+            {t(language, "counter.saveChanges")}
           </Button>
         </div>
       </form>

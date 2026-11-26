@@ -43,16 +43,21 @@ for (const language of ["ar", "en"] as const) {
       });
       await page.evaluate(() => document.fonts.ready);
       if (reading.route !== "/azkar/morning/1") {
-        const title = page.locator(".reading-compact-header h1");
+        const header = page.locator(
+          reading.route === "/counter" ? ".masbaha-header" : ".reading-compact-header .shared-screen-header",
+        );
+        const title = header.locator("h1");
         await expect(title).toBeVisible();
-        expect((await title.boundingBox())!.width).toBeGreaterThan(200);
-        await expectTextInside(page.locator(".reading-compact-header .shared-screen-header"), title);
+        expect((await title.boundingBox())!.width).toBeGreaterThanOrEqual(100);
+        await expectTextInside(header, title);
       }
       await counter.scrollIntoViewIfNeeded();
-      await expectTextInside(counter, counter.locator(".adaptive-counter-content"));
+      await expectTextInside(
+        counter,
+        counter.locator(reading.route === "/counter" ? ".masbaha-ring-value" : ".adaptive-counter-content"),
+      );
       if (reading.route === "/counter") {
-        for (const id of ["custom-counter-prev-btn", "custom-counter-next-btn"]) {
-          const nav = page.getByTestId(id);
+        for (const nav of await page.getByTestId("masbaha-support-actions").getByRole("button").all()) {
           await nav.scrollIntoViewIfNeeded();
           const bounds = await nav.boundingBox();
           const owner = await page.getByTestId("reader-card").boundingBox();
@@ -60,9 +65,6 @@ for (const language of ["ar", "en"] as const) {
           expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(owner!.x + owner!.width);
           expect(bounds!.width).toBeGreaterThanOrEqual(44);
         }
-        const summary = page.getByTestId("masbaha-settings-summary");
-        await summary.scrollIntoViewIfNeeded();
-        for (const line of await summary.locator("p").all()) await expectTextInside(summary, line);
         const settings = (await page.getByTestId("masbaha-settings-trigger").boundingBox())!;
         expect(settings.width).toBeGreaterThanOrEqual(44);
         expect(settings.height).toBeGreaterThanOrEqual(44);

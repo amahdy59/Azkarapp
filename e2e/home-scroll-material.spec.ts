@@ -25,13 +25,14 @@ test("scrolled Home protects gaps with one continuous ground and preserves fallb
   await sticky.locator("..").evaluate((node) => {
     node.scrollTop = 150;
   });
-  await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+  await expect(sticky).toHaveAttribute("data-scrolled", "true");
+  await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
   await expect(sticky).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
   expect(
     await sticky.evaluate((node) =>
       Number(getComputedStyle(node).backgroundColor.match(/(?:,|\/)\s*([\d.]+)\s*\)$/)?.[1] ?? 1),
     ),
-  ).toBeCloseTo(0.6, 2);
+  ).toBeCloseTo(0.36, 2);
   await expect(page.getByTestId("home-utility-header")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(page.getByTestId("home-utility-header")).toHaveCSS("background-image", "none");
   await expect(sticky).not.toHaveCSS("background-image", "none");

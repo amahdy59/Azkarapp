@@ -1,4 +1,4 @@
-import { assertPrayerOverview } from "./helpers/home-overview";
+import { assertPrayerOverview, closePrayerDialog } from "./helpers/home-overview";
 import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { expect, test } from "@playwright/test";
 
@@ -27,7 +27,7 @@ for (const language of ["ar", "en"] as const) {
         );
       }, language);
       await page.goto("/#/home");
-      await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+      await page.getByTestId("prayer-card-dhuhr").locator("button").click();
       await expect(page.getByTestId("home-prayer-moment")).toBeVisible();
       const alignment = await page.getByTestId("home-context-grid").evaluate((grid) => {
         const row = document.querySelector('[data-testid="home-prayer-strip"]')!;
@@ -36,11 +36,7 @@ for (const language of ["ar", "en"] as const) {
         // Narrow tablets retain native browsing; align to its visible aperture.
         const left = frame.left + parseFloat(inset.paddingLeft);
         const right = frame.right - parseFloat(inset.paddingRight);
-        const sections = [
-          grid,
-          document.querySelector('[data-testid="home-prayer-moment"]')!,
-          ...document.querySelectorAll('[data-testid="home-content-grid"] > .px-page'),
-        ];
+        const sections = [grid, ...document.querySelectorAll('[data-testid="home-content-grid"] > .px-page')];
         return sections.map((section) => {
           const bounds = section.getBoundingClientRect();
           const style = getComputedStyle(section);
@@ -102,33 +98,28 @@ for (const language of ["ar", "en"] as const) {
       await expect(row.locator("article")).toHaveCount(5);
       await assertPrayerOverview(page);
       const current = row.locator('[data-prayer-state="current"]');
-      const toggle = current.getByRole("button");
+      const toggle = current.locator("button");
       await toggle.focus();
       await expect(toggle).toBeFocused();
-      const initial = await toggle.getAttribute("aria-expanded");
       await toggle.press("Space");
-      await expect(toggle).toHaveAttribute("aria-expanded", initial === "true" ? "false" : "true");
-      if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
-      await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
-      await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute(
+      const panel = page.getByTestId("home-prayer-moment");
+      await expect(panel.locator(".prayer-tracking-body")).toHaveAttribute(
         "data-prayer",
         (await current.getAttribute("data-prayer"))!,
       );
+      await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
+      expect(await panel.evaluate((node) => node.contains(document.activeElement))).toBe(true);
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "32px";
       });
       await assertPrayerOverview(page);
-      const arrow = current.locator("[data-prayer-chevron]");
-      await toggle.scrollIntoViewIfNeeded();
-      const hit = (await arrow.boundingBox())!;
-      await page.mouse.click(hit.x + hit.width / 2, hit.y + hit.height / 2);
-      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      expect(await panel.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+      await closePrayerDialog(page);
+      await expect(toggle).toBeFocused();
+      await expect(row.locator('[data-selected="true"]')).toHaveCount(0);
       await toggle.press("Space");
-      await expect(toggle).toHaveAttribute("aria-expanded", "true");
-      const panel = page.getByTestId("home-prayer-moment");
-      await expect(panel).toHaveAttribute("data-prayer", (await current.getAttribute("data-prayer"))!);
+      await expect(panel).toBeVisible();
       await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
-      await expect(panel).toHaveCSS("margin-top", "0px");
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "";
       });

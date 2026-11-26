@@ -152,6 +152,7 @@ export function Header({
     <div
       ref={headerRef}
       data-testid="shared-screen-header"
+      data-overlay-edge="top"
       data-scrolled={isScrolled || undefined}
       data-header-contrast="solid"
       className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 gap-2 border-transparent bg-background ${pageGutters ? "page-header-frame items-start px-page" : "items-center px-4"} pt-2 pb-1 transition-colors duration-standard`}
@@ -221,6 +222,7 @@ export function BottomNav({ active, onChange, isArabic = false, ...utilities }: 
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
+      data-overlay-edge="bottom"
       className="bottom-nav flex min-h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
     >
       <div className="bottom-nav-items flex min-h-0 flex-1 items-center justify-start overflow-x-auto px-1 min-[360px]:justify-between min-[360px]:px-2 min-[390px]:px-4">

@@ -23,9 +23,19 @@ type Result = {
   selection?: readonly string[];
   pageRange?: readonly [number, number];
 };
-type Snapshot = { job: DownloadJob | null; result: Result | null; revision: number };
+export type DownloadReadiness =
+  | { status: "unchecked" | "busy" }
+  | {
+      status: "checked";
+      readyGroups: number;
+      totalGroups: number;
+      usageBytes?: number;
+      duaVoiceId: string;
+      quranReciterId: string;
+    };
+type Snapshot = { job: DownloadJob | null; result: Result | null; revision: number; readiness: DownloadReadiness };
 const listeners = new Set<() => void>();
-let snapshot: Snapshot = { job: null, result: null, revision: 0 };
+let snapshot: Snapshot = { job: null, result: null, revision: 0, readiness: { status: "unchecked" } };
 let controller: AbortController | null = null;
 let progressTimer: ReturnType<typeof setTimeout> | undefined;
 const emit = () => listeners.forEach((listener) => listener());
@@ -34,6 +44,21 @@ const subscribe = (listener: () => void) => {
   return () => listeners.delete(listener);
 };
 export const getDownloadSession = () => snapshot;
+/** Reuse a completed check; menu subscribers never scan files or persist a readiness claim. */
+export function publishDownloadReadiness(readiness: Extract<DownloadReadiness, { status: "checked" }>) {
+  if (controller) return;
+  snapshot = { ...snapshot, readiness };
+  emit();
+}
+export function invalidateDownloadReadiness() {
+  snapshot = { ...snapshot, readiness: { status: controller ? "busy" : "unchecked" } };
+  emit();
+}
+const getDownloadReadiness = () => snapshot.readiness;
+export function useDownloadReadiness() {
+  return useSyncExternalStore(subscribe, getDownloadReadiness, getDownloadReadiness);
+}
+if (typeof window !== "undefined") window.addEventListener("azkar-private-data-cleared", invalidateDownloadReadiness);
 export const cancelDownloadSession = () => {
   if (!controller || controller.signal.aborted) return;
   if (snapshot.job) snapshot = { ...snapshot, job: { ...snapshot.job, cancelling: true } };
@@ -63,7 +88,7 @@ export async function runDownloadSession(job: DownloadJob, work: (controller: Ab
   if (controller) return;
   const active = new AbortController();
   controller = active;
-  snapshot = { job, result: null, revision: snapshot.revision };
+  snapshot = { job, result: null, revision: snapshot.revision, readiness: { status: "busy" } };
   emit();
   const clear = () => active.abort();
   const visible = () => {
@@ -91,6 +116,7 @@ export async function runDownloadSession(job: DownloadJob, work: (controller: Ab
     job: null,
     result: { ...result, selection: job.selection, pageRange: job.pageRange },
     revision: snapshot.revision + 1,
+    readiness: { status: "unchecked" },
   };
   emit();
   return result;

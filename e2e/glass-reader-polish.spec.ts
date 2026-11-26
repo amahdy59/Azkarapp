@@ -160,7 +160,7 @@ test("Glass cards reveal scenery and keep their ink stable during pointer hover 
     await expect(card).toHaveCSS("opacity", "1");
   }
   await page.goto("/#/settings");
-  const row = page.getByRole("button", { name: /Audio & downloads/ });
+  const row = page.getByRole("button", { name: /Audio & recitations/ });
   await expect(row).toBeVisible();
   const original = await row.evaluate((node) => ({
     color: getComputedStyle(node).color,

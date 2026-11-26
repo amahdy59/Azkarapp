@@ -31,6 +31,7 @@ export function ReaderFooterTools({
   return (
     <div
       className="reader-footer-composition w-full"
+      data-overlay-edge="bottom"
       data-expanded={expanded && !focusMode}
       data-focus-mode={focusMode}
     >

@@ -1,4 +1,4 @@
-import { sharingStep } from "./helpers/sharing";
+import { sharingScope, sharingStep } from "./helpers/sharing";
 import { chooseProgressDetail } from "./helpers/progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
@@ -94,7 +94,9 @@ for (const language of ["ar", "en"] as const) {
       );
     }, language);
     await page.goto("/#/completion");
-    const label = t(language, "completion.share");
+    const label = t(language, "completion.shareCollection", {
+      category: language === "ar" ? "أذكار الصباح" : "Morning Azkar",
+    });
     const trigger = page.getByRole("button", { name: label, exact: true });
     await expect(trigger).toBeVisible();
     // Guest initialization persists its normalized category map asynchronously.
@@ -112,7 +114,17 @@ for (const language of ["ar", "en"] as const) {
     // Phone sharing fills the viewport while the artwork retains intrinsic size.
     await expect.poll(async () => (await modal.boundingBox())?.y).toBe(0);
     expect((await modal.boundingBox())!.height).toBeCloseTo(844, 1);
+    // Prepared-set-first sharing is an independently approved studio change.
+    // Exercise the explicit custom option to retain this test's actual PNG,
+    // balanced layout and all-card-scope proof for the completion entry point.
+    await modal.getByText(t(language, "shareStudio.generatedTab"), { exact: true }).click();
     await sharingStep(modal, "share");
+    await expect(modal.getByRole("combobox", { name: /^(Cards to share|البطاقات المراد مشاركتها)$/u })).toHaveText(
+      language === "ar" ? "كل البطاقات" : "All cards",
+    );
+    // The default now shares the whole collection. Retain the actual single-PNG
+    // export proof by explicitly selecting the currently previewed card.
+    await sharingScope(modal, "current");
     const image = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(image).toHaveAttribute("width", "1080");
     await expect(image).toHaveAttribute("height", "1080");

@@ -11,6 +11,10 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/native/systemBars.test.ts",
+  "src/app/learning/learningAssets.test.ts",
+  "src/app/learning/learningState.test.ts",
+  "src/app/screens/LearningAvailability.test.tsx",
   "src/app/components/PrayerActionsCard.test.tsx",
   "src/app/content/quranReadiness.test.ts",
   "src/app/native/liveUpdate.consent.test.ts",

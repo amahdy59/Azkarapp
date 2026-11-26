@@ -1258,12 +1258,14 @@ const OWNED_STORAGE_PREFIXES = [
   "azkarapp_",
   "azkar.audio-preferences",
   "azkar.audio-content-review",
+  "azkar.learning.",
   // supabase-js owns this namespace, but it still contains the reader's live
   // session and therefore belongs to an explicit local-data erasure.
   "sb-",
 ];
 
 const PRIVATE_STORAGE_PREFIXES = [
+  "azkar.learning.",
   "azkarapp.listening-bookmark.v1",
   "azkarapp.friday-dua-reading.v1",
   "azkarapp_recent_searches_",

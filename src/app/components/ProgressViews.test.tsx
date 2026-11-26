@@ -218,6 +218,10 @@ describe("ProgressViews components", () => {
   });
 
   it("renders empty progress periods with recorded zero values and neutral guidance", () => {
+    // Freeze at this fixture week's Saturday so all seven elapsed rows remain
+    // present and denominators cannot drift into placeholder-data assertions.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 8, 12));
     const { rerender } = render(
       <ProgressWeekView language="en" dailyCompletions={[]} referenceDate={new Date(2026, 7, 5)} />,
     );

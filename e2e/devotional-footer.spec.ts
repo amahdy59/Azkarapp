@@ -411,7 +411,13 @@ for (const language of ["ar", "en"] as const) {
           await expect(surface).toBeVisible();
           await expect(page.getByTestId("counter-tap-hint")).toHaveCount(0);
           await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
-          expect(Math.round((await surface.boundingBox())!.height)).toBe(48);
+          if (route === "counter") {
+            const ring = surface.locator(".masbaha-ring");
+            const bounds = (await ring.boundingBox())!;
+            expect(bounds.height).toBeGreaterThanOrEqual(44);
+            expect(bounds.height).toBeCloseTo(bounds.width, 0);
+            expect(await surface.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+          } else expect(Math.round((await surface.boundingBox())!.height)).toBe(48);
           await page.screenshot({ path: `output/playwright/footer-redesign/${testId}-${language}.png` });
         }
       }

@@ -755,7 +755,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("mock-next")).toBeInTheDocument();
   });
 
-  it("preserves identical look, feel and border styling between expanded and collapsed sidebar toggle buttons", () => {
+  it("keeps a seamless header toggle and an identifiable sidebar close control when opening and closing", () => {
     vi.stubGlobal(
       "matchMedia",
       vi.fn().mockImplementation((query: string) => ({
@@ -799,20 +799,26 @@ describe("ReaderScreen audio identity", () => {
 
     fireEvent.click(toggleBtn);
 
-    // Both use the same prominent card border and rounded-xl classes
+    expect(toggleBtn).toHaveAttribute("aria-expanded", "true");
+
+    // The close control belongs to the sidebar card; the toggle belongs to the header.
     expect(closeBtn.className).toContain("rounded-xl");
     expect(closeBtn.className).toContain("border border-border/80");
     expect(closeBtn.className).toContain("bg-card");
 
-    expect(toggleBtn.className).toContain("rounded-xl");
-    expect(toggleBtn.className).toContain("border border-border/80");
-    expect(toggleBtn.className).toContain("bg-card");
+    expect(toggleBtn.className).toContain("rounded-full");
+    expect(toggleBtn.className).toContain("h-[44px] w-[44px]");
+    expect(toggleBtn.className).toContain("text-foreground");
+    expect(toggleBtn.className).not.toContain("bg-card");
+    expect(toggleBtn.className).not.toContain("border-border");
 
     // Collapsing does not alter the toggle button styling
     fireEvent.click(closeBtn);
     expect(toggleBtn).toBeVisible();
-    expect(toggleBtn.className).toContain("rounded-xl");
-    expect(toggleBtn.className).toContain("border border-border/80");
+    expect(toggleBtn).toHaveAttribute("aria-expanded", "false");
+    expect(toggleBtn.className).toContain("rounded-full");
+    expect(toggleBtn.className).toContain("h-[44px] w-[44px]");
+    expect(toggleBtn.className).not.toContain("border-border");
   });
 
   it("keeps useful recovery while removing repeated and ambiguous reader menu actions", async () => {

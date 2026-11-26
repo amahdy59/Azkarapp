@@ -836,7 +836,13 @@ export function KhatmahReaderScreen({
     (!useRail || compactTranslation) && !isFocusMode ? (
       <button
         type="button"
-        onClick={inlineIndex && isIndexOpen ? closeIndex : onBack}
+        onClick={() => {
+          if (inlineIndex && (isIndexOpen || isQuickMenuOpen || isOptionsMenuOpen)) {
+            closeIndex();
+            setIsQuickMenuOpen(false);
+            setIsOptionsMenuOpen(false);
+          } else onBack();
+        }}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
         className={
@@ -861,7 +867,8 @@ export function KhatmahReaderScreen({
     (!useRail || compactTranslation) && !isFocusMode ? (
       <button
         type="button"
-        onClick={() => setIsQuickMenuOpen(true)}
+        onClick={() => setIsQuickMenuOpen((value) => !value)}
+        aria-expanded={isQuickMenuOpen}
         data-testid="mushaf-more-actions"
         aria-label={t(language, "mushaf.moreActions")}
         title={t(language, "mushaf.moreActions")}
@@ -924,6 +931,7 @@ export function KhatmahReaderScreen({
           setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "jump"));
         }}
         data-testid="mushaf-furniture-page-btn"
+        aria-expanded={isIndexOpen && indexTab === "jump"}
         aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(currentPage, language) })}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
@@ -943,6 +951,7 @@ export function KhatmahReaderScreen({
           setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "surahs"));
         }}
         data-testid="mushaf-top-center-index"
+        aria-expanded={isIndexOpen && indexTab === "surahs"}
         aria-label={t(language, "mushaf.indexTitle")}
         title={t(language, "mushaf.indexTitle")}
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
@@ -1335,6 +1344,7 @@ export function KhatmahReaderScreen({
               onCenterTap={() => setIsFocusMode((prev) => !prev)}
               onPrevious={() => paginate(-1)}
               onNext={() => paginate(1)}
+              onReadingZoomOpen={playback.pauseFollowing}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
               verticalGestures={pageMagnification === 100 && colorGestures}

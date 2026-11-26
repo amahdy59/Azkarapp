@@ -238,6 +238,53 @@ describe("audio offline cache registry writes", () => {
     expect(updatedRegistry[staleAssetId]).toBeUndefined();
   });
 
+  it("keeps every saved voice of an unchanged asset when a catalogue gains another variant", async () => {
+    const asset = AUDIO_CATALOG.assets["wu-hm-3"]!;
+    const urls = ["https://audio.test/original.mp3?sha256=original", "https://audio.test/other.mp3?sha256=other"];
+    const record = {
+      assetId: asset.id,
+      assetVersion: asset.version,
+      manifestVersion: 1,
+      variantIds: ["original", "other"],
+      urls,
+      byteSize: 6,
+      downloadedAt: "2026-11-25T00:00:00.000Z",
+    };
+    localStorage.setItem(REGISTRY_KEY, JSON.stringify({ [asset.id]: record }));
+    const originalFiles = new Map(urls.map((url) => [url, new Response(new Uint8Array([1, 2, 3]))]));
+    const currentFiles = new Map<string, Response>();
+    const deleteCache = vi.fn(async () => true);
+    const deleteFile = vi.fn(async () => true);
+    Object.defineProperty(window, "caches", {
+      configurable: true,
+      value: {
+        keys: async () => ["azkar-audio-v1", AUDIO_CACHE_NAME],
+        open: async (name: string) => ({
+          match: async (url: string) => (name === AUDIO_CACHE_NAME ? currentFiles : originalFiles).get(url)?.clone(),
+          put: async (url: string, response: Response) => {
+            currentFiles.set(url, response);
+          },
+          delete: deleteFile,
+        }),
+        delete: deleteCache,
+      },
+    });
+    const variants = asset.segments[0]!.variants;
+    variants.push({ ...variants[0]!, id: "pending-added-voice", voiceId: "added-voice", reviewStatus: "pending" });
+    try {
+      await cleanupStaleAudioDownloads();
+      expect([...currentFiles.keys()]).toEqual(urls);
+      expect(deleteFile).not.toHaveBeenCalled();
+      expect(JSON.parse(localStorage.getItem(REGISTRY_KEY)!)[asset.id]).toEqual({
+        ...record,
+        manifestVersion: AUDIO_CATALOG.version,
+      });
+      expect(deleteCache).toHaveBeenCalledWith("azkar-audio-v1");
+    } finally {
+      variants.pop();
+    }
+  });
+
   it("keeps browser playback on the hosted URL rather than creating a Blob URL", async () => {
     installCaches();
     const createObjectUrl = vi.spyOn(URL, "createObjectURL");

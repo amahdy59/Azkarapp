@@ -2,16 +2,15 @@ import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { expect, test, type Page } from "@playwright/test";
 
 async function assertPrayerMaterials(page: Page) {
-  const overview = page.getByTestId("prayer-tracker-cards");
-  const desktop = (await overview.getAttribute("data-desktop")) === "true";
-  const surfaces = desktop ? overview.locator(".hero-glass.home-glass-surface") : overview;
-  await expect(surfaces).toHaveCount(desktop ? 7 : 1);
+  const surfaces = page.locator(
+    ".home-prayer-overview-v2 .hero-glass.home-glass-surface, .home-prayer-interval.hero-glass",
+  );
+  await expect(surfaces).toHaveCount(page.viewportSize()!.width < 768 ? 3 : 7);
   for (const surface of await surfaces.all()) {
     await expect(surface).toHaveClass(/hero-glass/);
     await expect(surface).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
     await expect(surface).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
   }
-  return desktop;
 }
 
 test.beforeEach(async ({ page }) => fixtureReminderCatalogue(page));
@@ -45,7 +44,7 @@ test("next-prayer remaining time updates without live announcements or phone ove
   const strip = page.getByTestId("home-prayer-strip");
   await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
   await expect(strip.getByRole("progressbar")).toHaveCount(0);
-  const countdown = strip.locator("[data-prayer-countdown-line]");
+  const countdown = page.getByTestId("home-prayer-interval").locator("[data-prayer-countdown-line]");
   const first = await countdown.textContent();
   await page.clock.fastForward(60_000);
   await expect.poll(() => countdown.textContent()).not.toBe(first);
@@ -97,7 +96,7 @@ for (const width of [390, 1440]) {
       for (const card of await page.locator('[data-density="summary"]').all()) {
         await expect(card).toHaveCSS("opacity", "1");
         await expect(card).toHaveCSS("filter", "none");
-        await expect(card).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
+        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       }
       const a11y = await new AxeBuilder({ page }).include('[data-testid="home-prayer-strip"]').analyze();
       expect(a11y.violations).toEqual([]);
@@ -143,7 +142,7 @@ for (const width of [390, 834, 1440]) {
         .locator('article[data-prayer-state="past"], article[data-prayer-state="upcoming"]')
         .first();
       await assertPrayerMaterials(page);
-      await expect(standard).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
+      await expect(standard).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       const quietBorder = await standard.evaluate((node) => getComputedStyle(node).borderTopColor);
       expect(quietBorder).not.toBe("rgba(0, 0, 0, 0)");
       await expect(standard).not.toHaveAttribute("data-selected");
@@ -252,10 +251,11 @@ for (const width of [390, 1440]) {
     }
     await assertPrayerMaterials(page);
     for (const prayer of await page.getByTestId("prayer-tracker-cards").locator("article").all()) {
-      await expect(prayer).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
+      await expect(prayer).toHaveCSS("backdrop-filter", width < 768 ? "none" : "blur(22px) saturate(1.35)");
     }
-    await page.getByTestId("prayer-card-fajr").getByRole("button").click();
-    await expect(page.getByTestId("home-prayer-moment").locator(".hero-glass.home-glass-surface")).toHaveCount(1);
+    await page.getByTestId("prayer-card-fajr").locator("button").click();
+    await expect(page.getByTestId("home-prayer-moment").locator(".hero-glass.home-glass-surface")).toHaveCount(0);
+    await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-dropdown-surface", "");
   });
 }
 
@@ -303,18 +303,17 @@ test("photo-enabled Wird tiles fill the card behind a readable gradient", async 
 test("localized prayer accent edges preserve selection at phone and desktop widths", async ({ page }, testInfo) => {
   await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
   await page.goto("/#/home");
-  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+  await page.getByTestId("prayer-card-dhuhr").locator("button").click();
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
-    await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
+
     const selected = page.getByTestId("prayer-card-dhuhr");
-    if ((await selected.getByRole("button").getAttribute("aria-expanded")) !== "true")
-      await selected.getByRole("button").click();
+
     await expect(selected).toHaveAttribute("data-selected", "true");
-    await expect(selected).toHaveCSS("outline-width", "1px");
+    await expect(selected).toHaveCSS("outline-width", "2px");
     const panel = page.getByTestId("home-prayer-moment");
-    await expect(panel).toHaveAttribute("data-prayer", "dhuhr");
-    expect(await panel.evaluate((node) => getComputedStyle(node, "::before").display)).toBe("none");
+    await expect(panel.locator(".prayer-tracking-body")).toHaveAttribute("data-prayer", "dhuhr");
+    await expect(panel).toHaveAttribute("data-dropdown-surface", "");
     await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
     await page.screenshot({ path: testInfo.outputPath(`matching-edges-${width}.png`), scale: "css" });
   }
@@ -354,8 +353,8 @@ for (const themeMode of ["light", "dark", "midnight"]) {
                     document.querySelector(`[data-testid="${id}"].hero-glass.home-glass-surface`),
                   ) &&
                   document.querySelectorAll(
-                    ".home-prayer-overview-v2.hero-glass.home-glass-surface, .home-prayer-overview-v2 .hero-glass.home-glass-surface",
-                  ).length === (document.querySelector(".home-prayer-overview-v2[data-desktop]") ? 7 : 1),
+                    ".home-prayer-interval.hero-glass, .home-prayer-overview-v2 .hero-glass.home-glass-surface",
+                  ).length === (innerWidth < 768 ? 3 : 7),
                 filters: [...new Set(styles.map((style) => style.backdropFilter))],
                 nonTranslucent: nodes
                   .filter(

@@ -1,17 +1,51 @@
 import { matchesSearch, normalizeSearchText } from "./searchNormalization";
+import { t } from "../i18n";
 import type { AppLanguage, LocationSettings } from "../types";
 
-/** Localize recognized presets without relabeling a custom location with the same city name. */
+/** Name coordinates locally; never replace a reader's custom name or the calculation coordinates. */
 export function displayLocationName(location: LocationSettings | undefined, language: AppLanguage): string | undefined {
-  if (!location?.cityName) return undefined;
+  if (!location) return undefined;
+  const name = location.cityName?.trim();
+  if (!name || /^[+-]?\d+(?:\.\d+)?°?\s*[,،]\s*[+-]?\d+(?:\.\d+)?°?$/u.test(name)) {
+    const fallback = t(
+      language,
+      location.autoDetect ? "prayerLocation.deviceLocation" : "prayerLocation.savedLocation",
+    );
+    const { latitude, longitude } = location;
+    if (latitude === undefined || longitude === undefined || !Number.isFinite(latitude) || !Number.isFinite(longitude))
+      return fallback;
+    // The small offline catalogue is a nearby-city hint, not a reverse geocoder.
+    // A bounded radius and explicit "Near" avoid claiming an exact city/country.
+    let nearest: PrayerLocationPreset | undefined;
+    let nearestKm = 75;
+    for (const entry of PRAYER_LOCATION_PRESETS) {
+      const radians = Math.PI / 180;
+      const latitudeDelta = (entry.latitude - latitude) * radians;
+      const longitudeDelta = (entry.longitude - longitude) * radians;
+      const a =
+        Math.sin(latitudeDelta / 2) ** 2 +
+        Math.cos(latitude * radians) * Math.cos(entry.latitude * radians) * Math.sin(longitudeDelta / 2) ** 2;
+      const distanceKm = 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, a)));
+      if (distanceKm < nearestKm) {
+        nearest = entry;
+        nearestKm = distanceKm;
+      }
+    }
+    return nearest
+      ? t(language, "prayerLocation.nearCity", {
+          city: language === "ar" ? nearest.nameArabic : nearest.nameEnglish,
+          country: language === "ar" ? nearest.countryArabic : nearest.countryEnglish,
+        })
+      : fallback;
+  }
   const preset = PRAYER_LOCATION_PRESETS.find(
     (entry) =>
-      [entry.nameEnglish, entry.nameArabic].includes(location.cityName!) &&
+      [entry.nameEnglish, entry.nameArabic].includes(name) &&
       entry.latitude === location.latitude &&
       entry.longitude === location.longitude &&
       entry.timeZone === location.timeZone,
   );
-  return preset ? (language === "ar" ? preset.nameArabic : preset.nameEnglish) : location.cityName;
+  return preset ? (language === "ar" ? preset.nameArabic : preset.nameEnglish) : name;
 }
 
 export interface PrayerLocationPreset {

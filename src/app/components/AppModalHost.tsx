@@ -9,9 +9,11 @@ import { ScreenFallback } from "./ScreenFallback";
 const ProgressShareModal = lazy(() =>
   import("./ProgressShareModal").then((module) => ({ default: module.ProgressShareModal })),
 );
-const AudioContentReviewScreen = lazy(() =>
-  import("../screens/AudioContentReviewScreen").then((module) => ({ default: module.AudioContentReviewScreen })),
-);
+const AudioContentReviewScreen = import.meta.env.DEV
+  ? lazy(() =>
+      import("../screens/AudioContentReviewScreen").then((module) => ({ default: module.AudioContentReviewScreen })),
+    )
+  : null;
 
 export function AppModalHost({
   language,
@@ -51,9 +53,11 @@ export function AppModalHost({
         />
       )}
 
-      {import.meta.env.DEV && showAudioReview && (
+      {import.meta.env.DEV && showAudioReview && AudioContentReviewScreen && (
         <Suspense fallback={<ScreenFallback language={language} />}>
           <AudioContentReviewScreen
+            language={language}
+            onPlay={() => audioController?.pause()}
             onClose={() => {
               audioController?.stop();
               onCloseAudioReview();

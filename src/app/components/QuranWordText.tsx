@@ -5,6 +5,8 @@ import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { QuranVerseText, type QuranWordAttributes } from "./QuranVerseText";
+import { QuranReadingZoom } from "./QuranReadingZoom";
+import { readingWordsFromText } from "./quranReadingPortions";
 
 /** Meanings decorate the existing word boxes; they never replace the text layout. */
 export function QuranWordText({
@@ -36,6 +38,7 @@ export function QuranWordText({
     });
   }, [meanings, text]);
   const groups = annotations.map((annotation) => annotation.meanings);
+  const zoomWords = useMemo(() => readingWordsFromText(text), [text]);
   const wordAttributes: QuranWordAttributes = (start, end) => {
     if (!showMeanings) return {};
     const annotation = annotations.find((item) => item.start < end && item.end > start);
@@ -75,16 +78,30 @@ export function QuranWordText({
     } as ReturnType<QuranWordAttributes>;
   };
   return (
-    <p
-      className="zikr-text text-center text-foreground"
-      data-testid="zikr-text"
-      data-quran-passage=""
-      dir="rtl"
-      lang="ar"
-      translate="no"
-      style={{ ...style, ...QURAN_TEXT_STYLE }}
-    >
-      <QuranVerseText text={text} language={language} canonicalKey={canonicalKey} wordAttributes={wordAttributes} />
-    </p>
+    <QuranReadingZoom words={zoomWords} language={language} returnLabel={t(language, "quranZoom.returnReading")}>
+      {(zoomTrigger) => (
+        <>
+          <p
+            className="zikr-text text-center text-foreground"
+            data-testid="zikr-text"
+            data-quran-passage=""
+            dir="rtl"
+            lang="ar"
+            translate="no"
+            style={{ ...style, ...QURAN_TEXT_STYLE }}
+          >
+            <QuranVerseText
+              text={text}
+              language={language}
+              canonicalKey={canonicalKey}
+              wordAttributes={wordAttributes}
+            />
+          </p>
+          <div className="flex justify-center pt-2" data-prevent-count="true">
+            {zoomTrigger}
+          </div>
+        </>
+      )}
+    </QuranReadingZoom>
   );
 }

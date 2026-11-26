@@ -19,10 +19,10 @@ import { TranquilityCompletionCard } from "../components/TranquilityCompletionCa
 import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
 import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../types";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard } from "../components/HomeCards";
-import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
+import { PrayerTrackingDialog } from "../components/PrayerTrackingDialog";
 import { VisitorCount } from "../components/VisitorCount";
-import { useHomePrayerScroll } from "../hooks/useHomePrayerScroll";
-import { HomePrayerOverview } from "../components/HomePrayerOverview";
+import { useScrollElevation } from "../hooks/useScrollElevation";
+import { HomePrayerOverview, HomePrayerSummary } from "../components/HomePrayerOverview";
 import { HomeLocationRow } from "../components/HomeLocationRow";
 import { Modal, SheetHeader } from "../components/ResponsiveSheet";
 import { useHomeLocation } from "../hooks/useHomeLocation";
@@ -38,10 +38,8 @@ import {
   isRoutineCategory,
 } from "../content/azkarCore";
 import { CATEGORIES } from "../content/categories";
-import { formatPrayerTimeLabel, type PrayerName } from "../content/prayerTimes";
-import { PRAYER_ICON, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
-import { prayerDisplayName } from "../prayerPresentation";
-import { useMediaQuery } from "../hooks/useMediaQuery";
+import { type PrayerName } from "../content/prayerTimes";
+import { type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
 import { useQuickRoutineShare } from "../hooks/useQuickRoutineShare";
@@ -171,7 +169,6 @@ export function HomeScreen({
   onOpenLocation,
   onResume,
   onOpenPrayerAdhkar,
-  onViewPrayers,
   mosquePrayerGoal,
   dailyPathStartDayKey,
   onOpenFridayMode,
@@ -239,8 +236,6 @@ export function HomeScreen({
     next: boolean | "mosque" | "home" | null,
   ) => void;
 }) {
-  const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
-  const scrolledHomeRef = useRef(false);
   const [failedBackgroundCategory, setFailedBackgroundCategory] = useState<string | null>(null);
   const isArabic = language === "ar";
   const now = useNow();
@@ -248,7 +243,7 @@ export function HomeScreen({
   const locationRefreshTrigger = useRef<HTMLButtonElement | null>(null);
   const [fridayKahfStarted] = useState(hasStartedFridayKahf);
   const [selectedPrayer, setSelectedPrayer] = useState<PrayerName | null>(null);
-  const [dismissedAutoPrayer, setDismissedAutoPrayer] = useState<PrayerName | null>(null);
+  const [prayerTimingsExpanded, setPrayerTimingsExpanded] = useState(true);
 
   /* How each day is judged. Days before the reader's daily path started keep
      the verdict they were lived under — see dailyPath.ts — so this is one
@@ -310,9 +305,8 @@ export function HomeScreen({
     ],
   );
 
-  /* The prayer worth leading with, if any. Home shows the whole card while one
-     is live so that recording a prayer happening right now costs no
-     navigation; outside those windows it stays the compact five below. */
+  /* Prayer context still selects relevant evidence. Tracking opens only from
+     a deliberate card activation, never from a clock-driven modal. */
   const leadingPrayer = useMemo(
     () =>
       getLeadingPrayerMoment({
@@ -539,13 +533,7 @@ export function HomeScreen({
   );
   const homeScrollRef = useRef<HTMLDivElement>(null);
   const homeStickyRef = useRef<HTMLDivElement>(null);
-  const prayerPanelRef = useRef<HTMLElement>(null);
-  const { condensed: prayerCardsCondensed, updateScroll: updatePrayerScroll } = useHomePrayerScroll();
-  const narrowPrayerRail = useMediaQuery("(width < 768px)");
-  const nextPrayer = prayerCardModels.find((model) => model.state === "next");
-  const NextPrayerIcon = nextPrayer && PRAYER_ICON[nextPrayer.prayer];
-  const showCompactPrayer = narrowPrayerRail && Boolean(onViewPrayers && nextPrayer);
-  const compactPrayerActive = showCompactPrayer && prayerCardsCondensed;
+  const hasScrolledHomeContent = useScrollElevation(homeStickyRef);
   const secondaryDate = useMemo(
     () => formatDisplayDate(now, language, calendarType === "hijri" ? "gregorian" : "hijri", hijriDateOffset, false),
     [now, language, calendarType, hijriDateOffset],
@@ -555,50 +543,24 @@ export function HomeScreen({
     const scroll = homeScrollRef.current;
     const sticky = homeStickyRef.current;
     if (!scroll || !sticky) return;
-    // Keep native focus/scroll-into-view recovery below the full sticky cards,
+    // Keep native focus/scroll-into-view recovery below the persistent summary,
     // including when text size, viewport width or safe-area insets change.
-    const overview = sticky.querySelector<HTMLElement>(".home-prayer-overview-v2");
-    const compact = sticky.querySelector<HTMLElement>(".home-compact-prayer");
-    let viewportHeight = scroll.clientHeight;
-    const measure = (entries: ResizeObserverEntry[] = []) => {
-      const stickyEntry = entries.find((entry) => entry.target === sticky);
-      const height = stickyEntry?.borderBoxSize?.[0]?.blockSize ?? sticky.getBoundingClientRect().height;
-      if (entries.some((entry) => entry.target === scroll)) viewportHeight = scroll.clientHeight;
-      const foldRange =
-        overview && compact
-          ? Math.max(0, overview.getBoundingClientRect().height - compact.getBoundingClientRect().height)
-          : 0;
-      // Finish geometry reads before changing styles. A read after changing
-      // the reserved margin forced a second full layout on every motion frame.
-      const fits = height + 44 < viewportHeight;
-      const range = `${foldRange}px`;
-      const padding = `${fits ? height + 8 : 8}px`;
-      // CSS reserves the fold's lost height in the same layout as contraction.
-      // Reserving it after resize lets Firefox clamp a bottom scroll before
-      // the observer can restore the range. Never repair that by scrolling.
-      if (sticky.style.getPropertyValue("--home-prayer-fold-range") !== range)
-        sticky.style.setProperty("--home-prayer-fold-range", range);
-      // A short landscape or enlarged-text viewport must still expose the
-      // content below the cards. Restore ordinary scrolling if it cannot.
-      const position = fits ? "" : "relative";
-      if (sticky.style.position !== position) sticky.style.position = position;
-      if (scroll.style.scrollPaddingTop !== padding) scroll.style.scrollPaddingTop = padding;
+    const measure = () => {
+      const height = sticky.getBoundingClientRect().height;
+      const fits = height + 44 < scroll.clientHeight;
+      scroll.style.scrollPaddingTop = `${fits ? height + 8 : 8}px`;
+      sticky.style.position = fits ? "" : "relative";
     };
     const observer = new ResizeObserver(measure);
     observer.observe(sticky);
     observer.observe(scroll);
-    if (overview) observer.observe(overview);
-    if (compact) observer.observe(compact);
     measure();
     return () => {
       observer.disconnect();
       scroll.style.removeProperty("scroll-padding-top");
       sticky.style.removeProperty("position");
-      sticky.style.removeProperty("--home-prayer-fold-range");
     };
-    // Crossing the desktop breakpoint mounts or removes the compact row.
-    // Reconnect to that current element so folding still reserves its space.
-  }, [showCompactPrayer]);
+  }, []);
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 
@@ -627,29 +589,15 @@ export function HomeScreen({
     (leadingPrayer.phase === "approaching" || leadingPrayer.phase === "now" || leadingPrayer.phase === "recorded"),
   );
   const isRoutineHero = !isPrayerHero && showRoutineCard;
-  const autoPrayer = isPrayerHero ? (leadingPrayer?.prayer ?? null) : null;
-  const expandedPrayer = selectedPrayer ?? (dismissedAutoPrayer === autoPrayer ? null : autoPrayer);
-  const expandedPrayerModel = prayerCardModels.find((model) => model.prayer === expandedPrayer);
+  const selectedPrayerModel = prayerCardModels.find((model) => model.prayer === selectedPrayer);
   const quickShare = useQuickRoutineShare(reminderInfo.categoryId, language);
   const hasQuranActivity =
     Boolean(quranWirdPlan?.startedDayKey) ||
     (quranReadingPosition?.page ?? 1) > 1 ||
     Object.values(wirdHistory ?? {}).some((pages) => pages.length > 0);
 
-  useEffect(() => {
-    if (dismissedAutoPrayer && dismissedAutoPrayer !== autoPrayer) setDismissedAutoPrayer(null);
-  }, [autoPrayer, dismissedAutoPrayer]);
-
-  const prayerControlFocused = () =>
-    !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row :is(button, a):focus");
   const locationInteractionActive = locationUpdate.locating || Boolean(locationUpdate.message);
-  const handlePrayerOpen = (prayer: PrayerName | null) => {
-    setSelectedPrayer(prayer);
-    setDismissedAutoPrayer(prayer ? null : autoPrayer);
-    // WebKit can leave focus on the native horizontal scroll region after a
-    // pointer close. Reconcile now; only a prayer button holds its geometry.
-    if (!prayer) updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0, prayerControlFocused());
-  };
+  const handlePrayerOpen = (prayer: PrayerName) => setSelectedPrayer(prayer);
   const hasPrimaryContext = showCompletionCard || showRoutineCard;
   const hasContextCompanion = Boolean(dailyEvidence) || !readingCatalogue;
   const hasContextStackContent = Boolean(hasPrimaryContext || dailyEvidence);
@@ -690,44 +638,18 @@ export function HomeScreen({
         role="region"
         aria-label={t(language, "home.title")}
         className="home-content-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        data-header-scroll-owner
         onTouchStart={() => {
-          if (
-            selectedPrayer === null &&
-            document.activeElement instanceof HTMLElement &&
-            document.activeElement.closest(".home-prayer-sticky-row button")
-          ) {
-            document.activeElement.blur();
-          }
-        }}
-        onScroll={(event) => {
-          const top = event.currentTarget.scrollTop;
-          const scrolled = top > (scrolledHomeRef.current ? 2 : 8);
-          if (scrolledHomeRef.current !== scrolled) {
-            scrolledHomeRef.current = scrolled;
-            setHasScrolledHomeContent(scrolled);
-          }
-          updatePrayerScroll(top, selectedPrayer !== null || locationInteractionActive || prayerControlFocused());
+          const active = document.activeElement;
+          if (active instanceof HTMLElement && active.closest(".home-prayer-sticky-row button")) active.blur();
         }}
       >
         {/* Sticky Header Overlay */}
         <div
           ref={homeStickyRef}
-          onBlurCapture={(event) => {
-            if (
-              !selectedPrayer &&
-              !locationInteractionActive &&
-              !(
-                event.relatedTarget instanceof Element &&
-                event.relatedTarget.closest(".home-prayer-sticky-row :is(button, a)")
-              )
-            )
-              updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0);
-          }}
           data-testid="home-sticky-prayers"
           data-scrolled={hasScrolledHomeContent || undefined}
-          data-prayer-cards-condensed={prayerCardsCondensed || undefined}
           data-home-motion={reduceMotion ? "reduced" : undefined}
-          data-home-compact-prayer={showCompactPrayer || undefined}
           className="home-prayer-sticky pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible"
         >
           <header
@@ -817,12 +739,31 @@ export function HomeScreen({
           </header>
           {showHeroContent && (
             <div className="home-layout-frame home-prayer-sticky-row pointer-events-auto mx-auto w-full max-w-7xl px-page">
-              <div className={showCompactPrayer ? "home-prayer-expanded home-rail-fold" : undefined}>
-                <div
-                  data-testid="home-prayer-strip"
-                  className="relative z-10 mx-auto w-full min-w-0 min-h-0"
-                  {...(compactPrayerActive ? { inert: "" } : {})}
-                >
+              <HomePrayerSummary
+                models={prayerCardModels}
+                language={language}
+                dayKey={todayKey}
+                elapsedPercent={elapsedPercent}
+                onGlass={homeVisualEffects}
+                expanded={prayerTimingsExpanded}
+                onToggleExpanded={() => setPrayerTimingsExpanded((value) => !value)}
+                disclosureDisabled={locationInteractionActive}
+              />
+            </div>
+          )}
+        </div>
+        {showHeroContent && (
+          <div className="home-layout-frame mx-auto w-full max-w-7xl px-page">
+            <div
+              id="home-prayer-timings"
+              className="home-prayer-timings"
+              data-home-motion={reduceMotion ? "reduced" : undefined}
+              data-expanded={prayerTimingsExpanded}
+              aria-hidden={!prayerTimingsExpanded}
+              {...(!prayerTimingsExpanded ? { inert: "" } : {})}
+            >
+              <div className="min-h-0 overflow-hidden">
+                <section data-testid="home-prayer-strip" aria-label={t(language, "prayerMoment.dayTitle")}>
                   <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
                   <HomePrayerOverview
                     models={prayerCardModels}
@@ -830,8 +771,8 @@ export function HomeScreen({
                     dayKey={todayKey}
                     onOpen={handlePrayerOpen}
                     onGlass={homeVisualEffects}
-                    elapsedPercent={elapsedPercent}
-                    selectedPrayer={expandedPrayer}
+                    selectedPrayer={selectedPrayer}
+                    records={prayerTracking}
                     location={
                       <HomeLocationRow
                         language={language}
@@ -850,50 +791,11 @@ export function HomeScreen({
                       />
                     }
                   />
-                </div>
+                </section>
               </div>
-              {showCompactPrayer && nextPrayer && NextPrayerIcon && (
-                <div className="home-prayer-mobile-fold home-rail-fold">
-                  <div className="min-h-0" {...(!compactPrayerActive ? { inert: "" } : {})}>
-                    <div
-                      data-testid="home-compact-prayer"
-                      className={`home-compact-prayer mx-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl border ${
-                        homeVisualEffects
-                          ? "hero-glass home-glass-surface text-on-media"
-                          : "border-border bg-card text-foreground"
-                      }`}
-                    >
-                      <div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
-                        <NextPrayerIcon
-                          size={20}
-                          className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
-                          aria-hidden="true"
-                        />
-                        <p className="min-w-0 text-sm font-bold leading-snug [overflow-wrap:anywhere]">
-                          {prayerDisplayName(nextPrayer.prayer, language, todayKey)} ·{" "}
-                          <bdi className="tabular-nums">{formatPrayerTimeLabel(nextPrayer.time, isArabic)}</bdi>
-                        </p>
-                        <p
-                          className={`col-span-2 text-xs tabular-nums whitespace-nowrap ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
-                          data-prayer-countdown-line
-                        >
-                          {nextPrayer.countdown ?? t(language, "prayerTracking.nextShort")}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        className={`choice-pill home-header-path-button min-h-11 min-w-11 max-w-full rounded-xl px-2.5 text-xs font-bold [overflow-wrap:anywhere] ${NAVIGATION_FOCUS}`}
-                        onClick={() => onViewPrayers?.(nextPrayer.prayer)}
-                      >
-                        {t(language, "home.viewAllPrayers")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
         <div
           data-testid="home-content-grid"
           className="home-layout-frame mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:gap-5"
@@ -906,44 +808,6 @@ export function HomeScreen({
                   className="grid w-full grid-cols-1 items-start gap-x-4 gap-y-2 md:grid-cols-2 md:gap-y-3"
                   dir={direction}
                 >
-                  <div data-testid="home-prayer-column" className="contents">
-                    {expandedPrayer && (
-                      <section
-                        ref={prayerPanelRef}
-                        id="home-expanded-prayer"
-                        data-testid="home-prayer-moment"
-                        data-prayer={expandedPrayer}
-                        aria-label={t(language, "prayerMoment.homeTitle")}
-                        className="home-prayer-connected-panel home-prayer-details-v2 mx-auto w-full min-w-0 justify-self-center md:col-span-2"
-                      >
-                        <PrayerMomentPanel
-                          key={expandedPrayer}
-                          onClose={() => {
-                            homeStickyRef.current
-                              ?.querySelector<HTMLButtonElement>(`[data-prayer-trigger="${expandedPrayer}"]`)
-                              ?.focus({ preventScroll: true });
-                            handlePrayerOpen(null);
-                          }}
-                          prayer={expandedPrayer}
-                          language={language}
-                          direction={direction}
-                          records={prayerTracking}
-                          dayKey={todayKey}
-                          calendarType={calendarType}
-                          hijriDateOffset={hijriDateOffset}
-                          locationSettings={locationSettings}
-                          now={now}
-                          onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                          onOpenAdhkar={(prayer) =>
-                            onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
-                          }
-                          onGlass={homeVisualEffects}
-                          canRecord={expandedPrayerModel?.isRecordable ?? false}
-                        />
-                      </section>
-                    )}
-                  </div>
-
                   {hasContextStackContent && (
                     <div data-testid="home-context-stack" className="contents">
                       {/* Contextual Hero */}
@@ -1156,6 +1020,27 @@ export function HomeScreen({
           </footer>
         </div>
       </div>
+      {selectedPrayer && selectedPrayerModel && (
+        <PrayerTrackingDialog
+          prayer={selectedPrayer}
+          language={language}
+          direction={direction}
+          records={prayerTracking}
+          dayKey={todayKey}
+          calendarType={calendarType}
+          hijriDateOffset={hijriDateOffset}
+          locationSettings={locationSettings}
+          now={now}
+          canRecord={selectedPrayerModel.isRecordable}
+          onToggle={onTogglePrayerTracking ?? (() => undefined)}
+          onClose={() => setSelectedPrayer(null)}
+          onOpenAdhkar={(prayer) => {
+            setSelectedPrayer(null);
+            if (onOpenPrayerAdhkar) onOpenPrayerAdhkar(prayer);
+            else onResume("after_prayer");
+          }}
+        />
+      )}
       {locationUpdate.message && (
         <Modal
           open

@@ -77,8 +77,8 @@ import { Button } from "../components/ui/button";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
-import { ReaderSceneArt } from "../components/ReaderSceneArt";
 import { ReadingHeroToolbar } from "../components/ReadingHeroToolbar";
+import { ReadingHeaderSurface, READING_HEADER_ACTION_CLASS } from "../components/ReadingHeaderSurface";
 import { AppearanceMenu } from "../components/AppearanceMenu";
 import { QuranPrelude } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
@@ -120,11 +120,7 @@ const ACTION_FOCUS = "focus-visible:outline-none focus-visible:ring-[3px] focus-
 /**
  * Same three steps, same labels and same order as Settings → Accessibility →
 /** Shared ghost icon-button treatment for every control in the phone header row. */
-const READER_HEADER_ACTION_CLASS =
-  "flex h-[44px] w-[44px] min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
-
-const READER_WIDE_HEADER_ACTION_CLASS =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media)]/20 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-on-media";
+const READER_HEADER_ACTION_CLASS = READING_HEADER_ACTION_CLASS;
 
 const READER_SIDEBAR_TOGGLE_CLASS =
   "flex size-11 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-card shadow-xs text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
@@ -1644,26 +1640,11 @@ export function ReaderScreen({
           >
             {/* Reading Canvas Column (flex-1): Hero + Reading Card + Counter */}
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-              {/* Wide-desktop hero band (>=1200px). Fixed navy brand surface,
-                independent of the active theme — mirrors the Home screen's
-                .azkar-hero background (src/app/components/azkar-hero-background.css)
-                rather than following light/dark/midnight tokens, since it plays
-                the same "always-dark brand band" role. */}
-              <div
+              {/* In-flow chrome borrows the same canvas as the reading area. */}
+              <ReadingHeaderSurface
                 data-testid="reader-desktop-hero"
-                data-reading-chrome
-                className={`relative isolate w-full flex shrink-0 flex-col items-center overflow-hidden rounded-b-2xl px-6 pb-2.5 pt-2 text-center ${longSurah ? "reader-surah-header" : ""}`}
-                style={
-                  longSurah
-                    ? undefined
-                    : {
-                        gap: "0.375rem",
-                        background:
-                          "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
-                      }
-                }
+                className={longSurah ? "reader-surah-header" : ""}
               >
-                {!longSurah && <ReaderSceneArt category={catId} />}
                 <ReadingHeroToolbar
                   title={readerHeaderTitle}
                   testId="reader-header-toolbar"
@@ -1671,7 +1652,7 @@ export function ReaderScreen({
                     <IconButton
                       onClick={onBack}
                       label={t(language, "common.back")}
-                      className={longSurah ? READER_HEADER_ACTION_CLASS : READER_WIDE_HEADER_ACTION_CLASS}
+                      className={READER_HEADER_ACTION_CLASS}
                     >
                       <ArrowPrevious size={20} />
                     </IconButton>
@@ -1682,12 +1663,12 @@ export function ReaderScreen({
                     className="flex min-w-0 flex-wrap items-center justify-end gap-2"
                     data-testid="reader-hero-actions"
                   >
-                    {longSurah ? renderSurahShare() : renderAppearanceMenu(READER_WIDE_HEADER_ACTION_CLASS)}
+                    {longSurah ? renderSurahShare() : renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
                         ref={readerMenuRef}
                         aria-label={t(language, "reader.menu")}
-                        className={longSurah ? READER_HEADER_ACTION_CLASS : READER_WIDE_HEADER_ACTION_CLASS}
+                        className={READER_HEADER_ACTION_CLASS}
                       >
                         <MoreVertical size={20} />
                       </DropdownMenuTrigger>
@@ -1721,7 +1702,7 @@ export function ReaderScreen({
                       }
                       data-testid="reader-sidebar-toggle"
                       ref={sidebarToggleRef}
-                      className={`${READER_SIDEBAR_TOGGLE_CLASS} ${canDockCollection && isSidebarOpen ? "hidden" : ""}`}
+                      className={`${READER_HEADER_ACTION_CLASS} ${canDockCollection && isSidebarOpen ? "hidden" : ""}`}
                     >
                       <PanelLeftIcon
                         size={18}
@@ -1735,10 +1716,10 @@ export function ReaderScreen({
                 {showCollectionProgress && (
                   <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-1">
                     <div className="flex w-full items-center justify-between px-1 leading-none" aria-hidden="true">
-                      <span className="text-xs font-semibold text-on-media-muted">
+                      <span className="text-xs font-semibold text-muted-foreground">
                         {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
                       </span>
-                      <span className="text-xs font-bold text-on-media-muted">
+                      <span className="text-xs font-bold text-muted-foreground">
                         {t(language, "reader.collectionCount", {
                           done: formatNumerals(readingProgressValue, language),
                           total: formatNumerals(azkar.length, language),
@@ -1749,14 +1730,14 @@ export function ReaderScreen({
                       value={readingProgressValue}
                       max={azkar.length}
                       height={8}
-                      trackColor="rgba(255,255,255,0.2)"
-                      fillColor="var(--on-media-accent)"
+                      trackColor="var(--reading-header-progress-track, var(--muted))"
+                      fillColor="var(--primary)"
                       direction={direction}
                       aria-label={t(language, "reader.groupProgress")}
                     />
                   </div>
                 )}
-              </div>
+              </ReadingHeaderSurface>
 
               {/* Wide-desktop card: reading content, side navigation, counter,
                 and keyboard guidance. Page-level actions stay in the hero. */}
@@ -1871,7 +1852,6 @@ export function ReaderScreen({
                 onBack={onBack}
                 language={language}
                 elevateOnScroll={false}
-                decoration={longSurah ? undefined : <ReaderSceneArt category={catId} compact />}
                 backButtonClassName={READER_HEADER_ACTION_CLASS}
                 right={
                   // The entry has no adjustable reading text. Its two actions
@@ -1919,7 +1899,7 @@ export function ReaderScreen({
                   value={readingProgressValue}
                   max={azkar.length}
                   height={8}
-                  trackColor="var(--muted)"
+                  trackColor="var(--reader-progress-track, var(--muted))"
                   fillColor="var(--primary)"
                   direction={direction}
                   aria-label={t(language, "reader.groupProgress")}

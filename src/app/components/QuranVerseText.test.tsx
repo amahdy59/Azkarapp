@@ -4,6 +4,7 @@ const { useListeningMushafPage } = vi.hoisted(() => ({ useListeningMushafPage: v
 vi.mock("../hooks/useListeningMushafPage", () => ({ useListeningMushafPage }));
 import { QuranVerseText } from "./QuranVerseText";
 import { QuranWordText } from "./QuranWordText";
+import { t } from "../i18n";
 beforeEach(() => useListeningMushafPage.mockReturnValue({ result: null }));
 
 const lines = [
@@ -95,7 +96,10 @@ for (const qcf of [true, false]) {
     fireEvent.keyDown(screen.getAllByTestId("quran-word-help")[1]!, { key: "Enter" });
     expect(select).toHaveBeenCalledWith(expect.objectContaining({ index: 0 }));
     view.rerender(<QuranWordText {...props} showMeanings={false} />);
-    expect(screen.queryByRole("button")).toBeNull();
+    // Meaning actions disappear; the independent accessible zoom action remains.
+    expect(screen.getAllByRole("button")).toEqual([
+      screen.getByRole("button", { name: t("ar", "quranZoom.open"), exact: true }),
+    ]);
     expect([...view.container.querySelectorAll("[data-quran-word]")]).toEqual(nodes);
   });
 }

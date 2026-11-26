@@ -17,6 +17,7 @@ import {
   type BenefitEvidence,
 } from "../content/zikrBenefits";
 import { formatNumerals } from "../formatting";
+import { benefitEvidenceCitation } from "../benefitEvidencePresentation";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -32,31 +33,12 @@ export function buildWhatsAppBenefitUrl(message: string) {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
 
-const QURAN_SURAH_NAMES: Readonly<Record<number, { ar: string; en: string }>> = {
-  2: { ar: "البقرة", en: "Al-Baqarah" },
-  3: { ar: "آل عمران", en: "Ali 'Imran" },
-  8: { ar: "الأنفال", en: "Al-Anfal" },
-  13: { ar: "الرعد", en: "Ar-Ra'd" },
-  33: { ar: "الأحزاب", en: "Al-Ahzab" },
-  62: { ar: "الجمعة", en: "Al-Jumu'ah" },
-};
-
-function quranCitation(item: BenefitEvidence, language: AppLanguage) {
-  const [, surahValue, ayahValue] = item.id.split("-");
-  const surah = Number(surahValue);
-  const ayah = Number(ayahValue);
-  const name = QURAN_SURAH_NAMES[surah]?.[language];
-  if (!name || !Number.isFinite(ayah)) return localizeBenefitText(item.source, language);
-  const reference = `${formatNumerals(surah, language)}:${formatNumerals(ayah, language)}`;
-  return language === "ar" ? `سورة ${name} · ${reference}` : `Surah ${name} · ${reference}`;
-}
-
 export function benefitEvidenceToShareItem(item: BenefitEvidence, language: AppLanguage): ShareItem {
   const isQuran = item.kind === "quran";
   const title = localizeBenefitText(item.title, language);
   const text = isQuran ? item.text.ar : localizeBenefitText(item.text, language);
   const meaning = isQuran || language === "ar" ? item.text.en : undefined;
-  const source = isQuran ? quranCitation(item, language) : localizeBenefitText(item.source, language);
+  const source = benefitEvidenceCitation(item, language);
 
   return {
     id: item.id,
@@ -85,7 +67,7 @@ function EvidenceCard({
   const title = localizeBenefitText(item.title, language);
   const text = item.kind === "quran" ? item.text.ar : localizeBenefitText(item.text, language);
   const meaning = item.kind === "quran" && language === "en" ? item.text.en : "";
-  const source = item.kind === "quran" ? quranCitation(item, language) : localizeBenefitText(item.source, language);
+  const source = benefitEvidenceCitation(item, language);
 
   return (
     <article className="flex flex-col rounded-3xl border border-border bg-card p-5 text-start shadow-raised sm:p-6">
@@ -278,7 +260,7 @@ export function BenefitsScreen({
               collectionSubtitle={
                 sharingEvidence
                   ? sharingEvidence.kind === "quran"
-                    ? quranCitation(sharingEvidence, language)
+                    ? benefitEvidenceCitation(sharingEvidence, language)
                     : localizeBenefitText(sharingEvidence.source, language)
                   : t(language, `benefits.${activeSection}Heading`)
               }

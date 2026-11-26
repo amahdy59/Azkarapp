@@ -314,7 +314,7 @@ describe("MushafNavigationModal", () => {
     expect(screen.getByText("الحزب ١")).toBeInTheDocument();
   });
 
-  it("enforces 44px minimum target sizes for close button", () => {
+  it("shares the 48px overlay close target", () => {
     render(
       <MushafNavigationModal
         isOpen={true}
@@ -327,7 +327,7 @@ describe("MushafNavigationModal", () => {
     );
 
     const closeBtn = screen.getByTestId("modal-close-button");
-    expect(closeBtn).toHaveClass("min-h-[44px]", "min-w-[44px]");
+    expect(closeBtn).toHaveClass("min-h-[48px]", "min-w-[48px]");
   });
 
   it("enforces 44px minimum target sizes for search clear button", () => {

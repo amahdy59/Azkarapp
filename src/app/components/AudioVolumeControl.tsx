@@ -6,6 +6,7 @@ import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { Volume2, VolumeX } from "./icons";
+import "./overlay-surfaces.css";
 
 export function AudioVolumeControl({
   controller,
@@ -54,6 +55,7 @@ export function AudioVolumeControl({
           aria-label={volumeLabel}
           data-testid="audio-volume-popover"
           data-dropdown-surface=""
+          data-overlay-surface="contextual"
           dir={language === "ar" ? "rtl" : "ltr"}
           onEscapeKeyDown={(event) => event.stopPropagation()}
           className="audio-volume-popover z-[120] flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-2 text-foreground shadow-overlay"

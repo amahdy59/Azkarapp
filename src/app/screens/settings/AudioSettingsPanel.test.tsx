@@ -11,7 +11,15 @@ describe("AudioSettingsPanel", () => {
 
   it("persists the preferred voice, speed, and navigation behavior without an active player", async () => {
     const user = userEvent.setup();
-    render(<AudioSettingsPanel language="en" controller={null} onBack={() => undefined} />);
+    const onPreferencesChange = vi.fn();
+    render(
+      <AudioSettingsPanel
+        language="en"
+        controller={null}
+        onBack={() => undefined}
+        onPreferencesChange={onPreferencesChange}
+      />,
+    );
 
     await user.click(screen.getByRole("combobox", { name: "Azkar and dua voice" }));
     await user.click(screen.getByRole("option", { name: "English Translation" }));
@@ -23,6 +31,9 @@ describe("AudioSettingsPanel", () => {
       playbackRate: 1.25,
       continueOnNavigation: false,
     });
+    expect(onPreferencesChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ duaVoiceId: "english-george", playbackRate: 1.25, continueOnNavigation: false }),
+    );
   });
 
   it("disables unavailable reciters in the voice dropdown", async () => {
@@ -38,6 +49,8 @@ describe("AudioSettingsPanel", () => {
   it("uses the shared themed select instead of a browser-native dropdown", () => {
     const { container } = render(<AudioSettingsPanel language="en" controller={null} onBack={() => undefined} />);
 
+    expect(screen.getByRole("heading", { name: "Audio & recitations" })).toBeInTheDocument();
+    expect(screen.queryByTestId("settings-sub-downloads")).not.toBeInTheDocument();
     expect(container.querySelector("select")).not.toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Azkar and dua voice" })).toHaveAttribute(
       "data-slot",

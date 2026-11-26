@@ -48,6 +48,7 @@ export function AudioQueueSheet({
         dir={language === "ar" ? "rtl" : "ltr"}
         data-testid="audio-queue-sheet"
         data-dropdown-surface=""
+        data-overlay-surface="contextual"
         className="audio-queue-sheet z-[120] flex flex-col overflow-hidden rounded-[var(--ds-radius-overlay)] border border-border-control bg-popover text-popover-foreground shadow-overlay"
         onEscapeKeyDown={(event) => event.stopPropagation()}
         onOpenAutoFocus={(event) => {

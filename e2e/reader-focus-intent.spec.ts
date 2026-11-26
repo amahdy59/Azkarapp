@@ -72,12 +72,22 @@ for (const scenario of [
       }
 
       const options = page.getByRole("button", {
-        name: t(scenario.language, reading.collection ? "reader.menu" : "common.moreOptions"),
+        name: t(
+          scenario.language,
+          reading.collection ? "reader.menu" : reading.route === "/counter" ? "counter.settings" : "common.moreOptions",
+        ),
         exact: true,
       });
       await options.click();
       if (reading.collection) {
         await clickReaderOption(page, t(scenario.language, "counter.muteSound"));
+      } else if (reading.route === "/counter") {
+        const settings = page.getByTestId("masbaha-settings-sheet");
+        await settings.getByRole("switch", { name: t(scenario.language, "counter.sound"), exact: true }).click();
+        await settings.getByRole("button", { name: t(scenario.language, "counter.saveChanges"), exact: true }).click();
+        await expect(options).toBeFocused();
+        await options.click();
+        await expect(settings).toBeVisible();
       } else {
         await page.getByRole("menuitem", { name: t(scenario.language, "counter.muteSound"), exact: true }).click();
         await expect(page.getByRole("menu")).toHaveCount(0);
@@ -87,7 +97,12 @@ for (const scenario of [
         await expect(page.getByRole("menu")).toBeVisible();
       }
       await page.keyboard.press("Escape");
-      await expect(page.getByRole("menu").or(page.getByTestId("reader-options-sheet"))).toHaveCount(0);
+      await expect(
+        page
+          .getByRole("menu")
+          .or(page.getByTestId("reader-options-sheet"))
+          .or(page.getByTestId("masbaha-settings-sheet")),
+      ).toHaveCount(0);
       await expect(options).toBeFocused();
       await expect(page).toHaveURL(new RegExp(`#${reading.route}$`));
       await region.focus();

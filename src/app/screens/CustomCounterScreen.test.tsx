@@ -1,14 +1,39 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { COUNTER_SOUND_STORAGE_KEY } from "../hooks/useCounterClickFeedback";
+import { AUTHENTIC_AZKAR_COLLECTION } from "../content/authenticAzkar";
 import { CustomCounterScreen } from "./CustomCounterScreen";
 
-describe("CustomCounterScreen Component", () => {
+async function options(user: ReturnType<typeof userEvent.setup>, more = false) {
+  await user.click(screen.getByTestId("masbaha-settings-trigger"));
+  if (more) await user.click(screen.getByText(/^(More options|المزيد من الخيارات)$/u, { selector: "summary" }));
+}
+async function choose(user: ReturnType<typeof userEvent.setup>, id: string) {
+  await user.click(screen.getByTestId("counter-zikr-filter"));
+  await user.click(screen.getByTestId(`zikr-option-${id}`));
+  await user.click(screen.getByRole("button", { name: /^(Continue|متابعة)$/u, exact: true }));
+}
+function swipe(canvas: HTMLElement) {
+  fireEvent.touchStart(canvas, { touches: [{ clientX: 200, clientY: 100 }] });
+  fireEvent.touchMove(canvas, { touches: [{ clientX: 100, clientY: 100 }] });
+  fireEvent.touchEnd(canvas, { changedTouches: [{ clientX: 100, clientY: 100 }] });
+}
+describe("CustomCounterScreen", () => {
   beforeEach(() => window.localStorage.clear());
   afterEach(() => vi.unstubAllGlobals());
 
-  it("keeps the header clean without a sequential after-prayer button", () => {
+  it("shows one reviewed dhikr and one tally without instructional or duplicate goal copy", () => {
+    render(<CustomCounterScreen isArabic direction="rtl" onBack={vi.fn()} />);
+    expect(screen.getByRole("heading", { name: "المسبحة" })).toBeInTheDocument();
+    expect(screen.getAllByText(AUTHENTIC_AZKAR_COLLECTION[0]!.textAr)).toHaveLength(1);
+    expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("٠ / ١٠٠"));
+    expect(screen.queryByText(/اضغط|بقي|الهدف:/u)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("custom-counter-next-btn")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("custom-counter-prev-btn")).not.toBeInTheDocument();
+    expect(within(screen.getByTestId("masbaha-support-actions")).getAllByRole("button")).toHaveLength(3);
+  });
+  it("keeps the existing saved tally on initial render", () => {
     render(
       <CustomCounterScreen
         isArabic={false}
@@ -17,230 +42,153 @@ describe("CustomCounterScreen Component", () => {
         initialMasbahaState={{ count: 12, target: 100, laps: 0 }}
       />,
     );
+    expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("12 / 100"));
     expect(screen.queryByRole("button", { name: "Read guided after-prayer azkar" })).not.toBeInTheDocument();
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("12/100");
   });
-
-  it("renders correctly in Arabic with initial state", () => {
-    const onBack = vi.fn();
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
-
-    expect(screen.getByText("المسبحة")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" })).toBeInTheDocument();
-    expect(screen.getAllByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toHaveLength(2);
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("٠/١٠٠");
-    expect(screen.getByTestId("custom-counter-surface")).toHaveClass("adaptive-counter-surface");
+  it("increments, undoes precisely one count, saves the corrected tally and disables Undo at zero", async () => {
+    const user = userEvent.setup(),
+      save = vi.fn();
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} onSaveMasbahaState={save} />);
+    const counter = screen.getByTestId("custom-counter-surface"),
+      undo = screen.getByRole("button", { name: "Undo one count" });
+    expect(undo).toBeDisabled();
+    fireEvent.click(counter);
+    fireEvent.click(counter);
+    await user.click(undo);
+    expect(counter).toHaveAccessibleName(expect.stringContaining("1 / 100"));
+    expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ count: 1, target: 100 }));
+    await user.click(undo);
+    expect(undo).toBeDisabled();
+    expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ count: 0, items: undefined }));
   });
-
-  it("increments on tap, removes undo, and keeps reset as the single secondary action in the menu", async () => {
-    const user = userEvent.setup();
-    const onBack = vi.fn();
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
-
-    const tapButton = screen.getAllByTestId("custom-counter-surface")[0]!;
-    fireEvent.click(tapButton);
-
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("١");
-    expect(screen.queryByRole("button", { name: "تراجع" })).not.toBeInTheDocument();
-
-    // Open More Options and click Reset
-    await user.click(screen.getByRole("button", { name: "المزيد من الخيارات" }));
-    await user.click(screen.getByRole("menuitem", { name: "إعادة تعيين العداد" }));
-    await user.click(screen.getByRole("button", { name: "إعادة العداد لـ 0" }));
-
-    expect(screen.getAllByText("٠")[0]).toBeInTheDocument();
-  });
-
-  it("counts from non-interactive canvas space while protecting controls", async () => {
+  it("counts from non-interactive canvas space and never from option controls", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
-    const canvas = screen.getByTestId("custom-counter-content");
+    fireEvent.click(screen.getByTestId("custom-counter-content"));
     const counter = screen.getByTestId("custom-counter-surface");
-    fireEvent.click(canvas);
-    expect(counter).toHaveTextContent("1");
-
-    // Click the target filter instead of opening the zikr dropdown
-    await user.click(screen.getByTestId("counter-target-filter"));
-    expect(counter).toHaveTextContent("1");
+    expect(counter).toHaveAccessibleName(expect.stringContaining("1 / 100"));
+    await options(user);
+    expect(counter).toHaveAttribute("aria-label", expect.stringContaining("1 / 100"));
+    await user.click(screen.getByRole("radio", { name: "33", exact: true }));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(counter).toHaveAccessibleName(expect.stringContaining("1 / 100"));
   });
-
   it("does not count the synthetic click after swiping to another zikr", () => {
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
     const canvas = screen.getByTestId("custom-counter-content");
-    fireEvent.touchStart(canvas, { touches: [{ clientX: 200, clientY: 100 }] });
-    fireEvent.touchMove(canvas, { touches: [{ clientX: 100, clientY: 100 }] });
-    fireEvent.touchEnd(canvas, { changedTouches: [{ clientX: 100, clientY: 100 }] });
+    swipe(canvas);
     fireEvent.click(canvas);
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("0/");
+    expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("0 / 100"));
   });
-
-  it("persists a localized sound toggle with pressed-state semantics inside More Options menu", async () => {
-    const user = userEvent.setup();
-    const firstRender = render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
-    // Open More Options
-    await user.click(screen.getByRole("button", { name: "More options" }));
-    const mute = screen.getByRole("menuitem", { name: "Mute counter sound" });
-
-    // Toggle sound
-    await user.click(mute);
-
-    // Verify local storage and menu item change
-    await user.click(screen.getByRole("button", { name: "More options" }));
-    expect(screen.getByRole("menuitem", { name: "Enable counter sound" })).toBeInTheDocument();
-    expect(window.localStorage.getItem(COUNTER_SOUND_STORAGE_KEY)).toBe("false");
-
-    firstRender.unmount();
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
-
-    await user.click(screen.getByRole("button", { name: "المزيد من الخيارات" }));
-    expect(screen.getByRole("menuitem", { name: "تشغيل صوت العداد" })).toBeInTheDocument();
-  });
-
-  it("counts once from the focused counter but never from Space on another control", () => {
-    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-    const counter = screen.getByTestId("custom-counter-surface");
-    const moreOptions = screen.getByRole("button", { name: "More options" });
-
-    moreOptions.focus();
-    fireEvent.keyDown(moreOptions, { key: " ", code: "Space" });
-    expect(counter).toHaveTextContent("0");
-
-    counter.focus();
-    fireEvent.keyDown(counter, { key: " ", code: "Space" });
-    expect(counter).toHaveTextContent("1");
-  });
-
-  it("exposes expanded abbreviated previews, named options and selection confirmation", async () => {
+  it.each(["scroll", "two-finger"])(
+    "does not count a synthesized click after a %s gesture and permits the next tap",
+    (gesture) => {
+      render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+      const canvas = screen.getByTestId("reader-card");
+      const first = { clientX: 100, clientY: 100 };
+      fireEvent.touchStart(canvas, {
+        touches: gesture === "scroll" ? [first] : [first, { clientX: 200, clientY: 100 }],
+      });
+      fireEvent.touchMove(canvas, {
+        touches: gesture === "scroll" ? [{ clientX: 100, clientY: 160 }] : [first, { clientX: 240, clientY: 100 }],
+      });
+      fireEvent.touchEnd(canvas, { touches: [], changedTouches: [{ clientX: 100, clientY: 160 }] });
+      fireEvent.click(canvas);
+      expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("0 / 100"));
+      fireEvent.touchStart(canvas, { touches: [first] });
+      fireEvent.touchEnd(canvas, { touches: [], changedTouches: [first] });
+      fireEvent.click(canvas);
+      expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("1 / 100"));
+    },
+  );
+  it("stages a searchable dhikr choice and closes without changing the selected reading", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
-    const picker = screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i });
-    await user.click(picker);
-
-    expect(screen.getByRole("menu")).toBeInTheDocument();
+    await user.click(screen.getByTestId("counter-zikr-filter"));
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    await user.click(screen.getByTestId("zikr-option-auth_la_hawla_wala_quwwata"));
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.getByText(AUTHENTIC_AZKAR_COLLECTION[0]!.textAr)).toBeVisible();
+  });
+  it("offers every reviewed Arabic dhikr including complete long text", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic direction="rtl" onBack={vi.fn()} />);
+    await user.click(screen.getByTestId("counter-zikr-filter"));
+    expect(screen.getAllByRole("radio")).toHaveLength(AUTHENTIC_AZKAR_COLLECTION.length);
+    for (const item of AUTHENTIC_AZKAR_COLLECTION)
+      expect(screen.getByTestId(`zikr-option-${item.id}`)).toHaveTextContent(item.textAr);
+    await user.click(screen.getByTestId("zikr-option-auth_sayyid_al_istighfar"));
+    await user.click(screen.getByRole("button", { name: "متابعة" }));
     expect(
-      screen.getByRole("menuitemradio", { name: "Subhanallahi wa bihamdihi, Subhanallahil-Azeem" }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: /Hawqalah/i })).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: /Sayyid al-Istighfar/i })).toBeInTheDocument();
-
-    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
-
-    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Hawqalah/i })).toBeInTheDocument();
+      screen.getByText(AUTHENTIC_AZKAR_COLLECTION.find((item) => item.id === "auth_sayyid_al_istighfar")!.textAr),
+    ).toBeVisible();
   });
-
-  it("exposes concise Islamic names in Arabic dropdown menu like الحوقلة and سيد الاستغفار", async () => {
-    const user = userEvent.setup();
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
-
-    const picker = screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" });
-    await user.click(picker);
-
-    expect(screen.getByRole("menu")).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: "الحوقلة" })).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: "سيد الاستغفار" })).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: "الباقيات الصالحات" })).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: "الصلاة على النبي ﷺ" })).toBeInTheDocument();
-
-    await user.click(screen.getByRole("menuitemradio", { name: "سيد الاستغفار" }));
-
-    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "سيد الاستغفار" })).toBeInTheDocument();
-    // Center reading surface displays full devotional text
-    expect(screen.getByText(/اللَّهُمَّ أَنْتَ رَبِّي لا إِلَهَ إِلا أَنْتَ/)).toBeInTheDocument();
-  });
-
-  it("keeps the current count when the finite target changes", async () => {
+  it("changes a finite target without resetting the current count", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
     fireEvent.click(screen.getByTestId("custom-counter-surface"));
-    await user.click(screen.getByTestId("counter-target-filter"));
-    expect(screen.queryByRole("menuitemradio", { name: "Open" })).not.toBeInTheDocument();
-    await user.click(screen.getByRole("menuitemradio", { name: "33" }));
-
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("1/33");
+    await options(user);
+    expect(screen.queryByRole("radio", { name: "Open", exact: true })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("radio", { name: "33", exact: true }));
+    await user.click(screen.getByRole("button", { name: "Save", exact: true }));
+    expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("1 / 33"));
   });
-
-  it("protects an in-progress count before changing to another zikr", async () => {
+  it("saves counts across dhikr changes and resumes the original count without destructive prompts", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
-    fireEvent.click(screen.getByTestId("custom-counter-surface"));
-    await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
-    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
-
-    expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
-    expect(screen.getByText(/clear the current count of 1/i)).toBeInTheDocument();
-  });
-
-  it("saves progress across azkar and restores it when switching back with Save & switch", async () => {
-    const user = userEvent.setup();
-    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
-    // Count 3 on initial zikr
     const counter = screen.getByTestId("custom-counter-surface");
     fireEvent.click(counter);
     fireEvent.click(counter);
     fireEvent.click(counter);
-    expect(counter).toHaveTextContent("3/100");
-
-    // Open picker and pick another zikr
-    await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
-    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
-
-    // Dialog appears with Save & switch
-    expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Save & switch" }));
-
-    // Now on new zikr with count 0
-    expect(counter).toHaveTextContent("0/100");
-
-    // Count 2 on the new zikr
+    await choose(user, "auth_la_hawla_wala_quwwata");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(counter).toHaveAccessibleName(expect.stringContaining("0 / 100"));
     fireEvent.click(counter);
     fireEvent.click(counter);
-    expect(counter).toHaveTextContent("2/100");
-
-    // Open picker again - verify original zikr shows saved count badge
-    await user.click(screen.getByRole("button", { name: /Hawqalah/i }));
-    expect(screen.getByText("3 / 100")).toBeInTheDocument();
-
-    // Select original zikr
+    await user.click(screen.getByTestId("counter-zikr-filter"));
+    expect(screen.getByText("3 / 100")).toBeVisible();
     await user.click(screen.getByTestId("zikr-option-auth_subhanallah_wabihamdihi"));
-    await user.click(screen.getByRole("button", { name: "Save & switch" }));
-
-    // Count is restored to 3!
-    expect(counter).toHaveTextContent("3/100");
+    await user.click(screen.getByRole("button", { name: "Continue", exact: true }));
+    expect(counter).toHaveAccessibleName(expect.stringContaining("3 / 100"));
+    await choose(user, "auth_la_hawla_wala_quwwata");
+    expect(counter).toHaveAccessibleName(expect.stringContaining("2 / 100"));
   });
-
-  it("resets count when switching with Change and reset", async () => {
+  it("retains save/reset protection on legacy swipes with active progress", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
-    const counter = screen.getByTestId("custom-counter-surface");
-    fireEvent.click(counter);
-    fireEvent.click(counter);
-    expect(counter).toHaveTextContent("2/100");
-
-    await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
-    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
-
-    // Click Change and reset
-    await user.click(screen.getByRole("button", { name: "Change and reset" }));
-    expect(counter).toHaveTextContent("0/100");
-
-    // Switch back to original zikr (from count 0, so no prompt)
-    await user.click(screen.getByRole("button", { name: /Hawqalah/i }));
-    await user.click(screen.getByTestId("zikr-option-auth_subhanallah_wabihamdihi"));
-
-    // Original count was wiped by reset, so starts at 0
-    expect(counter).toHaveTextContent("0/100");
+    fireEvent.click(screen.getByTestId("custom-counter-surface"));
+    swipe(screen.getByTestId("custom-counter-content"));
+    expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Save & switch" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
-
-  it("keeps a completed counter focusable so its next-step dialog can be reopened", () => {
+  it("keeps reset protected and removes the reset counter's record after confirmation", async () => {
+    const user = userEvent.setup(),
+      save = vi.fn();
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} onSaveMasbahaState={save} />);
+    fireEvent.click(screen.getByTestId("custom-counter-surface"));
+    await options(user, true);
+    await user.click(screen.getByRole("button", { name: "Reset Counter", exact: true }));
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    await user.click(screen.getByRole("button", { name: "Cancel", exact: true }));
+    expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("1 / 100"));
+    await options(user, true);
+    await user.click(screen.getByRole("button", { name: "Reset Counter", exact: true }));
+    await user.click(screen.getByRole("button", { name: "Reset Counter to 0", exact: true }));
+    expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ count: 0, items: undefined }));
+  });
+  it("does not restore a previous devotional day's tally", () => {
+    render(
+      <CustomCounterScreen
+        isArabic={false}
+        direction="ltr"
+        onBack={vi.fn()}
+        initialMasbahaState={{ count: 40, target: 100, laps: 2, dayKey: "2000-01-01" }}
+      />,
+    );
+    expect(screen.getByTestId("custom-counter-surface")).toHaveAccessibleName(expect.stringContaining("0 / 100"));
+  });
+  it("keeps completed counters focusable and acknowledges completion inline", () => {
     render(
       <CustomCounterScreen
         isArabic={false}
@@ -249,13 +197,11 @@ describe("CustomCounterScreen Component", () => {
         initialMasbahaState={{ count: 1, target: 1, laps: 0, selectedZikrId: "auth_sayyid_al_istighfar" }}
       />,
     );
-
     const counter = screen.getByTestId("custom-counter-surface");
     expect(counter).not.toBeDisabled();
     fireEvent.click(counter);
-    expect(screen.getByRole("dialog", { name: "Goal Reached!" })).toBeInTheDocument();
+    expect(screen.getByTestId("masbaha-completion")).toHaveTextContent("Target reached");
   });
-
   it("plays the Web Audio click when an enabled counter is tapped", () => {
     const oscillator = {
       type: "sine",
@@ -292,129 +238,87 @@ describe("CustomCounterScreen Component", () => {
     expect(oscillator.stop).toHaveBeenCalledWith(1.045);
   });
 
-  it("follows reader look and feel with Lightbulb benefit button and Uthmanic typography", async () => {
+  it("opens the unchanged reviewed reference through Options, retaining full hadith and source", async () => {
     const user = userEvent.setup();
-    const { unmount } = render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-
-    const benefitButton = screen.getByRole("button", { name: /Virtue & Reference/i });
-    expect(benefitButton).toBeInTheDocument();
-    expect(benefitButton).toHaveTextContent("Benefit");
-
-    const zikrText = screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ");
-    expect(zikrText).toHaveClass("zikr-text", "font-medium");
-    expect(zikrText).toHaveStyle({ fontFamily: "var(--font-zikr)" });
-
-    await user.click(benefitButton);
-    expect(screen.getByRole("dialog", { name: /Virtue & Reference/i })).toBeInTheDocument();
-
-    unmount();
-
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
-    const arBenefitBtn = screen.getByRole("button", { name: /الفضل والحديث/ });
-    expect(arBenefitBtn).toHaveTextContent("الفائدة");
-  });
-
-  it("renders both virtue and full hadith cards with source link in reference sheet", async () => {
-    const user = userEvent.setup();
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
-
-    const arBenefitBtn = screen.getByRole("button", { name: /الفضل والحديث/ });
-    await user.click(arBenefitBtn);
-
-    const dialog = screen.getByRole("dialog", { name: /الفضل والحديث/ });
-    expect(dialog).toBeInTheDocument();
-
-    // Virtue card
-    expect(screen.getByTestId("masbaha-virtue-text")).toHaveTextContent(
-      "مَنْ قَالَ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، فِي يَوْمٍ مِائَةَ مَرَّةٍ، حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ",
-    );
+    render(<CustomCounterScreen isArabic direction="rtl" onBack={vi.fn()} />);
+    const text = screen.getByText(AUTHENTIC_AZKAR_COLLECTION[0]!.textAr);
+    expect(text).toHaveClass("zikr-text", "font-medium");
+    expect(text).toHaveStyle({ fontFamily: "var(--font-zikr)" });
+    await options(user, true);
+    await user.click(screen.getByTestId("custom-counter-benefit-dock-button"));
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(screen.getByTestId("masbaha-virtue-text")).toHaveTextContent(AUTHENTIC_AZKAR_COLLECTION[0]!.virtueAr);
+    expect(screen.getByTestId("masbaha-hadith-text")).toHaveTextContent(AUTHENTIC_AZKAR_COLLECTION[0]!.hadithTextAr);
     expect(screen.getByRole("heading", { name: "الفائدة" })).toBeInTheDocument();
-
-    // Full Hadith card
-    expect(screen.getByTestId("masbaha-hadith-text")).toHaveTextContent(
-      "عَنْ أَبِي هُرَيْرَةَ رَضِيَ اللَّهُ عَنْهُ، أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ، حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ».",
-    );
     expect(screen.getByRole("heading", { name: "نص الحديث" })).toBeInTheDocument();
-
-    // Source link
-    const sourceLink = screen.getByRole("link", { name: /صحيح البخاري/ });
-    expect(sourceLink).toHaveAttribute("href", "https://sunnah.com/bukhari:6405");
-    expect(sourceLink).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("link", { name: /صحيح البخاري/u })).toHaveAttribute(
+      "href",
+      "https://sunnah.com/bukhari:6405",
+    );
+    expect(screen.getByRole("link", { name: /صحيح البخاري/u })).toHaveAttribute("target", "_blank");
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.getByTestId("masbaha-settings-trigger")).toHaveFocus());
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
-
-  it("exposes return action on completion dialog", async () => {
-    const user = userEvent.setup();
-    const onBack = vi.fn();
+  it("completes inline, allows undo, then finishes with the existing return action", async () => {
+    const user = userEvent.setup(),
+      back = vi.fn();
     render(
       <CustomCounterScreen
         isArabic={false}
         direction="ltr"
-        onBack={onBack}
+        onBack={back}
         initialMasbahaState={{ count: 32, target: 33, laps: 0 }}
       />,
     );
-
-    // One more click reaches target 33
-    fireEvent.click(screen.getByTestId("custom-counter-surface"));
-    expect(await screen.findByRole("dialog", { name: /Goal Reached!/i })).toBeInTheDocument();
-    expect(screen.getByTestId("custom-counter-return-btn")).toBeInTheDocument();
-
+    const counter = screen.getByTestId("custom-counter-surface");
+    fireEvent.click(counter);
+    expect(screen.getByTestId("masbaha-completion")).toBeVisible();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Undo one count" }));
+    expect(counter).toHaveAccessibleName(expect.stringContaining("32 / 33"));
+    expect(screen.queryByTestId("masbaha-completion")).not.toBeInTheDocument();
+    fireEvent.click(counter);
     await user.click(screen.getByTestId("custom-counter-return-btn"));
-    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(back).toHaveBeenCalledOnce();
   });
-
-  it("supports navigating through azkar with next and previous buttons", async () => {
-    const user = userEvent.setup();
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
-
-    expect(screen.getByTestId("custom-counter-next-btn")).toBeInTheDocument();
-    expect(screen.getByTestId("custom-counter-prev-btn")).toBeInTheDocument();
-
-    // Click next to switch to second authentic dhikr
-    await user.click(screen.getByTestId("custom-counter-next-btn"));
-    expect(
-      screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ" }),
-    ).toBeInTheDocument();
-
-    // Click previous to switch back
-    await user.click(screen.getByTestId("custom-counter-prev-btn"));
-    expect(screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" })).toBeInTheDocument();
-  });
-
-  it("opens share modal when share button is tapped", async () => {
-    // Module transfer is covered by browser tests. Await the real lazy module
-    // here so this interaction assertion does not race Vitest's transformer.
-    await import("../components/CollectionShareModal");
-    const user = userEvent.setup();
-    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
-
-    const shareButton = screen.getByTestId("counter-share-button");
-    expect(shareButton).toBeInTheDocument();
-    await user.click(shareButton);
-
-    // Modal is opened
-    expect(await screen.findByRole("dialog", {}, { timeout: 5000 })).toBeInTheDocument();
-  });
-
-  it("exposes the Aa typography menu to adjust text size", async () => {
-    const user = userEvent.setup();
-    const onTextSizeChange = vi.fn();
+  it("starts a new round explicitly while preserving the target and round total", async () => {
+    const user = userEvent.setup(),
+      save = vi.fn();
     render(
       <CustomCounterScreen
-        isArabic={true}
-        direction="rtl"
+        isArabic={false}
+        direction="ltr"
         onBack={vi.fn()}
-        textSize="medium"
-        onTextSizeChange={onTextSizeChange}
+        onSaveMasbahaState={save}
+        initialMasbahaState={{ count: 32, target: 33, laps: 1 }}
       />,
     );
-
-    const typographyButton = screen.getByTestId("custom-counter-settings-button");
-    expect(typographyButton).toBeInTheDocument();
-    await user.click(typographyButton);
-
-    const largeOption = screen.getByTestId("custom-counter-display-text-size-large");
-    await user.click(largeOption);
-    expect(onTextSizeChange).toHaveBeenCalledWith("large");
+    fireEvent.click(screen.getByTestId("custom-counter-surface"));
+    await user.click(screen.getByRole("button", { name: "New round" }));
+    expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ count: 0, target: 33, laps: 2 }));
+  });
+  it("opens real sharing through Options without leaving two panels open", async () => {
+    await import("../components/CollectionShareModal");
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic direction="rtl" onBack={vi.fn()} />);
+    await options(user, true);
+    await user.click(screen.getByTestId("counter-share-button"));
+    await waitFor(() => expect(screen.getAllByRole("dialog")).toHaveLength(1));
+    expect(screen.queryByTestId("masbaha-settings-sheet")).not.toBeInTheDocument();
+    expect(await screen.findByTestId("collection-share-modal")).toBeInTheDocument();
+  });
+  it("stages typography and sound until Save and remembers the sound choice", async () => {
+    const user = userEvent.setup(),
+      resize = vi.fn();
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} onTextSizeChange={resize} />);
+    await options(user, true);
+    await user.click(screen.getByRole("radio", { name: "Large" }));
+    await user.click(screen.getByRole("switch", { name: "Counter sound" }));
+    expect(resize).not.toHaveBeenCalled();
+    expect(localStorage.getItem(COUNTER_SOUND_STORAGE_KEY)).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Save", exact: true }));
+    expect(resize).toHaveBeenCalledWith("large");
+    expect(localStorage.getItem(COUNTER_SOUND_STORAGE_KEY)).toBe("false");
   });
 });

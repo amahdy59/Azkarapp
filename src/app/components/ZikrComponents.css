@@ -339,3 +339,56 @@
 .adaptive-counter-surface--action {
   min-height: 48px;
 }
+.masbaha-counter.adaptive-counter-surface {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  height: auto;
+  padding: 12px;
+  max-width: none;
+  border: 0;
+  border-radius: var(--ds-radius-card);
+  background: transparent;
+  --paper-grain: none;
+  box-shadow: none;
+}
+.masbaha-counter.adaptive-counter-surface:hover:not(:focus-visible) {
+  box-shadow: none;
+}
+.masbaha-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 16rem);
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+.masbaha-ring > svg {
+  width: 100%;
+  height: auto;
+}
+.masbaha-ring-value {
+  position: absolute;
+  inset: 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.masbaha-ring-value .counter-number {
+  font-size: min(3rem, 24cqi);
+  line-height: 1.2;
+}
+.masbaha-ring[data-long-count="true"] .counter-number {
+  font-size: min(3rem, 15cqi);
+}
+@media (forced-colors: active) {
+  .masbaha-ring circle {
+    stroke: CanvasText;
+  }
+  .masbaha-ring circle + circle {
+    stroke: Highlight;
+  }
+}

@@ -9,6 +9,7 @@ import { ignoreGeneratedWatchPath } from "./scripts/generated-watch-paths";
 import { compactBuildManifest } from "./scripts/compact-build-manifest";
 import { compactAudioLiterals } from "./scripts/compact-audio-literals";
 import reminderManifest from "./src/app/content/homeReminderManifest.json";
+import { learningAssetsPlugin } from "./scripts/learning-assets-plugin";
 
 /**
  * The release this build is, stamped in at build time.
@@ -220,6 +221,7 @@ function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string,
         "https://*.supabase.co",
         cloudflareApiOrigin,
         new URL(reminderManifest.url).origin,
+        "https://raw.githubusercontent.com",
         ...(liveUpdateOrigin ? [liveUpdateOrigin] : []),
         ...(audioOrigin ? [audioOrigin] : []),
       ],
@@ -266,6 +268,14 @@ export default defineConfig(({ mode, command }) => {
       __ANDROID_BUILD__: JSON.stringify(mode === "android"),
       __APP_RELEASE__: JSON.stringify(currentRelease()),
       __APP_VERSION__: JSON.stringify(JSON.parse(readFileSync("package.json", "utf8")).version),
+      __LEARNING_REVIEW__: JSON.stringify(
+        command === "serve" || process.env.VITE_CLOUDFLARE_API_URL?.includes("/__browser-test-api") === true,
+      ),
+      __LEARNING_ASSET_BASE__: JSON.stringify(
+        command === "serve" || process.env.VITE_CLOUDFLARE_API_URL?.includes("/__browser-test-api")
+          ? "/__learning-assets__/"
+          : "https://raw.githubusercontent.com/amahdy59/Azkarapp/main/docs/learning/assets/",
+      ),
     },
     plugins: [
       // Both plugins are load-bearing: the app is React, and Tailwind compiles
@@ -273,6 +283,7 @@ export default defineConfig(({ mode, command }) => {
       // being actively used" — a leftover from the Figma Make scaffold that was
       // actively misleading. DEC-070 / F36.)
       react(),
+      learningAssetsPlugin(),
       tailwindcss(),
       unwrapColorMixGuards(),
       flattenAndroidCascadeLayers(mode === "android"),
@@ -439,6 +450,9 @@ export default defineConfig(({ mode, command }) => {
             : "src/app/native/localNotifications.browser.ts",
         ),
         "@": path.resolve(__dirname, "./src"),
+        "@azkar/native-system-bars": path.resolve(
+          isBrowserBuild ? "src/app/native/systemBars.browser.ts" : "src/app/native/systemBars.ts",
+        ),
         "@azkar/native-mushaf-download": path.resolve(
           isGithubPages ? "src/app/content/nativeMushafDownload.browser.ts" : "src/app/content/nativeMushafDownload.ts",
         ),

@@ -2,6 +2,21 @@ import { describe, expect, it } from "vitest";
 import { parseHash, parseLocation, routeToHash } from "./routing";
 
 describe("routeToHash", () => {
+  it("keeps Learn resource and source-section links stable without changing Azkar routes", () => {
+    expect(routeToHash({ view: "learn" })).toBe("#/learn");
+    for (const learningResourceId of ["al-mukhtar", "dalil-al-mutamir", "al-wird-an-nabawi"] as const) {
+      const route = { view: "learning_reader" as const, learningResourceId, learningUnitId: "p-32" };
+      expect(parseHash(routeToHash(route)!)).toEqual(route);
+    }
+    for (const hash of [
+      "#/learn/missing",
+      "#/learn/al-mukhtar/p-0",
+      "#/learn/al-mukhtar/../p-3",
+      "#/learn/al-mukhtar/p-3/extra",
+    ])
+      expect(parseHash(hash)).toBeNull();
+    expect(parseHash("#/azkar/saved")).toEqual({ view: "library", librarySection: "saved" });
+  });
   it("keeps explicit Progress snapshots and rolling ranges distinct from the default destination", () => {
     for (const progressPeriod of ["day", "week", "month", "year", "last30"] as const) {
       const route = { view: "progress" as const, progressPeriod };
@@ -74,6 +89,22 @@ describe("routeToHash", () => {
 });
 
 describe("parseHash", () => {
+  it("retains legacy Arabic book routes and round-trips only available English editions", () => {
+    expect(parseHash("#/learn/dalil-al-mutamir/p-8")).toEqual({
+      view: "learning_reader",
+      learningResourceId: "dalil-al-mutamir",
+      learningUnitId: "p-8",
+    });
+    const english = {
+      view: "learning_reader",
+      learningResourceId: "dalil-al-mutamir",
+      learningUnitId: "p-9",
+      learningLanguage: "en",
+    } as const;
+    expect(parseHash(routeToHash(english)!)).toEqual(english);
+    expect(parseHash("#/learn/al-mukhtar/p-8?lang=en")).toBeNull();
+    expect(parseHash("#/learn/dalil-al-mutamir?lang=fr")).toBeNull();
+  });
   it("round-trips every linkable view", () => {
     for (const route of [
       { view: "home" },

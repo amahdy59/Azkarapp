@@ -49,11 +49,19 @@ test("keyboard instructions follow the shared breakpoint on every counter @cross
       await page.setViewportSize({ width, height });
       await expect(help).not.toBeVisible();
       const more = page.getByRole("button", {
-        name: route.includes("/azkar/") ? "Reader options" : "More options",
+        name: route.includes("/azkar/")
+          ? "Reader options"
+          : route === "/#/counter"
+            ? "Masbaha settings"
+            : "More options",
         exact: true,
       });
       await more.click();
-      const shortcutItem = page.getByRole("menuitem", { name: "Keyboard shortcuts", exact: true });
+      if (route === "/#/counter") await page.getByTestId("masbaha-settings-sheet").locator("summary").press("Enter");
+      const shortcutItem = page.getByRole(route === "/#/counter" ? "button" : "menuitem", {
+        name: "Keyboard shortcuts",
+        exact: true,
+      });
       const shortTouch = height <= 600 && (await page.evaluate(() => matchMedia("(pointer: coarse)").matches));
       if (width < 768 || shortTouch) await expect(shortcutItem).toHaveCount(0);
       else await expect(shortcutItem).toBeVisible();
@@ -216,8 +224,9 @@ test("keyboard help disables character actions while preserving native counting"
   const counter = page.getByTestId("custom-counter-surface");
   await expect(counter).toBeVisible();
   await counter.click();
-  await page.getByRole("button", { name: "More options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Keyboard shortcuts", exact: true }).click();
+  const settings = await openMasbahaSettings(page);
+  await settings.locator("summary").press("Enter");
+  await settings.getByRole("button", { name: "Keyboard shortcuts", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Keyboard shortcuts" });
   await dialog.getByRole("checkbox").uncheck();
   const axe = await new AxeBuilder({ page })
@@ -230,10 +239,10 @@ test("keyboard help disables character actions while preserving native counting"
   await expect(dialog).not.toBeVisible();
   await page.locator("#main-content").focus();
   await page.keyboard.press("r");
-  await expect(counter).toHaveText("1/100");
+  await expect(counter).toHaveText(/1\s*\/\s*100/);
   await counter.focus();
   await page.keyboard.press("Space");
-  await expect(counter).toHaveText("2/100");
+  await expect(counter).toHaveText(/2\s*\/\s*100/);
   await expect(page.getByRole("button", { name: "Read guided after-prayer azkar" })).toHaveCount(0);
   await page.goto("/#/azkar/after-prayer/1");
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-reader-category", "after_prayer");
@@ -316,44 +325,29 @@ test("dhikr picker supports arrow keys, explicit activation and cancellation @cr
   await returningReader(page, "en");
   await page.goto("/#/counter");
   await expect(page.getByTestId("custom-counter-surface")).toBeVisible();
-  if (page.viewportSize()!.width < 600) {
-    let sheet = await openMasbahaSettings(page);
-    await sheet.locator("summary").press("Enter");
-    let radios = sheet.getByRole("group", { name: t("en", "counter.chooseDhikr"), exact: true }).getByRole("radio");
-    await radios.first().focus();
-    await page.keyboard.press("ArrowDown");
-    await sheet.getByRole("button", { name: "Apply settings", exact: true }).click();
-    const chosen = await page.getByTestId("masbaha-settings-summary").textContent();
-    sheet = await openMasbahaSettings(page);
-    await sheet.locator("summary").press("Enter");
-    radios = sheet.getByRole("group", { name: t("en", "counter.chooseDhikr"), exact: true }).getByRole("radio");
-    await expect(radios.nth(1)).toBeChecked();
-    await radios.nth(1).focus();
-    await page.keyboard.press("ArrowDown");
-    await page.keyboard.press("Escape");
-    await expect(page.getByTestId("masbaha-settings-trigger")).toBeFocused();
-    await expect(page.getByTestId("masbaha-settings-summary")).toHaveText(chosen!);
-    return;
-  }
-  await page.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }).click();
-  const menu = page.getByRole("menu");
-  const radios = menu.getByRole("menuitemradio");
+  const trigger = page.getByTestId("counter-zikr-filter");
+  await trigger.click();
+  const sheet = page.getByTestId("masbaha-dhikr-sheet");
+  const radios = sheet.getByRole("radio");
   await radios.first().focus();
   await expect(radios.first()).toBeChecked();
   await page.keyboard.press("ArrowDown");
-  await expect(radios.first()).toBeChecked();
   await expect(radios.nth(1)).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(menu).not.toBeVisible();
-  const trigger = page.getByTestId("counter-zikr-filter");
-  await expect(trigger).toHaveAttribute("title", "Subhanallahi wa bihamdihi, Subhanallahil-Azeem");
+  await expect(radios.nth(1)).toBeChecked();
+  // Radio navigation stages a choice; explicit Continue commits it.
+  const oldText = await page.getByTestId("custom-counter-content").textContent();
+  await expect(page.getByTestId("custom-counter-content")).toHaveText(oldText!);
+  await sheet.getByRole("button", { name: t("en", "common.continue"), exact: true }).click();
+  await expect(sheet).toBeHidden();
+  const chosen = await page.getByTestId("custom-counter-content").textContent();
+  expect(chosen).not.toBe(oldText);
   await trigger.click();
   await expect(radios.nth(1)).toBeChecked();
   await radios.nth(1).focus();
   await page.keyboard.press("ArrowDown");
   await expect(radios.nth(2)).toBeFocused();
   await page.keyboard.press("Escape");
-  await expect(menu).not.toBeVisible();
+  await expect(sheet).toBeHidden();
   await expect(trigger).toBeFocused();
-  await expect(trigger).toHaveAttribute("title", "Subhanallahi wa bihamdihi, Subhanallahil-Azeem");
+  await expect(page.getByTestId("custom-counter-content")).toHaveText(chosen!);
 });

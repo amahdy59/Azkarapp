@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { act, render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { CollectionShareModal } from "./CollectionShareModal";
 import type { Zikr } from "../types";
+import { getAzkarForMode } from "../content/azkar";
 
 // Mock canvas and share functions
 vi.mock("../share/attributedCard", () => ({
@@ -75,6 +76,31 @@ function showCaption() {
   return screen.getByRole("textbox", { name: /Caption preview|معاينة النص المرفق/u });
 }
 describe("CollectionShareModal", () => {
+  it("keeps explicit long-surah sharing on its sourced reminder when a prepared collection exists", async () => {
+    const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    const collection = getAzkarForMode("before_sleep", "complete");
+    const item = collection.find((candidate) => candidate.id === "s-hm-110a")!;
+    render(
+      <CollectionShareModal
+        open
+        single
+        onClose={vi.fn()}
+        categoryId="before_sleep"
+        collectionTitle="Surah reminder"
+        items={[item]}
+        collection={{ items: collection, title: "Sleep Remembrance" }}
+        language="en"
+      />,
+    );
+    await waitFor(() =>
+      expect(vi.mocked(generateAllCollectionStoryPages).mock.lastCall![0]).toMatchObject({
+        single: true,
+        format: "portrait",
+        allItems: [expect.objectContaining({ id: item.id, reminder: true })],
+      }),
+    );
+    expect(screen.queryByRole("radio", { name: "Ready-made cards" })).not.toBeInTheDocument();
+  });
   it("switches content from one zikr to its collection while retaining the chosen design", async () => {
     const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
     const collection = [...SAMPLE_ITEMS, { ...SAMPLE_ITEMS[0]!, id: "m-2", arabicText: "سبحان الله" }];
@@ -930,30 +956,33 @@ describe("CollectionShareModal", () => {
       />,
     );
 
-    await screen.findByAltText("أذكار الصباح - صفحة 1 من 5");
-    expect(fetch).not.toHaveBeenCalled();
-    const curatedChoice = await screen.findByRole("button", { name: "البطاقات المعتمدة" });
-    expect(curatedChoice).toHaveAccessibleDescription("بطاقات جاهزة للمجموعة");
-    expect(curatedChoice.querySelector(".sharing-choice-icon svg")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByRole("button", { name: "تصميم مخصص" })).toHaveAccessibleDescription("اختر المحتوى والتصميم");
-    fireEvent.click(curatedChoice);
+    const curatedChoice = screen.getByRole("radio", { name: "البطاقات الجاهزة" });
+    expect(curatedChoice).toBeChecked();
     expect(await screen.findByAltText(/أذكار الصباح - البطاقة الأولى/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "البطاقات المعتمدة" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByRole("navigation", { name: "خطوات المشاركة" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("checkbox", { name: /اختيار البطاقة/ })).toHaveLength(3);
     expect(screen.queryByText("إعدادات الصورة", { exact: true })).not.toBeInTheDocument();
 
     const nextBtn = screen.getByRole("button", { name: "البطاقة التالية" });
     fireEvent.click(nextBtn);
     expect(await screen.findByAltText(/أذكار الصباح - البطاقة الثانية/)).toBeInTheDocument();
 
-    goStep("share");
-    const shareBtn = screen.getByRole("button", { name: "مشاركة", exact: true });
+    const shareBtn = screen.getByRole("button", { name: "مشاركة ٣ بطاقات", exact: true });
+    await waitFor(() => expect(shareBtn).toBeEnabled());
     fireEvent.click(shareBtn);
-    await waitFor(() => expect(shareMultipleFiles).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(shareMultipleFiles).toHaveBeenCalledWith(expect.arrayContaining([expect.any(File)]), expect.anything()),
+    );
+    expect(vi.mocked(shareMultipleFiles).mock.lastCall![0]).toHaveLength(3);
+    await waitFor(() => expect(shareBtn).toBeEnabled());
+    fireEvent.click(screen.getAllByRole("checkbox", { name: /اختيار البطاقة/ })[0]!);
+    fireEvent.click(screen.getByRole("button", { name: "مشاركة ٢ بطاقات" }));
+    await waitFor(() => expect(vi.mocked(shareMultipleFiles).mock.lastCall![0]).toHaveLength(2));
 
-    goStep("content");
-    const customStudioBtn = screen.getByRole("button", { name: "تصميم مخصص" });
+    await waitFor(() => expect(screen.getByRole("radio", { name: "تصميم مخصص" })).toBeEnabled());
+    const customStudioBtn = screen.getByRole("radio", { name: "تصميم مخصص" });
     fireEvent.click(customStudioBtn);
-    expect(customStudioBtn).toHaveAttribute("aria-pressed", "true");
+    expect(customStudioBtn).toBeChecked();
     expect(await screen.findByAltText("أذكار الصباح - صفحة 1 من 5")).toBeInTheDocument();
     vi.unstubAllGlobals();
   });
@@ -971,9 +1000,9 @@ describe("CollectionShareModal", () => {
           language="ar"
         />,
       );
-      fireEvent.click(await screen.findByRole("button", { name: "البطاقات المعتمدة" }));
       expect(await screen.findByAltText("أذكار الصباح - صفحة 1 من 5")).toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "البطاقات المعتمدة" })).not.toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: "تصميم مخصص" })).toBeChecked();
+      expect(screen.getByText(/تعذّر تحميل البطاقات الجاهزة/)).toBeInTheDocument();
     } finally {
       vi.unstubAllGlobals();
     }

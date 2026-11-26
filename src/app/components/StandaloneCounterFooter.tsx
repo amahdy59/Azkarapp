@@ -3,7 +3,7 @@ import type { AppLanguage } from "../types";
 import { t } from "../i18n";
 import { DevotionalAction, DevotionalFooter } from "./DevotionalControls";
 import { ReaderFooterTools } from "./ReaderFooterTools";
-import { RotateCcw, Share2, Volume2, VolumeX } from "./icons";
+import { RotateCcw, Share2, Volume2, VolumeX, Undo } from "./icons";
 
 /** The Reader's footer anatomy with the standalone counter's own actions. */
 export function StandaloneCounterFooter({
@@ -20,6 +20,8 @@ export function StandaloneCounterFooter({
   onShare,
   previous,
   next,
+  onUndo,
+  undoDisabled,
 }: {
   language: AppLanguage;
   direction: "rtl" | "ltr";
@@ -35,6 +37,8 @@ export function StandaloneCounterFooter({
   onShare?: () => void;
   previous?: ReactNode;
   next?: ReactNode;
+  onUndo?: () => void;
+  undoDisabled?: boolean;
 }) {
   const soundLabel = t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound");
   return (
@@ -61,6 +65,19 @@ export function StandaloneCounterFooter({
         }
       >
         <div data-testid="reader-support-actions">
+          {onUndo && (
+            <DevotionalAction
+              disabled={undoDisabled}
+              onClick={(event) => {
+                event.stopPropagation();
+                onUndo();
+              }}
+              aria-label={t(language, "counter.undoCount")}
+            >
+              <Undo size={20} aria-hidden="true" />
+              <span className="reader-tool-label text-label font-semibold">{t(language, "common.undo")}</span>
+            </DevotionalAction>
+          )}
           {benefit}
           {onShare && (
             <DevotionalAction

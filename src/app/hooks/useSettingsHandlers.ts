@@ -34,6 +34,7 @@ export async function clearAllLocalData() {
     ...(isSupabaseConfigured ? [signOutSupabase()] : []),
     import("../audio/audioOfflineCache").then(({ removeDownloadedAudio }) => removeDownloadedAudio()),
     import("../content/mushafOfflineCache").then(({ removeDownloadedMushaf }) => removeDownloadedMushaf()),
+    import("../learning/learningDownloads").then(({ clearLearningDownloads }) => clearLearningDownloads()),
   ]);
   clearStoredAppData();
 }

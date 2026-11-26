@@ -1,0 +1,173 @@
+[
+  {
+    "id": "al-mukhtar",
+    "kind": "book",
+    "language": "ar",
+    "status": "draft-for-review",
+    "pack": {
+      "path": "2de538c40261561f5d7add34f1ab1ff8116452e0ffbc55f062adb26550a0e707.bin",
+      "sha256": "2de538c40261561f5d7add34f1ab1ff8116452e0ffbc55f062adb26550a0e707",
+      "bytes": 28231,
+      "mime": "application/gzip"
+    },
+    "images": [],
+    "pdfs": {
+      "light": {
+        "path": "7d1b4de97c22d83fb9829bea6cea949c4c0b8597c12cd1623107124a19e1005b.pdf",
+        "sha256": "7d1b4de97c22d83fb9829bea6cea949c4c0b8597c12cd1623107124a19e1005b",
+        "bytes": 1514578,
+        "mime": "application/pdf"
+      },
+      "dark": {
+        "path": "4f4fc96cab5cdb30731c9db38e5f90a991d8e15329e9fefcae6b7ac6c604a465.pdf",
+        "sha256": "4f4fc96cab5cdb30731c9db38e5f90a991d8e15329e9fefcae6b7ac6c604a465",
+        "bytes": 1515550,
+        "mime": "application/pdf"
+      },
+      "navy": {
+        "path": "d39b86357c9320a9923f6c5cde131558a49fd4684ff3d1b6c06eec568e8d6054.pdf",
+        "sha256": "d39b86357c9320a9923f6c5cde131558a49fd4684ff3d1b6c06eec568e8d6054",
+        "bytes": 1515331,
+        "mime": "application/pdf"
+      }
+    }
+  },
+  {
+    "id": "dalil-al-mutamir",
+    "kind": "book",
+    "language": "ar",
+    "pack": {
+      "path": "7018db19863382814687303bf4b0d8b63639b2de05c0996cb498bbe2977e7776.bin",
+      "sha256": "7018db19863382814687303bf4b0d8b63639b2de05c0996cb498bbe2977e7776",
+      "bytes": 11341,
+      "mime": "application/gzip"
+    },
+    "images": [
+      {
+        "path": "3f221d3499254316257765de43c7722c8f5e8edc2c4fda3ee645fb826c8a49ac.jpeg",
+        "sha256": "3f221d3499254316257765de43c7722c8f5e8edc2c4fda3ee645fb826c8a49ac",
+        "bytes": 280248,
+        "mime": "image/jpeg"
+      },
+      {
+        "path": "47b0ba0c1addb596cf0b6c31a76eeee483baa5453dc42d0dd162876deca39e5b.jpeg",
+        "sha256": "47b0ba0c1addb596cf0b6c31a76eeee483baa5453dc42d0dd162876deca39e5b",
+        "bytes": 543632,
+        "mime": "image/jpeg"
+      },
+      {
+        "path": "f47f84ed1041f01f15a398b0cd07c9e3c8150393825be34e727234dfe43841ef.jpeg",
+        "sha256": "f47f84ed1041f01f15a398b0cd07c9e3c8150393825be34e727234dfe43841ef",
+        "bytes": 76626,
+        "mime": "image/jpeg"
+      }
+    ],
+    "pdfs": {
+      "light": {
+        "path": "fde88b6267452eef584df9fba535bc04d1f0653f085eea8034e0b0f4f303563b.pdf",
+        "sha256": "fde88b6267452eef584df9fba535bc04d1f0653f085eea8034e0b0f4f303563b",
+        "bytes": 1437885,
+        "mime": "application/pdf"
+      },
+      "dark": {
+        "path": "ed0df2eb41a087ccf4a91cabe5ba237fbf3ea694789cb8d133f3b87fbd16dd7f.pdf",
+        "sha256": "ed0df2eb41a087ccf4a91cabe5ba237fbf3ea694789cb8d133f3b87fbd16dd7f",
+        "bytes": 1437988,
+        "mime": "application/pdf"
+      },
+      "navy": {
+        "path": "bafbe278754fa809e1f9d1c8f0c9aeb97fcd986df5e9214229ad549a01c29729.pdf",
+        "sha256": "bafbe278754fa809e1f9d1c8f0c9aeb97fcd986df5e9214229ad549a01c29729",
+        "bytes": 1437912,
+        "mime": "application/pdf"
+      }
+    }
+  },
+  {
+    "id": "al-wird-an-nabawi",
+    "kind": "book",
+    "language": "ar",
+    "status": "draft-for-review",
+    "pack": {
+      "path": "51c648ad00334f62f44f7865d951d7bad1a8ae2116f28bf65393a1e89a05ef76.bin",
+      "sha256": "51c648ad00334f62f44f7865d951d7bad1a8ae2116f28bf65393a1e89a05ef76",
+      "bytes": 46622,
+      "mime": "application/gzip"
+    },
+    "images": [],
+    "pdfs": {
+      "light": {
+        "path": "751981a622013b7dee53403eb5771531f0240655edd64521ff1b2303096d09de.pdf",
+        "sha256": "751981a622013b7dee53403eb5771531f0240655edd64521ff1b2303096d09de",
+        "bytes": 2003653,
+        "mime": "application/pdf"
+      },
+      "dark": {
+        "path": "68a4f8e140ad4edf703b6c0f919945e5866a4e493734fe7e60c5bd99d27a51a8.pdf",
+        "sha256": "68a4f8e140ad4edf703b6c0f919945e5866a4e493734fe7e60c5bd99d27a51a8",
+        "bytes": 2004613,
+        "mime": "application/pdf"
+      },
+      "navy": {
+        "path": "a69296d3164ca001b00938a5b704817c81507a2d297de5efa7b8071a27884ae5.pdf",
+        "sha256": "a69296d3164ca001b00938a5b704817c81507a2d297de5efa7b8071a27884ae5",
+        "bytes": 2004322,
+        "mime": "application/pdf"
+      }
+    }
+  },
+  {
+    "id": "dalil-al-mutamir",
+    "kind": "book",
+    "language": "en",
+    "status": "draft-for-review",
+    "title": "The Umrah Guide",
+    "author": "Compiled by Abu Muhammad Yusuf ibn Zabn Allah al-Utayr",
+    "pack": {
+      "path": "1af08d344e6ceb2d4fd34f826b57f54d79c46f517f81474ab29a179f50f56bcc.bin",
+      "sha256": "1af08d344e6ceb2d4fd34f826b57f54d79c46f517f81474ab29a179f50f56bcc",
+      "bytes": 11401,
+      "mime": "application/gzip"
+    },
+    "images": [
+      {
+        "path": "3f221d3499254316257765de43c7722c8f5e8edc2c4fda3ee645fb826c8a49ac.jpeg",
+        "sha256": "3f221d3499254316257765de43c7722c8f5e8edc2c4fda3ee645fb826c8a49ac",
+        "bytes": 280248,
+        "mime": "image/jpeg"
+      },
+      {
+        "path": "47b0ba0c1addb596cf0b6c31a76eeee483baa5453dc42d0dd162876deca39e5b.jpeg",
+        "sha256": "47b0ba0c1addb596cf0b6c31a76eeee483baa5453dc42d0dd162876deca39e5b",
+        "bytes": 543632,
+        "mime": "image/jpeg"
+      },
+      {
+        "path": "f47f84ed1041f01f15a398b0cd07c9e3c8150393825be34e727234dfe43841ef.jpeg",
+        "sha256": "f47f84ed1041f01f15a398b0cd07c9e3c8150393825be34e727234dfe43841ef",
+        "bytes": 76626,
+        "mime": "image/jpeg"
+      }
+    ],
+    "pdfs": {
+      "light": {
+        "path": "ca49b5ed382c5fe785c4ed4e235748e5ef4aa5b1858c1059ec3e2ecda62b3f0d.pdf",
+        "sha256": "ca49b5ed382c5fe785c4ed4e235748e5ef4aa5b1858c1059ec3e2ecda62b3f0d",
+        "bytes": 1272740,
+        "mime": "application/pdf"
+      },
+      "dark": {
+        "path": "0d87e881732e17a9f4809307579d4a88e1ed60644510f31bae4129d9414440f9.pdf",
+        "sha256": "0d87e881732e17a9f4809307579d4a88e1ed60644510f31bae4129d9414440f9",
+        "bytes": 1272716,
+        "mime": "application/pdf"
+      },
+      "navy": {
+        "path": "038579ac313c361cb3041e7dd6a68fc71c5bf4b129f03c35f6e4bc05c982f30e.pdf",
+        "sha256": "038579ac313c361cb3041e7dd6a68fc71c5bf4b129f03c35f6e4bc05c982f30e",
+        "bytes": 1272731,
+        "mime": "application/pdf"
+      }
+    }
+  }
+]

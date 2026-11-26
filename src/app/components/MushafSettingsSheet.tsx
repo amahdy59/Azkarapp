@@ -1,6 +1,7 @@
 import { MushafMaterialHint } from "./MushafMaterialHint";
 import { MushafMagnificationControl } from "./MushafMagnificationControl";
 import { ResponsiveSheet, SheetHeader, SidePanel } from "./ResponsiveSheet";
+import { ToolbarPanel } from "./ToolbarPanel";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
@@ -351,6 +352,7 @@ export function MushafSettingsSheet({
 
   return (
     <ResponsiveSheet
+      readerPanel={ToolbarPanel}
       open={open}
       onClose={onClose}
       title={t(language, "mushaf.readingSettings")}

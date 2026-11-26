@@ -1,6 +1,6 @@
 import { displayLocationName } from "../../content/prayerLocations";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, type Transition } from "motion/react";
 import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
 import { shouldReduceMotion } from "../../motionPreferences";
@@ -9,6 +9,9 @@ import { useScreenFocus } from "../../hooks/useScreenFocus";
 import "./SettingsScreen.css";
 import "../../components/scroll-edge.css";
 import type { SettingsScreenProps } from "./SettingsScreen.types";
+import { loadAudioPreferences } from "../../audio/audioPreferences";
+import { useDownloadReadiness } from "../../downloads/downloadSession";
+import { getSettingsSummaries } from "./settingsSummaries";
 import {
   AppearancePanel,
   PrayerSettingsPanel,
@@ -106,6 +109,16 @@ export function SettingsScreen({
   onSubBack,
 }: SettingsScreenProps) {
   useScreenFocus(t(language, "common.settings"));
+  const [savedAudioPreferences, setSavedAudioPreferences] = useState(loadAudioPreferences);
+  const downloadReadiness = useDownloadReadiness();
+  const summaries = getSettingsSummaries(
+    language,
+    audioController?.preferences ?? savedAudioPreferences,
+    downloadReadiness,
+    reminders,
+    quietProgressEnabled,
+    weeklyGoalDays,
+  );
   const [sub, setSub] = useState<SettingsSubScreen>(
     () => initialSub ?? (new URLSearchParams(window.location.search).has("pair") ? "account-data" : "root"),
   );
@@ -113,8 +126,7 @@ export function SettingsScreen({
   const [returnFocusSub, setReturnFocusSub] = useState<SettingsSubScreen>();
   const goBack = () => {
     const returnSub = focusReturnSub.current;
-    const parent: SettingsSubScreen =
-      sub === "location" || sub === "notifications" ? "prayer" : sub === "downloads" ? "audio" : "root";
+    const parent: SettingsSubScreen = sub === "location" || sub === "notifications" ? "prayer" : "root";
     setSub(parent);
     setReturnFocusSub(returnSub);
     onSubBack?.();
@@ -124,12 +136,7 @@ export function SettingsScreen({
   const motionReduced = shouldReduceMotion(reduceMotion);
   // The same first category is selected by default on wide layouts.
   const effectiveSub = isTwoPaneLayout && sub === "root" ? "appearance" : sub;
-  const rootFocusSub =
-    returnFocusSub === "location" || returnFocusSub === "notifications"
-      ? "prayer"
-      : returnFocusSub === "downloads"
-        ? "audio"
-        : returnFocusSub;
+  const rootFocusSub = returnFocusSub === "location" || returnFocusSub === "notifications" ? "prayer" : returnFocusSub;
 
   const openSubPanel = (next: SettingsSubScreen) => {
     setReturnFocusSub(undefined);
@@ -150,19 +157,18 @@ export function SettingsScreen({
   }, [initialSub]);
 
   const forwardOffset = direction === "rtl" ? -28 : 28;
+  const panelTransition: Transition = motionReduced ? { duration: 0.1 } : { duration: 0.22, ease: [0.22, 1, 0.36, 1] };
 
   const panelVariants = motionReduced
     ? {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
         exit: { opacity: 0 },
-        transition: { duration: 0.1 },
       }
     : {
         initial: { x: forwardOffset, opacity: 0 },
         animate: { x: 0, opacity: 1 },
         exit: { x: -forwardOffset, opacity: 0 },
-        transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
       };
 
   const rootVariants = motionReduced
@@ -170,13 +176,11 @@ export function SettingsScreen({
         initial: { opacity: 0 },
         animate: { opacity: 1 },
         exit: { opacity: 0 },
-        transition: { duration: 0.1 },
       }
     : {
         initial: { x: -forwardOffset, opacity: 0 },
         animate: { x: 0, opacity: 1 },
         exit: { x: forwardOffset, opacity: 0 },
-        transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
       };
 
   return (
@@ -204,6 +208,7 @@ export function SettingsScreen({
               isSyncing={isSyncing}
               syncError={syncError}
               quietProgressEnabled={quietProgressEnabled}
+              summaries={summaries}
               locationSettings={locationSettings}
               calendarType={calendarType}
               onCalendarTypeChange={onCalendarTypeChange}
@@ -211,13 +216,7 @@ export function SettingsScreen({
               onHijriDateOffsetChange={onHijriDateOffsetChange}
               textSize={textSize}
               zikrFont={zikrFont}
-              activeSub={
-                effectiveSub === "location" || effectiveSub === "notifications"
-                  ? "prayer"
-                  : effectiveSub === "downloads"
-                    ? "audio"
-                    : effectiveSub
-              }
+              activeSub={effectiveSub === "location" || effectiveSub === "notifications" ? "prayer" : effectiveSub}
               focusOnMount={rootFocusSub}
             />
           </div>
@@ -233,6 +232,7 @@ export function SettingsScreen({
             <motion.div
               key="root"
               variants={rootVariants}
+              transition={panelTransition}
               initial="initial"
               animate="animate"
               exit="exit"
@@ -252,6 +252,7 @@ export function SettingsScreen({
                 isSyncing={isSyncing}
                 syncError={syncError}
                 quietProgressEnabled={quietProgressEnabled}
+                summaries={summaries}
                 locationSettings={locationSettings}
                 calendarType={calendarType}
                 onCalendarTypeChange={onCalendarTypeChange}
@@ -266,6 +267,7 @@ export function SettingsScreen({
             <motion.div
               key={sub}
               variants={panelVariants}
+              transition={panelTransition}
               initial="initial"
               animate="animate"
               exit="exit"
@@ -327,8 +329,7 @@ export function SettingsScreen({
             direction={direction}
             controller={audioController}
             onBack={goBack}
-            onOpenDownloads={() => openSubPanel("downloads")}
-            focusOnMount={returnFocusSub === "downloads"}
+            onPreferencesChange={setSavedAudioPreferences}
           />
         );
       case "reading":

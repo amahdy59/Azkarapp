@@ -587,7 +587,13 @@ export function MushafImmersiveReader({
     !shell.rail && !isFocusMode ? (
       <button
         type="button"
-        onClick={inlineIndex && isIndexOpen ? closeIndex : onClose}
+        onClick={() => {
+          if (inlineIndex && (isIndexOpen || isQuickMenuOpen || isSettingsOpen)) {
+            closeIndex();
+            setIsQuickMenuOpen(false);
+            setIsSettingsOpen(false);
+          } else onClose();
+        }}
         data-testid="mushaf-immersive-close"
         aria-label={t(language, "common.back")}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -602,7 +608,8 @@ export function MushafImmersiveReader({
     !shell.rail && !isFocusMode ? (
       <button
         type="button"
-        onClick={() => setIsQuickMenuOpen(true)}
+        onClick={() => setIsQuickMenuOpen((value) => !value)}
+        aria-expanded={isQuickMenuOpen}
         data-testid="mushaf-immersive-more"
         aria-label={t(language, "mushaf.moreActions")}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -674,6 +681,7 @@ export function MushafImmersiveReader({
           setIsIndexOpen(!(inlineIndex && isIndexOpen && indexTab === "jump"));
         }}
         data-testid="mushaf-furniture-page-btn"
+        aria-expanded={isIndexOpen && indexTab === "jump"}
         aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(displayPage, language) })}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
@@ -939,6 +947,7 @@ export function MushafImmersiveReader({
               setIndexTab("jump");
               setIsIndexOpen(true);
             }}
+            onReadingZoomOpen={playback.pauseFollowing}
             onEdgeTap={(edge) => {
               if (edge === "left") paginate(1);
               else paginate(-1);

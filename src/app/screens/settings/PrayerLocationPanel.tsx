@@ -240,9 +240,7 @@ export function PrayerLocationPanel({
                 {t(language, "prayerLocation.locationUsed")}
               </h2>
               <p className="text-xl font-bold text-foreground" data-testid="prayer-location-name">
-                {location.autoDetect
-                  ? t(language, "prayerLocation.deviceLocation")
-                  : displayLocationName(location, language)}
+                {displayLocationName(location, language)}
               </p>
               <p className="text-label leading-relaxed text-muted-foreground">
                 {selectedCity && !location.autoDetect && (

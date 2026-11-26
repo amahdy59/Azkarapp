@@ -751,8 +751,7 @@ export function AudioProvider({
       if (!nextEntry?.availableVoiceIds.includes(voiceId)) return;
       updatePreferences({
         ...preferencesRef.current,
-        duaVoiceId: voiceId,
-        ...(entry.contentKind === "quran" ? { quranReciterId: voiceId } : {}),
+        ...(entry.contentKind === "quran" ? { quranReciterId: voiceId } : { duaVoiceId: voiceId }),
       });
       loadAt(
         nextPlan,

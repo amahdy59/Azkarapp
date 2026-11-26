@@ -142,6 +142,12 @@ const CustomCounterScreen = retryableScreen(() =>
 const MoreScreen = retryableScreen(() =>
   import("./screens/MoreScreen").then((module) => ({ default: module.MoreScreen })),
 );
+const LearnScreen = retryableScreen(() =>
+  import("./screens/LearnScreen").then((module) => ({ default: module.LearnScreen })),
+);
+const LearningReaderScreen = retryableScreen(() =>
+  import("./screens/LearningReaderScreen").then((module) => ({ default: module.LearningReaderScreen })),
+);
 const QiblaScreen = retryableScreen(() =>
   import("./screens/QiblaScreen").then((module) => ({ default: module.QiblaScreen })),
 );
@@ -277,6 +283,13 @@ function AppContent({
     librarySection,
     setLibrarySection,
     navigateLibrarySection,
+    learningResourceId,
+    learningUnitId,
+    navigateLearningResource,
+    navigateLearningUnit,
+    learningLanguage,
+    navigateLearningLanguage,
+    backLearningResource,
     progressPeriod,
     navigateProgressPeriod,
     settingsPanel,
@@ -958,6 +971,11 @@ function AppContent({
     },
   });
 
+  const completionSession =
+    view === "completion"
+      ? sessions.find((session) => session.category === activeCat && Date.parse(session.completedAt) >= sessionStart)
+      : undefined;
+
   const openCategory = useCallback(
     async (categoryId: CategoryId) => {
       if (isLazyRouteCategory(categoryId) && !(await hydrateRouteCategory(categoryId, "reader"))) {
@@ -1402,9 +1420,14 @@ function AppContent({
         colorBlindSupport,
       });
     apply();
-    const media = window.matchMedia("(prefers-reduced-transparency: reduce)");
-    media.addEventListener("change", apply);
-    return () => media.removeEventListener("change", apply);
+    const media = [
+      window.matchMedia("(prefers-reduced-transparency: reduce)"),
+      window.matchMedia("(forced-colors: active)"),
+    ];
+    for (const query of media) query.addEventListener("change", apply);
+    return () => {
+      for (const query of media) query.removeEventListener("change", apply);
+    };
   }, [
     boldText,
     colorBlindSupport,
@@ -1442,6 +1465,8 @@ function AppContent({
       "more",
       "qibla",
       "library",
+      "learn",
+      "learning_reader",
       "benefits",
       "wird_benefits",
       "category",
@@ -1758,13 +1783,20 @@ function AppContent({
   // On tablet (medium) and larger, we preserve navigation even during active reading.
   const showBottomNavArea =
     showBottomNav &&
-    ((layoutMode === "compact" && view !== "reader" && view !== "custom_counter" && view !== "friday_salawat") ||
+    ((layoutMode === "compact" &&
+      view !== "reader" &&
+      view !== "learning_reader" &&
+      view !== "custom_counter" &&
+      view !== "friday_salawat") ||
       layoutMode === "medium");
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
   // Utility pages have their own sidebar entry. Smaller nav variants must
   // not pretend that the previously visited primary destination is current.
-  const activeNavigationTab = view === "custom_counter" || view === "qibla" || view === "more" ? undefined : activeTab;
+  const activeNavigationTab =
+    view === "custom_counter" || view === "qibla" || view === "more" || view === "learn" || view === "learning_reader"
+      ? undefined
+      : activeTab;
 
   const utilityNavigation = {
     activeUtility: view === "custom_counter" ? ("masbaha" as const) : view === "qibla" ? ("qibla" as const) : undefined,
@@ -1794,7 +1826,11 @@ function AppContent({
         // No elevation utility here: theme.css sets `box-shadow: none` on
         // .app-shell both at <=599px and at >=600px, so the shadow-2xl that used
         // to sit here never rendered at any viewport width (DEC-067 / F11).
-        data-material-reading={view === "reader" || view === "khatmah" || readerInMushafMode ? "true" : undefined}
+        data-material-reading={
+          view === "reader" || view === "learning_reader" || view === "khatmah" || readerInMushafMode
+            ? "true"
+            : undefined
+        }
         data-native-android={isNativeAndroid() ? "true" : undefined}
         className={`app-shell relative isolate overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
@@ -2083,6 +2119,7 @@ function AppContent({
                   onOpenMasbaha={utilityNavigation.onOpenMasbaha}
                   onOpenSettings={() => push("settings")}
                   onOpenProgress={() => handleNavigationTab("progress")}
+                  onOpenLearn={() => push("learn")}
                 />
               )}
               {view === "qibla" && (
@@ -2093,6 +2130,29 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   hapticFeedback={hapticFeedback}
                   onBack={pop}
+                />
+              )}
+              {view === "learn" && (
+                <LearnScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  onBack={() => push("more")}
+                  onOpenResource={navigateLearningResource}
+                />
+              )}
+              {view === "learning_reader" && learningResourceId && (
+                <LearningReaderScreen
+                  key={learningResourceId}
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  resourceId={learningResourceId}
+                  contentLanguage={learningLanguage}
+                  onLanguageChange={navigateLearningLanguage}
+                  unitId={learningUnitId}
+                  textSize={textSize}
+                  onTextSizeChange={setTextSize}
+                  onUnitChange={navigateLearningUnit}
+                  onBack={backLearningResource}
                 />
               )}
               {view === "wird_benefits" && (
@@ -2120,6 +2180,7 @@ function AppContent({
                   initialSection={librarySection}
                   onSectionChange={navigateLibrarySection}
                   onOpenBenefits={() => push("benefits")}
+                  onOpenLearn={() => push("learn")}
                   hapticFeedback={hapticFeedback}
                 />
               )}
@@ -2512,17 +2573,21 @@ function AppContent({
                 <CompletionScreen
                   catId={activeCat}
                   sessionStart={sessionStart}
+                  completedAt={completionSession ? Date.parse(completionSession.completedAt) : undefined}
                   dailyCompletions={dailyCompletions}
                   growthEvent={lastGrowthEvent}
                   quietProgressEnabled={quietProgressEnabled}
                   progressDayStartHour={progressDayStartHour}
                   onHome={goHome}
+                  onOpenBenefits={() => push("benefits")}
+                  prayer={activeCat === "after_prayer" ? (activeSubCategory as PrayerName | undefined) : undefined}
+                  themeMode={themeMode}
                   onNewSession={
                     SITUATIONAL_SESSION_CATEGORY_IDS.includes(activeCat) ? () => startNewSession(activeCat) : undefined
                   }
                   language={selectedLang}
                   direction={layoutDirection}
-                  completionLevel={activeRoutineMode}
+                  completionLevel={completionSession?.completionLevel ?? activeRoutineMode}
                   onContinueComplete={
                     isRoutineCategory(activeCat)
                       ? () => {
@@ -2765,7 +2830,11 @@ function AppContent({
               language={selectedLang}
               direction={layoutDirection}
               overReadingSurface={
-                view === "khatmah" || view === "reader" || view === "custom_counter" || view === "friday_salawat"
+                view === "khatmah" ||
+                view === "reader" ||
+                view === "learning_reader" ||
+                view === "custom_counter" ||
+                view === "friday_salawat"
               }
               preferCompactReading={view === "khatmah"}
             />

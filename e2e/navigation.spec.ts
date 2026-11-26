@@ -61,9 +61,9 @@ for (const viewport of [
 
     const qibla = page.getByTestId("home-tool-qibla");
     await qibla.scrollIntoViewIfNeeded();
-    await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
-    // The scroll compacts the sticky row. Wait for that finite handoff before
-    // testing a pointer click on the content it moves, including Firefox.
+    await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
+    // Scroll elevation preserves the explicit timing choice. Settle any finite
+    // header feedback before testing the shortcut's pointer target in Firefox.
     await page.getByTestId("home-sticky-prayers").evaluate(async (node) => {
       await Promise.all(
         node
@@ -100,7 +100,7 @@ for (const viewport of [
 
     await page.getByTestId("nav-home").click();
     await page.getByTestId("home-tool-masbaha").scrollIntoViewIfNeeded();
-    await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+    await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
     await page.getByTestId("home-sticky-prayers").evaluate(async (node) => {
       await Promise.all(
         node
@@ -217,7 +217,7 @@ test("secondary app state is deep-linkable and browser Back restores Settings ro
   await page.getByTestId("nav-settings").click();
   await page.getByTestId("settings-sub-audio").click();
   await expect(page).toHaveURL(/#\/settings\/audio$/);
-  await expect(page.getByRole("heading", { name: "Audio & downloads", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Audio & recitations", exact: true })).toBeVisible();
 
   await page.goBack();
   await expect(page).toHaveURL(/#\/settings$/);

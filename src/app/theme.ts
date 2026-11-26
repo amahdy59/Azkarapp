@@ -1,6 +1,7 @@
 import type { AppLanguage, ColorBlindSupport, TextSizeOption, ZikrFontOption, ThemeMode } from "./types";
 import { t } from "./i18n";
 import { getQuranReadingSize } from "./quranTypography";
+import { applyNativeSystemBars } from "@azkar/native-system-bars";
 
 const PRODUCT_THEME_CLASSES = ["theme-midnight", "theme-light", "theme-dark"] as const;
 /** Mirrors the --background value per theme in src/styles/theme.css, for the theme-color meta tag. */
@@ -94,5 +95,11 @@ export function applyAppAppearance({
     metaThemeColor.name = "theme-color";
     document.head.appendChild(metaThemeColor);
   }
-  metaThemeColor.content = highContrast ? "#02050D" : THEME_BACKGROUND[themeMode];
+  // Resolve the real shell ground after applying material/accessibility tokens.
+  // In particular Glass stays dark even when the chosen product theme is light.
+  const systemBarColor =
+    getComputedStyle(root).getPropertyValue("--system-bar-background").trim() ||
+    (highContrast ? "#02050D" : THEME_BACKGROUND[themeMode]);
+  metaThemeColor.content = systemBarColor;
+  applyNativeSystemBars(systemBarColor);
 }

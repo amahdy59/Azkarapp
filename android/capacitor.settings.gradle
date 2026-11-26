@@ -9,4 +9,4 @@ include ':capacitor-local-notifications'
 project(':capacitor-local-notifications').projectDir = new File('../node_modules/.pnpm/@capacitor+local-notifications@8.0.0_@capacitor+core@8.5.3/node_modules/@capacitor/local-notifications/android')
 
 include ':capawesome-capacitor-live-update'
-project(':capawesome-capacitor-live-update').projectDir = new File('../node_modules/.pnpm/@capawesome+capacitor-live-update@8.6.0_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-live-update/android')
+project(':capawesome-capacitor-live-update').projectDir = new File('../node_modules/.pnpm/@capawesome+capacitor-live-_bca8d79a1e20465464a26b4b33214a21/node_modules/@capawesome/capacitor-live-update/android')

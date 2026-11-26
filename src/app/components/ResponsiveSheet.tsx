@@ -1,4 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { overlayReturnTarget, useOverlayOrigin, type OverlayOrigin } from "../hooks/useOverlayOrigin";
+import type { ToolbarPanel } from "./ToolbarPanel";
+import "./overlay-surfaces.css";
 import { useOverlayBack, topOverlay } from "../hooks/useOverlayBack";
 import {
   useCallback,
@@ -23,13 +26,18 @@ import type { AppLanguage } from "../types";
  * Restore in the scope's close event, after the trap is released, including
  * conditionally unmounted roots. No guessed timeout or competing cleanup.
  */
-function useRestoreFocusOnClose(shared?: MutableRefObject<HTMLElement | null>, sharedScopeId?: string) {
+function useRestoreFocusOnClose(
+  shared?: MutableRefObject<HTMLElement | null>,
+  sharedScopeId?: string,
+  opener?: HTMLElement | null,
+  frame?: HTMLElement | null,
+) {
   const local = useRef<HTMLElement | null>(null);
   const localScopeId = useId();
   const scopeId = sharedScopeId ?? localScopeId;
   const previous = shared ?? local;
   const onOpenAutoFocus = useCallback(() => {
-    const active = document.activeElement;
+    const active = opener ?? document.activeElement;
     // A responsive branch switch opens a replacement scope while the old
     // dialog still owns focus. Keep the original external opener across it.
     if (
@@ -37,14 +45,15 @@ function useRestoreFocusOnClose(shared?: MutableRefObject<HTMLElement | null>, s
       active.closest("[data-return-focus-scope]")?.getAttribute("data-return-focus-scope") !== scopeId
     )
       previous.current = active;
-  }, [previous, scopeId]);
+  }, [previous, scopeId, opener]);
   const onCloseAutoFocus = useCallback(
     (event: Event) => {
-      if (!previous.current?.isConnected) return;
+      const target = overlayReturnTarget(previous.current, frame);
+      if (!target) return;
       event.preventDefault();
-      previous.current.focus({ preventScroll: true });
+      target.focus({ preventScroll: true });
     },
-    [previous],
+    [previous, frame],
   );
   return { onOpenAutoFocus, onCloseAutoFocus, "data-return-focus-scope": scopeId };
 }
@@ -104,7 +113,8 @@ export function SheetHeader({
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-between gap-4 border-b px-5 py-3 ${
+      data-sheet-header=""
+      className={`flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2.5 sm:px-5 sm:py-3 ${
         onGlass ? "border-white/20" : "border-border/40"
       } ${className}`.trim()}
     >
@@ -123,7 +133,7 @@ export function SheetHeader({
           <div
             data-testid="sheet-header-title"
             aria-hidden="true"
-            className={`break-words text-lg font-extrabold leading-snug ${onGlass ? "text-white" : "text-foreground"}`}
+            className={`break-words text-base font-extrabold leading-snug sm:text-lg ${onGlass ? "text-white" : "text-foreground"}`}
           >
             {title}
           </div>
@@ -159,6 +169,7 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  origin?: OverlayOrigin;
   /** Functional pickers opt into the shared opaque dropdown-surface contract. */
   protectedSurface?: boolean;
   onOpenAutoFocus?: (event: Event) => void;
@@ -224,7 +235,8 @@ export function Modal({
   preventOutsideDismiss = false,
 }: ModalProps) {
   const backDismiss = useOverlayBack(open, onClose);
-  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
+  const source = useOverlayOrigin(open);
+  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId, source.opener, source.frame);
   const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
 
   return (
@@ -236,6 +248,7 @@ export function Modal({
     >
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
+          data-overlay-scrim=""
           className={
             overlayClassName
               ? `fixed inset-0 z-[100] animate-in fade-in-0 duration-standard ${overlayClassName}`
@@ -243,6 +256,7 @@ export function Modal({
           }
         />
         <DialogPrimitive.Content
+          data-overlay-surface="modal"
           data-dropdown-surface={protectedSurface ? "" : undefined}
           data-back-dismiss={backDismiss}
           {...focusScope}
@@ -276,7 +290,7 @@ export function Modal({
               onClick={onClose}
               aria-label={t(lang, "common.close")}
               data-testid="modal-close-button"
-              className={`ui-icon-button absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+              className={`ui-icon-button absolute top-[12px] end-[12px] z-30 flex size-[48px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                 onGlass
                   ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
                   : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
@@ -331,7 +345,8 @@ export function SidePanel({
   onCloseAutoFocus,
 }: SidePanelProps) {
   const backDismiss = useOverlayBack(open, onClose);
-  const focusScope = useRestoreFocusOnClose();
+  const source = useOverlayOrigin(open);
+  const focusScope = useRestoreFocusOnClose(undefined, undefined, source.opener, source.frame);
 
   return (
     <DialogPrimitive.Root
@@ -341,8 +356,12 @@ export function SidePanel({
       }}
     >
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="animate-in fade-in-0 fixed inset-0 z-[100] bg-black/25 duration-standard" />
+        <DialogPrimitive.Overlay
+          data-overlay-scrim=""
+          className="animate-in fade-in-0 fixed inset-0 z-[100] bg-black/25 duration-standard"
+        />
         <DialogPrimitive.Content
+          data-overlay-surface="side-panel"
           data-back-dismiss={backDismiss}
           onOpenAutoFocus={focusScope.onOpenAutoFocus}
           data-testid={testId}
@@ -371,6 +390,8 @@ export function SidePanel({
 }
 
 export interface ResponsiveSheetProps extends Omit<ModalProps, "className"> {
+  /** Ordinary phone reader tools share the index's non-modal content slot. */
+  readerPanel?: typeof ToolbarPanel;
   /** Move focus inside compact option dialogs; callers with text inputs can opt out. */
   focusOnOpen?: boolean;
   /** Extra classes for the desktop dialog surface only. */
@@ -385,6 +406,8 @@ export interface ResponsiveSheetProps extends Omit<ModalProps, "className"> {
  * provide focus containment, focus restore, Escape dismissal, and scroll lock.
  */
 export function ResponsiveSheet({
+  origin,
+  readerPanel: ReaderPanel,
   protectedSurface = false,
   onCloseAutoFocus,
   open,
@@ -401,8 +424,9 @@ export function ResponsiveSheet({
   showCloseButton = false,
   dialogClassName = "",
   drawerClassName = "",
-  focusOnOpen = false,
+  focusOnOpen = true,
 }: ResponsiveSheetProps) {
+  const source = useOverlayOrigin(open, origin);
   const backDismiss = useOverlayBack(open, onClose);
   const layoutMode = useLayoutMode();
   const isCompact = layoutMode === "compact";
@@ -412,7 +436,8 @@ export function ResponsiveSheet({
   // Modal runs this itself; only the drawer branch needs it here.
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const returnFocusScopeId = useId();
-  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
+  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId, source.opener, source.frame);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -429,6 +454,25 @@ export function ResponsiveSheet({
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, [open, onClose, backDismiss]);
+
+  if (isCompact && ReaderPanel && source.host?.isConnected) {
+    return (
+      <ReaderPanel
+        open={open}
+        onClose={onClose}
+        title={title}
+        direction={direction}
+        host={source.host}
+        opener={source.opener}
+        origin={source.origin}
+        testId={testId}
+        className={drawerClassName}
+        onCloseAutoFocus={onCloseAutoFocus}
+      >
+        {children}
+      </ReaderPanel>
+    );
+  }
 
   if (!isCompact) {
     return (
@@ -457,6 +501,8 @@ export function ResponsiveSheet({
 
   return (
     <Drawer
+      direction={source.origin}
+      handleOnly
       {...drawerFocusBehavior}
       open={open}
       onOpenChange={(nextOpen) => {
@@ -464,9 +510,20 @@ export function ResponsiveSheet({
       }}
     >
       <DrawerContent
+        ref={drawerRef}
+        tabIndex={-1}
+        data-overlay-surface="sheet"
+        data-overlay-origin={source.origin}
         data-dropdown-surface={protectedSurface ? "" : undefined}
         data-back-dismiss={backDismiss}
         {...focusScope}
+        onOpenAutoFocus={(event) => {
+          focusScope.onOpenAutoFocus();
+          if (focusOnOpen) {
+            event.preventDefault();
+            drawerRef.current?.focus({ preventScroll: true });
+          }
+        }}
         onCloseAutoFocus={(event) => {
           onCloseAutoFocus?.(event);
           if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
@@ -475,7 +532,7 @@ export function ResponsiveSheet({
         data-prevent-count="true"
         aria-describedby={describedById}
         dir={direction}
-        className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${
+        className={`overlay-sheet fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${
           onGlass ? "hero-glass home-glass-surface text-white" : "border-t border-border/40 bg-card shadow-overlay"
         } ${drawerClassName}`.trim()}
       >
@@ -486,7 +543,7 @@ export function ResponsiveSheet({
             onClick={onClose}
             aria-label={t(lang, "common.close")}
             data-testid="modal-close-button"
-            className={`ui-icon-button absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            className={`ui-icon-button absolute top-[12px] end-[12px] z-30 flex size-[48px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               onGlass
                 ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
                 : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"

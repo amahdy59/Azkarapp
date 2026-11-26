@@ -1,6 +1,7 @@
 "use client";
 
 import "../form-controls.css";
+import "../overlay-surfaces.css";
 
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
@@ -8,13 +9,38 @@ import { CheckIcon, ChevronRightIcon } from "../icons";
 
 import { cn } from "./utils";
 import { MENU_OPTION_STATE } from "./controlStyles";
+import { useOverlayOrigin } from "../../hooks/useOverlayOrigin";
+const MenuOrigin = React.createContext<"top" | "bottom">("bottom");
 
-function DropdownMenu({ modal = false, dir, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+function DropdownMenu({
+  modal = false,
+  dir,
+  open,
+  onOpenChange,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+  const [internalOpen, setInternalOpen] = React.useState(props.defaultOpen ?? false);
+  const actualOpen = open ?? internalOpen;
+  const source = useOverlayOrigin(actualOpen);
   // A contextual menu does not obscure the page. Keep background semantics
   // available rather than aria-hiding focusable controls outside the portal.
   const resolvedDir =
     dir ?? (typeof document !== "undefined" && document.documentElement.dir === "rtl" ? "rtl" : "ltr");
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" modal={modal} dir={resolvedDir} {...props} />;
+  return (
+    <MenuOrigin.Provider value={source.origin}>
+      <DropdownMenuPrimitive.Root
+        data-slot="dropdown-menu"
+        modal={modal}
+        dir={resolvedDir}
+        {...props}
+        open={actualOpen}
+        onOpenChange={(value) => {
+          setInternalOpen(value);
+          onOpenChange?.(value);
+        }}
+      />
+    </MenuOrigin.Provider>
+  );
 }
 
 function DropdownMenuPortal({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
@@ -47,11 +73,14 @@ function DropdownMenuContent({
   collisionPadding = 8,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+  const origin = React.useContext(MenuOrigin);
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
         data-dropdown-surface=""
+        data-overlay-surface="contextual"
+        data-overlay-origin={origin}
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
@@ -217,9 +246,12 @@ function DropdownMenuSubContent({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
+  const origin = React.useContext(MenuOrigin);
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
+      data-overlay-surface="contextual"
+      data-overlay-origin={origin}
       data-dropdown-surface=""
       className={cn(menuSurface, "origin-(--radix-dropdown-menu-content-transform-origin)", className)}
       {...props}

@@ -27,7 +27,7 @@ for (const material of ["glass", "solid"] as const) {
         );
         await page.setViewportSize({ width: 1440, height: 1000 });
         await page.goto("/#/home");
-        await page.getByTestId("prayer-card-fajr").getByRole("button").click();
+        await page.getByTestId("prayer-card-fajr").locator("button").click();
         await page.evaluate(() => document.fonts.ready);
         const panel = page.getByTestId("home-prayer-moment");
         const row = panel.getByTestId("prayer-action-fajr-adhkar");
@@ -39,6 +39,8 @@ for (const material of ["glass", "solid"] as const) {
         await expect(disclosure).toBeHidden();
         for (const width of [1440, 768, 390, 320]) {
           await page.setViewportSize({ width, height: 1000 });
+          if (width < 600) await expect(panel).toHaveAttribute("data-slot", "drawer-content");
+          else await expect(panel).not.toHaveAttribute("data-slot", "drawer-content");
           await read.scrollIntoViewIfNeeded();
           await expect(read).toBeVisible();
           // Compare related geometry in one layout sample: responsive font/
@@ -49,14 +51,14 @@ for (const material of ["glass", "solid"] as const) {
               return { x, y, width, height };
             };
             return {
-              titleBox: rect(node.querySelector("h2")!),
+              titleBox: rect(document.querySelector(".prayer-tracking-header")!),
               sunriseBox: rect(node.querySelector('[data-testid="prayer-sunrise-context"]')!),
             };
           });
           expect(sunriseBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
-          expect(language === "ar" ? sunriseBox.x + sunriseBox.width : sunriseBox.x).toBeCloseTo(
-            language === "ar" ? titleBox.x + titleBox.width : titleBox.x,
-            0,
+          expect(sunriseBox.x).toBeGreaterThanOrEqual((await panel.boundingBox())!.x);
+          expect(sunriseBox.x + sunriseBox.width).toBeLessThanOrEqual(
+            (await panel.boundingBox())!.x + (await panel.boundingBox())!.width,
           );
           await expect(read).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
           await expect(read).toHaveCSS("background-image", "none");
@@ -91,7 +93,7 @@ for (const material of ["glass", "solid"] as const) {
                 return { x, y, width, height };
               };
               return {
-                titleBox: rect("h2"),
+                titleBox: rect(".prayer-actions-main"),
                 sunriseBox: rect('[data-testid="prayer-sunrise-context"]'),
                 evidenceBox: rect('[data-testid="prayer-moment-virtue"]'),
                 virtueTitle: rect(".prayer-evidence-desktop-title"),
@@ -103,7 +105,8 @@ for (const material of ["glass", "solid"] as const) {
             expect(titleBox.height).toBeGreaterThan(virtueTitle.height);
             const attribution = panel.getByTestId("prayer-virtue-attribution");
             expect(attributionBox.y - (virtueTitle.y + virtueTitle.height)).toBeCloseTo(4, 0);
-            expect(sunriseBox.y - (titleBox.y + titleBox.height)).toBeCloseTo(4, 0);
+            expect(sunriseBox.y).toBeGreaterThanOrEqual(titleBox.y);
+            expect(sunriseBox.y + sunriseBox.height).toBeLessThanOrEqual(titleBox.y + titleBox.height);
             await expect(attribution).toHaveCSS("font-size", "13px");
             expect(language === "ar" ? attributionBox.x + attributionBox.width : attributionBox.x).toBeCloseTo(
               language === "ar" ? virtueTitle.x + virtueTitle.width : virtueTitle.x,

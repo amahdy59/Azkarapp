@@ -52,6 +52,9 @@ html[data-app-material-resolved="glass"] :is(.app-shell, [role="dialog"], [data-
     .progress-date-details,
     .heatmap-day,
     .home-prayer-summary-card,
+    .home-prayer-tile,
+    .home-prayer-interval,
+    .home-prayer-location,
     .home-prayer-sticky[data-scrolled],
     .field-shell,
     .audio-player-surface,
@@ -61,13 +64,11 @@ html[data-app-material-resolved="glass"] :is(.app-shell, [role="dialog"], [data-
   ) {
   background-image: var(--paper-grain);
 }
-/* Compact Home has one filled owner; desktop paints each card/summary/footer.
-   Keep its structural wrapper clear and Glass's existing sheen intact. */
-.home-prayer-overview-v2:not([data-desktop], .hero-glass),
-.home-prayer-overview-v2[data-desktop]
-  :is(.home-prayer-tile, .home-prayer-interval, .home-prayer-location):not(.hero-glass) {
-  background-image: var(--paper-grain);
+/* Home's structural overview stays clear; each timing and summary owns its material. */
+.home-prayer-overview-v2 {
+  background-image: none;
 }
+
 :is(.high-contrast, .reduce-transparency, [data-paper-texture="off"]) *,
 :root:is(.high-contrast, .reduce-transparency, [data-paper-texture="off"]) {
   --paper-grain: none !important;

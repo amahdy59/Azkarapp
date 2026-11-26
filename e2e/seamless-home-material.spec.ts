@@ -31,9 +31,9 @@ for (const [language, width] of [
       const header = page.getByTestId("home-utility-header");
       const sticky = page.getByTestId("home-sticky-prayers");
       const overview = page.getByTestId("prayer-tracker-cards");
-      const prayerSurfaces = width >= 1200 ? overview.locator(".hero-glass.home-glass-surface") : overview;
+      const prayerSurfaces = overview.locator(".hero-glass.home-glass-surface");
       await expect(overview.locator("article")).toHaveCount(5);
-      await expect(prayerSurfaces).toHaveCount(width >= 1200 ? 7 : 1);
+      await expect(prayerSurfaces).toHaveCount(width < 768 ? 2 : 6);
       for (const surface of await prayerSurfaces.all()) {
         await expect(surface).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
         await expect(surface).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
@@ -51,16 +51,12 @@ for (const [language, width] of [
       // reduced transparency, without stacking filters on its children.
       await expect(sticky).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       await expect(header).toHaveCSS("backdrop-filter", "none");
-      for (const surface of await prayerSurfaces.all()) await expect(surface).toHaveCSS("backdrop-filter", "none");
-      // The phone's compact row joins the strip, while the five-tile overview
-      // becomes inert. It has no five nested Glass filters to count.
-      if (width < 768) {
-        const compact = page.getByTestId("home-compact-prayer");
-        await expect(compact).toBeInViewport();
-        await expect(compact).toHaveCSS("backdrop-filter", "none");
-        await expect(page.getByTestId("home-prayer-strip")).toHaveAttribute("inert", "");
-        await expect(overview.locator(".hero-glass")).toHaveCount(0);
-      }
+      for (const surface of await prayerSurfaces.all())
+        await expect(surface).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+      await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
+      await expect(page.getByTestId("home-prayer-interval")).toBeInViewport();
+      await expect(page.getByTestId("home-prayer-strip")).not.toHaveAttribute("inert");
+      await expect(overview.locator(".hero-glass")).toHaveCount(width < 768 ? 2 : 6);
       await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(header).toHaveCSS("background-image", "none");
       await page.screenshot({ path: testInfo.outputPath(`home-${language}-${appMaterial}-scroll.png`) });

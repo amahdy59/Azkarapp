@@ -1,5 +1,9 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { topOverlay, useOverlayBack } from "../hooks/useOverlayBack";
+import { useOverlayOrigin } from "../hooks/useOverlayOrigin";
+import { useToolbarPanel } from "../hooks/useToolbarPanel";
+import { useOverlayPresence } from "../hooks/useOverlayPresence";
+import "./overlay-surfaces.css";
 import * as Dialog from "@radix-ui/react-dialog";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import type { AppLanguage, QuranVerseBookmark } from "../types";
@@ -60,6 +64,7 @@ export function MushafNavigationModal({
   pageRange?: { first: number; last: number };
 }) {
   const backDismiss = useOverlayBack(isOpen, onClose);
+  const source = useOverlayOrigin(isOpen);
   const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -105,6 +110,8 @@ export function MushafNavigationModal({
 
   const tabContentRef = useRef<HTMLDivElement>(null);
   const inlineIndexRef = useRef<HTMLElement>(null);
+  const replaced = useToolbarPanel(inline && isOpen, inlineIndexRef, onClose);
+  const retained = useOverlayPresence(inline && isOpen);
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -214,7 +221,11 @@ export function MushafNavigationModal({
     document.addEventListener("keydown", dismiss);
     return () => {
       document.removeEventListener("keydown", dismiss);
-      if (opener?.isConnected) opener.focus({ preventScroll: true });
+      // A toolbar replacement has already focused its successor in layout.
+      // Passive index cleanup must not pull focus back into the bottom bar.
+      if (!topOverlay()?.matches("[data-toolbar-panel]") && opener?.isConnected) {
+        opener.focus({ preventScroll: true });
+      }
     };
   }, [inline, isOpen, onClose]);
 
@@ -236,7 +247,7 @@ export function MushafNavigationModal({
         )}
         <button
           type="button"
-          className="flex size-[44px] min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95"
+          className="ui-icon-button flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
           aria-label={t(language, "common.close")}
           data-testid="modal-close-button"
           onClick={onClose}
@@ -624,12 +635,17 @@ export function MushafNavigationModal({
     </>
   );
   if (inline) {
-    return isOpen ? (
+    return isOpen || (retained && !replaced.current) ? (
       <section
         ref={inlineIndexRef}
         tabIndex={-1}
         aria-labelledby={titleId}
         data-mushaf-inline-index
+        data-overlay-surface="panel"
+        data-state={isOpen ? "open" : "closed"}
+        {...(!isOpen ? { inert: "" } : {})}
+        aria-hidden={!isOpen || undefined}
+        data-overlay-origin={source.origin}
         data-back-dismiss={backDismiss}
         data-testid="mushaf-index-inline"
         dir={direction}
@@ -643,8 +659,9 @@ export function MushafNavigationModal({
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 animate-in fade-in" />
+        <Dialog.Overlay data-overlay-scrim="" className="fixed inset-0 z-50 bg-black/60 animate-in fade-in" />
         <Dialog.Content
+          data-overlay-surface="modal"
           data-testid="mushaf-index-modal"
           data-back-dismiss={backDismiss}
           dir={direction}
@@ -658,7 +675,7 @@ export function MushafNavigationModal({
             ) {
               returnFocusRef.current = document.activeElement;
             }
-            if (initialTab === "surahs" && searchRef.current) {
+            if (!source.touch && initialTab === "surahs" && searchRef.current) {
               event.preventDefault();
               searchRef.current.focus();
             }

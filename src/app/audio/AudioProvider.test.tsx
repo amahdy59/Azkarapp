@@ -266,6 +266,53 @@ describe("AudioProvider integration", () => {
     expect(FakeAudio.latest!.src).toBe(source);
     expect(controller.state.status).toBe("playing");
   });
+  it("changes an optional Quran voice without replacing the saved dua voice", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    let controller!: ReturnType<typeof useAudioController>;
+    function VoiceHarness() {
+      controller = useAudioController();
+      return null;
+    }
+    const entry = plan.entries[0]!;
+    const alternatePlan: PlaybackPlan = {
+      ...plan,
+      entries: [
+        {
+          ...entry,
+          availableVoiceIds: ["voice", "alternative"],
+          segmentsByVoice: {
+            ...entry.segmentsByVoice,
+            alternative: [
+              {
+                ...entry.segmentsByVoice.voice![0]!,
+                variantId: "alternative",
+                voiceId: "alternative",
+                url: "https://audio.test/alternative.mp3",
+              },
+            ],
+          },
+        },
+      ],
+    };
+    render(
+      <AudioProvider>
+        <VoiceHarness />
+      </AudioProvider>,
+    );
+    act(() => controller.startPlan(alternatePlan));
+    await waitFor(() => expect(controller.state.status).toBe("playing"));
+    const previousDua = controller.preferences.duaVoiceId;
+    act(() => controller.pause());
+    act(() => controller.setVoice("alternative"));
+    await waitFor(() => expect(controller.state.currentVoiceId).toBe("alternative"));
+    expect(controller.preferences.quranReciterId).toBe("alternative");
+    expect(controller.preferences.duaVoiceId).toBe(previousDua);
+    expect(controller.state.status).toBe("paused");
+    expect(JSON.parse(localStorage.getItem("azkar.audio-preferences.v1")!)).toMatchObject({
+      duaVoiceId: previousDua,
+      quranReciterId: "alternative",
+    });
+  });
   it("stops after a complete prescribed run with auto-advance off but permits manual queue navigation without completing skips", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     const queue: PlaybackPlan = {

@@ -114,8 +114,25 @@ button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):focus-
   animation: none;
 }
 
-::view-transition-group(app-content) {
+::view-transition-group(app-content),
+::view-transition-old(app-content),
+::view-transition-new(app-content) {
   animation-duration: var(--motion-duration-standard);
+  animation-timing-function: var(--motion-ease-standard);
+}
+
+/* View-transition pseudo-elements are outside the ordinary element tree. */
+.reduce-motion::view-transition-group(*),
+.reduce-motion::view-transition-old(*),
+.reduce-motion::view-transition-new(*) {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
 /* The save control's finite acknowledgement. */

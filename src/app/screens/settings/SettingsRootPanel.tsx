@@ -25,6 +25,7 @@ import type { AppLanguage, LocationSettings, TextSizeOption, ThemeMode, ZikrFont
 import { RowChevron, SettingsRowItem, SettingsSection } from "./SettingsPrimitives";
 
 import type { SettingsRoutePanel } from "../../routing";
+import type { SettingsMenuSummaries } from "./settingsSummaries";
 
 export type SettingsSubScreen = SettingsRoutePanel;
 
@@ -38,7 +39,7 @@ export function SettingsRootPanel({
   isGuest,
   isSyncing,
   syncError,
-  quietProgressEnabled,
+  summaries,
   locationSettings,
   textSize,
   activeSub,
@@ -56,6 +57,7 @@ export function SettingsRootPanel({
   isSyncing: boolean;
   syncError: string;
   quietProgressEnabled: boolean;
+  summaries?: SettingsMenuSummaries;
   locationSettings?: LocationSettings;
   calendarType?: "hijri" | "gregorian";
   onCalendarTypeChange?: (value: "hijri" | "gregorian") => void;
@@ -174,14 +176,14 @@ export function SettingsRootPanel({
       id: "audio",
       icon: <Headphones size={20} className="text-primary" />,
       title: t(language, "settings.audioRecitations"),
-      description: t(language, "settings.audioRecitationsDesc"),
+      description: summaries?.audio ?? t(language, "settings.audioRecitationsDesc"),
       keywords: ["audio", "reciter", "speed", "playback", "صوت", "قارئ", "سرعة", "تشغيل", "تلاوة"],
     },
     {
       id: "progress",
       icon: <Sparkles size={20} className="text-primary" />,
       title: t(language, "settings.progressPreferences"),
-      description: quietProgressEnabled ? t(language, "settings.gardenActive") : t(language, "settings.gardenHidden"),
+      description: summaries?.progress ?? t(language, "settings.progressSavedLocally"),
       keywords: [
         "progress",
         "garden",
@@ -224,8 +226,8 @@ export function SettingsRootPanel({
     {
       id: "downloads",
       icon: <Download size={20} className="text-primary" />,
-      title: t(language, "settings.offlineAccess"),
-      description: t(language, "settings.included"),
+      title: t(language, "downloads.title"),
+      description: summaries?.downloads ?? t(language, "settings.downloadsUnchecked"),
       keywords: [
         "offline",
         "download",
@@ -340,18 +342,25 @@ export function SettingsRootPanel({
       id: "prayer",
       title: t(language, "settings.prayerReminders"),
       icon: <Bell size={20} className="text-primary" />,
-      value: displayLocationName(locationSettings, language),
+      value: [displayLocationName(locationSettings, language), summaries?.reminders].filter(Boolean).join(" · "),
     },
     {
       id: "audio",
-      title: t(language, "settings.audioDownloads"),
+      title: t(language, "settings.audioRecitations"),
       icon: <Headphones size={20} className="text-primary" />,
+      value: summaries?.audio,
+    },
+    {
+      id: "downloads",
+      title: t(language, "downloads.title"),
+      icon: <Download size={20} className="text-primary" />,
+      value: summaries?.downloads ?? t(language, "settings.downloadsUnchecked"),
     },
     {
       id: "progress",
       title: t(language, "settings.progressPreferences"),
       icon: <Sparkles size={20} className="text-primary" />,
-      value: quietProgressEnabled ? t(language, "settings.gardenActive") : t(language, "settings.gardenHidden"),
+      value: summaries?.progress ?? t(language, "settings.progressSavedLocally"),
     },
     {
       id: "accessibility",
@@ -477,7 +486,7 @@ export function SettingsRootPanel({
           <>
             {[
               { label: "settings.personalizationSection", ids: ["appearance", "reading", "accessibility"] },
-              { label: "settings.dailyPracticeSection", ids: ["prayer", "audio", "progress"] },
+              { label: "settings.dailyPracticeSection", ids: ["prayer", "audio", "downloads", "progress"] },
               { label: "settings.accountData", ids: ["account-data"] },
             ].map((group) => (
               <SettingsSection key={group.label} label={t(language, group.label)}>

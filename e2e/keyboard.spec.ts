@@ -73,12 +73,13 @@ test("Counters keyboard navigation and reset", async ({ page }) => {
   await expect(page.getByText("2").first()).toBeVisible();
 
   // Reset via keyboard: open more options menu first
-  const moreOptions = page.getByRole("button", { name: /options/i }).first();
+  const moreOptions = page.getByTestId("masbaha-settings-trigger");
   await moreOptions.focus();
   await page.keyboard.press("Enter");
 
   // Destructive resets keep keyboard focus inside a confirmation dialog.
-  const resetMenuItem = page.getByRole("menuitem", { name: /Reset/i }).first();
+  await page.getByTestId("masbaha-settings-sheet").locator("summary").press("Enter");
+  const resetMenuItem = page.getByTestId("masbaha-settings-sheet").getByRole("button", { name: /Reset/i }).first();
   await expect(resetMenuItem).toBeVisible();
   await resetMenuItem.focus();
   await page.keyboard.press("Enter");

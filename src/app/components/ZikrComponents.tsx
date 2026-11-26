@@ -67,6 +67,7 @@ export function CounterOutlineProgress({ count, total }: { count: number; total:
 }
 
 export interface ZikrCounterSurfaceProps {
+  presentation?: "standard" | "masbaha";
   count: number;
   total: number;
   complete?: boolean;
@@ -90,6 +91,7 @@ export interface ZikrCounterSurfaceProps {
 }
 
 export function ZikrCounterSurface({
+  presentation = "standard",
   count,
   total,
   complete = false,
@@ -184,50 +186,68 @@ export function ZikrCounterSurface({
       aria-disabled={disabled || (complete && !onCompleteTap)}
       aria-label={accessibleName}
       data-counter-variant={isSingleAction ? "action" : "tally"}
-      className={`adaptive-counter-surface ${isSingleAction ? "adaptive-counter-surface--action" : ""} ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${complete ? "is-complete" : ""} ${justCompleted ? "just-completed" : ""} ${className}`}
+      className={`adaptive-counter-surface ${presentation === "masbaha" ? "masbaha-counter" : ""} ${isSingleAction ? "adaptive-counter-surface--action" : ""} ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${complete ? "is-complete" : ""} ${justCompleted ? "just-completed" : ""} ${className}`}
     >
-      {/* Keyed on the face it shows so React swaps the node — the number face
+      {presentation === "masbaha" ? (
+        <>
+          <span className="masbaha-ring" data-long-count={count >= 10000}>
+            <CounterRing count={Math.min(count, total)} total={total} size={200} />
+            <span className="masbaha-ring-value">
+              <bdi className="counter-number" dir="ltr" style={{ fontFamily: counterNumeralFontFamily(language) }}>
+                {localizedCount}
+              </bdi>
+              <span className="text-base text-muted-foreground" dir="ltr">
+                / <bdi dir="ltr">{localizedTotal}</bdi>
+              </span>
+            </span>
+          </span>
+        </>
+      ) : (
+        <>
+          {/* Keyed on the face it shows so React swaps the node — the number face
           and the completed face each play a 180ms fade/rise instead of
           snapping, which is also what carries the eye to the next zikr. */}
-      <div className="adaptive-counter-content counter-face-swap" key={complete ? "complete" : "counting"}>
-        {complete ? (
-          <div
-            className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
-            data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
-          >
-            <span className="counter-check-mark">
-              <Check size={19} strokeWidth={3} />
-            </span>
-            <span className="counter-complete-label" dir="auto">
-              {t(language, "counter.done")}
-            </span>
-          </div>
-        ) : isSingleAction ? (
-          <span className="counter-action-label text-sm font-bold leading-normal text-current" dir="auto">
-            {actionLabel || activeInstruction}
-          </span>
-        ) : (
-          <p
-            className="inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 text-xl font-black leading-normal text-current"
-            dir={isArabic ? "rtl" : "ltr"}
-            style={{
-              fontFamily: counterNumeralFontFamily(language),
-              fontVariantNumeric: "tabular-nums lining-nums",
-            }}
-          >
-            <bdi className="counter-number" dir="ltr" key={count}>
-              {localizedCount}
-            </bdi>
-            {total > 0 && (
-              <>
-                <span aria-hidden="true">/</span>
-                <bdi dir="ltr">{localizedTotal}</bdi>
-              </>
+          <div className="adaptive-counter-content counter-face-swap" key={complete ? "complete" : "counting"}>
+            {complete ? (
+              <div
+                className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
+                data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
+              >
+                <span className="counter-check-mark">
+                  <Check size={19} strokeWidth={3} />
+                </span>
+                <span className="counter-complete-label" dir="auto">
+                  {t(language, "counter.done")}
+                </span>
+              </div>
+            ) : isSingleAction ? (
+              <span className="counter-action-label text-sm font-bold leading-normal text-current" dir="auto">
+                {actionLabel || activeInstruction}
+              </span>
+            ) : (
+              <p
+                className="inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 text-xl font-black leading-normal text-current"
+                dir={isArabic ? "rtl" : "ltr"}
+                style={{
+                  fontFamily: counterNumeralFontFamily(language),
+                  fontVariantNumeric: "tabular-nums lining-nums",
+                }}
+              >
+                <bdi className="counter-number" dir="ltr" key={count}>
+                  {localizedCount}
+                </bdi>
+                {total > 0 && (
+                  <>
+                    <span aria-hidden="true">/</span>
+                    <bdi dir="ltr">{localizedTotal}</bdi>
+                  </>
+                )}
+              </p>
             )}
-          </p>
-        )}
-      </div>
-      <CounterOutlineProgress count={count} total={total} />
+          </div>
+          <CounterOutlineProgress count={count} total={total} />
+        </>
+      )}
     </button>
   );
 }

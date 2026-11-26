@@ -1,6 +1,7 @@
 import { MushafMaterialHint } from "./MushafMaterialHint";
 import { useRef, type ReactNode } from "react";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
+import { ToolbarPanel } from "./ToolbarPanel";
 import { handleRadioNavigation } from "./radioNavigation";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -243,6 +244,7 @@ export function MushafQuickMenu({
 
   return (
     <ResponsiveSheet
+      readerPanel={ToolbarPanel}
       open={open}
       onClose={onClose}
       onCloseAutoFocus={(event) => {
@@ -441,9 +443,9 @@ export function MushafQuickMenu({
                     {item.icon}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-bold leading-tight">{item.label}</span>
+                    <span className="block break-words text-sm font-bold leading-tight">{item.label}</span>
                     {item.detail && (
-                      <span className="mt-0.5 block truncate text-xs font-medium text-muted-foreground">
+                      <span className="mt-0.5 block break-words text-xs font-medium text-muted-foreground">
                         {item.detail}
                       </span>
                     )}

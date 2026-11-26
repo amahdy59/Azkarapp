@@ -1,0 +1,11 @@
+/* Reading headers stay in flow above their own scrollport. Borrowing the
+   parent canvas makes all themes/materials continuous without another blur,
+   painted band, rounded container, border or shadow. */
+.reading-header-surface {
+  background: transparent;
+  color: var(--foreground);
+}
+
+html.theme-light:not(.high-contrast)[data-app-material-resolved="solid"] .reading-header-surface {
+  --reading-header-progress-track: color-mix(in srgb, var(--border-subtle) 40%, var(--background));
+}

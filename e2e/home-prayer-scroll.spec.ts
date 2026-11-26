@@ -51,76 +51,59 @@ for (const language of ["ar", "en"] as const) {
           ),
         )
         .toBe(0);
-      const original = (await label.boundingBox())!;
       const expanded = await assertPrayerOverview(page);
-      const grid = page.getByTestId("home-content-grid");
-      await scroll.evaluate((element) => (element.scrollTop = 96));
-      const contentBefore = (await grid.boundingBox())!.y + 96;
-      await page.screenshot({ path: testInfo.outputPath(`expanded-${language}-${width}.png`), scale: "css" });
-      const horizontal = await page.getByTestId("home-all-prayers-row").evaluate((node) => node.scrollLeft);
-      await scroll.evaluate((element) => (element.scrollTop = 150));
-      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      await expect.poll(activeHandoffAnimations).toBe(0);
-      expect(await page.getByTestId("home-all-prayers-row").evaluate((node) => node.scrollLeft)).toBe(horizontal);
-      if (width < 768) {
-        await expect(page.getByTestId("home-prayer-strip")).toHaveAttribute("inert", "");
-        await expect(page.getByTestId("home-compact-prayer")).toBeInViewport();
-      } else {
-        const compact = await assertPrayerOverview(page);
-        expect((await label.boundingBox())!.x).toBeCloseTo(original.x, 0);
-        expect(compact.map((cell) => cell.height)).toEqual(expanded.map((cell) => cell.height));
+      const grid = page.getByTestId("home-context-grid");
+      const documentTop = () =>
+        grid.evaluate((node) => node.getBoundingClientRect().top + node.closest(".home-content-scroll")!.scrollTop);
+      const contentBefore = await documentTop();
+      const toggle = page.getByTestId("home-prayer-disclosure");
+      for (const top of [150, 0, 180]) {
+        await scroll.evaluate((node, top) => {
+          node.scrollTop = top;
+        }, top);
+        await expect(toggle).toHaveAttribute("aria-expanded", "true");
+        await expect.poll(documentTop).toBeCloseTo(contentBefore, 0);
+        const cards = await assertPrayerOverview(page);
+        expect(cards.map((cell) => [cell.width, cell.height])).toEqual(
+          expanded.map((cell) => [cell.width, cell.height]),
+        );
+        await expect.poll(activeHandoffAnimations).toBe(0);
       }
-
-      expect((await grid.boundingBox())!.y + (await scroll.evaluate((node) => node.scrollTop))).toBeCloseTo(
-        contentBefore,
-        0,
-      );
-      const stableTop = await scroll.evaluate((node) => node.scrollTop);
-      await page.waitForTimeout(100);
-      expect(await scroll.evaluate((node) => node.scrollTop)).toBe(stableTop);
-      await expect(next.locator("progress")).not.toBeVisible();
-      await expect.poll(activeHandoffAnimations).toBe(0);
-      await page.screenshot({ path: testInfo.outputPath(`compact-${language}-${width}.png`), scale: "css" });
-      // Reverse repeatedly without waiting for the previous animation. The latest state wins.
-      await scroll.evaluate((element) => (element.scrollTop = 0));
-      await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
-      await scroll.evaluate((element) => (element.scrollTop = 150));
-      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await expect.poll(activeHandoffAnimations).toBe(0);
-      await scroll.evaluate((element) => (element.scrollTop = 0));
-      await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
       await expect(next.locator("progress")).toHaveCount(0);
-      await expect(page.getByTestId("home-prayer-interval")).toContainText(/remaining|متبقٍ/);
+      await page.screenshot({ path: testInfo.outputPath(`scrolled-${language}-${width}.png`) });
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("#home-prayer-timings")).toHaveAttribute("inert", "");
+      await scroll.evaluate((node) => {
+        node.scrollTop = 0;
+      });
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      await assertPrayerOverview(page);
       const footer = page.getByTestId("home-visitor-footer");
       await expect(footer).toContainText(language === "ar" ? "١٢" : "12");
-      const footerBefore = await footer.evaluate((node) => {
-        const scroll = document.querySelector(".home-content-scroll")!;
-        return node.getBoundingClientRect().bottom + scroll.scrollTop;
-      });
+      const footerBefore = await footer.evaluate(
+        (node) => node.getBoundingClientRect().bottom + node.closest(".home-content-scroll")!.scrollTop,
+      );
       await footer.scrollIntoViewIfNeeded();
       await expect(footer).toBeInViewport();
-      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      await expect.poll(activeHandoffAnimations).toBe(0);
-      const footerAfter = await footer.evaluate((node) => {
-        const scroll = document.querySelector(".home-content-scroll")!;
-        return node.getBoundingClientRect().bottom + scroll.scrollTop;
-      });
-      expect(footerAfter).toBeCloseTo(footerBefore, 0);
-      await expect(footer).toBeInViewport();
+      expect(
+        await footer.evaluate(
+          (node) => node.getBoundingClientRect().bottom + node.closest(".home-content-scroll")!.scrollTop,
+        ),
+      ).toBeCloseTo(footerBefore, 0);
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
       expect(
         (await new AxeBuilder({ page }).include('[data-testid="home-sticky-prayers"]').analyze()).violations,
       ).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      const currentButton =
-        width < 768
-          ? page.getByTestId("home-compact-prayer").getByRole("button")
-          : sticky.locator('[data-prayer-state="current"] button');
-      await currentButton.focus();
-      await scroll.evaluate((node) => (node.scrollTop = 0));
-      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-      await currentButton.evaluate((node) => (node as HTMLElement).blur());
-      await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+      await toggle.focus();
+      await expect(toggle).toBeFocused();
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await toggle.press("Enter");
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect.poll(activeHandoffAnimations).toBe(0);
     });
   }
 }

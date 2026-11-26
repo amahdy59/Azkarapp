@@ -211,10 +211,11 @@ for (const homeMaterial of ["solid", "glass"] as const) {
     // the structural desktop wrapper or add nested Glass filters on phones.
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
-      const owners =
-        width >= 1200 ? overview.locator(".home-prayer-tile, .home-prayer-interval, .home-prayer-location") : overview;
-      await expect(owners).toHaveCount(width >= 1200 ? 7 : 1);
-      if (width >= 1200) await expect(overview).toHaveCSS("background-image", "none");
+      const owners = page.locator(
+        ".home-prayer-overview-v2 .home-prayer-tile, .home-prayer-overview-v2 .home-prayer-location, .home-prayer-interval",
+      );
+      await expect(owners).toHaveCount(7);
+      await expect(overview).toHaveCSS("background-image", "none");
       for (const owner of await owners.all()) {
         await expect(owner).toHaveCSS("background-image", asset);
         for (const fallback of ["high-contrast", "reduce-transparency"]) {

@@ -55,7 +55,10 @@ for (const language of ["en", "ar"] as const) {
       await page.getByTestId("share-collection-button").click();
       const modal = page.getByTestId("collection-share-modal");
       if (curated)
-        await modal.getByRole("button", { name: t(language, "shareStudio.curatedTab"), exact: true }).click();
+        await expect(
+          modal.getByRole("radio", { name: t(language, "shareStudio.curatedTab"), exact: true }),
+        ).toBeChecked();
+      else await sharingStep(modal, "share");
       const image = modal.getByTestId("sharing-preview").getByRole("img").first();
       await expect(image).toBeVisible();
       if (curated) await expect(image).toHaveAttribute("src", /^blob:/u);

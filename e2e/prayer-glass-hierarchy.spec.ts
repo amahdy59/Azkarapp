@@ -28,8 +28,9 @@ for (const language of ["ar", "en"] as const) {
       const row = page.getByTestId("home-all-prayers-row");
       const current = row.locator('[data-prayer-state="current"]');
       const next = row.locator('[data-prayer-state="next"]');
+      if (width < 768) await expect(row).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       for (const card of [current, next]) {
-        await expect(card).toHaveCSS("backdrop-filter", width >= 1200 ? "blur(22px) saturate(1.35)" : "none");
+        await expect(card).toHaveCSS("backdrop-filter", width < 768 ? "none" : "blur(22px) saturate(1.35)");
         await expect
           .poll(() =>
             card.evaluate((n) => {
@@ -49,20 +50,16 @@ for (const language of ["ar", "en"] as const) {
       await expect(next.getByRole("progressbar")).toHaveCount(0);
       await page.evaluate(() => document.fonts.ready);
       const sizes = await assertPrayerOverview(page);
-      expect(Math.max(...sizes.map((s) => s.height))).toBeLessThanOrEqual(width >= 1200 ? 160 : 140);
-      if (width < 1200) {
-        await expect(page.getByTestId("prayer-tracker-cards")).toHaveCSS(
-          "backdrop-filter",
-          "blur(22px) saturate(1.35)",
-        );
-      }
+      expect(Math.max(...sizes.map((s) => s.height))).toBeLessThanOrEqual(width >= 768 ? 176 : 180);
+      for (const card of await row.locator("article").all())
+        await expect(card).toHaveCSS("backdrop-filter", width < 768 ? "none" : "blur(22px) saturate(1.35)");
       if (width === 1440) {
         const grid = (await page.getByTestId("home-context-grid").boundingBox())!;
         const summary = (await row.boundingBox())!;
         expect(summary.width).toBeCloseTo(grid.width, 0);
         expect(summary.x).toBeCloseTo(grid.x, 0);
         const icon = current.locator("[data-prayer-icon]");
-        await expect(icon).toHaveCSS("width", "40px");
+        await expect(icon).toHaveCSS("width", "28px");
       }
       if (width === 480) expect(sizes[0]!.width * 3 + 16).toBeLessThanOrEqual(await row.evaluate((n) => n.clientWidth));
       await page.screenshot({ path: testInfo.outputPath("prayer-hierarchy.png"), scale: "css" });
@@ -93,7 +90,7 @@ for (const language of ["ar", "en"] as const) {
         node.scrollTop = 0;
       });
       await expect(page.getByTestId("home-prayer-strip")).not.toHaveAttribute("inert");
-      await current.getByRole("button").click();
+      await current.locator("button").click();
       const panel = page.getByTestId("home-prayer-moment");
       await expect(panel.getByTestId("prayer-open-adhkar")).toBeVisible();
       if (width < 600) {

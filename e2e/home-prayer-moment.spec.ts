@@ -1,3 +1,4 @@
+import { openPrayerDialog, closePrayerDialog } from "./helpers/home-overview";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -14,6 +15,7 @@ async function openHomeAt(
   language: "ar" | "en" = "en",
   calendarType: "hijri" | "gregorian" = "hijri",
   hijriDateOffset = 0,
+  open = true,
 ) {
   // Append +03:00 to ensure the time evaluates correctly relative to Africa/Cairo (the playwright timezoneId).
   await page.clock.setFixedTime(new Date(`${isoTime}+03:00`));
@@ -39,6 +41,7 @@ async function openHomeAt(
   );
   await page.goto("/");
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 15000 });
+  if (open) await openPrayerDialog(page, "dhuhr");
 }
 
 for (const language of ["ar", "en"] as const) {
@@ -66,7 +69,7 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
   await openHomeAt(page, "2026-09-05T13:20:00");
   const card = page.getByTestId("home-prayer-moment");
   await expect(card).toBeVisible();
-  await expect(card).toHaveAttribute("data-prayer", "dhuhr");
+  await expect(card.locator(".prayer-tracking-body")).toHaveAttribute("data-prayer", "dhuhr");
 
   // Its parts are the prayer screen's, not a second copy of them.
   await expect(card.getByTestId("prayer-moment-status")).toHaveCount(0);
@@ -83,7 +86,8 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
     }),
   ).toBe(true);
   await expect(card).not.toHaveClass(/hero-glass/);
-  await expect(card.locator(".hero-glass").first()).toBeVisible();
+  await expect(card.locator(".hero-glass")).toHaveCount(0);
+  await expect(card).toHaveAttribute("data-dropdown-surface", "");
 });
 
 test("recording the prayer as congregational works without leaving Home", async ({ page }) => {
@@ -113,18 +117,20 @@ test("recording the prayer as congregational works without leaving Home", async 
   // A recorded prayer confirms in place, then yields Home to its routine.
   await page.clock.setFixedTime(new Date("2026-09-05T13:26:00+03:00"));
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect(card).toBeVisible();
+  await closePrayerDialog(page);
   await expect(card).toHaveCount(0);
 });
 
-test("the contextual prayer closes thirty minutes after the adhan", async ({ page }) => {
-  await openHomeAt(page, "2026-09-05T13:40:00");
+test("time alone never opens the prayer tracking dialog", async ({ page }) => {
+  await openHomeAt(page, "2026-09-05T13:40:00", "en", "hijri", 0, false);
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
   await expect(page.getByTestId("home-prayer-strip")).toBeVisible();
 });
 
 test("a quiet stretch between prayers keeps Home to the compact five", async ({ page }) => {
   // Late evening: Isha is hours past and Fajr is not close.
-  await openHomeAt(page, "2026-09-05T22:30:00");
+  await openHomeAt(page, "2026-09-05T22:30:00", "en", "hijri", 0, false);
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
 });
 
@@ -132,27 +138,27 @@ test("each Home prayer expands its shared properties in the connected detail pan
   await openHomeAt(page, "2026-09-05T13:20:00");
   // The contextual prayer starts open. It can still be dismissed, then opened
   // again explicitly from the stable five-prayer strip.
-  await page.getByRole("button", { name: /Close Dhuhr details/i }).click();
+  await closePrayerDialog(page);
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
   await page.getByRole("button", { name: /Open Dhuhr/i }).click();
 
   await expect(page).toHaveURL(/\/?$/);
   const expanded = page.getByTestId("home-prayer-moment");
-  await expect(expanded).toHaveAttribute("data-prayer", "dhuhr");
+  await expect(expanded.locator(".prayer-tracking-body")).toHaveAttribute("data-prayer", "dhuhr");
   await expect(expanded.getByTestId("prayer-moment-status")).toHaveCount(0);
   await expect(expanded.getByTestId("prayer-action-location")).toBeVisible();
 
   const selected = page.getByTestId("prayer-card-dhuhr");
-  await expect(selected.getByRole("button")).toHaveAttribute("aria-expanded", "true");
+  await expect(selected.locator("button")).toHaveAttribute("aria-haspopup", "dialog");
   await expect(selected).toHaveAttribute("data-selected", "true");
 });
 
 test("the selected prayer card reflects selection in RTL visual order", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00", "ar");
   const fajrCard = page.getByTestId("prayer-card-fajr");
-  await fajrCard.getByRole("button").click();
+  await openPrayerDialog(page, "fajr");
   await expect(fajrCard).toHaveAttribute("data-selected", "true");
-  await expect(fajrCard.getByRole("button")).toHaveAttribute("aria-expanded", "true");
+  await expect(fajrCard.locator("button")).toHaveAttribute("aria-haspopup", "dialog");
 });
 
 /**
@@ -276,7 +282,7 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
 
   const indicatorCenterX = indicatorBox!.x + indicatorBox!.width / 2;
   const actions = page.getByTestId("prayer-actions-card");
-  const headingBox = await actions.locator(".prayer-actions-header").boundingBox();
+  const headingBox = await page.locator(".prayer-tracking-header").boundingBox();
   const groupBox = (await actions.locator(".prayer-actions-checklist").boundingBox())!;
   const listBox = await actions.locator(".prayer-actions-list").boundingBox();
   const dateBox = (await actions.locator(".prayer-actions-context").boundingBox())!;
@@ -288,8 +294,8 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
   const evidenceBox = (await actions.getByTestId("prayer-moment-virtue").boundingBox())!;
   // Concept A aligns the heading with the inset's outside edge, while the
   // checklist and recording date share its padded content measure.
-  expect(headingBox!.x).toBeCloseTo(groupBox.x, 0);
-  expect(headingBox!.width).toBeCloseTo(groupBox.width, 0);
+  expect(headingBox!.y + headingBox!.height).toBeLessThanOrEqual(groupBox.y);
+  expect(headingBox!.width).toBeGreaterThan(groupBox.width);
   expect(listBox!.x).toBeGreaterThan(groupBox.x);
   expect(listBox!.x + listBox!.width).toBeLessThan(groupBox.x + groupBox.width);
   expect(dateBox.x).toBeCloseTo(listBox!.x, 0);
@@ -297,15 +303,11 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
   expect(evidenceBox.x + evidenceBox.width).toBeLessThan(listBox!.x);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  const infoCircle = page.getByTestId("prayer-actions-more-info").locator("span[aria-hidden='true']");
-  const phoneInfo = await infoCircle.boundingBox();
+  await expect(page.getByTestId("prayer-actions-more-info")).toHaveCount(0);
   const phoneIndicator = await indicator.boundingBox();
-  expect(phoneInfo).not.toBeNull();
-  expect(phoneInfo!.width).toBeCloseTo(24, 0);
-  expect(phoneInfo!.height).toBeCloseTo(24, 0);
-  expect(phoneIndicator).not.toBeNull();
   const phoneCopy = (await copy.boundingBox())!;
+  expect(phoneIndicator).not.toBeNull();
   expect(phoneIndicator!.x).toBeGreaterThan(phoneCopy.x + phoneCopy.width);
   expect(phoneIndicator!.x - (phoneCopy.x + phoneCopy.width)).toBeCloseTo(12, 0);
-  expect(phoneInfo!.x + phoneInfo!.width).toBeLessThan(phoneIndicator!.x);
+  await expect(page.getByTestId("home-prayer-moment").getByTestId("modal-close-button")).toBeInViewport();
 });

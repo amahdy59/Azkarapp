@@ -197,7 +197,7 @@ for (const width of [390, 1440]) {
         await region.evaluate((node) => {
           node.scrollTop = 0;
         });
-        await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute("data-prayer-cards-condensed");
+        await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
         await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 1 });
         await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 180, y: 720 }] });
         for (let y = 690; y >= 390; y -= 30) {
@@ -206,7 +206,7 @@ for (const width of [390, 1440]) {
         }
         await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
         await expect.poll(() => region.evaluate((node) => node.scrollTop)).toBeGreaterThan(96);
-        await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+        await expect(page.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
         touchTop = await region.evaluate((node) => node.scrollTop);
         await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: false });
       }

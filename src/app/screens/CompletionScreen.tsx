@@ -1,40 +1,26 @@
-import { useState, useEffect, lazy, Suspense } from "react";
-import confetti from "canvas-confetti";
+import { useState, useEffect, lazy, Suspense, Fragment } from "react";
 import "./CompletionScreen.css";
-import { Check, Home, Share2 } from "../components/icons";
+import { Check, ChevronNext, Home, Share2 } from "../components/icons";
+import { Button } from "../components/ui/button";
+import { CompletionReflectionCard } from "../components/CompletionReflectionCard";
 import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";
-import { getAzkarForMode, isRoutineCategory } from "../content/azkarCore";
-import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../content/azkarCore";
+import { getCompletionReflection } from "../completionReflection";
+import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
-import "../../styles/animations/ZikrAnimations.css";
-import { getCategoryStreak, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion, RoutineMode } from "../types";
-import { getShareUrl, type ShareItem } from "../share/shareLayout";
+import { vibrateIfEnabled } from "../motionPreferences";
+import { getCategoryStreak, type GrowthEvent } from "../progress";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion, PrayerName, RoutineMode, ThemeMode } from "../types";
 
 const CollectionShareModal = lazy(() =>
   import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
 );
 
-/**
- * Confetti takes an array of colour strings, so these cannot be utility classes.
- * They read the named decorative ramps from the stylesheet instead of hardcoding
- * hex here (DEC-069 / F17), which keeps the celebration in step with the theme.
- */
-function confettiColors(token: "--confetti-session" | "--confetti-group", fallback: string[]): string[] {
-  if (typeof document === "undefined") return fallback;
-  const value = getComputedStyle(document.documentElement).getPropertyValue(token);
-  const parsed = value
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-  return parsed.length > 0 ? parsed : fallback;
-}
-
 export function CompletionScreen({
   catId,
   sessionStart,
+  completedAt: sessionCompletedAt,
   dailyCompletions,
   growthEvent,
   quietProgressEnabled,
@@ -45,11 +31,15 @@ export function CompletionScreen({
   completionLevel = "complete",
   onContinueComplete,
   onNewSession,
+  onOpenBenefits,
+  prayer,
+  themeMode,
   reduceMotion = false,
   hapticFeedback = true,
 }: {
   catId: CategoryId;
   sessionStart: number;
+  completedAt?: number;
   dailyCompletions: DailyCollectionCompletion[];
   growthEvent: GrowthEvent | null;
   quietProgressEnabled: boolean;
@@ -60,71 +50,31 @@ export function CompletionScreen({
   completionLevel?: RoutineMode;
   onContinueComplete?: () => void;
   onNewSession?: () => void;
+  onOpenBenefits?: () => void;
+  prayer?: PrayerName;
+  themeMode?: ThemeMode;
   reduceMotion?: boolean;
   hapticFeedback?: boolean;
 }) {
   const cat = CATEGORIES.find((item) => item.id === catId)!;
-  const azkarCount = getAzkarForMode(catId, completionLevel).length;
-  const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60_000));
+  const azkar =
+    catId === "after_prayer" && prayer
+      ? getAzkarForPrayer(prayer, completionLevel)
+      : getAzkarForMode(catId, completionLevel);
+  // Freeze the finished session's metadata. Opening details/sharing must not add
+  // time to a session that has already ended.
+  const [completedAt] = useState(() => new Date(sessionCompletedAt ?? Date.now()));
+  const elapsedMin = Math.max(1, Math.round((completedAt.getTime() - sessionStart) / 60_000));
   const isArabic = language === "ar";
   const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
-    // Haptics and motion are separate preferences: someone who suppresses
-    // animation may still want the completion buzz, so gate them independently.
+    // Haptics remain independent from the still alternative for visual motion.
     vibrateIfEnabled(hapticFeedback, [30, 50, 30, 50, 50]);
-
-    if (shouldReduceMotion(reduceMotion)) {
-      return;
-    }
-
-    const isCore = MAIN_CATEGORY_IDS.includes(catId);
-    const sessionColors = confettiColors("--confetti-session", ["#16a34a", "#22c55e", "#4ade80"]);
-    const groupColors = confettiColors("--confetti-group", ["#d7a528", "#fbbf24", "#fde68a", "#a3e635"]);
-    let animationFrame = 0;
-
-    if (isCore) {
-      // Keep routine celebrations brief so they feel rewarding without interrupting the next action.
-      const duration = 900;
-      const end = Date.now() + duration;
-      const frame = () => {
-        confetti({
-          particleCount: 3,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: sessionColors,
-        });
-        confetti({
-          particleCount: 3,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: sessionColors,
-        });
-        if (Date.now() < end) {
-          animationFrame = requestAnimationFrame(frame);
-        }
-      };
-      frame();
-    } else {
-      // Quieter single burst for extra groups — softer colours, smaller scale
-      confetti({
-        particleCount: 28,
-        angle: 90,
-        spread: 45,
-        origin: { x: 0.5, y: 0.35 },
-        colors: groupColors,
-        scalar: 0.7,
-        gravity: 0.9,
-      });
-    }
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [catId, hapticFeedback, reduceMotion]);
+  }, [catId, hapticFeedback]);
 
   const categoryName = isArabic ? cat.nameArabic : cat.name;
-  const categoryStreak = Math.max(1, getCategoryStreak(dailyCompletions, catId, new Date(), progressDayStartHour));
+  const categoryStreak = getCategoryStreak(dailyCompletions, catId, completedAt, progressDayStartHour);
   const streakMessage = t(
     language,
     categoryStreak === 1
@@ -134,149 +84,126 @@ export function CompletionScreen({
         : "completion.categoryStreakMany",
     { category: categoryName, count: formatNumerals(categoryStreak, language) },
   );
-  const stats = [
-    { value: azkarCount, label: t(language, "completion.completedAzkar") },
-    { value: elapsedMin, label: t(language, "completion.minutes") },
-  ];
+  const canContinue = isRoutineCategory(catId) && completionLevel === "core" && Boolean(onContinueComplete);
+  const reflection = getCompletionReflection(sessionStart);
 
   return (
     <div
-      className="completion-screen-enter relative h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 text-center"
+      className="completion-screen completion-screen-enter h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 text-center"
       dir={direction}
+      data-testid="completion-screen"
+      data-reduce-motion={reduceMotion || undefined}
     >
-      <div className="relative z-10 mx-auto flex min-h-full w-full max-w-md flex-col justify-center py-4 sm:py-8">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-5 pb-2 sm:gap-6 sm:pt-3">
         <p className="sr-only" role="status" aria-live="polite">
           {t(language, "completion.sessionComplete", { category: categoryName })}
         </p>
 
-        <div
-          className="celebration-glow celebration-pop relative mx-auto flex size-16 items-center justify-center rounded-2xl bg-primary"
-          aria-hidden="true"
-        >
-          <Check size={30} className="text-primary-foreground" strokeWidth={2.5} />
-        </div>
+        <header>
+          <div
+            className="completion-check mx-auto mb-3 flex size-12 items-center justify-center rounded-full border-2 border-primary text-primary"
+            aria-hidden="true"
+          >
+            <Check size={25} strokeWidth={2.5} />
+          </div>
+          <h1 className="break-words text-display font-extrabold leading-9 text-foreground">
+            {t(language, "completion.mashaAllah")
+              .split(/(?<=’)/u)
+              .map((part, index) => (
+                <Fragment key={index}>
+                  {index > 0 && <wbr />}
+                  {part}
+                </Fragment>
+              ))}
+          </h1>
+          <p className="mt-2 text-lg font-bold text-foreground">
+            {t(language, "completion.completed", { category: categoryName })}
+          </p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">{t(language, "completion.acceptance")}</p>
+        </header>
 
-        <h1 className="mt-4 text-display font-extrabold leading-9 text-primary">
-          {t(language, "completion.mashaAllah")}
-        </h1>
-        <p className="mt-1 text-lg font-bold text-card-foreground">
-          {t(language, "completion.completed", { category: categoryName })}
-        </p>
-        <p className="mx-auto mt-2 max-w-[36ch] text-sm leading-6 text-foreground/80">
-          {quietProgressEnabled ? streakMessage : t(language, "completion.reflection")}
-        </p>
+        <CompletionReflectionCard evidence={reflection} language={language} onExplore={onOpenBenefits} />
 
-        {quietProgressEnabled && growthEvent?.kind === "palm" && (
-          <GrowthEventStatus event={growthEvent} language={language} />
-        )}
-
-        <section
-          className="mt-5 grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card"
-          aria-label={t(language, "completion.sessionSummary")}
-        >
-          {stats.map(({ value, label }, index) => (
-            <article
-              key={label}
-              className={`summary-item-enter flex min-h-[82px] flex-col items-center justify-center p-3 ${index === 0 ? "border-e border-border" : ""}`}
-              style={{ animationDelay: `${180 + index * 55}ms` }}
-            >
-              <p
-                className="text-[1.625rem] font-extrabold text-primary"
-                style={{ fontFamily: numeralFontFamily(language) }}
-              >
-                {formatNumerals(value, language)}
-              </p>
-              <p className="mt-1 text-label text-foreground/75">{label}</p>
-            </article>
-          ))}
+        <section aria-label={t(language, "completion.sessionSummary")} className="text-sm text-muted-foreground">
+          <p className="font-semibold" data-testid="completion-count">
+            {formatNumerals(azkar.length, language)} {t(language, "completion.completedAzkar")}
+          </p>
+          {quietProgressEnabled && categoryStreak > 0 && <p className="mt-1 leading-6">{streakMessage}</p>}
+          {quietProgressEnabled && growthEvent?.kind === "palm" && (
+            <GrowthEventStatus event={growthEvent} language={language} />
+          )}
+          <details className="completion-details mt-1">
+            <summary className="mx-auto flex min-h-11 w-fit max-w-full cursor-pointer items-center justify-center gap-1 rounded-xl px-3 py-2 text-xs underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+              {t(language, "completion.sessionDetails")}
+              <ChevronNext size={16} className="completion-details-chevron shrink-0" aria-hidden="true" />
+            </summary>
+            <div className="mx-auto max-w-sm space-y-1 pt-1 text-xs leading-6" data-testid="completion-session-details">
+              <p>{t(language, "completion.elapsed", { count: formatNumerals(elapsedMin, language) })}</p>
+              <p>{t(language, "completion.elapsedHint")}</p>
+              <p dir="auto">{formatHijriDate(completedAt, language)}</p>
+            </div>
+          </details>
         </section>
 
-        <div className="pt-5">
-          <p className="text-xs text-foreground/70" dir="auto">
-            {formatHijriDate(new Date(), language)}
-          </p>
-          <div className="mt-3 grid gap-2.5">
-            {isRoutineCategory(catId) && completionLevel === "core" && onContinueComplete && (
-              <button
-                type="button"
-                onClick={onContinueComplete}
-                className="flex min-h-12 items-center justify-center rounded-xl border border-primary/40 bg-primary/10 px-4 font-bold text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-primary"
-              >
-                {t(language, "category.continueAdditional", {
-                  count: formatNumerals(
-                    getAzkarForMode(catId, "complete").filter((zikr) => !zikr.includedInCore).length,
-                    language,
-                  ),
-                })}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onHome}
-              className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-primary px-4 font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <Home size={18} aria-hidden="true" />{" "}
-              {t(language, onNewSession ? "completion.done" : "completion.returnHome")}
-            </button>
-            {onNewSession && (
-              <button
-                type="button"
-                onClick={onNewSession}
-                className="flex min-h-12 items-center justify-center rounded-xl border border-border-control bg-card px-4 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              >
-                {t(language, "completion.newSession")}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={(event) => {
-                // Safari pointer clicks do not focus buttons automatically.
-                // Give the dialog a real opener to restore on dismissal.
-                event.currentTarget.focus({ preventScroll: true });
-                setShareOpen(true);
-              }}
-              aria-haspopup="dialog"
-              className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-wait disabled:opacity-60"
-            >
-              <Share2 size={18} aria-hidden="true" /> {t(language, "completion.share")}
-            </button>
-          </div>
+        <div className="grid gap-2.5" data-testid="completion-actions">
+          {canContinue && (
+            <Button size="lg" onClick={onContinueComplete} className="w-full">
+              {t(language, "category.continueAdditional", {
+                count: formatNumerals(
+                  (catId === "after_prayer" && prayer
+                    ? getAzkarForPrayer(prayer, "complete")
+                    : getAzkarForMode(catId, "complete")
+                  ).filter((zikr) => !zikr.includedInCore).length,
+                  language,
+                ),
+              })}
+            </Button>
+          )}
+          <Button size="lg" variant={canContinue ? "outline" : "default"} onClick={onHome} className="w-full">
+            <Home size={18} aria-hidden="true" />{" "}
+            {t(language, onNewSession ? "completion.done" : "completion.returnHome")}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={(event) => {
+              // Safari pointer clicks do not focus buttons automatically.
+              // Give the dialog a real opener to restore on dismissal.
+              event.currentTarget.focus({ preventScroll: true });
+              setShareOpen(true);
+            }}
+            aria-haspopup="dialog"
+            className="w-full"
+          >
+            <Share2 size={18} aria-hidden="true" />
+            {t(language, "completion.shareCollection", { category: categoryName })}
+          </Button>
+          {onNewSession && (
+            <Button size="lg" variant="ghost" onClick={onNewSession} className="w-full text-muted-foreground">
+              {t(language, "completion.newSession")}
+            </Button>
+          )}
         </div>
       </div>
       {shareOpen && (
         <Suspense fallback={<p role="status">{t(language, "shareStoryPack.generating")}</p>}>
           <CollectionShareModal
             open
-            single
             initialFormat="square"
-            contentAlignment="center"
+            initialScope="all"
+            contentAlignment="balanced"
             onClose={() => setShareOpen(false)}
-            dialogTitle={t(language, "completion.share")}
-            dialogDescription={t(language, "completion.sessionComplete", { category: categoryName })}
-            collectionTitle={t(language, "completion.completedCategory", { category: categoryName })}
-            collectionTitleArabic={t("ar", "completion.completedCategory", { category: cat.nameArabic })}
-            collectionTitleEnglish={t("en", "completion.completedCategory", { category: cat.name })}
-            items={[]}
-            shareUrl={getShareUrl(catId)}
-            shareItemsByLanguage={
-              Object.fromEntries(
-                (["ar", "en"] as const).map((exportLanguage) => [
-                  exportLanguage,
-                  [
-                    {
-                      id: "session-completion",
-                      arabicText: t(exportLanguage, "completion.shareText", {
-                        category: exportLanguage === "ar" ? cat.nameArabic : cat.name,
-                      }),
-                      textDirection: exportLanguage === "ar" ? "rtl" : "ltr",
-                      language: exportLanguage,
-                      hideRepetition: true,
-                    } satisfies ShareItem,
-                  ],
-                ]),
-              ) as Record<AppLanguage, ShareItem[]>
-            }
+            dialogTitle={t(language, "completion.shareCollection", { category: categoryName })}
+            dialogDescription={t(language, "completion.shareCollectionHint")}
+            collectionTitle={categoryName}
+            collectionTitleArabic={cat.nameArabic}
+            collectionTitleEnglish={cat.name}
+            categoryId={catId}
+            routineMode={completionLevel}
+            prayer={prayer}
+            items={azkar}
             language={language}
+            themeMode={themeMode}
           />
         </Suspense>
       )}

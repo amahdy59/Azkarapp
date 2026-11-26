@@ -50,8 +50,8 @@ describe("PrayerLocationPanel", () => {
         adjustments: { fajr: 3 },
       }),
     );
-    expect(screen.getByTestId("prayer-location-name")).toHaveTextContent("Device location");
-    expect(screen.getByTestId("prayer-location-name")).not.toHaveTextContent("Riyadh");
+    expect(screen.getByTestId("prayer-location-name")).toHaveTextContent("Near Riyadh, Saudi Arabia");
+    expect(screen.getByTestId("prayer-location-name")).not.toHaveTextContent("24.50");
   });
 
   it("keeps timezone work stable during city search and refreshes it on a new foreground date", () => {

@@ -119,7 +119,7 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
 
   const overview = page.getByTestId("prayer-tracker-cards");
   const current = overview.locator('article[data-prayer-state="current"]');
-  const standard = (await overview.getAttribute("data-desktop")) === "true" ? current : overview;
+  const standard = current;
   const reading = page.getByTestId("home-daily-evidence");
   await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
   await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");

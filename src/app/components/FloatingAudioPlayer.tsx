@@ -1134,6 +1134,7 @@ export function FloatingAudioPlayer({
                   <Popover.Portal>
                     <Popover.Content
                       ref={repeatContent}
+                      data-overlay-surface="contextual"
                       onCloseAutoFocus={repeatFocus}
                       data-dropdown-surface=""
                       aria-label={t(language, "audioPlayer.repeatShort")}
@@ -1283,6 +1284,7 @@ export function FloatingAudioPlayer({
                     <Popover.Portal>
                       <Popover.Content
                         ref={optionsContent}
+                        data-overlay-surface="contextual"
                         onCloseAutoFocus={optionsFocus}
                         side="bottom"
                         collisionPadding={8}

@@ -1,4 +1,3 @@
-import { homeArtworkUrl } from "./azkar-backgrounds";
 /**
  * Decorative product illustration, served AVIF-first with a WebP fallback.
  *
@@ -11,7 +10,7 @@ import { homeArtworkUrl } from "./azkar-backgrounds";
  *
  * Regenerate with design-sources/azkar-responsive-assets/tools/export_product_images.py.
  */
-export type ProductImageName = "mosque_prophet" | "benefits_zikr";
+export type ProductImageName = "mosque_prophet";
 
 export function ProductImage({
   name,
@@ -25,14 +24,11 @@ export function ProductImage({
   loading?: "lazy" | "eager";
   sizes?: string;
 }) {
-  const responsive = name === "mosque_prophet";
-  const base = responsive ? `${import.meta.env.BASE_URL}images/${name}` : homeArtworkUrl(`images/${name}`);
+  const base = `${import.meta.env.BASE_URL}images/${name}`;
   const srcSet = (format: "avif" | "webp") =>
-    responsive
-      ? (format === "avif" ? [192, 384, 768] : [192, 384])
-          .map((width) => `${base}-${width}.${format} ${width}w`)
-          .join(", ")
-      : `${base}.${format}`;
+    (format === "avif" ? [192, 384, 768] : [192, 384])
+      .map((width) => `${base}-${width}.${format} ${width}w`)
+      .join(", ");
   return (
     <picture
       className="absolute inset-0 block bg-cover bg-center"
@@ -40,12 +36,12 @@ export function ProductImage({
     >
       <source srcSet={srcSet("avif")} sizes={sizes} type="image/avif" />
       <img
-        src={`${base}${responsive ? "-384" : ""}.webp`}
-        srcSet={responsive ? srcSet("webp") : undefined}
+        src={`${base}-384.webp`}
+        srcSet={srcSet("webp")}
         sizes={sizes}
         alt=""
-        width={responsive ? 768 : 1254}
-        height={responsive ? 768 : 1254}
+        width={768}
+        height={768}
         loading={loading}
         decoding="async"
         onError={(event) => {

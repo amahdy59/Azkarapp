@@ -1,8 +1,22 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { t } from "../src/app/i18n";
-import { sharingStep } from "./helpers/sharing";
+import { sharingSingleContent, sharingStep } from "./helpers/sharing";
+
+async function expectSettingsReachable(modal: Locator) {
+  const body = modal.getByTestId("sharing-scroll");
+  const footer = modal.getByTestId("sharing-actions");
+  expect(await body.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+  for (const field of await modal.getByTestId("sharing-settings").getByRole("combobox").all()) {
+    await field.focus();
+    await expect(field).toBeInViewport({ ratio: 1 });
+    const bounds = (await field.boundingBox())!;
+    expect(bounds.height).toBeGreaterThanOrEqual(44);
+    expect(bounds.y).toBeGreaterThanOrEqual((await body.boundingBox())!.y - 1);
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual((await footer.boundingBox())!.y + 1);
+  }
+}
 
 for (const language of ["ar", "en"] as const) {
   test(`sharing steps retain choices, clear dropdowns and a live preview in ${language} @cross-browser`, async ({
@@ -25,10 +39,13 @@ for (const language of ["ar", "en"] as const) {
     const modal = page.getByTestId("collection-share-modal");
     const preview = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(preview).toBeVisible();
+    await sharingSingleContent(modal);
     await expect(modal.getByRole("button", { name: t(language, "shareStudio.save"), exact: true })).toHaveCount(0);
     const preset = modal.getByRole("combobox", { name: t(language, "shareStudio.preset"), exact: true });
     const scroll = modal.getByTestId("sharing-scroll");
-    expect(await scroll.evaluate((node) => node.scrollHeight - node.clientHeight)).toBeLessThanOrEqual(1);
+    // Explicit custom content uses the approved scrolling fullscreen frame.
+    // Every field must be reachable above its fixed actions, including keyboard entry.
+    await expectSettingsReachable(modal);
     const initial = await preview.getAttribute("src");
     await preset.press("Enter");
     await page.getByRole("option", { name: t(language, "shareStudio.presettranslated"), exact: true }).click();
@@ -37,7 +54,7 @@ for (const language of ["ar", "en"] as const) {
     await expect(
       modal.getByRole("heading", { name: t(language, "shareStudio.stepdesign"), exact: true }),
     ).toBeFocused();
-    expect(await scroll.evaluate((node) => node.scrollHeight - node.clientHeight)).toBeLessThanOrEqual(1);
+    await expectSettingsReachable(modal);
     const format = modal.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true });
     await expect(format).toHaveAttribute("aria-haspopup", "listbox");
     const affordance = await format.evaluate((element) => {

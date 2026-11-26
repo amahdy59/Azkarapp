@@ -22,14 +22,19 @@ for (const language of ["ar", "en"] as const) {
       const counter = page.getByTestId(id);
       await expect(counter).toBeVisible();
       await counter.click();
-      const tally = counter.locator("p");
+      const masbaha = id === "custom-counter-surface";
+      const tally = counter.locator(masbaha ? ".masbaha-ring-value" : "p");
       const current = tally.locator("bdi").nth(0);
       const target = tally.locator("bdi").nth(1);
       await expect(current).toHaveText(language === "ar" ? "١" : "1");
       await expect(target).toHaveText(language === "ar" ? "١٠٠" : "100");
       const currentBox = (await current.boundingBox())!;
       const targetBox = (await target.boundingBox())!;
-      if (language === "ar") expect(currentBox.x).toBeGreaterThan(targetBox.x + targetBox.width);
+      if (masbaha) {
+        expect(currentBox.y + currentBox.height).toBeLessThanOrEqual(targetBox.y);
+        const targetLine = (await tally.locator("span").boundingBox())!;
+        expect(currentBox.x + currentBox.width / 2).toBeCloseTo(targetLine.x + targetLine.width / 2, 0);
+      } else if (language === "ar") expect(currentBox.x).toBeGreaterThan(targetBox.x + targetBox.width);
       else expect(currentBox.x + currentBox.width).toBeLessThan(targetBox.x);
       await expect(counter).toHaveAttribute("aria-label", language === "ar" ? /١ \/ ١٠٠$/ : /1 \/ 100$/);
       await page.screenshot({ path: `output/playwright/counter-direction/${id}-${language}.png` });

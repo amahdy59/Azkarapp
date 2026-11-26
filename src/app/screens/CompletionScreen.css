@@ -8,11 +8,81 @@
 }
 
 .completion-screen-enter {
-  animation: completion-screen-fade-in 240ms ease-out both;
+  animation: completion-screen-fade-in var(--motion-duration-entrance) var(--motion-ease-enter) both;
 }
 
-.summary-item-enter {
-  animation: zikr-step-enter 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.completion-screen {
+  padding-inline: clamp(12px, 5vw, 20px);
+}
+
+@keyframes completion-check-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.completion-check {
+  animation: completion-check-arrive 440ms var(--motion-ease-enter) both;
+}
+
+.completion-reflection-heading::before,
+.completion-reflection-heading::after {
+  content: "";
+  width: 2rem;
+  height: 1px;
+  flex-shrink: 1;
+  background: color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+/* This is a reading pause. Protect the quotation from the app's photographic
+   Glass canvas and legacy header/card frosting, while retaining its palette. */
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .completion-screen {
+      --background: var(--on-media-surface);
+      --card: color-mix(in srgb, var(--on-media-surface) 92%, white);
+      background-color: var(--background);
+    }
+
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      [data-material-ui]
+      .completion-screen
+      .completion-reflection {
+      background-color: var(--card);
+      background-image: var(--paper-grain, none);
+      backdrop-filter: none;
+    }
+
+    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] .completion-screen header {
+      background: transparent;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.completion-details > summary {
+  list-style: none;
+}
+
+.completion-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.completion-details[open] .completion-details-chevron {
+  rotate: 90deg;
+}
+
+.completion-screen[data-reduce-motion],
+.completion-screen[data-reduce-motion] .completion-check,
+.reduce-motion .completion-screen-enter,
+.reduce-motion .completion-check {
+  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -21,7 +91,7 @@
     opacity: 1;
   }
 
-  .summary-item-enter {
+  .completion-check {
     animation: none;
     opacity: 1;
   }

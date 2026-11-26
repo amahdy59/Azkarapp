@@ -129,7 +129,7 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByTestId("home-benefits-card")).not.toBeInTheDocument();
   });
 
-  it("shows all five prayer summaries without a disclosure", () => {
+  it("shows all five timings beneath the persistent summary", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
     render(
@@ -148,7 +148,8 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByRole("button", { name: "Show all prayers" })).not.toBeInTheDocument();
     expect(screen.getAllByTestId(/^prayer-card-/)).toHaveLength(5);
     expect(screen.getByTestId("prayer-card-fajr")).toBeInTheDocument();
-    expect(screen.getByTestId("home-sticky-prayers")).toContainElement(screen.getByTestId("home-prayer-strip"));
+    expect(screen.getByTestId("home-sticky-prayers")).not.toContainElement(screen.getByTestId("home-prayer-strip"));
+    expect(screen.getByTestId("home-sticky-prayers")).toContainElement(screen.getByTestId("home-prayer-interval"));
     expect(screen.getByTestId("home-sticky-prayers")).toHaveClass("sticky", "top-0");
     expect(screen.getByTestId("home-context-grid")).not.toContainElement(screen.getByTestId("home-prayer-strip"));
     expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
@@ -173,22 +174,28 @@ describe("HomeScreen quick access", () => {
       />,
     );
 
-    fireEvent.scroll(screen.getByRole("region", { name: "Azkar" }), { target: { scrollTop: 12 } });
+    const scroll = screen.getByRole("region", { name: "Azkar" });
+    const disclosure = screen.getByRole("button", { name: "Hide timings" });
+    fireEvent.scroll(scroll, { target: { scrollTop: 12 } });
     expect(screen.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
     expect(screen.getByTestId("home-utility-header")).toHaveClass("home-glass-header");
-    const scroll = screen.getByRole("region", { name: "Azkar" });
-    const sticky = screen.getByTestId("home-sticky-prayers");
     fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
-    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    fireEvent.scroll(scroll, { target: { scrollTop: 40 } });
-    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    expect(disclosure).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(disclosure);
+    expect(disclosure).toHaveAttribute("aria-expanded", "false");
+    expect(document.getElementById("home-prayer-timings")).toHaveAttribute("inert");
     fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
-    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+    expect(disclosure).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByTestId("home-prayer-interval")).toBeVisible();
+    fireEvent.click(disclosure);
+    expect(disclosure).toHaveAttribute("aria-expanded", "true");
+    expect(document.getElementById("home-prayer-timings")).not.toHaveAttribute("inert");
   });
 
-  it("releases closed prayer geometry when WebKit leaves focus on the horizontal scroll region", () => {
+  it("opens prayer tracking only on request and keeps the underlying Home in place", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-10-16T14:00:00+03:00"));
+    const onToggle = vi.fn();
     render(
       <HomeScreen
         completed={emptyProgress()}
@@ -199,41 +206,22 @@ describe("HomeScreen quick access", () => {
         direction="ltr"
         onResume={() => undefined}
         routineModes={routineModes}
+        onTogglePrayerTracking={onToggle}
       />,
     );
-    const sticky = screen.getByTestId("home-sticky-prayers");
-    const scroll = sticky.parentElement!;
+    expect(screen.queryByRole("dialog")).toBeNull();
     const current = screen.getByTestId("prayer-card-dhuhr").querySelector("button")!;
-    const row = screen.getByTestId("home-all-prayers-row");
-    // Match the native keyboard focusability of the real narrow overflow row.
-    row.tabIndex = 0;
-    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
-    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    act(() => current.focus());
     fireEvent.click(current);
-    expect(current).toHaveAttribute("aria-expanded", "true");
-    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
-    act(() => row.focus());
-    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    fireEvent.click(current);
-    expect(current).toHaveAttribute("aria-expanded", "false");
-    expect(row).toHaveFocus();
-    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
-    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
-    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
-    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
-    // Real keyboard focus retains the hold until it leaves the prayer button.
-    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
-    act(() => current.focus());
-    fireEvent.click(current);
-    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
-    fireEvent.click(current);
-    expect(current).toHaveAttribute("aria-expanded", "false");
-    expect(current).toHaveFocus();
-    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-    act(() => row.focus());
-    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("data-dropdown-surface");
+    expect(screen.getByTestId("home-context-grid")).not.toContainElement(dialog);
+    expect(onToggle).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole("checkbox", { name: "Prayed at the mosque" }));
+    expect(onToggle).toHaveBeenCalledWith("dhuhr", "location", "mosque");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Done" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.getByTestId("home-context-grid")).toBeInTheDocument();
+    expect(screen.getByTestId("home-prayer-disclosure")).toHaveAttribute("aria-expanded", "true");
   });
 
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {
@@ -268,7 +256,7 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByTestId("home-primary-cta")).not.toBeInTheDocument();
   });
 
-  it("expands prayer moment across both columns when context stack has no content", () => {
+  it("keeps prayer tracking available in a dialog when context stack has no content", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
     vi.spyOn(dailyEvidence, "getContextualEvidence").mockReturnValue(null);
@@ -296,7 +284,8 @@ describe("HomeScreen quick access", () => {
 
     const expandedPrayer = screen.getByTestId("home-prayer-moment");
     expect(expandedPrayer).toBeInTheDocument();
-    expect(expandedPrayer).toHaveClass("md:col-span-2");
+    expect(expandedPrayer).toHaveAttribute("role", "dialog");
+    expect(screen.getByTestId("home-content-grid")).not.toContainElement(expandedPrayer);
     expect(screen.queryByTestId("home-context-stack")).toBeNull();
   });
 });

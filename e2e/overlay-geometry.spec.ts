@@ -86,7 +86,7 @@ test("the destructive-action confirm dialog is centred behind a dimming scrim", 
 test("menus stay inside a 320px viewport and keep their item geometry", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await openReturningGuest(page);
-  await page.goto("/#/counter");
+  await page.goto("/#/friday/salawat");
 
   const trigger = page.getByRole("button", { name: "More options" });
   await expect(trigger).toBeVisible();
@@ -135,10 +135,10 @@ test("radio menu items keep their logical-end indicator gutter in Arabic", async
       }),
     );
   });
-  await page.goto("/#/counter");
+  await page.goto("/#/friday/salawat");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
 
-  await page.getByTestId("counter-target-filter").click();
+  await page.getByTestId("salawat-target-filter").click();
   const menu = page.locator('[data-slot="dropdown-menu-content"]');
   await expect(menu).toBeVisible();
 

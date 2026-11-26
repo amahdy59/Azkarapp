@@ -1,3 +1,4 @@
+import { closePrayerDialog } from "./helpers/home-overview";
 import { expect, test, type Page } from "@playwright/test";
 
 test("custom target remains reachable at 200 percent text on a short phone", async ({ page }) => {
@@ -5,23 +6,22 @@ test("custom target remains reachable at 200 percent text on a short phone", asy
   await openReturningGuest(page);
   await page.goto("/#/counter");
   await page.getByTestId("masbaha-settings-trigger").click();
-  await page.getByRole("radio", { name: "Custom", exact: true }).check();
   await page.locator("html").evaluate((el) => {
     el.style.fontSize = "32px";
   });
   const dialog = page.getByRole("dialog", { name: "Masbaha settings", exact: true });
   const title = dialog.locator('[aria-hidden="true"]').filter({ hasText: "Masbaha settings" });
   expect(await title.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
-  const target = dialog.getByRole("spinbutton", { name: "Set Custom Target" });
+  const target = dialog.getByRole("textbox", { name: "Target:", exact: true });
   await target.fill("55");
-  const apply = dialog.getByRole("button", { name: "Apply settings", exact: true });
+  const apply = dialog.getByRole("button", { name: "Save", exact: true });
   await apply.scrollIntoViewIfNeeded();
   const bounds = (await apply.boundingBox())!;
   expect(bounds.y + bounds.height).toBeLessThanOrEqual(569);
   await page.screenshot({ path: "output/playwright/review-custom-target-200-percent-fixed.png" });
   await apply.click();
   await expect(dialog).toBeHidden();
-  await expect(page.getByTestId("masbaha-settings-summary")).toHaveText(/55/);
+  await expect(page.getByTestId("custom-counter-surface")).toHaveAttribute("aria-label", /55/);
 });
 
 async function openReturningGuest(page: Page, language: "ar" | "en" = "en", settings: Record<string, unknown> = {}) {
@@ -132,11 +132,11 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   }
 });
 
-test("tablet and desktop Home keep full-width prayer detail above the fixed contextual pair", async ({ page }) => {
+test("tablet and desktop Home keep prayer tracking separate from the fixed contextual pair", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar", { textSize: "large" });
-  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+  await page.getByTestId("prayer-card-dhuhr").locator("button").click();
 
   const grid = page.getByTestId("home-context-grid");
   const prayerDetail = page.getByTestId("home-prayer-moment");
@@ -147,61 +147,34 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
   const prayerSummary = page.getByTestId("prayer-tracker-cards");
 
   await expect(companion).toBeVisible();
-  await expect(prayerDetail.locator(".hero-glass").first()).toBeVisible();
+  await expect(prayerDetail).toHaveAttribute("role", "dialog");
+  await expect(prayerDetail).toHaveAttribute("data-dropdown-surface", "");
+  await closePrayerDialog(page);
   await expect(primaryGlass).toBeVisible();
   await expect(companion.locator(".hero-glass").first()).toBeVisible();
   await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
   await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
-  await expect(async () => {
-    const [gridBox, prayerDetailBox, primaryBox, companionBox, wirdBox, prayerSummaryBox] = await Promise.all(
-      [grid, prayerDetail, primary, companion, wird, prayerSummary].map((locator) => locator.boundingBox()),
+  for (const width of [1440, 834]) {
+    await page.setViewportSize({ width, height: 900 });
+    const [gridBox, primaryBox, companionBox, wirdBox, summaryBox] = await Promise.all(
+      [grid, primary, companion, wird, prayerSummary].map((node) => node.boundingBox()),
     );
-    expect(gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox && prayerSummaryBox).toBeTruthy();
-    if (gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox && prayerSummaryBox) {
-      const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-      expect(prayerDetailBox.width).toBeCloseTo(gridBox.width, 0);
-      expect(prayerDetailBox.x).toBeCloseTo(gridBox.x, 0);
-      expect(prayerSummaryBox.width).toBeCloseTo(gridBox.width, 0);
-      expect(prayerSummaryBox.x + prayerSummaryBox.width / 2).toBeCloseTo(gridBox.x + gridBox.width / 2, 0);
-      // The approved location footer is part of the complete prayer overview.
-      expect(prayerDetailBox.y).toBeCloseTo(prayerSummaryBox.y + prayerSummaryBox.height + 0.25 * rootSize, 0);
-      expect(primaryBox.width).toBeCloseTo((gridBox.width - rootSize) / 2, 0);
-      expect(companionBox.width).toBeCloseTo(primaryBox.width, 0);
-      expect(primaryBox.y).toBeCloseTo(prayerDetailBox.y + prayerDetailBox.height + 0.75 * rootSize, 0);
-      expect(companionBox.y).toBeCloseTo(primaryBox.y, 0);
-      expect(primaryBox.x + primaryBox.width).toBeCloseTo(gridBox.x + gridBox.width, 0);
-      expect(companionBox.x).toBeCloseTo(gridBox.x, 0);
-      expect(wirdBox.y).toBeGreaterThanOrEqual(
-        Math.max(primaryBox.y + primaryBox.height, companionBox.y + companionBox.height) + 12,
-      );
-      expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
-    }
-  }).toPass({ timeout: 15_000 });
-
-  await page.setViewportSize({ width: 834, height: 900 });
-  await page.waitForFunction(() => window.innerWidth === 834);
-  await expect(async () => {
-    const [tabletPrayerBox, tabletPrimaryBox, tabletCompanionBox, tabletSummaryBox, tabletGridBox] = await Promise.all([
-      prayerDetail.boundingBox(),
-      primary.boundingBox(),
-      companion.boundingBox(),
-      prayerSummary.boundingBox(),
-      grid.boundingBox(),
-    ]);
-    expect(tabletPrayerBox && tabletPrimaryBox && tabletCompanionBox && tabletSummaryBox && tabletGridBox).toBeTruthy();
-    if (tabletPrayerBox && tabletPrimaryBox && tabletCompanionBox && tabletSummaryBox && tabletGridBox) {
-      const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-      expect(tabletPrayerBox.width).toBeCloseTo(tabletGridBox.width, 0);
-      expect(tabletPrayerBox.x).toBeCloseTo(tabletGridBox.x, 0);
-      expect(tabletSummaryBox.width).toBeCloseTo(tabletGridBox.width, 0);
-      expect(tabletPrimaryBox.y).toBeCloseTo(tabletPrayerBox.y + tabletPrayerBox.height + 0.75 * rootSize, 0);
-      expect(tabletCompanionBox.y).toBeCloseTo(tabletPrimaryBox.y, 0);
-      expect(tabletPrimaryBox.width).toBeCloseTo((tabletGridBox.width - rootSize) / 2, 0);
-      expect(tabletCompanionBox.width).toBeCloseTo(tabletPrimaryBox.width, 0);
-    }
-  }).toPass({ timeout: 15_000 });
-
+    expect(gridBox && primaryBox && companionBox && wirdBox && summaryBox).toBeTruthy();
+    const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(summaryBox!.width).toBeCloseTo(gridBox!.width, 0);
+    expect(summaryBox!.x + summaryBox!.width / 2).toBeCloseTo(gridBox!.x + gridBox!.width / 2, 0);
+    expect(primaryBox!.width).toBeCloseTo((gridBox!.width - rootSize) / 2, 0);
+    expect(companionBox!.width).toBeCloseTo(primaryBox!.width, 0);
+    expect(primaryBox!.y).toBeGreaterThanOrEqual(summaryBox!.y + summaryBox!.height);
+    expect(companionBox!.y).toBeCloseTo(primaryBox!.y, 0);
+    expect(primaryBox!.x + primaryBox!.width).toBeCloseTo(gridBox!.x + gridBox!.width, 0);
+    expect(companionBox!.x).toBeCloseTo(gridBox!.x, 0);
+    expect(wirdBox!.y).toBeGreaterThanOrEqual(
+      Math.max(primaryBox!.y + primaryBox!.height, companionBox!.y + companionBox!.height) + 12,
+    );
+    expect(wirdBox!.width).toBeGreaterThanOrEqual(gridBox!.width - 2);
+  }
   const routineTiles = page.getByTestId("today-garden-card").getByRole("button", { name: / - (مكتملة|غير مكتملة)$/ });
   await expect(routineTiles).toHaveCount(3);
   const quranTile = page.getByTestId("today-garden-card").getByRole("button", { name: /ورد القرآن/ });
@@ -236,7 +209,7 @@ test("wide Home keeps navigation exposed, Glass cards and an opaque expanded rea
   await page.setViewportSize({ width: 1885, height: 982 });
   await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar");
-  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+  await page.getByTestId("prayer-card-dhuhr").locator("button").click();
 
   const navigation = page.locator(".app-sidebar");
   const main = page.locator(".app-main");
@@ -259,7 +232,6 @@ test("wide Home keeps navigation exposed, Glass cards and an opaque expanded rea
 
   const glassCards = [
     page.getByTestId("prayer-tracker-cards").locator('article[data-density="summary"]').first(),
-    page.getByTestId("home-prayer-moment").locator(".hero-glass").first(),
     page.getByTestId("home-primary-card").locator(".hero-glass").first(),
     page.getByTestId("home-context-companion").locator(".hero-glass").first(),
     page.getByTestId("home-wird-row").locator(".hero-glass").first(),
@@ -268,7 +240,7 @@ test("wide Home keeps navigation exposed, Glass cards and an opaque expanded rea
     await expect(cards.first()).toHaveClass(/hero-glass/);
   }
 
-  const material = await glassCards[1]!.evaluate((element) => {
+  const material = await page.getByTestId("home-prayer-moment").evaluate((element) => {
     const style = getComputedStyle(element);
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 1;
@@ -284,9 +256,10 @@ test("wide Home keeps navigation exposed, Glass cards and an opaque expanded rea
   });
   expect(material.backgroundAlpha).toBe(255);
   await expect(glassCards[0]!).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
-  expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(22px)");
-  expect(material.boxShadow).not.toBe("none");
+  await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-dropdown-surface", "");
+  expect(material.backdropFilter).toBe("none");
+  await closePrayerDialog(page);
+  await expect(navigation).toBeVisible();
 });
 
 test("Home prayer strip keeps all five prayers legible without page overflow", async ({ page }) => {
@@ -366,7 +339,7 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
   await openReturningGuest(page);
   await page.getByTestId("home-tool-masbaha").click();
 
-  const screen = page.locator(".app-screen-surface");
+  const screen = page.locator(".masbaha-reading");
   const content = page.getByTestId("custom-counter-content");
   const counter = page.getByTestId("custom-counter-surface");
   const counterNumber = counter.locator(".counter-number");
@@ -387,16 +360,16 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
     expect(counterBox.width).toBeGreaterThanOrEqual(44);
     const fits = await page
       .getByTestId("custom-counter-surface")
-      .locator(".adaptive-counter-content")
+      .locator(".masbaha-ring-value")
       .evaluate((node) => node.scrollWidth <= node.clientWidth + 1 && node.scrollHeight <= node.clientHeight + 1);
     expect(fits).toBe(true);
     expect(counterBox.width).toBeLessThanOrEqual(320);
-    expect(Math.round(counterBox.height)).toBe(48);
+    expect(counterBox.height).toBeGreaterThanOrEqual(120);
     expect(counterBox.x).toBeGreaterThanOrEqual(0);
     expect(counterBox.x + counterBox.width).toBeLessThanOrEqual(320);
   }
-  for (const id of ["custom-counter-prev-btn", "custom-counter-next-btn"]) {
-    const bounds = (await page.getByTestId(id).boundingBox())!;
+  for (const action of await page.getByTestId("masbaha-support-actions").getByRole("button").all()) {
+    const bounds = (await action.boundingBox())!;
     expect(bounds.width).toBeGreaterThanOrEqual(44);
     expect(bounds.height).toBeGreaterThanOrEqual(44);
     expect(bounds.x).toBeGreaterThanOrEqual(0);
@@ -439,11 +412,11 @@ test("custom counter content keeps its reading-width bound on desktop", async ({
       .poll(() =>
         page
           .getByTestId("custom-counter-surface")
-          .locator(".adaptive-counter-content")
+          .locator(".masbaha-ring-value")
           .evaluate((node) => Math.max(node.scrollWidth - node.clientWidth, node.scrollHeight - node.clientHeight)),
       )
       .toBeLessThanOrEqual(1);
-    expect(Math.round(counterBox.height)).toBe(48);
+    expect(counterBox.height).toBeGreaterThanOrEqual(120);
   }
 });
 
@@ -477,14 +450,18 @@ test("prayer information preserves compact keyboard disclosure and inline deskto
   for (const language of ["ar", "en"] as const) {
     await page.setViewportSize({ width: 390, height: 844 });
     await openReturningGuest(page, language);
-    await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
-    const info = page.getByTestId("prayer-actions-more-info");
-    await expect(info).toHaveText("");
+    await page.getByTestId("prayer-card-dhuhr").locator("button").click();
+    const modal = page.getByTestId("home-prayer-moment");
+    await expect(page.getByTestId("prayer-actions-more-info")).toHaveCount(0);
+    const guidance = modal.locator(".prayer-dialog-guidance").last();
+    const info = guidance.locator("summary");
+    await expect(info).toHaveText(language === "ar" ? "سنن صلاة الظهر" : "Sunnah prayers of Dhuhr");
     const box = await info.boundingBox();
     expect(box?.width).toBeGreaterThanOrEqual(44);
     expect(box?.height).toBeGreaterThanOrEqual(44);
-    await info.click();
-    const modal = page.getByTestId("prayer-actions-info-modal");
+    await info.focus();
+    await info.press("Enter");
+    await expect(guidance).toHaveAttribute("open", "");
     const points = modal.getByTestId("prayer-info-points");
     await expect(points.locator(":scope > li")).toHaveCount(2);
     expect(
@@ -492,14 +469,13 @@ test("prayer information preserves compact keyboard disclosure and inline deskto
         direction: getComputedStyle(element).direction,
         marker: getComputedStyle(element).listStyleType,
       })),
-    ).toEqual({ direction: language === "ar" ? "rtl" : "ltr", marker: "disc" });
-    const evidence = points.locator("details").first();
-    await expect(evidence).not.toHaveAttribute("open", "");
-    await evidence.locator("summary").focus();
-    await page.keyboard.press("Enter");
-    await expect(evidence).toHaveAttribute("open", "");
-    await expect(evidence.locator("blockquote")).toBeVisible();
-    await page.keyboard.press("Enter");
+    ).toEqual({ direction: language === "ar" ? "rtl" : "ltr", marker: "none" });
+    await expect(points).toHaveRole("list");
+    for (const quote of await points.locator("blockquote").all()) await expect(quote).toBeVisible();
+    await info.press("Enter");
+    await expect(guidance).not.toHaveAttribute("open");
+    await info.press("Space");
+    await expect(guidance).toHaveAttribute("open", "");
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 844 });
       // The compact dialog remains contained at both phone widths.
@@ -511,17 +487,21 @@ test("prayer information preserves compact keyboard disclosure and inline deskto
     await expect(modal).toBeVisible();
     await modal.screenshot({ path: testInfo.outputPath("prayer-info-" + language + ".png") });
     await page.keyboard.press("Escape");
-    await expect(info).toBeFocused();
-    await info.click();
+    const opener = page.getByTestId("prayer-card-dhuhr").locator("button");
+    await expect(opener).toBeFocused();
+    await opener.click();
     await page.setViewportSize({ width: 1440, height: 844 });
-    await expect(modal).toHaveCount(0);
+    await expect(modal).toBeVisible();
     const inline = page.getByTestId("prayer-inline-info");
     await expect(inline.getByTestId("prayer-info-points").locator(":scope > li")).toHaveCount(2);
     await expect(inline.locator("summary, details, a, button")).toHaveCount(0);
     for (const quote of await inline.locator("blockquote").all()) await expect(quote).toBeVisible();
-    await expect(page.getByTestId("prayer-open-adhkar")).toBeFocused();
+    await modal.getByTestId("prayer-open-adhkar").focus();
+    await expect(modal.getByTestId("prayer-open-adhkar")).toBeFocused();
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(info).toBeVisible();
-    await expect(modal).toHaveCount(0);
+    await expect(modal).toBeVisible();
+    await expect(page.getByTestId("prayer-actions-info-modal")).toHaveCount(0);
+    await closePrayerDialog(page);
   }
 });

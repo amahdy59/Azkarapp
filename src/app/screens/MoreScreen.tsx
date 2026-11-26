@@ -1,9 +1,10 @@
-import { BarChart3, Compass, Settings, Sparkles } from "../components/icons";
+import { BarChart3, BookOpen, Compass, Settings, Sparkles } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { NAVIGATION_FOCUS } from "../components/ui/controlStyles";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
+import { learningCatalogue } from "../learning/catalogue";
 
 function ToolCard({
   title,
@@ -49,6 +50,7 @@ export function MoreScreen({
   onOpenMasbaha,
   onOpenSettings,
   onOpenProgress,
+  onOpenLearn,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -56,6 +58,7 @@ export function MoreScreen({
   onOpenMasbaha: () => void;
   onOpenSettings: () => void;
   onOpenProgress?: () => void;
+  onOpenLearn?: () => void;
 }) {
   return (
     <ScreenContainer dir={direction} screenName={t(language, "more.title")}>
@@ -69,6 +72,12 @@ export function MoreScreen({
         <div className="grid w-full grid-cols-1 gap-4 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
           {(
             [
+              [
+                learningCatalogue(language).length ? onOpenLearn : undefined,
+                BookOpen,
+                "learnEntry.title",
+                "learnEntry.description",
+              ],
               [onOpenQibla, Compass, "qibla.title", "more.qiblaDescription"],
               [onOpenMasbaha, Sparkles, "counter.tasbeehTitle", "more.masbahaDescription"],
               [onOpenSettings, Settings, "common.settings", "more.settingsDescription"],
