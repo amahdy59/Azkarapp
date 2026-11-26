@@ -30,7 +30,10 @@ test("scrolled Home protects gaps with one continuous ground and preserves fallb
     await sticky.evaluate((node) =>
       Number(getComputedStyle(node).backgroundColor.match(/(?:,|\/)\s*([\d.]+)\s*\)$/)?.[1] ?? 1),
     ),
-  ).toBeGreaterThanOrEqual(0.88);
+  ).toBeCloseTo(0.6, 2);
+  await expect(page.getByTestId("home-utility-header")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(page.getByTestId("home-utility-header")).toHaveCSS("background-image", "none");
+  await expect(sticky).not.toHaveCSS("background-image", "none");
   for (const card of await sticky.locator(".hero-glass.home-glass-surface").all())
     await expect(card).toHaveCSS("backdrop-filter", "none");
   const ground = await sticky.boundingBox();

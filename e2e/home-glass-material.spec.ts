@@ -165,7 +165,9 @@ for (const width of [390, 834, 1440]) {
         node.scrollTop = 300;
       });
       await expect(header).toHaveAttribute("data-scrolled", "true");
-      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.48)");
+      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("backdrop-filter", "none");
+      await expect(page.getByTestId("home-sticky-prayers")).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       await expect(header).toHaveCSS("border-bottom-width", "0px");
       if (scene === "evening" && (width === 390 || width === 1440)) {
         await page.screenshot({ path: testInfo.outputPath(`${scene}-${width}-scrolled.png`), scale: "css" });

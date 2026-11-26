@@ -46,7 +46,8 @@ for (const [language, width] of [
       const prayerCards = sticky.locator("article.hero-glass.home-glass-surface");
       await expect(prayerCards).toHaveCount(5);
       for (const card of await prayerCards.all()) await expect(card).toHaveCSS("backdrop-filter", "none");
-      await expect(header).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("background-image", "none");
       await page.screenshot({ path: testInfo.outputPath(`home-${language}-${appMaterial}-scroll.png`) });
       await page.locator(".home-content-scroll").evaluate((node) => {
         node.scrollTop = 0;

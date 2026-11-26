@@ -1,5 +1,9 @@
 # Application architecture
 
+## Home frost/motion and Android handoff — 2026-10-19
+
+The owner supersedes the 88% scrolled Home ground and stacked header tint with one translucent 60% on-media material and the existing stationary chrome frost. The existing registered CSS expansion value now uses the shared 220ms standard duration without a contraction delay; footer/countdown fades finish with geometry. No scroll hook, prayer, persistence or remote boundary changes. The [Android handoff](ANDROID_DEVELOPER_HANDOFF.md) maps the existing packaged host/adapters and identifies persistent app-private download files as follow-up: current native playback still consumes WebView Cache Storage, while native document export is a separate service.
+
 ## Supplied-card attribution and collection citation follow-up — 2026-10-18
 
 Supplied routine cards append an export-only website footer through `share/attributedCard.ts`. The original image remains complete; prepared files feed Share, Save and studio previews, while Copy encodes the same layout as PNG. Decode/encoding failures retain explicit recovery and never export unbranded originals. `contentReview.ts` applies precise bilingual citation metadata to 165 verified original identities from the dated source audit; 20 Home alternatives are excluded. Counts, wording and stored identities are unchanged.

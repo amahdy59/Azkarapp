@@ -1,3 +1,7 @@
+## Home scroll frost — 2026-10-19
+
+The owner's latest screenshot correction supersedes the 88% dark shared ground and stacked header tint. Scrolled Home Glass uses one continuous 60% on-media tint, restrained directional reflection and stationary 32px/135% frost across the header, prayer row, gaps and gutters. Its nested utility header is transparent and child cards retain their existing tint/edges without another filter. Resting cards/header, independent Home/App choices and opaque/high-contrast/reduced-transparency/forced-color recovery remain authoritative. Prayer geometry uses the synchronized 220ms motion described in MOTION_SYSTEM.md; no text scaling, animated blur or scroll-position writes.
+
 ## Actionable Progress patterns — 2026-10-18, local only
 
 ## Supplied-card attribution — 2026-10-18

@@ -33,6 +33,8 @@ See [docs/PRAYER_TIMES.md](docs/PRAYER_TIMES.md) for formulas, caching, DST dete
 
 An owner-approved Capacitor Android host retains the web application and its offline reading/counting. See [Android build and acceptance requirements](docs/ANDROID.md) for builds, widgets, native reminders, offline audio/export and remaining signing/device/Play checks. A compiled test build alone does not establish Play readiness.
 
+The [Android developer handoff](docs/ANDROID_DEVELOPER_HANDOFF.md) maps the shared code and native adapters, identifies the remaining persistent native-file storage work, and defines the device/Play acceptance sequence.
+
 ## Technology
 
 | Area          | Implementation                               |
