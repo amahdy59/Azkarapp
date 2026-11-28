@@ -397,16 +397,23 @@ test("prayer times: effective timezone and offset are surfaced and survive going
   await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-location").click();
 
+  await page.getByTestId("prayer-more-settings").locator("summary").click();
+  const zone = page.getByRole("combobox", { name: "Time zone", exact: true });
+  await expect(zone).toContainText(/Cairo.*Egypt/);
+  await expect(zone).toContainText(/UTC\+0[23]:00/);
+  const savedZone = () =>
+    page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.location.timeZone);
+  await expect.poll(savedZone).toBe("Africa/Cairo");
   const status = page.getByTestId("daylight-saving-status");
   await expect(status).toBeVisible();
-  await expect(status).toContainText("Africa/Cairo");
-  await expect(status).toContainText(/UTC\+0[23]:00/);
   const onlineText = await status.innerText();
+  const onlineZone = await zone.innerText();
 
   // Astronomical calculation must not depend on the network.
   await page.context().setOffline(true);
   await page.evaluate(() => window.dispatchEvent(new Event("offline")));
-  await expect(status).toContainText("Africa/Cairo");
+  await expect.poll(savedZone).toBe("Africa/Cairo");
+  expect(await zone.innerText(), "offline timezone/offset drifted from online").toBe(onlineZone);
   expect(await status.innerText(), "offline timings drifted from online").toBe(onlineText);
   await page.context().setOffline(false);
 });

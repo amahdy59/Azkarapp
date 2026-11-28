@@ -181,8 +181,16 @@ test("launch-critical settings screens are discoverable and accessible", async (
   await page.getByTestId("settings-sub-location").click();
   await expect(page).toHaveURL(/#\/settings\/location$/);
   await expect(page.getByRole("heading", { name: "Prayer times & location", exact: true })).toBeVisible();
-  await expect(page.getByTestId("daylight-saving-status")).toContainText("Africa/Cairo");
-  await expect(page.getByTestId("daylight-saving-status")).toContainText(/UTC\+0[23]:00/);
+  const moreLocationSettings = page.getByTestId("prayer-more-settings");
+  await expect(moreLocationSettings).not.toHaveAttribute("open");
+  await moreLocationSettings.locator("summary").click();
+  const timeZone = page.getByRole("combobox", { name: "Time zone", exact: true });
+  await expect(timeZone).toContainText(/Cairo.*Egypt/);
+  await expect(timeZone).toContainText(/UTC\+0[23]:00/);
+  await expect(page.getByTestId("daylight-saving-status")).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.location.timeZone))
+    .toBe("Africa/Cairo");
   const locationBack = page.getByRole("button", { name: "Back", exact: true });
   if (await locationBack.isVisible()) await locationBack.click();
   else await page.getByTestId("settings-sub-prayer").click();
