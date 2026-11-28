@@ -30,9 +30,19 @@ for (const language of ["ar", "en"] as const) {
       await expect(header).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       const bounds = (await header.boundingBox())!;
-      // Compact padding/border and wide toolbar/title/progress geometry.
-      // Preserve the fractional CSS height rather than its rounded screenshot value.
-      expect(bounds.height).toBeCloseTo(width < 768 ? 56 : 96, 0);
+      // The shared edge token supersedes the old fixed outer height. Keep the
+      // exact original content geometry and verify the padding independently.
+      const padding = await header.evaluate((node) => {
+        const style = getComputedStyle(node);
+        return {
+          top: parseFloat(style.paddingTop),
+          bottom: parseFloat(style.paddingBottom),
+          edge: parseFloat(style.getPropertyValue("--chrome-edge-space")),
+        };
+      });
+      expect(padding.top).toBe(padding.edge);
+      expect(padding.bottom).toBe(padding.edge);
+      expect(bounds.height - padding.top - padding.bottom).toBeCloseTo(width < 768 ? 44 : 78, 0);
       // All actions in the seamless header share one round, borderless family.
       const buttons = header.getByRole("button");
       const styles = await buttons.evaluateAll((elements) =>

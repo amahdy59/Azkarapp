@@ -181,6 +181,7 @@ html[data-app-material-resolved="glass"]:not(.high-contrast)
   display: none;
 }
 .toolbar-panel {
+  margin-block-end: var(--floating-audio-clearance, 0px);
   display: flex;
   flex: 1;
   flex-direction: column;

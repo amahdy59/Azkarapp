@@ -86,6 +86,7 @@ for (const language of ["ar", "en"] as const) {
         await page.locator('[data-testid="mushaf-more-actions"], [data-testid="mushaf-rail-more"]').click();
         await page.getByTestId("mushaf-quick-settings").click();
       }
+      await page.getByTestId("mushaf-settings-sheet").locator(".mushaf-advanced-display > summary").click();
       const slider = page.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true });
       await page.keyboard.press("Tab");
       await slider.focus();

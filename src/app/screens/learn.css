@@ -64,7 +64,7 @@ html[data-app-material-resolved="glass"]:not(.high-contrast) .learn-book-card {
   overflow-y: auto;
   border-block-end: 1px solid var(--border);
   padding: var(--chrome-edge-space) var(--spacing-page);
-  background: var(--card);
+  background: var(--reading-canvas);
 }
 .learn-reader-header h1 {
   margin-block-start: 0.5rem;

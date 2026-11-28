@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { t } from "../src/app/i18n";
 import { sharingSingleContent, sharingStep } from "./helpers/sharing";
@@ -18,21 +18,25 @@ async function expectSettingsReachable(modal: Locator) {
   }
 }
 
+async function seedSharing(page: Page, language: "ar" | "en") {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript((language) => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language, reduceMotion: true, themeMode: "midnight" },
+        profile: { isGuest: true },
+      }),
+    );
+  }, language);
+}
+
 for (const language of ["ar", "en"] as const) {
   test(`sharing steps retain choices, clear dropdowns and a live preview in ${language} @cross-browser`, async ({
     page,
   }, testInfo) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.addInitScript((language) => {
-      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-      localStorage.setItem(
-        "azkarapp.state.v1",
-        JSON.stringify({
-          settings: { language, reduceMotion: true, themeMode: "midnight" },
-          profile: { isGuest: true },
-        }),
-      );
-    }, language);
+    await seedSharing(page, language);
     await page.goto("/#/azkar/morning/8");
     const opener = page.getByTestId("reader-share-dock-button");
     await opener.click();
@@ -42,8 +46,7 @@ for (const language of ["ar", "en"] as const) {
     await sharingSingleContent(modal);
     await expect(modal.getByRole("button", { name: t(language, "shareStudio.save"), exact: true })).toHaveCount(0);
     const preset = modal.getByRole("combobox", { name: t(language, "shareStudio.preset"), exact: true });
-    const scroll = modal.getByTestId("sharing-scroll");
-    // Explicit custom content uses the approved scrolling fullscreen frame.
+    // Explicit custom content uses the approved bounded scrolling frame.
     // Every field must be reachable above its fixed actions, including keyboard entry.
     await expectSettingsReachable(modal);
     const initial = await preview.getAttribute("src");
@@ -105,6 +108,13 @@ for (const language of ["ar", "en"] as const) {
     }
     await page.keyboard.press("Escape");
     await expect(opener).toBeFocused();
+  });
+
+  test(`sharing steps keep collection settings reachable in ${language} @cross-browser`, async ({ page }, testInfo) => {
+    await seedSharing(page, language);
+    const modal = page.getByTestId("collection-share-modal");
+    const preview = modal.getByTestId("sharing-preview").getByRole("img");
+    const scroll = modal.getByTestId("sharing-scroll");
     await page.goto("/#/azkar/morning");
     await page.getByTestId("share-collection-button").click();
     await expect(preview.first()).toBeVisible();
@@ -125,12 +135,14 @@ for (const language of ["ar", "en"] as const) {
           body: JSON.stringify(bounds),
           contentType: "application/json",
         });
-        await page.screenshot({ path: testInfo.outputPath(`sharing-${language}-${viewport.width}-${step}.png`) });
         expect(bounds.scrollWidth).toBeLessThanOrEqual(bounds.width + 1);
         if (viewport.width === 390) {
-          // The owner now prioritizes a larger preview and stable full-screen
-          // chrome. Complete collection settings may scroll inside that frame.
-          expect((await modal.boundingBox())!.height).toBeCloseTo(viewport.height, 1);
+          // The later bounded-modal approval reserves physical edge gutters.
+          // Keep an exact height check plus both visible recovery margins.
+          const box = (await modal.boundingBox())!;
+          expect(box.height).toBeCloseTo(Math.min(768, viewport.height - 32), 1);
+          expect(box.y).toBeGreaterThanOrEqual(16);
+          expect(box.y + box.height).toBeLessThanOrEqual(viewport.height - 16);
           const fields = modal.getByTestId("sharing-settings").getByRole("combobox");
           for (const field of await fields.all()) {
             await field.focus();

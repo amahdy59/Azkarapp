@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-28",
+  "release": "2026-11-28.1",
   "ar": [
-    "كبّر نص صفحة القرآن في موضعها وعد إلى المصحف من عنوان واحد، واختر ألوان القراءة والأصوات المتاحة مع خيارات استماع أوضح وتظليل تقديري للكلمات.",
-    "اقرأ نسخ الكتب العربية المصححة وافتح ملفاتها واحفظها، مع استعادة النص المحفوظ سابقًا عند تعذّر تحميل النسخة الأحدث وبيان نطاق كل نسخة ومراجعتها.",
-    "حدّد موقع الصلاة بالجهاز أو من قائمة المدن دون كتابة، وشارك رابط التطبيق ورمزه من الرئيسية بألوان أوضح وأزرار وقوائم تلائم الشاشة.",
-    "اختم جلستك بتحية وتذكير موثّق في مساحة أهدأ، مع مشاركة المجموعة نفسها، وتفاصيل اختيارية للجلسة، وملخص تقدم أبسط وألفاظ وأعداد ومراجع أذكار مصححة."
+    "اقرأ صفحة القرآن مكبّرة ثم عد إلى المصحف من عنوان واحد، واستمع بالأصوات المتاحة مع خيارات أوضح وتظليل تقديري وألوان قراءة متناسقة.",
+    "افتح الكتب العربية المصححة وملفاتها واحفظ مواردها، واستعد النص المحفوظ السابق عند تعذّر النسخة الأحدث مع بيان نطاق النسخ ومراجعتها.",
+    "اختر موقع الصلاة بالجهاز أو بتصفّح المدن، وشارك التطبيق برابطه ورمزه، مع قوائم قراءة وأزرار مشاركة ظاهرة في النوافذ الصغيرة والنص المكبّر.",
+    "أكمل الذكر بتحية وتذكير موثّق ومشاركة المجموعة، وافتح تفاصيل الجلسة والتقدم عند الحاجة، مع ألفاظ وأعداد ومراجع أذكار مصححة."
   ],
   "en": [
-    "Enlarge the current Quran page in place and return through one header, with clearer reading colors, available voices, listening options and estimated word highlights.",
-    "Read corrected Arabic book editions and save their PDFs, with earlier saved text available when the latest edition cannot load and clear edition scope and review notices.",
-    "Set prayer location from your device or the browsable city list, and share the app link and QR from Home with clearer colors and controls that fit your screen.",
-    "Finish with a calmer greeting and sourced reminder, share the completed collection, and open optional session details beside simpler progress and source-checked dhikr wording, counts and references."
+    "Read an enlarged Quran page and return through one header, with available voices, clearer listening options, estimated word highlights and consistent reading colors.",
+    "Open corrected Arabic books and PDFs, save their resources, and recover earlier saved text when the latest edition is unavailable, with clear scope and review notices.",
+    "Choose prayer location from your device or browse cities, share the app link and QR, and keep reading menus and sharing controls usable in short windows and enlarged text.",
+    "Complete dhikr with a calmer greeting, sourced reminder and collection sharing, with optional session details, simpler progress and source-checked wording, counts and references."
   ]
 }

@@ -36,7 +36,7 @@ const families = {
 } as const;
 
 /** Observe native frames without holding an automation call open through rendering. */
-function installMotionProbe() {
+function installMotionProbe(selector: string) {
   const collect = () => {
     const pseudo = getComputedStyle(document.documentElement, "::view-transition-new(app-content)");
     const animations = document
@@ -81,7 +81,7 @@ function installMotionProbe() {
         };
       })
       .filter((item) => item !== null);
-    const main = document.getElementById("main-content")!;
+    const main = document.querySelector(selector)!;
     const box = main.getBoundingClientRect();
     return {
       pseudoName: pseudo.animationName,
@@ -155,12 +155,15 @@ for (const [language, mode, width] of [
           await page.goto(`/?motion-endpoint=${encodeURIComponent(route)}#${route}`);
           await page.bringToFront();
           expect(await page.evaluate(() => document.visibilityState)).toBe("visible");
-          const main = page.locator("#main-content");
+          // Wide completion is intentionally portalled into its protected dialog.
+          const selector =
+            route === "/completion" && width >= 900 ? '[data-testid="completion-desktop-dialog"]' : "#main-content";
+          const main = page.locator(selector);
           await expect(main).toBeVisible();
           await expect(page.getByTestId("screen-loading")).toHaveCount(0);
           await expect.poll(() => main.innerText()).not.toBe("");
           await page.evaluate(() => document.fonts.ready);
-          const probe = await page.evaluateHandle(installMotionProbe);
+          const probe = await page.evaluateHandle(installMotionProbe, selector);
           try {
             await expect
               // Readiness uses the repository assertion budget: headless WebKit

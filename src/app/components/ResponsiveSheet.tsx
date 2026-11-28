@@ -133,7 +133,7 @@ export function SheetHeader({
           <div
             data-testid="sheet-header-title"
             aria-hidden="true"
-            className={`break-words text-base font-extrabold leading-snug sm:text-lg ${onGlass ? "text-white" : "text-foreground"}`}
+            className={`break-words text-base font-extrabold leading-relaxed sm:text-lg ${onGlass ? "text-white" : "text-foreground"}`}
           >
             {title}
           </div>

@@ -118,6 +118,8 @@ for (const { language, width } of (["ar", "en"] as const).flatMap((language) =>
     await expect(page.locator(".audio-expanded-meta > .sr-only")).toHaveCount(0); // Reader already supplies context.
     await page.screenshot({ path: testInfo.outputPath(`consistent-audio-options-${language}.png`), scale: "css" });
     await page.keyboard.press("Escape");
+    await expect(options).toBeFocused();
+    await expect(page).toHaveURL(/#\/azkar\/evening\/1$/);
     const continuation = page.getByRole("switch", {
       name: language === "ar" ? "تشغيل التالي تلقائيًا" : "Auto-play next",
       exact: true,

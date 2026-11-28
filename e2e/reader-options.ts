@@ -9,7 +9,10 @@ export async function playEnglishTranslation(page: Page) {
   const player = page.getByRole("region", { name: t("en", "audioPlayer.region"), exact: true });
   await player.getByRole("button", { name: t("en", "audioPlayer.expand"), exact: true }).click();
   await player.getByRole("button", { name: "Audio options", exact: true }).click();
-  const options = page.getByRole("dialog", { name: "Audio options", exact: true });
+  const options = page
+    .getByRole("dialog", { name: "Audio options", exact: true })
+    .or(page.getByRole("complementary", { name: "Audio options", exact: true }));
+  await expect(options).toBeVisible();
   await options.getByTestId("audio-reciter-select").click();
   await page.getByRole("option", { name: "English Translation", exact: true }).click();
   await expect(options.getByTestId("audio-reciter-select")).toContainText("English Translation");

@@ -229,6 +229,9 @@ html [data-dropdown-surface].quran-word-popover {
     container-type: size;
     justify-content: safe center;
   }
+  .mushaf-reader-viewer .mushaf-paper:not([data-magnified="true"]) :is(.mushaf-page-canvas, .mushaf-spread__gutter) {
+    min-block-size: 0;
+  }
   .mushaf-reader-viewer .mushaf-paper:not([data-magnified="true"]):not(.mushaf-spread) .mushaf-page-canvas {
     flex: none;
     inline-size: min(100cqw, max(66.667cqh, 21.333rem), 36rem);

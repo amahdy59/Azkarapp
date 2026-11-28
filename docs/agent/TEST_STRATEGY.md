@@ -4,6 +4,8 @@ reader-focus-intent covers real Tab/Space and pointer/menu journeys in the three
 
 # Test and Evidence Strategy
 
+Release remediation on 2026-11-28 splits the two widest prayer reflow sweeps into complete three-prayer/two-prayer groups and separates single-card export/accessibility from collection reflow in sharing. Every previous prayer, viewport, language, axe and interaction assertion remains; each independent journey has the normal deadline. An identical duplicate screenshot is captured once after its assertions. The Progress week comparison fixes its clock midweek so Saturday does not silently produce an intentionally empty period. Audio helpers discover either the protected dialog or requested desktop sidebar, and advanced controls are reached through their visible native disclosure. Production-like isolated previews, rather than a changing development server, are required for final evidence.
+
 The 2026-11-28 release adds explicit selection coverage for book/audio responsiveness, additional estimated timings, quiet reading tools, Android safe areas and Home/image/mobile sharing. Feature-selector regressions require these files under their owning commands. This improves targeted development feedback without removing any full-CI identity, engine, assertion, retry evidence or gate. Emitted-string compaction has exact-value VM regressions, including real audio catalogues and minified token boundaries; real-browser startup/feature and offline smoke remain necessary.
 
 ## Final-touch quality and motion — 2026-11-02

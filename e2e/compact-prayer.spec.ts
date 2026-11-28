@@ -312,16 +312,26 @@ for (const language of ["ar", "en"] as const) {
       });
     }
   }
-  // Each viewport checks all five prayers within the normal per-test deadline,
-  // including WebKit under concurrent local development workloads.
-  for (const views of [[[320, 700]], [[390, 844]], [[643, 275]], [[820, 900]], [[1440, 900]], [[1885, 1000]]]) {
-    test(`compact prayer panels reflow across ${language} ${views[0][0]} view @cross-browser`, async ({
+  // Preserve all five prayers; wide WebKit journeys have two bounded groups
+  // so earlier prayer interactions cannot exhaust a later prayer's deadline.
+  for (const scenario of [
+    { views: [[320, 700]], prayers, suffix: "" },
+    { views: [[390, 844]], prayers, suffix: "" },
+    { views: [[643, 275]], prayers, suffix: "" },
+    { views: [[820, 900]], prayers, suffix: "" },
+    ...[1440, 1885].flatMap((width) => [
+      { views: [[width, width === 1885 ? 1000 : 900]], prayers: prayers.slice(0, 3), suffix: " fajr/dhuhr/asr" },
+      { views: [[width, width === 1885 ? 1000 : 900]], prayers: prayers.slice(3), suffix: " maghrib/isha" },
+    ]),
+  ]) {
+    const { views } = scenario;
+    test(`compact prayer panels reflow across ${language} ${views[0][0]} view${scenario.suffix} @cross-browser`, async ({
       page,
     }, testInfo) => {
       await openHome(page, language);
       for (const [width, height] of views) {
         await page.setViewportSize({ width, height });
-        for (const prayer of prayers) {
+        for (const prayer of scenario.prayers) {
           const time = getEstimatedPrayerTimes(new Date("2026-09-05T12:00:00+03:00"))[prayer];
           const instant = new Date(`2026-09-05T${time}:00+03:00`);
           instant.setMinutes(instant.getMinutes() + 2);

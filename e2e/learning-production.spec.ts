@@ -161,21 +161,27 @@ test("a previously saved Arabic edition remains offline-capable and removable wi
   const resource = catalogue.find(
     (item: { id: string; language: string }) => item.id === "al-mukhtar" && item.language === "ar",
   );
-  const bytes = [...(await readFile(path.join("docs/learning/assets", resource.pack.path)))];
+  const assets = await Promise.all(
+    [resource.pack, ...resource.images].map(async (asset: { path: string; mime: string }) => ({
+      asset,
+      bytes: [...(await readFile(path.join("docs/learning/assets", asset.path)))],
+    })),
+  );
   const records = { "al-mukhtar": { position: { unitId: "p-32", offset: 0.45 }, bookmarks: ["p-32"] } };
   await page.goto(`${origin}/#/settings/downloads`);
   await page.evaluate(
-    async ({ asset, bytes, records }) => {
+    async ({ assets, records }) => {
       localStorage.setItem("azkar.learning.v1", JSON.stringify(records));
       const cache = await caches.open("azkar-learning-v1");
-      await cache.put(
-        `${location.origin}/__learning-assets__/${asset.path}`,
-        new Response(new Uint8Array(bytes), {
-          headers: { "Content-Type": asset.mime, "X-Learning-Resource": "al-mukhtar" },
-        }),
-      );
+      for (const { asset, bytes } of assets)
+        await cache.put(
+          `${location.origin}/__learning-assets__/${asset.path}`,
+          new Response(new Uint8Array(bytes), {
+            headers: { "Content-Type": asset.mime, "X-Learning-Resource": "al-mukhtar" },
+          }),
+        );
     },
-    { asset: resource.pack, bytes, records },
+    { assets, records },
   );
   await page.reload();
   const requests: string[] = [];

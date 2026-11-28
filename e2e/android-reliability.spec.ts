@@ -103,20 +103,9 @@ test("a nonzero system top inset is reserved once on Progress", async ({ page })
   await returningGuest(page, "ar");
   await page.goto("/#/progress");
   await expect(page.locator(".progress-screen-controls")).toBeVisible();
-  // Desktop engines report zero safe areas. Replace env() in the actual loaded
-  // declarations, preserving which elements own the inset and their geometry.
+  // Exercise the same CSS handoff as Capacitor without rewriting app styles.
   await page.evaluate(() => {
-    const replace = (rules: CSSRuleList) => {
-      for (const rule of rules) {
-        if ("cssRules" in rule) replace((rule as CSSGroupingRule).cssRules);
-        if (rule instanceof CSSStyleRule && rule.style.cssText.includes("safe-area-inset-top")) {
-          rule.style.cssText = rule.style.cssText.replaceAll("env(safe-area-inset-top)", "32px ");
-        }
-      }
-    };
-    for (const sheet of document.styleSheets) {
-      replace(sheet.cssRules);
-    }
+    document.documentElement.style.setProperty("--safe-area-inset-top", "32px");
   });
   await expect(page.locator(".app-shell")).toHaveCSS("padding-top", "32px");
   await expect(page.locator(".progress-screen-controls")).toHaveCSS("padding-top", "0px");

@@ -471,7 +471,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   padding-inline: 0;
 }
 [data-canonical-listening] :is(.audio-listening-page, .audio-listening-stream) {
-  background: transparent !important;
+  background: var(--mushaf-paper, var(--background)) !important;
   border-radius: 0;
   box-shadow: none;
 }

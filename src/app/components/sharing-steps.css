@@ -206,6 +206,9 @@
 .sharing-surface [data-sharing-body] {
   min-height: 180px;
 }
+.sharing-surface:not([data-scroll-whole]) [data-sharing-body] {
+  container-type: size;
+}
 .sharing-surface[data-scroll-whole] {
   overflow-y: auto;
 }
@@ -357,7 +360,7 @@
     background: color-mix(in srgb, var(--muted) 35%, var(--card));
   }
   .sharing-collection .sharing-preview-image img {
-    max-height: min(44dvh, 380px);
+    max-height: min(44dvh, 380px, max(120px, calc(100cqh - 8.5rem)));
   }
   .sharing-collection .sharing-layout[data-inspect] .sharing-preview-image img {
     max-height: min(70dvh, 800px);

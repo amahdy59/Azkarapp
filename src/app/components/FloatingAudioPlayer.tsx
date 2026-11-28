@@ -1317,6 +1317,7 @@ export function FloatingAudioPlayer({
                           title={t(language, "audioPlayer.options")}
                           data-card-action
                           ref={optionsTrigger}
+                          onClick={(event) => event.currentTarget.focus({ preventScroll: true })}
                           aria-controls={optionsOpen ? audioOptionsId : undefined}
                           aria-haspopup={canDockOptions ? undefined : "dialog"}
                           className={`audio-options-trigger surface-control-finish inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast ${ACTION_FOCUS}`}

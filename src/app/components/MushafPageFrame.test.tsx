@@ -24,7 +24,10 @@ describe("the Mushaf page frame", () => {
     expect(viewer).not.toContain("MushafOpeningFrameArt");
     expect(viewer).toContain("mushaf-opening__content");
     expect(viewer).toContain("gridTemplateRows:");
-    expect(viewer).toContain('className="grid h-[58%]');
+    // The fitted opening pages use 60% to retain at least 90% of the ordinary
+    // page's letter size inside the same eight canonical source slots.
+    expect(viewer).toContain('className="grid h-[60%]');
+    expect(viewer).toContain('gridTemplateRows: "repeat(8, minmax(0, 1fr))"');
   });
 
   it("uses the documented crisp page-turn distance and duration", () => {

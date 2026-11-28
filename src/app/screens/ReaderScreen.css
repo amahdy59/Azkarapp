@@ -29,7 +29,7 @@ html.theme-light:not(.high-contrast)[data-app-material-resolved="solid"] [data-t
 }
 
 [data-testid="canonical-surah-passage"] {
-  padding-block: 0.75rem 1.5rem;
+  padding-block: 0.75rem;
 }
 
 .collection-panel-resizer:hover .collection-panel-resizer-grip,

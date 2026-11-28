@@ -630,6 +630,7 @@ test("keeps reading settings in a consistent wide-screen side panel", async ({ p
   const panel = page.getByTestId("mushaf-settings-sheet");
   await expect(panel).toBeVisible();
   await expect(panel).toHaveAttribute("data-side", "right");
+  await panel.locator(".mushaf-advanced-display > summary").click();
   await expect(page.getByText("تخطيط الصفحة")).toBeVisible();
   await expect(page.getByText("مكان شريط الأدوات")).toBeVisible();
 

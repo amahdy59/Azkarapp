@@ -12,6 +12,7 @@
   max-block-size: calc(100dvh - max(0.5rem, var(--app-safe-area-top)) - max(0.5rem, var(--app-safe-area-bottom)));
 }
 .mushaf-index-inline {
+  margin-block-end: var(--floating-audio-clearance, 0px);
   background-color: var(--mushaf-paper);
   color: var(--mushaf-ink);
   outline: none;

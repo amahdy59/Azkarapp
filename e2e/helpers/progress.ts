@@ -21,7 +21,10 @@ export async function openPrayerBreakdown(page: Page, language: "ar" | "en") {
     exact: true,
     includeHidden: true,
   });
-  const disclosure = page.locator(".progress-screen details").filter({ has: region });
+  const disclosure = page.locator(".progress-screen details").filter({
+    has: page.locator(":scope > summary").filter({ hasText: dashboardText(language, "perPrayer") }),
+  });
+  await expect(disclosure.locator(":scope > summary")).toBeVisible();
   if (!(await disclosure.evaluate((node) => (node as HTMLDetailsElement).open)))
     await disclosure.locator(":scope > summary").click();
   await expect(region).toBeVisible();

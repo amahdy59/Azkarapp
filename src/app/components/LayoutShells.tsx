@@ -247,7 +247,7 @@ export function BottomNav({ active, onChange, isArabic = false, ...utilities }: 
                   transient entrance animation that reduced-motion disables. */}
               <span
                 aria-hidden="true"
-                className={`absolute inset-x-2 top-0 h-[3px] rounded-b-full ${on ? "bg-primary" : "bg-transparent"}`}
+                className={`absolute inset-x-2 -top-1 h-[3px] rounded-b-full ${on ? "bg-primary" : "bg-transparent"}`}
               />
               <span className={on ? "nav-active-cue" : ""}>
                 <Icon size={22} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />

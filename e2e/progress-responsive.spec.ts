@@ -69,6 +69,8 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
 }
 
 test("longer Progress periods compare five prayers with exact data available as a file", async ({ page }) => {
+  // Keep completed weekdays in the current week, including on Saturday runs.
+  await page.clock.setFixedTime(new Date("2026-11-25T10:00:00Z"));
   await page.setViewportSize({ width: 375, height: 812 });
   await openProgress(page);
 

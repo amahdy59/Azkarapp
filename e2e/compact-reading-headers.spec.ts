@@ -50,8 +50,24 @@ for (const language of ["ar", "en"] as const) {
           expect(progress.y).toBeGreaterThanOrEqual(box.y + box.height);
           expect(progress.y - box.y - box.height).toBeLessThanOrEqual(40);
         }
-        if (width === 1440)
-          expect((await hero.boundingBox())!.height).toBeLessThanOrEqual(prefix === "reader" ? 100 : 160);
+        if (width === 1440) {
+          // Preserve the prior content-density budget separately from the
+          // owner-approved shared edge spacing (previously 18px in total).
+          const density = await hero.evaluate((node) => {
+            const style = getComputedStyle(node);
+            const top = parseFloat(style.paddingTop),
+              bottom = parseFloat(style.paddingBottom);
+            return {
+              content: node.getBoundingClientRect().height - top - bottom,
+              top,
+              bottom,
+              edge: parseFloat(style.getPropertyValue("--chrome-edge-space")),
+            };
+          });
+          expect(density.top).toBe(density.edge);
+          expect(density.bottom).toBe(density.edge);
+          expect(density.content).toBeLessThanOrEqual(prefix === "reader" ? 82 : 142);
+        }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         await page.screenshot({
           path: `output/playwright/compact-reading-headers/${testInfo.project.name}/${language}-${prefix}-${route.split("/")[1] ?? "counter"}-${width}.png`,
