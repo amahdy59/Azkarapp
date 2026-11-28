@@ -43,4 +43,14 @@ describe("safe-area collision bounds", () => {
     const { result } = renderHook(() => useSafeAreaCollisionPadding(16));
     expect(result.current).toEqual({ top: 16, right: 16, bottom: 16, left: 16 });
   });
+
+  it("observes live inset changes again after the final consumer unmounts", async () => {
+    const first = renderHook(() => useSafeAreaCollisionPadding());
+    first.unmount();
+    insets(20, 0, 16, 0);
+    const next = renderHook(() => useSafeAreaCollisionPadding());
+    expect(next.result.current).toEqual({ top: 28, right: 8, bottom: 24, left: 8 });
+    act(() => insets(0, 24, 0, 12));
+    await waitFor(() => expect(next.result.current).toEqual({ top: 8, right: 32, bottom: 8, left: 20 }));
+  });
 });

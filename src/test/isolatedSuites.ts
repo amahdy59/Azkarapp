@@ -40,6 +40,8 @@ export const ISOLATED_SUITES = [
   "src/app/screens/settings/AudioFileExports.test.tsx",
   "src/app/components/QuranVerseText.test.tsx",
   "src/app/hooks/useListeningMushafPage.test.tsx",
+  // The shared observer/subscription singleton belongs to this suite's jsdom document.
+  "src/app/hooks/useSafeAreaCollisionPadding.test.tsx",
   "src/app/hooks/useMushafMeaningsReady.test.tsx",
   "src/app/share/quranGlyphs.test.ts",
   "src/app/hooks/useMushafPlayback.test.tsx",
