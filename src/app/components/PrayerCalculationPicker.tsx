@@ -82,10 +82,9 @@ export function PrayerCalculationPicker({
           </SelectContent>
         </Select>
       )}
-      <p id={`${id}-full`} className="text-label leading-relaxed text-muted-foreground">
+      <p id={`${id}-full`} className="sr-only">
         {selected?.label}
       </p>
-      <p className="text-xs leading-relaxed text-muted-foreground">{t(language, "prayerLocation.methodHint")}</p>
       <ResponsiveSheet
         open={open}
         onClose={close}

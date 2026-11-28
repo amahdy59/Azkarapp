@@ -7,7 +7,8 @@ import { getAzkarForMode, getAzkarForPrayer } from "../content/azkarCore";
 import { getCompletionReflection } from "../completionReflection";
 import type { ComponentProps } from "react";
 
-const { studio } = vi.hoisted(() => ({ studio: vi.fn() }));
+const { studio, layout } = vi.hoisted(() => ({ studio: vi.fn(), layout: { desktop: false } }));
+vi.mock("../hooks/useMediaQuery", () => ({ useMediaQuery: () => layout.desktop }));
 vi.mock("../components/CollectionShareModal", () => ({
   CollectionShareModal: (props: CollectionShareModalProps) => {
     studio(props);
@@ -29,7 +30,10 @@ const props: ComponentProps<typeof CompletionScreen> = {
   hapticFeedback: false,
 };
 
-afterEach(() => vi.useRealTimers());
+afterEach(() => {
+  vi.useRealTimers();
+  layout.desktop = false;
+});
 
 for (const language of ["ar", "en"] as const) {
   describe(`Completion collection sharing ${language}`, () => {
@@ -113,15 +117,46 @@ it("keeps the exact evidence and finished elapsed time stable across details and
   render(<CompletionScreen {...props} sessionStart={sessionStart} />);
   const evidence = getCompletionReflection(sessionStart);
   expect(screen.getByTestId("completion-reflection-text")).toHaveTextContent(evidence.text.en);
-  expect(screen.getByTestId("completion-session-details")).not.toBeVisible();
-  fireEvent.click(screen.getByText("Session details"));
+  expect(screen.queryByTestId("completion-session-details")).not.toBeInTheDocument();
+  const details = screen.getByRole("button", { name: "Session details" });
+  fireEvent.click(details);
+  expect(screen.getByRole("dialog", { name: "Session details" })).toBeVisible();
   expect(screen.getByText("Elapsed time: 1 min")).toBeVisible();
+  expect(screen.getByTestId("completion-reflection-reading")).toHaveAttribute("tabindex", "0");
+  fireEvent.click(screen.getByRole("button", { name: "Close", exact: true }));
+  await waitFor(() => expect(details).toHaveFocus());
   vi.setSystemTime(new Date(now.getTime() + 10 * 60_000));
   fireEvent.click(screen.getByRole("button", { name: "Share Morning Azkar" }));
   fireEvent.click(await screen.findByRole("button", { name: "Close completion image" }));
+  fireEvent.click(details);
   expect(screen.getByText("Elapsed time: 1 min")).toBeVisible();
   expect(screen.getByTestId("completion-reflection")).toHaveAttribute("data-evidence-id", evidence.id);
   expect(screen.getByTestId("completion-reflection-text")).toHaveTextContent(evidence.text.en);
+});
+
+it.each(["ar", "en"] as const)("keeps restart and contextual sharing available in %s", (language) => {
+  const onNewSession = vi.fn();
+  const category = language === "ar" ? "أذكار الصباح" : "Morning Azkar";
+  render(<CompletionScreen {...props} language={language} onNewSession={onNewSession} />);
+  const share = screen.getByRole("button", { name: t(language, "completion.shareCollection", { category }) });
+  expect(share).toHaveTextContent(t(language, "completion.shareAzkar"));
+  expect(screen.getByRole("button", { name: t(language, "completion.done"), exact: true })).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: t(language, "completion.newSession") }));
+  expect(onNewSession).toHaveBeenCalledOnce();
+});
+
+it("uses a named desktop dialog and closes to Home without modifying session metadata", () => {
+  layout.desktop = true;
+  const onHome = vi.fn();
+  render(<CompletionScreen {...props} onHome={onHome} />);
+  const dialog = screen.getByRole("dialog", { name: "Morning Azkar session complete" });
+  expect(dialog).toHaveAttribute("data-dropdown-surface", "");
+  expect(screen.getByTestId("completion-reflection")).toHaveAttribute(
+    "data-evidence-id",
+    getCompletionReflection(props.sessionStart).id,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Close", exact: true }));
+  expect(onHome).toHaveBeenCalledOnce();
 });
 
 it("shows Quran in Arabic beside its reviewed English meaning and lets the reader explore benefits", async () => {
@@ -155,5 +190,43 @@ it("keeps extra-azkar continuation primary, and never invents a streak when ther
   expect(screen.queryByText(/You kept up/)).not.toBeInTheDocument();
   fireEvent.click(continuation);
   expect(onContinueComplete).toHaveBeenCalledOnce();
-  expect(screen.getByTestId("completion-count")).toHaveTextContent(String(getAzkarForMode("morning", "core").length));
+  expect(screen.queryByTestId("completion-count")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Session details" }));
+  expect(screen.queryByTestId("completion-streak")).not.toBeInTheDocument();
 });
+
+for (const language of ["ar", "en"] as const) {
+  it.each([true, false])(
+    `uses the approved %s greeting and discloses optional progress in details (${language})`,
+    (quietProgressEnabled) => {
+      const completedAt = new Date("2026-11-25T10:00:00Z").getTime();
+      render(
+        <CompletionScreen
+          {...props}
+          language={language}
+          completedAt={completedAt}
+          quietProgressEnabled={quietProgressEnabled}
+          dailyCompletions={[
+            { category: "morning", dayKey: "2026-11-25", timeZone: "Africa/Cairo", completionLevel: "complete" },
+          ]}
+        />,
+      );
+      const greeting = screen.getByTestId("completion-greeting");
+      expect(greeting).toHaveTextContent(t(language, "completion.blessing"));
+      expect(greeting).toHaveTextContent(t(language, "completion.acceptance"));
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        t(language, "completion.completed", { category: language === "ar" ? "أذكار الصباح" : "Morning Azkar" }),
+      );
+      expect(screen.queryByTestId("completion-count")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("completion-streak")).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: t(language, "completion.sessionDetails") }));
+      if (quietProgressEnabled)
+        expect(screen.getByTestId("completion-streak")).toHaveTextContent(
+          t(language, "completion.categoryStreakOne", {
+            category: language === "ar" ? "أذكار الصباح" : "Morning Azkar",
+          }),
+        );
+      else expect(screen.queryByTestId("completion-streak")).not.toBeInTheDocument();
+    },
+  );
+}

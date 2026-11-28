@@ -30,7 +30,11 @@ export function HomeLearningCard({
       data-testid="home-learning"
       className="flex min-w-0 flex-wrap items-center gap-3"
     >
-      <BookOpen size={22} aria-hidden="true" className="shrink-0 text-primary" />
+      <BookOpen
+        size={22}
+        aria-hidden="true"
+        className={`shrink-0 ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+      />
       <div className="min-w-0 flex-1 basis-[12rem]">
         <h2 id={titleId} className="text-title font-bold">
           {learningT(language, "homeTitle")}

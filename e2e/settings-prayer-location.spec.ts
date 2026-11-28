@@ -121,7 +121,12 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("prayer-location-name")).toHaveText(
         language === "ar" ? "مكة المكرمة، السعودية" : "Makkah, Saudi Arabia",
       );
-      await expect(page.getByTestId("daylight-saving-status")).toContainText("Asia/Riyadh");
+      const locationSummary = await page
+        .getByTestId("prayer-location-name")
+        .evaluate((e) => e.closest("section")!.textContent);
+      expect(locationSummary?.match(language === "ar" ? /السعودية/g : /Saudi Arabia/g)).toHaveLength(1);
+      await expect(page.getByTestId("prayer-more-settings")).toContainText("UTC+03:00");
+      await expect(page.getByTestId("daylight-saving-status")).toBeHidden();
       const trigger = page.locator("#calculation-method-select");
       await trigger.scrollIntoViewIfNeeded();
       const valueBounds = await trigger.evaluate((e) => {
@@ -133,6 +138,7 @@ for (const language of ["ar", "en"] as const) {
         return text.left >= box.left && text.right <= box.right && text.top >= box.top && text.bottom <= box.bottom;
       });
       expect(valueBounds, "complete short value must fit the trigger").toBe(true);
+      await page.getByTestId("prayer-location-name").click();
       await page.screenshot({ path: info.outputPath("page.png") });
       await trigger.click();
       const popup =
@@ -166,6 +172,76 @@ for (const language of ["ar", "en"] as const) {
       expect(scan.violations).toEqual([]);
       await page.keyboard.press("Escape");
       await expect(cityTrigger).toBeFocused();
+    });
+  }
+}
+
+for (const language of ["ar", "en"] as const) {
+  for (const width of [390, 320]) {
+    test(`prayer choices need no manual entry and preserve saved data ${language}/${width} @cross-browser`, async ({
+      page,
+    }, info) => {
+      await openSettings(page, language, width, width === 320 ? 700 : 844, width === 320 ? 2 : 1);
+      const savedLocation = () =>
+        page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.location);
+      await expect
+        .poll(savedLocation)
+        .toMatchObject({ adjustments: { fajr: 3, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 } });
+      const original = await savedLocation();
+      const more = page.getByTestId("prayer-more-settings");
+      await expect(more).not.toHaveAttribute("open");
+      await expect(page.locator("input:not([type=hidden])")).toHaveCount(0);
+      await more.locator("summary").click();
+      await expect(page.getByRole("textbox")).toHaveCount(0);
+      await expect(page.getByRole("spinbutton")).toHaveCount(0);
+      const zone = page.getByRole("combobox", { name: t(language, "prayerLocation.timeZone"), exact: true });
+      await zone.click();
+      const popup = page.locator('[data-slot="select-content"]');
+      await protect(popup, page);
+      await page.getByRole("option", { name: /London.*United Kingdom|لندن.*المملكة المتحدة/ }).click();
+      await expect(zone).toBeFocused();
+      await expect.poll(savedLocation).toMatchObject({ ...original, timeZone: "Europe/London" });
+      const later = page.getByRole("button", {
+        name: t(language, "prayerLocation.later", { prayer: t(language, "notifications.fajr") }),
+        exact: true,
+      });
+      await later.scrollIntoViewIfNeeded();
+      const bounds = (await later.boundingBox())!;
+      expect(bounds.width).toBeGreaterThanOrEqual(44);
+      expect(bounds.height).toBeGreaterThanOrEqual(44);
+      expect(bounds.width).toBeLessThanOrEqual(45);
+      const rows = page.locator(".prayer-adjustment-row");
+      for (const row of await rows.all()) {
+        expect(await row.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
+      }
+      await later.focus();
+      await page.keyboard.press("Enter");
+      await expect.poll(savedLocation).toMatchObject({ adjustments: { fajr: 4 } });
+      await page.screenshot({ path: info.outputPath("more-settings.png") });
+      const scan = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+      expect(scan.violations).toEqual([]);
+      await page.getByRole("button", { name: t(language, "prayerLocation.resetAdjustments"), exact: true }).click();
+      const expected = {
+        ...original,
+        timeZone: "Europe/London",
+        adjustments: { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 },
+      };
+      await expect.poll(savedLocation).toEqual(expected);
+      await page.reload();
+      expect(await savedLocation()).toEqual(expected);
+      await expect(more).not.toHaveAttribute("open");
+      await page.getByRole("button", { name: t(language, "prayerLocation.chooseAnotherCity") }).click();
+      const cities = page.getByTestId("prayer-city-sheet");
+      await expect(cities.getByRole("searchbox")).toHaveValue("");
+      const sydney = cities.getByRole("button", { name: /Sydney.*Australia|سيدني.*أستراليا/ });
+      await sydney.scrollIntoViewIfNeeded();
+      await sydney.click();
+      await expect.poll(savedLocation).toMatchObject({
+        cityName: "Sydney",
+        timeZone: "Australia/Sydney",
+        adjustments: expected.adjustments,
+        calculationMethod: original.calculationMethod,
+      });
     });
   }
 }

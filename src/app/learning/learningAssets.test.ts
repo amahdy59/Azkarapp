@@ -1,4 +1,7 @@
 import { createHash, webcrypto } from "node:crypto";
+import { gzipSync } from "node:zlib";
+import { Blob } from "node:buffer";
+import { DecompressionStream } from "node:stream/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { waitFor } from "@testing-library/react";
 import { learningCatalogue, learningEditions } from "./catalogue";
@@ -49,6 +52,51 @@ afterEach(() => {
 });
 
 describe("verified learning downloads", () => {
+  it("keeps a verified earlier saved edition readable when an update is unavailable, and removes it only on request", async () => {
+    vi.stubGlobal("Blob", Blob);
+    vi.stubGlobal("DecompressionStream", DecompressionStream);
+    const pack = {
+      schema: 1,
+      resourceId: resource.id,
+      language: "ar",
+      units: [
+        {
+          id: "p-14",
+          title: "Saved section",
+          sourcePage: 14,
+          text: "نَصٌّ مَحْفُوظٌ",
+          nodes: [{ tag: "p", children: ["نَصٌّ مَحْفُوظٌ"] }],
+        },
+      ],
+      contents: [{ unitId: "p-14", title: "Saved section" }],
+    };
+    const previousBytes = gzipSync(JSON.stringify(pack));
+    const sha256 = createHash("sha256").update(previousBytes).digest("hex");
+    const previous = { path: `${sha256}.bin`, sha256, bytes: previousBytes.length, mime: "application/gzip" };
+    const migrated = { ...resource, previousPacks: [previous] };
+    const url = learningAssetUrl(previous);
+    stored.set(url, new Response(previousBytes));
+    network.mockRejectedValue(new Error("offline"));
+    const loaded = await loadLearningPack(migrated);
+    expect(loaded.previousEdition).toBe(true);
+    expect(loaded.units).toEqual(pack.units);
+    expect(network).toHaveBeenCalledTimes(1);
+    expect(network.mock.calls[0]![0]).toBe(learningAssetUrl(resource.pack));
+    expect(await learningOfflineStatus(migrated)).toMatchObject({
+      complete: false,
+      savedFiles: 0,
+      previousEdition: true,
+    });
+    const aborted = new AbortController();
+    aborted.abort();
+    await expect(loadLearningPack(migrated, aborted.signal)).rejects.toThrow();
+    expect(stored.has(url)).toBe(true);
+    await removeLearningDownload(migrated);
+    expect(stored.has(url)).toBe(false);
+    stored.set(url, new Response(new Uint8Array(previousBytes.length)));
+    await expect(loadLearningPack(migrated)).rejects.toThrow("offline");
+    expect(stored.has(url)).toBe(false);
+  });
   it("rejects a withheld production edition before loading or saving any asset", async () => {
     vi.stubEnv("DEV", false);
     vi.stubGlobal("__LEARNING_REVIEW__", false);

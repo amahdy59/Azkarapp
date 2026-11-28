@@ -70,22 +70,25 @@ for (const scenario of [
     };
     for (const scale of [125, 150, 175, 200]) {
       await openSettings();
+      await page.getByText(scenario.language === "ar" ? "العرض المتقدم" : "Advanced display", { exact: true }).click();
       const slider = page.getByRole("slider", {
-        name: scenario.language === "ar" ? "تكبير الصفحة" : "Page magnification",
+        name: scenario.language === "ar" ? "تكبير الصفحة الأصلية" : "Original page magnification",
       });
       await slider.focus();
-      await page.keyboard.press("Home");
-      for (let step = 100; step < scale; step += 25) await page.keyboard.press("ArrowUp");
+      await slider.press("Home");
+      for (let step = 100; step < scale; step += 25) await slider.press("ArrowUp");
       await expect(slider).toHaveValue(String(scale));
       await page.keyboard.press("Escape");
       await expect(paper).toHaveAttribute("data-magnified", "true");
-      const isMagnifiedScroll = await paper.evaluate((el) => ({
-        horizontal: el.scrollWidth > el.clientWidth + 1,
-        vertical: el.scrollHeight > el.clientHeight,
-      }));
-      expect(isMagnifiedScroll.horizontal).toBe(true);
       await expect.poll(fontSize).toBeGreaterThan(originalFont * (scale / 100) * 0.9);
-      expect(isMagnifiedScroll.vertical).toBe(true);
+      await expect
+        .poll(() =>
+          paper.evaluate((el) => ({
+            horizontal: el.scrollWidth > el.clientWidth + 1,
+            vertical: el.scrollHeight > el.clientHeight,
+          })),
+        )
+        .toEqual({ horizontal: true, vertical: true });
       expect(await paper.locator("[data-mushaf-column]").allTextContents()).toEqual(originalText);
     }
     await expect(paper.locator("[data-mushaf-column] > div")).toHaveCount(15);
@@ -106,6 +109,7 @@ for (const scenario of [
     await expect.poll(chromePosition).toEqual(originalChrome);
     await page.screenshot({ path: testInfo.outputPath(`mushaf-200-${scenario.width}.png`) });
     await openSettings();
+    await page.getByText(scenario.language === "ar" ? "العرض المتقدم" : "Advanced display", { exact: true }).click();
     await page.getByRole("button", { name: scenario.language === "ar" ? "ملاءمة الصفحة" : "Fit page" }).click();
     await page.keyboard.press("Escape");
     await expect(paper).toHaveAttribute("data-magnified", "false");
@@ -137,8 +141,9 @@ for (const scenario of [
       await page.locator('[data-testid="mushaf-more-actions"], [data-testid="mushaf-rail-more"]').click();
       await page.getByTestId("mushaf-quick-settings").click();
     }
+    await page.getByText(scenario.language === "ar" ? "العرض المتقدم" : "Advanced display", { exact: true }).click();
     const slider = page.getByRole("slider", {
-      name: scenario.language === "ar" ? "تكبير الصفحة" : "Page magnification",
+      name: scenario.language === "ar" ? "تكبير الصفحة الأصلية" : "Original page magnification",
     });
     await slider.focus();
     await page.keyboard.press("End");

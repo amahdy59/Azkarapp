@@ -18,8 +18,13 @@
       "englishIntroduction": "Abd al-Rahman ibn Yazid narrated from Abdullah ibn Masud, may Allah be pleased with him, who said: When evening came, the Prophet of Allah, peace and blessings be upon him, would say:",
       "englishSupplication": "We have reached the evening, and all dominion belongs to Allah. All praise belongs to Allah. There is no deity except Allah alone, with no partner. To Him belongs dominion and to Him belongs all praise, and He has power over all things. My Lord, I ask You for the good in this night and the good after it, and I seek refuge in You from the evil in this night and the evil after it. My Lord, I seek refuge in You from laziness and the hardship of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.",
       "referenceContinuation": "The morning variant and the attribution to Muslim continue on PDF page 19. The glossary discussion of kibr/kibar must be kept with that continuation.",
-      "arabicReviewStatus": "pending; existing Arabic editions unchanged",
-      "englishReviewStatus": "draft; visually checked against original PDF page 18; independent language/source review pending"
+      "arabicReviewStatus": "applied locally from original-source comparison on 2026-11-27; independent scholarly review pending",
+      "englishReviewStatus": "draft; visually checked against original PDF page 18; independent language/source review pending",
+      "restoredSourcePageSha256s": ["c5fd69fe22c7de37c57c92c116780749934693daccd8ea760a78020a0b1105e6"],
+      "headingNavigationCheckpoint": {
+        "previousRestoredSourcePageSha256s": ["1299331ee2fd614c1371a258edee90c4b1a111eb874bc4d7f7aaf47646b2c608"],
+        "reason": "Only source heading placement changes: PDF pp18 and125 gain their original chapter headings; p126 continues travel and loses the premature next-chapter heading. Reconstructed prior-heading text matches every previous page fingerprint; narration, supplication, glossary and Quran body text are unchanged."
+      }
     },
     {
       "id": "wird-125-126-complete-travel",
@@ -36,37 +41,92 @@
           "arabicStart": "سُبْحَانَ",
           "arabicEnd": "مُقْرِنِينَ",
           "start": "Exalted is He",
-          "end": "subdued it."
+          "end": "subdued it.",
+          "restoredWordRange": [12, 20],
+          "restoredArabic": "سُبْحَـٰنَ ٱلَّذِى سَخَّرَ لَنَا هَـٰذَا وَمَا كُنَّا لَهُۥ مُقْرِنِينَ"
         },
         {
           "ref": "43:14",
           "mode": "full",
           "selector": "#p-125 .hadith-text",
           "arabicStart": "وَإِنَّا",
-          "arabicEnd": "لَمُنقَلِبُونَ"
+          "arabicEnd": "لَمُنقَلِبُونَ",
+          "restoredWordRange": [1, 4],
+          "restoredArabic": "وَإِنَّآ إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ"
         }
       ],
       "englishSupplication": "O Allah, we ask You on this journey of ours for righteousness and mindfulness of You, and for deeds that please You. O Allah, make this journey of ours easy for us and shorten its distance for us. O Allah, You are the Companion on the journey and the Guardian of the family we leave behind. O Allah, I seek refuge in You from the hardship of travel, from a distressing sight, and from an ill return in property and family.",
       "englishReturnInstruction": "When he returned, he said those words and added:",
       "englishReturnSupplication": "We are returning, repenting, worshipping and praising our Lord.",
       "reference": "Reported by Muslim, as cited by the author.",
-      "repetition": { "action": "Declaring Allah's greatness before the supplication", "count": 3 },
+      "repetition": {
+        "action": "Declaring Allah's greatness before the supplication",
+        "count": 3
+      },
       "glossary": [
-        { "term": "Muqrinin", "meaning": "Able to manage and control it." },
+        {
+          "term": "Muqrinin",
+          "meaning": "Able to manage and control it."
+        },
         {
           "term": "Wa-twi",
           "meaning": "Bring the distance of our journey nearer and shorten it, so that we may cross it easily."
         },
-        { "term": "Wa'tha al-safar", "meaning": "The severity and hardship of travel." },
+        {
+          "term": "Wa'tha al-safar",
+          "meaning": "The severity and hardship of travel."
+        },
         {
           "term": "Ka'abat al-manzar",
           "meaning": "The soul's distress and dejection from intense worry and sorrow caused by something one sees."
         },
-        { "term": "Su' al-munqalab", "meaning": "A return that brings distress rather than joy." }
+        {
+          "term": "Su' al-munqalab",
+          "meaning": "A return that brings distress rather than joy."
+        }
       ],
       "nextNarration": "Salim ibn Abi al-Jad narrated from Jabir ibn Abdullah, may Allah be pleased with them both, who said: When we went uphill, we declared Allah's greatness; when we went downhill, we glorified Him. Reported by al-Bukhari.",
-      "arabicReviewStatus": "pending; existing Arabic editions unchanged",
-      "englishReviewStatus": "draft; complete text and glossary visually checked against original PDF pages 125–126; independent language/source review pending"
+      "arabicReviewStatus": "applied locally from original-source comparison on 2026-11-27; independent scholarly review pending",
+      "englishReviewStatus": "draft; complete text and glossary visually checked against original PDF pages 125–126; independent language/source review pending",
+      "restoredSourcePageSha256s": [
+        "47823a67577bc9725ee9ccf01caa701598a2cc78b8655245153d3f6b97d4087e",
+        "212d96ae8e1cbee1ef1d9df219d33d00d387f08e1d8c6d6a71f6a91552a728c3"
+      ],
+      "headingNavigationCheckpoint": {
+        "previousRestoredSourcePageSha256s": [
+          "9832a31063d78874e966c418b3982b91861cccf55950a41b58e0b0e83029750d",
+          "1e1f002e7e2ad09c5a6de6cae291c9e0a0ee602eca8bcc6bd4163b1debd2984d"
+        ],
+        "reason": "Only source heading placement changes: PDF pp18 and125 gain their original chapter headings; p126 continues travel and loses the premature next-chapter heading. Reconstructed prior-heading text matches every previous page fingerprint; narration, supplication, glossary and Quran body text are unchanged."
+      }
     }
-  ]
+  ],
+  "adaptationAfterRestorationSha256": "463f9fcfb07fbd5adb6bec029f9fc6f5e4b8fde95388dcfc1dd0e2fb39824799",
+  "arabicRestorationLedger": "docs/learning/SOURCE_REPAIR_2026_11_27.md",
+  "auditCheckpoint": {
+    "previousAdaptationSha256": "d34dedc82521e456a1853c74cf9ed5279da4552b5a4b673c0731a1a5d7089c50",
+    "reason": "Source-confirmed bedtime, after-prayer and wind passages restored on PDF pp36–37,96–98,118. Existing English override source passages on pp18,125,126 retain their exact recorded text hashes; no English wording or Quran binding changes."
+  },
+  "auditCheckpoints": [
+    {
+      "previousAdaptationSha256": "9ea2435c88e2d1a130de1f64f7961dd079ec16633a1eed050e59f0765d750c47",
+      "reason": "Source-confirmed wind narration restored on PDF p118. Existing English override source passages on pp18,125,126 retain their exact recorded text hashes; no English wording or Quran binding changes."
+    },
+    {
+      "previousAdaptationSha256": "58edf27131989dc480041c0b37f0fb098329854331c2c60f503e810f08082f87",
+      "reason": "Source PDF pp33–34: morning/evening continuation restored; bedtime heading/context figure moved to its original beginning; Urwa narrator and full glossary restored. English override pp18,125,126 retain their exact recorded text hashes. English wording unchanged."
+    },
+    {
+      "previousAdaptationSha256": "c7cb1598a40eccf75a8e39e41873eb81311b467c674200595b5390572c537d2a",
+      "reason": "Source-confirmed chapter/contents mapping, title and publication plates, blank divider, original author back cover, and bedtime figure at chapter opening. English overrides retain exact devotional body wording; per-page prior hashes are retained in headingNavigationCheckpoint."
+    },
+    {
+      "previousAdaptationSha256": "12068df0ff69b4a44e342ec361f034de77129ec0cc11195a30878ae998bf649c",
+      "reason": "Source cover now restores the gift-copy designation and printing patron; no devotional body wording changes. Existing English override page hashes remain exact."
+    }
+  ],
+  "graphicCheckpoint": {
+    "previousSourceSha256": "c7cb1598a40eccf75a8e39e41873eb81311b467c674200595b5390572c537d2a",
+    "reason": "Generated context figure at the source-confirmed bedtime opening on PDF p34 (printed p33). All English source override pages retain their exact recorded hashes."
+  }
 }

@@ -1,0 +1,297 @@
+{
+  "schema": 1,
+  "originalPdfSha256": "8b8d8482ed0c7f1a8a9c3714414a0c1c4488bfd87567c644837f0979c06d5816",
+  "beforePagesSha256": "462dcb4e3a393881c14e09a57da87347163b8c5d8f0ed38eef488ed41c69fac9",
+  "review": "Original contents images PDF pp134–136 compared; printed page numbers are one lower than PDF file indices. Titles are source text with normalized typography. Chapter body reconciliation remains incomplete. Mid-page headings on PDF pp77,80,82,88,95,98 and the original contents discrepancy for ruku were compared with the body images; preceding continuations remain before their headings.",
+  "contents": [
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 3,
+      "pdfPage": 4,
+      "title": "المقدمة"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 17,
+      "pdfPage": 18,
+      "title": "ورد الصباح والمساء"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 33,
+      "pdfPage": 34,
+      "title": "ورد النوم"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 45,
+      "pdfPage": 46,
+      "title": "الأمر النبوي لمن رأى الرؤيا أو الحلم"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 49,
+      "pdfPage": 50,
+      "title": "الورد النبوي عند الانتباه أثناء النوم"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 50,
+      "pdfPage": 51,
+      "title": "دعاء دخول الخلاء"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 51,
+      "pdfPage": 52,
+      "title": "دعاء الخروج من الخلاء"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 52,
+      "pdfPage": 53,
+      "title": "ذكر الفراغ من الوضوء"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 53,
+      "pdfPage": 54,
+      "title": "ذكر دخول المنزل"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 54,
+      "pdfPage": 55,
+      "title": "ذكر الخروج من المنزل"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 56,
+      "pdfPage": 57,
+      "title": "دعاء لبس الثوب الجديد وما يقال لمن لبسه"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 59,
+      "pdfPage": 60,
+      "title": "دعاء الذهاب إلى المسجد"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 60,
+      "pdfPage": 61,
+      "title": "دعاء دخول المسجد والخروج منه"
+    },
+    {
+      "contentsPdfPage": 134,
+      "printedPage": 62,
+      "pdfPage": 63,
+      "title": "الذكر عند الأذان"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 67,
+      "pdfPage": 68,
+      "title": "الذكر في الصلاة"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 67,
+      "pdfPage": 68,
+      "title": "دعاء الاستفتاح"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 75,
+      "pdfPage": 75,
+      "title": "دعاء الركوع",
+      "sourceDiscrepancy": "Original contents prints 75; the actual heading is on PDF p75 / printed p74. Link follows the visually compared body heading, retaining the printed reference separately."
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 76,
+      "pdfPage": 77,
+      "title": "دعاء الرفع من الركوع",
+      "headingPlacement": {
+        "beforeLine": 7
+      }
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 79,
+      "pdfPage": 80,
+      "title": "دعاء السجود",
+      "headingPlacement": {
+        "beforeLine": 4
+      }
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 81,
+      "pdfPage": 82,
+      "title": "دعاء الجلسة بين السجدتين",
+      "headingPlacement": {
+        "beforeLine": 4
+      }
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 83,
+      "pdfPage": 84,
+      "title": "التشهد"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 85,
+      "pdfPage": 86,
+      "title": "الصلاة على النبي ﷺ بعد التشهد"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 87,
+      "pdfPage": 88,
+      "title": "الدعاء بعد التشهد الأخير قبل السلام",
+      "headingPlacement": {
+        "beforeLine": 9
+      }
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 92,
+      "pdfPage": 93,
+      "title": "الأذكار بعد السلام من الصلاة"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 94,
+      "pdfPage": 95,
+      "title": "التسبيح والتحميد والتكبير بعد الصلاة",
+      "headingPlacement": {
+        "beforeLine": 7
+      }
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 97,
+      "pdfPage": 98,
+      "title": "التسبيح بعد الوتر",
+      "headingPlacement": {
+        "correctedBlock": 4
+      }
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 99,
+      "pdfPage": 100,
+      "title": "ما يقول عند الطعام"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 101,
+      "pdfPage": 102,
+      "title": "ما يقول عند الفراغ من الطعام"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 103,
+      "pdfPage": 104,
+      "title": "دعاء الضيف لمن ضيفه"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 105,
+      "pdfPage": 106,
+      "title": "كفارة المجلس"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 106,
+      "pdfPage": 107,
+      "title": "الورد النبوي عند نزول منزل"
+    },
+    {
+      "contentsPdfPage": 135,
+      "printedPage": 107,
+      "pdfPage": 108,
+      "title": "دعاء من أصيب بمصيبة"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 108,
+      "pdfPage": 109,
+      "title": "الأمر النبوي لمن تألم من جسده"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 109,
+      "pdfPage": 110,
+      "title": "دعاء الهم والحزن"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 112,
+      "pdfPage": 113,
+      "title": "الذكر عند الكرب"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 114,
+      "pdfPage": 115,
+      "title": "الدعاء للمريض ورقيته"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 116,
+      "pdfPage": 117,
+      "title": "في تعويذ الطفل"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 117,
+      "pdfPage": 118,
+      "title": "الدعاء عند هبوب الريح"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 119,
+      "pdfPage": 120,
+      "title": "ما يقال عن نزول الغيث"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 122,
+      "pdfPage": 123,
+      "title": "دعاء الاستخارة"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 124,
+      "pdfPage": 125,
+      "title": "دعاء السفر"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 126,
+      "pdfPage": 127,
+      "title": "ما يقول المسافر وقت السحر"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 127,
+      "pdfPage": 128,
+      "title": "الدعاء للميت في الصلاة عليه"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 130,
+      "pdfPage": 131,
+      "title": "دعاء زيارة القبور"
+    },
+    {
+      "contentsPdfPage": 136,
+      "printedPage": 133,
+      "pdfPage": 134,
+      "title": "الفهرس"
+    }
+  ]
+}

@@ -152,7 +152,7 @@ describe("read-only listening controls", () => {
       <QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" magnification={150} />,
     );
     const body = container.querySelector(".audio-listening-body")!;
-    const pane = screen.getByRole("region", { name: "Page magnification" });
+    const pane = screen.getByRole("region", { name: "Original page magnification" });
     expect(body).toHaveAttribute("data-listening-magnified", "true");
     expect(pane).toHaveAttribute("tabindex", "0");
     expect(pane.querySelector('[data-mushaf-page="562"]')).not.toBeNull();

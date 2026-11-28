@@ -176,6 +176,7 @@ function buildHtml(theme) {
 
     // Special Page: Introduction (Pages 4 and 5)
     if (p.page === 4 || p.page === 5) {
+      if (!p.correctedHtml) throw new Error("Missing source-compared introduction");
       pagesHtml += `
       <div class="page page-intro" id="p-${p.page}" style="background:${t.bg}; color:${t.text};">
         <div class="page-frame-outer"></div>
@@ -199,57 +200,7 @@ function buildHtml(theme) {
           }
 
           <div class="intro-card-luxury">
-            ${
-              p.page === 4
-                ? `
-            <div class="intro-besmalah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ</div>
-            <div class="intro-body-p">
-              الْحَمْدُ لِلَّهِ الَّذِي لَمْ يَجْعَلْ بَيْنَهُ وَبَيْنَ عِبَادِهِ وَاسِطَةً فِي الدُّعَاءِ، وَهُوَ القَائِلُ سُبْحَانَهُ:
-            </div>
-            <div class="quran-quote-box">
-              <div class="quran-ayah-text">﴿وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ ۖ أُجِيبُ دَعْوَةَ الدَّاعِ إِذَا دَعَانِ﴾</div>
-              <div class="ayah-ref">[سورة البقرة: ١٨٦]</div>
-            </div>
-            <div class="quran-quote-box">
-              <div class="quran-ayah-text">﴿وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ﴾</div>
-              <div class="ayah-ref">[سورة غافر: ٦٠]</div>
-            </div>
-            <div class="intro-body-p">
-              وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِهِ الأَمِينِ، القَائِلِ ﷺ:
-              <span class="hadith-inline-quote">«الدُّعَاءُ هُوَ العِبَادَةُ»</span> <span class="takhrij-micro">[رواه أحمد والترمذي، صحيح]</span>،
-              وَالقَائِلِ صَلَوَاتُ رَبِّي وَسَلَامُهُ عَلَيْهِ:
-              <span class="hadith-inline-quote">«مَنْ لَمْ يَسْأَلِ اللَّهَ؛ يَغْضَبْ عَلَيْهِ»</span> <span class="takhrij-micro">[رواه الترمذي، حسن]</span>.
-            </div>
-            <div class="intro-divider-fleuron">✦ • ✦ • ✦</div>
-            <div class="intro-body-p">
-              <strong>وَبَعْدُ:</strong> فَإِنَّ دُعَاءَ اللَّهِ وَالإِلْحَاحَ عَلَيْهِ؛ شَأْنُ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَشَأْنُ الأَنْبِيَاءِ مِنْ قَبْلِهِ، وَشَأْنُ الصَّالِحِينَ، وَلَيْسَ أَمْرٌ مِنْ أُمُورِ الدُّنْيَا وَالآخِرَةِ إِلَّا وَقَدْ جَعَلَ اللَّهُ مِفْتَاحَ تَحْقِيقِهِ وَالوُصُولِ إِلَيْهِ: <strong>الدُّعَاءَ</strong>.
-            </div>
-            `
-                : `
-            <div class="intro-body-p">
-              وَاللَّهُ سُبْحَانَهُ يُحِبُّ المُلِحِّينَ فِي الدُّعَاءِ، وَيُجِيبُ دَعْوَةَ المُضْطَرِّينَ كَمَا قَالَ تَعَالَى:
-            </div>
-            <div class="quran-quote-box">
-              <div class="quran-ayah-text">﴿أَمَّنْ يُجِيبُ الْمُضْطَرَّ إِذَا دَعَاهُ وَيَكْشِفُ السُّوءَ﴾</div>
-              <div class="ayah-ref">[سورة النمل: ٦٢]</div>
-            </div>
-            <div class="intro-body-p">
-              وَأَفْضَلُ الدُّعَاءِ وَالذِّكْرِ: مَا كَانَ مَأْخُوذًا مِنْ كَلَامِ رَبِّنَا تَبَارَكَ وَتَعَالَى، وَمِنْ سُنَّةِ نَبِيِّنَا مُحَمَّدٍ ﷺ.
-            </div>
-            <div class="intro-divider-fleuron">✦ • ✦ • ✦</div>
-            <div class="intro-body-p">
-              وَتَعَاوُنًا عَلَى البِرِّ وَالتَّقْوَى، وَتَسْهِيلًا عَلَى إِخْوَانِي المُسْلِمِينَ، وَخَاصَّةً عَلَى مَنْ لَا يَحْفَظُ الأَدْعِيَةَ؛ فَقَدْ يَسَّرَ اللَّهُ جَمْعَ هَذِهِ الأَدْعِيَةِ مِنَ الكِتَابِ وَالسُّنَّةِ الصَّحِيحَةِ، وَأَرْجُو مِنَ اللَّهِ الثَّوَابَ، وَأَنْ يَنْفَعَنِي بِهَذَا الجَمْعِ وَإِخْوَانِي المُسْلِمِينَ.
-            </div>
-            <div class="intro-body-p" style="font-weight:600;">
-              وَصَلَّى اللَّهُ وَسَلَّمَ عَلَى نَبِيِّنَا مُحَمَّدٍ، وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ.
-            </div>
-            <div class="intro-signature-box">
-              <div class="signature-title">الدَّاعِي لَكُمْ بِالخَيْرِ:</div>
-              <div class="signature-name">أَبُو مُحَمَّدٍ يُوسُفُ بْنُ زَبْنِ اللهِ العُطَيْرِ</div>
-              <div class="signature-dua">غَفَرَ اللهُ لَهُ وَلِوَالِدَيْهِ وَلِجَمِيعِ المُسْلِمِينَ</div>
-            </div>
-            `
-            }
+            ${p.correctedHtml}
           </div>
         </div>
 
@@ -321,7 +272,7 @@ function buildHtml(theme) {
 
     // Special Page: Advisory for Pilgrims (Page 60)
     if (p.page === 60) {
-      const advisoryText = p.lines.filter((l) => l && !l.includes("تنبيه خاص") && l !== "60").join(" ");
+      if (!p.correctedHtml) throw new Error("Missing source-compared advisory paragraphs");
       pagesHtml += `
       <div class="page" style="background:${t.bg}; color:${t.text};">
         <div class="page-frame-outer"></div>
@@ -340,7 +291,7 @@ function buildHtml(theme) {
 
           <div class="advisory-card">
             <div class="advisory-body">
-              ${advisoryText}
+              ${p.correctedHtml}
             </div>
           </div>
         </div>
@@ -398,7 +349,9 @@ function buildHtml(theme) {
 
     // Normal Devotional Content Pages
     const isChapterStart = [6, 9, 12, 15, 16, 18, 24, 26, 31, 32, 34, 47, 48, 52, 54, 57, 61].includes(p.page);
-    const flowResult = formatLuxuryFlow(p.lines, t, p.chapter);
+    const flowResult = p.correctedHtml
+      ? { html: `<div class="dua-card">${p.correctedHtml}</div>`, count: 1 }
+      : formatLuxuryFlow(p.lines, t, p.chapter, p.footnoteLines);
     let flowClass;
     if (flowResult.count >= 8) {
       flowClass = "flow-ultra-dense";
@@ -1080,12 +1033,17 @@ function buildHtml(theme) {
 </html>`;
 }
 
-function formatLuxuryFlow(lines, t, chapter) {
+function formatLuxuryFlow(lines, t, chapter, footnoteLines = []) {
   const entries = [];
+  const footnotes = [];
   let current = null;
 
   for (let i = 0; i < lines.length; i++) {
     let l = lines[i].trim();
+    if (footnoteLines.includes(i)) {
+      footnotes.push(l);
+      continue;
+    }
     if (
       !l ||
       l === "." ||
@@ -1105,7 +1063,7 @@ function formatLuxuryFlow(lines, t, chapter) {
 
     // Check if line contains a dua/hadith number at start or end
     const startNumMatch = l.match(/^[(«]?\s*([٠-٩\d]+)\s*[)».-]/);
-    const endNumMatch = l.match(/[«(]\s*([٠-٩\d]+)\s*$/);
+    const endNumMatch = l.match(/[«(]\s*([٠-٩\d]+)\s*$/) || l.match(/\s+(174|176|186)$/);
 
     if (startNumMatch) {
       if (current) entries.push(current);
@@ -1177,16 +1135,15 @@ function formatLuxuryFlow(lines, t, chapter) {
     // Extract takhrij/reference
     let takhrij = "";
     const refMatch = raw.match(
-      /(\[(?:صحيح|رواه|مسلم|البخاري|أحمد|الترمذي|أبو داود|النسائي|ابن ماجه|الطبراني|الحاكم|الدارمي|النووي|حسن|بإِسناد|بإسناد|الأعراف|البقرة|هود|إبراهيم|المؤمنون|الفرقان|القصص|الحشر|الأنبياء|الممتحنة|التحريم|التوبة|الأنعام|يونس|الكهف|الفاتحة|آل عمران|الأحقاف|نوح|النمل|الإسراء|الشعراء|طه|يوسف)[^\]]*\])/,
+      /(\[(?:صحيح|رواه|مسلم|البخاري|أحمد|الترمذي|أبو داود|النسائي|ابن ماجه|الطبراني|الحاكم|الدارمي|النووي|حسن|بإِسناد|بإسناد|الأعراف|البقرة|هود|إبراهيم|المؤمنون|الفرقان|القصص|الحشر|الأنبياء|الممتحنة|التحريم|التوبة|الأنعام|يونس|الكهف|الفاتحة|آل عمران|الأحقاف|نوح|النمل|الإسراء|الشعراء|الصافات|العنكبوت|طه|يوسف)[^\]]*\])/,
     );
     if (refMatch) {
       takhrij = refMatch[1].trim();
       raw = raw.replace(takhrij, "").trim();
     }
 
-    // Clean any residual broken quote symbols and tatweel in raw
+    // Preserve excerpt ellipses, sentence punctuation and interior quotations.
     raw = raw
-      .replace(/[.»«]{1,}/g, " ")
       .replace(/ـ+/g, "")
       .replace(/\s{2,}/g, " ")
       .trim();
@@ -1222,7 +1179,7 @@ function formatLuxuryFlow(lines, t, chapter) {
   }
 
   return {
-    html,
+    html: html + footnotes.map((note) => `<aside class="source-note">${note}</aside>`).join(""),
     count: entries.length,
     totalChars: entries.reduce((acc, e) => acc + e.lines.join(" ").length, 0),
   };

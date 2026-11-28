@@ -2,7 +2,7 @@ import { useId, useMemo, useState } from "react";
 import { Bookmark, List, Search } from "./icons";
 import { TabList, tabPanelProps } from "./Tabs";
 import { learningT } from "../i18n/learning";
-import { normalizeSearchText } from "../content/searchNormalization";
+import { getSearchSnippet, normalizeSearchText } from "../content/searchNormalization";
 import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
 import type { LearningPack } from "../learning/types";
@@ -33,13 +33,13 @@ export function LearningContents({
       normalized
         ? pack.units
             .filter((unit) => normalizeSearchText(unit.text).includes(normalized))
-            .map((unit) => ({ unitId: unit.id, title: unit.title }))
+            .map((unit) => ({ unitId: unit.id, title: unit.title, excerpt: getSearchSnippet(unit.text, query) }))
         : mode === "bookmarks"
           ? pack.units
               .filter((unit) => bookmarks.includes(unit.id))
               .map((unit) => ({ unitId: unit.id, title: unit.title }))
           : pack.contents,
-    [normalized, mode, pack, bookmarks],
+    [normalized, query, mode, pack, bookmarks],
   );
   return (
     <div className="learn-contents">
@@ -123,10 +123,13 @@ export function LearningContents({
                   onNavigate(entry.unitId);
                 }}
               >
-                {entry.title}
-                <span className="text-sm text-muted-foreground">
-                  {formatNumerals(Number(entry.unitId.slice(2)), language)}
+                <span className="learn-contents-label">
+                  {entry.title}
+                  {"excerpt" in entry && <span className="learn-search-excerpt">{String(entry.excerpt)}</span>}
                 </span>
+                <bdi className="learn-contents-page text-sm text-muted-foreground">
+                  {formatNumerals(Number(entry.unitId.slice(2)), language)}
+                </bdi>
               </a>
             </li>
           ))}

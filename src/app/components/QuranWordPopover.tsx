@@ -1,12 +1,13 @@
 import "../../styles/theme/wordPopover.css";
 import "./overlay-surfaces.css";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronUp } from "./icons";
+import { ChevronUp, X } from "./icons";
 import { type QuranWordMeaning } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
+import { useSafeAreaCollisionPadding } from "../hooks/useSafeAreaCollisionPadding";
 
 /**
  * The meaning of the word you just tapped, anchored under that word.
@@ -36,8 +37,14 @@ export function QuranWordPopover({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const description = useId();
+  const closeAndRestore = () => {
+    onClose();
+    anchorEl?.focus({ preventScroll: true });
+  };
   const [fallback, setFallback] = useState<{ top: number; left: number; caret: number; above: boolean } | null>(null);
   const open = Boolean(meanings?.length && anchorEl);
+  const { top: safeTop, right: safeRight, bottom: safeBottom, left: safeLeft } = useSafeAreaCollisionPadding();
 
   /* One measurement per open, never on scroll. A tooltip that chases the text
      while it moves is both a jank source and the wrong behaviour; this closes
@@ -47,20 +54,34 @@ export function QuranWordPopover({
      containment across engines and keep blur outside the reading canvas. */
   useLayoutEffect(() => {
     if (!open || !anchorEl || !ref.current) return;
-    const word = anchorEl.getBoundingClientRect();
-    const box = ref.current.getBoundingClientRect();
-    const margin = 8;
+    const measure = () => {
+      if (!ref.current) return;
+      const word = anchorEl.getBoundingClientRect();
+      // Entrance transforms must not shorten the collision box.
+      const box = { width: ref.current.offsetWidth, height: ref.current.offsetHeight };
+      const margin = 8;
 
-    const above = word.bottom + margin + box.height > window.innerHeight;
-    const wordCenter = word.left + word.width / 2;
-    const left = Math.min(Math.max(wordCenter - box.width / 2, margin), window.innerWidth - box.width - margin);
-    setFallback({
-      top: Math.max(margin, above ? word.top - box.height - margin : word.bottom + margin),
-      left,
-      caret: wordCenter - left,
-      above,
-    });
-  }, [open, anchorEl]);
+      const above = word.bottom + margin + box.height > window.innerHeight - safeBottom;
+      const wordCenter = word.left + word.width / 2;
+      const left = Math.max(safeLeft, Math.min(wordCenter - box.width / 2, window.innerWidth - box.width - safeRight));
+      setFallback({
+        top: Math.max(
+          safeTop,
+          Math.min(
+            above ? word.top - box.height - margin : word.bottom + margin,
+            window.innerHeight - safeBottom - box.height,
+          ),
+        ),
+        left,
+        caret: wordCenter - left,
+        above,
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [open, anchorEl, meanings, safeTop, safeRight, safeBottom, safeLeft]);
 
   useEffect(() => {
     if (!open) {
@@ -87,6 +108,7 @@ export function QuranWordPopover({
         event.preventDefault();
         event.stopPropagation();
         onClose();
+        anchorEl?.focus({ preventScroll: true });
       }
     };
     // `capture` so a tap inside the reading canvas closes this before the
@@ -103,7 +125,8 @@ export function QuranWordPopover({
     const armScroll = window.setTimeout(() => {
       scrollArmed = true;
     }, 300);
-    const onScroll = () => {
+    const onScroll = (event: Event) => {
+      if (event.target instanceof Node && ref.current?.contains(event.target)) return;
       if (scrollArmed) onClose();
     };
     window.addEventListener("scroll", onScroll, { passive: true, capture: true });
@@ -132,6 +155,8 @@ export function QuranWordPopover({
       role="dialog"
       data-overlay-surface="contextual"
       data-state="open"
+      data-dropdown-surface=""
+      aria-describedby={description}
       aria-label={`${t(language, "reader.wordMeaningLabel")}: ${primary.word}`}
       dir={direction}
       data-testid="quran-word-popover"
@@ -161,52 +186,42 @@ export function QuranWordPopover({
           : undefined
       }
     >
-      <div className="grid min-w-0 gap-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-stretch sm:gap-4">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t(language, "reader.closeWordMeaning")}
-          data-testid="quran-word-popover-dismiss"
-          className="flex min-h-11 min-w-0 flex-col justify-center gap-1 rounded-lg text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          lang="ar"
-          dir="rtl"
-        >
-          <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
-            <span className="font-ui-arabic text-lg font-bold text-primary">{primary.word}</span>
-            <span className="font-ui-arabic text-micro font-bold text-primary/80">
-              {t(language, "reader.wordMeaningLabel")}
+      <div className="quran-word-popover-content">
+        <div className="quran-word-popover-heading">
+          <div className="quran-word-popover-reference">
+            <span className="quran-word-popover-word" lang="ar" dir="rtl">
+              {primary.word}
             </span>
-          </div>
-          <span className="font-ui-arabic text-sm font-bold leading-relaxed text-foreground">
-            {primary.explanationArabic}
-          </span>
-        </button>
-
-        <div className="flex min-w-0 items-center justify-between gap-2 border-t border-border/40 pt-2 sm:flex-col sm:items-end sm:justify-center sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0">
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t(language, "common.close")}
-            className="flex min-h-11 min-w-11 flex-col items-start justify-center gap-1 rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-micro font-bold text-muted-foreground">
+            <bdi className="quran-word-popover-ayah">
               {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
             </bdi>
+          </div>
+          <button
+            type="button"
+            onClick={closeAndRestore}
+            aria-label={t(language, "reader.closeWordMeaning")}
+            data-testid="quran-word-popover-dismiss"
+            className="quran-word-popover-close"
+          >
+            <X size={18} aria-hidden="true" />
           </button>
-          {onShowAll && (
-            <button
-              type="button"
-              onClick={onShowAll}
-              data-testid="quran-word-popover-all"
-              className="-my-2 inline-flex min-h-11 shrink-0 items-center justify-center gap-1 rounded-full px-2 text-micro font-bold text-primary transition-[background-color,transform] hover:bg-primary/10 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:my-0 sm:self-start"
-            >
-              {extra > 0
-                ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
-                : t(language, "reader.wordMeaningAll")}
-              <ChevronUp size={12} aria-hidden="true" className="shrink-0" />
-            </button>
-          )}
         </div>
+        <p id={description} className="quran-word-popover-explanation" lang="ar" dir="rtl">
+          {primary.explanationArabic}
+        </p>
+        {onShowAll && (
+          <button
+            type="button"
+            onClick={onShowAll}
+            data-testid="quran-word-popover-all"
+            className="quran-word-popover-all"
+          >
+            {extra > 0
+              ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
+              : t(language, "reader.wordMeaningAll")}
+            <ChevronUp size={12} aria-hidden="true" />
+          </button>
+        )}
       </div>
     </div>,
     document.body,

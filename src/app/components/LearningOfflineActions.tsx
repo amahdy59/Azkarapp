@@ -37,9 +37,11 @@ export function LearningOfflineActions({
         ? "storageUnavailable"
         : status.complete
           ? "savedOffline"
-          : status.savedFiles
-            ? "partial"
-            : "notSaved";
+          : status.previousEdition
+            ? "previousSaved"
+            : status.savedFiles
+              ? "partial"
+              : "notSaved";
   return (
     <div className="space-y-2">
       <p
@@ -92,7 +94,7 @@ export function LearningOfflineActions({
             </Button>
           )
         )}
-        {onRemove && Boolean(status?.savedFiles) && (
+        {onRemove && Boolean(status?.savedFiles || status?.previousEdition) && (
           <Button variant="ghost" onClick={onRemove} disabled={busy}>
             {learningT(language, "removeDownload")}
           </Button>

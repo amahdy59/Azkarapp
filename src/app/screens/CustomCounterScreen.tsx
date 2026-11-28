@@ -673,7 +673,7 @@ export function CustomCounterScreen({
           language={language}
           maxWidthClassName="max-w-sm"
           showCloseButton={false}
-          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          drawerClassName="pb-[max(1.5rem,var(--app-safe-area-bottom))]"
         >
           <div className="flex min-h-0 flex-col overflow-hidden text-start">
             <SheetHeader
@@ -716,7 +716,7 @@ export function CustomCounterScreen({
           language={language}
           maxWidthClassName="max-w-sm"
           showCloseButton={false}
-          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          drawerClassName="pb-[max(1.5rem,var(--app-safe-area-bottom))]"
         >
           <div className="flex min-h-0 flex-col overflow-hidden text-start">
             <SheetHeader
@@ -766,7 +766,7 @@ export function CustomCounterScreen({
           testId="custom-counter-reference-sheet"
           maxWidthClassName="max-w-md"
           showCloseButton={false}
-          drawerClassName="pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+          drawerClassName="pb-[max(1.25rem,var(--app-safe-area-bottom))]"
         >
           <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
             <SheetHeader

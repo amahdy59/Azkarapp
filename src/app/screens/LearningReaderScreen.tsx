@@ -283,6 +283,11 @@ function AvailableLearningReader({
               data-testid="learning-reading-scroll"
             >
               <div className="learn-reading-measure">
+                {pack?.previousEdition && (
+                  <p role="status" className="learn-draft-notice text-sm">
+                    {learningT(language, "previousEdition")}
+                  </p>
+                )}
                 {learningEditionNotice(language, resource) && (
                   <p className="learn-draft-notice text-sm" role="note">
                     {learningEditionNotice(language, resource)}

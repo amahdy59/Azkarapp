@@ -2,6 +2,24 @@
   overflow-wrap: anywhere;
 }
 
+.prayer-adjustment-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.prayer-adjustment-row > span {
+  flex: 1 1 5rem;
+  min-width: 0;
+}
+
+.prayer-adjustment-row > div {
+  flex: 1 1 10.5rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .prayer-method-trigger {
   white-space: normal;
   overflow-wrap: anywhere;

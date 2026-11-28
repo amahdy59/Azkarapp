@@ -3,7 +3,7 @@
    layouts use the main canvas and never cover the rail or sidebar. */
 .floating-audio-player {
   inset-inline: 0.5rem;
-  bottom: calc(4.5rem + env(safe-area-inset-bottom) + 0.5rem);
+  bottom: calc(4.5rem + var(--app-safe-area-bottom) + 0.5rem);
   transition:
     opacity var(--motion-duration-fast) var(--motion-ease-standard),
     transform var(--motion-duration-fast) var(--motion-ease-standard);
@@ -110,7 +110,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 
 .audio-player-surface--viewport {
   position: fixed;
-  top: env(safe-area-inset-top);
+  top: var(--app-safe-area-top);
 }
 .audio-player-surface[data-full-screen] {
   position: fixed;
@@ -120,7 +120,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 [data-listening-focus] .audio-expanded-layout {
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) max-content;
-  padding-block-start: max(0.5rem, env(safe-area-inset-top));
+  padding-block-start: max(0.5rem, var(--app-safe-area-top));
 }
 [data-listening-focus] .audio-expanded-header,
 [data-listening-focus] .audio-expanded-controls > :not(.audio-expanded-feedback),
@@ -146,13 +146,13 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
-  padding: 0.5rem max(1rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-bottom))
-    max(1rem, env(safe-area-inset-right));
+  padding: var(--chrome-edge-space) max(1rem, var(--app-safe-area-left))
+    max(var(--chrome-edge-space), var(--chrome-safe-bottom)) max(1rem, var(--app-safe-area-right));
 }
 
 .audio-expanded-header {
   column-gap: 12px;
-  padding-inline: 12px;
+  padding-inline: 0;
   width: 100%;
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   min-height: 44px;
@@ -189,8 +189,29 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 
 [data-listening-desk] .audio-expanded-header {
-  grid-template-columns: 44px minmax(0, 1fr) auto 44px;
+  grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px;
   gap: 4px;
+}
+[data-listening-desk] .audio-expanded-header > button:first-child {
+  grid-area: 1 / 1;
+}
+[data-listening-desk] .audio-expanded-header > button:last-child {
+  grid-area: 1 / 5;
+}
+[data-listening-desk] .audio-expanded-identity {
+  grid-area: 1 / 2;
+}
+[data-listening-desk] .audio-desk-title {
+  grid-area: 1 / 3;
+  margin: 0;
+  text-align: center;
+}
+[data-listening-desk] .audio-options-trigger {
+  inline-size: 44px;
+  padding: 0;
+}
+[data-listening-desk] .audio-options-trigger > :not(.audio-options-icon) {
+  display: none;
 }
 
 .audio-desk-title {
@@ -312,9 +333,9 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   white-space: nowrap;
 }
 [data-testid="audio-reciter-select"] {
-  height: 2.75rem;
+  height: auto;
   min-height: 2.75rem;
-  white-space: nowrap;
+  white-space: normal;
   padding-inline: 12px;
   gap: 8px;
   justify-content: space-between;
@@ -330,9 +351,9 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 [data-testid="audio-reciter-select"] [data-slot="select-value"] {
   display: block;
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
   text-align: start;
   flex: 1 1 auto;
 }
@@ -443,6 +464,29 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   padding-block-end: 1rem;
 }
 
+/* Listening borrows the printed page's quiet, continuous canvas. Settings
+   overlay on request and never squeeze or move the sacred text sideways. */
+[data-canonical-listening] .audio-expanded-text {
+  max-inline-size: 72rem;
+  padding-inline: 0;
+}
+[data-canonical-listening] :is(.audio-listening-page, .audio-listening-stream) {
+  background: transparent !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-canonical-listening] .audio-listening-page .mushaf-opening [data-mushaf-column] {
+  /* Use the opening page's spare margins to compensate for transport height,
+     retaining the same eight source slots and normal-reader letter size. */
+  height: calc(58% + 6rem);
+  max-block-size: 80%;
+}
+@container audio-surface (min-width: 64rem) {
+  .floating-audio-player--expanded[data-canonical-listening]:not([data-listening-focus]) .audio-expanded-stage {
+    block-size: 100%;
+  }
+}
+
 /* Grow the printed page with the reading canvas; short windows scroll
    rather than squeezing fifteen canonical lines into illegible slots. */
 .audio-listening-page {
@@ -522,7 +566,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 
 @container audio-surface (max-width: 23rem) {
   .audio-expanded-layout {
-    padding-inline: max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-right));
+    padding-inline: max(0.5rem, var(--app-safe-area-left)) max(0.5rem, var(--app-safe-area-right));
   }
 }
 
@@ -561,7 +605,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 
 .floating-audio-player--docked .audio-compact-card {
-  padding-block-end: env(safe-area-inset-bottom);
+  padding-block-end: var(--app-safe-area-bottom);
   border-block-end: 0;
   border-end-start-radius: 0;
   border-end-end-radius: 0;
@@ -573,7 +617,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.75fr);
     grid-template-rows: max-content minmax(11rem, 1fr);
     column-gap: 1rem;
-    padding-block: 0.25rem max(0.25rem, env(safe-area-inset-bottom));
+    padding-block: var(--chrome-edge-space) max(var(--chrome-edge-space), var(--chrome-safe-bottom));
   }
 
   .audio-expanded-header {
@@ -660,14 +704,14 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 
 .app-shell.app-shell--navigation-hidden .floating-audio-player {
-  bottom: env(safe-area-inset-bottom);
+  bottom: var(--app-safe-area-bottom);
 }
 
 .floating-audio-player--reading {
   /* Mobile reading hides the tab bar independently of the global navigation
      flag. Dock to the actual reading surface so no phantom nav-sized gap is
      left below either player state. */
-  bottom: env(safe-area-inset-bottom);
+  bottom: var(--app-safe-area-bottom);
 }
 
 @media (min-width: 37.5rem) {
@@ -709,7 +753,12 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 .audio-options-menu {
   --audio-menu-inset: 12px;
+  container: audio-options / inline-size;
   max-block-size: min(80dvh, var(--radix-popover-content-available-height));
+}
+.audio-options-menu [data-slot="select-trigger"] {
+  /* The ordinary and docked forms retain one frame through Glass/hover states. */
+  border-color: var(--border) !important;
 }
 
 .audio-options-scroll {
@@ -795,7 +844,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   padding-block: 0;
 }
 [data-listening-focus] .audio-expanded-layout {
-  padding-block-end: max(0.25rem, env(safe-area-inset-bottom));
+  padding-block-end: max(0.25rem, var(--app-safe-area-bottom));
 }
 [data-listening-focus] .audio-expanded-feedback .audio-focus-actions {
   flex-wrap: wrap;
@@ -971,5 +1020,148 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   line-height: 1.5;
 }
 .audio-reading-options:not([open]) > :not(summary) {
+  display: none;
+}
+
+/* Ordinary labels and fields share a row; large text recovers the stacked
+   form. Keep scrolling available for opened help and genuinely short screens. */
+@container audio-options (min-width: 18rem) {
+  .audio-sleep-setting {
+    display: grid;
+    grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+  }
+  .audio-sleep-setting > :not(label) {
+    min-inline-size: 0;
+    grid-column: 2;
+  }
+}
+.audio-options-scroll > :not(:first-child) {
+  padding-block-start: 8px;
+}
+.audio-options-menu .audio-options-pair {
+  column-gap: 12px;
+}
+.audio-options-menu :is(.audio-reading-options, .audio-options-help) > summary {
+  font-weight: 500;
+}
+.audio-options-dock .audio-options-heading {
+  border-block-end-color: transparent;
+}
+.audio-options-dock .audio-options-scroll {
+  scrollbar-gutter: auto;
+}
+
+.audio-options-dock {
+  display: none;
+}
+.audio-expanded-stage {
+  display: contents;
+}
+.audio-wide-title {
+  display: none;
+}
+
+/* Reserve ordinary layout space instead of covering the reading with tools.
+   Rem-based container queries also recover the popup at enlarged text. */
+@media (min-height: 35rem) {
+  @container audio-surface (min-width: 64rem) {
+    .floating-audio-player--expanded:not([data-listening-focus]) .audio-expanded-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: max-content minmax(0, 1fr);
+      column-gap: 1.5rem;
+      inline-size: 100%;
+      max-inline-size: 60rem;
+      margin-inline: auto;
+    }
+    .floating-audio-player--expanded[data-options-docked] .audio-expanded-layout {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      max-inline-size: 82rem;
+    }
+    .floating-audio-player--expanded:not([data-listening-focus]) .audio-wide-title {
+      display: block;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .floating-audio-player--expanded:not([data-listening-focus]) .audio-expanded-stage {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      grid-column: 1;
+      grid-row: 2;
+      align-self: center;
+      inline-size: 100%;
+      block-size: 100%;
+      min-block-size: 0;
+    }
+    .floating-audio-player--expanded:not([data-listening-focus]) .audio-expanded-header {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      width: 100%;
+      max-width: none;
+    }
+    .floating-audio-player--expanded:not([data-listening-focus]) .audio-expanded-reading {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .floating-audio-player--expanded:not([data-listening-focus]) .audio-expanded-controls {
+      grid-column: 1;
+      grid-row: 2;
+      width: 100%;
+      max-width: none;
+    }
+    .floating-audio-player--expanded:not([data-listening-focus]) .audio-options-dock {
+      /* A measurable sentinel keeps layout selection independent of open state. */
+      display: flex;
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .floating-audio-player--expanded[data-options-docked] .audio-options-dock {
+      position: static;
+      inline-size: auto;
+      block-size: min(100%, 42rem);
+      align-self: center;
+      visibility: visible;
+      pointer-events: auto;
+      grid-column: 2;
+      grid-row: 2;
+      min-block-size: 0;
+      min-inline-size: 0;
+      padding-block: 0.5rem;
+      max-block-size: 100%;
+    }
+    [data-options-docked] .audio-expanded-text {
+      max-width: 52rem;
+      margin-inline: auto;
+    }
+  }
+}
+
+.audio-options-dock .audio-options-sidebar {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+  max-block-size: 100%;
+  block-size: fit-content;
+  inline-size: 100%;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: var(--card);
+  color: var(--foreground);
+  overflow: hidden;
+}
+.audio-options-sidebar .audio-options-heading {
+  min-block-size: 44px;
+  padding: 0.75rem;
+}
+.audio-options-sidebar .audio-options-scroll {
+  flex: 1;
+}
+.audio-options-trigger[hidden] {
   display: none;
 }

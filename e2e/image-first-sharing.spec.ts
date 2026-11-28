@@ -123,9 +123,9 @@ for (const language of ["ar", "en"] as const) {
     const before = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed);
     await trigger.click();
     const modal = page.getByTestId("collection-share-modal");
-    // Phone sharing fills the viewport while the artwork retains intrinsic size.
-    await expect.poll(async () => (await modal.boundingBox())?.y).toBe(0);
-    expect((await modal.boundingBox())!.height).toBeCloseTo(844, 1);
+    // The bounded editor retains a visible gutter and intrinsic artwork size.
+    await expect.poll(async () => (await modal.boundingBox())?.y).toBeGreaterThanOrEqual(16);
+    expect((await modal.boundingBox())!.height).toBeLessThanOrEqual(812);
     // Prepared-set-first sharing is an independently approved studio change.
     // Exercise the explicit custom option to retain this test's actual PNG,
     // balanced layout and all-card-scope proof for the completion entry point.
@@ -140,7 +140,7 @@ for (const language of ["ar", "en"] as const) {
     const image = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(image).toHaveAttribute("width", "1080");
     await expect(image).toHaveAttribute("height", "1080");
-    expect((await modal.boundingBox())?.y).toBe(0);
+    expect((await modal.boundingBox())!.y).toBeGreaterThanOrEqual(16);
     const download = page.waitForEvent("download");
     await modal
       .getByTestId("sharing-actions")

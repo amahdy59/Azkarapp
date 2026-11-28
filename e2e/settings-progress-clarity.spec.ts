@@ -104,7 +104,7 @@ for (const language of ["ar", "en"] as const) {
       await page.goto("/#/settings/location");
       await page.getByRole("button", { name: t(language, "prayerLocation.chooseAnotherCity") }).click();
       await expect(
-        page.getByRole("searchbox", { name: ar ? "البحث في المدن والدول" : "Search cities and countries" }),
+        page.getByRole("searchbox", { name: t(language, "prayerLocation.citySearchOptional") }),
       ).toBeVisible();
       await page.getByRole("button", { name: t(language, "common.close"), exact: true }).click();
       await expect(

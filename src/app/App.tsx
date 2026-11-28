@@ -2910,8 +2910,8 @@ function AppContent({
             className="absolute inset-x-0 z-40"
             style={{
               bottom: showBottomNavArea
-                ? "calc(4.5rem + env(safe-area-inset-bottom))"
-                : "max(0.75rem, env(safe-area-inset-bottom))",
+                ? "calc(4.5rem + var(--app-safe-area-bottom))"
+                : "max(0.75rem, var(--app-safe-area-bottom))",
             }}
           >
             {persistenceError && !persistenceNoticeDismissed ? (

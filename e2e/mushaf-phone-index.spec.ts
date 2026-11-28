@@ -1,4 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
+import { t } from "../src/app/i18n";
 import { expect, test } from "@playwright/test";
 
 for (const { width, language, owner } of [
@@ -37,9 +38,10 @@ for (const { width, language, owner } of [
     const opener = top.getByTestId(owner === "wird" ? "mushaf-top-center-index" : "mushaf-furniture-surah-btn");
     const bookmark = top.getByTestId(owner === "wird" ? "mushaf-page-bookmark" : "mushaf-immersive-bookmark");
     const folio = bottom.getByTestId("mushaf-furniture-page-btn");
-    const focus = bottom.getByTestId("mushaf-focus-toggle");
+    const zoom = bottom.getByRole("button", { name: t(language, "quranZoom.open"), exact: true });
+    const more = top.getByTestId(owner === "wird" ? "mushaf-more-actions" : "mushaf-immersive-more");
     const back = top.getByTestId(owner === "wird" ? "mushaf-top-left-back" : "mushaf-immersive-close");
-    for (const control of [opener, bookmark, folio, focus]) {
+    for (const control of [opener, bookmark, folio, zoom]) {
       const bounds = (await control.boundingBox())!;
       expect(Number(bounds.height.toFixed(3))).toBeGreaterThanOrEqual(44);
       expect(Number(bounds.width.toFixed(3))).toBeGreaterThanOrEqual(44);
@@ -55,19 +57,24 @@ for (const { width, language, owner } of [
       // Enlarged text gives the location its full row; corner actions remain above.
       expect(bookmarkBounds.y + bookmarkBounds.height).toBeLessThanOrEqual(openerBounds.y + 1);
     } else expect(bookmarkBounds.x).toBeLessThan(openerBounds.x);
-    expect((await focus.boundingBox())!.x).toBeLessThan((await folio.boundingBox())!.x);
-    await expect(focus).toHaveText("");
+    expect((await zoom.boundingBox())!.x).toBeLessThan((await folio.boundingBox())!.x);
+    await expect(zoom).toContainText(t(language, "quranZoom.shortOpen"));
     await page.screenshot({ path: info.outputPath("reading.png") });
     await bookmark.click();
     await expect(bookmark).toHaveAttribute(owner === "wird" ? "aria-checked" : "aria-pressed", "true");
     await page.screenshot({ path: info.outputPath("bookmarked.png") });
-    await focus.click();
+    await zoom.click();
+    await expect(page.getByTestId("quran-enlarged-reading")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(zoom).toBeFocused();
+    await more.click();
+    await page.getByTestId("mushaf-focus-enter").click();
     const exit = bottom.getByTestId("mushaf-focus-exit");
     await expect(exit).toHaveText("");
     await expect(exit).toBeFocused();
     await page.screenshot({ path: info.outputPath("focus.png") });
     await exit.click();
-    await expect(focus).toBeFocused();
+    await expect(more).toBeFocused();
     await opener.click();
     const index = reader.getByTestId("mushaf-index-inline");
     await expect(index).toBeVisible();

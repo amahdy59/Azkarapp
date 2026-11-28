@@ -115,7 +115,7 @@
       "folder": "book3_al_wird_an_nabawi",
       "file": "al_wird_an_nabawi",
       "sourcePage": 34,
-      "scope": "The complete selected hadith on source page 34. The glossary beginning on this page continues elsewhere and is outside this sample.",
+      "scope": "The complete selected report and narrator chain on source PDF page 34. This English sample does not translate the glossary printed on that page.",
       "reference": "Reported by al-Bukhari, as cited by the publication. Source comparison: Sahih al-Bukhari 5017.",
       "referenceUrl": "https://sunnah.com/bukhari:5017",
       "sections": [
@@ -123,8 +123,8 @@
           "id": "bedtime",
           "title": "A report from Aishah",
           "kind": "hadith",
-          "selector": "#p-34 .hadith-text",
-          "english": "Aishah (may Allah be pleased with her) reported that whenever the Prophet ﷺ went to bed at night, he brought his palms together, blew lightly into them and recited Surah al-Ikhlas, Surah al-Falaq and Surah an-Nas. He then wiped as much of his body as he could with his hands, beginning with his head, his face and the front of his body. He did this three times.",
+          "selector": "[data-source-page=\"34\"] .hadith-text",
+          "english": "Urwah narrated from Aishah (may Allah be pleased with her) that whenever the Prophet ﷺ went to bed at night, he brought his palms together, blew lightly into them and recited Surah al-Ikhlas, Surah al-Falaq and Surah an-Nas. He then wiped as much of his body as he could with his hands, beginning with his head, his face and the front of his body. He did this three times.",
           "note": "The source identifies the three surahs by their opening words. These paired verses identify the surahs; they are not a substitute for reciting the complete surahs.",
           "repetition": "Three times, as stated in the report.",
           "quran": [

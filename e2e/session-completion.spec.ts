@@ -3,7 +3,11 @@ import { getAzkarForMode } from "../src/app/content/azkar";
 import { startOutageOrigin } from "./helpers/outage-origin";
 
 for (const language of ["ar", "en"] as const) {
-  test(`first final count opens the completion summary in ${language} @cross-browser`, async ({ page, baseURL }) => {
+  test(`first final count opens the completion summary in ${language} @cross-browser`, async ({
+    page,
+    baseURL,
+  }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     // A stopped test-owned origin proves actual cache recovery. Playwright's
     // context.setOffline can bypass the service worker for cold module loads
     // in WebKit (internal-error responses), rather than simulating an outage.
@@ -33,7 +37,10 @@ for (const language of ["ar", "en"] as const) {
       await origin.stop();
       await page.getByTestId("counter-surface").click();
       await expect(
-        page.getByRole("heading", { name: language === "ar" ? "ما شاء الله!" : "Masha’Allah!" }),
+        page.getByRole("heading", {
+          name: language === "ar" ? "أكملت أذكار المنزل" : "You completed Home",
+          level: 1,
+        }),
       ).toBeVisible();
       await expect(page.getByTestId("completion-reflection-source")).toBeVisible();
       await expect(page.getByTestId("completion-reflection-text")).not.toContainText(/Loading|جارٍ التحميل/u);
@@ -41,6 +48,13 @@ for (const language of ["ar", "en"] as const) {
       expect(saved.completed.home).toHaveLength(items.length);
       expect(saved.sessions.filter((session: { category: string }) => session.category === "home")).toHaveLength(1);
       await expect(page.getByRole("button", { name: language === "ar" ? "تم" : "Done", exact: true })).toBeVisible();
+      const completion = page.getByTestId("completion-screen");
+      expect(await completion.evaluate((node) => node.scrollHeight - node.clientHeight)).toBeLessThanOrEqual(1);
+      for (const action of await page.getByTestId("completion-actions").getByRole("button").all()) {
+        const rect = (await action.boundingBox())!;
+        expect(rect.y + rect.height).toBeLessThanOrEqual(844);
+      }
+      await page.screenshot({ path: info.outputPath(`completion-${language}-offline-restart.png`), scale: "css" });
       await page
         .getByRole("button", { name: language === "ar" ? "بدء جلسة جديدة" : "Start new session", exact: true })
         .click();

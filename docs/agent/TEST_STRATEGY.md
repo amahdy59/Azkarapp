@@ -4,6 +4,8 @@ reader-focus-intent covers real Tab/Space and pointer/menu journeys in the three
 
 # Test and Evidence Strategy
 
+The 2026-11-28 release adds explicit selection coverage for book/audio responsiveness, additional estimated timings, quiet reading tools, Android safe areas and Home/image/mobile sharing. Feature-selector regressions require these files under their owning commands. This improves targeted development feedback without removing any full-CI identity, engine, assertion, retry evidence or gate. Emitted-string compaction has exact-value VM regressions, including real audio catalogues and minified token boundaries; real-browser startup/feature and offline smoke remain necessary.
+
 ## Final-touch quality and motion — 2026-11-02
 
 `paper-grain.spec.ts` verifies the static texture in every app theme/material, asset loading, still geometry, actual Mushaf navigation and plain high-contrast/transparency/forced-color/print fallbacks. The Windows reduced-transparency preference must not hide an enabled static texture: it still disables frosting/material effects, while the app's explicit Reduce transparency, High contrast and Paper texture choices retain plain-surface control. The OS-preference case is separately asserted. Juz selection reuses the existing searchable picker for thirty choices, retaining pointer/keyboard/search and opaque bounded popup checks at 320px/200%.

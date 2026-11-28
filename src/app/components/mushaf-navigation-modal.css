@@ -4,12 +4,12 @@
   container: mushaf-index / inline-size;
 }
 .mushaf-index-dialog {
-  inset-inline-start: 50%;
-  inset-block-start: 50%;
+  left: calc(50% + (var(--app-safe-area-left) - var(--app-safe-area-right)) / 2);
+  top: calc(50% + (var(--app-safe-area-top) - var(--app-safe-area-bottom)) / 2);
   transform: translate(-50%, -50%);
-  inline-size: min(36rem, calc(100vw - 1rem));
+  inline-size: min(36rem, calc(100vw - var(--app-safe-area-left) - var(--app-safe-area-right) - 1rem));
   block-size: min(40rem, max(76dvh, calc(14rem + 200px)));
-  max-block-size: calc(100dvh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom)));
+  max-block-size: calc(100dvh - max(0.5rem, var(--app-safe-area-top)) - max(0.5rem, var(--app-safe-area-bottom)));
 }
 .mushaf-index-inline {
   background-color: var(--mushaf-paper);

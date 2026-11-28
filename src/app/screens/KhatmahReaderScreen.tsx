@@ -1318,6 +1318,7 @@ export function KhatmahReaderScreen({
               inlineIndex={inlineIndex ? indexPanel : undefined}
               inlineIndexOpen={inlineIndex && isIndexOpen}
               bottomLeftControl={isPhone ? phoneFocus : mobileBookmark}
+              zoomReplacesFocus={isPhone && !isFocusMode}
               bottomCenterControl={
                 isPhone ? (
                   mobileBottomCenter
@@ -1350,7 +1351,11 @@ export function KhatmahReaderScreen({
               onCenterTap={() => setIsFocusMode((prev) => !prev)}
               onPrevious={() => paginate(-1)}
               onNext={() => paginate(1)}
-              onReadingZoomOpen={playback.pauseFollowing}
+              onReadingZoomOpen={() => {
+                setPageMagnification(100);
+                setIsOptionsMenuOpen(false);
+                playback.pauseFollowing();
+              }}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
               verticalGestures={pageMagnification === 100 && colorGestures}

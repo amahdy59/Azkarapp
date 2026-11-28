@@ -379,7 +379,7 @@ describe("KhatmahReaderScreen difficult words", () => {
     const word = await screen.findByRole("button", { name: /معنى كلمة/ });
     await user.click(word);
     const popover = await screen.findByTestId("quran-word-popover");
-    expect(popover).toHaveTextContent("المعنى");
+    expect(popover).toHaveAccessibleName(/المعنى/);
     expect(popover).toHaveTextContent("آية ٢٥٥");
     expect(popover).not.toHaveTextContent("مجمع الملك فهد");
 
@@ -592,7 +592,8 @@ describe("KhatmahReaderScreen magnification and sizing", () => {
     const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
 
     expect(sheet.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
-    const zoom = sheet.getByRole("slider", { name: "Page magnification" });
+    await user.click(sheet.getByText("Advanced display"));
+    const zoom = sheet.getByRole("slider", { name: "Original page magnification" });
     fireEvent.change(zoom, { target: { value: "200" } });
     expect(document.querySelector(".mushaf-paper")).toHaveAttribute("data-magnified", "true");
     expect(document.querySelector(".mushaf-spread")).not.toBeInTheDocument();
@@ -611,7 +612,8 @@ describe("KhatmahReaderScreen magnification and sizing", () => {
     const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
 
     expect(sheet.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
-    expect(sheet.getByRole("slider", { name: "Page magnification" })).toBeInTheDocument();
+    await user.click(sheet.getByText("Advanced display"));
+    expect(sheet.getByRole("slider", { name: "Original page magnification" })).toBeInTheDocument();
   });
 });
 

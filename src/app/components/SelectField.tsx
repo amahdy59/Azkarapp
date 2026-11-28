@@ -11,6 +11,7 @@ export function SelectField<Value extends string>({
   options,
   onChange,
   direction,
+  contentClassName,
 }: {
   label: string;
   hint?: string;
@@ -18,6 +19,8 @@ export function SelectField<Value extends string>({
   options: readonly { value: Value; label: string }[];
   onChange: (value: Value) => void;
   direction: "ltr" | "rtl";
+  /** Opt-in surface treatment; shared portal, bounds and keyboard behavior remain. */
+  contentClassName?: string;
 }) {
   const id = useId();
   return (
@@ -41,7 +44,7 @@ export function SelectField<Value extends string>({
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className={contentClassName}>
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}

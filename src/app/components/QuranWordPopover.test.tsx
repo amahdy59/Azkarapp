@@ -4,6 +4,32 @@ import { QuranWordPopover } from "./QuranWordPopover";
 import { QuranWordMeaningSheet } from "./QuranWordMeaningSheet";
 
 describe("QuranWordPopover and QuranWordMeaningSheet", () => {
+  it("keeps a near-edge gloss inside the native safe rectangle", () => {
+    const root = document.documentElement;
+    for (const [edge, value] of Object.entries({ top: 48, right: 32, bottom: 64, left: 24 })) {
+      root.style.setProperty(`--app-safe-area-${edge}`, `${value}px`);
+    }
+    const anchor = document.createElement("button");
+    document.body.append(anchor);
+    vi.spyOn(anchor, "getBoundingClientRect").mockReturnValue({ top: 40, bottom: 60, left: 0, width: 20 } as DOMRect);
+    const width = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(200);
+    const height = vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(120);
+    const view = render(
+      <QuranWordPopover meanings={[sampleMeaning]} anchorEl={anchor} language="en" direction="ltr" onClose={vi.fn()} />,
+    );
+    try {
+      const gloss = screen.getByRole("dialog");
+      expect(Number.parseFloat(gloss.style.left)).toBeGreaterThanOrEqual(32);
+      expect(Number.parseFloat(gloss.style.top)).toBeGreaterThanOrEqual(56);
+      expect(Number.parseFloat(gloss.style.top) + 120).toBeLessThanOrEqual(window.innerHeight - 72);
+    } finally {
+      view.unmount();
+      width.mockRestore();
+      height.mockRestore();
+      anchor.remove();
+      for (const edge of ["top", "right", "bottom", "left"]) root.style.removeProperty(`--app-safe-area-${edge}`);
+    }
+  });
   const sampleMeaning = {
     id: "114:4:1",
     surahNumber: 114,
@@ -11,6 +37,27 @@ describe("QuranWordPopover and QuranWordMeaningSheet", () => {
     word: "الْوَسْوَاسِ",
     explanationArabic: "الذي يُلْقِي في النفس حديثًا خفيًا",
   };
+
+  it("keeps the verse passive, describes the gloss and returns explicit close focus to its word", () => {
+    const anchor = document.createElement("button");
+    document.body.append(anchor);
+    const onClose = vi.fn();
+    const view = render(
+      <QuranWordPopover meanings={[sampleMeaning]} anchorEl={anchor} language="en" direction="ltr" onClose={onClose} />,
+    );
+    try {
+      const gloss = screen.getByRole("dialog");
+      expect(gloss).toHaveAttribute("data-dropdown-surface", "");
+      expect(gloss).toHaveAccessibleDescription(sampleMeaning.explanationArabic);
+      expect(gloss.querySelector(".quran-word-popover-ayah")?.closest("button")).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Close word meaning" }));
+      expect(onClose).toHaveBeenCalledOnce();
+      expect(anchor).toHaveFocus();
+    } finally {
+      view.unmount();
+      anchor.remove();
+    }
+  });
 
   it("keeps the fixed gloss outside the reading canvas while preserving its page theme", () => {
     const canvas = document.createElement("div");

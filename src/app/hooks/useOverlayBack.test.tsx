@@ -12,6 +12,20 @@ function Layer({ close, hidden = false }: { close: () => void; hidden?: boolean 
 }
 
 describe("Android overlay Back", () => {
+  it("returns from inline enlargement before leaving the reading route", () => {
+    const close = vi.fn();
+    function InlineReading() {
+      const id = useOverlayBack(true, close);
+      return (
+        <section data-quran-inline-zoom="" data-back-dismiss={id}>
+          Reading
+        </section>
+      );
+    }
+    render(<InlineReading />);
+    act(() => expect(dismissTopOverlay()).toBe(true));
+    expect(close).toHaveBeenCalledOnce();
+  });
   it("dismisses only the foremost visible layer and cleans up on unmount", () => {
     const parent = vi.fn(),
       child = vi.fn();

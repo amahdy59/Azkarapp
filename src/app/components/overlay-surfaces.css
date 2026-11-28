@@ -5,6 +5,10 @@
 [data-overlay-surface] {
   overscroll-behavior: contain;
   --overlay-travel: -16px;
+  --overlay-gutter: 16px;
+  --overlay-available-height: calc(
+    100dvh - var(--app-safe-area-top) - var(--app-safe-area-bottom) - 2 * var(--overlay-gutter)
+  );
 }
 [data-overlay-origin="bottom"] {
   --overlay-travel: 16px;
@@ -122,14 +126,16 @@ html[data-app-material-resolved="glass"]:not(.high-contrast)
   }
 }
 .overlay-sheet[data-overlay-origin="top"] {
-  top: max(0px, env(safe-area-inset-top));
+  top: calc(var(--app-safe-area-top) + var(--overlay-gutter));
   bottom: auto;
   margin-block: 0;
   border-radius: 0 0 var(--ds-radius-overlay) var(--ds-radius-overlay);
   padding-block: 0;
 }
 .overlay-sheet {
-  max-block-size: calc(100dvh - max(12px, env(safe-area-inset-top)) - env(safe-area-inset-bottom));
+  padding-left: var(--app-safe-area-left);
+  padding-right: var(--app-safe-area-right);
+  max-block-size: var(--overlay-available-height);
   border-radius: var(--ds-radius-overlay) var(--ds-radius-overlay) 0 0;
 }
 .overlay-sheet > [data-slot="drawer-handle"] {
@@ -144,7 +150,10 @@ html[data-app-material-resolved="glass"]:not(.high-contrast)
   animation: overlay-leave var(--motion-duration-fast) var(--motion-ease-exit) both;
 }
 [data-overlay-surface="modal"] {
-  max-block-size: calc(100dvh - max(16px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)));
+  top: calc(50% + (var(--app-safe-area-top) - var(--app-safe-area-bottom)) / 2);
+  left: calc(50% + (var(--app-safe-area-left) - var(--app-safe-area-right)) / 2);
+  width: calc(100% - var(--app-safe-area-left) - var(--app-safe-area-right) - 2 * var(--overlay-gutter));
+  max-block-size: var(--overlay-available-height);
   border-radius: var(--ds-radius-overlay);
 }
 [data-overlay-surface] :is(input, button, select, textarea) {

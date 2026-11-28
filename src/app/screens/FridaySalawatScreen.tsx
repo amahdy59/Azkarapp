@@ -414,7 +414,7 @@ export function FridaySalawatScreen({
                 </div>
               </div>
 
-              <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+              <footer className="screen-chrome-footer shrink-0">
                 <div data-testid="reader-counter-stack">
                   {rounds > 0 && (
                     <div className="mb-2 text-center text-xs font-bold text-muted-foreground" aria-live="polite">
@@ -500,7 +500,7 @@ export function FridaySalawatScreen({
           language={language}
           maxWidthClassName="max-w-sm"
           showCloseButton={false}
-          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          drawerClassName="pb-[max(1.5rem,var(--app-safe-area-bottom))]"
         >
           <div className="flex min-h-0 flex-col overflow-hidden text-start">
             <SheetHeader
@@ -572,7 +572,7 @@ export function FridaySalawatScreen({
           testId="salawat-benefits-sheet"
           maxWidthClassName="max-w-lg"
           showCloseButton={false}
-          drawerClassName="pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+          drawerClassName="pb-[max(1.25rem,var(--app-safe-area-bottom))]"
         >
           <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
             <SheetHeader

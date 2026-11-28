@@ -1,9 +1,45 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { startOutageOrigin } from "./helpers/outage-origin";
+import catalogue from "../src/app/learning/catalogue.json" with { type: "json" };
+import type { LearningResource } from "../src/app/learning/types";
 
 test.beforeEach(async ({ page }) => {
   await page.route(/\/__browser-test-api(?:\/|\?|$)/, (route) => route.abort());
+});
+
+test("@cross-browser a book update retains a verified older offline copy and saved bookmarks", async ({ page }) => {
+  const resource = catalogue.find(
+    (item) => item.id === "al-mukhtar" && item.language === "ar",
+  ) as unknown as LearningResource;
+  const previous = resource.previousPacks![0]!;
+  await enter(page, "#/learn");
+  await page.evaluate(async (previous) => {
+    const response = await fetch(`/__learning-assets__/${previous.path}`);
+    if (!response.ok) throw new Error("Missing prior immutable book");
+    const cache = await caches.open("azkar-learning-v1");
+    await cache.put(
+      `/__learning-assets__/${previous.path}`,
+      new Response(await response.arrayBuffer(), { headers: { "X-Learning-Resource": "al-mukhtar" } }),
+    );
+    localStorage.setItem(
+      "azkar.learning.v1",
+      JSON.stringify({ "al-mukhtar": { position: { unitId: "p-14", offset: 0.25 }, bookmarks: ["p-14"] } }),
+    );
+  }, previous);
+  await page.route(`**/__learning-assets__/${resource.pack.path}`, (route) => route.abort());
+  await page.goto("/#/learn/al-mukhtar/p-14");
+  await expect(page.getByTestId("learning-content")).toBeVisible();
+  await expect(
+    page.getByText(
+      "Showing your previously saved edition. The latest edition is unavailable; connect to download it.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Remove this bookmark", exact: true })).toBeVisible();
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("azkar.learning.v1")!)["al-mukhtar"]);
+  expect(stored.position.unitId).toBe("p-14");
+  expect(stored.bookmarks).toEqual(["p-14"]);
 });
 
 async function enter(page: Page, hash = "#/learn", language: "ar" | "en" = "en", origin = "") {
@@ -17,6 +53,71 @@ async function enter(page: Page, hash = "#/learn", language: "ar" | "en" = "en",
   );
   await page.goto(`${origin}/${hash}`);
 }
+
+for (const sample of [
+  { id: "mukhtar context", book: "al-mukhtar", unit: 5, selector: ".learn-visual", image: true },
+  { id: "bedtime context", book: "al-wird-an-nabawi", unit: 34, selector: ".learn-visual", image: true },
+  { id: "tawaf route", book: "dalil-al-mutamir", unit: 8, selector: '[data-diagram="tawaf"]', image: false },
+  { id: "sai route", book: "dalil-al-mutamir", unit: 9, selector: '[data-diagram="sai"]', image: false },
+]) {
+  test(`@cross-browser source-bound graphic: ${sample.id} reflows and preserves equivalent text`, async ({
+    browser,
+  }, testInfo) => {
+    for (const variant of [
+      { width: 320, height: 900, language: "ar", themeMode: "light", appMaterial: "glass", enlarged: true },
+      { width: 390, height: 844, language: "ar", themeMode: "dark", appMaterial: "solid", enlarged: false },
+      { width: 768, height: 1024, language: "en", themeMode: "navy", appMaterial: "glass", enlarged: false },
+      { width: 1440, height: 1000, language: "en", themeMode: "light", appMaterial: "solid", enlarged: false },
+    ]) {
+      const context = await browser.newContext({ viewport: variant, reducedMotion: "reduce" });
+      try {
+        const page = await context.newPage();
+        await page.route(/\/__browser-test-api(?:\/|\?|$)/, (route) => route.abort());
+        await page.addInitScript((settings) => {
+          localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+          localStorage.setItem("azkarapp.state.v1", JSON.stringify({ settings }));
+        }, variant);
+        await page.goto(`/#/learn/${sample.book}/p-${sample.unit}`);
+        const content = page.getByTestId("learning-content");
+        await expect(content).toHaveAttribute("lang", "ar");
+        if (variant.enlarged) await page.evaluate(() => (document.documentElement.style.fontSize = "200%"));
+        await page.evaluate(() => document.fonts.ready);
+        const figure = content.locator(sample.selector).first();
+        await figure.scrollIntoViewIfNeeded();
+        await expect(figure.locator("figcaption")).not.toBeEmpty();
+        expect(await figure.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+        expect(await content.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+        if (sample.image) {
+          const image = figure.locator("img");
+          await expect(image).toHaveAttribute("alt", /.+/);
+          await expect.poll(() => image.evaluate((element) => element.complete && element.naturalWidth > 0)).toBe(true);
+          const ratio = await image.evaluate((element) => element.clientWidth / element.clientHeight);
+          expect(ratio).toBeCloseTo(1.5, 1);
+        } else {
+          await expect(figure.locator("svg")).toHaveAttribute("lang", "ar");
+          await expect(figure.locator("svg desc")).not.toBeEmpty();
+          if (sample.unit === 9) await expect(figure.locator("[data-passage]")).toHaveCount(7);
+        }
+        await page.screenshot({ path: testInfo.outputPath(`${sample.book}-${sample.unit}-${variant.width}.png`) });
+      } finally {
+        await context.close();
+      }
+    }
+  });
+}
+
+test("source-bound graphic: unavailable bedtime photo preserves text and chapter boundary", async ({ page }) => {
+  await page.route(/\/__learning-assets__\/[^/]+\.webp$/, (route) => route.abort());
+  await enter(page, "#/learn/al-wird-an-nabawi/p-33", "ar");
+  await expect(page.getByTestId("learning-content")).toBeVisible();
+  await expect(page.locator(".learn-visual")).toHaveCount(0);
+  await page.goto("/#/learn/al-wird-an-nabawi/p-34");
+  const content = page.getByTestId("learning-content");
+  await expect(content.locator(".learn-visual figcaption")).toContainText("ورد النوم");
+  await expect(content.locator(".learn-photo-placeholder")).toHaveAttribute("aria-label", /فراش/);
+  await expect(content).toContainText("عُرْوَةَ");
+  await expect(content).toContainText("الرِّيقِ");
+});
 
 test("@cross-browser completed English book is selectable, searchable and keeps Arabic records independent", async ({
   page,

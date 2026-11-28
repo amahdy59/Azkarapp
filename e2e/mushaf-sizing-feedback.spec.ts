@@ -101,7 +101,7 @@ for (const owner of ["wird", "surah"] as const) {
     await page.screenshot({ path: info.outputPath(`${owner}-focus.png`) });
     await exit.click();
     await expect(more).toBeVisible();
-    await expect(page.getByTestId("mushaf-focus-toggle")).toBeFocused();
+    await expect(more).toBeFocused();
     expect(await canvas.getAttribute("data-mushaf-page")).toBe(position);
   });
 }

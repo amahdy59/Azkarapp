@@ -1,5 +1,19 @@
 /* Only ordinary headers mark their Back wrapper; immersive reading keeps its
    recovery action. Actual rail/sidebar presence owns wide navigation. */
+.shared-screen-header,
+.home-page-header,
+[data-sheet-header] {
+  padding-block: var(--chrome-edge-space);
+}
+.screen-chrome-footer {
+  padding-block: var(--chrome-edge-space) max(var(--chrome-edge-space), var(--chrome-safe-bottom));
+}
+.bottom-nav {
+  padding-block: var(--chrome-edge-space) calc(var(--chrome-edge-space) + var(--app-safe-area-bottom));
+}
+.nav-sidebar-footer {
+  padding-block: var(--chrome-edge-space);
+}
 .app-shell:has(.app-sidebar, .app-rail) .shared-header-back {
   display: none;
 }

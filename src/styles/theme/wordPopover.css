@@ -5,12 +5,13 @@
 .quran-word-popover {
   position: fixed;
   z-index: 60;
-  max-width: min(22rem, calc(100vw - 2rem));
+  width: max-content;
+  max-width: min(19rem, calc(100vw - var(--app-safe-area-left) - var(--app-safe-area-right) - 1.5rem));
   /* Keeps the box off the screen edge when it is clamped. Without it the
      browser parks it flush against the edge on a phone, which reads as
      clipped rather than placed. */
   margin-inline: 0;
-  border-radius: var(--ds-radius-card, 1rem);
+  border-radius: 1rem;
   border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
   /* Reads as a layer above the page rather than another card in it: the tint
      leans on the highlight colour the word already uses, so the eye connects
@@ -18,11 +19,80 @@
   background: color-mix(in srgb, var(--primary) 10%, var(--popover, var(--card)));
   color: var(--popover-foreground, var(--card-foreground));
   box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.28),
-    0 12px 28px -10px rgb(0 0 0 / 0.45);
-  padding: 0.625rem 0.75rem;
+    0 2px 4px rgb(0 0 0 / 0.08),
+    0 8px 24px -10px rgb(0 0 0 / 0.28);
+  padding: 0.375rem 0.75rem 0.75rem;
   transform-origin: var(--caret-x, 50%) 0;
   animation: quran-word-popover-in var(--motion-duration-fast) var(--motion-ease-enter) both;
+}
+/* The paper's own theme follows the portal; Glass never makes a gloss
+   translucent or changes a light page's explanation to a navy surface. */
+html [data-dropdown-surface].quran-word-popover {
+  background-color: var(--background) !important;
+  background-image: none !important;
+  color: var(--foreground);
+  backdrop-filter: none;
+}
+.quran-word-popover-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.quran-word-popover-content {
+  max-block-size: calc(100dvh - var(--app-safe-area-top) - var(--app-safe-area-bottom) - 3rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.quran-word-popover-reference {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  min-inline-size: 0;
+}
+.quran-word-popover-word {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.65;
+  color: var(--primary);
+}
+.quran-word-popover-ayah {
+  font-size: var(--text-micro);
+  color: var(--muted-foreground);
+}
+.quran-word-popover-close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border-radius: 999px;
+}
+.quran-word-popover-explanation {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.quran-word-popover-all {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: 44px;
+  margin-block-end: -0.5rem;
+  font-size: var(--text-micro);
+  font-weight: 600;
+  color: var(--primary);
+  border-radius: 0.5rem;
+}
+.quran-word-popover :is(button:focus-visible) {
+  outline: 3px solid var(--ring);
+  outline-offset: 1px;
 }
 
 /* Caret. Centred under anchor positioning (the popover is anchor-centred);

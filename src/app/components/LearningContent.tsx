@@ -21,14 +21,20 @@ export function LearningContent({
     const className = node.className ? `learn-${node.className}` : undefined;
     if (node.tag === "diagram")
       return (
-        <LearningDiagram key={key} kind={node.diagram!} title={node.label!} description={node.alt!}>
+        <LearningDiagram
+          key={key}
+          kind={node.diagram!}
+          title={node.label!}
+          description={node.alt!}
+          language={node.lang}
+        >
           {children}
         </LearningDiagram>
       );
     if (node.tag === "illustration") return <UmrahStageArtwork key={key} stage={node.artwork!} />;
     if (node.tag === "img")
       return images[node.asset!] ? (
-        <img key={key} src={images[node.asset!]} alt={node.alt || ""} />
+        <img key={key} src={images[node.asset!]} alt={node.alt || ""} loading="lazy" decoding="async" />
       ) : (
         <div key={key} className="learn-photo-placeholder" role="img" aria-label={node.alt || undefined} />
       );

@@ -1,8 +1,10 @@
 import { AudioQueueSheet } from "./AudioQueueSheet";
+import { useSafeAreaCollisionPadding } from "../hooks/useSafeAreaCollisionPadding";
 import { ToggleTrack } from "./SettingsRow";
 import { AudioControlLock } from "./AudioControlLock";
 import { Lock } from "./icons";
 import { AudioOptionToggle } from "./AudioOptionToggle";
+import { AudioOptionsSurface, useAudioOptionsDock } from "./AudioOptionsSurface";
 import "./floating-audio-player.css";
 import { createPortal } from "react-dom";
 import { MushafMagnificationControl } from "./MushafMagnificationControl";
@@ -197,6 +199,7 @@ export function FloatingAudioPlayer({
   onClose?: () => void;
 }) {
   const { state, currentEntry, currentSegment } = controller;
+  const sleepMenuPadding = useSafeAreaCollisionPadding(16);
   /* A tablet or desktop has room for the player beside the page. */
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && (preferCompactReading || !hasRoomBesideReading);
@@ -218,17 +221,43 @@ export function FloatingAudioPlayer({
   const readingOverlay = preferCompactReading && overReadingSurface && !dockedInReader;
   useEffect(() => setReadingDockHidden(false), [currentEntry?.entryId, readingOverlay]);
   const [audioOptionsHost, setAudioOptionsHost] = useState<HTMLDivElement | null>(null);
+  const [audioOptionsDockHost, setAudioOptionsDockHost] = useState<HTMLDivElement | null>(null);
+  const optionsDockAvailable = useAudioOptionsDock(audioOptionsDockHost);
   const [listeningRecoveryHost, setListeningRecoveryHost] = useState<HTMLDivElement | null>(null);
   const [quranPreferencesHost, setQuranPreferencesHost] = useState<HTMLDivElement | null>(null);
   const [repeatOpen, setRepeatOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  // Quran keeps the printed page centered even while optional settings are open.
+  const canDockOptions = optionsDockAvailable && !focusMode && currentEntry?.contentKind !== "quran";
+  const dockedOptions = canDockOptions && optionsOpen;
   const repeatTrigger = useRef<HTMLButtonElement>(null);
   const repeatContent = useRef<HTMLDivElement>(null);
   const optionsTrigger = useRef<HTMLButtonElement>(null);
-  const optionsContent = useRef<HTMLDivElement>(null);
+  const optionsContent = useRef<HTMLElement | null>(null);
+  const focusedOption = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const remember = () => {
+      const active = document.activeElement;
+      focusedOption.current = active instanceof HTMLElement && optionsContent.current?.contains(active) ? active : null;
+    };
+    document.addEventListener("focusin", remember);
+    return () => document.removeEventListener("focusin", remember);
+  }, []);
+  useLayoutEffect(() => {
+    if (!focusedOption.current || focusedOption.current.isConnected) return;
+    // Reparenting between the sidebar and portal must not strand keyboard focus.
+    const target = dockedOptions
+      ? optionsContent.current?.querySelector<HTMLElement>('button:not([disabled]), [tabindex="0"], summary')
+      : optionsTrigger.current;
+    target?.focus();
+    focusedOption.current = null;
+    setVoiceMenuOpen(false);
+    setSpeedMenuOpen(false);
+    setOptionsOpen(false);
+  }, [dockedOptions]);
   const repeatFocus = usePopoverOutsideDismiss(repeatOpen, () => setRepeatOpen(false), repeatTrigger, repeatContent);
   const optionsFocus = usePopoverOutsideDismiss(
-    optionsOpen,
+    optionsOpen && !dockedOptions,
     () => {
       setOptionsOpen(false);
       setVoiceMenuOpen(false);
@@ -326,6 +355,7 @@ export function FloatingAudioPlayer({
   const arabicTextId = useId();
   const compactDescriptionId = useId();
   const continuationDescriptionId = useId();
+  const audioOptionsId = useId();
   const controllerRef = useRef(controller);
   controllerRef.current = controller;
   const timingRef = useRef({ currentTime: state.currentTime, duration: state.duration });
@@ -672,6 +702,7 @@ export function FloatingAudioPlayer({
             <button
               type="button"
               ref={expandButtonRef}
+              data-testid="reader-audio-expand"
               onClick={() => setIsMinimized(false)}
               aria-label={t(language, "audioPlayer.expand")}
               aria-describedby={compactDescriptionId}
@@ -855,7 +886,14 @@ export function FloatingAudioPlayer({
         data-variant="expanded"
         data-listening-focus={focusMode || undefined}
         data-listening-desk={listeningDesk || undefined}
+        data-canonical-listening={canonicalListening || undefined}
+        data-options-docked={dockedOptions || undefined}
         onKeyDown={(event) => {
+          if (event.key === "Escape" && dockedOptions && !voiceMenuOpen && !speedMenuOpen) {
+            event.preventDefault();
+            setOptionsOpen(false);
+            optionsTrigger.current?.focus();
+          }
           event.stopPropagation();
           const viewport = readingTextRef.current;
           if (
@@ -917,6 +955,11 @@ export function FloatingAudioPlayer({
               className="audio-expanded-identity flex min-w-0 flex-wrap items-center justify-center gap-2 px-1"
               data-testid="audio-expanded-identity"
             >
+              {!listeningDesk && (
+                <p className="audio-wide-title" dir="auto">
+                  {title}
+                </p>
+              )}
               <div className="min-w-0 max-w-full" ref={setAudioOptionsHost} />
             </div>
             <button
@@ -932,120 +975,104 @@ export function FloatingAudioPlayer({
             </button>
           </div>
 
-          {/* Metadata stays still while the complete reviewed text scrolls independently. */}
-          <div className="audio-expanded-reading relative flex min-h-0 flex-col overflow-hidden">
-            <div className="flex min-h-0 flex-1 flex-col items-center">
-              <div className="audio-expanded-meta w-full shrink-0 flex items-center px-3 text-center">
-                {!dockedInReader && !currentEntry.mushafPages?.length && <span className="sr-only">{title}</span>}
-              </div>
+          <div className="audio-expanded-stage">
+            {/* Metadata stays still while the complete reviewed text scrolls independently. */}
+            <div className="audio-expanded-reading relative flex min-h-0 flex-col overflow-hidden">
+              <div className="flex min-h-0 flex-1 flex-col items-center">
+                <div className="audio-expanded-meta w-full shrink-0 flex items-center px-3 text-center">
+                  {!dockedInReader && !currentEntry.mushafPages?.length && <span className="sr-only">{title}</span>}
+                </div>
 
-              {/* Full Zikr Text Area: written within the area of the Zikr name */}
-              <div
-                ref={readingTextRef}
-                // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Native text region must be keyboard-scrollable.
-                tabIndex={0}
-                role="region"
-                aria-label={t(language, "audioPlayer.nowPlaying")}
-                className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
-                style={{
-                  scrollbarGutter: "stable both-edges",
-                  paddingBlockStart: canonicalListening ? 0 : undefined,
-                }}
-              >
-                {canonicalListening ? (
-                  <Suspense fallback={<p role="status">{t(language, "quranListening.loading")}</p>}>
-                    <QuranListeningReader
-                      key={currentEntry.entryId}
-                      recoveryHost={listeningRecoveryHost}
-                      preferencesHost={quranPreferencesHost}
-                      entry={currentEntry}
-                      segment={controller.currentSegment}
-                      currentTime={state.currentTime}
-                      playing={state.status === "playing"}
-                      readTime={state.status === "loading" ? undefined : controller.getPlaybackTime}
-                      theme={mushafTheme}
-                      textScale={mushafTextScale}
-                      magnification={pageMagnification}
-                      language={language}
-                      textSize={textSize}
-                    />
-                  </Suspense>
-                ) : (
-                  <ReadingTextTransition
-                    entryId={currentEntry.entryId}
-                    index={state.entryIndex}
-                    direction={direction}
-                    reduceMotion={Boolean(motionReduced)}
-                    className={`w-full max-w-2xl shrink-0 py-2 text-center`}
-                  >
-                    <div className="flex w-full flex-col items-center justify-center">
-                      {englishFirst && (
-                        <>
-                          <p
-                            data-testid="audio-player-zikr-text"
-                            className="w-full text-center text-lg sm:text-xl leading-relaxed text-foreground"
-                            dir="ltr"
-                            lang="en"
-                          >
-                            <ListeningWordText
-                              text={currentEntry.translation ?? ""}
-                              cue={spokenLanguage === "en" ? listeningCue : null}
-                            />
-                          </p>
-                        </>
-                      )}
-                      {language === "en" && !englishFirst && (
-                        <p className="mb-2 text-sm leading-relaxed text-muted-foreground" lang="en" dir="ltr">
-                          {t(language, "audioPlayer.translationUnavailable")}
-                        </p>
-                      )}
-
-                      <ArabicTextTag
-                        id={arabicTextId}
-                        hidden={englishFirst && !showArabic}
-                        data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
-                        className={`zikr-text text-center font-medium ${
-                          currentEntry.quranText || currentEntry.contentKind === "quran"
-                            ? "leading-[1.7]"
-                            : "leading-relaxed"
-                        } text-foreground ${hasExcerpt ? "w-full" : ""} ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
-                        style={{
-                          fontFamily:
-                            currentEntry.quranText || currentEntry.contentKind === "quran"
-                              ? "var(--font-mushaf)"
-                              : undefined,
-                          ...(currentEntry.quranText || currentEntry.contentKind === "quran" ? QURAN_TEXT_STYLE : {}),
-                          fontSize:
-                            currentEntry.quranText || currentEntry.contentKind === "quran"
-                              ? getQuranReadingSize(textSize)
-                              : getReadingFontSizeRem({
-                                  textSize,
-                                  arabicLength: zikrArabicText.length,
-                                  longSurah: false,
-                                }),
-                        }}
-                        dir="rtl"
-                        lang="ar"
-                      >
-                        {hasExcerpt ? (
-                          <Suspense
-                            fallback={
+                {/* Full Zikr Text Area: written within the area of the Zikr name */}
+                <div
+                  ref={readingTextRef}
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Native text region must be keyboard-scrollable.
+                  tabIndex={0}
+                  role="region"
+                  aria-label={t(language, "audioPlayer.nowPlaying")}
+                  className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+                  style={{
+                    scrollbarGutter: "stable both-edges",
+                    paddingBlockStart: canonicalListening ? 0 : undefined,
+                  }}
+                >
+                  {canonicalListening ? (
+                    <Suspense fallback={<p role="status">{t(language, "quranListening.loading")}</p>}>
+                      <QuranListeningReader
+                        key={currentEntry.entryId}
+                        recoveryHost={listeningRecoveryHost}
+                        preferencesHost={quranPreferencesHost}
+                        entry={currentEntry}
+                        segment={controller.currentSegment}
+                        currentTime={state.currentTime}
+                        playing={state.status === "playing"}
+                        readTime={state.status === "loading" ? undefined : controller.getPlaybackTime}
+                        theme={mushafTheme}
+                        textScale={mushafTextScale}
+                        magnification={pageMagnification}
+                        language={language}
+                        textSize={textSize}
+                      />
+                    </Suspense>
+                  ) : (
+                    <ReadingTextTransition
+                      entryId={currentEntry.entryId}
+                      index={state.entryIndex}
+                      direction={direction}
+                      reduceMotion={Boolean(motionReduced)}
+                      className={`w-full max-w-2xl shrink-0 py-2 text-center`}
+                    >
+                      <div className="flex w-full flex-col items-center justify-center">
+                        {englishFirst && (
+                          <>
+                            <p
+                              data-testid="audio-player-zikr-text"
+                              className="w-full text-center text-lg sm:text-xl leading-relaxed text-foreground"
+                              dir="ltr"
+                              lang="en"
+                            >
                               <ListeningWordText
-                                text={zikrArabicText}
-                                quranLanguage={
-                                  currentEntry.quranText || currentEntry.contentKind === "quran" ? language : undefined
-                                }
-                                cue={spokenLanguage === "ar" ? listeningCue : null}
+                                text={currentEntry.translation ?? ""}
+                                cue={spokenLanguage === "en" ? listeningCue : null}
                               />
-                            }
-                          >
-                            <MushafExcerpt
-                              canonicalKey={currentEntry.canonicalKey}
-                              transcript={zikrArabicText}
-                              language={language}
-                              cue={spokenLanguage === "ar" ? listeningCue : null}
-                              textSize={textSize}
-                              theme={mushafTheme}
+                            </p>
+                          </>
+                        )}
+                        {language === "en" && !englishFirst && (
+                          <p className="mb-2 text-sm leading-relaxed text-muted-foreground" lang="en" dir="ltr">
+                            {t(language, "audioPlayer.translationUnavailable")}
+                          </p>
+                        )}
+
+                        <ArabicTextTag
+                          id={arabicTextId}
+                          hidden={englishFirst && !showArabic}
+                          data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
+                          className={`zikr-text text-center font-medium ${
+                            currentEntry.quranText || currentEntry.contentKind === "quran"
+                              ? "leading-[1.7]"
+                              : "leading-relaxed"
+                          } text-foreground ${hasExcerpt ? "w-full" : ""} ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
+                          style={{
+                            fontFamily:
+                              currentEntry.quranText || currentEntry.contentKind === "quran"
+                                ? "var(--font-mushaf)"
+                                : undefined,
+                            ...(currentEntry.quranText || currentEntry.contentKind === "quran" ? QURAN_TEXT_STYLE : {}),
+                            fontSize:
+                              currentEntry.quranText || currentEntry.contentKind === "quran"
+                                ? getQuranReadingSize(textSize)
+                                : getReadingFontSizeRem({
+                                    textSize,
+                                    arabicLength: zikrArabicText.length,
+                                    longSurah: false,
+                                  }),
+                          }}
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          {hasExcerpt ? (
+                            <Suspense
                               fallback={
                                 <ListeningWordText
                                   text={zikrArabicText}
@@ -1057,233 +1084,256 @@ export function FloatingAudioPlayer({
                                   cue={spokenLanguage === "ar" ? listeningCue : null}
                                 />
                               }
+                            >
+                              <MushafExcerpt
+                                canonicalKey={currentEntry.canonicalKey}
+                                transcript={zikrArabicText}
+                                language={language}
+                                cue={spokenLanguage === "ar" ? listeningCue : null}
+                                textSize={textSize}
+                                theme={mushafTheme}
+                                fallback={
+                                  <ListeningWordText
+                                    text={zikrArabicText}
+                                    quranLanguage={
+                                      currentEntry.quranText || currentEntry.contentKind === "quran"
+                                        ? language
+                                        : undefined
+                                    }
+                                    cue={spokenLanguage === "ar" ? listeningCue : null}
+                                  />
+                                }
+                              />
+                            </Suspense>
+                          ) : (
+                            <ListeningWordText
+                              text={zikrArabicText}
+                              quranLanguage={
+                                currentEntry.quranText || currentEntry.contentKind === "quran" ? language : undefined
+                              }
+                              cue={spokenLanguage === "ar" ? listeningCue : null}
                             />
-                          </Suspense>
-                        ) : (
-                          <ListeningWordText
-                            text={zikrArabicText}
-                            quranLanguage={
-                              currentEntry.quranText || currentEntry.contentKind === "quran" ? language : undefined
-                            }
-                            cue={spokenLanguage === "ar" ? listeningCue : null}
-                          />
+                          )}
+                        </ArabicTextTag>
+                        {!englishFirst && isEnglishMode && currentEntry.translation && (
+                          <p
+                            className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"
+                            dir="ltr"
+                            lang="en"
+                          >
+                            <ListeningWordText
+                              text={currentEntry.translation}
+                              cue={spokenLanguage === "en" ? listeningCue : null}
+                            />
+                          </p>
                         )}
-                      </ArabicTextTag>
-                      {!englishFirst && isEnglishMode && currentEntry.translation && (
-                        <p
-                          className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"
-                          dir="ltr"
-                          lang="en"
-                        >
-                          <ListeningWordText
-                            text={currentEntry.translation}
-                            cue={spokenLanguage === "en" ? listeningCue : null}
-                          />
-                        </p>
-                      )}
-                    </div>
-                  </ReadingTextTransition>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
-          <div className="audio-expanded-controls mx-auto w-full max-w-5xl shrink-0 pt-1">
-            <div
-              className="audio-expanded-feedback flex items-center justify-center text-xs text-muted-foreground"
-              dir={direction}
-            >
-              {totalTracks > 1 && (
-                <Popover.Root open={queueOpen} onOpenChange={setQueueOpen}>
-                  <Popover.Trigger asChild>
-                    <button
-                      type="button"
-                      data-testid="audio-queue-trigger"
-                      aria-label={`${t(language, "listening.queue")} · ${queuePosition}`}
-                      className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 text-xs font-semibold hover:bg-muted ${ACTION_FOCUS}`}
-                    >
-                      <List size={16} className="control-cue" aria-hidden="true" />
-                      <span className="audio-context-label">{t(language, "listening.queueShort")}</span>{" "}
-                      <bdi dir="ltr">{queuePosition}</bdi>
-                    </button>
-                  </Popover.Trigger>
-                  <AudioQueueSheet onClose={() => setQueueOpen(false)} controller={controller} language={language} />
-                </Popover.Root>
-              )}
-              {(canRepeat || repetitionProgress) && (
-                <Popover.Root open={repeatOpen} onOpenChange={setRepeatOpen}>
-                  <Popover.Trigger asChild>
-                    <button
-                      type="button"
-                      aria-label={`${t(language, "audioPlayer.repeatShort")}: ${repetitionProgress ?? (repeatEnabled ? repeatLabel : t(language, "audioPlayer.playOnce"))}`}
-                      className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 font-semibold hover:bg-muted ${ACTION_FOCUS}`}
-                      data-testid="audio-repetition-progress"
-                      ref={repeatTrigger}
-                    >
-                      <Repeat size={16} className="control-cue" aria-hidden="true" />
-                      <span className="audio-context-label">{t(language, "audioPlayer.repeatShort")}</span>{" "}
-                      <bdi dir="ltr">
-                        {repetitionProgress ??
-                          (repeatEnabled
-                            ? formatNumerals(currentEntry.prescribedRepetitions, language)
-                            : formatNumerals(1, language))}
-                      </bdi>
-                    </button>
-                  </Popover.Trigger>
-                  <Popover.Portal>
-                    <Popover.Content
-                      ref={repeatContent}
-                      data-overlay-surface="contextual"
-                      onCloseAutoFocus={repeatFocus}
-                      data-dropdown-surface=""
-                      aria-label={t(language, "audioPlayer.repeatShort")}
-                      side="top"
-                      collisionPadding={16}
-                      dir={direction}
-                      className="audio-options-panel z-[120] w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-popover p-3 text-popover-foreground shadow-overlay"
-                      style={{ maxHeight: "var(--radix-popover-content-available-height)", overflowY: "auto" }}
-                    >
-                      <p className="mb-2 text-xs text-muted-foreground">{t(language, "listening.repeatHelp")}</p>
-                      {canRepeat && (
-                        <AudioOptionToggle
-                          className="audio-repeat-option"
-                          label={repeatLabel}
-                          checked={repeatEnabled}
-                          onChange={() =>
-                            controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")
-                          }
-                        />
-                      )}
-                    </Popover.Content>
-                  </Popover.Portal>
-                </Popover.Root>
-              )}
-              {controller.sleepDeadline && (
-                <span className="audio-timer-context inline-flex min-h-11 items-center gap-1 text-xs text-muted-foreground">
-                  <span aria-hidden="true">{t(language, "listening.timerShort")}</span>
-                  <span className="sr-only">
-                    {t(language, "listening.sleepAt", {
-                      time: new Intl.DateTimeFormat(language, { hour: "numeric", minute: "2-digit" }).format(
-                        controller.sleepDeadline,
-                      ),
-                    })}
-                  </span>
-                  <bdi dir="ltr" aria-hidden="true">
-                    {new Intl.DateTimeFormat(language, { hour: "numeric", minute: "2-digit" }).format(
-                      controller.sleepDeadline,
-                    )}
-                  </bdi>
-                </span>
-              )}
-              <div className="audio-play-all-indicator" data-testid="audio-play-all-indicator">
-                {totalTracks > 1 && (
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={controller.autoAdvance}
-                    aria-label={t(language, "listening.autoContinue")}
-                    title={t(language, "listening.autoContinueHelp")}
-                    aria-describedby={continuationDescriptionId}
-                    onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
-                    className={`audio-continuation-switch flex min-h-11 items-center justify-between gap-2 rounded-full border border-border px-3 py-2 text-start text-xs ${ACTION_FOCUS}`}
-                  >
-                    <span className="audio-continue-label min-w-0 font-semibold">
-                      {t(language, "listening.autoContinueShort")}
-                    </span>
-                    <ToggleTrack checked={controller.autoAdvance} />
-                  </button>
-                )}
-              </div>
-              <span id={continuationDescriptionId} className="sr-only">
-                {t(language, "listening.autoContinueHelp")}
-              </span>
-              {!listeningDesk && (
-                <div className="audio-focus-actions">
-                  <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
-                  {focusToggle}
-                  {lockToggle}
+                      </div>
+                    </ReadingTextTransition>
+                  )}
                 </div>
-              )}
-            </div>
-            {listeningDesk && (
-              <div className="audio-focus-actions audio-desk-recovery">
-                <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
               </div>
-            )}
-            {/* One waveform seek control with balanced time labels. */}
-            <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
-              <span dir="ltr" className={AUDIO_TIME_LABEL}>
-                <span className="sr-only">{t(language, "audioPlayer.elapsed")}: </span>
-                {formatTime(state.currentTime, language)}
-              </span>
+            </div>
+
+            {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
+            <div className="audio-expanded-controls mx-auto w-full max-w-5xl shrink-0 pt-1">
               <div
-                className={`audio-seek-control relative flex min-w-0 flex-1 items-center h-11 ${waveform ? "audio-seek-control--waveform" : ""}`}
+                className="audio-expanded-feedback flex items-center justify-center text-xs text-muted-foreground"
+                dir={direction}
               >
-                {waveform && renderWaveform(waveform, 18, "audio-seek-waveform")}
-                <input
-                  type="range"
-                  min={0}
-                  max={Math.max(0, state.duration)}
-                  step="any"
-                  value={Math.min(state.currentTime, state.duration || 0)}
-                  disabled={state.duration <= 0}
-                  onChange={(event) => controller.seek(Number(event.currentTarget.value))}
-                  onKeyDown={handleTimelineKeyDown}
-                  aria-label={t(language, "audioPlayer.seek")}
-                  aria-keyshortcuts="PageUp PageDown"
-                  aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
-                  style={
-                    {
-                      "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%)`,
-                    } as CSSProperties
-                  }
-                  className={`audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary ${ACTION_FOCUS}`}
-                />
-              </div>
-              <span dir="ltr" className={AUDIO_TIME_LABEL}>
-                <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
-                {formatTime(state.duration, language)}
-              </span>
-            </div>
-
-            {listeningDesk ? (
-              <div className="audio-desk-transport">
-                {focusToggle}
-                {transport}
-                {lockToggle}
-              </div>
-            ) : (
-              transport
-            )}
-
-            {audioOptionsHost &&
-              createPortal(
-                <div
-                  className="audio-expanded-options flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-muted-foreground"
-                  dir={direction}
-                >
-                  <Popover.Root open={optionsOpen} onOpenChange={setOptionsOpen}>
+                {totalTracks > 1 && (
+                  <Popover.Root open={queueOpen} onOpenChange={setQueueOpen}>
                     <Popover.Trigger asChild>
                       <button
                         type="button"
-                        aria-label={t(language, "audioPlayer.options")}
-                        title={t(language, "audioPlayer.options")}
-                        data-card-action
-                        ref={optionsTrigger}
-                        className={`audio-options-trigger surface-control-finish inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast ${ACTION_FOCUS}`}
+                        data-testid="audio-queue-trigger"
+                        aria-label={`${t(language, "listening.queue")} · ${queuePosition}`}
+                        className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 text-xs font-semibold hover:bg-muted ${ACTION_FOCUS}`}
                       >
-                        <span className="audio-options-icon control-cue" aria-hidden="true">
-                          <SlidersHorizontal size={18} />
-                        </span>
-                        <span>{t(language, "audioPlayer.options")}</span>
-                        {controller.sleepDeadline && <Clock size={16} aria-hidden="true" />}
-                        <ChevronDown size={16} aria-hidden="true" />
+                        <List size={16} className="control-cue" aria-hidden="true" />
+                        <span className="audio-context-label">{t(language, "listening.queueShort")}</span>{" "}
+                        <bdi dir="ltr">{queuePosition}</bdi>
+                      </button>
+                    </Popover.Trigger>
+                    <AudioQueueSheet onClose={() => setQueueOpen(false)} controller={controller} language={language} />
+                  </Popover.Root>
+                )}
+                {(canRepeat || repetitionProgress) && (
+                  <Popover.Root open={repeatOpen} onOpenChange={setRepeatOpen}>
+                    <Popover.Trigger asChild>
+                      <button
+                        type="button"
+                        aria-label={`${t(language, "audioPlayer.repeatShort")}: ${repetitionProgress ?? (repeatEnabled ? repeatLabel : t(language, "audioPlayer.playOnce"))}`}
+                        className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 font-semibold hover:bg-muted ${ACTION_FOCUS}`}
+                        data-testid="audio-repetition-progress"
+                        ref={repeatTrigger}
+                      >
+                        <Repeat size={16} className="control-cue" aria-hidden="true" />
+                        <span className="audio-context-label">{t(language, "audioPlayer.repeatShort")}</span>{" "}
+                        <bdi dir="ltr">
+                          {repetitionProgress ??
+                            (repeatEnabled
+                              ? formatNumerals(currentEntry.prescribedRepetitions, language)
+                              : formatNumerals(1, language))}
+                        </bdi>
                       </button>
                     </Popover.Trigger>
                     <Popover.Portal>
                       <Popover.Content
-                        ref={optionsContent}
+                        ref={repeatContent}
+                        data-overlay-surface="contextual"
+                        onCloseAutoFocus={repeatFocus}
+                        data-dropdown-surface=""
+                        aria-label={t(language, "audioPlayer.repeatShort")}
+                        side="top"
+                        collisionPadding={sleepMenuPadding}
+                        dir={direction}
+                        className="audio-options-panel z-[120] w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-popover p-3 text-popover-foreground shadow-overlay"
+                        style={{ maxHeight: "var(--radix-popover-content-available-height)", overflowY: "auto" }}
+                      >
+                        <p className="mb-2 text-xs text-muted-foreground">{t(language, "listening.repeatHelp")}</p>
+                        {canRepeat && (
+                          <AudioOptionToggle
+                            className="audio-repeat-option"
+                            label={repeatLabel}
+                            checked={repeatEnabled}
+                            onChange={() =>
+                              controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")
+                            }
+                          />
+                        )}
+                      </Popover.Content>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+                {controller.sleepDeadline && (
+                  <span className="audio-timer-context inline-flex min-h-11 items-center gap-1 text-xs text-muted-foreground">
+                    <span aria-hidden="true">{t(language, "listening.timerShort")}</span>
+                    <span className="sr-only">
+                      {t(language, "listening.sleepAt", {
+                        time: new Intl.DateTimeFormat(language, { hour: "numeric", minute: "2-digit" }).format(
+                          controller.sleepDeadline,
+                        ),
+                      })}
+                    </span>
+                    <bdi dir="ltr" aria-hidden="true">
+                      {new Intl.DateTimeFormat(language, { hour: "numeric", minute: "2-digit" }).format(
+                        controller.sleepDeadline,
+                      )}
+                    </bdi>
+                  </span>
+                )}
+                <div className="audio-play-all-indicator" data-testid="audio-play-all-indicator">
+                  {totalTracks > 1 && (
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={controller.autoAdvance}
+                      aria-label={t(language, "listening.autoContinue")}
+                      title={t(language, "listening.autoContinueHelp")}
+                      aria-describedby={continuationDescriptionId}
+                      onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
+                      className={`audio-continuation-switch flex min-h-11 items-center justify-between gap-2 rounded-full border border-border px-3 py-2 text-start text-xs ${ACTION_FOCUS}`}
+                    >
+                      <span className="audio-continue-label min-w-0 font-semibold">
+                        {t(language, "listening.autoContinueShort")}
+                      </span>
+                      <ToggleTrack checked={controller.autoAdvance} />
+                    </button>
+                  )}
+                </div>
+                <span id={continuationDescriptionId} className="sr-only">
+                  {t(language, "listening.autoContinueHelp")}
+                </span>
+                {!listeningDesk && (
+                  <div className="audio-focus-actions">
+                    <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
+                    {focusToggle}
+                    {lockToggle}
+                  </div>
+                )}
+              </div>
+              {listeningDesk && (
+                <div className="audio-focus-actions audio-desk-recovery">
+                  <div className="audio-listening-recovery-host" ref={setListeningRecoveryHost} />
+                </div>
+              )}
+              {/* One waveform seek control with balanced time labels. */}
+              <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
+                <span dir="ltr" className={AUDIO_TIME_LABEL}>
+                  <span className="sr-only">{t(language, "audioPlayer.elapsed")}: </span>
+                  {formatTime(state.currentTime, language)}
+                </span>
+                <div
+                  className={`audio-seek-control relative flex min-w-0 flex-1 items-center h-11 ${waveform ? "audio-seek-control--waveform" : ""}`}
+                >
+                  {waveform && renderWaveform(waveform, 18, "audio-seek-waveform")}
+                  <input
+                    type="range"
+                    min={0}
+                    max={Math.max(0, state.duration)}
+                    step="any"
+                    value={Math.min(state.currentTime, state.duration || 0)}
+                    disabled={state.duration <= 0}
+                    onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+                    onKeyDown={handleTimelineKeyDown}
+                    aria-label={t(language, "audioPlayer.seek")}
+                    aria-keyshortcuts="PageUp PageDown"
+                    aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
+                    style={
+                      {
+                        "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%)`,
+                      } as CSSProperties
+                    }
+                    className={`audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary ${ACTION_FOCUS}`}
+                  />
+                </div>
+                <span dir="ltr" className={AUDIO_TIME_LABEL}>
+                  <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
+                  {formatTime(state.duration, language)}
+                </span>
+              </div>
+
+              {listeningDesk ? (
+                <div className="audio-desk-transport">
+                  {focusToggle}
+                  {transport}
+                  {lockToggle}
+                </div>
+              ) : (
+                transport
+              )}
+
+              {audioOptionsHost &&
+                createPortal(
+                  <div
+                    className="audio-expanded-options flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-muted-foreground"
+                    dir={direction}
+                  >
+                    <Popover.Root open={optionsOpen} onOpenChange={setOptionsOpen}>
+                      <Popover.Trigger asChild>
+                        <button
+                          type="button"
+                          aria-label={t(language, "audioPlayer.options")}
+                          title={t(language, "audioPlayer.options")}
+                          data-card-action
+                          ref={optionsTrigger}
+                          aria-controls={optionsOpen ? audioOptionsId : undefined}
+                          aria-haspopup={canDockOptions ? undefined : "dialog"}
+                          className={`audio-options-trigger surface-control-finish inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast ${ACTION_FOCUS}`}
+                        >
+                          <span className="audio-options-icon control-cue" aria-hidden="true">
+                            <SlidersHorizontal size={18} />
+                          </span>
+                          <span>{t(language, "audioPlayer.options")}</span>
+                          {controller.sleepDeadline && <Clock size={16} aria-hidden="true" />}
+                          <ChevronDown size={16} aria-hidden="true" />
+                        </button>
+                      </Popover.Trigger>
+                      <AudioOptionsSurface
+                        id={audioOptionsId}
+                        docked={dockedOptions}
+                        dockHost={audioOptionsDockHost}
+                        panelRef={optionsContent}
                         data-overlay-surface="contextual"
                         onCloseAutoFocus={optionsFocus}
                         side="bottom"
@@ -1316,21 +1366,23 @@ export function FloatingAudioPlayer({
                               {t(language, "audioPlayer.options")}
                             </span>
                           </div>
-                          <Popover.Close asChild>
-                            <button
-                              type="button"
-                              aria-label={t(language, "common.close")}
-                              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors cursor-pointer"
-                            >
-                              <X size={16} aria-hidden="true" />
-                            </button>
-                          </Popover.Close>
+                          {
+                            <Popover.Close asChild>
+                              <button
+                                type="button"
+                                aria-label={t(language, "common.close")}
+                                className="flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors cursor-pointer"
+                              >
+                                <X size={16} aria-hidden="true" />
+                              </button>
+                            </Popover.Close>
+                          }
                         </div>
 
                         <div className="audio-options-scroll">
                           <div className="audio-options-section">
                             <div className={AUDIO_OPTION_GROUP}>
-                              <div className="audio-option-field">
+                              <div className="audio-reciter-field audio-option-field">
                                 <label
                                   id="audio-voice-label"
                                   htmlFor={reciterOptions.length > 1 ? "audio-voice-field" : undefined}
@@ -1593,45 +1645,46 @@ export function FloatingAudioPlayer({
                             </a>
                           </details>
                         </div>
-                      </Popover.Content>
-                    </Popover.Portal>
-                  </Popover.Root>
-                </div>,
-                audioOptionsHost,
-              )}
+                      </AudioOptionsSurface>
+                    </Popover.Root>
+                  </div>,
+                  audioOptionsHost,
+                )}
 
-            {/* Error state */}
-            {state.status === "error" && (
-              <div className="mt-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3" role="alert">
-                <p className="text-label font-semibold text-destructive">
-                  {getErrorMessage(state.error?.code, language)}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={controller.retry}
-                    className={`min-h-11 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground ${ACTION_FOCUS}`}
-                  >
-                    {t(language, "audioPlayer.retry")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={controller.skip}
-                    className={`min-h-11 rounded-xl border border-border px-4 text-xs font-bold text-foreground ${ACTION_FOCUS}`}
-                  >
-                    {t(language, "audioPlayer.skip")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={controller.stop}
-                    className={`min-h-11 rounded-xl border border-destructive/40 px-4 text-xs font-bold text-destructive ${ACTION_FOCUS}`}
-                  >
-                    {t(language, "audioPlayer.stop")}
-                  </button>
+              {/* Error state */}
+              {state.status === "error" && (
+                <div className="mt-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3" role="alert">
+                  <p className="text-label font-semibold text-destructive">
+                    {getErrorMessage(state.error?.code, language)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={controller.retry}
+                      className={`min-h-11 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground ${ACTION_FOCUS}`}
+                    >
+                      {t(language, "audioPlayer.retry")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={controller.skip}
+                      className={`min-h-11 rounded-xl border border-border px-4 text-xs font-bold text-foreground ${ACTION_FOCUS}`}
+                    >
+                      {t(language, "audioPlayer.skip")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={controller.stop}
+                      className={`min-h-11 rounded-xl border border-destructive/40 px-4 text-xs font-bold text-destructive ${ACTION_FOCUS}`}
+                    >
+                      {t(language, "audioPlayer.stop")}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
+          <div className="audio-options-dock" ref={setAudioOptionsDockHost} />
         </motion.div>
       </motion.section>
     </AudioPlayerSurface>

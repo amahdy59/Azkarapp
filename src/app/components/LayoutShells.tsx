@@ -223,7 +223,7 @@ export function BottomNav({ active, onChange, isArabic = false, ...utilities }: 
     <nav
       aria-label={t(language, "common.bottomNavigation")}
       data-overlay-edge="bottom"
-      className="bottom-nav flex min-h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
+      className="bottom-nav flex min-h-[calc(4.5rem+var(--app-safe-area-bottom))] shrink-0 bg-card pb-[var(--app-safe-area-bottom)] shadow-sm"
     >
       <div className="bottom-nav-items flex min-h-0 flex-1 items-center justify-start overflow-x-auto px-1 min-[360px]:justify-between min-[360px]:px-2 min-[390px]:px-4">
         {tabs.map(({ id, label, Icon }) => {
@@ -430,7 +430,7 @@ export function NavSidebar({
       </div>
 
       {/* Quick controls footer (Language & Theme toggle) */}
-      <div className="flex flex-col gap-2 p-3 mt-auto border-t border-border/40">
+      <div className="nav-sidebar-footer flex flex-col gap-2 p-3 mt-auto border-t border-border/40">
         {onLanguageChange && (
           <button
             type="button"

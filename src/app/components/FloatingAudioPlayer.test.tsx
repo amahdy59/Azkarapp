@@ -585,7 +585,7 @@ describe("FloatingAudioPlayer", () => {
     expect(reciterSelect).toHaveTextContent("Test reciter");
     expect(identity).toHaveClass("justify-center");
     expect(reciterSelect).toHaveClass("min-h-11", "rounded-xl");
-    expect(identity).not.toHaveTextContent(entry.titleArabic);
+    expect(identity.querySelector(".audio-wide-title")).toHaveTextContent(entry.titleArabic);
     expect(identity).toContainElement(screen.getByRole("button", { name: "خيارات الصوت" }));
     expect(screen.getByRole("region", { name: "مشغل الصوت" })).toHaveTextContent(entry.titleArabic);
     expect(identity).not.toHaveTextContent("المقطع");

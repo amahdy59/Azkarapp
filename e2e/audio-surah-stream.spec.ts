@@ -4,6 +4,7 @@ import { listeningCases, listeningTiming, openListeningPage } from "./helpers/qu
 import { t } from "../src/app/i18n";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { FRIDAY_KAHF } from "../src/app/content/fridayKahf";
+import { revealAudioReadingOptions } from "./helpers/audio-reading-options";
 
 for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
   for (const language of ["ar", "en"] as const) {
@@ -84,6 +85,7 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       await expect(resume).toHaveCount(0);
       const options = player.getByRole("button", { name: t(language, "audioPlayer.options"), exact: true });
       await options.click();
+      await revealAudioReadingOptions(page);
       const preferences = page.getByTestId("quran-listening-preferences");
       const preferenceLayout = await preferences.getByRole("button").evaluateAll((buttons) =>
         buttons.map((button) => {
@@ -157,6 +159,7 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       });
       const geometry = await active.boundingBox();
       await options.click();
+      await revealAudioReadingOptions(page);
       await words.click();
       await expect(active).toHaveCount(0);
       await words.click();
@@ -201,6 +204,7 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       await page.evaluate(() => document.fonts.ready);
       const baseFont = await textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
       await options.click();
+      await revealAudioReadingOptions(page);
       const magnification = page.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true });
       await magnification.focus();
       await page.keyboard.press("Home");
@@ -218,6 +222,7 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       ).toEqual(printedLines);
       await page.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-150.png`) });
       await options.click();
+      await revealAudioReadingOptions(page);
       await page.getByRole("button", { name: t(language, "mushaf.magnificationReset"), exact: true }).click();
       await page.keyboard.press("Escape");
       // Reset schedules fitting via ResizeObserver; record word geometry only

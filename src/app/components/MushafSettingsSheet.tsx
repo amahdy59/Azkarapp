@@ -5,9 +5,11 @@ import { ToolbarPanel } from "./ToolbarPanel";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
-import { Check, SlidersHorizontal } from "./icons";
+import { Check, ChevronDown, SlidersHorizontal } from "./icons";
 import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
 import { ToggleTrack } from "./SettingsRow";
+import { handleRadioNavigation } from "./radioNavigation";
+import "./mushaf-reading-settings.css";
 
 export interface MushafSettingsSheetProps {
   open: boolean;
@@ -56,28 +58,28 @@ interface ThemeOption {
 const THEME_OPTIONS: readonly ThemeOption[] = [
   {
     id: "midnight",
-    nameKey: "mushaf.themeMidnight",
+    nameKey: "mushaf.colorMidnight",
     swatchBg: "#0b1220",
     swatchBorder: "#1e293b",
     swatchAccent: "#d4af37",
   },
   {
     id: "light",
-    nameKey: "mushaf.themeLight",
+    nameKey: "mushaf.colorLight",
     swatchBg: "#fdfbf7",
     swatchBorder: "#e5e0d8",
     swatchAccent: "#b45309",
   },
   {
     id: "dark",
-    nameKey: "mushaf.themeDark",
+    nameKey: "mushaf.colorDark",
     swatchBg: "#18181b",
     swatchBorder: "#27272a",
     swatchAccent: "#a1a1aa",
   },
   {
     id: "oled",
-    nameKey: "mushaf.themeOled",
+    nameKey: "mushaf.colorOled",
     swatchBg: "#000000",
     swatchBorder: "#333333",
     swatchAccent: "#ffffff",
@@ -109,7 +111,6 @@ export function MushafSettingsSheet({
   surahName,
 }: MushafSettingsSheetProps) {
   const resolvedTheme = theme === "follow-app" ? appTheme : theme;
-  const isPanel = presentation === "side-panel";
   const sheetSurfaceClass =
     resolvedTheme === "oled"
       ? "theme-oled bg-card text-card-foreground border-neutral-800"
@@ -134,7 +135,7 @@ export function MushafSettingsSheet({
     }`;
 
   const body = (
-    <div className="flex flex-col h-full overflow-hidden" dir={direction}>
+    <div className="mushaf-reading-settings flex flex-col h-full overflow-hidden" dir={direction}>
       {/* Standard Sheet Header */}
       <SheetHeader
         title={t(language, "mushaf.readingSettings")}
@@ -145,26 +146,38 @@ export function MushafSettingsSheet({
         direction={direction}
       />
 
-      <div className="flex flex-col gap-5 p-5 sm:p-6 overflow-y-auto min-h-0 flex-1">
-        {onSelectMagnification && (
-          <MushafMagnificationControl language={language} value={magnification} onChange={onSelectMagnification} />
-        )}
-
+      <div className="mushaf-settings-body flex flex-col gap-5 p-5 sm:p-6 overflow-y-auto min-h-0 flex-1">
         {/* Section: Themes (Clean Swatches + App Theme Badge) */}
         <section aria-labelledby="mushaf-theme-heading" className="flex flex-col gap-2.5">
           <h3 id="mushaf-theme-heading" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             {t(language, "mushaf.pageColor")}
           </h3>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={theme === "follow-app"}
+            aria-label={t(language, "mushaf.themeFollowApp")}
+            onClick={() => onSelectTheme(theme === "follow-app" ? resolvedTheme : "follow-app")}
+            className="mushaf-follow-app"
+          >
+            <span>
+              <span className="block text-sm font-semibold">{t(language, "mushaf.themeFollowApp")}</span>
+              <span className="block text-xs text-muted-foreground">
+                {t(language, theme === "follow-app" ? "mushaf.colorAutomatic" : "mushaf.colorManual")}
+              </span>
+            </span>
+            <ToggleTrack checked={theme === "follow-app"} />
+          </button>
           <MushafMaterialHint language={language} />
           <div
             role="radiogroup"
             aria-labelledby="mushaf-theme-heading"
-            className={`grid gap-2 ${isPanel ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}
+            className="mushaf-color-options"
+            dir={direction}
           >
             {THEME_OPTIONS.map((opt) => {
               const isSelected = theme === opt.id || (theme === "follow-app" && opt.id === appTheme);
               const label = t(language, opt.nameKey);
-              const isAppTheme = opt.id === appTheme;
 
               return (
                 <button
@@ -174,42 +187,25 @@ export function MushafSettingsSheet({
                   aria-checked={isSelected}
                   data-testid={`mushaf-theme-option-${opt.id}`}
                   onClick={() => onSelectTheme(opt.id)}
-                  className={`interactive-elem flex min-h-[48px] items-center justify-between gap-3 rounded-xl border p-2.5 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    isSelected
-                      ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary/40 font-bold text-foreground"
-                      : "border-border/60 bg-muted/30 hover:bg-muted/60 text-foreground"
-                  }`}
+                  tabIndex={isSelected ? 0 : -1}
+                  onKeyDown={handleRadioNavigation}
+                  className="mushaf-color-option"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {/* Visual Color Preview Swatch: Rectangular miniature page, not a radio circle */}
-                    <div
-                      className="flex h-7 w-9 shrink-0 flex-col justify-center gap-1 rounded-lg border px-1.5 shadow-xs transition-transform"
-                      style={{ backgroundColor: opt.swatchBg, borderColor: opt.swatchBorder }}
-                      aria-hidden="true"
-                    >
-                      <div
-                        className="h-1 w-full rounded-full opacity-90"
-                        style={{ backgroundColor: opt.swatchAccent }}
-                      />
-                      <div
-                        className="h-1 w-2/3 rounded-full opacity-60"
-                        style={{ backgroundColor: opt.swatchAccent }}
-                      />
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-semibold truncate">{label}</span>
-                      {isAppTheme && (
-                        <span className="text-[10px] font-medium text-muted-foreground">
-                          {t(language, "mushaf.appThemeBadge")}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {isSelected && (
-                    <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                      <Check size={13} strokeWidth={3} aria-hidden="true" />
-                    </div>
-                  )}
+                  <span
+                    className="mushaf-color-preview"
+                    style={{ backgroundColor: opt.swatchBg, borderColor: opt.swatchBorder }}
+                    aria-hidden="true"
+                  >
+                    <span style={{ backgroundColor: opt.swatchAccent }} />
+                    <span style={{ backgroundColor: opt.swatchAccent }} />
+                    <span style={{ backgroundColor: opt.swatchAccent }} />
+                    {isSelected && (
+                      <span className="mushaf-color-check">
+                        <Check size={14} aria-hidden="true" />
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-xs font-semibold">{label}</span>
                 </button>
               );
             })}
@@ -239,84 +235,104 @@ export function MushafSettingsSheet({
           </section>
         )}
 
-        {/* Section 2: Page Layout (Segmented Control when available) */}
-        {autoSpreadRoom && onSelectLayout && (
-          <section aria-labelledby="mushaf-layout-heading" className="flex flex-col gap-2.5">
-            <h3 id="mushaf-layout-heading" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              {t(language, "mushaf.layoutTitle")}
-            </h3>
-            <div
-              role="radiogroup"
-              aria-labelledby="mushaf-layout-heading"
-              aria-describedby="mushaf-layout-hint"
-              className="grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
-            >
-              {layoutOptions.map(([id, label]) => {
-                const isSelected = mushafLayout === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    role="radio"
-                    aria-checked={isSelected}
-                    data-testid={`mushaf-layout-option-${id}`}
-                    onClick={() => onSelectLayout(id)}
-                    className={`flex min-h-[44px] items-center justify-center rounded-lg px-2 text-center text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      isSelected
-                        ? "bg-card text-foreground shadow-xs ring-1 ring-border/80"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <span className="truncate">{label}</span>
-                  </button>
-                );
-              })}
-            </div>
-            <p id="mushaf-layout-hint" className="text-micro font-medium leading-snug text-muted-foreground">
-              {mushafLayout === "single"
-                ? t(language, "mushaf.layoutHintSingle")
-                : mushafLayout === "spread"
-                  ? t(language, "mushaf.layoutHintSpread")
-                  : t(language, "mushaf.layoutHintAuto")}
-            </p>
-          </section>
-        )}
+        {(onSelectMagnification || (autoSpreadRoom && onSelectLayout) || (showToolbarSide && onSelectToolbarSide)) && (
+          <details className="mushaf-advanced-display">
+            <summary>
+              <span>{t(language, "mushaf.advancedDisplay")}</span>
+              <ChevronDown size={18} aria-hidden="true" />
+            </summary>
+            <div className="flex flex-col gap-5 pt-4">
+              {onSelectMagnification && (
+                <MushafMagnificationControl
+                  language={language}
+                  value={magnification}
+                  onChange={onSelectMagnification}
+                />
+              )}
 
-        {/* Toolbar position — only meaningful where a rail is actually shown. */}
-        {showToolbarSide && onSelectToolbarSide && (
-          <section aria-labelledby="mushaf-toolbar-side-heading" className="flex flex-col gap-2.5">
-            <h3
-              id="mushaf-toolbar-side-heading"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
-            >
-              {t(language, "mushaf.toolbarSideTitle")}
-            </h3>
-            <div
-              role="radiogroup"
-              aria-labelledby="mushaf-toolbar-side-heading"
-              className="grid grid-cols-2 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
-            >
-              {toolbarSideOptions.map(([id, label]) => {
-                const isSelected = toolbarSide === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    role="radio"
-                    aria-checked={isSelected}
-                    data-testid={`mushaf-toolbar-side-option-${id}`}
-                    onClick={() => onSelectToolbarSide(id)}
-                    className={segmentClass(isSelected)}
+              {autoSpreadRoom && onSelectLayout && (
+                <section aria-labelledby="mushaf-layout-heading" className="flex flex-col gap-2.5">
+                  <h3
+                    id="mushaf-layout-heading"
+                    className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
                   >
-                    <span className="truncate">{label}</span>
-                  </button>
-                );
-              })}
+                    {t(language, "mushaf.layoutTitle")}
+                  </h3>
+                  <div
+                    role="radiogroup"
+                    aria-labelledby="mushaf-layout-heading"
+                    aria-describedby="mushaf-layout-hint"
+                    className="grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
+                  >
+                    {layoutOptions.map(([id, label]) => {
+                      const isSelected = mushafLayout === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          role="radio"
+                          aria-checked={isSelected}
+                          data-testid={`mushaf-layout-option-${id}`}
+                          onClick={() => onSelectLayout(id)}
+                          className={`flex min-h-[44px] items-center justify-center rounded-lg px-2 text-center text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                            isSelected
+                              ? "bg-card text-foreground shadow-xs ring-1 ring-border/80"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <span>{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p id="mushaf-layout-hint" className="text-micro font-medium leading-snug text-muted-foreground">
+                    {mushafLayout === "single"
+                      ? t(language, "mushaf.layoutHintSingle")
+                      : mushafLayout === "spread"
+                        ? t(language, "mushaf.layoutHintSpread")
+                        : t(language, "mushaf.layoutHintAuto")}
+                  </p>
+                </section>
+              )}
+
+              {/* Toolbar position — only meaningful where a rail is actually shown. */}
+              {showToolbarSide && onSelectToolbarSide && (
+                <section aria-labelledby="mushaf-toolbar-side-heading" className="flex flex-col gap-2.5">
+                  <h3
+                    id="mushaf-toolbar-side-heading"
+                    className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                  >
+                    {t(language, "mushaf.toolbarSideTitle")}
+                  </h3>
+                  <div
+                    role="radiogroup"
+                    aria-labelledby="mushaf-toolbar-side-heading"
+                    className="grid grid-cols-2 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
+                  >
+                    {toolbarSideOptions.map(([id, label]) => {
+                      const isSelected = toolbarSide === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          role="radio"
+                          aria-checked={isSelected}
+                          data-testid={`mushaf-toolbar-side-option-${id}`}
+                          onClick={() => onSelectToolbarSide(id)}
+                          className={segmentClass(isSelected)}
+                        >
+                          <span>{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-micro font-medium leading-snug text-muted-foreground">
+                    {t(language, "mushaf.toolbarSideHint")}
+                  </p>
+                </section>
+              )}
             </div>
-            <p className="text-micro font-medium leading-snug text-muted-foreground">
-              {t(language, "mushaf.toolbarSideHint")}
-            </p>
-          </section>
+          </details>
         )}
         {/* DEC-097 put the arrow-key behaviour in the footer; the rail replaced
           that footer and has no room for a list. It belongs where a desktop

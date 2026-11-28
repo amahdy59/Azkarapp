@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { dismissTopOverlay } from "../hooks/useOverlayBack";
 import { describe, expect, it, vi } from "vitest";
@@ -86,6 +86,40 @@ describe("Modal accessibility", () => {
     await waitFor(() => expect(opener).toHaveFocus());
     opener.remove();
   });
+  it("dismisses only the top nested modal once on Escape", async () => {
+    const parentClose = vi.fn();
+    const childClose = vi.fn();
+    function NestedEscape() {
+      const [child, setChild] = useState(false);
+      return (
+        <>
+          <Modal open onClose={parentClose} title="Completion" direction="ltr">
+            <button type="button" onClick={() => setChild(true)}>
+              Open details
+            </button>
+          </Modal>
+          <Modal
+            open={child}
+            onClose={() => {
+              childClose();
+              setChild(false);
+            }}
+            title="Session details"
+            direction="ltr"
+          >
+            <button type="button">Details action</button>
+          </Modal>
+        </>
+      );
+    }
+    render(<NestedEscape />);
+    fireEvent.click(screen.getByRole("button", { name: "Open details" }));
+    fireEvent.keyDown(await screen.findByRole("button", { name: "Details action" }), { key: "Escape" });
+    await waitFor(() => expect(childClose).toHaveBeenCalledOnce());
+    expect(parentClose).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog", { name: "Completion" })).toBeVisible();
+  });
+
   it("uses the title once without inventing a duplicate description", () => {
     render(
       <Modal open onClose={vi.fn()} title="Ayah actions" direction="ltr">
@@ -94,6 +128,7 @@ describe("Modal accessibility", () => {
     );
 
     const dialog = screen.getByRole("dialog", { name: "Ayah actions" });
+    expect(dialog).toHaveAttribute("aria-modal", "true");
     expect(dialog).not.toHaveAccessibleDescription();
     expect(screen.getAllByText("Ayah actions")).toHaveLength(1);
   });
@@ -205,6 +240,6 @@ describe("SheetHeader", () => {
     );
 
     const panel = screen.getByTestId("test-side-panel");
-    expect(panel).toHaveClass("pt-[env(safe-area-inset-top)]", "pb-[env(safe-area-inset-bottom)]");
+    expect(panel).toHaveClass("pt-[var(--app-safe-area-top)]", "pb-[var(--app-safe-area-bottom)]");
   });
 });

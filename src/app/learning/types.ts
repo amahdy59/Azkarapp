@@ -24,6 +24,8 @@ export interface LearningResource {
   title: string;
   author: string;
   pack: LearningAsset;
+  /** Known earlier text packs; cache-only recovery never guesses another edition. */
+  previousPacks?: LearningAsset[];
   images: LearningAsset[];
   pdfs: Record<PdfEdition, LearningAsset>;
 }
@@ -55,6 +57,7 @@ export interface LearningUnit {
 }
 
 export interface LearningPack {
+  previousEdition?: true;
   schema: 1;
   resourceId: LearningResourceId;
   language: LearningLanguage;

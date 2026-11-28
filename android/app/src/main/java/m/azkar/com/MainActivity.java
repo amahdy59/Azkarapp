@@ -3,17 +3,18 @@ package m.azkar.com;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.SharedPreferences;
-import android.view.View;
+import android.content.res.Configuration;
 import android.view.Window;
-import android.view.WindowManager;
+import androidx.activity.EdgeToEdge;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.plugin.WebView;
 
 public class MainActivity extends BridgeActivity {
     private int systemBarColor = SystemBarAppearance.DEFAULT_COLOR;
+    private WindowInsetsDiagnostics insetDiagnostics;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,8 +31,12 @@ public class MainActivity extends BridgeActivity {
         systemBarColor = getSharedPreferences("azkarapp.native", MODE_PRIVATE)
                 .getInt("system-bars-background", SystemBarAppearance.DEFAULT_COLOR) | 0xff000000;
         super.onCreate(savedInstanceState);
+        // Layout policy is initialized once. Capacitor owns inset delivery;
+        // appearance/focus recovery must not change the window's layout flags.
+        EdgeToEdge.enable(this);
         if (getSupportActionBar() != null) getSupportActionBar().hide();
-        configureSystemBars();
+        updateSystemBarAppearance();
+        insetDiagnostics = new WindowInsetsDiagnostics(this, bridge);
     }
 
     /**
@@ -65,7 +70,38 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) configureSystemBars();
+        if (hasFocus) {
+            updateSystemBarAppearance();
+            ViewCompat.requestApplyInsets(getWindow().getDecorView());
+            if (insetDiagnostics != null) insetDiagnostics.capture("focus");
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        updateSystemBarAppearance();
+        ViewCompat.requestApplyInsets(getWindow().getDecorView());
+        if (insetDiagnostics != null) insetDiagnostics.capture("configuration");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ViewCompat.requestApplyInsets(getWindow().getDecorView());
+        if (insetDiagnostics != null) insetDiagnostics.resume();
+    }
+
+    @Override
+    public void onPause() {
+        if (insetDiagnostics != null) insetDiagnostics.pause();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (insetDiagnostics != null) insetDiagnostics.close();
+        super.onDestroy();
     }
 
     void setSystemBarColor(int color) {
@@ -75,25 +111,18 @@ public class MainActivity extends BridgeActivity {
             getSharedPreferences("azkarapp.native", MODE_PRIVATE).edit()
                     .putInt("system-bars-background", color).apply();
         }
-        configureSystemBars();
+        updateSystemBarAppearance();
     }
 
     @SuppressWarnings("deprecation")
-    private void configureSystemBars() {
+    private void updateSystemBarAppearance() {
         Window window = getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         window.getDecorView().setBackgroundColor(systemBarColor);
         // Legacy Android paints these colors. Enforced edge-to-edge uses the
         // matching protected web inset instead; it ignores statusBarColor.
         window.setStatusBarColor(systemBarColor);
         window.setNavigationBarColor(SystemBarAppearance.navigationColor(systemBarColor, Build.VERSION.SDK_INT));
-        WindowCompat.setDecorFitsSystemWindows(window, true);
-        window.getDecorView().setSystemUiVisibility(
-                window.getDecorView().getSystemUiVisibility()
-                        & ~(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-        );
         WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, window.getDecorView());
-        controller.show(WindowInsetsCompat.Type.statusBars());
         boolean darkIcons = SystemBarAppearance.usesDarkIcons(systemBarColor);
         controller.setAppearanceLightStatusBars(darkIcons);
         controller.setAppearanceLightNavigationBars(darkIcons);

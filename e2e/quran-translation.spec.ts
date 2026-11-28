@@ -4,6 +4,7 @@ import { getAzkarForMode } from "../src/app/content/azkar";
 import { FRIDAY_KAHF } from "../src/app/content/fridayKahf";
 import { t } from "../src/app/i18n";
 import { listeningCases, listeningTiming, openListeningPage } from "./helpers/quran-listening";
+import { revealAudioReadingOptions } from "./helpers/audio-reading-options";
 
 test("Main Mushaf follows audio beside readable English and yields to manual browsing @cross-browser", async ({
   page,
@@ -238,6 +239,7 @@ test("Enlarged paired Mushaf stays inside a keyboard-scrollable Arabic pane @cro
     await player.getByRole("button", { name: t("en", "audioPlayer.expand"), exact: true }).click();
   }
   await player.getByRole("button", { name: t("en", "audioPlayer.options"), exact: true }).click();
+  await revealAudioReadingOptions(page);
   const magnification = page.getByRole("slider", { name: t("en", "mushaf.magnification"), exact: true });
   await magnification.focus();
   await page.keyboard.press("End");

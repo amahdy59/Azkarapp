@@ -4,6 +4,16 @@ The app downloads and validates a candidate ZIP in the background. It records th
 
 # Android host and release verification
 
+## Android 16 safe areas — local 2026-11-27
+
+The Vivo Y500 report establishes top/bottom system-bar overlap in an installed APK on reported Android 16; the installed binary/WebView and exact failure trigger remain unknown. The local correction initializes `EdgeToEdge.enable` once after bridge creation. Focus/configuration/resume request current insets without reapplying legacy window-layout flags; appearance remains independent. Bundled Capacitor SystemBars explicitly owns CSS inset delivery with `insetsHandling: css` and an initial `cover` viewport hint. Older WebViews may receive native container padding and intentional zero CSS insets; these zeros must remain authoritative to avoid double spacing.
+
+Shared `--app-safe-area-*` values prefer Capacitor's `--safe-area-inset-*` and fall back to browser `env()` values. The shell owns top/side spacing; bottom navigation or immersive chrome owns bottom spacing once. Portalled sheets/dialogs and contextual collision bounds consume the same live values. No new plugin, permission, state migration or runtime dependency is added. Rebuild/install the APK for native changes; web OTA alone cannot update Java. The local binary uses versionCode 4 so the existing native-upgrade boundary clears an older selected OTA bundle and starts with the newly packaged web UI; devotional data is preserved.
+
+Debug APKs contain the `AzkarInsets` geometry logger; release builds use a no-op class and omit the diagnostic script. It captures launch/page/focus/resume and changed native geometry (including keyboard/rotation), coalesces bursts, pauses in background and removes listeners on destruction. Local Logcat records Android/APK/WebView versions, physical insets, native WebView/container geometry and computed CSS padding/viewport dimensions. It never reads page text, URLs/routes, storage, location or credentials and performs no network reporting.
+
+With the affected phone connected and USB debugging authorized, collect only this tag using the configured SDK's `platform-tools/adb logcat -v time AzkarInsets:I '*:S'`. Compare failing/successful cold launch, background return, unlock, keyboard dismissal and rotation in gesture and three-button navigation. Capture screenshots, exact APK checksum, OS/WebView versions and both native/CSS values. Browser inset simulations and native builds do not establish Vivo or TalkBack acceptance. See [local phase](agent/phases/ANDROID_SAFE_AREAS_LOCAL_2026_11_27.md).
+
 ## Seamless light system bars — 2026-11-25, local
 
 The appearance boundary sends the resolved opaque CSS system-bar ground through the custom AzkarSystemBars bridge. Native luminance selects dark icons on light paper and light icons on dark/Midnight/Glass/high-contrast grounds. The activity retains the last ground for focus return and stores only that native presentation value for subsequent launches. Android 7 retains a dark navigation bar because it cannot draw dark navigation buttons. Current Android edge-to-edge uses the matching protected web status inset; legacy bar colors remain fallbacks. Safe-area ownership remains in the app shell once, including Mushaf. No plugin dependency, application-state field or permission was added.

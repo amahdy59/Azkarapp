@@ -33,6 +33,26 @@ describe("MushafPageViewer", () => {
     ],
   ];
 
+  it("returns enlargement to the canonical page when Focus takes over its single exit slot", () => {
+    const props = {
+      lines: sampleLines,
+      language: "en" as const,
+      pageNumber: 3,
+      surahName: "Al-Baqarah",
+      juzNumber: 1,
+      direction: "ltr" as const,
+    };
+    const view = render(<MushafPageViewer {...props} />);
+    fireEvent.click(screen.getByRole("button", { name: "Enlarge text", exact: true }));
+    expect(screen.getByRole("region", { name: "Enlarged reading" })).toBeInTheDocument();
+    view.rerender(
+      <MushafPageViewer {...props} focusMode bottomLeftControl={<button type="button">Show tools</button>} />,
+    );
+    expect(screen.queryByRole("region", { name: "Enlarged reading" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Enlarge text", exact: true })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Show tools" })).toBeInTheDocument();
+  });
+
   it("matches the English frame to the measured Arabic page rather than a separate container-unit estimate", () => {
     const bounds = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
       return {
@@ -686,5 +706,34 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     expect(centerBtn).toBeInTheDocument();
     expect(centerBtn.className).toContain("h-11");
     expect(centerBtn.querySelector("span")).toHaveClass("mushaf-furniture-pill");
+  });
+});
+
+describe("enlargement keeps one page identity", () => {
+  it("enlarges only the current page of a spread and restores both original canvases at 100%", () => {
+    const { container } = render(
+      <MushafPageViewer
+        lines={[[{ verseKey: "2:1", position: 1, isEnd: 0, text: "first-page" }]]}
+        facingPage={{
+          pageNumber: 3,
+          lines: [[{ verseKey: "2:2", position: 1, isEnd: 0, text: "facing-page" }]],
+          useQcfGlyphs: false,
+        }}
+        language="en"
+        direction="ltr"
+        pageNumber={2}
+        surahName="Al-Baqarah"
+        juzNumber={1}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Enlarge text" }));
+    expect(screen.getByTestId("quran-enlarged-text")).toHaveTextContent("first-page");
+    expect(screen.getByTestId("quran-enlarged-text")).not.toHaveTextContent("facing-page");
+    expect(container.querySelectorAll("[data-mushaf-page]")).toHaveLength(2);
+    const smaller = screen.getByRole("button", { name: "Smaller Quran text" });
+    fireEvent.click(smaller);
+    fireEvent.click(smaller);
+    expect(screen.queryByTestId("quran-enlarged-reading")).not.toBeInTheDocument();
+    expect(container.querySelectorAll("[data-mushaf-page]")).toHaveLength(2);
   });
 });

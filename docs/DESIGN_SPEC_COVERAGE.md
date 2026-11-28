@@ -6,6 +6,14 @@ This file maps the supplied July 2026 design specification to implementation evi
 
 ## Implemented
 
+- Home material color pairing (2026-11-27, local): sharing/More follow Home's material independently of App; Glass books controls pair on-media ink/ground and visible accent while QR bytes retain their white ground. Exact palette/contrast, hover/focus, independent materials, solid/fallback and screenshot evidence belong to agent/reports/HOME_MATERIAL_COLOR_LOCAL_2026_11_27_REPORT.md. Local only; human/device acceptance remains separate.
+
+- Canonical header zoom and reading settings (2026-11-27, local): one size/return header, complete vertically scrolling source words, original Mushaf at 100%, one footer page identity, labelled colour previews and explicit Follow app. Existing original-page zoom is disclosed under Advanced and resets before reading enlargement. See agent/phases/HEADER_ZOOM_LOCAL_2026_11_27.md; physical-device/assistive-technology acceptance remains separate.
+
+- Bounded modal tasks (2026-11-27, local): the owner's Android screenshot follow-up replaces forced full-screen collection/ayah sharing and modal excerpt enlargement with shared safe bounds and gutters, a stable editor area and intrinsic short-reading height. Tests exercise exact-word coverage, responsive/enlarged reflow, dropdowns, keyboard/focus and system-inset simulations. See agent/phases/MODAL_SIZING_LOCAL_2026_11_27.md and the corresponding report/gallery; physical-device and assistive-technology acceptance remain separate.
+
+- Public application sharing (2026-11-27, local, simplified after screenshot review): desktop-only Home QR and one compact mobile/tablet entry open the same protected Google Play sheet. One Share app action automatically includes a supported QR or shares the link, with quiet Copy and manual recovery only on failure. Responsive/enlarged-text, offline and keyboard/axe evidence belongs to agent/reports/APP_QR_SHARING_LOCAL_2026_11_27_REPORT.md; real-camera/Android/assistive-technology acceptance remains separate. Uncommitted/unpublished at the owner's request.
+
 - Seamless page headers (2026-11-25, local): shared canvas-borrowing wide Reader/Masbaha/Salawat headers, semantic ink and one round 44px action family, with ordinary-page and protected-scroll audits. This supersedes the old navy reading/counting header treatment while retaining content imagery and actual safe areas. Evidence and limits belong to agent/reports/SEAMLESS_PAGE_HEADERS_LOCAL_2026_11_25_REPORT.md.
 
 - Seamless light native system bars (2026-11-25, local): continuous phone reader, actual-ground native icon contrast, protected single status inset and a quiet visible light progress track. Actual RTL/LTR phone/tablet/desktop images and 30 passing feature cases are recorded in agent/reports/SEAMLESS_LIGHT_SYSTEM_BARS_LOCAL_2026_11_25_REPORT.md. Physical status/navigation icon and assistive-technology acceptance remain pending.

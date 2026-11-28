@@ -16,6 +16,7 @@ import { ArrowNext, Compass, Sparkles, Zap } from "../components/icons";
 import { getQiblaBearing } from "../qibla";
 import { PalmTreeMark } from "../components/GardenMarks";
 import { HomeWirdSection } from "../components/HomeWirdSection";
+import { HomeAppShareSection } from "./HomeAppShareSection";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
 import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../types";
@@ -663,7 +664,7 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full pt-2 pb-1 sm:pt-3 sm:pb-2 transition-[background-color,box-shadow] duration-standard ${
+            className={`home-page-header ${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full transition-[background-color,box-shadow] duration-standard ${
               homeVisualEffects
                 ? hasScrolledHomeContent
                   ? "shadow-none"
@@ -1023,13 +1024,16 @@ export function HomeScreen({
               </div>
             </div>
           )}
+          <div className="px-page mx-auto w-full">
+            <HomeAppShareSection language={language} direction={direction} onGlass={homeVisualEffects} />
+          </div>
           {onOpenMore && (
             <div className="px-page mx-auto w-full">
               <button
                 type="button"
                 data-testid="home-more"
                 onClick={onOpenMore}
-                className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm font-bold text-foreground hover:bg-muted ${NAVIGATION_FOCUS}`}
+                className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 py-2 text-sm font-bold ${homeVisualEffects ? "hero-glass home-glass-surface" : "border-border bg-card text-foreground hover:bg-muted"} ${NAVIGATION_FOCUS}`}
               >
                 {t(language, "more.title")}
                 <ArrowNext size={18} data-rtl-flip aria-hidden="true" />

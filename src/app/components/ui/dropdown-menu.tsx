@@ -4,6 +4,7 @@ import "../form-controls.css";
 import "../overlay-surfaces.css";
 
 import * as React from "react";
+import { useSafeAreaCollisionPadding } from "../../hooks/useSafeAreaCollisionPadding";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { CheckIcon, ChevronRightIcon } from "../icons";
 
@@ -74,6 +75,7 @@ function DropdownMenuContent({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   const origin = React.useContext(MenuOrigin);
+  const safePadding = useSafeAreaCollisionPadding(collisionPadding);
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -82,7 +84,7 @@ function DropdownMenuContent({
         data-overlay-surface="contextual"
         data-overlay-origin={origin}
         sideOffset={sideOffset}
-        collisionPadding={collisionPadding}
+        collisionPadding={props.collisionBoundary ? collisionPadding : safePadding}
         className={cn(
           menuSurface,
           "max-h-(--radix-dropdown-menu-content-available-height) origin-(--radix-dropdown-menu-content-transform-origin)",
@@ -244,15 +246,18 @@ function DropdownMenuSubTrigger({
 
 function DropdownMenuSubContent({
   className,
+  collisionPadding = 8,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
   const origin = React.useContext(MenuOrigin);
+  const safePadding = useSafeAreaCollisionPadding(collisionPadding);
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       data-overlay-surface="contextual"
       data-overlay-origin={origin}
       data-dropdown-surface=""
+      collisionPadding={props.collisionBoundary ? collisionPadding : safePadding}
       className={cn(menuSurface, "origin-(--radix-dropdown-menu-content-transform-origin)", className)}
       {...props}
     />

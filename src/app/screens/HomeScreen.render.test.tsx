@@ -22,6 +22,25 @@ const routineModes = {
 } as const;
 
 describe("HomeScreen quick access", () => {
+  it("keeps application sharing on the resolved Home material and returns to solid when scenery is disabled", () => {
+    const props = {
+      completed: emptyProgress(),
+      dailyCompletions: [],
+      quietProgressEnabled: false,
+      progressDayStartHour: 4,
+      language: "en" as const,
+      direction: "ltr" as const,
+      onResume: () => undefined,
+      routineModes,
+    };
+    const view = render(<HomeScreen {...props} homeVisualEffects />);
+    const action = within(screen.getByTestId("home-app-sharing")).getByRole("button");
+    expect(action).toHaveClass("hero-glass", "home-glass-surface");
+    view.rerender(<HomeScreen {...props} homeVisualEffects={false} />);
+    expect(action).not.toHaveClass("hero-glass");
+    expect(action).toBe(within(screen.getByTestId("home-app-sharing")).getByRole("button"));
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
@@ -118,7 +137,7 @@ describe("HomeScreen quick access", () => {
 
     expect(screen.getByTestId("hijri-date")).toBeInTheDocument();
     const utilityHeader = screen.getByTestId("home-utility-header");
-    expect(utilityHeader).toHaveClass("pt-2");
+    expect(utilityHeader).toHaveClass("home-page-header");
     expect(utilityHeader.className).not.toContain("safe-area-inset-top");
     expect(screen.getByTestId("home-hero")).not.toHaveClass("sm:mt-4");
     expect(screen.getByTestId("home-hero").closest(".app-screen-surface")).toHaveStyle({ paddingTop: "0px" });

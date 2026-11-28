@@ -6,6 +6,7 @@ import "./accessible-combobox.css";
 import { ChevronDown, Search, Check, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
+import { useSafeAreaCollisionPadding } from "../hooks/useSafeAreaCollisionPadding";
 
 export interface ComboboxOption {
   id: number | string;
@@ -54,6 +55,7 @@ export function AccessibleCombobox({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  const safePadding = useSafeAreaCollisionPadding();
   const touchOpen = useRef(false);
 
   useEffect(() => {
@@ -222,7 +224,7 @@ export function AccessibleCombobox({
             dir={direction}
             align="start"
             sideOffset={6}
-            collisionPadding={8}
+            collisionPadding={triggerRef.current?.closest('[role="dialog"]') ? 8 : safePadding}
             collisionBoundary={triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined}
             onOpenAutoFocus={(event) => {
               event.preventDefault();

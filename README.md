@@ -1,3 +1,9 @@
+Reading settings and zoom (local, 2026-11-27): the expansion action opens complete current-page text with native vertical scrolling. A single existing-position header holds size and Page view; reducing to 100% restores the original Mushaf. The footer retains one original page identity. Colour previews and explicit Follow app simplify settings; original-page magnification is disclosed under Advanced and is reset before reading enlargement. No publication is included.
+
+Android safe-area follow-up (local, 2026-11-27): the Android host initializes edge-to-edge once and shared chrome/overlays use normalized native/browser safe-area values. A rebuilt debug APK includes local geometry diagnostics for the reported Vivo Y500 / Android 16 overlap; physical-device verification remains pending. Native Java changes require reinstalling the rebuilt APK. No publication is included in this checkpoint.
+
+Quran reader refinement (local, 2026-11-27): the ordinary phone Zoom action replaces Focus in the existing bottom row, returning the extra button row to the printed page. Enlarged portions stay inside the same canvas, preserve every reviewed word and return to the untouched fifteen-line page. Word meanings use a compact aligned word/verse/close header and an opaque explanation. Expanded audio keeps ordinary phone controls compact. Quran retains a centered continuous Mushaf canvas and normal-reader type; protected audio options open on demand without shifting or shrinking it. Other playback retains responsive optional docking, full reciter names and short-screen/enlarged-text recovery. No publication is included in this checkpoint.
+
 Optional audio follow-up (local, 2026-11-26): owner-accepted Muhammad Jumah/OpenDua recordings are available as a second voice for three existing azkar. The owner also accepts the concrete Al-Minshawi, Al-Hussary and Yasser Al-Dosari Al-Mulk comparisons; these three optional Quran voices preserve the current Abdullah Muhammad default. Current saved choices, downloaded recordings and exact-file timing boundaries remain intact. Settings explains dua coverage and About retains source credits/permission links. All three books remain available in the development Learn catalogue with existing source-review notices. Other Quran recordings retain their existing reciters. See docs/audio/quran-reciter-pilot/README.md.
 
 Ordinary phone Mushaf tools share the index content area between usable reading bars. Shared sheets open from the triggering edge; dialogs, menus and pickers share finite motion, opaque text protection and predictable focus/Back recovery.
@@ -12,9 +18,15 @@ Home uses one shared prayer rail on phones, with a quiet highlighted next prayer
 
 # Azkarapp
 
+Local completion follow-up (2026-11-27): ordinary phones/tablets keep a compact completion message, a reminder card fitted to its text and every available action within the viewport. Desktop uses a protected centered modal with Close returning Home. The composition has more top/bottom breathing room without blank bands inside the card. Long quotations scroll inside the bounded card while sources and Benefits remain visible. Session details open separately without moving the page; very short windows and enlarged text retain natural scrolling. No publication is included.
+
+Local Home sharing follow-up (2026-11-27): desktop Home shows a public Google Play QR below the devotional tools; phone/tablet Home offers Share app. Both open one simple protected sheet: the QR, Share app and a quiet Copy link action. Sharing includes the QR automatically when supported, otherwise the Play Store link. The bundled code works offline without an image-cache request. This remains uncommitted and unpublished at the owner's request; physical-camera/Android share-sheet acceptance remains separate.
+
+Local Home color correction (2026-11-27): sharing and More follow Home's material independently of the app theme. Glass books actions pair light labels with a dark control ground and matching icon accents; solid themes and unavailable-photo recovery retain their own surfaces. The public QR stays black on white. No publication is included.
+
 Reading and counting headers share their active page canvas on phones, tablets and desktops. Light, Dark, Midnight and Glass retain readable theme-aware title/actions/progress; scrolling headers and menus keep their protected surfaces.
 
-Completion offers one stable, source-linked reminder from the reviewed Benefits catalogue in a centered reading card. Counts and optional quiet progress sit below; session details disclose elapsed time including pauses. Sharing opens the completed collection with its current routine length/prayer, full sources and repetitions, rather than personal achievement text.
+Completion offers one stable, source-linked reminder from the reviewed Benefits catalogue in a centered reading card. The approved blessing and acceptance share one wrapping greeting row above the completed collection title. Completed-zikr totals are omitted; optional quiet progress and elapsed time including pauses live in Session details. Sharing opens the completed collection with its current routine length/prayer, full sources and repetitions, rather than personal achievement text.
 
 Settings exposes Audio & recitations and Downloads separately. Coordinate-only prayer locations show a localized nearby city/country from the offline catalogue when within 75 km, or Device location outside coverage. Exact GPS coordinates still drive prayer calculations without an online naming service.
 
@@ -45,7 +57,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 ## Product capabilities
 
 - Reviewed azkar collections with Arabic-first reading and optional English translation/transliteration and a remembered on-device English main-text choice
-- Preview and share individual azkar or collections as complete image cards, text or contextual links, with full-screen phone sharing, a This zikr / Entire collection choice, selectable artwork/formats, explicit card selection, long-surah Mushaf reminders and one-file ZIP saving
+- Preview and share individual azkar or collections as complete image cards, text or contextual links, with bounded phone dialogs clear of system bars, a This zikr / Entire collection choice, selectable artwork/formats, explicit card selection, long-surah Mushaf reminders and one-file ZIP saving
 - Time-aware Home recommendations, next-prayer countdown, and Hijri date
 - Private on-device astronomical prayer timings with selectable calculation methods and manual minute adjustments
 - Automatic geolocation, device IANA timezone detection, and DST handling without sending coordinates to a third party

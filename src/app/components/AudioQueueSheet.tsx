@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useSafeAreaCollisionPadding } from "../hooks/useSafeAreaCollisionPadding";
 import * as Popover from "@radix-ui/react-popover";
 import { SheetHeader } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
@@ -17,6 +18,7 @@ export function AudioQueueSheet({
   language: AppLanguage;
 }) {
   const currentButton = useRef<HTMLButtonElement>(null);
+  const safePadding = useSafeAreaCollisionPadding();
   const [body, setBody] = useState<HTMLDivElement | null>(null);
   // Positioning publishes the available height after the portal mounts. Reveal
   // the selected row once that scroll viewport has its actual bounded size.
@@ -43,7 +45,7 @@ export function AudioQueueSheet({
         side="top"
         align="center"
         sideOffset={8}
-        collisionPadding={8}
+        collisionPadding={safePadding}
         aria-label={t(language, "listening.queue")}
         dir={language === "ar" ? "rtl" : "ltr"}
         data-testid="audio-queue-sheet"

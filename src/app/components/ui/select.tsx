@@ -9,6 +9,7 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "../icons";
 
 import { cn } from "./utils";
 import { MENU_OPTION_STATE } from "./controlStyles";
+import { useSafeAreaCollisionPadding } from "../../hooks/useSafeAreaCollisionPadding";
 
 function Select({ dir, ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   const resolvedDir =
@@ -55,10 +56,12 @@ function SelectContent({
   children,
   position = "popper",
   viewportProps,
+  collisionPadding = 8,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content> & {
   viewportProps?: React.ComponentProps<typeof SelectPrimitive.Viewport>;
 }) {
+  const safePadding = useSafeAreaCollisionPadding(collisionPadding);
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -73,6 +76,7 @@ function SelectContent({
           className,
         )}
         position={position}
+        collisionPadding={props.collisionBoundary ? collisionPadding : safePadding}
         {...props}
       >
         <SelectScrollUpButton />

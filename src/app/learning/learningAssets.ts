@@ -16,6 +16,7 @@ if (typeof window !== "undefined") {
   });
 }
 const tags = new Set([
+  "bdi",
   "diagram",
   "header",
   "section",
@@ -43,6 +44,7 @@ const tags = new Set([
   "img",
 ]);
 const classes = new Set([
+  "visual",
   "quran",
   "meaning",
   "photo",
@@ -176,13 +178,39 @@ export function validateLearningPack(value: unknown, resource: LearningResource)
   return pack;
 }
 
+async function previousSavedPack(resource: LearningResource) {
+  const cache = await openCache();
+  for (const asset of resource.previousPacks ?? []) {
+    const url = learningAssetUrl(asset);
+    const response = await cache?.match(url).catch(() => undefined);
+    if (!response) continue;
+    try {
+      return { asset, bytes: await verified(response, asset) };
+    } catch (error) {
+      if (!pageClosing && error instanceof LearningIntegrityError) await cache?.delete(url).catch(() => false);
+    }
+  }
+  return null;
+}
+
 export async function loadLearningPack(resource: LearningResource, signal?: AbortSignal) {
   if (!isLearningResourceAvailable(resource)) throw new Error("Learning edition unavailable");
-  const bytes = await fetchLearningAsset(resource.pack, signal, true, learningEditionId(resource));
+  let bytes: ArrayBuffer,
+    previousEdition = false;
+  try {
+    bytes = await fetchLearningAsset(resource.pack, signal, true, learningEditionId(resource));
+  } catch (error) {
+    signal?.throwIfAborted();
+    const saved = await previousSavedPack(resource);
+    if (!saved) throw error;
+    bytes = saved.bytes;
+    previousEdition = true;
+  }
   const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
   const text = await new Response(stream).text();
   signal?.throwIfAborted();
-  return validateLearningPack(JSON.parse(text), resource);
+  const pack = validateLearningPack(JSON.parse(text), resource);
+  return previousEdition ? { ...pack, previousEdition: true as const } : pack;
 }
 
 export interface LearningOfflineStatus {
@@ -191,6 +219,7 @@ export interface LearningOfflineStatus {
   savedFiles: number;
   totalFiles: number;
   textSaved?: boolean;
+  previousEdition?: true;
 }
 export async function learningOfflineStatus(resource: LearningResource): Promise<LearningOfflineStatus> {
   const cache = await openCache();
@@ -209,12 +238,14 @@ export async function learningOfflineStatus(resource: LearningResource): Promise
       if (!pageClosing && error instanceof LearningIntegrityError) await cache?.delete(url).catch(() => false);
     }
   }
+  const previousEdition = !textSaved && Boolean(await previousSavedPack(resource));
   return {
     complete: savedFiles === assets.length,
     available: Boolean(cache),
     savedFiles,
     totalFiles: assets.length,
     textSaved,
+    ...(previousEdition ? { previousEdition: true as const } : {}),
   };
 }
 
@@ -222,7 +253,7 @@ export async function removeLearningDownload(resource: LearningResource) {
   generation++;
   const cache = await openCache();
   if (!cache) throw new Error("Learning storage unavailable");
-  const current = new Set([resource.pack, ...resource.images].map(learningAssetUrl));
+  const current = new Set([resource.pack, ...(resource.previousPacks ?? []), ...resource.images].map(learningAssetUrl));
   const identity = learningEditionId(resource);
   const shared = new Set<string>();
   for (const other of allLearningEditions("ar")) {

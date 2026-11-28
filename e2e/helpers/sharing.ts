@@ -1,52 +1,37 @@
 import { expect, type Locator } from "@playwright/test";
 
-/** Circles, labels and colored connector segments must remain independent at every width. */
+/** Compact steps keep full labels, usable targets and one visible current mark. */
 export async function expectSharingStepGeometry(studio: Locator) {
-  // Stage attributes update before the browser finishes its reduced-motion style frame.
-  const connectors = studio.locator(".sharing-steps li:not(:last-child)");
-  for (const item of await connectors.all()) {
-    await expect
-      .poll(() =>
-        item.evaluate((element) => {
-          const state = element.getAttribute("data-state");
-          const scale = state === "past" ? 1 : state === "current" ? 0.5 : 0;
-          return getComputedStyle(element, "::after").transform === `matrix(${scale}, 0, 0, 1, 0, 0)`;
-        }),
-      )
-      .toBe(true);
-  }
-  const geometry = await studio.locator(".sharing-steps li").evaluateAll((items) =>
-    items.map((item, index) => {
-      const circle = item.querySelector(".sharing-step-number")!.getBoundingClientRect();
-      const label = item.querySelector("button > span:last-child")!.getBoundingClientRect();
-      const column = item.getBoundingClientRect();
-      const track = getComputedStyle(item, "::before");
-      const fill = getComputedStyle(item, "::after");
+  const steps = studio.locator(".sharing-steps");
+  await expect(steps.locator('[aria-current="step"]')).toHaveCount(1);
+  await expect(steps.locator(".sharing-step-number")).toHaveCount(0);
+  const geometry = await steps.locator("button").evaluateAll((items) =>
+    items.map((item) => {
+      const label = item.querySelector("span")!.getBoundingClientRect();
+      const box = item.getBoundingClientRect();
+      const mark = getComputedStyle(item, "::after");
       return {
-        size: circle.width,
-        labelGap: label.top - circle.bottom,
-        labelWidth: label.width,
-        columnWidth: column.width,
-        last: index === items.length - 1,
-        state: item.getAttribute("data-state"),
-        trackWidth: parseFloat(track.width),
-        transform: fill.transform,
-        trackColor: track.backgroundColor,
-        fillColor: fill.backgroundColor,
-        centerOffset: parseFloat(track.top) + 1 - (circle.top - column.top + circle.height / 2),
+        width: box.width,
+        height: box.height,
+        labelInside:
+          label.left >= box.left - 1 &&
+          label.right <= box.right + 1 &&
+          label.top >= box.top - 1 &&
+          label.bottom <= box.bottom + 1,
+        current: item.getAttribute("aria-current") === "step",
+        markHeight: parseFloat(mark.height),
+        markContent: mark.content,
+        hit: item.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)),
       };
     }),
   );
   for (const item of geometry) {
-    expect(item.size).toBeGreaterThanOrEqual(32);
-    expect(item.labelGap).toBeGreaterThanOrEqual(5);
-    expect(item.labelWidth).toBeLessThanOrEqual(item.columnWidth + 1);
-    if (item.last) continue;
-    expect(item.trackWidth).toBeGreaterThan(0);
-    expect(Math.abs(item.centerOffset)).toBeLessThanOrEqual(1);
-    expect(item.fillColor).not.toBe(item.trackColor);
-    const scale = item.state === "past" ? 1 : item.state === "current" ? 0.5 : 0;
-    expect(item.transform).toBe(`matrix(${scale}, 0, 0, 1, 0, 0)`);
+    expect(item.width).toBeGreaterThanOrEqual(44);
+    expect(item.height).toBeGreaterThanOrEqual(44);
+    expect(item.labelInside).toBe(true);
+    expect(item.hit).toBe(true);
+    if (item.current) expect(item.markHeight).toBeGreaterThanOrEqual(3);
+    else expect(item.markContent).toBe("none");
   }
 }
 

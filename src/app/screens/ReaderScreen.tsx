@@ -435,6 +435,16 @@ export function ReaderScreen({
   // for the desktop reader, and running the phone layout there left a wide,
   // sparse column. Below 768px the phone layout takes over.
   const isDesktopReader = useMediaQuery("(min-width: 768px)");
+  const previousAudioLayout = useRef(isDesktopReader);
+  useLayoutEffect(() => {
+    const changed = previousAudioLayout.current !== isDesktopReader;
+    previousAudioLayout.current = isDesktopReader;
+    if (!changed || !audioModeActive) return;
+    const frame = requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>('[data-testid="reader-audio-expand"]')?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isDesktopReader, audioModeActive]);
   const isWideReader = useMediaQuery("(min-width: 1200px)");
   const panelSize = useCollectionPanelSize(isDesktopReader && !focusMode);
   const canDockCollection = isWideReader && panelSize.canDock;
@@ -1815,7 +1825,11 @@ export function ReaderScreen({
                       </div>
                     </div>
 
-                    {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}
+                    {
+                      <footer className={audioModeActive ? "shrink-0" : "screen-chrome-footer shrink-0"}>
+                        {renderDock()}
+                      </footer>
+                    }
                     {!audioModeActive && typeof audioPlayer !== "function" && audioPlayer}
                   </div>
                 </div>
@@ -1987,13 +2001,7 @@ export function ReaderScreen({
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-              {
-                <div
-                  className={`shrink-0 pt-3 ${audioModeActive ? "pb-0" : "pb-[max(0.75rem,env(safe-area-inset-bottom))]"}`}
-                >
-                  {renderDock()}
-                </div>
-              }
+              {<div className={audioModeActive ? "shrink-0" : "screen-chrome-footer shrink-0"}>{renderDock()}</div>}
               {!audioModeActive && typeof audioPlayer !== "function" && audioPlayer}
             </div>
           </>

@@ -43,7 +43,7 @@
 }
 .masbaha-stage::after {
   content: "";
-  flex: 0 0 max(16px, env(safe-area-inset-bottom));
+  flex: 0 0 max(16px, var(--app-safe-area-bottom));
   width: 1px;
 }
 .masbaha-dhikr {
@@ -125,7 +125,7 @@
 .masbaha-sheet-footer {
   flex-shrink: 0;
   border-top: 1px solid var(--border);
-  padding: 12px 20px max(12px, env(safe-area-inset-bottom));
+  padding: var(--chrome-edge-space) 20px;
   background: var(--popover);
 }
 .masbaha-draft-actions {

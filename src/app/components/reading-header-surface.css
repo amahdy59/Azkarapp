@@ -2,6 +2,7 @@
    parent canvas makes all themes/materials continuous without another blur,
    painted band, rounded container, border or shadow. */
 .reading-header-surface {
+  padding-block: var(--chrome-edge-space);
   background: transparent;
   color: var(--foreground);
 }

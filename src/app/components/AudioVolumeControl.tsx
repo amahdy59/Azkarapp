@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { usePopoverOutsideDismiss } from "../hooks/usePopoverOutsideDismiss";
+import { useSafeAreaCollisionPadding } from "../hooks/useSafeAreaCollisionPadding";
 import * as Popover from "@radix-ui/react-popover";
 import type { AudioController } from "../audio/AudioProvider";
 import type { AppLanguage } from "../types";
@@ -18,6 +19,7 @@ export function AudioVolumeControl({
   labelled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const safePadding = useSafeAreaCollisionPadding();
   const trigger = useRef<HTMLButtonElement>(null);
   const content = useRef<HTMLDivElement>(null);
   const recoverFocus = usePopoverOutsideDismiss(open, () => setOpen(false), trigger, content);
@@ -51,7 +53,7 @@ export function AudioVolumeControl({
           side="top"
           align="center"
           sideOffset={8}
-          collisionPadding={8}
+          collisionPadding={safePadding}
           aria-label={volumeLabel}
           data-testid="audio-volume-popover"
           data-dropdown-surface=""

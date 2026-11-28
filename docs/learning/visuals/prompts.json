@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "tool": "Built-in image_gen",
+  "date": "2026-11-27",
+  "assets": [
+    {
+      "id": "quiet-prayer-space",
+      "prompt": "Photorealistic natural editorial image of a clean unornamented ivory woven prayer mat on pale stone floor near a softly lit window, natural daylight and physically plausible shadows. No people, no pose, no books, no religious writing, no imaginary mosque architecture, no text or watermark. Landscape 3:2; whole subject within center 70 percent for responsive display. Calm contextual illustration only; no prescribed ritual or historical-location claim."
+    },
+    {
+      "id": "bedtime-context",
+      "prompt": "Photorealistic natural editorial image of a modest clean bedroom prepared for sleep, ivory pillow, beige cotton bedding, small bedside lamp with realistic amber light and blue evening light through a plain window. No people, faces, figurines, books, religious script, text or logos. Context for an existing bedtime remembrance chapter; no prescribed ritual, pose or object. Landscape 3:2; main subject clear within center 70 percent, restrained colors, no artificial glow or watermark."
+    }
+  ]
+}

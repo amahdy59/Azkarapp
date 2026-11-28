@@ -73,7 +73,8 @@ export async function resolveWirdSourceOverrides() {
   );
   const sourcePath = "docs/external-sources/book3_al_wird_an_nabawi/al_wird_an_nabawi_light.html";
   const bytes = await fs.readFile(path.join(root, sourcePath));
-  if (hash(bytes) !== ledger.adaptationBeforeRestorationSha256)
+  const restored = hash(bytes) === ledger.adaptationAfterRestorationSha256;
+  if (!restored && hash(bytes) !== ledger.adaptationBeforeRestorationSha256)
     throw new Error("Wird source changed; reconcile the recorded original-source differences");
   const document = new JSDOM(bytes.toString("utf8")).window.document;
   for (const change of ledger.changes) {
@@ -82,10 +83,16 @@ export async function resolveWirdSourceOverrides() {
       page.querySelectorAll(".page-header,.page-footer,svg,[aria-hidden=true]").forEach((node) => node.remove());
       return clean(page.textContent);
     });
+    if (restored && JSON.stringify(change.sourceArabic.map(hash)) !== JSON.stringify(change.restoredSourcePageSha256s))
+      throw new Error("Restored Wird page text differs from its source-comparison ledger");
     for (const pair of change.quran || []) {
       const matches = document.querySelectorAll(pair.selector);
       if (matches.length !== 1) throw new Error(`Ambiguous Wird source ${pair.ref}`);
-      pair.arabic = exactExcerpt(clean(matches[0].textContent), pair.arabicStart, pair.arabicEnd);
+      pair.arabic = restored
+        ? pair.restoredArabic
+        : exactExcerpt(clean(matches[0].textContent), pair.arabicStart, pair.arabicEnd);
+      if (!pair.arabic || !clean(matches[0].textContent).includes(pair.arabic))
+        throw new Error("Wird Quran binding differs from restored source");
       const [surah, ayah] = pair.ref.split(":");
       pair.translationPath = `public/data/translations/en/${surah}.json`;
       const translationBytes = await fs.readFile(path.join(root, pair.translationPath));

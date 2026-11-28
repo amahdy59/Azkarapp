@@ -279,6 +279,17 @@ export function Modal({
           // treats Escape as "leave the reader", so dismissing a dialog would
           // exit the reading session underneath it.
           onEscapeKeyDown={(event) => event.stopPropagation()}
+          onKeyDown={(event) => {
+            // A newly opened nested modal can receive a key before Radix's
+            // layer index refreshes. Its focused content still owns Escape.
+            // Already-handled native/menu keys must never dismiss a second layer.
+            if (event.key !== "Escape" || event.defaultPrevented || topOverlay()?.dataset.backDismiss !== backDismiss)
+              return;
+            event.preventDefault();
+            event.stopPropagation();
+            onClose();
+          }}
+          aria-modal="true"
           className={`fixed left-1/2 top-1/2 z-[100] flex w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col ${maxWidthClassName} max-h-[85vh] overflow-hidden rounded-3xl outline-none animate-in fade-in-0 zoom-in-95 duration-standard ${
             onGlass ? "hero-glass home-glass-surface text-white" : "border border-border/60 bg-card shadow-overlay"
           } ${className}`.trim()}
@@ -377,7 +388,7 @@ export function SidePanel({
             if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
           }}
           style={inset > 0 ? { [side]: `${inset}px` } : undefined}
-          className={`animate-in fixed inset-y-0 z-[100] flex w-[22rem] max-w-[calc(100%-3rem)] flex-col overflow-y-auto bg-card shadow-overlay duration-standard outline-none pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] ${
+          className={`animate-in fixed inset-y-0 z-[100] flex w-[22rem] max-w-[calc(100%-3rem)] flex-col overflow-y-auto bg-card shadow-overlay duration-standard outline-none pt-[var(--app-safe-area-top)] pb-[var(--app-safe-area-bottom)] ${
             side === "right" ? "right-0 border-l slide-in-from-right" : "left-0 border-r slide-in-from-left"
           } border-border/60 ${className}`.trim()}
         >

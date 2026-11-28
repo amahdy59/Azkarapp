@@ -118,6 +118,7 @@ function Passage({
     <div ref={root} data-listening-passage={page} className="w-full">
       {lines?.some((line) => line.length) ? (
         <MushafListeningPage
+          showZoomControl={false}
           lines={lines}
           pageNumber={page}
           language={props.language}

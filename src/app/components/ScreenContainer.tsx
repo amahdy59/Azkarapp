@@ -26,7 +26,7 @@ export function ScreenContainer({
 }: ScreenContainerProps) {
   useScreenFocus(screenName);
 
-  const blockPadding = edgeToEdge ? "" : "pb-[max(1.5rem,env(safe-area-inset-bottom))]";
+  const blockPadding = edgeToEdge ? "" : "pb-[max(1.5rem,var(--chrome-safe-bottom))]";
 
   return (
     // Deliberately a div, not <main>: App.tsx already renders the single

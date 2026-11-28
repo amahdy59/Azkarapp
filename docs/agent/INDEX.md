@@ -2,6 +2,46 @@
 
 ## Active phase
 
+[Verified main release](phases/VERIFIED_MAIN_RELEASE_2026_11_28.md) is the current owner-authorized release checkpoint: review and repair the entire pending batch, push to main through unchanged gates, and verify exact-commit Quality, Pages and production. The owner's latest push-all instruction supersedes historical publication holds below; source/draft and physical-device acceptance boundaries remain.
+
+[Home material color pairing](phases/HOME_MATERIAL_COLOR_LOCAL_2026_11_27.md) is the owner's screenshot follow-up to the sharing work: resolve the light sharing card on Glass Home, white-on-pale books action and adjacent More/icon mismatches through existing material state and semantic tokens. Preserve horizontal desktop/simple phone sharing, all independent scopes and the local-only/no-commit/no-push hold.
+
+[Reading settings and header zoom](phases/HEADER_ZOOM_LOCAL_2026_11_27.md) is the owner-approved local follow-up to the revised visual concepts: one header, continuous current-page enlargement, original Mushaf at 100%, one footer page identity and compact appearance settings. No commit, push or publication. Preserve the independent scopes below.
+
+Its [completed local report](reports/HEADER_ZOOM_LOCAL_2026_11_27_REPORT.md) links the [actual screenshots](evidence/header-zoom/README.md), 107 focused units, three-engine browser evidence and independent aggregate-gate limitations. No commit or push.
+
+[Approved completion greeting](phases/COMPLETION_GREETING_LOCAL_2026_11_27.md) is this chat's local follow-up after the owner selects the recommended depiction: blessing/acceptance together, more space above, completed-count line removed and optional streak in Session details. Preserve the compact card, desktop modal with Close and all independent work below. No commit, push or publication.
+
+Its [local greeting/spacing report](reports/COMPLETION_GREETING_LOCAL_2026_11_27_REPORT.md) records the owner's additional 4px spacing/larger-check correction, 17 passing focused unit tests, passing evidence for all 54 browser feature cases (one WebKit case needs a separate fresh-origin reproduction) and the [fourteen-image actual-app gallery](evidence/completion-greeting/README.md). Independent repository-gate failures and local WebKit timing remain explicit limitations.
+
+[Prayer-location page review](phases/PRAYER_LOCATION_REVIEW_LOCAL_2026_11_27.md) is this chat's local screenshot/simplicity follow-up: primary GPS, complete city browsing without typing, calculation selection and optional timezone/minute choices. Remove manual-entry forms and repeated technical detail; preserve existing saved data and stale-GPS protection. Do not commit or push; retain the independently active completion, book, player and safe-area work below and physical-device acceptance limits.
+
+Its [local report](reports/PRAYER_LOCATION_REVIEW_LOCAL_2026_11_27_REPORT.md) records the applied simplified page, 37 focused unit passes, all 60 feature cases successfully covered across the documented runs, 15 Settings integration passes and the [eight-image gallery](evidence/prayer-location-simple/README.md). Independent complete-gate failures and physical-device acceptance remain explicit limitations.
+
+[Completion within the viewport](phases/COMPLETION_VIEWPORT_LOCAL_2026_11_27.md) is the owner's local screenshot follow-up: compact completion header, visible available actions, separate Session details and complete-text/short-window recovery. The latest density correction fits the card to its text, removes internal blank bands and increases screen top/bottom padding. The owner requests screenshot evidence and local implementation only. No commit, push or publication; preserve all independent scopes below.
+
+The [density and desktop-modal report](reports/COMPLETION_DENSITY_LOCAL_2026_11_27_REPORT.md) records the latest correction: desktop completion is a protected closable modal; its check/Close row stays outside scrolling text. The [sixteen-image updated gallery](evidence/completion-viewport-density/README.md) supersedes the stretched-card presentation below. Repository-release blockers and physical-device acceptance remain separate.
+
+Its [completed local report](reports/COMPLETION_VIEWPORT_LOCAL_2026_11_27_REPORT.md) records twelve passing unit tests, 48 passing browser cases across three engines and a [twelve-image gallery](evidence/completion-viewport/README.md). Existing independent book-audit, formatting and aggregate bundle failures remain explicit release blockers; physical-device acceptance is pending.
+
+[Bounded modal sizing](phases/MODAL_SIZING_LOCAL_2026_11_27.md) is the owner's local screenshot follow-up: remove unnecessary full-screen sharing/excerpt dialogs, preserve physical safe areas plus breathing room, and audit equivalent shared overlays. No commit, push or publication. Preserve all independent scopes below.
+
+Its [completed local report](reports/MODAL_SIZING_LOCAL_2026_11_27_REPORT.md) records 60 passing browser cases across three engines, 20 passing targeted units and a [twelve-image gallery](evidence/modal-sizing/README.md). Independent book/format findings and aggregate bundle budgets prevent a complete repository gate pass; physical-device acceptance remains pending.
+
+[Home application QR and sharing](phases/APP_QR_SHARING_LOCAL_2026_11_27.md) is the owner's separate local scope: desktop Home QR, compact mobile/tablet entry, and one simplified public Google Play sheet. The screenshot follow-up removes the destination picker and separate QR/link/save options in favor of one Share app action and quiet Copy. Apply locally without committing/pushing and preserve all independent scopes below.
+
+[Android system-bar safe areas](phases/ANDROID_SAFE_AREAS_LOCAL_2026_11_27.md) is this chat's owner-approved local follow-up to the Vivo Y500 / Android 16 overlap investigation. Normalize native/browser insets, initialize supported edge-to-edge once, protect shared chrome/overlays, add debug-only diagnostics and rebuild a test APK. Preserve the independent book/Quran/audio scopes below. No commit, push or publication; real-device acceptance remains separate.
+
+Its [completed local report](reports/ANDROID_SAFE_AREAS_LOCAL_2026_11_27_REPORT.md) records the rebuilt versionCode 4 debug APK, passing feature/native/lint/type/build checks and [labelled screenshot gallery](evidence/android-safe-areas/README.md). Independent book full-gate failures and physical-device acceptance remain explicit limitations.
+
+[Complete available-book content audit](phases/BOOK_CONTENT_AUDIT_2026_11_27.md) is the latest owner-requested follow-up. Review all available Arabic/English adaptation content against exact originals, record every unit's checked/discrepant/unverifiable status, and apply clear source-confirmed repairs. This supersedes any implication that the earlier local source/visual checks established complete content revision. Publication remains held.
+
+[Quran inline enlargement and expanded-player polish](phases/QURAN_INLINE_PLAYER_LOCAL_2026_11_27.md) is this chat’s approved local presentation follow-up after image agreement. Replace the phone Focus slot with inline zoom, reclaim reading height, compact meanings and refine ordinary-size audio options. Preserve the independent books/audio work below. No commit or publication.
+
+[Books and expanded listening, locally](phases/BOOKS_LISTENING_LOCAL_2026_11_27.md) is the owner's current follow-up: source-backed book repairs, native reading clarity, responsive desktop audio options and explicitly estimated exact-file word following. The owner now authorizes starting while the release is held. Keep this follow-up local and preserve the independent release repairs; no commit or publication.
+
+The [completed local report](reports/BOOKS_LISTENING_LOCAL_2026_11_27_REPORT.md) records the passing complete gate (402 files/2,835 tests), Pages build, 104 affected browser cases across three engines plus six coordinated canonical player cases, source/export checks and [actual-output gallery](evidence/books-listening/README.md). Global edge spacing, responsive reading defaults, requested audio settings and verified cached-edition recovery are implemented. Human source/listening/device acceptance and publication remain separate.
+
 [Audio choices and complete book access](phases/AUDIO_LIBRARY_EXPANSION_2026_11_26.md) extends the release below under the owner's latest instruction. Improve responsive audio options, expand automatically verified Mushaf/dua recordings and expose all three books/PDFs without another owner confirmation. Deferred human review is not represented as completed; exact text/source/byte verification remains mandatory.
 
 [Consolidated main release](phases/CONSOLIDATED_MAIN_RELEASE_2026_11_26.md) is the owner-authorized integration and publication phase. Consolidate pending work and branch-only developments, preserve review boundaries, pass the release gates and verify exact-commit Quality, Pages and production. This supersedes the preceding local-only publication holds. The [integration report](reports/CONSOLIDATED_MAIN_RELEASE_2026_11_26_REPORT.md) maps the combined scope and verification evidence.

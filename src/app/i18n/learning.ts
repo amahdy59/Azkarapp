@@ -2,6 +2,14 @@ import { translateDictionary } from "./index";
 import type { AppLanguage } from "../types";
 
 const en = {
+  diagramKaaba: "Ka'bah",
+  diagramTawafCount: "7 anticlockwise circuits",
+  diagramStartAt: "Start at the",
+  diagramBlackStone: "Black Stone",
+  diagramSafa: "al-Safa",
+  diagramMarwah: "al-Marwah",
+  diagramStart: "Start",
+  diagramFinish: "Finish",
   title: "Learn",
   homeTitle: "Learn & books",
   allBooks: "All books",
@@ -69,6 +77,8 @@ const en = {
   savedOffline: "Available offline",
   partial: "Partly saved on this device",
   notSaved: "Internet needed for first reading",
+  previousSaved: "An earlier edition is saved on this device",
+  previousEdition: "Showing your previously saved edition. The latest edition is unavailable; connect to download it.",
   checking: "Checking saved files…",
   storageUnavailable: "Offline storage is unavailable in this browser.",
   downloadProgress: "Saving {current} of {total} files",
@@ -101,6 +111,14 @@ const en = {
 };
 
 const ar: typeof en = {
+  diagramKaaba: "الكعبة",
+  diagramTawafCount: "٧ أشواط عكس عقارب الساعة",
+  diagramStartAt: "البداية من",
+  diagramBlackStone: "الحجر الأسود",
+  diagramSafa: "الصفا",
+  diagramMarwah: "المروة",
+  diagramStart: "البداية",
+  diagramFinish: "النهاية",
   title: "تعلّم",
   homeTitle: "تعلّم والكتب",
   allBooks: "كل الكتب",
@@ -166,6 +184,8 @@ const ar: typeof en = {
   savedOffline: "متاح دون إنترنت",
   partial: "محفوظ جزئيًا على هذا الجهاز",
   notSaved: "يلزم الإنترنت للقراءة أول مرة",
+  previousSaved: "نسخة سابقة محفوظة على هذا الجهاز",
+  previousEdition: "تُعرض نسختك المحفوظة سابقًا. النسخة الأحدث غير متاحة؛ اتصل بالإنترنت لتنزيلها.",
   checking: "جارٍ التحقق من الملفات المحفوظة…",
   storageUnavailable: "التخزين للقراءة دون إنترنت غير متاح في هذا المتصفح.",
   downloadProgress: "حفظ {current} من {total} ملفات",

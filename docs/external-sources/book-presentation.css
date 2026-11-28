@@ -1,3 +1,61 @@
+.teaching-diagram {
+  break-inside: avoid;
+  margin: 4mm 0;
+  padding: 3mm;
+  border: 1px solid var(--book-line);
+  border-radius: 3mm;
+  background: var(--book-card);
+  color: var(--book-ink);
+}
+.teaching-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--book-accent);
+  direction: ltr;
+}
+.teaching-diagram text {
+  fill: var(--book-ink);
+  font:
+    14px "IBM Plex Arabic",
+    sans-serif;
+}
+.teaching-diagram .diagram-route,
+.teaching-diagram .diagram-detail,
+.teaching-diagram .diagram-house {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+.teaching-diagram .diagram-count {
+  fill: var(--book-card);
+  stroke: currentColor;
+}
+.teaching-diagram .diagram-point {
+  fill: var(--book-ink);
+}
+.teaching-diagram figcaption {
+  font-size: 0.8em;
+  line-height: 1.7;
+}
+.book-context-figure {
+  break-inside: avoid;
+  margin: 4mm 0;
+}
+.book-context-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  border-radius: 3mm;
+}
+.book-context-figure figcaption {
+  margin-block-start: 2mm;
+  color: var(--book-muted);
+  font-size: 0.8em;
+  line-height: 1.65;
+}
 :root {
   --book-bg: #fbf9f5;
   --book-card: #ffffff;
@@ -504,6 +562,18 @@ body {
 .book-cover h1 {
   font-size: 32pt !important;
   line-height: 1.7 !important;
+}
+.source-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4mm;
+  margin-block: 5mm;
+}
+.source-cover .body-text,
+.source-cover .source-note-meta {
+  color: inherit;
+  margin: 0;
 }
 .book-cover [style*="Amiri"] {
   font-weight: 400 !important;

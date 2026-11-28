@@ -1,4 +1,4 @@
-import { Check, ChevronLeft, ChevronRight } from "./icons";
+import { ChevronLeft, ChevronRight } from "./icons";
 import { Button } from "./ui/button";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -40,9 +40,6 @@ export function SharingSteps({ steps, step, onChange, language, disabled }: Shar
               disabled={disabled}
               onClick={() => onChange(value)}
             >
-              <span className="sharing-step-number" aria-hidden="true">
-                {index < current ? <Check className="size-4" /> : formatNumerals(index + 1, language)}
-              </span>
               <span>{t(language, `shareStudio.step${value}`)}</span>
             </button>
           </li>

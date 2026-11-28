@@ -329,6 +329,7 @@ export function PagedQuranListeningReader({
             </p>
           ) : (
             <MushafListeningPage
+              showZoomControl={false}
               theme={theme}
               textScale={textScale}
               magnification={magnification}

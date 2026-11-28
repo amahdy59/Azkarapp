@@ -444,6 +444,9 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
     let fittedViewport = "";
 
     const fit = () => {
+      // A reader panel temporarily hides the paper. Preserve its last real
+      // fitted measures until it is visible again, including in WebKit.
+      if (!canvas.clientWidth || !canvas.clientHeight) return;
       const column = canvas.firstElementChild as HTMLElement | null;
       const contents = Array.from(canvas.querySelectorAll<HTMLElement>("[data-mushaf-line-content]"));
       const first = contents[0];
@@ -1203,6 +1206,7 @@ export function MushafPageViewer({
   onPrevious,
   onNext,
   onReadingZoomOpen,
+  zoomReplacesFocus = false,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -1272,6 +1276,7 @@ export function MushafPageViewer({
   onPrevious?: () => void;
   onNext?: () => void;
   onReadingZoomOpen?: () => void;
+  zoomReplacesFocus?: boolean;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
   const meaningFrameRef = useRef<HTMLDivElement>(null);
@@ -1298,7 +1303,9 @@ export function MushafPageViewer({
   useLayoutEffect(() => {
     const paper = paperRef?.current;
     if (!paper) return;
-    const updateHeight = () => paper.style.setProperty("--mushaf-page-height", `${paper.clientHeight}px`);
+    const updateHeight = () => {
+      if (paper.clientHeight > 0) paper.style.setProperty("--mushaf-page-height", `${paper.clientHeight}px`);
+    };
     updateHeight();
     const observer = new ResizeObserver(updateHeight);
     observer.observe(paper);
@@ -1415,24 +1422,21 @@ export function MushafPageViewer({
   const showBottomCenter =
     bottomCenterControl || (isFloatingLayout && !facingPage && showPageIdentity && showFloatingPageIndicator);
   const zoomWords = useMemo(
-    () => [
-      ...readingWordsFromMushaf(lines.flat(), pageNumber, useQcfGlyphs),
-      ...(facingPage
-        ? readingWordsFromMushaf(facingPage.lines.flat(), facingPage.pageNumber, facingPage.useQcfGlyphs)
-        : []),
-    ],
-    [lines, pageNumber, useQcfGlyphs, facingPage],
+    () => readingWordsFromMushaf(lines.flat(), pageNumber, useQcfGlyphs),
+    [lines, pageNumber, useQcfGlyphs],
   );
 
   return (
     <QuranReadingZoom
+      inline
+      disabled={focusMode}
       words={zoomWords}
       language={language}
       title={`${surahName} · ${t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}`}
       gestureSelector=".mushaf-paper"
       onOpen={onReadingZoomOpen}
     >
-      {(zoomTrigger) => (
+      {(zoomTrigger, enlarged, zoomHeader) => (
         <article
           className={`mushaf-reader-viewer glass-reading relative flex h-full min-h-0 w-full transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
           style={
@@ -1445,7 +1449,8 @@ export function MushafPageViewer({
             } as CSSProperties
           }
           data-mushaf-chrome-mode={useRail ? "rail" : headerContent ? "bars" : "clean"}
-          data-desktop-chrome={Boolean(desktopHeader && useRail)}
+          data-desktop-chrome={Boolean(desktopHeader && useRail && !enlarged)}
+          data-reading-enlarged={Boolean(enlarged)}
           data-rail-side={railSide}
           data-focus-mode={focusMode}
           data-phone-controls={Boolean(inlineIndex)}
@@ -1466,7 +1471,7 @@ export function MushafPageViewer({
             {surahName} · {formattedJuz}
           </h1>
 
-          {desktopHeader && useRail && (
+          {!enlarged && desktopHeader && useRail && (
             <div className="mushaf-desktop-top" data-theme-notice={Boolean(themeNotice)}>
               {desktopHeader}
               {themeNotice && <div className="mushaf-title-notice">{themeNotice}</div>}
@@ -1481,7 +1486,7 @@ export function MushafPageViewer({
                 })
               : t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
           </div>
-          {!useRail && (
+          {!enlarged && !useRail && (
             <nav className="sr-only" aria-label={t(language, "mushaf.pageNavigation")}>
               <button
                 type="button"
@@ -1501,7 +1506,7 @@ export function MushafPageViewer({
               </button>
             </nav>
           )}
-          {isBookmarked && !topCenterControl && !(inlineIndex && focusMode) && (
+          {!enlarged && isBookmarked && !topCenterControl && !(inlineIndex && focusMode) && (
             <div
               className={`pointer-events-none absolute end-4 z-20 flex items-center justify-center text-primary drop-shadow-md ${
                 headerContent && !useRail ? "top-14" : "top-2"
@@ -1513,7 +1518,8 @@ export function MushafPageViewer({
             </div>
           )}
 
-          {(topLeftControl || topRightControl || topCenterControl) && (
+          {zoomHeader}
+          {!enlarged && (topLeftControl || topRightControl || topCenterControl) && (
             <div
               dir="ltr"
               className="mushaf-control-band mushaf-control-band--top"
@@ -1570,7 +1576,7 @@ export function MushafPageViewer({
           of it. Elsewhere the chrome keeps the physical Mushaf header/footer
           band, its content held to the page's own measure so Previous and Next
           sit under the paper they turn. */}
-          {useRail ? (
+          {enlarged ? null : useRail ? (
             <div
               data-mushaf-chrome="rail"
               className={`relative flex shrink-0 flex-col ${railSide === "left" ? "border-s" : "border-e"} ${chromeBgClass}`}
@@ -1622,6 +1628,7 @@ export function MushafPageViewer({
               } as CSSProperties
             }
             data-magnified={magnification > 100}
+            data-inline-zoom={Boolean(enlarged)}
             data-theme-notice={Boolean(themeNotice && !topCenterControl && !desktopHeader)}
             role={magnification > 100 ? "region" : undefined}
             aria-label={magnification > 100 ? t(language, "mushaf.magnification") : undefined}
@@ -1634,6 +1641,7 @@ export function MushafPageViewer({
             // let the reader's gestures own movement instead of HTML drag/drop.
             onDragStart={(event) => event.preventDefault()}
             onPointerDown={(event) => {
+              if (enlarged) return;
               if (event.target instanceof Element && event.target.closest("[data-mushaf-meaning]")) {
                 paperTap.current = null;
                 return;
@@ -1653,7 +1661,7 @@ export function MushafPageViewer({
             onPointerCancel={() => {
               paperTap.current = null;
             }}
-            onPointerUp={magnification > 100 ? undefined : handlePaperPointerUp}
+            onPointerUp={magnification > 100 || enlarged ? undefined : handlePaperPointerUp}
           >
             {/* Plain visual words step aside from the accessibility tree until
             study mode is enabled; ayah-marker buttons remain operable in
@@ -1662,7 +1670,13 @@ export function MushafPageViewer({
             {themeNotice && !topCenterControl && !desktopHeader && (
               <div className="mushaf-paper-notice">{themeNotice}</div>
             )}
-            <div className="contents">
+            {enlarged}
+            <div
+              className="contents"
+              aria-hidden={enlarged ? true : undefined}
+              {...(enlarged ? { inert: "" } : {})}
+              style={enlarged ? { visibility: "hidden" } : undefined}
+            >
               <MushafPageCanvas
                 lines={lines}
                 language={language}
@@ -1734,7 +1748,7 @@ export function MushafPageViewer({
             </div>
 
             {/* The cohesive verse text, cleanly readable for screen readers when they aren't in study mode. */}
-            {!showWordMeanings && (
+            {!showWordMeanings && !enlarged && (
               <div className="sr-only">
                 <ScreenReaderVerses
                   lines={lines}
@@ -1752,53 +1766,59 @@ export function MushafPageViewer({
           <div data-toolbar-panel-host="" />
           {inlineIndex}
 
-          {!inlineIndexOpen && !focusMode && !useRail && !facingContent && (onNext || onPrevious || onEdgeTap) && (
-            <nav className="mushaf-tablet-turns" aria-label={t(language, "mushaf.pageNavigation")}>
-              <button
-                type="button"
-                data-testid="mushaf-tablet-next"
-                aria-label={t(language, "common.next")}
-                disabled={pageNumber >= pageTurnBounds.last}
-                onClick={onNext ?? (() => onEdgeTap?.("left"))}
-              >
-                <ChevronLeft size={20} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                data-testid="mushaf-tablet-previous"
-                aria-label={t(language, "common.previous")}
-                disabled={pageNumber <= pageTurnBounds.first}
-                onClick={onPrevious ?? (() => onEdgeTap?.("right"))}
-              >
-                <ChevronRight size={20} aria-hidden="true" />
-              </button>
-            </nav>
-          )}
-          {desktopFooter && useRail && <div className="mushaf-desktop-bottom">{desktopFooter}</div>}
+          {!enlarged &&
+            !inlineIndexOpen &&
+            !focusMode &&
+            !useRail &&
+            !facingContent &&
+            (onNext || onPrevious || onEdgeTap) && (
+              <nav className="mushaf-tablet-turns" aria-label={t(language, "mushaf.pageNavigation")}>
+                <button
+                  type="button"
+                  data-testid="mushaf-tablet-next"
+                  aria-label={t(language, "common.next")}
+                  disabled={pageNumber >= pageTurnBounds.last}
+                  onClick={onNext ?? (() => onEdgeTap?.("left"))}
+                >
+                  <ChevronLeft size={20} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  data-testid="mushaf-tablet-previous"
+                  aria-label={t(language, "common.previous")}
+                  disabled={pageNumber <= pageTurnBounds.first}
+                  onClick={onPrevious ?? (() => onEdgeTap?.("right"))}
+                >
+                  <ChevronRight size={20} aria-hidden="true" />
+                </button>
+              </nav>
+            )}
+          {!enlarged && desktopFooter && useRail && <div className="mushaf-desktop-bottom">{desktopFooter}</div>}
 
-          {(bottomLeftControl || bottomRightControl || showBottomCenter || !useRail) && (
+          {(enlarged || bottomLeftControl || bottomRightControl || showBottomCenter || (!useRail && !focusMode)) && (
             <div dir="ltr" data-overlay-edge="bottom" className="mushaf-control-band mushaf-control-band--bottom">
-              {bottomLeftControl && (
+              {!enlarged && (bottomLeftControl || (!useRail && !focusMode)) && (
                 <div
                   data-testid="mushaf-corner-bottom-left"
                   className="col-start-1 row-start-1 flex min-w-0 justify-center gap-1.5"
                 >
-                  {bottomLeftControl}
+                  {!useRail && !focusMode && zoomTrigger}
+                  {!zoomReplacesFocus && bottomLeftControl}
                 </div>
               )}
 
-              {(showBottomCenter || !useRail) && (
+              {(enlarged || showBottomCenter || !useRail) && (
                 <div
                   data-testid="mushaf-control-bottom-center"
                   className="col-start-2 row-start-1 flex min-w-0 justify-center gap-1.5"
                 >
-                  {bottomCenterControl ?? (
+                  {(!enlarged && bottomCenterControl) || (
                     <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} floating />
                   )}
                 </div>
               )}
 
-              {bottomRightControl && (
+              {!enlarged && bottomRightControl && (
                 <div
                   data-testid="mushaf-corner-bottom-right"
                   className="col-start-3 row-start-1 flex min-w-0 justify-center gap-1.5"
@@ -1806,15 +1826,14 @@ export function MushafPageViewer({
                   {bottomRightControl}
                 </div>
               )}
-              {!useRail && <div className="col-span-3 row-start-2 flex min-w-0 justify-center py-1">{zoomTrigger}</div>}
             </div>
           )}
 
-          {!useRail && footerContent && (
+          {!enlarged && !useRail && footerContent && (
             <div
               data-mushaf-chrome="footer"
-              className={`relative flex h-14 shrink-0 items-center border-t px-2 pb-[env(safe-area-inset-bottom)] sm:px-3 ${chromeBgClass}`}
-              style={{ height: `calc(3.5rem + env(safe-area-inset-bottom))` }}
+              className={`relative flex h-14 shrink-0 items-center border-t px-2 pb-[var(--app-safe-area-bottom)] sm:px-3 ${chromeBgClass}`}
+              style={{ height: `calc(3.5rem + var(--app-safe-area-bottom))` }}
             >
               <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
                 {footerContent}
@@ -1933,6 +1952,7 @@ export function MushafListeningPage({
   textScale = "medium",
   magnification = 100,
   onlySurah,
+  showZoomControl = true,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -1942,6 +1962,7 @@ export function MushafListeningPage({
   textScale?: MushafTextScale;
   magnification?: number;
   onlySurah?: number;
+  showZoomControl?: boolean;
   highlightedVerseKey?: string | null;
   highlightedWord?: { verseKey: string; position: number } | null;
 }) {
@@ -1954,52 +1975,58 @@ export function MushafListeningPage({
       ),
     [lines, onlySurah, pageNumber, useQcfGlyphs],
   );
+  const content = (
+    <>
+      <div
+        style={
+          {
+            "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
+            width: `calc(100% * ${magnification / 100})`,
+            maxWidth: "none",
+            "--mushaf-listening-height": `calc(max(36rem, 100cqh) * ${magnification / 100})`,
+          } as CSSProperties
+        }
+        aria-hidden="true"
+        data-listening-passage-paper={onlySurah !== undefined || undefined}
+        className={`glass-reading audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
+        dir="rtl"
+        lang="ar"
+      >
+        <MushafPageCanvas
+          lines={lines}
+          language={language}
+          pageNumber={pageNumber}
+          direction="rtl"
+          theme={theme}
+          useQcfGlyphs={useQcfGlyphs}
+          showWordMeanings={false}
+          inkStroke={{ midnight: "0.016em", dark: "0.016em", oled: "0.012em", light: "0.021em" }[theme]}
+          textScale={textScale}
+          magnification={magnification}
+          showPageIdentity={false}
+          readOnly
+          onlySurah={onlySurah}
+          highlightedVerseKey={highlightedVerseKey}
+          highlightedWord={highlightedWord}
+        />
+      </div>
+      <div className="sr-only">
+        <ScreenReaderVerses
+          lines={lines}
+          language={language}
+          pageNumber={pageNumber}
+          highlightedVerseKey={highlightedVerseKey}
+        />
+      </div>
+    </>
+  );
+  if (!showZoomControl) return content;
   return (
     <QuranReadingZoom words={zoomWords} language={language} returnLabel={t(language, "quranZoom.returnReading")}>
       {(zoomTrigger) => (
         <>
           <div className="flex justify-center py-2">{zoomTrigger}</div>
-          <div
-            style={
-              {
-                "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
-                width: `calc(100% * ${magnification / 100})`,
-                maxWidth: "none",
-                "--mushaf-listening-height": `calc(max(36rem, 100cqh) * ${magnification / 100})`,
-              } as CSSProperties
-            }
-            aria-hidden="true"
-            data-listening-passage-paper={onlySurah !== undefined || undefined}
-            className={`glass-reading audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
-            dir="rtl"
-            lang="ar"
-          >
-            <MushafPageCanvas
-              lines={lines}
-              language={language}
-              pageNumber={pageNumber}
-              direction="rtl"
-              theme={theme}
-              useQcfGlyphs={useQcfGlyphs}
-              showWordMeanings={false}
-              inkStroke={{ midnight: "0.016em", dark: "0.016em", oled: "0.012em", light: "0.021em" }[theme]}
-              textScale={textScale}
-              magnification={magnification}
-              showPageIdentity={false}
-              readOnly
-              onlySurah={onlySurah}
-              highlightedVerseKey={highlightedVerseKey}
-              highlightedWord={highlightedWord}
-            />
-          </div>
-          <div className="sr-only">
-            <ScreenReaderVerses
-              lines={lines}
-              language={language}
-              pageNumber={pageNumber}
-              highlightedVerseKey={highlightedVerseKey}
-            />
-          </div>
+          {content}
         </>
       )}
     </QuranReadingZoom>

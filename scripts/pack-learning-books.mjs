@@ -20,6 +20,7 @@ const tags = new Set([
   "div",
   "p",
   "span",
+  "bdi",
   "strong",
   "em",
   "b",
@@ -41,6 +42,7 @@ const tags = new Set([
 const skip =
   ".page-header,.page-footer,.page-frame-outer,.page-frame-inner,.book-icon,.chapter-badge,.intro-divider-fleuron,script,style";
 const styles = [
+  [/book-context-figure/, "visual"],
   [/photo-hero-box/, "photo"],
   [/book-cover/, "cover"],
   [/dua-card$|hadith-card|section-box|adab-card|advisory-card|conclusion-card|intro-card-luxury|catalog-box/, "panel"],
@@ -63,6 +65,15 @@ export async function extractBook(document, storeAsset) {
   async function node(source) {
     if (source.nodeType === 3) return source.textContent.replace(/\s+/g, " ");
     if (source.nodeType !== 1 || source.matches(skip)) return null;
+    if (source.matches(".teaching-diagram"))
+      return {
+        tag: "diagram",
+        diagram: source.dataset.diagram,
+        lang: source.lang === "ar" ? "ar" : "en",
+        label: clean(source.querySelector("h4").textContent),
+        alt: clean(source.querySelector("desc").textContent),
+        children: (await Promise.all([...source.querySelector("figcaption").childNodes].map(node))).filter(Boolean),
+      };
     if (source.matches("svg.step-art")) {
       const artwork = [...document.querySelectorAll(".roadmap-card")].indexOf(source.closest(".roadmap-card")) + 1;
       if (artwork < 1 || artwork > 6) throw new Error("Unknown Umrah stage illustration");
@@ -90,6 +101,7 @@ export async function extractBook(document, storeAsset) {
     const children = (await Promise.all([...source.childNodes].map(node))).filter((child) => child !== null);
     if (!children.length && tag !== "br") return null;
     const result = { tag, children };
+    if (tag === "bdi" && source.getAttribute("dir") === "ltr") result.dir = "ltr";
     const className = styles.find(([pattern]) => pattern.test(source.getAttribute("class") || ""))?.[1];
     if (className) result.className = className;
     const target = source.getAttribute("href")?.match(/^#(p-\d+)(?:-part-\d+)?$/)?.[1];
@@ -104,7 +116,10 @@ export async function extractBook(document, storeAsset) {
     const heading = page.querySelector(".chapter-title");
     if (heading) title = clean(heading.textContent);
     const nodes = (await Promise.all([...page.childNodes].map(node))).filter((child) => child !== null);
-    const textOf = (item) => (typeof item === "string" ? item : item.children.map(textOf).join(" "));
+    const textOf = (item) =>
+      typeof item === "string"
+        ? item
+        : [item.label, item.tag === "diagram" ? item.alt : "", ...item.children.map(textOf)].filter(Boolean).join(" ");
     const text = clean(nodes.map(textOf).join(" "));
     if (!text) throw new Error(`Empty book source page ${sourcePage}`);
     const previous = units.at(-1);
@@ -122,7 +137,8 @@ export async function extractBook(document, storeAsset) {
   return { units, contents, images: [...images.values()] };
 }
 
-export async function packLearningBooks() {
+export async function packLearningBooks({ preserveEnglish = false } = {}) {
+  const previousCatalogue = JSON.parse(await fs.readFile(path.join(root, "src/app/learning/catalogue.json"), "utf8"));
   await fs.mkdir(assetDirectory, { recursive: true });
   const storeAsset = async (bytes, mime, extension) => {
     const digest = sha256(bytes);
@@ -138,6 +154,11 @@ export async function packLearningBooks() {
     const { units, contents, images } = await extractBook(document, storeAsset);
     const pack = { schema: 1, resourceId: source.id, language: "ar", units, contents };
     const asset = await storeAsset(gzipSync(JSON.stringify(pack), { level: 9 }), "application/gzip", "bin");
+    const previous = previousCatalogue.find((item) => item.id === source.id && item.language === "ar");
+    const history = [previous?.pack, ...(previous?.previousPacks ?? [])].filter(
+      (item) => item && item.sha256 !== asset.sha256,
+    );
+    const previousPacks = [...new Map(history.map((item) => [item.sha256, item])).values()];
     const pdfs = {};
     for (const edition of ["light", "dark", "navy"]) {
       const bytes = await fs.readFile(path.join(directory, `${source.file}_${edition}.pdf`));
@@ -149,6 +170,7 @@ export async function packLearningBooks() {
       language: "ar",
       ...(source.reviewOnly ? { status: "draft-for-review" } : {}),
       pack: asset,
+      ...(previousPacks.length ? { previousPacks } : {}),
       images,
       pdfs,
     });
@@ -156,9 +178,20 @@ export async function packLearningBooks() {
       `${source.id}: ${units.length} source pages, ${contents.length} contents entries, ${asset.bytes} text bytes, ${images.length} images`,
     );
   }
-  resources.push(await packEnglishLearningBook(storeAsset));
+  if (preserveEnglish) {
+    const previous = JSON.parse(await fs.readFile(path.join(root, "src/app/learning/catalogue.json"), "utf8"));
+    const english = previous.filter((item) => item.language === "en");
+    if (english.length !== 1) throw new Error("Expected the existing English edition");
+    for (const asset of [english[0].pack, ...english[0].images, ...Object.values(english[0].pdfs)]) {
+      const bytes = await fs.readFile(path.join(assetDirectory, asset.path));
+      if (sha256(bytes) !== asset.sha256 || bytes.length !== asset.bytes)
+        throw new Error("English asset identity changed");
+    }
+    resources.push(...english);
+  } else resources.push(await packEnglishLearningBook(storeAsset));
   await fs.mkdir(path.join(root, "src/app/learning"), { recursive: true });
   await fs.writeFile(path.join(root, "src/app/learning/catalogue.json"), JSON.stringify(resources, null, 2) + "\n");
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await packLearningBooks();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url))
+  await packLearningBooks({ preserveEnglish: process.argv.includes("--preserve-english") });

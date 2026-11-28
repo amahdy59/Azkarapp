@@ -58,7 +58,7 @@
   content: "";
   position: absolute;
   inset: 0 0 auto;
-  height: env(safe-area-inset-top);
+  height: var(--app-safe-area-top);
   z-index: 90;
   pointer-events: none;
   background-color: var(--system-bar-background);
@@ -81,12 +81,12 @@
   border-radius: var(--ds-radius-device);
   /* Reserve the system status-bar area once for the app shell. Individual
      screens must not add a second top inset on top of this. */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  padding: var(--app-safe-area-top) var(--app-safe-area-right) 0 var(--app-safe-area-left);
 }
 
 .marketing-landing {
   box-sizing: border-box;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: var(--app-safe-area-top) var(--app-safe-area-right) var(--app-safe-area-bottom) var(--app-safe-area-left);
 }
 
 /* A sticky header must cover the scrollport's top edge. Screen padding would

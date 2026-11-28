@@ -175,7 +175,8 @@ describe("owner-approved original-source corrections", () => {
       expect(pair.translator).toBe("Saheeh International");
       expect(pair.english.length).toBeGreaterThan(30);
     }
-    expect(travel.sourceArabic[0]).toContain("تَرْضَى...");
+    expect(travel.sourceArabic[0]).toContain("تَرْضَى، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا");
+    expect(travel.sourceArabic[0]).not.toContain("تَرْضَى...");
     expect(ledger.originalPdfSha256).toMatch(/^[a-f0-9]{64}$/);
   });
 

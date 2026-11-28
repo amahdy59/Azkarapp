@@ -33,6 +33,13 @@ test("model normalization retains exact UTF-16 offsets and canonical text", () =
     ["أعوذ", "بالله"],
   );
   assert.equal(arabic[0].text, "أَعُوذُ");
+  const smallLetters = "بِهِۦ لَهُۥ";
+  const smallTokens = tokenizeAlignmentText(smallLetters, "ar");
+  assert.deepEqual(
+    smallTokens.map((token) => token.alignmentText),
+    ["بهي", "لهو"],
+  );
+  assert.ok(smallTokens.every((token) => smallLetters.slice(token.startOffset, token.endOffset) === token.text));
 });
 test("preserves distinct reviewed English candidates instead of choosing by Arabic identity", () => {
   const jobs = collectAlignmentJobs(

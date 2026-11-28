@@ -2,7 +2,7 @@ import { useEffect, useId } from "react";
 
 const dismissers = new Map<string, () => void>();
 const layers =
-  '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [data-mushaf-inline-index], [data-toolbar-panel]';
+  '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [data-mushaf-inline-index], [data-toolbar-panel], [data-quran-inline-zoom]';
 
 export function topOverlay(): HTMLElement | undefined {
   return [...document.querySelectorAll<HTMLElement>(layers)]

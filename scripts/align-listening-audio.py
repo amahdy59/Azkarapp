@@ -19,7 +19,7 @@ MODELS = {
     "ar": ("arabic", "jonatasgrosman/wav2vec2-large-xlsr-53-arabic", "af46c2d8531b8dcbb5e23b952f739b372c2e5d2d"),
 }
 RATE = 16000
-PIPELINE_VERSION = 3
+PIPELINE_VERSION = 4
 
 
 def write_json(path, value):
@@ -113,7 +113,7 @@ def emissions(decoded, model, processor, job, cache, revision):
 def alignment_spelling(text, language):
     text = unicodedata.normalize("NFC", text)
     if language == "ar":
-        return "".join(character for character in text if not unicodedata.category(character).startswith("M")).replace("ـ", "").replace("ٱ", "ا")
+        return "".join(character for character in text if not unicodedata.category(character).startswith("M")).replace("ـ", "").replace("ٱ", "ا").replace("ۦ", "ي").replace("ۥ", "و")
     return text.replace("’", "'").replace("-", "").upper()
 
 

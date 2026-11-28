@@ -4,15 +4,7 @@ async function reserveNativeTopInset(page: Page) {
   // Browser engines expose no physical Android status bar. Exercise the real
   // CSS ownership with a nonzero inset, without drawing fake system icons.
   await page.evaluate(() => {
-    const replace = (rules: CSSRuleList) => {
-      for (const rule of rules) {
-        if ("cssRules" in rule) replace((rule as CSSGroupingRule).cssRules);
-        if (rule instanceof CSSStyleRule && rule.style.cssText.includes("safe-area-inset-top")) {
-          rule.style.cssText = rule.style.cssText.replaceAll("env(safe-area-inset-top)", "32px ");
-        }
-      }
-    };
-    for (const sheet of document.styleSheets) replace(sheet.cssRules);
+    document.documentElement.style.setProperty("--safe-area-inset-top", "32px");
     document.querySelector(".app-shell")?.setAttribute("data-native-android", "true");
   });
 }

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "status": "full-source-restoration-in-progress",
+  "original": {
+    "path": "docs/learning/assets/3d6f6d9b148db8db04246e04da3e79ce84dc2b637e75ae6cfc23e37b0e0bb4a2.pdf",
+    "sha256": "3d6f6d9b148db8db04246e04da3e79ce84dc2b637e75ae6cfc23e37b0e0bb4a2",
+    "bytes": 20732980,
+    "mime": "application/pdf",
+    "pages": 138
+  },
+  "transcription": "Unverified OCR candidates remain in output; no OCR text is activated.",
+  "legacyIdentity": "dalil-al-mutamir",
+  "legacyEnglishIdentity": "dalil-al-mutamir:en",
+  "legacyUnitCount": 16,
+  "sourceUnitCount": 138
+}

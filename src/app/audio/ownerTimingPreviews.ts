@@ -23,13 +23,14 @@ export function expandOwnerTiming(
   pack: OwnerTimingPack,
   record: PackedTimingRecord,
   text = "",
+  variantId = record.v[0]!,
 ): ListeningTimingAnnotation | QuranTimingAnnotation {
   const common = { ...pack.approval, sha256: record.s, durationMs: record.d, unit: "milliseconds" as const };
   let previousEnd = 0;
   if (record.q)
     return {
       ...common,
-      variantId: record.v[0]!,
+      variantId: record.v.includes(variantId) ? variantId : "",
       verses: record.q.map(([verseKey, gap, duration, words]) => {
         const startMs = previousEnd + gap,
           endMs = startMs + duration;

@@ -1,0 +1,1667 @@
+{
+  "schema": 1,
+  "id": "learn-audio-ar-2026-11-27-v2",
+  "status": "draft-for-owner-and-source-review",
+  "language": "ar",
+  "direction": "rtl",
+  "generationAllowed": false,
+  "uploadAllowed": false,
+  "appIntegrationAllowed": false,
+  "latestInstruction": "Revise the Arabic teaching and review notes for natural language and explicit hadith/fiqh support; retain script approval before generation/upload.",
+  "voiceBrief": {
+    "selectedVoiceId": null,
+    "language": "ar",
+    "style": "فصحى واضحة وهادئة ودافئة، تناسب الكبار والأطفال، دون تمثيل مبالغ أو موسيقى أو مؤثرات.",
+    "model": "server-selected-after-approval",
+    "voiceSelection": "Use a real ACTIVE voice from the live HeyGen Voice catalog; no paid auditions or cloning.",
+    "delivery": "Natural semantic pauses. Retain exact approved wording; no unsupported stage directions or forced duration."
+  },
+  "productionPlan": {
+    "original": "Preserve returned lossless master",
+    "delivery": "Separate MP3, mono, 48 kHz, 96 kbps; verify actual format, duration and loudness",
+    "progress": "Training progress only; no devotional completion",
+    "timing": "Only exact-file returned/verified alignment; never divide duration evenly",
+    "storage": "Content-addressed immutable R2 paths after approval; verify SHA-256, byte size, MIME, production CORS and ranges; never overwrite live assets",
+    "credentials": "No credentials stored in this package; supplied keys not used during script review"
+  },
+  "designRequirements": [
+    "No visible eyes or closed-eye marks in any figure",
+    "Learner-controlled segments; one dominant action",
+    "Explanation and devotional wording are separate",
+    "Full text and silent equivalents remain available",
+    "Practice is in-app recognition/retrieval, not certification of physical worship",
+    "Buttons provide alternatives to drag/rotate gestures",
+    "App/OS reduced-motion alternatives; pause hidden work",
+    "No background music or competing narration",
+    "No recording or microphone/camera grading"
+  ],
+  "sources": [
+    {
+      "id": "q5-6",
+      "title": "المائدة: ٦ — أعضاء الوضوء",
+      "url": "https://quran.com/5/6",
+      "kind": "quran",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "q4-103",
+      "title": "النساء: ١٠٣ — وقت الصلاة",
+      "url": "https://quran.com/4/103",
+      "kind": "quran",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "q16-98",
+      "title": "النحل: ٩٨ — الاستعاذة عند القراءة",
+      "url": "https://quran.com/16/98",
+      "kind": "quran",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b1",
+      "title": "صحيح البخاري ١ — النية",
+      "url": "https://sunnah.com/bukhari:1",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b60",
+      "title": "صحيح البخاري ٦٠ — العناية بغسل الأعقاب",
+      "url": "https://sunnah.com/bukhari:60",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b157",
+      "title": "صحيح البخاري ١٥٧ — الغسل مرة",
+      "url": "https://sunnah.com/bukhari:157",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b158",
+      "title": "صحيح البخاري ١٥٨ — الغسل مرتين",
+      "url": "https://sunnah.com/bukhari:158",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b159",
+      "title": "صحيح البخاري ١٥٩ — وصف الوضوء",
+      "url": "https://sunnah.com/bukhari:159",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b168",
+      "title": "صحيح البخاري ١٦٨ — البدء باليمين",
+      "url": "https://sunnah.com/bukhari:168",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b185",
+      "title": "صحيح البخاري ١٨٥ — مسح الرأس",
+      "url": "https://sunnah.com/bukhari:185",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "ad101",
+      "title": "سنن أبي داود ١٠١ — التسمية في أول الوضوء",
+      "url": "https://sunnah.com/abudawud:101",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27",
+      "gradingNote": "تعرض صفحة الحديث تصحيح الألباني، ويذكر شرح فروض الوضوء وسننه الخلاف في حكم التسمية وطرق الحديث. لا يستعمل التدريب هذا الخلاف للحكم على عبادة المستخدم."
+    },
+    {
+      "id": "ad135",
+      "title": "سنن أبي داود ١٣٥ — مسح الأذنين",
+      "url": "https://sunnah.com/abudawud:135",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "m234b",
+      "title": "صحيح مسلم ٢٣٤ب — الذكر بعد الوضوء",
+      "url": "https://sunnah.com/muslim:234b",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b735",
+      "title": "صحيح البخاري ٧٣٥ — رفع اليدين",
+      "url": "https://sunnah.com/bukhari:735",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b740",
+      "title": "صحيح البخاري ٧٤٠ — وضع اليمنى على اليسرى",
+      "url": "https://sunnah.com/bukhari:740",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b744",
+      "title": "صحيح البخاري ٧٤٤ — دعاء الاستفتاح",
+      "url": "https://sunnah.com/bukhari:744",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b757",
+      "title": "صحيح البخاري ٧٥٧ — استقبال القبلة والطمأنينة",
+      "url": "https://sunnah.com/bukhari:757",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b776",
+      "title": "صحيح البخاري ٧٧٦ — القراءة في الركعات",
+      "url": "https://sunnah.com/bukhari:776",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b780",
+      "title": "صحيح البخاري ٧٨٠ — التأمين",
+      "url": "https://sunnah.com/bukhari:780",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b795",
+      "title": "صحيح البخاري ٧٩٥ — ذكر الرفع والتكبير",
+      "url": "https://sunnah.com/bukhari:795",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b812",
+      "title": "صحيح البخاري ٨١٢ — أعضاء السجود",
+      "url": "https://sunnah.com/bukhari:812",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b828",
+      "title": "صحيح البخاري ٨٢٨ — هيئة الركوع والجلوس",
+      "url": "https://sunnah.com/bukhari:828",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b831",
+      "title": "صحيح البخاري ٨٣١ — التشهد",
+      "url": "https://sunnah.com/bukhari:831",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b6357",
+      "title": "صحيح البخاري ٦٣٥٧ — الصلاة الإبراهيمية باللفظ المختار",
+      "url": "https://sunnah.com/bukhari:6357",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "m397",
+      "title": "صحيح مسلم ٣٩٧أ — الطمأنينة في الصلاة",
+      "url": "https://sunnah.com/muslim:397a",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "m498",
+      "title": "صحيح مسلم ٤٩٨ — وصف الصلاة والتشهد والتسليم",
+      "url": "https://sunnah.com/muslim:498",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "m582",
+      "title": "صحيح مسلم ٥٨٢ — التسليم يمينًا ويسارًا",
+      "url": "https://sunnah.com/muslim:582",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "m588",
+      "title": "صحيح مسلم ٥٨٨أ — الدعاء قبل السلام",
+      "url": "https://sunnah.com/muslim:588",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "ad874",
+      "title": "سنن أبي داود ٨٧٤ — الدعاء بين السجدتين",
+      "url": "https://sunnah.com/abudawud:874",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "ad996",
+      "title": "سنن أبي داود ٩٩٦ — لفظ التسليم",
+      "url": "https://sunnah.com/abudawud:996",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27",
+      "gradingNote": "تعرض الصفحة تصحيح الألباني، مع الاحتفاظ بتعليق أبي داود على بعض طرق الرفع."
+    },
+    {
+      "id": "h33",
+      "title": "حصن المسلم ٣٣ — تسبيح الركوع؛ ثلاث في المرجع",
+      "url": "https://sunnah.com/hisn:33",
+      "kind": "existing-reference",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "h41",
+      "title": "حصن المسلم ٤١ — تسبيح السجود؛ ثلاث في المرجع",
+      "url": "https://sunnah.com/hisn:41",
+      "kind": "existing-reference",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "guide",
+      "title": "ابن باز: بيان كيفية الوضوء والصلاة",
+      "url": "https://binbaz.org.sa/fatwas/4022/بيان-كيفية-الوضوء-والصلاة",
+      "kind": "proposed-teaching-reference",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "wudu-guide",
+      "title": "ابن باز: كيفية وضوء النبي صلى الله عليه وسلم",
+      "url": "https://binbaz.org.sa/fatwas/20297/كيفية-وضوء-النبي-صلى-الله-عليه-وسلم",
+      "kind": "proposed-teaching-reference",
+      "consultedAt": "2026-11-27",
+      "editorialNote": "تتضمن الصفحة تصحيحًا تحريريًا لكلمة في تفريغ الشرح؛ لم يُنقل الموضع الذي نبهت الصفحة إلى تصحيحه بوصفه تعليمًا."
+    },
+    {
+      "id": "b191",
+      "title": "صحيح البخاري ١٩١ — المضمضة والاستنشاق من غرفة واحدة",
+      "url": "https://sunnah.com/bukhari:191",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "b162",
+      "title": "صحيح البخاري ١٦٢ — الاستنشاق والاستنثار",
+      "url": "https://sunnah.com/bukhari:162",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "ad142",
+      "title": "سنن أبي داود ١٤٢ — إسباغ الوضوء والاستنشاق",
+      "url": "https://sunnah.com/abudawud:142",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27",
+      "gradingNote": "صحيح عند الألباني كما في المصدر. يُراجع النص العربي؛ الترجمة الإنجليزية في الصفحة لا تطابق عبارة تخليل الأصابع بدقة."
+    },
+    {
+      "id": "t788",
+      "title": "جامع الترمذي ٧٨٨ — الاستنشاق للصائم",
+      "url": "https://sunnah.com/tirmidhi:788",
+      "kind": "hadith",
+      "consultedAt": "2026-11-27",
+      "gradingNote": "قال الترمذي: حديث حسن صحيح. تعرض الصفحة أيضًا تصحيح دار السلام."
+    },
+    {
+      "id": "fiqh-mouth-nose",
+      "title": "ابن باز: صفة المضمضة والاستنشاق",
+      "url": "https://binbaz.org.sa/fatwas/18827/صفة-المضمضة-والاستنشاق",
+      "kind": "fiqh-explanation",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "fiqh-wudu",
+      "title": "ابن باز: فروض الوضوء وسننه",
+      "url": "https://binbaz.org.sa/fatwas/13505/فروض-الوضوء-وسننه",
+      "kind": "fiqh-explanation",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "fiqh-face",
+      "title": "ابن باز: تحديد الوجه في الوضوء",
+      "url": "https://binbaz.org.sa/fatwas/9899/تحديد-الوجه-في-الوضوء",
+      "kind": "fiqh-explanation",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "fiqh-istinshaq",
+      "title": "ابن باز: شرح المبالغة في المضمضة والاستنشاق",
+      "url": "https://binbaz.org.sa/audios/1863/04-من-قوله-ومن-سنن-الوضوء",
+      "kind": "fiqh-explanation",
+      "consultedAt": "2026-11-27"
+    },
+    {
+      "id": "fiqh-rakahs",
+      "title": "ابن باز: بيان أعداد ركعات الفرائض في شرح السنة ومكانتها",
+      "url": "https://binbaz.org.sa/audios/1233/السنة-ومكانتها-في-التشريع-الإسلامي",
+      "kind": "fiqh-explanation",
+      "consultedAt": "2026-11-27"
+    }
+  ],
+  "stages": [
+    {
+      "id": "w00",
+      "module": "wudu",
+      "title": "الاستعداد للوضوء",
+      "explanationClipId": "w00-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر أدوات الوضوء ببساطة، دون كتابة صيغة للنية. جميع الشخصيات بلا أعين ظاهرة.",
+      "reviewerNoteNotSpoken": "النية قصد العمل في القلب. الشرح هنا صياغة تعليمية، وليس لفظًا يُطلب من المتعلّم قوله قبل الوضوء.",
+      "evidenceNoteNotSpoken": "أصل النية من حديث الأعمال بالنيات؛ وترتيب التعليم لا يضيف ذكرًا للوضوء."
+    },
+    {
+      "id": "w01",
+      "module": "wudu",
+      "title": "التسمية",
+      "explanationClipId": "w01-explain",
+      "additionalClipIds": ["say-pur-ref-1"],
+      "visualDirectionNotSpoken": "تظهر التسمية مع زر للاستماع إليها وحدها، منفصل عن شرح الخطوة.",
+      "reviewerNoteNotSpoken": "تُذكر التسمية في موضعها دون الدخول في الخلاف في حكمها. لا يتضمن التدريب حكمًا على وضوء من نسيها.",
+      "evidenceNoteNotSpoken": "يدل أبو داود ١٠١ على ذكر اسم الله؛ وشرح فروض الوضوء وسننه يحدد موضعه قبل غسل الكفين ويذكر الخلاف الفقهي."
+    },
+    {
+      "id": "w02",
+      "module": "wudu",
+      "title": "غسل الكفّين",
+      "explanationClipId": "w02-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر اليدان من الجهتين، وتُبرز المسافات بين الأصابع عند شرح التخليل.",
+      "reviewerNoteNotSpoken": "الغسل ثلاثًا هو الوصف المختار للعرض. تكفي الإشارة إلى التكرار دون تحويله إلى نقاط أو مكافآت.",
+      "evidenceNoteNotSpoken": "حديث عثمان يذكر غسل الكفين ثلاثًا، وحديث لقيط يذكر تخليل الأصابع. لا تُنسب عبارة «بين الأصابع» إلى أبي داود ١٣٥ وحده."
+    },
+    {
+      "id": "w03",
+      "module": "wudu",
+      "title": "المضمضة",
+      "explanationClipId": "w03-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تعرض المضمضة والاستنشاق متتابعتين من غرفة واحدة، ثم تتكرر المجموعة ثلاث مرات. يمكن إيقاف العرض عند كل حركة لفهمها.",
+      "reviewerNoteNotSpoken": "فصل العنوانين يساعد على شرح المصطلحين. عند مشاهدة الوضوء متصلًا، يجمع العرض بينهما في كل مرة. يذكر المرجع الفقهي جواز الفصل بين غرفتيهما أيضًا؛ فلا يُعد ذلك خطأً في التدريب.",
+      "evidenceNoteNotSpoken": "حديث عبد الله بن زيد في البخاري ١٩١ يصف الجمع بينهما من غرفة واحدة وتكراره ثلاثًا. شرح ابن باز يوضح أن الفصل بغرفتين جائز أيضًا."
+    },
+    {
+      "id": "w04",
+      "module": "wudu",
+      "title": "الاستنشاق والاستنثار",
+      "explanationClipId": "w04-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "توضح الحركة دخول الماء إلى الأنف ثم خروجه. يظهر تنبيه الصائم بجوار الخطوة، ويمكن الاستماع إليه مرة أخرى.",
+      "reviewerNoteNotSpoken": "يُذكر تنبيه الصائم هنا، في موضع الحاجة إليه. والمبالغة لغير الصائم هي إيصال الماء إلى داخل الأنف على الصفة التي شرحها أهل العلم، وليست أمرًا باستعمال العنف. لا تُستبدل السنة بعبارة عامة تنهى عن المبالغة للجميع.",
+      "evidenceNoteNotSpoken": "البخاري ١٦٢ يبين الإدخال والإخراج. حديث لقيط في أبي داود ١٤٢ والترمذي ٧٨٨ يثبت المبالغة ويستثني الصائم؛ ويُرجع في بيان معناها إلى الشرح الفقهي."
+    },
+    {
+      "id": "w05",
+      "module": "wudu",
+      "title": "غسل الوجه",
+      "explanationClipId": "w05-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "توضح الإضاءة حدود الوجه من دون رسم أعين. إذا ظهرت لحية، يشمل العرض غسلها ولا يتوقف عند الجلد الظاهر.",
+      "reviewerNoteNotSpoken": "تؤخذ حدود الوجه من الشرح الفقهي، ولا تُعرض على أنها نص حديث. تُشرح أحكام غسل اللحية بحسب كثافتها في التفصيل الخاص بها قبل اعتماد نسخة الكبار.",
+      "evidenceNoteNotSpoken": "حديث عثمان يثبت غسل الوجه ثلاثًا؛ وتفصيل الحد طولًا وعرضًا وارد في شرح فروض الوضوء وسننه، مع تفصيل مستقل للوجه واللحية."
+    },
+    {
+      "id": "w06",
+      "module": "wudu",
+      "title": "غسل اليد اليمنى إلى المرفق",
+      "explanationClipId": "w06-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر الأصابع والذراع والمرفق في لقطة واحدة، مع مرور الماء على المرفق.",
+      "reviewerNoteNotSpoken": "تشمل هذه الغسلة اليد كلها، ولا يقتصر العرض على الجزء بين الرسغ والمرفق.",
+      "evidenceNoteNotSpoken": "الآية وحديث عثمان يذكران اليدين إلى المرفقين، ويبين الشرح دخول المرفق في الغسل. البدء باليمنى تؤيده رواية التيمن."
+    },
+    {
+      "id": "w07",
+      "module": "wudu",
+      "title": "غسل اليد اليسرى إلى المرفق",
+      "explanationClipId": "w07-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تُستخدم زاوية التصوير نفسها لليد اليسرى حتى يسهل تتبع الحركة.",
+      "reviewerNoteNotSpoken": "لا يعكس تغيير لغة الواجهة ترتيب اليمنى واليسرى في العبادة.",
+      "evidenceNoteNotSpoken": "نفس أدلة غسل اليد اليمنى؛ يتبعها غسل اليسرى في الوصف المختار."
+    },
+    {
+      "id": "w08",
+      "module": "wudu",
+      "title": "مسح الرأس",
+      "explanationClipId": "w08-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر اليدان تتحركان إلى الخلف ثم تعودان إلى الأمام. تنتهي الحركة عند الرأس ولا تمتد لمسح الرقبة.",
+      "reviewerNoteNotSpoken": "الذهاب والعودة وصف لمسحة واحدة، لا مسحتين. تُراعى هيئة الشعر عند إعداد الأمثلة التفصيلية.",
+      "evidenceNoteNotSpoken": "حديث عبد الله بن زيد يصف بدء المسح من مقدم الرأس إلى القفا ثم رد اليدين؛ والشرح يبين مسح الرأس مرة."
+    },
+    {
+      "id": "w09",
+      "module": "wudu",
+      "title": "مسح الأذنين",
+      "explanationClipId": "w09-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر السبابتان والإبهامان بوضوح عند الأذنين، دون تصوير إدخال الأصابع بعمق.",
+      "reviewerNoteNotSpoken": "يبين العرض طريقة المسح فقط؛ لا حركة إضافية ولا غسل للأذنين ضمن هذه الخطوة.",
+      "evidenceNoteNotSpoken": "ورد في أبي داود ١٣٥ استعمال السبابتين لباطن الأذنين والإبهامين لظاهرهما، وفي المرجع التفصيلي بيان المسح مرة."
+    },
+    {
+      "id": "w10",
+      "module": "wudu",
+      "title": "غسل القدم اليمنى",
+      "explanationClipId": "w10-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر القدم من الجانب والخلف، مع توضيح الكعبين والعقب والمسافات بين الأصابع.",
+      "reviewerNoteNotSpoken": "يوضح المثال الفرق بين غسل القدم ومسح الرأس. أحكام المسح على الخفّين والجوربين لها شرح مستقل.",
+      "evidenceNoteNotSpoken": "الآية والحديث يذكران غسل القدمين، وحديث الأعقاب يؤكد شمول الغسل، وحديث لقيط أصل لتخليل الأصابع."
+    },
+    {
+      "id": "w11",
+      "module": "wudu",
+      "title": "غسل القدم اليسرى",
+      "explanationClipId": "w11-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تحافظ لقطة القدم اليسرى على حجم وتفاصيل اللقطة السابقة.",
+      "reviewerNoteNotSpoken": "تظل اليمنى واليسرى بحسب جسم الشخصية، لا بحسب موضعهما على الشاشة.",
+      "evidenceNoteNotSpoken": "نفس أدلة غسل القدم اليمنى؛ يأتي بعدها غسل اليسرى في الوصف المختار."
+    },
+    {
+      "id": "w12",
+      "module": "wudu",
+      "title": "الذكر بعد الوضوء",
+      "explanationClipId": "w12-explain",
+      "additionalClipIds": ["say-pur-ref-5"],
+      "visualDirectionNotSpoken": "يظهر الذكر كاملًا، مع خيار سماعه كاملًا أو تكرار عباراته أثناء التعلّم.",
+      "reviewerNoteNotSpoken": "يُستخدم اللفظ الموجود في التطبيق كما هو. لا يضاف دعاء مخصوص عند غسل كل عضو.",
+      "evidenceNoteNotSpoken": "وردت الشهادة بعد الوضوء في مسلم ٢٣٤ب. الملف المأثور مستقل عن الشرح."
+    },
+    {
+      "id": "w13",
+      "module": "wudu",
+      "title": "هل يلزم الغسل ثلاث مرات؟",
+      "explanationClipId": "w13-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر الملاحظة بعد تعلم الأفعال، مع تمييز الغسل عن المسح.",
+      "reviewerNoteNotSpoken": "التكرار ثلاثًا في المثال لا يعني أن الغسل الصحيح مرة واحدة خطأ. لا يُنشأ اختبار يحكم على صحة الوضوء من عدد حركات اللمس.",
+      "evidenceNoteNotSpoken": "روايات البخاري تثبت الغسل مرة ومرتين وثلاثًا، ويشرح المرجع التفصيلي الإجزاء مع تعميم الماء ومسح الرأس مرة."
+    },
+    {
+      "id": "p00",
+      "module": "prayer",
+      "title": "الاستعداد للصلاة",
+      "explanationClipId": "p00-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر الاستعدادات في ترتيب واضح، دون صيغة منطوقة للنية أو رموز توحي باحتساب صلاة مؤدّاة.",
+      "reviewerNoteNotSpoken": "الشرح الأساسي للمنفرد القادر على القيام. تُراجع تفاصيل الطهارة واللباس والسترة وأحكام أصحاب الأعذار في موادها الخاصة.",
+      "evidenceNoteNotSpoken": "وقت الصلاة في الآية، والقبلة في حديث المسيء صلاته، وأصل النية في حديث الأعمال؛ يجمع المرجع الفقهي التفاصيل التعليمية."
+    },
+    {
+      "id": "p01",
+      "module": "prayer",
+      "title": "تكبيرة الإحرام",
+      "explanationClipId": "p01-explain",
+      "additionalClipIds": ["say-takbir"],
+      "visualDirectionNotSpoken": "تظهر حركة رفع اليدين والتكبير مرة واحدة، مع إمكانية مشاهدة الهيئة من الجانب.",
+      "reviewerNoteNotSpoken": "تُعرض الهيئة الواردة في حديث ابن عمر. لا يوصف رفع اليدين إلى مستوى آخر ثابت بأنه خطأ لمجرد اختلافه عن النموذج.",
+      "evidenceNoteNotSpoken": "رفع اليدين إلى المنكبين وارد في البخاري ٧٣٥، والبدء بالتكبير في مسلم ٤٩٨."
+    },
+    {
+      "id": "p02",
+      "module": "prayer",
+      "title": "القيام ودعاء الاستفتاح",
+      "explanationClipId": "p02-explain",
+      "additionalClipIds": ["say-opening-bukhari-744"],
+      "visualDirectionNotSpoken": "يظهر دعاء واحد مع خيار سماعه كاملًا أو تعلم عباراته، دون تشغيل الصيغ البديلة متتابعة.",
+      "reviewerNoteNotSpoken": "اختيرت للمراجعة رواية البخاري ٧٤٤ المبينة في R1. الصيغ الصحيحة الأخرى بدائل، وليست أجزاء يجب جمعها.",
+      "evidenceNoteNotSpoken": "وضع اليمنى على اليسرى في البخاري ٧٤٠، والاستفتاح المحدد في البخاري ٧٤٤."
+    },
+    {
+      "id": "p03",
+      "module": "prayer",
+      "title": "الاستعاذة وقراءة الفاتحة",
+      "explanationClipId": "p03-explain",
+      "additionalClipIds": ["say-refuge-before-reading", "quran-1"],
+      "visualDirectionNotSpoken": "تظهر الآيات من النص المحلي المعتمد، وتُستخدم تلاوة قارئ مراجع بدل توليد صوت قرآني.",
+      "reviewerNoteNotSpoken": "تُراجع حدود التسجيل والبسملة قبل الإنتاج. لا تعني عبارة «آية آية» إدخال وقوف مصطنعة في مواضع لا تصلح.",
+      "evidenceNoteNotSpoken": "الاستعاذة في آية النحل، وموضعها مع قراءة الفاتحة مبين في المرجع الفقهي. حديث المسيء صلاته أصل لتعليم القراءة والطمأنينة."
+    },
+    {
+      "id": "p04",
+      "module": "prayer",
+      "title": "التأمين والقراءة بعد الفاتحة",
+      "explanationClipId": "p04-explain",
+      "additionalClipIds": ["say-amin", "quran-112"],
+      "visualDirectionNotSpoken": "تُعرض آمين منفصلة عن الآيات، ثم السورة كاملة دون الإيحاء بأنها السورة الوحيدة المختارة للصلاة.",
+      "reviewerNoteNotSpoken": "الإخلاص مثال للتعلّم، وليست سورة مخصوصة لكل ركعة أو صلاة. لا تُدمج كلمة آمين في النص القرآني.",
+      "evidenceNoteNotSpoken": "التأمين في البخاري ٧٨٠، وقراءة سورة مع الفاتحة في الأوليين في البخاري ٧٧٦؛ اختيار الإخلاص قرار تعليمي."
+    },
+    {
+      "id": "p05",
+      "module": "prayer",
+      "title": "الركوع",
+      "explanationClipId": "p05-explain",
+      "additionalClipIds": ["say-takbir", "say-in-prayer-ruku-tasbih"],
+      "visualDirectionNotSpoken": "توضح اللقطة الجانبية استواء الظهر ووضع اليدين على الركبتين، دون مؤشرات تقيس زوايا جسم المتعلّم.",
+      "reviewerNoteNotSpoken": "التسبيح تسجيل واحد يعاد في المثال وفق التكرار الموجود في المرجع. لا يتغير النص المأثور ولا يتحول المثال إلى حكم بصحة صلاة المستخدم.",
+      "evidenceNoteNotSpoken": "تمكين اليدين من الركبتين واستواء الظهر في البخاري ٨٢٨، واعتدال الرأس في مسلم ٤٩٨، والطمأنينة في مسلم ٣٩٧أ."
+    },
+    {
+      "id": "p06",
+      "module": "prayer",
+      "title": "الاعتدال بعد الركوع",
+      "explanationClipId": "p06-explain",
+      "additionalClipIds": ["say-in-prayer-rising-praise"],
+      "visualDirectionNotSpoken": "يبين العرض الفرق بين حركة الرفع والوقوف المعتدل، ويُربط الصوت بكل موضع بعد التحقق من التسجيل.",
+      "reviewerNoteNotSpoken": "يوضح الشرح ما يقوله المنفرد. لا يُنقل الحكم نفسه إلى المأموم دون شرح مستقل لأدوار صلاة الجماعة.",
+      "evidenceNoteNotSpoken": "لفظ الرفع والحمد في البخاري ٧٩٥ و٧٣٥، والاعتدال مطمئنًا في مسلم ٣٩٧أ."
+    },
+    {
+      "id": "p07",
+      "module": "prayer",
+      "title": "السجدة الأولى",
+      "explanationClipId": "p07-explain",
+      "additionalClipIds": ["say-takbir", "say-in-prayer-sujud-tasbih"],
+      "visualDirectionNotSpoken": "تظهر مواضع السجود بوضوح، مع لقطة مناسبة للقدمين. تبقى الشخصية بلا أعين ظاهرة.",
+      "reviewerNoteNotSpoken": "لا يقيس التدريب ترتيب نزول اليدين والركبتين بوصفه معيارًا وحيدًا للصواب. تُراجع بقية هيئة السجود قبل اعتماد التحريك.",
+      "evidenceNoteNotSpoken": "الأعضاء السبعة، مع الجبهة والأنف موضعًا واحدًا، في البخاري ٨١٢؛ والطمأنينة في مسلم ٣٩٧أ."
+    },
+    {
+      "id": "p08",
+      "module": "prayer",
+      "title": "الجلوس بين السجدتين",
+      "explanationClipId": "p08-explain",
+      "additionalClipIds": ["say-takbir", "say-in-prayer-between-prostrations-brief"],
+      "visualDirectionNotSpoken": "تظهر جلسة مستقرة بين السجدتين، دون انتقال سريع يتجاوزها.",
+      "reviewerNoteNotSpoken": "تؤخذ هيئة القدمين من الرواية التي تعتمد للمشهد، ويظل الدعاء منفصلًا عن الشرح.",
+      "evidenceNoteNotSpoken": "الجلوس مطمئنًا في مسلم ٣٩٧أ، والدعاء المختار في أبي داود ٨٧٤."
+    },
+    {
+      "id": "p09",
+      "module": "prayer",
+      "title": "السجدة الثانية",
+      "explanationClipId": "p09-explain",
+      "additionalClipIds": ["say-takbir", "say-in-prayer-sujud-tasbih"],
+      "visualDirectionNotSpoken": "تُعرض السجدة الثانية بعد الجلوس، ويظل ترتيب الحركات واضحًا في المعاينة.",
+      "reviewerNoteNotSpoken": "تعاد الحركة والتسجيل المراجعان نفسيهما، دون إنشاء صيغة جديدة للسجدة الثانية.",
+      "evidenceNoteNotSpoken": "تكرار السجود مع الجلوس بين السجدتين ظاهر في وصف الصلاة في مسلم ٤٩٨ وحديث الطمأنينة."
+    },
+    {
+      "id": "p10",
+      "module": "prayer",
+      "title": "الركعة الثانية",
+      "explanationClipId": "p10-explain",
+      "additionalClipIds": ["say-takbir"],
+      "visualDirectionNotSpoken": "تتكرر الخطوات المألوفة مع تلميحات أقل، ويبقى خيار إعادة الشرح متاحًا.",
+      "reviewerNoteNotSpoken": "لا يعاد دعاء الاستفتاح تلقائيًا في الركعة الثانية. تقليل التلميحات قرار تعليمي، لا تقليل للذكر أو لأفعال الصلاة.",
+      "evidenceNoteNotSpoken": "التكبير عند النهوض والقراءة في الأوليين ثابتان في البخاري، وبنية الركعة مبيّنة في وصف الصلاة."
+    },
+    {
+      "id": "p11",
+      "module": "prayer",
+      "title": "التشهد",
+      "explanationClipId": "p11-explain",
+      "additionalClipIds": ["say-in-prayer-tashahhud"],
+      "visualDirectionNotSpoken": "يظهر نص التشهد كاملًا، مع تقسيم التدريب عند عبارات تامة المعنى.",
+      "reviewerNoteNotSpoken": "لا تختصر صيغة التشهد عند إعادة عرضها، وتُراجع هيئة الجلوس والإشارة في المشهد بصورة مستقلة.",
+      "evidenceNoteNotSpoken": "التشهد كل ركعتين في مسلم ٤٩٨، واللفظ المختار في البخاري ٨٣١."
+    },
+    {
+      "id": "p12",
+      "module": "prayer",
+      "title": "الصلاة على النبي صلى الله عليه وسلم",
+      "explanationClipId": "p12-explain",
+      "additionalClipIds": ["say-in-prayer-ibrahimiyyah"],
+      "visualDirectionNotSpoken": "يظل النص المختار ثابتًا أثناء الاستماع، مع خيار الرجوع لأي عبارة.",
+      "reviewerNoteNotSpoken": "تستعمل صيغة البخاري ٦٣٥٧ الموجودة في التطبيق، دون خلطها بصيغ صحيحة أخرى.",
+      "evidenceNoteNotSpoken": "اللفظ في البخاري ٦٣٥٧، وموضعه بعد التشهد الأخير مبيّن في المرجع التفصيلي."
+    },
+    {
+      "id": "p13",
+      "module": "prayer",
+      "title": "الدعاء قبل السلام",
+      "explanationClipId": "p13-explain",
+      "additionalClipIds": ["say-in-prayer-before-salam-refuge"],
+      "visualDirectionNotSpoken": "يبين العنوان موضع الدعاء، ويظهر نصه الكامل إلى جانب زر الاستماع.",
+      "reviewerNoteNotSpoken": "الشرح يعرّف موضوع الدعاء، أما ألفاظه فتُسمع من المقطع المستقل كما وردت. ليس في العرض ما يمنع الدعاء المشروع بغيره.",
+      "evidenceNoteNotSpoken": "حديث مسلم ٥٨٨أ يعلّم الاستعاذة بعد التشهد. الوصف المختصر للمعنى ليس بديلًا عن ألفاظ الدعاء."
+    },
+    {
+      "id": "p14",
+      "module": "prayer",
+      "title": "التسليم",
+      "explanationClipId": "p14-explain",
+      "additionalClipIds": ["say-salam"],
+      "visualDirectionNotSpoken": "تظهر الجهتان بحسب جسم الشخصية، ويبقى ذلك ثابتًا في الواجهتين العربية والإنجليزية.",
+      "reviewerNoteNotSpoken": "يستخدم لفظ التسليم نفسه لكل جهة، في تشغيلين يمكن إعادة أحدهما منفردًا.",
+      "evidenceNoteNotSpoken": "التسليم عن اليمين واليسار في مسلم ٥٨٢، ولفظه المختار في أبي داود ٩٩٦."
+    },
+    {
+      "id": "p15",
+      "module": "prayer",
+      "title": "كيف نكمل ثلاث ركعات أو أربعًا؟",
+      "explanationClipId": "p15-explain",
+      "additionalClipIds": ["say-takbir"],
+      "visualDirectionNotSpoken": "يظهر موضع التشهد الأول والأخير في مخطط بسيط، دون ازدحام بالحركات السابقة.",
+      "reviewerNoteNotSpoken": "يفتح هذا الشرح بعد مثال الركعتين. تُراجع تفاصيل الجلوس والتشهد بحسب الصلاة، مع إبقاء الهيئات الثابتة الأخرى معتبرة.",
+      "evidenceNoteNotSpoken": "التشهد كل ركعتين في مسلم ٤٩٨، وتفصيل استكمال الثلاث والرباعية في المرجع الفقهي."
+    },
+    {
+      "id": "p16",
+      "module": "prayer",
+      "title": "القراءة في الثالثة والرابعة",
+      "explanationClipId": "p16-explain",
+      "additionalClipIds": ["quran-1"],
+      "visualDirectionNotSpoken": "تعاد تلاوة الفاتحة المراجعة نفسها، مع بيان رقم الركعة دون تغيير نص الآيات.",
+      "reviewerNoteNotSpoken": "لا يُفهم من اقتصار الشرح على الفاتحة نفي كل زيادة ثبتت في بعض الصلوات. لا يعاد دعاء الاستفتاح.",
+      "evidenceNoteNotSpoken": "البخاري ٧٧٦ يصف الاقتصار على الفاتحة في أخريي الظهر؛ ويبيّن المرجع التفصيلي القراءة في بقية المواضع."
+    },
+    {
+      "id": "p17",
+      "module": "prayer",
+      "title": "عدد ركعات الفرائض",
+      "explanationClipId": "p17-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر الصلوات وأعدادها في بطاقة مقروءة، مع إمكان الرجوع إليها بعد الدرس.",
+      "reviewerNoteNotSpoken": "هذه أعداد الفرائض اليومية للمقيم. لا تتضمن البطاقة أحكام القصر أو الجمعة، ولا تخلط بينها وبين الرواتب.",
+      "evidenceNoteNotSpoken": "المصدر التعليمي يذكر أعداد الصلوات الخمس صراحة؛ استبدل الإحالة العامة السابقة بموضع يذكر هذه الأعداد بالفعل."
+    },
+    {
+      "id": "p18",
+      "module": "prayer",
+      "title": "الطمأنينة في الصلاة",
+      "explanationClipId": "p18-explain",
+      "additionalClipIds": [],
+      "visualDirectionNotSpoken": "تظهر وقفات مستقرة في مواضعها، ويتقدم العرض بأمر المتعلّم دون عدّ تنازلي.",
+      "reviewerNoteNotSpoken": "يُشرح معنى الطمأنينة بلغة ميسّرة. مدة الحركة المصوّرة للتعليم لا تحدد زمنًا شرعيًا ثابتًا ولا تقيس صحة صلاة المستخدم.",
+      "evidenceNoteNotSpoken": "الحديث يقرن كل ركن بالطمأنينة والاعتدال؛ التعريف هنا شرح للمعنى، لا اقتباس حرفي."
+    }
+  ],
+  "clips": [
+    {
+      "id": "say-pur-ref-1",
+      "module": "wudu",
+      "role": "devotional-wording",
+      "title": "التسمية قبل الوضوء",
+      "spokenText": "بِسمِ اللَّهِ",
+      "sourceIds": ["ad101"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "0be49d4749ef38ba003674734948bf3be2af9697fcffa058cadf21a463abf366",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/azkarCore.ts",
+        "id": "pur-ref-1",
+        "exactTextSha256": "0be49d4749ef38ba003674734948bf3be2af9697fcffa058cadf21a463abf366",
+        "sourceReference": "Sunan Abi Dawud 101; Sunan Abu Dawud 101; Sunan Ibn Majah 399; Hisn al-Muslim 8.",
+        "existingRepetitionCount": 1
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-pur-ref-5",
+      "module": "wudu",
+      "role": "devotional-wording",
+      "title": "الذكر بعد الوضوء",
+      "spokenText": "أَشهَدُ أَن لَا إِلَهَ إِلَّا اللَّهُ وَحدَهُ لَا شَرِيكَ لَهُ وَأَشهَدُ أَنَّ مُحَمَّدًا عَبدُهُ وَرَسُولُهُ",
+      "sourceIds": ["m234b"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "6cf2a14c12e9f8aa0b75d0b8523f8e5cd059258a7bd152616559d1b87501e673",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/azkarCore.ts",
+        "id": "pur-ref-5",
+        "exactTextSha256": "6cf2a14c12e9f8aa0b75d0b8523f8e5cd059258a7bd152616559d1b87501e673",
+        "sourceReference": "Sahih Muslim 234a; Sahih Muslim 234; Jami` at-Tirmidhi 55; Hisn al-Muslim 9.",
+        "existingRepetitionCount": 1
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-opening-bukhari-744",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "دعاء الاستفتاح",
+      "spokenText": "اللَّهُمَّ بَاعِدْ بَيْنِي وَبَيْنَ خَطَايَايَ كَمَا بَاعَدْتَ بَيْنَ الْمَشْرِقِ وَالْمَغْرِبِ، اللَّهُمَّ نَقِّنِي مِنَ الْخَطَايَا كَمَا يُنَقَّى الثَّوْبُ الْأَبْيَضُ مِنَ الدَّنَسِ، اللَّهُمَّ اغْسِلْ خَطَايَايَ بِالْمَاءِ وَالثَّلْجِ وَالْبَرَدِ",
+      "sourceIds": ["b744"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "7541c629303f7af467a8c627da5686170678b2e70795ea7f134264401fe1ae5d",
+      "editorialParaphrase": false,
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved.",
+      "comparisonToExistingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-opening-forgiveness",
+        "exactTextSha256": "d9a5c0a5cba1fe684a51b362aea9d6535659c9561914bd26342fbd77bd65f0e2",
+        "sourceReference": "Sahih al-Bukhari 744.",
+        "existingRepetitionCount": 1,
+        "relationship": "New proposed source-specific lesson variant; existing canonical text remains untouched",
+        "originalText": "اللَّهُمَّ بَاعِدْ بَيْنِي وَبَيْنَ خَطَايَايَ كَمَا بَاعَدْتَ بَيْنَ الْمَشْرِقِ وَالْمَغْرِبِ، اللَّهُمَّ نَقِّنِي مِنْ خَطَايَايَ كَمَا يُنَقَّى الثَّوْبُ الْأَبْيَضُ مِنَ الدَّنَسِ، اللَّهُمَّ اغْسِلْ خَطَايَايَ بِالْمَاءِ وَالثَّلْجِ وَالْبَرَدِ",
+        "proposedDifference": "Use مِنَ الْخَطَايَا in the second sentence, as in the inspected Bukhari 744 Arabic text. This is a version selection for approval, not a judgment against other established wording."
+      }
+    },
+    {
+      "id": "say-in-prayer-ruku-tasbih",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "ذكر الركوع",
+      "spokenText": "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+      "sourceIds": ["h33"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "37c9aff1a135fbfcd877a2e96a232c797c83f76104fb2bd223da2a2a2c5f2051",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-ruku-tasbih",
+        "exactTextSha256": "37c9aff1a135fbfcd877a2e96a232c797c83f76104fb2bd223da2a2a2c5f2051",
+        "sourceReference": "Hisn al-Muslim 33; see Al-Albani, Sahih at-Tirmidhi 1/83.",
+        "existingRepetitionCount": 3
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-in-prayer-rising-praise",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "ذكر الرفع والحمد",
+      "spokenText": "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ، رَبَّنَا وَلَكَ الْحَمْدُ",
+      "sourceIds": ["b795", "b735"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "2138a66bd2e3b26b919bfa8307d3564a0e99bf2796f7409b4efec1d4af18117f",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-rising-praise",
+        "exactTextSha256": "2138a66bd2e3b26b919bfa8307d3564a0e99bf2796f7409b4efec1d4af18117f",
+        "sourceReference": "Sahih al-Bukhari 795.",
+        "existingRepetitionCount": 1
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-in-prayer-sujud-tasbih",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "ذكر السجود",
+      "spokenText": "سُبْحَانَ رَبِّيَ الْأَعْلَى",
+      "sourceIds": ["h41"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "b0b3b81c534cc2b09d7179e40d22c2d1fd36910f99c6c5e6e6fcd7117f3f1b9d",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-sujud-tasbih",
+        "exactTextSha256": "b0b3b81c534cc2b09d7179e40d22c2d1fd36910f99c6c5e6e6fcd7117f3f1b9d",
+        "sourceReference": "Hisn al-Muslim 41; see Al-Albani, Sahih at-Tirmidhi 1/83.",
+        "existingRepetitionCount": 3
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-in-prayer-between-prostrations-brief",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "الدعاء بين السجدتين",
+      "spokenText": "رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي",
+      "sourceIds": ["ad874"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "255d2520ab7b5e12686049f872278e306bb3fb2ec241b2036497691bb0097a87",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-between-prostrations-brief",
+        "exactTextSha256": "255d2520ab7b5e12686049f872278e306bb3fb2ec241b2036497691bb0097a87",
+        "sourceReference": "Sunan Abi Dawud 874 (Sahih, al-Albani).",
+        "existingRepetitionCount": 1
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-in-prayer-tashahhud",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "التشهد",
+      "spokenText": "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+      "sourceIds": ["b831"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "2b148538ac2d43b4fd4d6d2ca155f4fcdad7d0d4d1a0a8620459c20a014ea31a",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-tashahhud",
+        "exactTextSha256": "2b148538ac2d43b4fd4d6d2ca155f4fcdad7d0d4d1a0a8620459c20a014ea31a",
+        "sourceReference": "Sahih al-Bukhari 831.",
+        "existingRepetitionCount": 1
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-in-prayer-ibrahimiyyah",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "الصلاة الإبراهيمية",
+      "spokenText": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
+      "sourceIds": ["b6357"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "a25ffe0cd2ec94970a4f9769089d9531d8ef0094e031deb1fc4b54a6c6773596",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-ibrahimiyyah",
+        "exactTextSha256": "a25ffe0cd2ec94970a4f9769089d9531d8ef0094e031deb1fc4b54a6c6773596",
+        "sourceReference": "Sahih al-Bukhari 6357.",
+        "existingRepetitionCount": 1
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-in-prayer-before-salam-refuge",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "الدعاء قبل السلام",
+      "spokenText": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ جَهَنَّمَ، وَمِنْ عَذَابِ الْقَبْرِ، وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ، وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ",
+      "sourceIds": ["m588"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "ad431482198b0d345ee01e467badaefd49b5a1f1273789cb34fc294360083301",
+      "editorialParaphrase": false,
+      "existingContent": {
+        "file": "src/app/content/inPrayerSupplications.ts",
+        "id": "in-prayer-before-salam-refuge",
+        "exactTextSha256": "ad431482198b0d345ee01e467badaefd49b5a1f1273789cb34fc294360083301",
+        "sourceReference": "Sahih Muslim 588a.",
+        "existingRepetitionCount": 1
+      },
+      "recordingPolicy": "One exact canonical text per asset; sequence/replay is separate. Existing internal repeated wording is preserved."
+    },
+    {
+      "id": "say-takbir",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "التكبير",
+      "spokenText": "اللَّهُ أَكْبَرُ",
+      "sourceIds": ["m498", "b795"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "0f55d2e0475912f34c3a5198ed454c3525e63b40cbc2dddd9ca3d6eda3f69b68"
+    },
+    {
+      "id": "say-refuge-before-reading",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "الاستعاذة قبل القراءة",
+      "spokenText": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      "sourceIds": ["q16-98", "guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "2f94e22a8ce609aa71feca88ae048a9b87b55c984e3d5224bf95dafa6df44a14"
+    },
+    {
+      "id": "say-amin",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "التأمين بعد الفاتحة — ليس آية",
+      "spokenText": "آمِين",
+      "sourceIds": ["b780"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "f19e4d9f0c371311d4512dad1c660fbc568468d61f1af83b384e70734d7b51ca"
+    },
+    {
+      "id": "say-salam",
+      "module": "prayer",
+      "role": "devotional-wording",
+      "title": "التسليم",
+      "spokenText": "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ",
+      "sourceIds": ["ad996", "m582"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "2fc272c10a2233b676d66faa857bdf1cb3cff6a189461edfdfc71242ee1a6d8e"
+    },
+    {
+      "id": "quran-1",
+      "module": "prayer",
+      "role": "quran-recitation",
+      "title": "سورة الفاتحة كاملة",
+      "spokenText": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ\nٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ\nٱلرَّحْمَـٰنِ ٱلرَّحِيمِ\nمَـٰلِكِ يَوْمِ ٱلدِّينِ\nإِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ\nٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ\nصِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "existing-reviewed-reciter-recording",
+      "transcriptSha256": "2ba2195e4abc07d8551ba06ed4df0b956322f5106c777ff3bee0bdc805a0810a",
+      "sourceFile": "public/data/mushaf/1.json",
+      "verses": [
+        {
+          "key": "1:1",
+          "text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ"
+        },
+        {
+          "key": "1:2",
+          "text": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ"
+        },
+        {
+          "key": "1:3",
+          "text": "ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ"
+        },
+        {
+          "key": "1:4",
+          "text": "مَـٰلِكِ يَوْمِ ٱلدِّينِ"
+        },
+        {
+          "key": "1:5",
+          "text": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ"
+        },
+        {
+          "key": "1:6",
+          "text": "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ"
+        },
+        {
+          "key": "1:7",
+          "text": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ"
+        }
+      ],
+      "reviewNote": "No Quran text is sent to speech synthesis. Verify a complete recording, rights, tajwid review and exact-file timing before use. Basmalah handling for the additional surah needs explicit source/recording selection; never prepend synthesized Quran.",
+      "verseReference": "1:1-7"
+    },
+    {
+      "id": "quran-112",
+      "module": "prayer",
+      "role": "quran-recitation",
+      "title": "سورة الإخلاص كاملة",
+      "spokenText": "قُلْ هُوَ ٱللَّهُ أَحَدٌ\nٱللَّهُ ٱلصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "existing-reviewed-reciter-recording",
+      "transcriptSha256": "d7e6b7a6e7e349b372b2d24b5f240a2af4e8eb0e7f67bfb103db0cde5d77c94b",
+      "sourceFile": "public/data/mushaf/604.json",
+      "verses": [
+        {
+          "key": "112:1",
+          "text": "قُلْ هُوَ ٱللَّهُ أَحَدٌ"
+        },
+        {
+          "key": "112:2",
+          "text": "ٱللَّهُ ٱلصَّمَدُ"
+        },
+        {
+          "key": "112:3",
+          "text": "لَمْ يَلِدْ وَلَمْ يُولَدْ"
+        },
+        {
+          "key": "112:4",
+          "text": "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ"
+        }
+      ],
+      "reviewNote": "No Quran text is sent to speech synthesis. Verify a complete recording, rights, tajwid review and exact-file timing before use. Basmalah handling for the additional surah needs explicit source/recording selection; never prepend synthesized Quran.",
+      "verseReference": "112:1-4"
+    },
+    {
+      "id": "w00-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "الاستعداد للوضوء",
+      "spokenText": "نتعلّم الوضوء كما ورد عن النبي صلى الله عليه وسلم. نبدأ بنيّة الوضوء في القلب، ونتعلّم كل خطوة على حدة.",
+      "sourceIds": ["b1", "q5-6", "fiqh-wudu"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "7f94e0987b608456947b0b1469256bb7cb6047343591df992fa974f580f8913d",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w01-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "التسمية",
+      "spokenText": "نسمّي الله عند بدء الوضوء، قبل غسل الكفّين. نستمع إلى التسمية، ثم نقولها.",
+      "sourceIds": ["ad101", "fiqh-wudu"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "902de442e4e06e16291d3ebf0984412cc552a5d465c255b83b2a953f4010d3f6",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w02-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "غسل الكفّين",
+      "spokenText": "نغسل الكفّين ثلاث مرات، ونعتني بظاهر اليدين وباطنهما، ونخلّل بين الأصابع ليصل إليها الماء.",
+      "sourceIds": ["b159", "ad142"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "4802ebaa3a25ce4adc55628137ae07e8b6e6711c457b56abf888accc2bb7c65a",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w03-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "المضمضة",
+      "spokenText": "نأخذ غرفة من الماء بكفّنا. نُدير بعض الماء في الفم ثم نخرجه؛ وهذه هي المضمضة. ونستخدم بقيّة الغرفة للاستنشاق، ونكرّر المضمضة والاستنشاق ثلاث مرات.",
+      "sourceIds": ["b191", "fiqh-mouth-nose"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "ef9fcd8ca060837338fc4dfdae4dd1f6f80e2ac4093c2e825dd6f446b0f320f1",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w04-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "الاستنشاق والاستنثار",
+      "spokenText": "نجذب الماء بالنَّفَس إلى داخل الأنف، وهذا هو الاستنشاق، ثم نخرجه، وهذا هو الاستنثار. ومن السنة المبالغة في الاستنشاق لغير الصائم؛ أمّا الصائم فلا يبالغ.",
+      "sourceIds": ["b162", "ad142", "t788", "fiqh-istinshaq"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "81f3ef1850e8be42d785ff84fc319a24233b6b3a5947defa98af36480fe36b7d",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w05-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "غسل الوجه",
+      "spokenText": "نغسل الوجه كله ثلاث مرات، من منابت شعر الرأس المعتادة إلى أسفل الذقن، ومن الأذن إلى الأذن، مع إيصال الماء إلى جميع أجزائه.",
+      "sourceIds": ["b159", "fiqh-wudu", "fiqh-face"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "323ca8b2f1443ff80b2cfd76cb87ba9c7707b693a7f0f2206651b3cd88c641ae",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w06-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "غسل اليد اليمنى إلى المرفق",
+      "spokenText": "نغسل اليد اليمنى من أطراف الأصابع إلى المرفق ثلاث مرات، ونتأكد من غسل المرفق معها.",
+      "sourceIds": ["q5-6", "b159", "b168", "fiqh-wudu"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "de66e7bfa2974d1fcc5d23f1355198e8ea82258b3dc14d8c8da6105c9cc3ada9",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w07-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "غسل اليد اليسرى إلى المرفق",
+      "spokenText": "ثم نغسل اليد اليسرى من أطراف الأصابع إلى المرفق ثلاث مرات، ونتأكد من غسل المرفق معها.",
+      "sourceIds": ["q5-6", "b159", "b168", "fiqh-wudu"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "891abf259cb4e02bb953bcb58ea535a964e6833803c9905e9db01ae58434cfa6",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w08-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "مسح الرأس",
+      "spokenText": "نبلّل اليدين، ثم نمسح بهما الرأس مرة واحدة: نبدأ من مقدّمته حتى القفا، ثم نعيدهما إلى المقدّمة.",
+      "sourceIds": ["b185", "wudu-guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "6a8bff354e237fd9a1645532c543d5dc4d392b2bbf70589d19eee509db92055e",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w09-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "مسح الأذنين",
+      "spokenText": "نمسح باطن الأذنين بالسبّابتين، وظاهرهما بالإبهامين، مرة واحدة.",
+      "sourceIds": ["ad135", "wudu-guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "b5412263ebc28c866d13e1a8533e0e1e93217bd78add19d1d88394abfb65a370",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w10-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "غسل القدم اليمنى",
+      "spokenText": "نغسل القدم اليمنى ثلاث مرات مع الكعبين، ونعتني بالعقب وما بين الأصابع حتى يصل الماء إلى القدم كلها.",
+      "sourceIds": ["q5-6", "b159", "b168", "b60", "ad142", "fiqh-wudu"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "a07140adf648dc284eecca761a85a51617b90022ef854824916e1f239c7623e4",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w11-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "غسل القدم اليسرى",
+      "spokenText": "ثم نغسل القدم اليسرى ثلاث مرات مع الكعبين، ونعتني بالعقب وما بين الأصابع حتى يصل الماء إلى القدم كلها.",
+      "sourceIds": ["q5-6", "b159", "b168", "b60", "ad142", "fiqh-wudu"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "d4089d435fb6f47941a643ca563443a1ab255b8d09e80216fc05ec9d1362cac1",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w12-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "الذكر بعد الوضوء",
+      "spokenText": "بعد الفراغ من الوضوء، نقول الذكر الذي ورد عن النبي صلى الله عليه وسلم. نستمع إليه، ثم نتعلّم ألفاظه على مهل.",
+      "sourceIds": ["m234b"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "4e4d5499eb4201fb5df082cc3aa12f9af1fe9094d59b8d6c9ead4eaa762fa26d",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "w13-explain",
+      "module": "wudu",
+      "role": "explanation",
+      "title": "هل يلزم الغسل ثلاث مرات؟",
+      "spokenText": "ورد عن النبي صلى الله عليه وسلم غسل الأعضاء مرة، ومرتين، وثلاثًا. فلا يلزم تكرار الغسل ثلاثًا، والمهم أن يعمّ الماء العضو كله. أمّا الرأس فنمسحه مرة واحدة.",
+      "sourceIds": ["b157", "b158", "b159", "wudu-guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "5a47b7b0180a41855de1b82a9c483220314146ec1ac66ee659334e8a5c5683fd",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p00-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الاستعداد للصلاة",
+      "spokenText": "قبل الصلاة نتأكد من دخول وقتها، ونتطهّر، ونستر العورة، ونستقبل القبلة. ننوي الصلاة بقلوبنا، ونتعلّم أولًا كيف نصلّي ركعتين.",
+      "sourceIds": ["q4-103", "b757", "b1", "guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "6fba387c21869c489a81567e0c37b5ff76f69d70f4c1737fd6ddd838aa20c160",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p01-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "تكبيرة الإحرام",
+      "spokenText": "نبدأ الصلاة واقفين مستقبلين القبلة. نرفع اليدين إلى حذو المنكبين ونكبّر؛ وهذه هي تكبيرة الإحرام.",
+      "sourceIds": ["b735", "m498"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "b3bbc249f58421b36bfb4f98c3ed711cbe5d23d27008eaeaa206b62ea33668a0",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p02-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "القيام ودعاء الاستفتاح",
+      "spokenText": "نضع اليد اليمنى على اليسرى، ونقرأ دعاء الاستفتاح. سنستمع إلى إحدى الصيغ الواردة عن النبي صلى الله عليه وسلم.",
+      "sourceIds": ["b740", "b744"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "45924165f58bb46ac8b2bd23936ec9336d05c3c47bf9efd223ccf48f15732b93",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p03-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الاستعاذة وقراءة الفاتحة",
+      "spokenText": "نستعيذ بالله من الشيطان الرجيم، ثم نقرأ الفاتحة كاملة. نتعلّمها من تلاوة واضحة، آية آية.",
+      "sourceIds": ["q16-98", "b757", "guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "272954e363818e9bbeef5f0de6127c38ffbfd630f21f84f74d47f47e10452156",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p04-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "التأمين والقراءة بعد الفاتحة",
+      "spokenText": "بعد الفاتحة نقول آمين، ثم نقرأ ما تيسّر من القرآن. وفي درسنا نستمع إلى سورة الإخلاص مثالًا على القراءة في الركعتين الأوليين.",
+      "sourceIds": ["b780", "b776"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "eb59d4436ca778c6259415a7170cb62fd9921f8bc92933a2be3429de1c6ed63e",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p05-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الركوع",
+      "spokenText": "نكبّر ونركع، ونضع اليدين على الركبتين. نسوّي الظهر، ولا نرفع الرأس ولا نخفضه، ونطمئن ثم نقول ذكر الركوع.",
+      "sourceIds": ["b735", "b828", "m498", "m397", "b795"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "0b7905f7616be2dafb66b3357d76e09ee324a9dec8ddd3aa16ebc485ddb0a11a",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p06-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الاعتدال بعد الركوع",
+      "spokenText": "نرفع من الركوع مع ذكر الرفع، ثم نحمد الله. نقف مستقيمين ونطمئن قبل أن نسجد.",
+      "sourceIds": ["b735", "b795", "m397"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "b83adc76c5ddfe770770eabc824861fdd6706c335225ae5e7a85c35206af2dab",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p07-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "السجدة الأولى",
+      "spokenText": "نكبّر ونسجد على الجبهة والأنف، والكفّين، والركبتين، وأطراف أصابع القدمين. نطمئن في السجود، ونقول ذكره.",
+      "sourceIds": ["b812", "m397", "b795"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "7f7032164ed8a3662978e2d6b447a63cb9486f8b3443a052cf50f0609ea3862d",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p08-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الجلوس بين السجدتين",
+      "spokenText": "نكبّر ونرفع من السجود، ثم نجلس حتى نطمئن. نقول في هذا الجلوس الدعاء الوارد بين السجدتين.",
+      "sourceIds": ["b795", "m397", "m498", "ad874"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "6f47dbc5cbe05fa52968600927d79577a5e267ca09d6bea90a4fd5015c3a7a31",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p09-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "السجدة الثانية",
+      "spokenText": "نكبّر ونسجد السجدة الثانية، ونطمئن فيها ونقول ذكر السجود، كما فعلنا في السجدة الأولى.",
+      "sourceIds": ["b795", "m397", "m498"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "e28b65b882cd00b29f8270d3f146db536ab23c82c23829d02d40aefa92c61201",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p10-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الركعة الثانية",
+      "spokenText": "نقوم مكبّرين للركعة الثانية. نقرأ الفاتحة وما تيسّر من القرآن، ثم نركع ونعتدل ونسجد سجدتين بينهما جلوس، كما تعلّمنا.",
+      "sourceIds": ["b795", "b776", "m498"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "d64aa06db98c8623196524abce0d23ccfbdec4389fc6fe2b3c36f3ddeee6887f",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p11-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "التشهد",
+      "spokenText": "بعد السجدة الثانية من الركعة الثانية نجلس ونقرأ التشهد. نستمع إليه كاملًا، ثم نتعلّمه عبارة عبارة.",
+      "sourceIds": ["m498", "b831", "b828"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "dfbe44ce022b61cbf86bb2a0d9fd98815021a1206679d1ca855f1156f61119db",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p12-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الصلاة على النبي صلى الله عليه وسلم",
+      "spokenText": "بعد التشهد الأخير نصلّي على النبي صلى الله عليه وسلم. نستمع إلى الصلاة الإبراهيمية، ثم نتعلّم ألفاظها.",
+      "sourceIds": ["b6357", "guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "3aaa9599c1e8dbcd3c5f805d28c23217ebeaa8da15e4d5d2a0e302d8b62b8e6d",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p13-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الدعاء قبل السلام",
+      "spokenText": "قبل أن نسلّم، ندعو الله. ومن الدعاء الوارد في هذا الموضع الاستعاذة من عذاب جهنم، وعذاب القبر، وفتنة المحيا والممات، وفتنة المسيح الدجال.",
+      "sourceIds": ["m588"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "93ff6039dd2eb2027660291604350a82d7a5ec4c4b117c75c6ecf55217ffe28b",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p14-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "التسليم",
+      "spokenText": "نلتفت إلى اليمين ونسلّم، ثم نلتفت إلى اليسار ونسلّم. وبالتسليم نختم الصلاة.",
+      "sourceIds": ["m582", "ad996"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "073ea421cd30e49b910c1b0fe412d87303c508d49d2b5442d940868f5687f5af",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p15-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "كيف نكمل ثلاث ركعات أو أربعًا؟",
+      "spokenText": "في المغرب والصلوات الرباعية نجلس للتشهد الأول بعد الركعة الثانية، ثم نقوم لإكمال الصلاة. وبعد الركعة الأخيرة نجلس للتشهد الأخير، ثم نختم الصلاة بالتسليم.",
+      "sourceIds": ["m498", "guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "0745af61dd6a8e733b842ff5cb85a746d5e84644e33708b4427df54129ef8c49",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p16-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "القراءة في الثالثة والرابعة",
+      "spokenText": "نقرأ الفاتحة في الركعة الثالثة، وفي الرابعة إذا كانت الصلاة أربع ركعات، ثم نكمل الركوع والسجود كما تعلّمنا.",
+      "sourceIds": ["b776", "guide"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "643ef3c6cb7d116ab382d2e4bc7a160d6e00c057582bd737220e31dc82364bac",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p17-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "عدد ركعات الفرائض",
+      "spokenText": "للمقيم: الفجر ركعتان، والظهر أربع ركعات، والعصر أربع، والمغرب ثلاث، والعشاء أربع ركعات.",
+      "sourceIds": ["fiqh-rakahs"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "bf325e53a94101e268d8c7d161279b84a86962b653b82e1510ec208bf6f396eb",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "p18-explain",
+      "module": "prayer",
+      "role": "explanation",
+      "title": "الطمأنينة في الصلاة",
+      "spokenText": "الطمأنينة أن تستقرّ أعضاؤنا في القيام والركوع والسجود والجلوس، قبل الانتقال إلى الحركة التالية. نؤدّي كل حركة بهدوء، دون عجلة.",
+      "sourceIds": ["m397", "m498"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "1098921941bd7ef6e5b2bba96fb930ab85028fc0fd61e8b75d8384b400517a60",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "ui-watch",
+      "module": "shared",
+      "role": "interaction",
+      "title": "بدء المشاهدة",
+      "spokenText": "شاهد الحركة، ويمكنك إيقافها أو إعادتها في أي وقت.",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "e80f4023406ac0b07986df25aac61da92b74010bd841524f1335c59f62c4f1af",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "ui-listen-repeat",
+      "module": "shared",
+      "role": "interaction",
+      "title": "الاستماع والترديد",
+      "spokenText": "استمع أولًا، ثم ردّد على مهل. اضغط متابعة عندما تكون مستعدًا.",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "3f047f506d4f8528c790c2d778cde06e4e75ce58525cb40803c3d14a88f09f6f",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "ui-choose",
+      "module": "shared",
+      "role": "interaction",
+      "title": "اختيار الصورة",
+      "spokenText": "اختر الصورة التي تبيّن الخطوة التي تعلّمناها.",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "1e0a92e2c6760592b504e20696bf305275b590e7df452197b20cac11392b53c7",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "ui-order",
+      "module": "shared",
+      "role": "interaction",
+      "title": "ترتيب الخطوات",
+      "spokenText": "رتّب الصور كما شاهدت الخطوات. يمكنك تغيير ترتيبها بأزرار التحريك.",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "3a48c17be52de76310b8821009baea4f9a6399a074c0e3a233709119cdc00d7e",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "ui-retry",
+      "module": "shared",
+      "role": "feedback",
+      "title": "استعادة المساعدة",
+      "spokenText": "لنشاهد الخطوة مرة أخرى، ثم نحاول من جديد.",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "cbc97c8c15cf9dd53842d9c26e7d6d688fde272b7c84697165389cb4747f0851",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "ui-review",
+      "module": "shared",
+      "role": "feedback",
+      "title": "مراجعة لاحقة اختيارية",
+      "spokenText": "أكملت هذا التدريب. يمكنك العودة لاحقًا وتجربة الخطوات دون مساعدة.",
+      "sourceIds": [],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "6a8bf2a9be2418e05c428534fc19637f9c623e54502553b7d7fedbeeca260be3",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "feedback-wudu-elbow",
+      "module": "wudu",
+      "role": "feedback",
+      "title": "تغذية راجعة: المرفق",
+      "spokenText": "أحسنت. نغسل المرفق مع اليد، ولا نتوقف بالغسل قبله.",
+      "sourceIds": ["q5-6", "fiqh-wudu"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "dc9e1d08d609ad09417479130fbdef6c9ca7cee3822496d41d034aab82081bf0",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "feedback-wudu-head",
+      "module": "wudu",
+      "role": "feedback",
+      "title": "تغذية راجعة: مسح الرأس",
+      "spokenText": "نمسح الرأس بيدين مبلولتين. شاهد كيف تمرّ اليدان على الرأس، ثم حاول مرة أخرى.",
+      "sourceIds": ["b185"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "66b9d59a488d1e1841c4c050dd41863ffd43075c3d2b6d2769ba11abd75bdcd7",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "feedback-prayer-ruku",
+      "module": "prayer",
+      "role": "feedback",
+      "title": "تغذية راجعة: الركوع",
+      "spokenText": "أحسنت. هذه هيئة الركوع: اليدان على الركبتين، والظهر مستوٍ.",
+      "sourceIds": ["b828"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "86241bff8ad1438b45def96ee556abbdb8d8baaf91af79543088158b6f9fbc20",
+      "editorialParaphrase": true
+    },
+    {
+      "id": "feedback-prayer-sitting",
+      "module": "prayer",
+      "role": "feedback",
+      "title": "تغذية راجعة: بين السجدتين",
+      "spokenText": "بين السجدتين جلوس فيه طمأنينة. ضع صورة الجلوس بين صورتي السجود.",
+      "sourceIds": ["m397"],
+      "status": "draft-for-review",
+      "productionReady": false,
+      "plannedProvider": "heygen",
+      "transcriptSha256": "d7680d2031b125d0a5470103e5830e9179344a319205097d3258827b092df235",
+      "editorialParaphrase": true
+    }
+  ],
+  "reviewIssues": [
+    {
+      "id": "R1",
+      "severity": "owner-and-source-approval",
+      "clipIds": ["say-opening-bukhari-744"],
+      "title": "اختيار لفظ دعاء الاستفتاح",
+      "detail": "للدرس نسخة مقترحة من رواية البخاري ٧٤٤، فيها «نقني من الخطايا». وفي التطبيق «نقني من خطاياي». بقي نص التطبيق كما هو، والنسخة المقترحة معروضة كاملة للموافقة. المقارنة توثق اختلاف الرواية، ولا تحكم على الصيغ الأخرى بالبطلان."
+    },
+    {
+      "id": "R2",
+      "severity": "curriculum-review",
+      "clipIds": [],
+      "title": "تحديد المرجع التفصيلي",
+      "detail": "تستند الأفعال والأذكار إلى الأحاديث المبينة مع كل خطوة، ويستعان بشروح ابن باز في بيان معانيها وبعض التفاصيل. هذا اقتراح للمراجعة، وليس اعتمادًا من المالك لمذهب فقهي. قبل التحريك النهائي تُراجع خصوصًا هيئة الجلوس، وحركة الإصبع، وأحكام اللحية، وأدوار الإمام والمأموم، مع احترام الصور المقبولة في الفقه."
+    },
+    {
+      "id": "R3",
+      "severity": "audio-production-review",
+      "clipIds": ["quran-1", "quran-112"],
+      "title": "اختيار تلاوة الفاتحة والإخلاص",
+      "detail": "تستخدم تلاوة قارئ موثوقة ومسموحًا بإعادة نشرها. يجب التحقق من اكتمال السورتين وحدود البسملة قبل استعمال التسجيل. لا ترسل الآيات إلى توليد الكلام، ولم تختَر ملفات التلاوة بعد."
+    },
+    {
+      "id": "R4",
+      "severity": "requires-listening-after-generation",
+      "clipIds": [],
+      "title": "مراجعة النطق بعد التسجيل",
+      "detail": "فحص النص والمصدر لا يكفي للحكم على نطق التسجيل. تحتاج كل مادة صوتية جديدة إلى الاستماع والمراجعة، وتحتاج التلاوة إلى مراجعة متخصصة. لم تُنجز هذه المراجعات بعد، ولا ينتقل اعتماد ملف قديم إلى تسجيل جديد."
+    },
+    {
+      "id": "R5",
+      "severity": "scope-review",
+      "clipIds": [],
+      "title": "الفئة المستهدفة وحدود الدرس",
+      "detail": "الدرس الأساسي للمنفرد القادر على القيام، ويبدأ بمثال من ركعتين. ما زال عمر الأطفال يحتاج إلى تحديد. صلاة الجماعة والجمعة والسفر وأصحاب الأعذار وسجود السهو، وكذلك التيمم والمسح على الخفين، لها شروح مستقلة؛ فلا يقدم هذا الدرس بوصفه مرجعًا جامعًا لكل الأحكام."
+    }
+  ],
+  "inventory": {
+    "clips": 59,
+    "heygenClipsAfterApproval": 57,
+    "quranAssetsToResolve": 2,
+    "canonicalTextsPreserved": 9,
+    "stages": 33,
+    "wuduStages": 14,
+    "prayerStages": 19,
+    "plannedHeygenCharacters": 5349,
+    "generatedAudioFiles": 0,
+    "r2UploadedObjects": 0
+  },
+  "revision": 2,
+  "reviewDocument": "SCRIPT_REVIEW.ar.md",
+  "productionNotesDocument": "REVIEW_NOTES.ar.md",
+  "editorialPolicy": {
+    "language": "فصحى ميسّرة ومباشرة، بجمل قصيرة تصف الفعل وتشرح المصطلح عند أول استعمال.",
+    "separation": "التعليم المنطوق في ملف مراجعة النص، وتوثيق الدليل وملاحظات الإعداد والإنتاج في ملف مستقل. لا تُرسل الملاحظات إلى تحويل النص إلى كلام.",
+    "evidence": "الحديث مصدر للأفعال والألفاظ؛ والشرح الفقهي مصدر لتفصيل المعنى والحدود. لا يُسمّى الشرح التعليمي حديثًا، ولا يُدّعى الإجماع في المسائل المختلفة.",
+    "acceptedVariants": "اختيار هيئة ثابتة للتعليم لا يعني رفض الهيئات المقبولة الأخرى.",
+    "productionStatus": "مسودة للمراجعة، لا اعتماد جديد للألفاظ أو النطق أو التسجيل، ولا توليد أو رفع قبل الموافقة."
+  },
+  "sequenceGroups": [
+    {
+      "id": "wudu-mouth-nose",
+      "stageIds": ["w03", "w04"],
+      "repetitionsInDemonstration": 3,
+      "sourceIds": ["b191", "fiqh-mouth-nose"],
+      "explanationNotSpoken": "يشرح العنوانان الفعلين منفصلين، ويعرضهما المشهد المتصل مقترنين من غرفة واحدة في كل مرة؛ ولا يحكم بخطأ الأخذ بغرفتين."
+    }
+  ],
+  "evidenceHighlights": [
+    {
+      "id": "istinshaq-fasting",
+      "stageIds": ["w04"],
+      "sourceIds": ["ad142", "t788"],
+      "quote": "وَبَالِغْ فِي الِاسْتِنْشَاقِ إِلَّا أَنْ تَكُونَ صَائِمًا",
+      "explanationNotSpoken": "هذه جملة من حديث لقيط بن صبرة. نص الترمذي يثبت تحسينه وتصحيحه. يشمل الشرح المبالغة لغير الصائم واستثناء الصائم؛ لا يُترك هذا التنبيه لتذكير غير محدد في مرحلة لاحقة."
+    }
+  ],
+  "revisionHistory": [
+    {
+      "revision": 1,
+      "id": "learn-audio-ar-2026-11-27-v1",
+      "note": "مسودة أولى للمراجعة قبل توليد الصوت."
+    },
+    {
+      "revision": 2,
+      "id": "learn-audio-ar-2026-11-27-v2",
+      "note": "تبسيط العربية وتوثيق الاستنشاق واستثناء الصائم والجمع بين المضمضة والاستنشاق، وفصل الشرح عن ملاحظات الإعداد. لا تغيير للأذكار أو القرآن."
+    }
+  ]
+}

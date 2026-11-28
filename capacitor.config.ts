@@ -5,6 +5,10 @@ const config: CapacitorConfig = {
   appName: "wa-zaker",
   webDir: "dist",
   plugins: {
+    SystemBars: {
+      insetsHandling: "css",
+      initialViewportFitValueHint: "cover",
+    },
     LocalNotifications: {
       // Use the single-color crescent and star for Android's status-bar glyph.
       // Capacitor resolves this name from android/app/src/main/res/drawable.

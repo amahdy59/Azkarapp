@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "status": "local-visual-review",
+  "diagrams": [
+    {
+      "book": 2,
+      "sourcePage": 8,
+      "originalPdfPage": 7,
+      "kind": "tawaf",
+      "language": "ar",
+      "title": "مسار الطواف",
+      "description": "سبعة أشواط عكس عقارب الساعة حول الكعبة، تبدأ من محاذاة الحجر الأسود وتنتهي عنده، والكعبة عن يسار الطائف.",
+      "caption": "رسم تعليمي مبسّط للاتجاه؛ اقرأ التعليمات كاملة. لا يمثل مخططًا معماريًا أو مقياس مسافات."
+    },
+    {
+      "book": 2,
+      "sourcePage": 9,
+      "originalPdfPage": 7,
+      "kind": "sai",
+      "language": "ar",
+      "title": "سبعة أشواط بين الصفا والمروة",
+      "description": "من الصفا إلى المروة شوط، والعودة من المروة إلى الصفا شوط آخر. يبدأ السعي بالصفا وينتهي بالمروة في الشوط السابع.",
+      "caption": "الأسهم تفصل الأشواط لتوضيح عددها؛ الذهاب والعودة في المسعى نفسه. لا يتغير الاتجاه بتغيير لغة الواجهة."
+    }
+  ],
+  "figures": [
+    {
+      "id": "quiet-prayer-space",
+      "placement": "after-introduction",
+      "book": 1,
+      "sourcePage": 5,
+      "kind": "generated-context",
+      "asset": "quiet-prayer-space.webp",
+      "purpose": "Quiet chapter orientation after the compiler introduction; conveys no ritual instruction.",
+      "alt": "مكان هادئ فيه بساط بسيط وضوء نهاري، دون أشخاص أو نصوص.",
+      "caption": "صورة توضيحية مولّدة للسياق؛ ليست جزءًا من نص المؤلف ولا تحدد مكانًا أو هيئة للدعاء.",
+      "generator": "Built-in image_gen, 2026-11-27",
+      "promptFile": "prompts.json"
+    },
+    {
+      "id": "bedtime-context",
+      "placement": "chapter-opening",
+      "book": 3,
+      "sourcePage": 34,
+      "kind": "generated-context",
+      "asset": "bedtime-context.webp",
+      "purpose": "Identify the source-confirmed start of the bedtime chapter on PDF page 34 (printed page 33), without adding actions or prescribed objects.",
+      "alt": "فراش بسيط في غرفة هادئة عند المساء، دون أشخاص أو نصوص.",
+      "caption": "صورة توضيحية مولّدة لسياق ورد النوم؛ لا تضيف هيئة أو عملًا إلى الأذكار الواردة.",
+      "generator": "Built-in image_gen, 2026-11-27",
+      "promptFile": "prompts.json"
+    }
+  ]
+}

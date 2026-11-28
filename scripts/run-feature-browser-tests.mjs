@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 // an inferred guarantee that unrelated features cannot be affected.
 export const FEATURE_SPECS = {
   learning: [
+    "books-audio-responsive.spec.ts",
     "home-learning-entry.spec.ts",
     "learning-library.spec.ts",
     "learning-production.spec.ts",
@@ -31,8 +32,14 @@ export const FEATURE_SPECS = {
     "contextual-reminder-plan.spec.ts",
     "pwa-update-flow.spec.ts",
   ],
-  reader: ["reader-*.spec.ts", "devotional-footer.spec.ts", "reading-reliability.spec.ts"],
+  reader: [
+    "reader-*.spec.ts",
+    "quiet-reading-toolbar.spec.ts",
+    "devotional-footer.spec.ts",
+    "reading-reliability.spec.ts",
+  ],
   quran: [
+    "header-zoom-settings.spec.ts",
     "button-family-consistency.spec.ts",
     "adaptive-navigation.spec.ts",
     "compact-practice.spec.ts",
@@ -46,9 +53,12 @@ export const FEATURE_SPECS = {
     "audio-surah-stream.spec.ts",
   ],
   audio: [
+    "additional-timing-follow.spec.ts",
+    "books-audio-responsive.spec.ts",
     "compact-practice.spec.ts",
     "final-touch-quality.spec.ts",
     "audio*.spec.ts",
+    "quran-inline-player.spec.ts",
     "quran-listening.spec.ts",
     "quran-translation.spec.ts",
     "player-containment-benefits.spec.ts",
@@ -65,6 +75,8 @@ export const FEATURE_SPECS = {
     "manual-checklist.spec.ts",
   ],
   controls: [
+    "android-safe-areas.spec.ts",
+    "modal-safe-sizing.spec.ts",
     "qibla-automatic-mobile.spec.ts",
     "next-release-location-dialogs.spec.ts",
     "masbaha-quiet.spec.ts",
@@ -104,7 +116,14 @@ export const FEATURE_SPECS = {
     "settings-*.spec.ts",
     "offline-downloads.spec.ts",
   ],
-  sharing: ["sharing-*.spec.ts", "ayah-*.spec.ts"],
+  sharing: [
+    "home-app-sharing.spec.ts",
+    "image-first-sharing.spec.ts",
+    "mobile-sharing-filters.spec.ts",
+    "modal-safe-sizing.spec.ts",
+    "sharing-*.spec.ts",
+    "ayah-*.spec.ts",
+  ],
   offline: ["offline-*.spec.ts", "pwa-*.spec.ts", "reader-mushaf-lettering.spec.ts"],
   persistence: ["audio-integrity.spec.ts", "reading-reliability.spec.ts", "offline-core.spec.ts"],
 };

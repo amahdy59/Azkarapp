@@ -10,6 +10,7 @@ import { compactBuildManifest } from "./scripts/compact-build-manifest";
 import { compactAudioLiterals } from "./scripts/compact-audio-literals";
 import reminderManifest from "./src/app/content/homeReminderManifest.json";
 import { learningAssetsPlugin } from "./scripts/learning-assets-plugin";
+import { compactChunkStringsPlugin } from "./scripts/compact-chunk-strings";
 
 /**
  * The release this build is, stamped in at build time.
@@ -276,6 +277,11 @@ export default defineConfig(({ mode, command }) => {
           ? "/__learning-assets__/"
           : "https://raw.githubusercontent.com/amahdy59/Azkarapp/main/docs/learning/assets/",
       ),
+      __TIMING_ASSET_BASE__: JSON.stringify(
+        command === "serve" || process.env.VITE_CLOUDFLARE_API_URL?.includes("/__browser-test-api")
+          ? "/__timing-assets__/"
+          : "https://raw.githubusercontent.com/amahdy59/Azkarapp/main/docs/audio/timing-assets/",
+      ),
     },
     plugins: [
       // Both plugins are load-bearing: the app is React, and Tailwind compiles
@@ -284,6 +290,7 @@ export default defineConfig(({ mode, command }) => {
       // actively misleading. DEC-070 / F36.)
       react(),
       learningAssetsPlugin(),
+      compactChunkStringsPlugin(),
       tailwindcss(),
       unwrapColorMixGuards(),
       flattenAndroidCascadeLayers(mode === "android"),
@@ -389,7 +396,7 @@ export default defineConfig(({ mode, command }) => {
             },
             {
               urlPattern:
-                /\/data\/listening-timings\/(?:(?:listening|quran)-[a-f0-9]{64}-[a-f0-9]{64}\.json|owner-[a-f0-9]{64}\.bin)$/,
+                /(?:\/data\/listening-timings\/(?:(?:listening|quran)-[a-f0-9]{64}-[a-f0-9]{64}\.json|owner-[a-f0-9]{64}\.bin)|(?:\/__timing-assets__\/|\/docs\/audio\/timing-assets\/)[a-f0-9]{64}\.bin)$/,
               handler: "CacheFirst" as const,
               method: "GET" as const,
               options: {

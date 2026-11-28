@@ -5,6 +5,7 @@ import { FRIDAY_KAHF } from "../src/app/content/fridayKahf";
 import { t } from "../src/app/i18n";
 import { splitMushafPages } from "../src/app/content/mushafPages";
 import { listeningCases, listeningTiming, openListeningPage } from "./helpers/quran-listening";
+import { revealAudioReadingOptions } from "./helpers/audio-reading-options";
 
 for (const scenario of [
   { name: "narrow-ar", width: 320, height: 568, language: "ar", enlarged: false },
@@ -208,6 +209,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       const information = player.getByRole("button", { name: t(language, "audioPlayer.options"), exact: true });
       await information.focus();
       await page.keyboard.press("Enter");
+      await revealAudioReadingOptions(page);
       const explanation = page.getByTestId("quran-listening-preferences");
       await expect(explanation).toBeVisible();
       await expect(explanation.locator("p")).toHaveText(t(language, "quranListening.browseHint"));
@@ -258,6 +260,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       });
       expect(metrics.visible).toBe(true);
       await information.click();
+      await revealAudioReadingOptions(page);
       await explanation
         .getByRole("button", { name: t(language, "quranListening.estimatedWords"), exact: true })
         .click();
@@ -310,6 +313,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
         .locator(".audio-expanded-text")
         .evaluate((viewport) => viewport.dispatchEvent(new WheelEvent("wheel", { bubbles: true })));
       await information.click();
+      await revealAudioReadingOptions(page);
       const following = explanation.getByRole("button", { name: t(language, "quranListening.follow"), exact: true });
       await expect(following).toHaveAttribute("aria-pressed", "false");
       await following.click();
@@ -335,6 +339,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       }
       await expect(paper.getByRole("button")).toHaveCount(0);
       await information.click();
+      await revealAudioReadingOptions(page);
       const next = page.getByTestId("quran-listening-preferences").getByRole("combobox");
       expect(
         await next.evaluate((button) => {

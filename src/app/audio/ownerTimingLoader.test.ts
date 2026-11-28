@@ -4,12 +4,61 @@ import { webcrypto } from "node:crypto";
 import { Blob } from "node:buffer";
 import { DecompressionStream } from "node:stream/web";
 import { OWNER_TIMING_PACK_SHA, expandOwnerTiming } from "./ownerTimingPreviews";
+import partitions from "./ownerTimingPartitions.json";
+import { getQuranPlaybackCue, validateQuranTiming, type QuranTimingAnnotation } from "./quranTimings";
 import { validateListeningTiming, type ListeningTimingAnnotation } from "./listeningTimings";
 import type { ResolvedAudioSegment } from "./audioTypes";
 
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.resetModules();
+});
+it("expands only registered same-byte Quran aliases and preserves unhighlighted gaps", () => {
+  const record = {
+    v: ["first", "alias"],
+    s: "a".repeat(64),
+    d: 1000,
+    l: "ar" as const,
+    q: [
+      [
+        "1:1",
+        100,
+        800,
+        [
+          [1, 0, 100],
+          [3, 300, 100],
+        ],
+      ],
+    ] as [string, number, number, [number, number, number][]][],
+  };
+  const pack = {
+    version: 2 as const,
+    approval: {
+      reviewStatus: "owner-preview" as const,
+      source: "test",
+      authoredBy: "Author",
+      reviewedBy: "",
+      reviewedAt: "",
+      acceptedBy: "Owner",
+      acceptedAt: "2026-11-27",
+    },
+    records: [record],
+  };
+  const annotation = expandOwnerTiming(pack, record, "", "alias") as QuranTimingAnnotation;
+  const segment = {
+    variantId: "alias",
+    sha256: record.s,
+    durationMs: 1000,
+    quranReference: { surah: 1, ayahStart: 1, ayahEnd: 1 },
+  } as ResolvedAudioSegment;
+  expect(validateQuranTiming(annotation, segment)).toEqual([]);
+  expect(getQuranPlaybackCue(annotation, 0.15).word?.position).toBe(1);
+  expect(getQuranPlaybackCue(annotation, 0.3).word).toBeNull();
+  expect(getQuranPlaybackCue(annotation, 0.55).word?.position).toBe(3);
+  expect(
+    validateQuranTiming(expandOwnerTiming(pack, record, "", "other-reciter") as QuranTimingAnnotation, segment),
+  ).not.toEqual([]);
+  expect(validateQuranTiming(annotation, { ...segment, sha256: "b".repeat(64) })).not.toEqual([]);
 });
 it("rejects offline, corrupt and cancelled owner preview packs", async () => {
   vi.stubGlobal("crypto", webcrypto);
@@ -21,6 +70,23 @@ it("rejects offline, corrupt and cancelled owner preview packs", async () => {
   const controller = new AbortController();
   controller.abort();
   expect(await loadOwnerTimingPack(controller.signal)).toBeNull();
+});
+it("loads only the current recording's optional partition with its distinct acceptance", async () => {
+  vi.stubGlobal("crypto", webcrypto);
+  vi.stubGlobal("Blob", Blob);
+  vi.stubGlobal("DecompressionStream", DecompressionStream);
+  const partition = partitions[0]!;
+  const bytes = readFileSync(`docs/audio/timing-assets/${partition.sha256}.bin`);
+  const fetcher = vi.fn().mockImplementation(() => Promise.resolve(new Response(bytes)));
+  vi.stubGlobal("fetch", fetcher);
+  const { loadOwnerTimingForRecording } = await import("./ownerTimingLoader");
+  const pack = await loadOwnerTimingForRecording(partition.recordings[0]!, new AbortController().signal);
+  expect(pack?.records).toHaveLength(92);
+  expect(pack?.approval.acceptedAt).toBe("2026-11-27");
+  expect(pack?.approval.reviewedBy).toBe("");
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect(fetcher.mock.calls[0]![0]).toContain(partition.sha256);
+  expect(fetcher.mock.calls[0]![0]).not.toContain(OWNER_TIMING_PACK_SHA);
 });
 it("verifies and expands the real compressed library while preserving explicit gaps and acceptance", async () => {
   vi.stubGlobal("crypto", webcrypto);

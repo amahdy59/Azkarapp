@@ -84,7 +84,10 @@ for (const scenario of [
       await page.keyboard.press("Escape");
       await expect(page.getByTestId("mushaf-desktop-juz")).toBeFocused();
     }
-    const focus = desktop ? reader.locator('[data-tool="focus"]') : page.getByTestId("mushaf-focus-toggle");
+    const phone = scenario.width < 600;
+    const focus = desktop
+      ? reader.locator('[data-tool="focus"]')
+      : page.getByTestId(phone ? "mushaf-more-actions" : "mushaf-focus-toggle");
     await expect(focus).toBeVisible();
     const bounds = (await focus.boundingBox())!;
     expect(bounds.width).toBeGreaterThanOrEqual(44);
@@ -109,6 +112,7 @@ for (const scenario of [
     await expect.poll(chromePosition).toEqual(before);
     await page.screenshot({ path: info.outputPath("after-page-turn.png") });
     await focus.click();
+    if (phone) await page.getByTestId("mushaf-focus-enter").click();
     await expect(page.getByTestId("mushaf-focus-exit")).toBeFocused();
     await expect(page.getByTestId("mushaf-desktop-header")).toHaveCount(0);
     await page.screenshot({ path: info.outputPath("focus.png") });

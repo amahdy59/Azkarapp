@@ -1,6 +1,7 @@
 import { playEnglishTranslation } from "./reader-options";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { revealAudioReadingOptions } from "./helpers/audio-reading-options";
 
 const listeningScenarios = [
   { name: "narrow", width: 320, height: 568, language: "en", theme: "midnight" },
@@ -265,14 +266,18 @@ for (const scenario of listeningScenarios) {
     ).toHaveAttribute("aria-checked", "true");
     await optionsTrigger.focus();
     await page.keyboard.press("Enter");
-    const audioOptions = page.getByRole("dialog", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
+    const docked = await player.getByTestId("audio-options-sidebar").isVisible();
+    const audioOptions = page
+      .getByRole("dialog", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true })
+      .or(player.getByTestId("audio-options-sidebar"));
     await expect(audioOptions.getByRole("switch")).toHaveCount(0); // One visible footer switch; no duplicate preference.
-    expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
+    expect((await new AxeBuilder({ page }).include(".audio-options-menu").analyze()).violations).toEqual([]);
     await expect(audioOptions.getByTestId("audio-reciter-select")).toBeVisible();
     await expect(
       audioOptions.getByText(arabic ? "عرض النص والمتابعة" : "Text and following", { exact: true }),
     ).toHaveCount(0);
-    await expect(audioOptions).toHaveAttribute("data-dropdown-surface", "");
+    if (!docked) await expect(audioOptions).toHaveAttribute("data-dropdown-surface", "");
+    else await expect(audioOptions).toHaveRole("complementary");
     await expect(audioOptions.locator(".audio-options-scroll")).toHaveCSS("overflow-y", "auto");
     await expect(player.locator(".audio-expanded-controls")).toHaveCSS("border-top-width", "0px");
     const menuGeometry = await audioOptions.evaluate((node) => {
@@ -283,7 +288,7 @@ for (const scenario of listeningScenarios) {
       const gaps = fields.map((field) => {
         const label = field.querySelector("label")!.getBoundingClientRect();
         const input = field.querySelector('[role="combobox"]')!.getBoundingClientRect();
-        return input.top - label.bottom;
+        return Math.max(input.top - label.bottom, input.left - label.right, label.left - input.right);
       });
       const groups = [
         ...node.querySelectorAll<HTMLElement>(".audio-options-list, .audio-sleep-setting, .audio-quran-preferences"),
@@ -318,7 +323,8 @@ for (const scenario of listeningScenarios) {
       ).toBeLessThanOrEqual(1);
     }
 
-    await expect(audioOptions.getByRole("button", { name: arabic ? "إغلاق" : "Close", exact: true })).toBeVisible();
+    if (!docked)
+      await expect(audioOptions.getByRole("button", { name: arabic ? "إغلاق" : "Close", exact: true })).toBeVisible();
     if (scenario.name === "phone") {
       const volume = pair.getByRole("button", { name: arabic ? "مستوى الصوت" : "Volume", exact: true });
       if (await volume.count()) {
@@ -343,8 +349,10 @@ for (const scenario of listeningScenarios) {
     const borderBefore = await reciter.evaluate((node) => getComputedStyle(node).borderColor);
     await reciter.hover();
     await expect(reciter).toHaveCSS("border-color", borderBefore);
-    await expect(audioOptions).toHaveCSS("background-color", "rgb(15, 23, 42)");
-    await expect(audioOptions).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
+    if (!docked) {
+      await expect(audioOptions).toHaveCSS("background-color", "rgb(15, 23, 42)");
+      await expect(audioOptions).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
+    }
     await page.screenshot({ path: testInfo.outputPath(`frosted-options-${scenario.name}.png`) });
     const help = audioOptions.locator(".audio-options-help");
     await expect(help).not.toHaveAttribute("open");
@@ -384,18 +392,28 @@ for (const scenario of listeningScenarios) {
     await expect(player).toHaveAttribute("data-variant", "expanded");
     const reading = player.getByRole("region", { name: arabic ? "جارٍ التشغيل" : "Now playing" });
     const optionsTrigger = player.getByRole("button", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
-    const audioOptions = page.getByRole("dialog", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true });
-    const options = player.locator(".audio-expanded-options");
+    const docked = await player.getByTestId("audio-options-sidebar").isVisible();
+    const audioOptions = page
+      .getByRole("dialog", { name: arabic ? "خيارات الصوت" : "Audio options", exact: true })
+      .or(player.getByTestId("audio-options-sidebar"));
     const header = player.locator(".audio-expanded-header");
-    await expect(header).toContainText(arabic ? "خيارات الصوت" : "Audio options");
+    if (!docked) await expect(header).toContainText(arabic ? "خيارات الصوت" : "Audio options");
     const headerBounds = (await header.boundingBox())!;
-    const optionsBounds = (await options.boundingBox())!;
+    const optionsBounds = (await player.getByTestId("audio-expanded-identity").boundingBox())!;
     const transport = (await player.locator(".audio-expanded-transport").boundingBox())!;
     const controlsBounds = (await player.locator(".audio-expanded-controls").boundingBox())!;
-    expect(
-      Math.abs(optionsBounds.x + optionsBounds.width / 2 - (headerBounds.x + headerBounds.width / 2)),
-    ).toBeLessThanOrEqual(1);
-    expect(optionsBounds.y + optionsBounds.height).toBeLessThanOrEqual((await reading.boundingBox())!.y + 1);
+    if (!docked) {
+      expect(
+        Math.abs(optionsBounds.x + optionsBounds.width / 2 - (headerBounds.x + headerBounds.width / 2)),
+      ).toBeLessThanOrEqual(1);
+      expect(optionsBounds.y + optionsBounds.height).toBeLessThanOrEqual((await reading.boundingBox())!.y + 1);
+    } else {
+      const text = (await reading.boundingBox())!;
+      expect(optionsBounds.y).toBeGreaterThanOrEqual(headerBounds.y + headerBounds.height - 1);
+      expect(arabic ? optionsBounds.x + optionsBounds.width <= text.x : optionsBounds.x >= text.x + text.width).toBe(
+        true,
+      );
+    }
     expect(
       Math.abs(transport.x + transport.width / 2 - (controlsBounds.x + controlsBounds.width / 2)),
     ).toBeLessThanOrEqual(1);
@@ -406,7 +424,8 @@ for (const scenario of listeningScenarios) {
     if (!arabic) {
       await expect(player.getByTestId("audio-player-zikr-text")).toHaveAttribute("lang", "en");
       await expect(player.getByTestId("audio-player-arabic-text")).toBeHidden();
-      await optionsTrigger.click();
+      if (!docked) await optionsTrigger.click();
+      await revealAudioReadingOptions(page);
       const toggle = audioOptions.getByRole("button", { name: /^(Show|Hide) Arabic$/ });
       await toggle.focus();
       await page.keyboard.press("Enter");
@@ -416,7 +435,7 @@ for (const scenario of listeningScenarios) {
       await expect(toggle).toHaveAttribute("aria-expanded", "false");
       await expect(toggle).toBeFocused();
       await expect(player.getByTestId("audio-player-arabic-text")).toBeHidden();
-      await page.keyboard.press("Escape");
+      if (!docked) await page.keyboard.press("Escape");
       await reading.evaluate((el) => {
         el.scrollTop = 0;
       });
@@ -487,9 +506,9 @@ for (const scenario of listeningScenarios) {
       el.scrollTop = 0;
     });
     await page.mouse.move(0, 0);
-    await optionsTrigger.focus();
+    if (!docked) await optionsTrigger.focus();
     await page.screenshot({ path: testInfo.outputPath(`expanded-${scenario.name}.png`) });
-    await page.keyboard.press("Enter");
+    if (!docked) await page.keyboard.press("Enter");
     const voice = page.getByTestId("audio-reciter-select");
     await voice.click();
     await expect(page.getByRole("listbox")).toBeVisible();
@@ -512,9 +531,11 @@ for (const scenario of listeningScenarios) {
     await page.keyboard.press("Escape");
     await expect(speed).toBeFocused();
     await expect(player).toHaveAttribute("data-variant", "expanded");
-    await page.keyboard.press("Escape");
-    await expect(audioOptions).toHaveCount(0);
-    await expect(optionsTrigger).toBeFocused();
+    if (!docked) {
+      await page.keyboard.press("Escape");
+      await expect(audioOptions).toHaveCount(0);
+      await expect(optionsTrigger).toBeFocused();
+    }
     await page.keyboard.press("Escape");
     await expect(player).toHaveAttribute("data-variant", "compact");
     await expect(

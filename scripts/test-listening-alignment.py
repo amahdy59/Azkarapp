@@ -27,6 +27,7 @@ class AlignmentSpellingTests(unittest.TestCase):
     def test_arabic_recognition_anchors_match_supplied_spelling(self):
         self.assertEqual(alignment.alignment_spelling("ٱلْحَمْـدُ", "ar"), "الحمد")
         self.assertEqual(alignment.alignment_spelling("اللَّهِ", "ar"), "الله")
+        self.assertEqual(alignment.alignment_spelling("بِهِۦ لَهُۥ", "ar"), "بهي لهو")
 
     def test_english_apostrophe_and_hyphen_preserve_display_identity(self):
         self.assertEqual(alignment.alignment_spelling("Allah’s well-being", "en"), "ALLAH'S WELLBEING")

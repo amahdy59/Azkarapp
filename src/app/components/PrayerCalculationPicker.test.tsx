@@ -51,7 +51,7 @@ describe("PrayerCalculationPicker", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(trigger).toHaveTextContent("Umm Al-Qura");
-    expect(screen.getByText(options[1].label)).toBeVisible();
+    expect(trigger).toHaveAccessibleDescription(options[1].label);
     fireEvent.click(trigger);
     fireEvent.click(screen.getByRole("radio", { name: options[1].label }));
     expect(changed).toHaveBeenCalledTimes(1);

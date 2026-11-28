@@ -26,5 +26,23 @@ export function publicationDiagram(block) {
       "",
     )}<text x="58" y="301" text-anchor="middle">Start</text><text x="342" y="301" text-anchor="middle">Finish</text>`;
   } else throw new Error(`Unknown source diagram ${block.kind}`);
-  return `<figure class="teaching-diagram" data-diagram="${block.kind}" data-diagram-source="${block.sourcePage}"><h4 id="${id}-title">${escape(block.title)}</h4><svg viewBox="${viewBox}" role="img" aria-labelledby="${id}-title ${id}-description" focusable="false"><desc id="${id}-description">${escape(block.description)}</desc>${drawing}</svg><figcaption>${escape(block.caption)} <a tabindex="0" href="#p-${block.sourcePage}">Arabic source p. ${block.sourcePage}</a></figcaption></figure>`;
+  if (block.language === "ar") {
+    const labels = {
+      "Ka'bah": "الكعبة",
+      "7 anticlockwise circuits": "٧ أشواط عكس عقارب الساعة",
+      "Start at the": "البداية من",
+      "Black Stone": "الحجر الأسود",
+      "al-Safa": "الصفا",
+      "al-Marwah": "المروة",
+      Start: "البداية",
+      Finish: "النهاية",
+    };
+    drawing = drawing.replace(
+      />([^<>]+)<\/text>/g,
+      (match, label) => `>${labels[label] ?? label.replace(/\d/g, (digit) => "٠١٢٣٤٥٦٧٨٩"[Number(digit)])}</text>`,
+    );
+  }
+  const sourceLabel =
+    block.language === "ar" ? `صفحة المصدر ${block.sourcePage}` : `Arabic source p. ${block.sourcePage}`;
+  return `<figure class="teaching-diagram" lang="${block.language === "ar" ? "ar" : "en"}" data-diagram="${block.kind}" data-diagram-source="${block.sourcePage}"><h4 id="${id}-title">${escape(block.title)}</h4><svg viewBox="${viewBox}" role="img" aria-labelledby="${id}-title ${id}-description" focusable="false"><desc id="${id}-description">${escape(block.description)}</desc>${drawing}</svg><p class="diagram-description">${escape(block.description)}</p><figcaption>${escape(block.caption)} <a tabindex="0" href="#p-${block.sourcePage}">${sourceLabel}</a></figcaption></figure>`;
 }

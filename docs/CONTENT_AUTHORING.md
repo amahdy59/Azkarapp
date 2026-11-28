@@ -107,6 +107,8 @@ Use this minimal shape:
 
 ### Benefits evidence catalogue
 
+Completion greeting follow-up (owner-approved 2026-11-27): `بارك الله فيك` and the existing acceptance wish are localized interface goodwill only. They do not change the reviewed reminder or its sources, prescribe a completion dhikr, establish a repetition/reward or assert acceptance. The [greeting phase](agent/phases/COMPLETION_GREETING_LOCAL_2026_11_27.md) preserves the owner's explicit approval and source discussion. Reviewed catalogue text remains untouched.
+
 The dedicated Benefits screen reads `src/app/content/zikrBenefits.ts`; it must not scrape general editorial `benefit` fields from every collection.
 
 - Keep the display order Qur’an, authenticated hadith, then concise hadith-derived benefits.
@@ -223,3 +225,7 @@ The optional Friday Salawat and fasting preparation notifications use catalogue 
 ## Dhikr evidence alignment — 2026-11-24
 
 The owner authorizes exact sourced wording and repetition targets. The dated audit ledger covers 257 effective collection records and nine Masbaha choices, distinguishing screening, confirmed corrections and source-probe provenance. Thirty-seven collection records receive source/count/condition corrections. The hundredfold tahlil reward is ten freed slaves; its count remains 100. Related narrations are not merged into a single quotation. Morning no longer prescribes the evening-only threefold refuge step; the legacy ID remains resolvable for saved/history compatibility. Changed-text audio assignments are suspended pending independent recording review. No Quran text, stored history, IDs or recording bytes are rewritten. This coding-agent comparison does not establish independent scholarly approval.
+
+# Local book extraction repairs — 2026-11-27
+
+The [source-repair ledger](learning/SOURCE_REPAIR_2026_11_27.md) separates source comparison from presentation. Builders apply only explicit corrections whose original page fingerprints still match. Quran uses exact existing semantic word ranges, mixed prose stays outside Quran brackets, and original numbered items/source-page continuations remain stable. Preserve review-copy notices and do not infer independent approval from a passing export or content-integrity test.

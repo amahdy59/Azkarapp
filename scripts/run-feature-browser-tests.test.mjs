@@ -1,6 +1,23 @@
 import { expect, test } from "vitest";
 import { featureBrowserArguments } from "./run-feature-browser-tests.mjs";
 
+test("includes the new release regressions in their owning feature selections", () => {
+  const cases = {
+    learning: ["books-audio-responsive.spec.ts"],
+    audio: ["additional-timing-follow.spec.ts", "books-audio-responsive.spec.ts", "quran-inline-player.spec.ts"],
+    reader: ["quiet-reading-toolbar.spec.ts"],
+    quran: ["header-zoom-settings.spec.ts"],
+    controls: ["android-safe-areas.spec.ts", "modal-safe-sizing.spec.ts"],
+    sharing: ["home-app-sharing.spec.ts", "image-first-sharing.spec.ts", "mobile-sharing-filters.spec.ts"],
+  };
+  for (const [feature, files] of Object.entries(cases)) {
+    const patterns = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    for (const file of files) expect(patterns.some((pattern) => pattern.test(`e2e/${file}`))).toBe(true);
+  }
+});
+
 test("selects the separate-release location and Home learning regressions with their owning features", () => {
   for (const feature of ["home", "controls", "settings"]) {
     const patterns = featureBrowserArguments(feature)

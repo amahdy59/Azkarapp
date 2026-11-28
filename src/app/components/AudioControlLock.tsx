@@ -67,9 +67,9 @@ export function AudioControlLock({ language, onUnlock }: { language: AppLanguage
       overlayClassName="audio-lock-shield"
       className="audio-control-lock"
       style={{
-        top: "max(0.75rem, env(safe-area-inset-top))",
+        top: "max(0.75rem, var(--app-safe-area-top))",
         left: "auto",
-        insetInlineEnd: `max(0.75rem, env(safe-area-inset-${language === "ar" ? "left" : "right"}))`,
+        insetInlineEnd: `max(0.75rem, var(--app-safe-area-${language === "ar" ? "left" : "right"}))`,
         width: "min(18rem, calc(100% - 1.5rem))",
         transform: "none",
         translate: "none",

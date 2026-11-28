@@ -2,7 +2,7 @@ import { resolveListeningTiming, type ListeningTimingAnnotation } from "./listen
 import { resolveQuranTiming, type QuranTimingAnnotation } from "./quranTimings";
 import { REVIEWED_TIMING_FILES, reviewedTimingFilename, type ReviewedTimingFile } from "./reviewedTimingFiles";
 import type { ResolvedAudioSegment } from "./audioTypes";
-import { loadOwnerTimingPack } from "./ownerTimingLoader";
+import { loadOwnerTimingForRecording } from "./ownerTimingLoader";
 import { expandOwnerTiming } from "./ownerTimingPreviews";
 
 async function readTiming(file: ReviewedTimingFile, signal: AbortSignal): Promise<unknown> {
@@ -44,7 +44,7 @@ export async function loadReviewedListeningTiming(
       .join("");
     const matching = candidates.filter((file) => file.textSha256 === digest);
     if (!matching.length && files === REVIEWED_TIMING_FILES) {
-      const pack = await loadOwnerTimingPack(signal);
+      const pack = await loadOwnerTimingForRecording(segment.sha256!, signal);
       const records =
         pack?.records.filter(
           (record) =>
@@ -82,13 +82,15 @@ export async function loadReviewedQuranTiming(
         file.variantIds.includes(segment.variantId),
     );
     if (!candidates.length && files === REVIEWED_TIMING_FILES) {
-      const pack = await loadOwnerTimingPack(signal);
+      const pack = await loadOwnerTimingForRecording(segment.sha256!, signal);
       const records =
         pack?.records.filter(
           (record) => record.q && record.s === segment.sha256 && record.v.includes(segment.variantId),
         ) ?? [];
       if (pack && records.length === 1 && !signal.aborted)
-        return resolveQuranTiming(segment, [expandOwnerTiming(pack, records[0]!) as QuranTimingAnnotation]);
+        return resolveQuranTiming(segment, [
+          expandOwnerTiming(pack, records[0]!, "", segment.variantId) as QuranTimingAnnotation,
+        ]);
     }
     if (candidates.length !== 1) return null;
     const annotation = (await readTiming(candidates[0]!, signal)) as QuranTimingAnnotation | null;

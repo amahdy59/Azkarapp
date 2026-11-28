@@ -9,6 +9,7 @@
   animation: none;
 }
 .library-stationary-header {
+  padding-block: var(--chrome-edge-space);
   container: library-header / inline-size;
   max-block-size: 65%;
   overflow-y: auto;

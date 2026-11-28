@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from "react";
+import { learningT } from "../i18n/learning";
 
 /** Fixed source-verified geometry, never executable SVG from a content pack. */
 export function LearningDiagram({
@@ -6,11 +7,13 @@ export function LearningDiagram({
   title,
   description,
   children,
+  language = "en",
 }: {
   kind: "tawaf" | "sai";
   title: string;
   description: string;
   children: ReactNode;
+  language?: "ar" | "en";
 }) {
   const id = useId().replaceAll(":", "");
   const marker = `${id}-arrow`;
@@ -22,7 +25,7 @@ export function LearningDiagram({
         role="img"
         aria-labelledby={`${id}-title ${id}-description`}
         focusable="false"
-        lang="en"
+        lang={language}
       >
         <desc id={`${id}-description`}>{description}</desc>
         <defs>
@@ -50,25 +53,25 @@ export function LearningDiagram({
             <circle cx="227" cy="152" r="4" className="learn-diagram-point" />
             <path d="m231 156 26 26" className="learn-diagram-detail" />
             <text x="200" y="136" textAnchor="middle">
-              Ka'bah
+              {learningT(language, "diagramKaaba")}
             </text>
             <text x="200" y="23" textAnchor="middle" fontWeight="700">
-              7 anticlockwise circuits
+              {learningT(language, "diagramTawafCount")}
             </text>
             <text x="267" y="196">
-              Start at the
+              {learningT(language, "diagramStartAt")}
             </text>
             <text x="267" y="216">
-              Black Stone
+              {learningT(language, "diagramBlackStone")}
             </text>
           </>
         ) : (
           <>
             <text x="58" y="24" textAnchor="middle" fontWeight="700">
-              al-Safa
+              {learningT(language, "diagramSafa")}
             </text>
             <text x="342" y="24" textAnchor="middle" fontWeight="700">
-              al-Marwah
+              {learningT(language, "diagramMarwah")}
             </text>
             {Array.from({ length: 7 }, (_, index) => {
               const y = 52 + index * 33;
@@ -83,20 +86,23 @@ export function LearningDiagram({
                   />
                   <circle className="learn-diagram-count" cx="200" cy={y} r="13" />
                   <text x="200" y={y + 5} textAnchor="middle">
-                    {index + 1}
+                    {language === "ar"
+                      ? String(index + 1).replace(/\d/g, (digit) => "٠١٢٣٤٥٦٧٨٩"[Number(digit)]!)
+                      : index + 1}
                   </text>
                 </g>
               );
             })}
             <text x="58" y="301" textAnchor="middle">
-              Start
+              {learningT(language, "diagramStart")}
             </text>
             <text x="342" y="301" textAnchor="middle">
-              Finish
+              {learningT(language, "diagramFinish")}
             </text>
           </>
         )}
       </svg>
+      <p className="learn-diagram-description">{description}</p>
       <figcaption>{children}</figcaption>
     </figure>
   );

@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Modal } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
-import { BookOpen, Minus, Plus } from "./icons";
+import { ExpandCorners, Plus } from "./icons";
+import { InlineQuranReading, InlineQuranZoomHeader } from "./InlineQuranReading";
+import { EnlargedReadingToolbar } from "./EnlargedReadingToolbar";
 import { AyahMarker } from "./AyahMarker";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { t } from "../i18n";
-import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
 import { portionForWord, type QuranReadingWord } from "./quranReadingPortions";
 import "./quran-reading-zoom.css";
@@ -19,14 +20,18 @@ export function QuranReadingZoom({
   gestureSelector,
   returnLabel,
   onOpen,
+  inline = false,
+  disabled = false,
 }: {
   words: readonly QuranReadingWord[];
   language: AppLanguage;
   title?: string;
-  children: (trigger: ReactNode) => ReactNode;
+  children: (trigger: ReactNode, enlarged?: ReactNode, zoomHeader?: ReactNode) => ReactNode;
   gestureSelector?: string;
   returnLabel?: string;
   onOpen?: () => void;
+  inline?: boolean;
+  disabled?: boolean;
 }) {
   const boundary = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLButtonElement>(null);
@@ -34,27 +39,71 @@ export function QuranReadingZoom({
   const [scale, setScale] = useState(150);
   const [anchor, setAnchor] = useState(0);
   const [context, setContext] = useState(title);
+  const [baseFont, setBaseFont] = useState(23);
+  useEffect(() => {
+    if (disabled) setSnapshot(null);
+  }, [disabled]);
+  const close = useCallback(() => {
+    setSnapshot(null);
+  }, []);
+  const previouslyOpen = useRef(false);
+  useLayoutEffect(() => {
+    if (!snapshot && previouslyOpen.current) opener.current?.focus({ preventScroll: true });
+    previouslyOpen.current = Boolean(snapshot);
+  }, [snapshot]);
+  const changeInlineScale = useCallback(
+    (value: number) => {
+      if (value <= 100) close();
+      else setScale(Math.max(125, Math.min(250, Math.round(value / 25) * 25)));
+    },
+    [close],
+  );
+  useEffect(() => {
+    if (!inline || !snapshot) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('[role="dialog"], [data-dropdown-surface], [data-toolbar-panel]')) return;
+      event.preventDefault();
+      event.stopPropagation();
+      close();
+    };
+    document.addEventListener("keydown", escape);
+    return () => document.removeEventListener("keydown", escape);
+  }, [close, inline, snapshot]);
   const open = useCallback(
     (zoom = 150, target?: Element | null) => {
-      if (!words.length) return;
+      if (!words.length || disabled) return;
       const node = target?.closest<HTMLElement>("[data-zoom-word], [data-verse-key], [data-listening-verse]");
       const id = node?.dataset.zoomWord;
       const verse = node?.dataset.verseKey ?? node?.dataset.listeningVerse;
       const index = words.findIndex((word) => (id ? word.id === id : verse ? word.verseKey === verse : false));
+      if (inline) {
+        const line = boundary.current?.querySelector<HTMLElement>(".mushaf-paper [data-mushaf-line-content]");
+        const rootScale = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
+        const pageScale =
+          parseFloat(
+            getComputedStyle(line?.closest(".mushaf-paper") ?? document.documentElement).getPropertyValue(
+              "--mushaf-magnification",
+            ),
+          ) || 1;
+        const normalSize = line ? parseFloat(getComputedStyle(line).fontSize) / rootScale / pageScale : 23;
+        setBaseFont(Number.isFinite(normalSize) && normalSize > 0 ? normalSize : 23);
+      }
       setAnchor(Math.max(0, index));
       setScale(Math.max(125, Math.min(250, Math.round(zoom / 25) * 25)));
       setContext(title);
       setSnapshot([...words]);
       onOpen?.();
     },
-    [words, title, onOpen],
+    [words, title, onOpen, inline, disabled],
   );
 
   // Native non-passive capture owns only multi-touch inside the reading surface.
   // Prevent the synthetic click from also counting, opening a gloss or turning a page.
   useEffect(() => {
     const root = boundary.current;
-    if (!root) return;
+    if (!root || disabled) return;
     let pinch: { distance: number; ratio: number; target: Element | null } | null = null;
     let suppressUntil = 0;
     let firstPointer: { target: Element; id: number } | null = null;
@@ -78,7 +127,11 @@ export function QuranReadingZoom({
         if (event.touches.length === 0) {
           const finished = pinch;
           pinch = null;
-          if (event.type !== "touchcancel" && finished.ratio > 1.12) open(100 * finished.ratio, finished.target);
+          if (event.type !== "touchcancel" && finished.ratio > 1.12) {
+            if (inline && snapshot) changeInlineScale(scale * finished.ratio);
+            else open(100 * finished.ratio, finished.target);
+          } else if (event.type !== "touchcancel" && inline && snapshot && finished.ratio < 0.88)
+            changeInlineScale(scale * finished.ratio);
         }
       }
     };
@@ -123,28 +176,57 @@ export function QuranReadingZoom({
       for (const name of ["pointerdown", "pointermove", "pointerup"])
         root.removeEventListener(name, pointer as EventListener, true);
     };
-  }, [gestureSelector, open]);
+  }, [gestureSelector, open, disabled, inline, snapshot, scale, changeInlineScale]);
 
   const trigger = (
     <Button
       ref={opener}
       variant="outline"
-      className="quran-zoom-trigger"
-      aria-haspopup="dialog"
+      className={`quran-zoom-trigger ${inline ? "mushaf-chrome-action" : ""}`}
+      aria-label={t(language, "quranZoom.open")}
+      title={t(language, "quranZoom.open")}
+      aria-haspopup={inline ? undefined : "dialog"}
+      aria-pressed={inline ? Boolean(snapshot) : undefined}
       onClick={(event) => {
         event.stopPropagation();
-        open();
+        if (inline && snapshot) close();
+        else open();
       }}
-      disabled={!words.length}
+      disabled={!words.length || disabled}
     >
-      <Plus size={16} aria-hidden="true" />
-      <span>{t(language, "quranZoom.open")}</span>
+      {inline ? (
+        <span className="mushaf-furniture-pill">
+          <ExpandCorners size={18} aria-hidden="true" />
+          <span className="quran-zoom-label">{t(language, "quranZoom.shortOpen")}</span>
+        </span>
+      ) : (
+        <>
+          <Plus size={16} aria-hidden="true" />
+          <span>{t(language, "quranZoom.open")}</span>
+        </>
+      )}
     </Button>
   );
   return (
     <div ref={boundary} className="contents" data-quran-zoom-boundary="">
-      {children(trigger)}
-      {snapshot && (
+      {children(
+        trigger,
+        inline && !disabled && snapshot ? (
+          <InlineQuranReading
+            key={title}
+            words={words}
+            language={language}
+            initialAnchor={context === title ? anchor : 0}
+            scale={scale}
+            baseFont={baseFont}
+            onClose={close}
+          />
+        ) : undefined,
+        inline && !disabled && snapshot ? (
+          <InlineQuranZoomHeader language={language} scale={scale} onScale={changeInlineScale} onClose={close} />
+        ) : undefined,
+      )}
+      {!inline && !disabled && snapshot && (
         <EnlargedQuran
           words={snapshot}
           language={language}
@@ -211,7 +293,7 @@ function EnlargedQuran({
       )}
     </span>
   );
-  const requestedFont = useMemo(() => (scale / 100) * 23, [scale]);
+  const requestedFont = (scale / 100) * 23;
   useLayoutEffect(() => {
     setReady(false);
     setFont(requestedFont * (parseFloat(getComputedStyle(document.documentElement).fontSize) / 16));
@@ -226,6 +308,7 @@ function EnlargedQuran({
     // The temporary probe is outside React's owned children and never painted.
     const source = [...text.children];
     const probe = text.cloneNode(false) as HTMLDivElement;
+    probe.style.position = "absolute";
     probe.inert = true;
     frame.append(probe);
     const bounds = frame.getBoundingClientRect();
@@ -314,32 +397,16 @@ function EnlargedQuran({
   }, []);
   const continuation =
     range && range[0] > 0 && words[range[0]]?.verseKey && words[range[0]]?.verseKey === words[range[0] - 1]?.verseKey;
-  return (
-    <Modal
-      open
-      onClose={onClose}
-      title={t(language, "quranZoom.title")}
-      language={language}
-      direction={language === "ar" ? "rtl" : "ltr"}
-      protectedSurface
-      returnFocusRef={returnFocusRef}
-      onCloseAutoFocus={(event) => {
-        event.preventDefault();
-        returnFocusRef.current?.focus({ preventScroll: true });
-      }}
-      testId="quran-enlarged-reading"
-      describedById={hint}
-      maxWidthClassName="max-w-3xl"
-      className="quran-enlarged-dialog"
-    >
+  const body = (
+    <>
       <header className="quran-enlarged-heading">
         <h2 className="text-lg font-bold">{t(language, "quranZoom.title")}</h2>
         {title && <p className="text-sm text-muted-foreground">{title}</p>}
-        <p id={hint} className="text-xs text-muted-foreground">
-          {t(language, "quranZoom.hint")}
-        </p>
       </header>
-      <div className="quran-portion-context text-xs">
+      <p id={hint} className="sr-only">
+        {t(language, "quranZoom.hint")}
+      </p>
+      <div className="quran-portion-context sr-only">
         <span className="quran-portion-context-measure" aria-hidden="true">
           {t(language, "quranZoom.continuation")}
         </span>
@@ -368,53 +435,39 @@ function EnlargedQuran({
             words.slice(range[0], range[1]).map((word, index) => <span key={word.id}>{renderWord(word, index)} </span>)}
         </div>
       </div>
-      <footer className="quran-enlarged-controls" data-prevent-count="true">
-        <div className="quran-size-controls" role="group" aria-label={t(language, "quranZoom.size")}>
-          <Button
-            variant="outline"
-            aria-label={t(language, "quranZoom.smaller")}
-            disabled={scale <= 125}
-            onClick={() => onScale(Math.max(125, scale - 25))}
-          >
-            <Minus aria-hidden="true" />
-          </Button>
-          <output>{formatNumerals(scale, language)}%</output>
-          <Button
-            variant="outline"
-            aria-label={t(language, "quranZoom.larger")}
-            disabled={scale >= 250}
-            onClick={() => onScale(Math.min(250, scale + 25))}
-          >
-            <Plus aria-hidden="true" />
-          </Button>
-        </div>
-        <nav className="quran-portion-navigation" aria-label={t(language, "quranZoom.portions")}>
-          <Button
-            variant="outline"
-            disabled={!ready || current === 0}
-            onClick={() => setAnchor(portions[current - 1]![0])}
-          >
-            {t(language, "common.previous")}
-          </Button>
-          <span role="status" className="text-sm">
-            {t(language, "quranZoom.portion", {
-              current: formatNumerals(current + 1, language),
-              total: formatNumerals(portions.length || 1, language),
-            })}
-          </span>
-          <Button
-            variant="outline"
-            disabled={!ready || current >= portions.length - 1}
-            onClick={() => setAnchor(portions[current + 1]![0])}
-          >
-            {t(language, "common.next")}
-          </Button>
-        </nav>
-        <Button variant="outline" className="w-full" onClick={onClose}>
-          <BookOpen aria-hidden="true" />
-          {returnLabel ?? t(language, "quranZoom.returnMushaf")}
-        </Button>
-      </footer>
+      <EnlargedReadingToolbar
+        language={language}
+        scale={scale}
+        onScale={onScale}
+        current={current}
+        total={portions.length}
+        ready={ready}
+        onPrevious={() => setAnchor(portions[current - 1]![0])}
+        onNext={() => setAnchor(portions[current + 1]![0])}
+        closeLabel={returnLabel ?? t(language, "quranZoom.returnMushaf")}
+      />
+    </>
+  );
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={t(language, "quranZoom.title")}
+      language={language}
+      direction={language === "ar" ? "rtl" : "ltr"}
+      protectedSurface
+      returnFocusRef={returnFocusRef}
+      onCloseAutoFocus={(event) => {
+        event.preventDefault();
+        returnFocusRef.current?.focus({ preventScroll: true });
+      }}
+      testId="quran-enlarged-reading"
+      describedById={hint}
+      maxWidthClassName="max-w-3xl"
+      className="quran-enlarged-dialog"
+    >
+      {/* Modal presentation is retained for flowing excerpts and listening. */}
+      {body}
     </Modal>
   );
 }

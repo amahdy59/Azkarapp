@@ -1,12 +1,14 @@
-import { useState, useEffect, lazy, Suspense, Fragment } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import "./CompletionScreen.css";
-import { Check, ChevronNext, Home, Share2 } from "../components/icons";
+import { Check, Home, Info, RotateCcw, Share2, X } from "../components/icons";
 import { Button } from "../components/ui/button";
+import { Modal, SheetHeader } from "../components/ResponsiveSheet";
 import { CompletionReflectionCard } from "../components/CompletionReflectionCard";
 import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../content/azkarCore";
 import { getCompletionReflection } from "../completionReflection";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
@@ -67,6 +69,8 @@ export function CompletionScreen({
   const elapsedMin = Math.max(1, Math.round((completedAt.getTime() - sessionStart) / 60_000));
   const isArabic = language === "ar";
   const [shareOpen, setShareOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 900px)");
 
   useEffect(() => {
     // Haptics remain independent from the still alternative for visual motion.
@@ -87,65 +91,48 @@ export function CompletionScreen({
   const canContinue = isRoutineCategory(catId) && completionLevel === "core" && Boolean(onContinueComplete);
   const reflection = getCompletionReflection(sessionStart);
 
-  return (
+  const completionContent = (
     <div
-      className="completion-screen completion-screen-enter h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 text-center"
+      className={`completion-screen completion-screen-enter bg-background text-center ${isDesktop ? "completion-screen--dialog" : ""}`}
       dir={direction}
       data-testid="completion-screen"
       data-reduce-motion={reduceMotion || undefined}
     >
-      <div className="mx-auto flex w-full max-w-lg flex-col gap-5 pb-2 sm:gap-6 sm:pt-3">
-        <p className="sr-only" role="status" aria-live="polite">
-          {t(language, "completion.sessionComplete", { category: categoryName })}
-        </p>
-
-        <header>
-          <div
-            className="completion-check mx-auto mb-3 flex size-12 items-center justify-center rounded-full border-2 border-primary text-primary"
-            aria-hidden="true"
-          >
-            <Check size={25} strokeWidth={2.5} />
-          </div>
-          <h1 className="break-words text-display font-extrabold leading-9 text-foreground">
-            {t(language, "completion.mashaAllah")
-              .split(/(?<=’)/u)
-              .map((part, index) => (
-                <Fragment key={index}>
-                  {index > 0 && <wbr />}
-                  {part}
-                </Fragment>
-              ))}
-          </h1>
-          <p className="mt-2 text-lg font-bold text-foreground">
-            {t(language, "completion.completed", { category: categoryName })}
+      <div className="completion-layout mx-auto w-full max-w-lg">
+        {!isDesktop && (
+          <p className="sr-only" role="status" aria-live="polite">
+            {t(language, "completion.sessionComplete", { category: categoryName })}
           </p>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">{t(language, "completion.acceptance")}</p>
+        )}
+
+        <header className="completion-header">
+          {!isDesktop && (
+            <div
+              className="completion-check mx-auto mb-7 flex size-14 items-center justify-center rounded-full border-2 border-primary text-primary"
+              aria-hidden="true"
+            >
+              <Check size={28} strokeWidth={2.5} />
+            </div>
+          )}
+          <p
+            className="completion-greeting flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 text-lg leading-8 text-foreground"
+            data-testid="completion-greeting"
+            lang={language}
+          >
+            <span className="min-w-0 max-w-full break-words">{t(language, "completion.blessing")}</span>
+            <span className="completion-greeting-separator text-primary" aria-hidden="true">
+              ·
+            </span>
+            <span className="min-w-0 max-w-full break-words">{t(language, "completion.acceptance")}</span>
+          </p>
+          <h1 className="mt-4 break-words text-xl font-bold leading-8 text-foreground">
+            {t(language, "completion.completed", { category: categoryName })}
+          </h1>
         </header>
 
         <CompletionReflectionCard evidence={reflection} language={language} onExplore={onOpenBenefits} />
 
-        <section aria-label={t(language, "completion.sessionSummary")} className="text-sm text-muted-foreground">
-          <p className="font-semibold" data-testid="completion-count">
-            {formatNumerals(azkar.length, language)} {t(language, "completion.completedAzkar")}
-          </p>
-          {quietProgressEnabled && categoryStreak > 0 && <p className="mt-1 leading-6">{streakMessage}</p>}
-          {quietProgressEnabled && growthEvent?.kind === "palm" && (
-            <GrowthEventStatus event={growthEvent} language={language} />
-          )}
-          <details className="completion-details mt-1">
-            <summary className="mx-auto flex min-h-11 w-fit max-w-full cursor-pointer items-center justify-center gap-1 rounded-xl px-3 py-2 text-xs underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-              {t(language, "completion.sessionDetails")}
-              <ChevronNext size={16} className="completion-details-chevron shrink-0" aria-hidden="true" />
-            </summary>
-            <div className="mx-auto max-w-sm space-y-1 pt-1 text-xs leading-6" data-testid="completion-session-details">
-              <p>{t(language, "completion.elapsed", { count: formatNumerals(elapsedMin, language) })}</p>
-              <p>{t(language, "completion.elapsedHint")}</p>
-              <p dir="auto">{formatHijriDate(completedAt, language)}</p>
-            </div>
-          </details>
-        </section>
-
-        <div className="grid gap-2.5" data-testid="completion-actions">
+        <footer className="completion-actions grid gap-3" data-testid="completion-actions">
           {canContinue && (
             <Button size="lg" onClick={onContinueComplete} className="w-full">
               {t(language, "category.continueAdditional", {
@@ -163,30 +150,132 @@ export function CompletionScreen({
             <Home size={18} aria-hidden="true" />{" "}
             {t(language, onNewSession ? "completion.done" : "completion.returnHome")}
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={(event) => {
-              // Safari pointer clicks do not focus buttons automatically.
-              // Give the dialog a real opener to restore on dismissal.
-              event.currentTarget.focus({ preventScroll: true });
-              setShareOpen(true);
-            }}
-            aria-haspopup="dialog"
-            className="w-full"
-          >
-            <Share2 size={18} aria-hidden="true" />
-            {t(language, "completion.shareCollection", { category: categoryName })}
-          </Button>
-          {onNewSession && (
-            <Button size="lg" variant="ghost" onClick={onNewSession} className="w-full text-muted-foreground">
-              {t(language, "completion.newSession")}
+          <div className="completion-secondary-actions grid grid-cols-2 gap-2" data-has-restart={Boolean(onNewSession)}>
+            <Button
+              variant="ghost"
+              onClick={(event) => {
+                // Safari pointer clicks do not focus buttons automatically.
+                // Give the dialog a real opener to restore on dismissal.
+                event.currentTarget.focus({ preventScroll: true });
+                setShareOpen(true);
+              }}
+              aria-haspopup="dialog"
+              aria-label={t(language, "completion.shareCollection", { category: categoryName })}
+              className="completion-secondary-action w-full text-xs text-muted-foreground"
+            >
+              <Share2 size={18} aria-hidden="true" />
+              <span>{t(language, "completion.shareAzkar")}</span>
             </Button>
+            <Button
+              variant="ghost"
+              onClick={(event) => {
+                event.currentTarget.focus({ preventScroll: true });
+                setDetailsOpen(true);
+              }}
+              aria-haspopup="dialog"
+              className="completion-secondary-action w-full text-xs text-muted-foreground"
+            >
+              <Info size={18} aria-hidden="true" />
+              <span>{t(language, "completion.sessionDetails")}</span>
+            </Button>
+            {onNewSession && (
+              <Button
+                variant="ghost"
+                onClick={onNewSession}
+                className="completion-secondary-action w-full text-xs text-muted-foreground"
+              >
+                <RotateCcw size={18} aria-hidden="true" />
+                <span>{t(language, "completion.newSession")}</span>
+              </Button>
+            )}
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {isDesktop ? (
+        <Modal
+          open
+          onClose={onHome}
+          title={t(language, "completion.sessionComplete", { category: categoryName })}
+          language={language}
+          direction={direction}
+          protectedSurface
+          showCloseButton={false}
+          maxWidthClassName="max-w-xl"
+          className="completion-dialog"
+          testId="completion-desktop-dialog"
+        >
+          <div
+            className="completion-dialog-toolbar grid shrink-0 grid-cols-[3.5rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-3 pt-4 pb-3"
+            data-testid="completion-dialog-toolbar"
+          >
+            <div
+              className="completion-check col-start-2 mx-auto flex size-14 items-center justify-center rounded-full border-2 border-primary text-primary"
+              aria-hidden="true"
+            >
+              <Check size={28} strokeWidth={2.5} />
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-12 border border-border/60 bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              onClick={onHome}
+              aria-label={t(language, "common.close")}
+            >
+              <X size={20} aria-hidden="true" />
+            </Button>
+          </div>
+          {completionContent}
+        </Modal>
+      ) : (
+        completionContent
+      )}
+      <Modal
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        title={t(language, "completion.sessionDetails")}
+        language={language}
+        direction={direction}
+        protectedSurface
+        showCloseButton={false}
+        maxWidthClassName="max-w-md"
+      >
+        <SheetHeader
+          title={t(language, "completion.sessionDetails")}
+          language={language}
+          onClose={() => setDetailsOpen(false)}
+        />
+        <div
+          className="min-h-0 overflow-y-auto px-5 pb-5 pt-4 text-start text-sm leading-7"
+          data-testid="completion-session-details"
+        >
+          <p>{t(language, "completion.elapsed", { count: formatNumerals(elapsedMin, language) })}</p>
+          <p className="mt-1 text-muted-foreground">{t(language, "completion.elapsedHint")}</p>
+          <p className="mt-2" dir="auto">
+            {formatHijriDate(completedAt, language)}
+          </p>
+          {quietProgressEnabled && categoryStreak > 0 && (
+            <p className="mt-3" data-testid="completion-streak">
+              {streakMessage}
+            </p>
+          )}
+          {quietProgressEnabled && growthEvent?.kind === "palm" && (
+            <GrowthEventStatus event={growthEvent} language={language} />
           )}
         </div>
-      </div>
+      </Modal>
       {shareOpen && (
-        <Suspense fallback={<p role="status">{t(language, "shareStoryPack.generating")}</p>}>
+        <Suspense
+          fallback={
+            <p className="sr-only" role="status">
+              {t(language, "shareStoryPack.generating")}
+            </p>
+          }
+        >
           <CollectionShareModal
             open
             initialFormat="square"
@@ -207,6 +296,6 @@ export function CompletionScreen({
           />
         </Suspense>
       )}
-    </div>
+    </>
   );
 }

@@ -98,13 +98,19 @@ for (const scenario of [
     await page.goto("/#/settings/prayer");
     await page.getByTestId("settings-sub-location").click();
     await expect(page).toHaveURL(/settings\/location$/);
-    const advanced = page.locator("summary").filter({ hasText: t(scenario.language, "settings.advancedPrayer") });
+    const advanced = page.locator("summary").filter({ hasText: t(scenario.language, "prayerLocation.moreSettings") });
     await expect(
-      page.getByRole("spinbutton", { name: t(scenario.language, "notifications.fajr"), exact: true }),
+      page.getByRole("button", {
+        name: t(scenario.language, "prayerLocation.later", { prayer: t(scenario.language, "notifications.fajr") }),
+        exact: true,
+      }),
     ).toBeHidden();
     await advanced.click();
     await expect(
-      page.getByRole("spinbutton", { name: t(scenario.language, "notifications.fajr"), exact: true }),
+      page.getByRole("button", {
+        name: t(scenario.language, "prayerLocation.later", { prayer: t(scenario.language, "notifications.fajr") }),
+        exact: true,
+      }),
     ).toBeVisible();
     await page.goto("/#/settings/audio");
     await expect(

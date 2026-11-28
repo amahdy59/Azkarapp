@@ -49,8 +49,11 @@ for (const language of ["ar", "en"] as const)
       await expect(player).toBeVisible();
       await page.getByTestId("audio-compact-title").click();
       const trigger = page.getByRole("button", { name: t(language, "audioPlayer.options"), exact: true });
-      await trigger.click();
-      const panel = page.getByRole("dialog", { name: t(language, "audioPlayer.options"), exact: true });
+      const docked = await player.getByTestId("audio-options-sidebar").isVisible();
+      if (!docked) await trigger.click();
+      const panel = page
+        .getByRole("dialog", { name: t(language, "audioPlayer.options"), exact: true })
+        .or(player.getByTestId("audio-options-sidebar"));
       const reading = panel.locator(".audio-reading-options");
       await expect(reading).not.toHaveAttribute("open");
       await expect(panel.locator(".audio-speed-select")).toContainText("×");
@@ -82,10 +85,11 @@ for (const language of ["ar", "en"] as const)
         reading.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true }),
       ).toBeVisible();
       await page.screenshot({ path: info.outputPath(`options-${language}-${scenario.width}.png`) });
-      expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
+      expect((await new AxeBuilder({ page }).include(".audio-options-menu").analyze()).violations).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
       await page.keyboard.press("Escape");
       await expect(panel).toHaveCount(0);
-      await expect(trigger).toBeFocused();
+      if (docked) await expect(player).toHaveAttribute("data-variant", "compact");
+      else await expect(trigger).toBeFocused();
     });
   }

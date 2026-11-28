@@ -1,15 +1,15 @@
 {
-  "release": "2026-11-26.5",
+  "release": "2026-11-28",
   "ar": [
-    "اختر التذكيرات في ترحيب أبسط، وحدد مدينتك عند الحاجة، وشاهد أسماء المواقع وقبلة الهاتف بوضوح.",
-    "تابع قراءتك للقرآن وخطتك اليومية بوضوح، واستعرض تقدمك في ملخص وتقويم واتجاهات أبسط مع تصدير السجلات من الإعدادات.",
-    "افتح الكتب العربية الثلاثة وملفات PDF من المكتبة والرئيسية، واستعد موضع القراءة بعد إعادة التحميل مع بيان نطاق النسخة وحالة مراجعتها.",
-    "استمع إلى سور المصحف واختر من التسجيلات المتاحة، مع خيارات صوت أوضح وأدعية إضافية بصوت محمد جمعة وألفاظ وأعداد ومراجع أذكار مصححة."
+    "كبّر نص صفحة القرآن في موضعها وعد إلى المصحف من عنوان واحد، واختر ألوان القراءة والأصوات المتاحة مع خيارات استماع أوضح وتظليل تقديري للكلمات.",
+    "اقرأ نسخ الكتب العربية المصححة وافتح ملفاتها واحفظها، مع استعادة النص المحفوظ سابقًا عند تعذّر تحميل النسخة الأحدث وبيان نطاق كل نسخة ومراجعتها.",
+    "حدّد موقع الصلاة بالجهاز أو من قائمة المدن دون كتابة، وشارك رابط التطبيق ورمزه من الرئيسية بألوان أوضح وأزرار وقوائم تلائم الشاشة.",
+    "اختم جلستك بتحية وتذكير موثّق في مساحة أهدأ، مع مشاركة المجموعة نفسها، وتفاصيل اختيارية للجلسة، وملخص تقدم أبسط وألفاظ وأعداد ومراجع أذكار مصححة."
   ],
   "en": [
-    "Choose reminders in a simpler welcome, confirm your city when needed, and see clearer location names and phone Qibla.",
-    "Continue Quran reading with a clearer daily plan, and explore simpler progress summaries, calendar and trends with record exports in Settings.",
-    "Open all three Arabic books and their PDFs from the library and Home, with reliable reading-position recovery and clear edition scope and review notices.",
-    "Listen to Mushaf surahs and choose available reciters, with clearer audio options, more matching duas by Muhammad Jumah, and corrected dhikr wording, counts and references."
+    "Enlarge the current Quran page in place and return through one header, with clearer reading colors, available voices, listening options and estimated word highlights.",
+    "Read corrected Arabic book editions and save their PDFs, with earlier saved text available when the latest edition cannot load and clear edition scope and review notices.",
+    "Set prayer location from your device or the browsable city list, and share the app link and QR from Home with clearer colors and controls that fit your screen.",
+    "Finish with a calmer greeting and sourced reminder, share the completed collection, and open optional session details beside simpler progress and source-checked dhikr wording, counts and references."
   ]
 }

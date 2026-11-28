@@ -8,6 +8,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* One edge rhythm for application chrome; the shell owns the top safe area. */
+  --chrome-edge-space: 12px;
+  --chrome-safe-bottom: var(--app-safe-area-bottom);
+  /* Resolve on the theme root before Glass makes descendant backgrounds clear. */
+  --reading-canvas: var(--background);
   --motion-icon-hover-scale: 1.05;
   --glass-card-tint: rgb(15 23 42 / 0.24);
   --glass-reading-tint: rgb(15 23 42 / 0.36);
@@ -123,7 +128,23 @@
    variable per tier widens every page gutter in step with the hero (DEC-075). */
 @media (min-width: 40rem) {
   :root {
+    --chrome-edge-space: 16px;
     --spacing-page: 1.5rem;
+  }
+}
+@media (min-width: 75rem) {
+  :root {
+    --chrome-edge-space: 20px;
+  }
+}
+@media (max-height: 34rem) {
+  :root {
+    --chrome-edge-space: 8px;
+  }
+}
+@media (max-width: 56.249rem) {
+  .app-shell:has(.app-bottom-nav) {
+    --chrome-safe-bottom: 0px;
   }
 }
 @media (min-width: 48rem) {

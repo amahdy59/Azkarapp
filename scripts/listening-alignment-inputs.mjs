@@ -15,12 +15,34 @@ export function tokenizeAlignmentText(text, language) {
     text: match[0],
     alignmentText:
       language === "ar"
-        ? match[0].normalize("NFC").replace(/\p{M}/gu, "").replace(/ـ/g, "").replace(/ٱ/g, "ا")
+        ? match[0]
+            .normalize("NFC")
+            .replace(/\p{M}/gu, "")
+            .replace(/ـ/g, "")
+            .replace(/ٱ/g, "ا")
+            .replace(/ۦ/g, "ي")
+            .replace(/ۥ/g, "و")
         : match[0].normalize("NFC").replace(/’/g, "'").replace(/-/g, "").toUpperCase(),
   }));
 }
 
-export function collectAlignmentJobs(catalog, content, fingerprint, semanticWords = new Map()) {
+export function collectAlignmentJobs(catalog, content, fingerprint, semanticWords = new Map(), mushaf = []) {
+  // Registry aliases join only through identical recording bytes. No timing is
+  // transferred between reciters or different recordings of the same passage.
+  const assets = [
+    ...Object.values(catalog.assets),
+    ...mushaf.map((surah) => ({
+      id: `mushaf-${surah.surah}`,
+      reviewStatus: "approved",
+      segments: [
+        {
+          id: `mushaf-${surah.surah}`,
+          quranReference: { surah: surah.surah, ayahStart: 1, ayahEnd: surah.verseCount },
+          variants: surah.variants,
+        },
+      ],
+    })),
+  ];
   const byArabicIdentity = new Map();
   for (const item of content) {
     const key = fingerprint(item.arabicText);
@@ -29,7 +51,7 @@ export function collectAlignmentJobs(catalog, content, fingerprint, semanticWord
     byArabicIdentity.set(key, group);
   }
   const jobs = new Map();
-  for (const asset of Object.values(catalog.assets)) {
+  for (const asset of assets) {
     if (asset.reviewStatus !== "approved") continue;
     for (const segment of asset.segments) {
       for (const variant of segment.variants) {
@@ -164,6 +186,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     [...ALL_AZKAR, ...COMPREHENSIVE_DUAS, ...FRIDAY_KAHF],
     createArabicTextFingerprint,
     readSemanticWords("public/data/mushaf"),
+    JSON.parse(fs.readFileSync("src/app/audio/mushafAudio.data.json", "utf8")),
   );
   fs.mkdirSync(output, { recursive: true });
   fs.writeFileSync(

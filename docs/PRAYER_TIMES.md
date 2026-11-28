@@ -20,9 +20,15 @@ An eligible card opens the shared protected tracking overlay only on intent. Com
 
 # Prayer times, location, timezone, and DST
 
+## Selection-only location settings — 2026-11-27 (local)
+
+The owner's simplicity follow-up supersedes manual-field validation and the earlier manual-coordinate editing UI. The default page shows the saved place once, a primary Use my current location action, secondary Choose a city and calculation selection. City browsing exposes the complete existing offline catalogue without typing; search is optional filtering, never place data entry. Selecting a city supplies its coordinates and timezone. GPS retains exact device-supplied coordinates/timezone and the honest approximate-place label.
+
+More settings is initially closed and contains a protected timezone selection, seasonal status and bounded Earlier/Later minute buttons with Reset adjustments. Timezone options reuse familiar catalogue city/country names and dated UTC offsets; an existing custom zone remains selected even outside catalogue coverage. Manual city-name, coordinate, timezone and number text entry and Save are removed. Existing custom saved names/coordinates/zones remain intact until an explicit choice changes them. Full calculation authority names remain inside the picker and its accessible description without repeated visible provider text. Newer selections cancel pending GPS. Calculation formulas, normalization, reminders and synchronization are unchanged.
+
 ## Named location summaries — 2026-11-25 (local)
 
-Settings and shared location summaries resolve unnamed/coordinate-only locations against the existing offline city catalogue. A nearest entry less than 75 km away produces “Near city, country” in the active language; outside coverage, a neutral Device location or Saved location label avoids guessing. Custom names and exact recognized preset localization remain authoritative. This is approximate presentation context, not administrative-boundary geocoding. Precise saved coordinates, timezone, calculation settings and persistence are unchanged, and no coordinate/network request is added. Location details retain the exact coordinates for review.
+Settings and shared location summaries resolve unnamed/coordinate-only locations against the existing offline city catalogue. A nearest entry less than 75 km away produces “Near city, country” in the active language; outside coverage, a neutral Device location or Saved location label avoids guessing. Custom names and exact recognized preset localization remain authoritative. This is approximate presentation context, not administrative-boundary geocoding. Precise saved coordinates, timezone, calculation settings and persistence are unchanged, and no coordinate/network request is added. Exact stored coordinates continue driving prayer calculations; the simplified Settings page no longer exposes coordinate entry.
 
 ## Home overview and location refresh — 2026-11-24 (local)
 
@@ -85,8 +91,8 @@ The Home overview shows all five prayer timings in their usual order. Each bound
 - See whether daylight saving or standard time is active
 - Select a calculation authority
 - Search and select a built-in city without sharing GPS data; the preset coordinates and IANA timezone remain available offline
-- Enter a manual city, timezone, latitude, and longitude when the built-in list does not include the required location
-- Apply a minute adjustment to each prayer
+- Browse all built-in cities without typing, or use device location outside catalogue coverage
+- Optionally select a timezone and apply a minute adjustment with Earlier/Later buttons under More settings
   Prayer-time alert selection and lead time live separately in Settings → Notifications & reminders. The saved location, timezone, calculation method and minute adjustments still drive those alerts.
 
 The five trackable prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha. The same calculation also exposes Sunrise (Shrouk) as supporting Fajr-window context; it is never treated as a sixth prayer or given tracking controls.

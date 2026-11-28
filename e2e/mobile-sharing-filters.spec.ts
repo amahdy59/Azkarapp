@@ -89,7 +89,7 @@ for (const language of ["ar", "en"] as const) {
       expect((await new AxeBuilder({ page }).include(".progress-screen").analyze()).violations).toEqual([]);
     });
 
-    test(`mobile sharing fills every step and switches zikr/collection without losing design in ${language} @cross-browser`, async ({
+    test(`mobile sharing stays bounded through every step and switches zikr/collection without losing design in ${language} @cross-browser`, async ({
       page,
     }, testInfo) => {
       await page.goto("/#/azkar/waking-up/1");
@@ -99,11 +99,12 @@ for (const language of ["ar", "en"] as const) {
       await expect(image).toBeVisible();
       expect((await image.boundingBox())!.height).toBeGreaterThanOrEqual(160);
       const geometry = await studio.boundingBox();
-      expect(geometry!.x).toBe(0);
-      expect(geometry!.y).toBe(0);
-      expect(geometry!.width).toBe(390);
-      expect(geometry!.height).toBeCloseTo(844, 1); // WebKit quantizes dvh to 1/64 CSS px.
+      expect(geometry!.x).toBeGreaterThanOrEqual(16);
+      expect(geometry!.y).toBeGreaterThanOrEqual(16);
+      expect(geometry!.width).toBeLessThanOrEqual(358);
+      expect(geometry!.height).toBeLessThanOrEqual(812);
       await sharingStep(studio, "design");
+      const customGeometry = await studio.boundingBox();
       await studio.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }).click();
       await page.getByRole("option", { name: t(language, "shareStudio.square"), exact: true }).click();
       await expect(image).toHaveAttribute("height", "1080");
@@ -115,7 +116,7 @@ for (const language of ["ar", "en"] as const) {
       ).toContainText(t(language, "shareStudio.square"));
       for (const step of ["content", "design", "share"] as const) {
         await sharingStep(studio, step);
-        expect(await studio.boundingBox()).toEqual(geometry);
+        expect(await studio.boundingBox()).toEqual(customGeometry);
       }
       await expect(studio.getByRole("combobox", { name: t(language, "shareStudio.scope"), exact: true })).toContainText(
         t(language, "shareStudio.scopeall"),
@@ -127,7 +128,7 @@ for (const language of ["ar", "en"] as const) {
         "aria-busy",
         "false",
       );
-      await page.screenshot({ path: testInfo.outputPath(`sharing-fullscreen-${language}.png`) });
+      await page.screenshot({ path: testInfo.outputPath(`sharing-bounded-${language}.png`) });
       await sharingStep(studio, "share");
       const download = page.waitForEvent("download");
       await studio.getByRole("button", { name: t(language, "shareStudio.save"), exact: true }).click();

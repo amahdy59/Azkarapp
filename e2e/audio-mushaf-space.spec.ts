@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { listeningCases, listeningTiming, openListeningPage } from "./helpers/quran-listening";
 import { t } from "../src/app/i18n";
+import { revealAudioReadingOptions } from "./helpers/audio-reading-options";
 
 for (const scenario of [
   {
@@ -184,6 +185,7 @@ test("exact Mushaf glyphs retain word geometry and clear neighboring ayah ink @c
   );
   const geometry = await word.boundingBox();
   await player.getByRole("button", { name: t("ar", "audioPlayer.options"), exact: true }).click();
+  await revealAudioReadingOptions(page);
   const toggle = page.getByRole("button", { name: t("ar", "quranListening.estimatedWords"), exact: true });
   await toggle.click();
   await expect(word).toHaveCount(0);

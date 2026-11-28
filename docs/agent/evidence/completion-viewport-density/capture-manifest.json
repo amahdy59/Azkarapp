@@ -1,0 +1,114 @@
+[
+  {
+    "file": "ar-desktop-modal.png",
+    "description": "Arabic desktop completion modal, 1440 × 1000, explicit Close",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-desk-0f6ce-cted-modal-ar-cross-browser-desktop-chromium/completion-ar-desktop-modal.png",
+    "sha256": "4bf55299197ef24911275bce7d1ce80814ef2ab4d4abcdd59045843a2a0836d7"
+  },
+  {
+    "file": "en-desktop-modal.png",
+    "description": "English desktop completion modal, 1440 × 1000, explicit Close",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-desk-cb91a-cted-modal-en-cross-browser-desktop-chromium/completion-en-desktop-modal.png",
+    "sha256": "88d72f26d290454ff95e98f265afb9f32be9ba206e75ffb9dc6c3179be660e93"
+  },
+  {
+    "file": "ar-desktop-short-enlarged.png",
+    "description": "Arabic desktop modal, 900 × 480 at 200% text; scroll recovery and reachable Close",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-desk-0f6ce-cted-modal-ar-cross-browser-desktop-chromium/completion-ar-desktop-short-enlarged.png",
+    "sha256": "fe792accd9c56a2aeb01d996fd9910bc01cbee302c3f1ca24aa0514bac345eba"
+  },
+  {
+    "file": "en-desktop-short-enlarged.png",
+    "description": "English desktop modal, 900 × 480 at 200% text; scroll recovery and reachable Close",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-desk-cb91a-cted-modal-en-cross-browser-desktop-chromium/completion-en-desktop-short-enlarged.png",
+    "sha256": "9bf392425ca49efb8a1aa310ed9ad3b60cf2a0ee281238dcc4b0fec11cfa2d75"
+  },
+  {
+    "file": "ar-phone-midnight.png",
+    "description": "Arabic Midnight / Glass, 390 × 844; all ordinary completion actions",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-symm-7c2c5-n-ar-midnight-cross-browser-desktop-chromium/completion-ar-midnight-390-1x.png",
+    "sha256": "81201958b42a8836ccca989b1990767e767562e0b07cba2a690c933de602c076"
+  },
+  {
+    "file": "ar-short-phone-quote-start.png",
+    "description": "Arabic 360 × 650; simulated native 28px top / 20px bottom insets; quotation start",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-density-modal/completion-reflection-comp-3c44a-dence-scrolls-cross-browser-desktop-chromium/completion-ar-phone-insets-top.png",
+    "sha256": "ef6f0ccc12ad39a4ad3c92b49d1400afd5adc06912b9ea9deca05e5f405e2927"
+  },
+  {
+    "file": "ar-short-phone-quote-end.png",
+    "description": "Same simulated-inset viewport; quotation end; stationary card/source/actions",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-density-modal/completion-reflection-comp-3c44a-dence-scrolls-cross-browser-desktop-chromium/completion-ar-phone-insets-text-end.png",
+    "sha256": "e2718abc0be8df3874e30251afcf3180dd4393e8b0432d44f66608509eb3f3a6"
+  },
+  {
+    "file": "ar-session-details.png",
+    "description": "Protected Session details in the same simulated-inset viewport",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-density-modal/completion-reflection-comp-3c44a-dence-scrolls-cross-browser-desktop-chromium/completion-ar-details-dialog.png",
+    "sha256": "3dbd700d7e84b3689b31398b1eaa3fdebd58ebb8f48f2370a3034c575ecc3f09"
+  },
+  {
+    "file": "en-phone-light.png",
+    "description": "English Light / solid, 390 × 844; Arabic Quran plus reviewed English meaning",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-symm-488b3-tion-en-light-cross-browser-desktop-chromium/completion-en-light-390-1x.png",
+    "sha256": "afa914e6cc5be5768a656267790c6347ad39561b93e01169e5315ca777b55ce7"
+  },
+  {
+    "file": "ar-tablet-midnight.png",
+    "description": "Arabic Midnight / Glass, 834 × 1112",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-symm-7c2c5-n-ar-midnight-cross-browser-desktop-chromium/completion-ar-midnight-834-1x.png",
+    "sha256": "7ac0e1d9ccc9e666c5a4addff77efde1135017611cbcbdbe0a520e0e23c13829"
+  },
+  {
+    "file": "en-desktop-midnight.png",
+    "description": "English Midnight / Glass, 1440 × 1000",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-symm-24a1c-n-en-midnight-cross-browser-desktop-chromium/completion-en-midnight-1440-1x.png",
+    "sha256": "61146a123957b1100f66f9d9da984b6b9cb2ff9292b078612f6c250396718a51"
+  },
+  {
+    "file": "ar-narrow-phone.png",
+    "description": "Arabic 320 × 700 at ordinary text; all actions fit without page scrolling",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-symm-7c2c5-n-ar-midnight-cross-browser-desktop-chromium/completion-ar-midnight-320-1x.png",
+    "sha256": "be7cc42b382ad7b6bace4d3af006bb2ba29c725edd4750f4d956046b1d327791"
+  },
+  {
+    "file": "ar-200-percent-top.png",
+    "description": "Arabic 320 × 700 at verified 200% text; top of the intrinsic scroll recovery",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-toolbar-cross-browser/completion-reflection-symm-7c2c5-n-ar-midnight-cross-browser-desktop-chromium/completion-ar-midnight-320-2x.png",
+    "sha256": "b683d76669f91f26bddfe8829b977a0ca35b175bd73b39d63b3ef992df7b2d6f"
+  },
+  {
+    "file": "ar-core-routine.png",
+    "description": "Arabic Light / solid, 390 × 844; abbreviated routine with primary Continue and visible Home",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-density-modal/completion-reflection-abbr-78a7c-me-visible-ar-cross-browser-desktop-chromium/completion-ar-core-phone.png",
+    "sha256": "e82929ff170b19abdf8d6f3050de11e553eaa5d5f521d7857c5fe70a4fec9912"
+  },
+  {
+    "file": "ar-offline-new-session.png",
+    "description": "Arabic 390 × 844; real local-origin outage completion with Done, Share, details and restart",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-density-modal/session-completion-first-f-90574-summary-in-ar-cross-browser-desktop-chromium/completion-ar-offline-restart.png",
+    "sha256": "96b9594214f5b3d9a9272a37075d912936425103e06780c3658b01799c27f121"
+  },
+  {
+    "file": "ar-phone-streak.png",
+    "description": "Arabic 390 × 844; synthetic nineteen-day progress fixture",
+    "engine": "Chromium",
+    "source": "output/completion-layout-review/final-density-modal/completion-reflection-comp-96c0f-ng-actions-ar-cross-browser-desktop-chromium/completion-ar-phone-streak-fixture.png",
+    "sha256": "9261cfaa63941fa9189e42144c15e8340e60737a95efbd0b0505e3f72516a0c7"
+  }
+]

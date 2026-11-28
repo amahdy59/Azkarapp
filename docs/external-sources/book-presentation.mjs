@@ -6,6 +6,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { format, resolveConfig } from "prettier";
 import * as AppIcons from "../../src/app/components/icons.ts";
 import { exactNotes } from "./book-content.mjs";
+import bookVisuals from "../learning/visuals/book-visuals.json" with { type: "json" };
+import { publicationDiagram } from "../../scripts/publication-diagrams.mjs";
 
 const css = fs.readFileSync(path.join(import.meta.dirname, "book-presentation.css"), "utf8");
 const icon = (name) =>
@@ -38,7 +40,7 @@ const illustrations = [
     `<svg class="step-art" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${drawing}</svg>`,
 );
 
-export async function enhanceBookDocument({ book, theme, icons, illustrations, notes }) {
+export async function enhanceBookDocument({ book, theme, icons, illustrations, notes, figures = [], diagrams = [] }) {
   const doc = globalThis.document;
   doc.documentElement.setAttribute("data-edition", theme);
   doc.documentElement.setAttribute("data-book", String(book));
@@ -71,7 +73,7 @@ export async function enhanceBookDocument({ book, theme, icons, illustrations, n
   for (const [index, p] of pages.entries()) {
     p.id = `p-${index + 1}`;
     p.dataset.sourcePage = String(index + 1);
-    const cover = index === 0 || (index === pages.length - 1 && book !== 1);
+    const cover = index === 0 || (index === pages.length - 1 && book === 2);
     if (cover) {
       p.classList.add("book-cover");
       for (const e of p.querySelectorAll("[style]")) {
@@ -169,6 +171,34 @@ export async function enhanceBookDocument({ book, theme, icons, illustrations, n
       img.width = img.naturalWidth;
       img.height = img.naturalHeight;
     }
+    for (const figure of figures.filter((item) => item.sourcePage === index + 1)) {
+      const wrapper = doc.createElement("figure");
+      wrapper.className = "book-context-figure";
+      wrapper.dataset.visual = figure.id;
+      const img = doc.createElement("img");
+      img.src = figure.src;
+      img.alt = figure.alt;
+      img.width = 1536;
+      img.height = 1024;
+      img.decoding = "async";
+      const caption = doc.createElement("figcaption");
+      caption.textContent = figure.caption;
+      wrapper.append(img, caption);
+      const container = p.querySelector(".intro-card-luxury,.devotional-body,.devotional-flow");
+      if (!container) throw new Error(`Missing visual placement ${figure.id}`);
+      if (figure.placement === "after-introduction" && container.matches(".intro-card-luxury"))
+        container.after(wrapper);
+      else if (figure.placement === "chapter-opening" && container.querySelector(".chapter-banner"))
+        container.querySelector(".chapter-banner").after(wrapper);
+      else throw new Error(`Unknown visual placement ${figure.id}`);
+    }
+    for (const diagram of diagrams.filter((item) => item.sourcePage === index + 1)) {
+      const template = doc.createElement("template");
+      template.innerHTML = diagram.html;
+      const container = p.querySelector(".devotional-body,.devotional-flow,.content-flow");
+      if (!container) throw new Error(`Missing diagram placement p${index + 1}`);
+      container.append(template.content);
+    }
     // Keep source-page anchors stable even when larger text needs a continuation.
     if (!cover) {
       const body = [...p.children].filter(
@@ -216,7 +246,7 @@ export async function enhanceBookDocument({ book, theme, icons, illustrations, n
   toolbar.innerHTML = `<span class="toolbar-title"></span><a href="#p-${tocPage}">${icons.List}الفهرس</a><a class="pdf-download">${icons.Download}PDF</a><button type="button" data-size="minus" aria-label="تصغير النص">أ−</button><output class="reader-size-value" aria-live="polite" aria-label="حجم النص">100%</output><button type="button" data-size="plus" aria-label="تكبير النص">أ+</button>`;
   toolbar.querySelector(".toolbar-title").textContent = doc.title.split(" — ")[0];
   doc.body.prepend(toolbar);
-  for (const svg of doc.querySelectorAll("svg")) {
+  for (const svg of doc.querySelectorAll("svg:not(.teaching-diagram svg)")) {
     svg.setAttribute("aria-hidden", "true");
     svg.setAttribute("focusable", "false");
   }
@@ -347,7 +377,24 @@ export async function exportBookEdition(page, { html, htmlPath, pdfPath, book, t
         )
       : {};
   const checkedNotes = Object.fromEntries(Object.entries(notes).map(([n, text]) => [n, exactNotes(text, Number(n))]));
-  await page.evaluate(enhanceBookDocument, { book, theme, icons, illustrations, notes: checkedNotes });
+  const figures = bookVisuals.figures
+    .filter((figure) => figure.book === book)
+    .map((figure) => ({
+      ...figure,
+      src: `data:image/webp;base64,${fs.readFileSync(path.join(import.meta.dirname, "../learning/visuals", figure.asset)).toString("base64")}`,
+    }));
+  const diagrams = bookVisuals.diagrams
+    .filter((diagram) => diagram.book === book)
+    .map((diagram) => ({ ...diagram, html: publicationDiagram(diagram) }));
+  await page.evaluate(enhanceBookDocument, {
+    book,
+    theme,
+    icons,
+    illustrations,
+    notes: checkedNotes,
+    figures,
+    diagrams,
+  });
   await page.evaluate((pdfName) => {
     const link = globalThis.document.querySelector(".pdf-download");
     link.href = pdfName;

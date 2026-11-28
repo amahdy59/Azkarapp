@@ -12,7 +12,149 @@
 }
 
 .completion-screen {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-block-size: 0;
+  block-size: 100%;
+  overflow-y: auto;
+  container: completion-screen / size;
   padding-inline: clamp(12px, 5vw, 20px);
+  padding-block: 2rem max(1.5rem, var(--app-safe-area-bottom));
+}
+
+.completion-layout {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-block-size: 100%;
+  margin-block: auto;
+  gap: 1rem;
+}
+
+/* Desktop retains the shared modal's protected surface, Close and viewport
+   bounds. Intrinsic height avoids manufacturing blank space in the card. */
+.completion-screen--dialog {
+  container-type: inline-size;
+  flex: 0 1 auto;
+  block-size: auto;
+  max-block-size: var(--overlay-available-height);
+  padding-block-start: 1rem;
+  border-radius: inherit;
+}
+
+.completion-dialog-toolbar {
+  color: var(--foreground);
+}
+
+/* Longer English wishes stack as a deliberate pair on narrow surfaces;
+   a separator must not be stranded at the end of the first line. */
+@container completion-screen (max-width: 30rem) {
+  .completion-greeting[lang="en"] {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .completion-greeting[lang="en"] .completion-greeting-separator {
+    display: none;
+  }
+}
+
+.completion-screen--dialog .completion-layout {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  max-block-size: none;
+  margin-block: 0;
+}
+
+.completion-screen--dialog .completion-reflection {
+  flex-shrink: 0;
+}
+
+.completion-reflection {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.completion-reflection-body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  flex: 1;
+  min-block-size: 0;
+  padding: 1.25rem 1.25rem 0;
+}
+
+.completion-reflection-heading {
+  padding-block-end: 0.75rem;
+}
+
+.completion-reflection-reading {
+  display: flex;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-control) transparent;
+}
+
+.completion-reflection-reading::-webkit-scrollbar {
+  display: block;
+  width: 4px;
+}
+
+.completion-reflection-reading::-webkit-scrollbar-thumb {
+  background-color: var(--border-control);
+  border-radius: var(--ds-radius-control);
+}
+
+.completion-reflection-quotation {
+  inline-size: 100%;
+  margin-block: 0;
+  padding: 0.75rem 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.completion-reflection-explore {
+  flex-shrink: 0;
+  margin-inline: 1.25rem;
+}
+
+.completion-secondary-action {
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-inline: 0.5rem;
+}
+
+.completion-secondary-actions[data-has-restart="true"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Let text and targets reflow at enlargement or in a very short viewport.
+   Ordinary layouts keep a stable card and all actions in the available shell
+   height. The fallback never clips reviewed content or reduces reading type. */
+@container completion-screen (max-width: 16rem) or (max-height: 34rem) {
+  .completion-layout {
+    block-size: auto;
+    min-block-size: 100%;
+    max-block-size: none;
+    flex-shrink: 0;
+    margin-block: 0;
+    grid-template-rows: auto auto auto;
+    align-content: start;
+    padding-block-end: 0.5rem;
+  }
+
+  .completion-secondary-actions,
+  .completion-secondary-actions[data-has-restart="true"] {
+    grid-template-columns: 1fr;
+  }
+
+  .completion-secondary-action {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
 }
 
 @keyframes completion-check-arrive {
@@ -27,7 +169,37 @@
 }
 
 .completion-check {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--primary) 18%, var(--background)),
+    color-mix(in srgb, var(--primary) 6%, var(--background))
+  );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--primary) 30%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--primary) 6%, transparent);
   animation: completion-check-arrive 440ms var(--motion-ease-enter) both;
+}
+
+.high-contrast .completion-check,
+.reduce-transparency .completion-check {
+  background: var(--background);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .completion-check {
+    background: var(--background);
+    box-shadow: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .completion-check {
+    background: Canvas;
+    color: Highlight;
+    border-color: Highlight;
+    box-shadow: none;
+  }
 }
 
 .completion-reflection-heading::before,
@@ -64,18 +236,6 @@
       box-shadow: none;
     }
   }
-}
-
-.completion-details > summary {
-  list-style: none;
-}
-
-.completion-details > summary::-webkit-details-marker {
-  display: none;
-}
-
-.completion-details[open] .completion-details-chevron {
-  rotate: 90deg;
 }
 
 .completion-screen[data-reduce-motion],

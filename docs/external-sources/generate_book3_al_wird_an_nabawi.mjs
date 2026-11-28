@@ -1,5 +1,7 @@
 import { chromium } from "playwright";
 import { exportBookEdition } from "./book-presentation.mjs";
+import { correctedSourceChapter, correctedSourcePage } from "./book-content.mjs";
+import { wirdContents, wirdChapterStarts, wirdInlineHeading } from "./wird-source-navigation.mjs";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -99,188 +101,38 @@ function buildHtml(theme) {
   const t = THEMES[theme];
   let pagesHtml = "";
 
-  for (const p of pagesData) {
+  for (const original of pagesData) {
+    const p = { ...original, chapter: correctedSourceChapter("al-wird-an-nabawi", original) };
     if (p.page === 1) {
-      // Cover Page
-      pagesHtml += `
-      <div class="page" id="p-1" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
-        <div class="page-frame-outer" style="border-color:${t.gold}; opacity:0.75;"></div>
-        <div class="page-frame-inner" style="border-color:${t.gold}; opacity:0.4;"></div>
-
-        <div style="margin-top:14mm;">
-          <div style="font-family:'IBM Plex Arabic'; font-size:8.5pt; color:${t.gold}; font-weight:700; letter-spacing:1px; margin-bottom:5mm;">
-            بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ
-          </div>
-          <div style="display:inline-block; border-bottom:2px solid ${t.gold}; padding-bottom:3.5mm; margin-bottom:6mm;">
-            <h1 style="font-family:'Amiri Quran'; font-size:29pt; font-weight:700; color:#FFFFFF; margin:0; line-height:1.25;">
-              الْوِرْدُ النَّبَوِيُّ
-            </h1>
-            <div style="font-family:'IBM Plex Arabic'; font-size:12.5pt; color:${t.gold}; font-weight:700; margin-top:2mm;">
-              ( الصَّغِيرُ )
-            </div>
-          </div>
-          <div style="font-family:'IBM Plex Arabic'; font-size:7.8pt; color:#CCCCCC; margin-bottom:12mm;">
-            أَذْكَارُ اليَوْمِ وَاللَّيْلَةِ مِنَ السُّنَّةِ الصَّحِيحَةِ مَعَ بَيَانِ غَرِيبِ الحَدِيثِ
-          </div>
-        </div>
-
-        <div style="background:rgba(255,255,255,0.035); border:1px solid ${t.gold}; border-radius:8px; padding:5.5mm; margin:0 4mm;">
-          <div style="font-family:'IBM Plex Arabic'; font-size:7pt; color:${t.gold}; margin-bottom:2mm;">تَأْلِيفُ:</div>
-          <div style="font-family:'Amiri Quran'; font-size:14pt; font-weight:700; color:#FFFFFF;">د. عَلِيُّ بْنُ عَبْدِ الرَّحْمَنِ العُوَيْشِزْ</div>
-          <div style="font-family:'IBM Plex Arabic'; font-size:6.8pt; color:#AAAAAA; margin-top:2.5mm;">
-            فَهْرَسَةُ مَكْتَبَةِ المَلِكِ فَهْدٍ الوَطَنِيَّةِ • الدَّمَّام
-          </div>
-        </div>
-
-        <div style="margin-bottom:12mm;">
-          <div style="display:inline-block; background:${t.gold}; color:#000000; font-family:'IBM Plex Arabic'; font-size:6.8pt; font-weight:700; padding:1.2mm 4mm; border-radius:20px; margin-bottom:2.5mm;">
-            الطَّبْعَةُ الثَّانِيَةُ ١٤٤٦ هـ — رَدْمَك: 978-603-04-8666-3
-          </div>
-          <div style="font-family:'IBM Plex Arabic'; font-size:6.8pt; color:${t.gold};">
-            يُوَزَّعُ مَجَّانًا وَلَا يُبَاعُ • وَقْفٌ للهِ تَعَالَى
-          </div>
-        </div>
-      </div>
-      `;
+      pagesHtml += `<div class="page" id="p-1" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
+        <div class="page-frame-outer"></div><div class="source-cover">${correctedSourcePage("al-wird-an-nabawi", original)}</div>
+      </div>`;
       continue;
     }
 
-    if (p.page === 2) {
-      // Publication Cataloging & Legal Deposit
-      pagesHtml += `
-      <div class="page" id="p-2" style="background:${t.bg}; color:${t.text};">
-        <div class="page-frame-outer"></div>
-        <div class="page-frame-inner"></div>
-        <div class="page-header">
-          <div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div>
-          <a href="#p-134" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">بَيَانَاتُ النَّشْرِ وَالإِيدَاعِ ↰</a>
-        </div>
-
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:4mm; padding:0 3mm;">
-          <div class="catalog-box" style="background:${t.canvasBg}; border:1px solid ${t.divider}; border-right:3px solid ${t.gold}; border-radius:6px; padding:5mm;">
-            <div style="text-align:center; font-family:'IBM Plex Arabic'; font-size:8.5pt; font-weight:700; color:${t.gold}; margin-bottom:3.5mm;">
-              فِهْرَسَةُ مَكْتَبَةِ المَلِكِ فَهْدٍ الوَطَنِيَّةِ أَثْنَاءَ النَّشْرِ
-            </div>
-            <div style="font-family:'IBM Plex Arabic'; font-size:7.4pt; line-height:1.75; color:${t.text}; text-align:justify;">
-              <strong>العُوَيْشِزْ، عَلِيُّ بْنُ عَبْدِ الرَّحْمَنِ بْنِ عَبْدِ اللهِ</strong><br>
-              الورد النبوي (الصغير) / علي بن عبد الرحمن العويشز. — الدمام، ١٤٤٦ هـ.<br>
-              ١٣٥ ص ؛ ٨ × ١٢ سم.<br>
-              <strong>رقم الإيداع:</strong> ١٤٤٥/١١٤٤٦<br>
-              <strong>ردمك (ISBN):</strong> 978-603-04-8666-3<br>
-              ١- الأدعية والأذكار  أ. العنوان<br>
-              ديوي: ٢١٢,٩٣ — تاريخ الفهرسة: ١٤٤٥ هـ
-            </div>
-          </div>
-
-          <div style="background:${t.canvasBg}; border:1px solid ${t.divider}; border-radius:6px; padding:4mm; text-align:center;">
-            <div style="font-family:'IBM Plex Arabic'; font-size:7.8pt; font-weight:700; color:${t.emerald}; margin-bottom:1.5mm;">
-              حُقُوقُ الطَّبْعِ وَالنَّشْرِ
-            </div>
-            <div style="font-family:'IBM Plex Arabic'; font-size:7.2pt; color:${t.textMuted}; line-height:1.6;">
-              هَذَا الكِتَابُ وَقْفٌ للهِ تَعَالَى، يَحِقُّ لِكُلِّ مُسْلِمٍ طِبَاعَتُهُ وَتَوْزِيعُهُ مَجَّانًا دُونَ تَعْدِيلٍ عَلَى نُصُوصِهِ أَوْ حَذْفِ تَخْرِيجِهِ وَمَعَانِيهِ.
-            </div>
-          </div>
-        </div>
-
-        <div class="page-footer">
-          <span>الورد النبوي (الصغير)</span>
-          <span class="footer-page-pill">— ص ٢ —</span>
-          <span>بيانات النشر</span>
-        </div>
-      </div>
-      `;
+    if ([2, 3, 137].includes(p.page)) {
+      pagesHtml += `<div class="page" id="p-${p.page}" style="background:${t.bg}; color:${t.text};">
+        <div class="page-header"><div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div></div>
+        <div class="devotional-body"><h2 class="chapter-title">${p.chapter}</h2>${correctedSourcePage("al-wird-an-nabawi", original)}</div>
+        <div class="page-footer"><span>الورد النبوي (الصغير)</span><span class="footer-page-pill">— ص ${toArabicNumeral(p.page)} —</span></div>
+      </div>`;
       continue;
     }
 
     if (p.page === 17) {
-      // Chapter 1 Title Splash
-      pagesHtml += `
-      <div class="page" id="p-17" style="background:${t.bg}; color:${t.text};">
-        <div class="page-frame-outer"></div>
-        <div class="page-frame-inner"></div>
-        <div class="page-header">
-          <div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div>
-          <a href="#p-134" class="header-chapter" style="text-decoration:none; color:inherit;" title="انتقل إلى الفهرس">وِرْدُ الصَّبَاحِ وَالْمَسَاءِ ↰</a>
-        </div>
-
-        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-          <div style="width:18mm; height:18mm; border:1.5px solid ${t.gold}; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:5mm; color:${t.gold}; background:${t.goldLight};">
-            ${ICONS.sparkles}
-          </div>
-          <div style="font-family:'IBM Plex Arabic'; font-size:8.5pt; color:${t.gold}; font-weight:700; margin-bottom:2mm;">
-            الفَصْلُ الأَوَّلُ
-          </div>
-          <h2 style="font-family:'Amiri Quran'; font-size:26pt; font-weight:700; color:${t.text}; margin:0 0 4mm 0;">
-            وِرْدُ الصَّبَاحِ وَالمَسَاءِ
-          </h2>
-          <div style="font-family:'IBM Plex Arabic'; font-size:8pt; color:${t.textMuted}; max-width:90mm; line-height:1.7;">
-            أَحَادِيثُ وَأَدْعِيَةُ الصَّبَاحِ وَالمَسَاءِ الصَّحِيحَةُ الثَّابِتَةُ عَنْ رَسُولِ اللهِ ﷺ مَعَ بَيَانِ غَرِيبِهَا
-          </div>
-        </div>
-
-        <div class="page-footer">
-          <span>الورد النبوي (الصغير)</span>
-          <span class="footer-page-pill">— ص ١٧ —</span>
-          <span>ورد الصباح والمساء</span>
-        </div>
-      </div>
-      `;
-      continue;
-    }
-
-    if (p.page === 137) {
-      // Back Cover Page
-      pagesHtml += `
-      <div class="page" id="p-137" style="background:${t.coverBg}; color:${t.coverText}; text-align:center;">
-        <div class="page-frame-outer" style="border-color:${t.gold}; opacity:0.75;"></div>
-        <div class="page-frame-inner" style="border-color:${t.gold}; opacity:0.4;"></div>
-
-        <div style="margin-top:16mm;">
-          <div style="font-family:'IBM Plex Arabic'; font-size:8pt; color:${t.gold}; font-weight:700;">خَاتِمَةُ كِتَابِ «الْوِرْدُ النَّبَوِيُّ (الصَّغِيرُ)»</div>
-          <h2 style="font-family:'Amiri Quran'; font-size:24pt; font-weight:700; color:#FFFFFF; margin:3mm 0;">
-            تَمَّ بِحَمْدِ اللهِ وَتَوْفِيقِهِ
-          </h2>
-          <div style="font-family:'IBM Plex Arabic'; font-size:8pt; color:#CCCCCC; max-width:100mm; margin:0 auto 10mm auto; line-height:1.7;">
-            نَسْأَلُ اللهَ الكَرِيمَ أَنْ يَنْفَعَ بِهِ مُؤَلِّفَهُ وَقَارِئَهُ وَنَاشِرَهُ، وَأَنْ يَجْعَلَنَا جَمِيعًا مِنْ كِثَارِ الذَّاكِرِينَ اللهَ وَالذَّاكِرَاتِ.
-          </div>
-        </div>
-
-        <div style="background:rgba(255,255,255,0.035); border:1px solid ${t.gold}; border-radius:8px; padding:6mm; margin:0 5mm;">
-          <div style="font-family:'IBM Plex Arabic'; font-size:7pt; color:${t.gold}; margin-bottom:1.5mm;">حُقُوقُ الطَّبْعِ وَالنَّشْرِ:</div>
-          <div style="font-family:'IBM Plex Arabic'; font-size:8.5pt; font-weight:700; color:#FFFFFF;">
-            وَقْفٌ للهِ تَعَالَى لِكُلِّ مُسْلِمٍ
-          </div>
-          <div style="font-family:'IBM Plex Arabic'; font-size:7pt; color:#AAAAAA; margin-top:2mm; line-height:1.5;">
-            يُسْمَحُ بِطِبَاعَتِهِ وَنَشْرِهِ وَتَوْزِيعِهِ مَجَّانًا دُونَ تَعْدِيلٍ عَلَى نُصُوصِهِ أَوْ حَذْفِ تَخْرِيجِهِ.<br>
-            الطَّبْعَةُ الثَّانِيَةُ ١٤٤٦ هـ — رَدْمَك: 978-603-04-8666-3
-          </div>
-        </div>
-
-        <div style="margin-bottom:12mm;">
-          <div style="font-family:'Amiri Quran'; font-size:11.5pt; color:${t.gold}; margin-bottom:1.5mm;">
-            «سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلَّا أَنْتَ، أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ»
-          </div>
-          <div style="font-family:'IBM Plex Arabic'; font-size:6.8pt; color:#888888;">
-            فِهْرَسَةُ مَكْتَبَةِ المَلِكِ فَهْدٍ الوَطَنِيَّةِ • إِيدَاع: ١٤٤٥/١١٤٤٦
-          </div>
-        </div>
-      </div>
-      `;
+      // Original PDF p17 is a blank divider; retain its reading identity.
+      pagesHtml += `<div class="page" id="p-17" style="background:${t.bg}; color:${t.text};">
+        <div class="page-header"><div class="header-book-title">${ICONS.bookOpen}<span>الورد النبوي (الصغير)</span></div></div>
+        <div class="devotional-body"><h2 class="chapter-title">صفحة فاصلة</h2><aside class="source-note">هذه الصفحة فاصلة بيضاء في الأصل.</aside></div>
+        <div class="page-footer"><span>الورد النبوي (الصغير)</span><span class="footer-page-pill">— ص ١٧ —</span></div>
+      </div>`;
       continue;
     }
 
     // Dedicated Table of Contents rendering (Pages 134, 135, 136)
     if (p.page >= 134 && p.page <= 136) {
       const partNumber = p.page === 134 ? "الأَوَّلُ" : p.page === 135 ? "الثَّانِي" : "الثَّالِثُ";
-      const tocItems = (p.lines || [])
-        .map((line) => {
-          const match = line.match(/^(\d+)\s*\.{3,}\s*(.+)$/);
-          if (match) {
-            return { pageNum: parseInt(match[1], 10), title: match[2].trim() };
-          }
-          return null;
-        })
-        .filter(Boolean);
+      const tocItems = wirdContents.filter((item) => item.contentsPdfPage === p.page);
 
       pagesHtml += `
       <div class="page" id="p-${p.page}" style="background:${t.bg}; color:${t.text};">
@@ -302,10 +154,10 @@ function buildHtml(theme) {
             ${tocItems
               .map(
                 (item) => `
-            <a href="#p-${item.pageNum}" class="toc-item">
+            <a href="#p-${item.pdfPage}" class="toc-item">
               <span class="toc-item-title">${item.title}</span>
               <span class="toc-item-dots"></span>
-              <span class="toc-item-page">${toArabicNumeral(item.pageNum)}</span>
+              <span class="toc-item-page">${toArabicNumeral(item.pdfPage)}</span>
             </a>
             `,
               )
@@ -324,18 +176,23 @@ function buildHtml(theme) {
     }
 
     // Normal Devotional Content Pages
-    const isChapterStart = [
-      3, 17, 33, 45, 49, 50, 51, 52, 53, 54, 56, 59, 60, 62, 67, 75, 76, 79, 81, 83, 85, 87, 92, 94, 97, 99, 101, 103,
-      105, 106, 107, 108, 109, 112, 114, 116, 117, 119, 122, 124, 126, 127, 130, 133,
-    ].includes(p.page);
+    const inlineHeading = wirdInlineHeading(p.page);
+    const isChapterStart = wirdChapterStarts.has(p.page) && !inlineHeading;
 
     // Clean and group lines
     const cleanedLines = (p.lines || []).map(cleanWirdLine).filter((l) => l && l !== p.chapter);
+    const correctedHtml = correctedSourcePage("al-wird-an-nabawi", original);
     let fullText = cleanedLines.join(" ").trim();
     fullText = fullText
       .replace(/^\s*[.،]?\s*[»«]\s*/, "")
       .replace(/[ \t]{2,}/g, " ")
       .trim();
+    let readingHtml = correctedHtml || formatHadithContent(fullText, t);
+    if (inlineHeading?.headingPlacement.beforeLine !== undefined && !correctedHtml) {
+      const boundary = inlineHeading.headingPlacement.beforeLine;
+      const part = (lines) => formatHadithContent(lines.map(cleanWirdLine).filter(Boolean).join(" "), t);
+      readingHtml = `<p class="body-text">${part(original.lines.slice(0, boundary))}</p><h3 class="section-title">${inlineHeading.title}</h3><p class="body-text">${part(original.lines.slice(boundary))}</p>`;
+    }
     const totalChars = fullText.length + (p.vocab || []).join(" ").length;
     let densityClass = p.page === 11 ? "density-roomy" : "density-normal";
     if (p.page !== 11) {
@@ -368,10 +225,10 @@ function buildHtml(theme) {
             : ""
         }
 
-<div class="hadith-flow"><div class="hadith-card"><div class="hadith-text">${formatHadithContent(fullText, t)}</div></div></div>
+<div class="hadith-flow"><div class="hadith-card"><div class="hadith-text">${readingHtml}</div></div></div>
 
         ${
-          p.vocab && p.vocab.length > 0
+          !correctedHtml && p.vocab && p.vocab.length > 0
             ? `
         <div class="vocab-panel">
           <div class="vocab-title">${ICONS.bulb}<span>بَيَانُ غَرِيبِ الحَدِيثِ وَالمَعَانِي:</span></div>

@@ -1,8 +1,25 @@
 .quran-enlarged-dialog {
-  height: min(56rem, calc(100dvh - 24px));
-  max-height: calc(100dvh - 24px);
   gap: 0;
   padding: 0;
+  overflow-y: auto;
+}
+/* The hidden full-text measure provides intrinsic height for short readings.
+   Long readings remain portioned inside the available dialog work area. */
+.quran-enlarged-dialog .quran-enlarged-viewport {
+  flex: 0 1 auto;
+  min-block-size: 6rem;
+  max-block-size: min(32rem, 55dvh);
+}
+.quran-enlarged-dialog .quran-enlarged-measure {
+  position: relative;
+}
+.quran-enlarged-dialog .quran-enlarged-text {
+  position: absolute;
+  inset: 0;
+}
+.quran-enlarged-dialog .quran-enlarged-heading {
+  flex-shrink: 0;
+  min-block-size: 72px;
 }
 .quran-enlarged-heading {
   padding: 16px;
@@ -46,55 +63,126 @@
   white-space: pre;
   max-width: none;
 }
-.quran-enlarged-controls {
-  flex-shrink: 0;
-  border-top: 1px solid var(--border);
-  padding: 12px 16px max(12px, env(safe-area-inset-bottom));
-  display: grid;
-  gap: 8px;
-}
-.quran-size-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-.quran-portion-navigation {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
+.quran-enlarged-dialog [data-slot="button"] {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  height: auto;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .quran-zoom-trigger {
   min-height: 44px;
 }
-@media (max-width: 599px) {
-  .quran-enlarged-dialog {
-    inset: 0 !important;
-    width: 100% !important;
-    max-width: none !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    max-block-size: 100dvh !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    transform: none !important;
-    translate: none !important;
-    padding-top: env(safe-area-inset-top);
+.quran-zoom-trigger.mushaf-chrome-action {
+  height: auto;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.quran-zoom-trigger.mushaf-chrome-action > .mushaf-furniture-pill {
+  gap: 6px;
+}
+.mushaf-control-band--bottom {
+  container: mushaf-footer / inline-size;
+}
+/* Retain an unambiguous expansion glyph and full accessible name where
+   extreme text enlargement leaves no room for an additional visible label. */
+@container mushaf-footer (max-width: 16rem) {
+  .quran-zoom-label {
+    display: none;
   }
+}
+@media (max-width: 359px) {
+  .mushaf-reader-viewer[data-phone-controls="true"] .mushaf-control-band--bottom button {
+    /* At 200% text, remove only the transparent outer inset. The existing
+       capsule, enlarged labels and minimum 44px targets keep their sizes. */
+    padding-inline: 0;
+  }
+}
+.quran-zoom-trigger[aria-pressed="true"] > .mushaf-furniture-pill {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+.quran-enlarged-inline {
+  position: absolute;
+  inset: 0;
+  z-index: 31;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-gutter: stable;
+  background: var(--mushaf-paper, var(--background));
+  background-image: var(--paper-grain, none);
+  color: var(--mushaf-ink, var(--foreground));
+  container: quran-zoom / inline-size;
+  outline-offset: -3px;
+}
+.quran-inline-text {
+  padding: 8px 16px 24px;
+  max-inline-size: 44rem;
+  margin-inline: auto;
+  text-align: start;
+}
+.quran-inline-text [data-zoom-word] {
+  display: inline-block;
+  white-space: pre;
+}
+.mushaf-reader-viewer[data-reading-enlarged="true"] {
+  display: flex;
+  flex-direction: column;
+}
+.mushaf-reader-viewer[data-reading-enlarged="true"] > .mushaf-paper {
+  min-block-size: 0;
+}
+.quran-zoom-header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding: 4px 12px;
+  padding-block-start: max(var(--chrome-edge-space), var(--mushaf-safe-top, var(--app-safe-area-top)));
+  min-block-size: 56px;
+  inline-size: 100%;
+  max-inline-size: 46rem;
+  margin-inline: auto;
+}
+.app-shell[data-native-android="true"] .quran-zoom-header {
+  padding-block-start: var(--chrome-edge-space);
+}
+.quran-zoom-header button {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  block-size: auto;
+  border-radius: 999px;
+}
+.quran-page-view {
+  white-space: normal;
+  flex-shrink: 1;
+}
+.quran-header-size {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.quran-header-size output {
+  min-inline-size: 4.5ch;
+  text-align: center;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+.quran-enlarged-inline:focus-visible {
+  outline: 2px solid var(--ring);
 }
 @media (max-height: 400px) {
   .quran-enlarged-heading {
     padding-block: 4px;
-  }
-  .quran-enlarged-heading > p:last-child {
-    display: none;
-  }
-  .quran-enlarged-controls {
-    grid-template-columns: 1fr 1fr;
-    padding-block: 4px;
-  }
-  .quran-enlarged-controls > button:last-child {
-    grid-column: 1 / -1;
   }
 }

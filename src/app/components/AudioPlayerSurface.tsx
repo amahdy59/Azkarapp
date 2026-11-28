@@ -53,7 +53,11 @@ export function AudioPlayerSurface({
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || document.querySelector('[role="listbox"], [role="menu"], [role="dialog"]')) return;
+      if (
+        event.key !== "Escape" ||
+        document.querySelector('[role="listbox"], [role="menu"], [role="dialog"], .audio-options-sidebar')
+      )
+        return;
       event.preventDefault();
       event.stopImmediatePropagation();
       collapseRef.current();

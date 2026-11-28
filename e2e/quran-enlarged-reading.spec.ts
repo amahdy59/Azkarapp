@@ -8,7 +8,7 @@ for (const scenario of [
   { width: 834, height: 1112, scale: 1, language: "en", theme: "midnight" },
   { width: 1440, height: 900, scale: 1, language: "en", theme: "light" },
 ] as const) {
-  test(`enlarged Quran fits portions and returns to the unchanged Mushaf ${scenario.width}/${scenario.scale} @cross-browser`, async ({
+  test(`continuous Quran zoom has one header and returns at 100% ${scenario.width}/${scenario.scale} @cross-browser`, async ({
     page,
   }, info) => {
     await page.setViewportSize(scenario);
@@ -20,6 +20,7 @@ for (const scenario of [
           settings: {
             language: scenario.language,
             themeMode: scenario.theme,
+            mushafTheme: scenario.theme,
             reduceMotion: true,
             mushafLayout: "single",
           },
@@ -34,84 +35,109 @@ for (const scenario of [
       await document.fonts.ready;
     });
     const original = await paper.locator("[data-mushaf-line-content]").allTextContents();
+    const data = (await (await page.request.get("/data/mushaf/42.json")).json()) as {
+      k: string;
+      w: [number, number, number, string, string][];
+    }[];
+    const expected = data.flatMap((verse) => verse.w.map((word) => `${verse.k}:${word[0]}`));
     const trigger = page.getByRole("button", { name: t(scenario.language, "quranZoom.open"), exact: true });
     await trigger.click();
-    const modal = page.getByTestId("quran-enlarged-reading");
-    const text = modal.getByTestId("quran-enlarged-text");
-    await expect(text).toBeVisible();
-    if (scenario.width < 600) {
-      const frame = (await modal.boundingBox())!;
-      expect(frame.x).toBeCloseTo(0, 0);
-      expect(frame.y).toBeCloseTo(0, 0);
-      expect(frame.width).toBeCloseTo(scenario.width, 0);
-      expect(frame.height).toBeCloseTo(scenario.height, 0);
-    }
+    const region = page.getByTestId("quran-enlarged-reading");
+    const header = page.getByTestId("quran-zoom-header");
+    const text = region.getByTestId("quran-enlarged-text");
+    await expect(region).toBeFocused();
+    await expect(header).toHaveCount(1);
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.locator(".mushaf-control-band--top")).toHaveCount(0);
+    await expect(page.getByTestId("enlarged-reading-toolbar")).toHaveCount(0);
+    await expect(page.locator(".quran-portion-navigation")).toHaveCount(0);
+    await expect(page.locator(".mushaf-control-band--bottom button")).toHaveCount(1);
+    await expect(trigger).toHaveCount(0);
     await page.evaluate((scale) => {
       document.documentElement.style.fontSize = `${scale * 100}%`;
     }, scenario.scale);
-    await modal.getByRole("button", { name: t(scenario.language, "quranZoom.larger") }).click();
-    await expect(text).toBeVisible();
-    const close = (await modal.getByTestId("modal-close-button").boundingBox())!;
-    expect(close.width).toBe(48);
-    expect(close.height).toBe(48);
-    for (const block of await modal.locator(".quran-enlarged-heading > *").all()) {
-      const box = (await block.boundingBox())!;
-      if (scenario.language === "ar") expect(box.x).toBeGreaterThanOrEqual(close.x + close.width + 4);
-      else expect(box.x + box.width).toBeLessThanOrEqual(close.x - 4);
-    }
-    const contextHeight = (await modal.locator(".quran-portion-context").boundingBox())!.height;
-    const expected = await modal
-      .locator(".quran-enlarged-measure [data-zoom-word]")
-      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-zoom-word")));
-    const seen: (string | null)[] = [];
-    const next = modal.getByRole("button", { name: t(scenario.language, "common.next"), exact: true });
-    for (let portion = 0; portion <= expected.length; portion += 1) {
-      await expect(text).toBeVisible();
-      await expect(text).toHaveAttribute("data-layout-ready", "true");
-      expect((await modal.locator(".quran-portion-context").boundingBox())!.height).toBeCloseTo(contextHeight, 0);
-      seen.push(
-        ...(await text
-          .locator("[data-zoom-word]")
-          .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-zoom-word")))),
-      );
-      const bounds = await text.evaluate((node) => {
-        const frame = node.parentElement!.getBoundingClientRect(),
-          text = node.getBoundingClientRect();
-        const boxes = [...node.querySelectorAll("[data-zoom-word]")].map((word) => word.getBoundingClientRect());
-        return {
-          overflow: node.scrollWidth - node.clientWidth,
-          bottom: text.bottom - frame.bottom,
-          top: frame.top - text.top,
-          ink: boxes.every(
-            (box) =>
-              box.left >= frame.left - 1 &&
-              box.right <= frame.right + 1 &&
-              box.bottom <= frame.bottom + 1 &&
-              box.top >= frame.top - 1,
-          ),
-        };
-      });
-      expect(bounds, JSON.stringify(bounds)).toMatchObject({ ink: true });
-      expect(bounds.overflow).toBeLessThanOrEqual(1);
-      expect(bounds.bottom).toBeLessThanOrEqual(1);
-      expect(bounds.top).toBeLessThanOrEqual(1);
-      if (await next.isDisabled()) break;
-      // Exercise pointer entry and native keyboard continuation. WebKit's
-      // per-click stabilization otherwise dominates large-text word portions.
-      if (portion === 0) await next.click();
-      else await next.press("Enter");
-    }
-    expect(seen).toEqual(expected);
     expect(
-      (await new AxeBuilder({ page }).include('[data-testid="quran-enlarged-reading"]').analyze()).violations,
-    ).toEqual([]);
-    await page.screenshot({ path: info.outputPath(`enlarged-${scenario.width}.png`) });
-    await modal.getByRole("button", { name: t(scenario.language, "quranZoom.returnMushaf") }).click();
-    await expect(modal).toBeHidden();
+      await text
+        .locator("[data-zoom-word]")
+        .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-zoom-word"))),
+    ).toEqual(expected);
+    for (const control of await header.getByRole("button").all()) {
+      const box = (await control.boundingBox())!;
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(scenario.width + 1);
+      const hittable = await control.evaluate((node) => {
+        const r = node.getBoundingClientRect();
+        return node.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+      });
+      expect(hittable).toBe(true);
+    }
+    const area = (await paper.boundingBox())!;
+    const frame = (await region.boundingBox())!;
+    expect(frame.y).toBeGreaterThanOrEqual(area.y - 1);
+    expect(frame.y + frame.height).toBeLessThanOrEqual(area.y + area.height + 1);
+    const geometry = await region.evaluate((node) => {
+      node.scrollTop = node.scrollHeight;
+      const bounds = node.getBoundingClientRect();
+      const words = [...node.querySelectorAll("[data-zoom-word]")];
+      const last = words.at(-1)!.getBoundingClientRect();
+      return {
+        overflow: node.scrollWidth - node.clientWidth,
+        scrolls: node.scrollHeight > node.clientHeight,
+        lastReachable: last.bottom <= bounds.bottom && last.top >= bounds.top,
+        ink: words.every((word) => {
+          const box = word.getBoundingClientRect();
+          return box.left >= bounds.left && box.right <= bounds.right;
+        }),
+      };
+    });
+    expect(geometry).toEqual({ overflow: 0, scrolls: true, lastReachable: true, ink: true });
+    await region.evaluate((node) => {
+      node.scrollTop = node.scrollHeight / 3;
+    });
+    const visibleWord = () =>
+      region.evaluate((node) => {
+        const top = node.getBoundingClientRect().top;
+        return [...node.querySelectorAll("[data-zoom-word]")]
+          .find((word) => word.getBoundingClientRect().bottom > top + 8)
+          ?.getAttribute("data-zoom-word");
+      });
+    const anchor = await visibleWord();
+    await header.getByRole("button", { name: t(scenario.language, "quranZoom.larger"), exact: true }).click();
+    // Reflow may put earlier words on the same line; the anchored passage
+    // must remain visible within the first line, rather than jumping away.
+    await expect
+      .poll(() =>
+        region.evaluate((node, id) => {
+          const word = [...node.querySelectorAll<HTMLElement>("[data-zoom-word]")].find(
+            (word) => word.dataset.zoomWord === id,
+          )!;
+          const box = word.getBoundingClientRect(),
+            frame = node.getBoundingClientRect();
+          return (
+            box.top >= frame.top - 1 &&
+            box.bottom <= frame.top + parseFloat(getComputedStyle(word.parentElement!.parentElement!).lineHeight) + 16
+          );
+        }, anchor),
+      )
+      .toBe(true);
+    await expect(page).toHaveURL(/quran\/42$/);
+    expect((await new AxeBuilder({ page }).include(".mushaf-reader-viewer").analyze()).violations).toEqual([]);
+    await page.screenshot({ path: info.outputPath(`header-zoom-${scenario.width}.png`) });
+    // Page view is the same reset as reducing to 100%.
+    await header.getByRole("button", { name: t(scenario.language, "quranZoom.pageView") }).click();
+    await expect(region).toHaveCount(0);
     await expect(trigger).toBeFocused();
     expect(await paper.locator("[data-mushaf-line-content]").allTextContents()).toEqual(original);
+    await trigger.click();
+    const smaller = header.getByRole("button", { name: t(scenario.language, "quranZoom.smaller"), exact: true });
+    await smaller.click();
+    await smaller.click();
+    await expect(region).toHaveCount(0);
+    await expect(trigger).toBeFocused();
     await expect(paper).toHaveAttribute("data-magnified", "false");
-    await expect(page).toHaveURL(/quran\/42$/);
+    expect(await paper.locator("[data-mushaf-line-content]").allTextContents()).toEqual(original);
   });
 }
 

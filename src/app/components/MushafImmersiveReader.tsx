@@ -913,6 +913,7 @@ export function MushafImmersiveReader({
             inlineIndex={inlineIndex ? indexPanel : undefined}
             inlineIndexOpen={inlineIndex && isIndexOpen}
             bottomLeftControl={isPhone ? phoneFocus : (mobileComplete ?? mobileBookmark)}
+            zoomReplacesFocus={isPhone && !isFocusMode}
             bottomCenterControl={
               isPhone ? (
                 mobileBottomCenter
@@ -947,7 +948,11 @@ export function MushafImmersiveReader({
               setIndexTab("jump");
               setIsIndexOpen(true);
             }}
-            onReadingZoomOpen={playback.pauseFollowing}
+            onReadingZoomOpen={() => {
+              setPageMagnification(100);
+              setIsSettingsOpen(false);
+              playback.pauseFollowing();
+            }}
             onEdgeTap={(edge) => {
               if (edge === "left") paginate(1);
               else paginate(-1);

@@ -48,7 +48,7 @@ html.theme-light:not(.high-contrast)[data-app-material-resolved="solid"] [data-t
 }
 
 .reference-sheet-content {
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  padding-bottom: max(1.5rem, var(--app-safe-area-bottom));
 }
 
 .reference-scroll [data-slot="scroll-area-viewport"] {
@@ -174,7 +174,7 @@ html.theme-light:not(.high-contrast)[data-app-material-resolved="solid"] [data-t
   gap: 1rem;
   width: 100%;
   max-inline-size: 32rem;
-  padding-block: 0.5rem max(1rem, env(safe-area-inset-bottom));
+  padding-block: 0.5rem max(1rem, var(--app-safe-area-bottom));
 }
 
 .reader-surah-heading {

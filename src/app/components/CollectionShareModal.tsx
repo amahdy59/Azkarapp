@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Check, Copy, Download, Share2, Maximize, Minimize, Globe, Translate, SlidersHorizontal } from "./icons";
 import { t } from "../i18n";
-import { FIELD_LABEL_CLASS } from "./FormField";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { QuranVerseText } from "./QuranVerseText";
 import { SharingCaption } from "./SharingCaption";
@@ -624,7 +623,7 @@ export function CollectionShareModal({
       describedById={descriptionId}
       testId="collection-share-modal"
       maxWidthClassName="max-w-5xl"
-      className="sharing-fullscreen sharing-collection-dialog gap-0"
+      className={`sharing-studio-dialog gap-0 ${isCuratedActive ? "sharing-studio-dialog--prepared" : ""}`}
     >
       <div
         ref={surface}
@@ -685,7 +684,7 @@ export function CollectionShareModal({
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <h2 className="text-title font-bold">
+                    <h2 className="text-sm font-bold">
                       {t(language, "shareStudio.previewHeading")}
                       {generating && !isCuratedActive && !reservePreview && <span aria-hidden="true"> …</span>}
                     </h2>
@@ -1049,8 +1048,13 @@ export function CollectionShareModal({
                   </div>
                 )}
                 {currentStep === "share" && isCuratedActive && curatedPack && (
-                  <div className="space-y-3">
-                    <h3 className="font-bold text-sm text-foreground">{t(language, "shareStudio.overview")}</h3>
+                  <details className="sharing-prepared-selection space-y-3">
+                    <summary className="sharing-prepared-summary">
+                      {t(language, "shareStudio.selectedCount", {
+                        count: formatNumerals(selectedCurated.length, language),
+                      })}
+                      <span className="text-muted-foreground">{t(language, "shareStudio.chooseCards")}</span>
+                    </summary>
                     <p className="text-xs text-muted-foreground">{t(language, "shareStudio.curatedHint")}</p>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p role="status">
@@ -1112,7 +1116,7 @@ export function CollectionShareModal({
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </details>
                 )}
                 {currentStep === "share" && !isCuratedActive && total > 1 && (
                   <div>
@@ -1164,7 +1168,7 @@ export function CollectionShareModal({
                   <div className="sharing-content-fields">
                     {presetOptions.length > 1 && (
                       <div className={selectClass}>
-                        <label htmlFor={presetId} className={FIELD_LABEL_CLASS}>
+                        <label htmlFor={presetId} className="sr-only">
                           {t(language, "shareStudio.preset")}
                         </label>
                         <Select
@@ -1182,7 +1186,10 @@ export function CollectionShareModal({
                         >
                           <SelectTrigger id={presetId} className="sharing-select-trigger" aria-haspopup="listbox">
                             <Globe aria-hidden="true" className="size-5" />
-                            <SelectValue />
+                            <span className="sharing-field-value">
+                              <span aria-hidden="true">{t(language, "shareStudio.preset")}</span>
+                              <SelectValue />
+                            </span>
                           </SelectTrigger>
                           <SelectContent className="z-[110]">
                             {[...presetOptions, "custom"].map((value) => (
@@ -1195,7 +1202,7 @@ export function CollectionShareModal({
                       </div>
                     )}
                     <div className={selectClass}>
-                      <label className={FIELD_LABEL_CLASS} id={languageId} htmlFor={`${languageId}-control`}>
+                      <label className="sr-only" id={languageId} htmlFor={`${languageId}-control`}>
                         {t(language, shareItemsByLanguage ? "shareStudio.contentLanguage" : "shareStudio.cardLanguage")}
                       </label>
                       <Select
@@ -1212,7 +1219,15 @@ export function CollectionShareModal({
                           aria-describedby={languageHintId}
                         >
                           <Translate aria-hidden="true" className="size-5" />
-                          <SelectValue />
+                          <span className="sharing-field-value">
+                            <span aria-hidden="true">
+                              {t(
+                                language,
+                                shareItemsByLanguage ? "shareStudio.contentLanguage" : "shareStudio.cardLanguage",
+                              )}
+                            </span>
+                            <SelectValue />
+                          </span>
                         </SelectTrigger>
                         <SelectContent className="z-[110]">
                           <SelectItem value="ar">العربية</SelectItem>
@@ -1433,10 +1448,7 @@ export function CollectionShareModal({
             </DialogPrimitive.Description>
           </div>
         </div>
-        <div
-          data-testid="sharing-actions"
-          className="shrink-0 border-t border-border bg-card p-[12px] pb-[max(12px,env(safe-area-inset-bottom))]"
-        >
+        <div data-testid="sharing-actions" className="shrink-0 border-t border-border bg-card p-[12px]">
           {currentStep !== "share" && (
             <SharingStepNavigation
               steps={steps}

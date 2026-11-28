@@ -16,6 +16,8 @@ export function PrayerCitySearch({
   selectedId,
   inputRef,
   emptyMessage,
+  resultsLabel,
+  searchLabel,
 }: {
   language: AppLanguage;
   query: string;
@@ -25,13 +27,15 @@ export function PrayerCitySearch({
   selectedId?: string;
   inputRef?: Ref<HTMLInputElement>;
   emptyMessage?: string;
+  resultsLabel?: string;
+  searchLabel?: string;
 }) {
   const id = useId();
   return (
     <>
       <div className="prayer-settings-search shrink-0 space-y-2 px-5 py-3">
         <label htmlFor={id} className={FIELD_LABEL_CLASS}>
-          {t(language, "notifications.citySearchLabel")}
+          {searchLabel ?? t(language, "notifications.citySearchLabel")}
         </label>
         <input
           ref={inputRef}
@@ -49,7 +53,7 @@ export function PrayerCitySearch({
       </div>
       <div className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-3" data-vaul-no-drag>
         <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">
-          {t(language, query.trim() ? "notifications.cityResults" : "notifications.popularCities")}
+          {resultsLabel ?? t(language, query.trim() ? "notifications.cityResults" : "notifications.popularCities")}
         </p>
         {results.length ? (
           <ul className="space-y-1">

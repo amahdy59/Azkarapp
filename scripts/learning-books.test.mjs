@@ -70,7 +70,12 @@ describe("published learning assets", () => {
   it("has exact immutable bytes for all text, illustrations and twelve PDFs", async () => {
     expect(catalogue).toHaveLength(4);
     for (const resource of catalogue) {
-      for (const asset of [resource.pack, ...resource.images, ...Object.values(resource.pdfs)]) {
+      for (const asset of [
+        resource.pack,
+        ...(resource.previousPacks ?? []),
+        ...resource.images,
+        ...Object.values(resource.pdfs),
+      ]) {
         const bytes = await fs.readFile(path.join(root, "docs/learning/assets", asset.path));
         expect(bytes.length).toBe(asset.bytes);
         expect(createHash("sha256").update(bytes).digest("hex")).toBe(asset.sha256);

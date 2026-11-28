@@ -176,7 +176,7 @@ test("global top sheets and anchored menus share the protected overlay family @c
   await expect(sheet).toHaveAttribute("data-overlay-surface", "sheet");
   await expect(sheet).toHaveAttribute("data-overlay-origin", "top");
   await expect(sheet).toBeFocused();
-  expect((await sheet.boundingBox())!.y).toBeLessThanOrEqual(1);
+  expect((await sheet.boundingBox())!.y).toBeCloseTo(16, 1);
   await page.keyboard.press("Escape");
   await expect(sheet).toBeHidden();
 });

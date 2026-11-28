@@ -36,7 +36,7 @@
   overflow-wrap: anywhere;
 }
 .bilingual-reader-footer {
-  padding-block-end: max(0.5rem, env(safe-area-inset-bottom));
+  padding-block-end: max(0.5rem, var(--app-safe-area-bottom));
 }
 /* A single ordered verse sequence preserves reading/keyboard order at every
    width. Arabic remains primary; long translations grow without clipping. */

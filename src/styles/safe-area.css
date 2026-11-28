@@ -1,0 +1,10 @@
+/* Capacitor supplies CSS values where Android WebView's env() is unreliable.
+   A supplied zero is intentional: older WebViews are inset by the native host.
+   Browsers/PWAs retain their own environment values. Consume each edge once
+   in its existing shell, navigation, immersive host or portalled surface. */
+:root {
+  --app-safe-area-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --app-safe-area-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  --app-safe-area-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --app-safe-area-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+}

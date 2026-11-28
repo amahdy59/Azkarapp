@@ -1,0 +1,110 @@
+.mushaf-reading-settings {
+  container: reading-settings / inline-size;
+}
+.mushaf-settings-body > section + section,
+.mushaf-advanced-display {
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 12px;
+}
+.mushaf-follow-app {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-block-size: 44px;
+  text-align: start;
+  border-radius: var(--ds-radius-control);
+}
+.mushaf-color-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.mushaf-color-option {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding: 4px 2px;
+  border-radius: var(--ds-radius-control);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.mushaf-color-preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  inline-size: min(100%, 4rem);
+  block-size: 3.5rem;
+  border: 1px solid;
+  border-radius: var(--ds-radius-control);
+}
+.mushaf-color-preview > span:not(.mushaf-color-check) {
+  inline-size: 62%;
+  block-size: 3px;
+  border-radius: 2px;
+}
+.mushaf-color-preview > span:nth-child(2) {
+  inline-size: 48%;
+}
+.mushaf-color-option[aria-checked="true"] .mushaf-color-preview {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.mushaf-color-check {
+  position: absolute;
+  inset-block-start: -5px;
+  inset-inline-end: -5px;
+  display: grid;
+  place-items: center;
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.mushaf-color-option:hover .mushaf-color-preview {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.mushaf-follow-app:focus-visible,
+.mushaf-color-option:focus-visible,
+.mushaf-advanced-display > summary:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+.mushaf-advanced-display > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-block-size: 44px;
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.mushaf-advanced-display > summary::-webkit-details-marker {
+  display: none;
+}
+.mushaf-advanced-display[open] > summary svg {
+  transform: rotate(180deg);
+}
+@container reading-settings (max-width: 19rem) {
+  .mushaf-color-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (forced-colors: active) {
+  .mushaf-color-option[aria-checked="true"] .mushaf-color-preview {
+    outline-color: Highlight;
+  }
+  .mushaf-color-check {
+    background: Highlight;
+    color: HighlightText;
+  }
+}

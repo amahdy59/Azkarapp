@@ -6,7 +6,7 @@
   "author": "Compiled by Abu Muhammad Yusuf ibn Zabn Allah al-Utayr",
   "sourceFolder": "book2_dalil_al_mutamir",
   "sourceFile": "dalil_al_mutamir",
-  "sourceSha256": "f14da4e59bbf39f725dedaeccd8885da2be22ef750c18fa55238d644a07c36ad",
+  "sourceSha256": "42b65883e929bae266e80b93312120bbd21c5943c3326acb4a40ffb27007fed9",
   "scope": "Complete translation draft of the existing 16-source-page Arabic digital adaptation. This is not a translation of all 138 pages of its earlier source publication.",
   "pages": [
     {
@@ -729,5 +729,9 @@
     "coverAuthorBlock": 3,
     "aboutCoverBlocks": [4, 5],
     "draftLabel": "English review draft · 16-page adaptation. Independent review pending."
+  },
+  "sourceGraphicCheckpoint": {
+    "previousSourceSha256": "c3df3b02945854441b54b559d715fbb8d83af7552d5860441ff1bf5bbb368b45",
+    "reason": "Visible equivalent descriptions added beside the two source-bound Arabic route schematics; their SVGs remain exposed to assistive technology. Original religious wording, source unit IDs, English wording, and Quran binding selectors remain unchanged. This is a draft of the 16-unit adaptation, not the full original."
   }
 }

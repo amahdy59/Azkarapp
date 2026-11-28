@@ -70,6 +70,8 @@ describe("MushafSettingsSheet", () => {
     fireEvent.click(screen.getByTestId("mushaf-theme-option-light"));
     expect(onSelectTheme).toHaveBeenCalledWith("light");
 
+    fireEvent.click(screen.getByText("العرض المتقدم"));
+
     // Layout options (visible when autoSpreadRoom is true)
     expect(screen.getByTestId("mushaf-layout-option-auto")).toHaveAttribute("aria-checked", "true");
     expect(screen.getByText(/يعرض صفحتين متجاورتين على الشاشات العريضة/)).toBeInTheDocument();
@@ -133,12 +135,14 @@ describe("MushafSettingsSheet reading choices", () => {
     return props;
   }
 
-  it("focuses on page magnification as the primary sizing control and omits text size segmented control", () => {
+  it("discloses original-page magnification only in Advanced display", () => {
     const onSelectMagnification = vi.fn();
     renderSheet({ onSelectMagnification, magnification: 125 });
 
     expect(screen.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
-    expect(screen.getByRole("slider", { name: "تكبير الصفحة" })).toHaveValue("125");
+    expect(screen.getByText("العرض المتقدم").closest("details")).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("العرض المتقدم"));
+    expect(screen.getByRole("slider", { name: "تكبير الصفحة الأصلية" })).toHaveValue("125");
   });
 
   it("offers the toolbar edge only where a rail is actually shown", () => {
@@ -150,14 +154,21 @@ describe("MushafSettingsSheet reading choices", () => {
     const onSelectToolbarSide = vi.fn();
     renderSheet({ onSelectToolbarSide, showToolbarSide: true });
 
+    fireEvent.click(screen.getByText("العرض المتقدم"));
     expect(screen.getByTestId("mushaf-toolbar-side-option-right")).toHaveAttribute("aria-checked", "true");
     fireEvent.click(screen.getByTestId("mushaf-toolbar-side-option-left"));
     expect(onSelectToolbarSide).toHaveBeenCalledWith("left");
   });
 
-  it("shows app theme badge on the theme matching appTheme", () => {
-    renderSheet({ appTheme: "midnight" });
-    expect(screen.getByText("سمة التطبيق")).toBeInTheDocument();
+  it("exposes following app appearance as an explicit reversible choice", () => {
+    const props = renderSheet({ appTheme: "midnight", theme: "follow-app" });
+    const follow = screen.getByRole("switch", { name: /اتباع نمط التطبيق/ });
+    expect(follow).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(follow);
+    expect(props.onSelectTheme).toHaveBeenCalledWith("midnight");
+    expect(screen.getByTestId("mushaf-theme-option-midnight")).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(screen.getByTestId("mushaf-theme-option-midnight"), { key: "ArrowLeft" });
+    expect(props.onSelectTheme).toHaveBeenLastCalledWith("light");
   });
 
   it("lists the page keys only where there is a keyboard using them", () => {
@@ -202,7 +213,8 @@ describe("MushafSettingsSheet docked panel", () => {
 
   it("keeps every reading control it has as a sheet, and still names itself", () => {
     renderPanel({ onSelectMagnification: vi.fn() });
-    expect(screen.getByRole("slider", { name: "تكبير الصفحة" })).toBeInTheDocument();
+    fireEvent.click(screen.getByText("العرض المتقدم"));
+    expect(screen.getByRole("slider", { name: "تكبير الصفحة الأصلية" })).toBeInTheDocument();
     expect(screen.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
     expect(screen.getByTestId("mushaf-theme-option-midnight")).toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: "إعدادات القراءة" })).toBeInTheDocument();
